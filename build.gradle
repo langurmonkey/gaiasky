@@ -20,9 +20,8 @@ allprojects {
         slf4jVersion = "2.0.+"
         sparkjavaVersion = "2.9.+"
         jafamaVersion = "2.3.+"
-        compressVersion = "1.21"
+        compressVersion = "1.23.0"
         commonsioVersion = "2.+"
-        commonsimagingVersion = "+"
         commonsmathVersion = "3.+"
         py4jVersion = "0.10.9.+"
         oshiVersion = "5.8.+"
@@ -152,8 +151,6 @@ project(":core") {
         api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         // System information
         api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
-        // Screenshots and frames
-        api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
         // Interpolators
         api group: "org.apache.commons", name: "commons-math3", version: "$commonsmathVersion"
         // Yaml

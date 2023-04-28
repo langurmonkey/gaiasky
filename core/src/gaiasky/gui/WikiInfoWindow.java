@@ -33,6 +33,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -192,7 +194,7 @@ public class WikiInfoWindow extends GenericDialog {
                     String thumbUrl = thumb.getString("source");
                     Path imageFile;
                     try {
-                        URL turl = new URL(thumbUrl);
+                        URL turl = (new URI(thumbUrl)).toURL();
                         String filename = FilenameUtils.getName(turl.getPath());
                         Path cacheDir = SysUtils.getCacheDir();
 
@@ -254,7 +256,7 @@ public class WikiInfoWindow extends GenericDialog {
                             // Image already in local cache
                             buildImage(imageFile);
                         }
-                    } catch (MalformedURLException e) {
+                    } catch (MalformedURLException | URISyntaxException e) {
                         logger.error("Error parsing thumbnail URL!");
                         logger.error(e);
                         return;

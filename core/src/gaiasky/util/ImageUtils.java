@@ -7,21 +7,20 @@
 
 package gaiasky.util;
 
-import org.apache.commons.imaging.*;
-import org.apache.commons.imaging.ImageInfo.ColorType;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Locale;
 
+/**
+ * Contains utilities to convert monochrome images to RGB.
+ */
 public class ImageUtils {
 
-    public static boolean isMonochrome(final File file) throws IOException, ImageReadException {
-        final ImageInfo imageInfo = Imaging.getImageInfo(file);
-        return imageInfo.getColorType() == ColorType.GRAYSCALE;
+    public static boolean isMonochrome(final BufferedImage image) {
+        return image.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_GRAY;
     }
 
     /**
@@ -31,23 +30,13 @@ public class ImageUtils {
      *
      * @return A boolean indicating whether the conversion was carried out (i.e. the image was actually monochrome)
      */
-    public static boolean monochromeToRGB(final File file) throws IOException, ImageReadException, ImageWriteException {
-        final ImageInfo imageInfo = Imaging.getImageInfo(file);
-        if (imageInfo.getColorType() == ColorType.GRAYSCALE) {
-
-            final BufferedImage monochrome = ImageIO.read(file);
+    public static boolean monochromeToRGB(final File file) throws IOException {
+        final BufferedImage monochrome = ImageIO.read(file);
+        if (isMonochrome(monochrome)) {
             BufferedImage rgb = monochromeToRGB(monochrome);
 
             String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1);
-            ImageFormat imageFormat;
-            try {
-                imageFormat = ImageFormats.valueOf(extension.toUpperCase(Locale.ROOT));
-            } catch (Exception e) {
-                // Default
-                imageFormat = ImageFormats.PNG;
-            }
-
-            Imaging.writeImage(rgb, file, imageFormat);
+            ImageIO.write(rgb, extension, file);
             return true;
         } else {
             return false;
