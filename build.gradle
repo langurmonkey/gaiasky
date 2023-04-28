@@ -150,8 +150,6 @@ project(":core") {
         api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         // System information
         api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
-        // Interpolators
-        api group: "org.apache.commons", name: "commons-math3", version: "$commonsmathVersion"
         // Yaml
         api group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
         api group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"

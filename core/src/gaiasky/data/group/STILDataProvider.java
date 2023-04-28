@@ -22,6 +22,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.LinearInterpolator;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
@@ -32,9 +33,6 @@ import gaiasky.util.units.Position;
 import gaiasky.util.units.Position.PositionType;
 import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
-import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
-import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
@@ -414,8 +412,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     double tn = variTimes[variTimes.length - 1];
                                     double tStep = (tn - t0) / (nVari - 1);
 
-                                    UnivariateInterpolator interp = new LinearInterpolator();
-                                    UnivariateFunction f = interp.interpolate(variTimes, variMagsDouble);
+                                    var linearInterpolator = new LinearInterpolator(variTimes, variMagsDouble);
 
                                     variMagsDouble = new double[nVari];
                                     variTimes = new double[nVari];
@@ -423,7 +420,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     for (idx = 0; idx < nVari; idx++) {
                                         double t = t0 + tStep * idx;
                                         variTimes[idx] = t;
-                                        variMagsDouble[idx] = f.value(t);
+                                        variMagsDouble[idx] = linearInterpolator.value(t);
                                     }
                                     resampledLightCurves++;
                                 }
