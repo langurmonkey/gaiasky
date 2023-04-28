@@ -211,7 +211,7 @@ scene:
     # TRIANGLES is the new mode. Triangles are sent to the GPU in VBOs with VAOs. Faster on newer hardware and geometrically correct.
     # TRIANGLES_INSTANCED is a variation of TRIANGLES. Saves x4 graphics memory. Your mileage may vary with this one.
     # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes.
-    pointCloud: POINTS
+    pointCloud: TRIANGLES_INSTANCED
     # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP].
     line: GL_LINES
     # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO].

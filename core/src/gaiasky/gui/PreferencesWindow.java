@@ -2316,13 +2316,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, 0.0);
         }
 
-        boolean restartDialog = false;
-        if (!settings.runtime.openXr) {
-            // Point cloud renderer
-            PointCloudMode newPointCloudMode = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
-            restartDialog = newPointCloudMode != settings.scene.renderer.pointCloud;
-            settings.scene.renderer.pointCloud = newPointCloudMode;
-        }
+        // Point cloud renderer
+        PointCloudMode newPointCloudMode = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
+        boolean restartDialog = newPointCloudMode != settings.scene.renderer.pointCloud;
+        settings.scene.renderer.pointCloud = newPointCloudMode;
+
         restartDialog = restartDialog || Settings.settings.data.realGaiaAttitude != real.isChecked();
 
         // Line renderer

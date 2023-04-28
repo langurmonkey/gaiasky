@@ -210,7 +210,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         /*
          * ======= INITIALIZE RENDER SYSTEMS =======
          */
-        final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
+        final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
+        final PointCloudMode pointCloudModeParticles = isVR() ? PointCloudMode.POINTS : Settings.settings.scene.renderer.pointCloud;
 
         // SINGLE STAR POINTS
         AbstractRenderSystem singlePointProc = new SingleStarQuadRenderer(this, POINT_STAR, alphas, renderAssets.starGroupShaders, ComponentType.Stars);
@@ -288,7 +289,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem billboardSetProc = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
 
         // PARTICLE GROUP
-        AbstractRenderSystem particleGroupProc = switch (pcm) {
+        AbstractRenderSystem particleGroupProc = switch (pointCloudModeParticles) {
             case TRIANGLES -> new ParticleSetRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
             case TRIANGLES_INSTANCED -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
             case POINTS -> new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
@@ -297,7 +298,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP
-        AbstractRenderSystem starGroupProc = switch (pcm) {
+        AbstractRenderSystem starGroupProc = switch (pointCloudMode) {
             case TRIANGLES -> new StarSetRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
             case TRIANGLES_INSTANCED -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
             case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
@@ -306,7 +307,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // VARIABLE GROUP
-        AbstractRenderSystem variableGroupProc = switch (pcm) {
+        AbstractRenderSystem variableGroupProc = switch (pointCloudMode) {
             case TRIANGLES -> new VariableSetRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
             case TRIANGLES_INSTANCED -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
             case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
@@ -625,6 +626,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     public boolean isOn(int ordinal) {
         return visible.get(ordinal) || alphas[ordinal] > 0;
+    }
+
+    public boolean isVR() {
+        return xrDriver != null;
     }
 
     @Override
