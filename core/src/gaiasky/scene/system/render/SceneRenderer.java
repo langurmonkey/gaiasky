@@ -507,7 +507,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             // Light glow pass.
             // In stereo/cubemap and VR modes, the glow pass is rendered in the SGR itself.
-            if (!Settings.settings.program.isStereoOrCubemap() && !Settings.settings.runtime.openXr) {
+            if (!Settings.settings.program.isStereoOrCubemap()) {
                 lightGlowPass.renderGlowPass(camera, null);
             }
 
