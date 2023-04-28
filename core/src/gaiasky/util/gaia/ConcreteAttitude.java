@@ -9,7 +9,7 @@ package gaiasky.util.gaia;
 
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 public class ConcreteAttitude implements IAttitude {
@@ -27,21 +27,21 @@ public class ConcreteAttitude implements IAttitude {
     /**
      * attitude quaternion at time t
      */
-    private Quaterniond q;
+    private QuaternionDouble q;
     /**
      * time derivative of the attitude at time t
      */
-    private Quaterniond qDot;
+    private QuaternionDouble qDot;
 
     /**
      * Construct object from time, and a quaternion. This leaves the time
      * derivative undefined. It can be set later with
-     * {@link #setQuaternionDot(Quaterniond)}
+     * {@link #setQuaternionDot(QuaternionDouble)}
      *
      * @param t time of the attitude
      * @param q quaternion
      */
-    public ConcreteAttitude(long t, Quaterniond q, boolean withZeroSigmaCorr) {
+    public ConcreteAttitude(long t, QuaternionDouble q, boolean withZeroSigmaCorr) {
         this(t, q, null, withZeroSigmaCorr);
     }
 
@@ -52,7 +52,7 @@ public class ConcreteAttitude implements IAttitude {
      * @param q    quaternion
      * @param qDot time derivative of quaternion [1/day]
      */
-    public ConcreteAttitude(long t, Quaterniond q, Quaterniond qDot,
+    public ConcreteAttitude(long t, QuaternionDouble q, QuaternionDouble qDot,
             boolean withZeroSigmaCorr) { //-V6022
         this.t = t;
         this.q = q;
@@ -81,7 +81,7 @@ public class ConcreteAttitude implements IAttitude {
      *
      */
     @Override
-    public Quaterniond getQuaternion() {
+    public QuaternionDouble getQuaternion() {
         return q;
     }
 
@@ -91,7 +91,7 @@ public class ConcreteAttitude implements IAttitude {
      *
      * @param q
      */
-    public void setQuaternion(Quaterniond q) {
+    public void setQuaternion(QuaternionDouble q) {
         this.q = q;
     }
 
@@ -101,14 +101,14 @@ public class ConcreteAttitude implements IAttitude {
      * @return time derivative of the attitude quaternion [1/day]
      */
     @Override
-    public Quaterniond getQuaternionDot() {
+    public QuaternionDouble getQuaternionDot() {
         return qDot;
     }
 
     /**
      * @param qDot quaternion derivative to set - all components in [1/day]
      */
-    public void setQuaternionDot(Quaterniond qDot) {
+    public void setQuaternionDot(QuaternionDouble qDot) {
         this.qDot = qDot;
     }
 
@@ -187,7 +187,7 @@ public class ConcreteAttitude implements IAttitude {
     @Override
     public Vector3d getSpinVectorInSrs() {
         // Using (A.18) in AGIS paper (A&A 538, A78, 2012):
-        Quaterniond tmp = q.cpy();
+        QuaternionDouble tmp = q.cpy();
         tmp.inverse().mul(qDot);
         return new Vector3d(2. * tmp.x, 2. * tmp.y, 2. * tmp.z);
     }
@@ -198,7 +198,7 @@ public class ConcreteAttitude implements IAttitude {
     @Override
     public Vector3d getSpinVectorInIcrs() {
         // Using (A.17) in AGIS paper (A&A 538, A78, 2012):
-        Quaterniond tmp = qDot.cpy();
+        QuaternionDouble tmp = qDot.cpy();
         tmp.mulInverse(q);
         return new Vector3d(2. * tmp.x, 2. * tmp.y, 2. * tmp.z);
     }

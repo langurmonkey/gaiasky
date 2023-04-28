@@ -32,9 +32,9 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
 import gaiasky.util.gaia.Satellite;
-import gaiasky.util.math.Frustumd;
+import gaiasky.util.math.FrustumDouble;
 import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -63,7 +63,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     public int dirIndex;
     Vector3d dirMiddle, up;
     private PerspectiveCamera camera2;
-    private Frustumd frustum2;
+    private FrustumDouble frustum2;
     private Entity gaia;
     private IAttitudeServer attitudeServer;
     private Matrix4d trf;
@@ -95,7 +95,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         camera2.near = (float) CAM_NEAR;
         camera2.far = (float) CAM_FAR;
 
-        frustum2 = new Frustumd();
+        frustum2 = new FrustumDouble();
 
         fovFactor = FOV / 5f;
 
@@ -184,7 +184,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         currentTime = time.getTime().toEpochMilli();
         trf = matrix;
         trf.idt();
-        Quaterniond quat = attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli())).getQuaternion();
+        QuaternionDouble quat = attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli())).getQuaternion();
         trf.rotate(quat).rotate(0, 0, 1, 180);
         directions[0].set(0, 0, 1).rotate(BAM_2, 0, 1, 0).mul(trf).nor();
         directions[1].set(0, 0, 1).rotate(-BAM_2, 0, 1, 0).mul(trf).nor();
@@ -196,7 +196,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     public Vector3d[] getDirections(Date d) {
         trf = matrix;
         trf.idt();
-        Quaterniond quat = attitudeServer.getAttitude(d).getQuaternion();
+        QuaternionDouble quat = attitudeServer.getAttitude(d).getQuaternion();
         trf.rotate(quat).rotate(0, 0, 1, 180);
         dir1.set(0, 0, 1).rotate(BAM_2, 0, 1, 0).mul(trf).nor();
         dir2.set(0, 0, 1).rotate(-BAM_2, 0, 1, 0).mul(trf).nor();
@@ -354,7 +354,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     }
 
-    public Frustumd getFrustum2() {
+    public FrustumDouble getFrustum2() {
         return frustum2;
     }
 

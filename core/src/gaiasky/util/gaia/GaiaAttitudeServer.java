@@ -13,7 +13,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 
 import java.util.Date;
 
@@ -36,7 +36,7 @@ public class GaiaAttitudeServer implements IAttitudeServer {
                 initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
                 current = new AttitudeIntervalBean("current", null, null, "dummy");
                 // Dummy attitude
-                dummyAttitude = new ConcreteAttitude(0, new Quaterniond(), false);
+                dummyAttitude = new ConcreteAttitude(0, new QuaternionDouble(), false);
             } else {
                 logger.error("Error loading real attitude: " + folder);
             }

@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Matrix3;
 
 import java.io.Serializable;
 
-public class Vector2d implements Serializable, Vectord<Vector2d> {
+public class Vector2d implements Serializable, VectorDouble<Vector2d> {
     public final static Vector2d X = new Vector2d(1, 0);
     public final static Vector2d Y = new Vector2d(0, 1);
     public final static Vector2d Zero = new Vector2d(0, 0);
@@ -416,7 +416,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     }
 
     @Override
-    public Vector2d interpolate(Vector2d target, double alpha, Interpolationd interpolation) {
+    public Vector2d interpolate(Vector2d target, double alpha, InterpolationDouble interpolation) {
         return lerp(target, interpolation.apply(alpha));
     }
 

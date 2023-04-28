@@ -9,7 +9,7 @@ package gaiasky.util.gaia;
 
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 public class AttitudeConverter {
@@ -49,7 +49,7 @@ public class AttitudeConverter {
      * @return an array of two quaternions, q (the attitude quaternion) and qDot
      * (the time derivative of q, per day)
      */
-    public static Quaterniond[] heliotropicToQuaternions(double lSun, double xi,
+    public static QuaternionDouble[] heliotropicToQuaternions(double lSun, double xi,
             double nu, double omega, double lSunDot, double nuDot,
             double omegaDot) {
 
@@ -61,11 +61,11 @@ public class AttitudeConverter {
          */
 
         /** Calculate the attitude quaternion **/
-        Quaterniond q = new Quaterniond(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(lSun)));
-        q.mul(new Quaterniond(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
-        q.mul(new Quaterniond(X_AXIS, Math.toDegrees(PI_HALF - xi)));
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(omega)));
+        QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
+        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - xi)));
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
 
         /**
          * Calculate the time derivative of the attitude quaternion using (A.17)
@@ -80,11 +80,11 @@ public class AttitudeConverter {
                 + omegaDot * zInSrs.y;
         double rateZ = lSunDot * cosObliquity + nuDot * sinLSun * sinObliquity
                 + omegaDot * zInSrs.z;
-        Quaterniond halfSpinInIcrs = new Quaterniond(0.5 * rateZ, 0.5 * rateX,
+        QuaternionDouble halfSpinInIcrs = new QuaternionDouble(0.5 * rateZ, 0.5 * rateX,
                 0.5 * rateY, 0.0);
-        Quaterniond qDot = halfSpinInIcrs.mul(q);
+        QuaternionDouble qDot = halfSpinInIcrs.mul(q);
 
-        return new Quaterniond[] { q, qDot };
+        return new QuaternionDouble[] { q, qDot };
     }
 
     /**
@@ -113,11 +113,11 @@ public class AttitudeConverter {
          */
 
         /** Calculate the attitude quaternion **/
-        Quaterniond q = new Quaterniond(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(lSun)));
-        q.mul(new Quaterniond(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
-        q.mul(new Quaterniond(X_AXIS, Math.toDegrees(PI_HALF - xi)));
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(omega)));
+        QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
+        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - xi)));
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
 
         /**
          * Calculate the inertial rate in SRS by adding the rotations around
@@ -148,7 +148,7 @@ public class AttitudeConverter {
      * @return an array of two quaternions, q (the attitude quaternion) and qDot
      * (the time derivative of q, per day)
      */
-    public static Quaterniond[] getQuaternionAndRate(long gt,
+    public static QuaternionDouble[] getQuaternionAndRate(long gt,
             HeliotropicAnglesRates h) {
 
         /** SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
@@ -164,11 +164,11 @@ public class AttitudeConverter {
         double lSunDot = sun.getSolarLongitudeDot();
 
         /** Calculate the attitude quaternion **/
-        Quaterniond q = new Quaterniond(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(lSun)));
-        q.mul(new Quaterniond(Z_AXIS, Math.toDegrees(h.getNu() - PI_HALF)));
-        q.mul(new Quaterniond(X_AXIS, Math.toDegrees(PI_HALF - h.getXi())));
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(h.getOmega())));
+        QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
+        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(h.getNu() - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - h.getXi())));
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(h.getOmega())));
 
         /**
          * Calculate the time derivative of the attitude quaternion using (A.17)
@@ -188,11 +188,11 @@ public class AttitudeConverter {
         double rateZ = lSunDot * cosObliquity + h.getNuDot() * sinLSun
                 * sinObliquity + h.getOmegaDot() * zInSrs.z + h.getXiDot()
                 * sz.z;
-        Quaterniond halfSpinInIcrs = new Quaterniond(0.5 * rateZ, 0.5 * rateX,
+        QuaternionDouble halfSpinInIcrs = new QuaternionDouble(0.5 * rateZ, 0.5 * rateX,
                 0.5 * rateY, 0.0);
-        Quaterniond qDot = halfSpinInIcrs.mul(q);
+        QuaternionDouble qDot = halfSpinInIcrs.mul(q);
 
-        return new Quaterniond[] { q, qDot };
+        return new QuaternionDouble[] { q, qDot };
     }
 
     /**

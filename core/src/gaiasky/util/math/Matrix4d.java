@@ -122,7 +122,7 @@ public class Matrix4d implements Serializable {
     static final Vector3d tmpForward = new Vector3d();
     static final Vector3d tmpUp = new Vector3d();
     @Serial private static final long serialVersionUID = -2717655254359579617L;
-    static Quaterniond quat = new Quaterniond();
+    static QuaternionDouble quat = new QuaternionDouble();
     public final double[] tmp = new double[16];
     public final double[] val = new double[16];
 
@@ -161,11 +161,11 @@ public class Matrix4d implements Serializable {
     }
 
     /**
-     * Constructs a rotation matrix from the given {@link Quaterniond}.
+     * Constructs a rotation matrix from the given {@link QuaternionDouble}.
      *
      * @param quaternion The quaternion to be copied. (The quaternion is not modified)
      */
-    public Matrix4d(Quaterniond quaternion) {
+    public Matrix4d(QuaternionDouble quaternion) {
         this.set(quaternion);
     }
 
@@ -176,7 +176,7 @@ public class Matrix4d implements Serializable {
      * @param rotation The rotation, must be normalized
      * @param scale    The scale
      */
-    public Matrix4d(Vector3d position, Quaterniond rotation, Vector3d scale) {
+    public Matrix4d(Vector3d position, QuaternionDouble rotation, Vector3d scale) {
         set(position, rotation, scale);
     }
 
@@ -429,7 +429,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d set(Quaterniond quaternion) {
+    public Matrix4d set(QuaternionDouble quaternion) {
         return set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
     }
 
@@ -459,7 +459,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for chaining
      */
-    public Matrix4d set(Vector3d position, Quaterniond orientation) {
+    public Matrix4d set(Vector3d position, QuaternionDouble orientation) {
         return set(position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w);
     }
 
@@ -521,7 +521,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for chaining
      */
-    public Matrix4d set(Vector3d position, Quaterniond orientation, Vector3d scale) {
+    public Matrix4d set(Vector3d position, QuaternionDouble orientation, Vector3d scale) {
         return set(position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w, scale.x, scale.y, scale.z);
     }
 
@@ -1328,23 +1328,23 @@ public class Matrix4d implements Serializable {
     /**
      * Gets the rotation of this matrix.
      *
-     * @param rotation      The {@link Quaterniond} to receive the rotation
+     * @param rotation      The {@link QuaternionDouble} to receive the rotation
      * @param normalizeAxes True to normalize the axes, necessary when the matrix might also include scaling.
      *
-     * @return The provided {@link Quaterniond} for chaining.
+     * @return The provided {@link QuaternionDouble} for chaining.
      */
-    public Quaterniond getRotation(Quaterniond rotation, boolean normalizeAxes) {
+    public QuaternionDouble getRotation(QuaternionDouble rotation, boolean normalizeAxes) {
         return rotation.setFromMatrix(normalizeAxes, this);
     }
 
     /**
      * Gets the rotation of this matrix.
      *
-     * @param rotation The {@link Quaterniond} to receive the rotation
+     * @param rotation The {@link QuaternionDouble} to receive the rotation
      *
-     * @return The provided {@link Quaterniond} for chaining.
+     * @return The provided {@link QuaternionDouble} for chaining.
      */
-    public Quaterniond getRotation(Quaterniond rotation) {
+    public QuaternionDouble getRotation(QuaternionDouble rotation) {
         return rotation.setFromMatrix(this);
     }
 
@@ -1531,7 +1531,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d rotate(Quaterniond rotation) {
+    public Matrix4d rotate(QuaternionDouble rotation) {
         rotation.toMatrix(tmp);
         matrix4_mul(val, tmp);
         return this;

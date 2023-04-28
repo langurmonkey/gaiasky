@@ -9,7 +9,7 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.math.MathUtils;
 
-public class CatmullRomSplined<T extends Vectord<T>> implements Pathd<T> {
+public class CatmullRomSplined<T extends VectorDouble<T>> implements PathDouble<T> {
     public T[] controlPoints;
     public boolean continuous;
     public int spanCount;
@@ -33,7 +33,7 @@ public class CatmullRomSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T calculate(final T out, final double t, final T[] points, final boolean continuous,
+    public static <T extends VectorDouble<T>> T calculate(final T out, final double t, final T[] points, final boolean continuous,
             final T tmp) {
         final int n = continuous ? points.length : points.length - 3;
         double u = t * n;
@@ -54,7 +54,7 @@ public class CatmullRomSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T calculate(final T out, final int i, final double u, final T[] points,
+    public static <T extends VectorDouble<T>> T calculate(final T out, final int i, final double u, final T[] points,
             final boolean continuous, final T tmp) {
         final int n = points.length;
         final double u2 = u * u;
@@ -80,7 +80,7 @@ public class CatmullRomSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T derivative(final T out, final double t, final T[] points, final boolean continuous,
+    public static <T extends VectorDouble<T>> T derivative(final T out, final double t, final T[] points, final boolean continuous,
             final T tmp) {
         final int n = continuous ? points.length : points.length - 3;
         double u = t * n;
@@ -101,7 +101,7 @@ public class CatmullRomSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T derivative(final T out, final int i, final double u, final T[] points,
+    public static <T extends VectorDouble<T>> T derivative(final T out, final int i, final double u, final T[] points,
             final boolean continuous, final T tmp) {
         /*
          * catmull'(u) = 0.5 *((-p0 + p2) + 2 * (2*p0 - 5*p1 + 4*p2 - p3) * u + 3 * (-p0 + 3*p1 - 3*p2 + p3) * u * u)

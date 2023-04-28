@@ -12,7 +12,7 @@ import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.gaia.time.GtiList;
 import gaiasky.util.gaia.utils.AttitudeUtils;
 import gaiasky.util.gaia.utils.Interpolator;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 
 public abstract class HermiteInterpolatedAttitudeDataServer extends
         NumericalAttitudeDataServer<IAttitude> {
@@ -104,11 +104,11 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
         double[] intW = Interpolator.linear(x, x0, qW[left], x1,
                 qW[left + 1]);
 
-        Quaterniond qInt = new Quaterniond(intX[0], intY[0], intZ[0], intW[0]);
+        QuaternionDouble qInt = new QuaternionDouble(intX[0], intY[0], intZ[0], intW[0]);
         double fact = 1.0 / Math.sqrt(qInt.len2());
 
         return new ConcreteAttitude(t, qInt.nor(),
-                new Quaterniond(intX[1] * fact, intY[1] * fact, intZ[1] * fact,
+                new QuaternionDouble(intX[1] * fact, intY[1] * fact, intZ[1] * fact,
                         intW[1] * fact), false);
     }
 }

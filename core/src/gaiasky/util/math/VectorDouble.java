@@ -7,7 +7,7 @@
 
 package gaiasky.util.math;
 
-public interface Vectord<T extends Vectord<T>> {
+public interface VectorDouble<T extends VectorDouble<T>> {
     /** @return a copy of this vector */
     T cpy();
 
@@ -15,7 +15,7 @@ public interface Vectord<T extends Vectord<T>> {
     double len();
 
     /**
-     * This method is faster than {@link Vectord#len()} because it avoids calculating a square root. It is useful for comparisons,
+     * This method is faster than {@link VectorDouble#len()} because it avoids calculating a square root. It is useful for comparisons,
      * but not for getting exact lengths, as the return value is the square of the actual length.
      *
      * @return The squared euclidean length
@@ -141,7 +141,7 @@ public interface Vectord<T extends Vectord<T>> {
     double dst(T v);
 
     /**
-     * This method is faster than {@link Vectord#dst(Vectord)} because it avoids calculating a square root. It is useful for
+     * This method is faster than {@link VectorDouble#dst(VectorDouble)} because it avoids calculating a square root. It is useful for
      * comparisons, but not for getting accurate distances, as the return value is the square of the actual distance.
      *
      * @param v The other vector
@@ -171,7 +171,7 @@ public interface Vectord<T extends Vectord<T>> {
      *
      * @return This vector for chaining.
      */
-    T interpolate(T target, double alpha, Interpolationd interpolator);
+    T interpolate(T target, double alpha, InterpolationDouble interpolator);
 
     /**
      * Sets this vector to the unit vector with a random direction
@@ -199,26 +199,26 @@ public interface Vectord<T extends Vectord<T>> {
     boolean isOnLine(T other);
 
     /**
-     * @return true if this vector is collinear with the other vector ({@link #isOnLine(Vectord, double)} &&
-     * {@link #hasSameDirection(Vectord)}).
+     * @return true if this vector is collinear with the other vector ({@link #isOnLine(VectorDouble, double)} &&
+     * {@link #hasSameDirection(VectorDouble)}).
      */
     boolean isCollinear(T other, double epsilon);
 
     /**
-     * @return true if this vector is collinear with the other vector ({@link #isOnLine(Vectord)} &&
-     * {@link #hasSameDirection(Vectord)}).
+     * @return true if this vector is collinear with the other vector ({@link #isOnLine(VectorDouble)} &&
+     * {@link #hasSameDirection(VectorDouble)}).
      */
     boolean isCollinear(T other);
 
     /**
-     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(Vectord, double)} &&
-     * {@link #hasOppositeDirection(Vectord)}).
+     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(VectorDouble, double)} &&
+     * {@link #hasOppositeDirection(VectorDouble)}).
      */
     boolean isCollinearOpposite(T other, double epsilon);
 
     /**
-     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(Vectord)} &&
-     * {@link #hasOppositeDirection(Vectord)}).
+     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(VectorDouble)} &&
+     * {@link #hasOppositeDirection(VectorDouble)}).
      */
     boolean isCollinearOpposite(T other);
 

@@ -7,15 +7,15 @@
 
 package gaiasky.util.math;
 
-public class Lineard<T extends Vectord<T>> implements Pathd<T> {
+public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
 
     public T[] controlPoints;
 
-    public Lineard(final T[] controlPoints) {
+    public LinearDouble(final T[] controlPoints) {
         set(controlPoints);
     }
 
-    public Lineard set(final T[] controlPoints) {
+    public LinearDouble set(final T[] controlPoints) {
         this.controlPoints = controlPoints;
         return this;
     }
@@ -36,7 +36,7 @@ public class Lineard<T extends Vectord<T>> implements Pathd<T> {
         T p1 = controlPoints[i1];
 
         out.set(p0);
-        return out.interpolate(p1, alpha, Interpolationd.linear);
+        return out.interpolate(p1, alpha, InterpolationDouble.linear);
     }
 
     @Override

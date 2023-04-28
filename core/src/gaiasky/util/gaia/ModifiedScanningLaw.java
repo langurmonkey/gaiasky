@@ -13,7 +13,7 @@ import gaiasky.util.coord.NslSun;
 import gaiasky.util.gaia.time.Secs;
 import gaiasky.util.gaia.utils.*;
 import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Arrays;
@@ -855,7 +855,7 @@ public class ModifiedScanningLaw {
             // scanning plane; the relevant area is
             // highDensityAreas[indexAltMin]
             // with reference direction refDir[indexAltMin]
-            Quaterniond q = sun.heliotropicToQuaternion(t, xi, y[0], y[1]);
+            QuaternionDouble q = sun.heliotropicToQuaternion(t, xi, y[0], y[1]);
             spinAxis.set(0.0, 0.0, 1.0).rotateVectorByQuaternion(q);
             Place spinAxisPlace = new Place(spinAxis);
             double altMin = 10.0;

@@ -7,12 +7,11 @@
 
 package gaiasky.util.math;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import gaiasky.util.math.Planed.PlaneSide;
+import gaiasky.util.math.PlaneDouble.PlaneSide;
 
-public class Frustumd {
+public class FrustumDouble {
     protected static final Vector3d[] clipSpacePlanePoints = { new Vector3d(-1, -1, -1), new Vector3d(1, -1, -1), new Vector3d(1, 1, -1), new Vector3d(-1, 1, -1), // near clip
             new Vector3d(-1, -1, 1), new Vector3d(1, -1, 1), new Vector3d(1, 1, 1), new Vector3d(-1, 1, 1) }; // far clip
     protected static final double[] clipSpacePlanePointsArray = new double[8 * 3];
@@ -28,15 +27,15 @@ public class Frustumd {
     }
 
     /** the six clipping planes, near, far, left, right, top, bottom **/
-    public final Planed[] planes = new Planed[6];
+    public final PlaneDouble[] planes = new PlaneDouble[6];
 
     /** eight points making up the near and far clipping "rectangles". order is counter clockwise, starting at bottom left **/
     public final Vector3d[] planePoints = { new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d() };
     protected final double[] planePointsArray = new double[8 * 3];
 
-    public Frustumd() {
+    public FrustumDouble() {
         for (int i = 0; i < 6; i++) {
-            planes[i] = new Planed(new Vector3d(), 0);
+            planes[i] = new PlaneDouble(new Vector3d(), 0);
         }
     }
 
@@ -163,13 +162,13 @@ public class Frustumd {
     }
 
     /**
-     * Returns whether the given {@link BoundingBoxd} is in the frustum.
+     * Returns whether the given {@link BoundingBoxDouble} is in the frustum.
      *
      * @param bounds The bounding box
      *
      * @return Whether the bounding box is in the frustum
      */
-    public boolean boundsInFrustum(BoundingBoxd bounds) {
+    public boolean boundsInFrustum(BoundingBoxDouble bounds) {
         for (int i = 0, len2 = planes.length; i < len2; i++) {
             if (planes[i].testPoint(bounds.getCorner000(tmpV)) != PlaneSide.Back)
                 continue;
@@ -208,7 +207,7 @@ public class Frustumd {
      * @return Whether the bounding box is in the frustum
      */
     public boolean boundsInFrustum(double x, double y, double z, double halfWidth, double halfHeight, double halfDepth) {
-        for (Planed plane : planes) {
+        for (PlaneDouble plane : planes) {
             if (plane.testPoint(x + halfWidth, y + halfHeight, z + halfDepth) != PlaneSide.Back)
                 continue;
             if (plane.testPoint(x + halfWidth, y + halfHeight, z - halfDepth) != PlaneSide.Back)

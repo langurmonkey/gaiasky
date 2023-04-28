@@ -4105,7 +4105,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         double seconds;
         double elapsed, start;
         double[] targetPos, targetDir, targetUp;
-        Pathd<Vector3d> posl, dirl, upl;
+        PathDouble<Vector3d> posl, dirl, upl;
         Runnable end;
 
         /**
@@ -4141,9 +4141,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             D33 = new Vector3d();
         }
 
-        private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
+        private PathDouble<Vector3d> getPathd(Vector3d p0, double[] p1) {
             Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
-            return new Lineard<>(points);
+            return new LinearDouble<>(points);
         }
 
         @Override

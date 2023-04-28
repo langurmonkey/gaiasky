@@ -10,14 +10,14 @@ package gaiasky.util.math;
 
 import java.io.Serializable;
 
-public class Planed implements Serializable {
+public class PlaneDouble implements Serializable {
     private static final long serialVersionUID = -1240652082930747866L;
     public final Vector3d normal = new Vector3d();
     public double d = 0;
     /**
      * Constructs a new plane with all values set to 0
      */
-    public Planed() {
+    public PlaneDouble() {
 
     }
 
@@ -27,7 +27,7 @@ public class Planed implements Serializable {
      * @param normal The plane normal
      * @param d      The distance to the origin
      */
-    public Planed(Vector3d normal, double d) {
+    public PlaneDouble(Vector3d normal, double d) {
         this.normal.set(normal).nor();
         this.d = d;
     }
@@ -38,7 +38,7 @@ public class Planed implements Serializable {
      * @param normal The normal
      * @param point  The point on the plane
      */
-    public Planed(Vector3d normal, Vector3d point) {
+    public PlaneDouble(Vector3d normal, Vector3d point) {
         this.normal.set(normal).nor();
         this.d = -this.normal.dot(point);
     }
@@ -51,7 +51,7 @@ public class Planed implements Serializable {
      * @param point2 The second point
      * @param point3 The third point
      */
-    public Planed(Vector3d point1, Vector3d point2, Vector3d point3) {
+    public PlaneDouble(Vector3d point1, Vector3d point2, Vector3d point3) {
         set(point1, point2, point3);
     }
 
@@ -176,7 +176,7 @@ public class Planed implements Serializable {
      *
      * @param plane the plane
      */
-    public void set(Planed plane) {
+    public void set(PlaneDouble plane) {
         this.normal.set(plane.normal);
         this.d = plane.d;
     }

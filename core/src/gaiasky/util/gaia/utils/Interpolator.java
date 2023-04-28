@@ -9,7 +9,7 @@ package gaiasky.util.gaia.utils;
 
 import gaiasky.util.Nature;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 
 public class Interpolator {
 
@@ -79,10 +79,10 @@ public class Interpolator {
      * element and the average attitude quaternion rate [1/timeUnit] as
      * the second element
      */
-    public static Quaterniond[] qHermiteAverage(final double ta, final double tb, final double[] t, final int indx, final Quaterniond[] q, final Quaterniond[] qDot) {
+    public static QuaternionDouble[] qHermiteAverage(final double ta, final double tb, final double[] t, final int indx, final QuaternionDouble[] q, final QuaternionDouble[] qDot) {
 
-        Quaterniond qAve;
-        Quaterniond qDotAve;
+        QuaternionDouble qAve;
+        QuaternionDouble qDotAve;
 
         if (tb - ta < dtMin) {
             double tm = (ta + tb) / 2;
@@ -93,10 +93,10 @@ public class Interpolator {
         } else {
 
             int lefta = getLeftVar(ta, t, indx);
-            Quaterniond qa = Interpolator.qEval(ta, t, q, qDot, lefta, Kind.INT);
+            QuaternionDouble qa = Interpolator.qEval(ta, t, q, qDot, lefta, Kind.INT);
 
             int leftb = getLeftVar(tb, t, indx);
-            Quaterniond qb = Interpolator.qEval(tb, t, q, qDot, leftb, Kind.INT);
+            QuaternionDouble qb = Interpolator.qEval(tb, t, q, qDot, leftb, Kind.INT);
 
             qAve = qb.mulAdd(qa, -1);
             for (int left = lefta; left < leftb; left++) {
@@ -110,7 +110,7 @@ public class Interpolator {
             qDotAve = qb.mulAdd(qa, -1).mul(1 / (tb - ta));
         }
 
-        return new Quaterniond[] { qAve, qDotAve };
+        return new QuaternionDouble[] { qAve, qDotAve };
     }
 
     /**
@@ -130,34 +130,31 @@ public class Interpolator {
      *
      * @return The quaternion
      */
-    public static Quaterniond qEval(double tx, double[] t, Quaterniond[] q, Quaterniond[] qDot, int left, Kind kind) {
+    public static QuaternionDouble qEval(double tx, double[] t, QuaternionDouble[] q, QuaternionDouble[] qDot, int left, Kind kind) {
         double dt = t[left + 1] - t[left];
         double x = (tx - t[left]) / dt;
         double[] p;
         switch (kind) {
-        case DER:
+        case DER -> {
             p = Interpolator.interPolDer(x);
             p[0] /= dt;
             p[1] /= dt;
-            break;
-        case VAL:
+        }
+        case VAL -> {
             p = Interpolator.interPolVal(x);
             p[2] *= dt;
             p[3] *= dt;
-            break;
-        case INT:
+        }
+        case INT -> {
             p = Interpolator.interPolInt(x);
             p[0] *= dt;
             p[1] *= dt;
             p[2] *= dt * dt;
             p[3] *= dt * dt;
-            break;
-        default:
-            p = null;
-            break;
         }
-        Quaterniond qx = q[left].cpy().mul(p[0]).mulAdd(q[left + 1], p[1]).mulAdd(qDot[left], p[2]).mulAdd(qDot[left + 1], p[3]);
-        return qx;
+        default -> p = null;
+        }
+        return q[left].cpy().mul(p[0]).mulAdd(q[left + 1], p[1]).mulAdd(qDot[left], p[2]).mulAdd(qDot[left + 1], p[3]);
     }
 
     /**

@@ -10,7 +10,7 @@ package gaiasky.util.gaia;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.NslSun;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 
 public class Nsl37 extends AnalyticalAttitudeDataServer {
 
@@ -119,7 +119,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
 
         // EventManager.publish(Events.DEBUG_RAM, "Nu: " + (float) Math.toDegrees(getNuMod4Pi()) + ", Omega: " + (float) Math.toDegrees(getOmegaMod4Pi()));
 
-        Quaterniond[] qAndRate = AttitudeConverter.heliotropicToQuaternions(lSun, super.getXiRef(), getNuMod4Pi(), getOmegaMod4Pi(), lSunDot, nuDot, omegaDot);
+        QuaternionDouble[] qAndRate = AttitudeConverter.heliotropicToQuaternions(lSun, super.getXiRef(), getNuMod4Pi(), getOmegaMod4Pi(), lSunDot, nuDot, omegaDot);
 
         return new ConcreteAttitude(tNow, qAndRate[0], qAndRate[1], true);
     }

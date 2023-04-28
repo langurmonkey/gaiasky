@@ -10,7 +10,7 @@ package gaiasky.util.gaia;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.gaia.time.Duration;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 
 public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
@@ -161,7 +161,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
         sunDir.setTime(time);
 
         // convert heliotropic angles and rates to quaternion and rate
-        Quaterniond[] qr = AttitudeConverter.heliotropicToQuaternions(sunDir.getSolarLongitude(), getXiRef(), nu, omega, sunDir.getSolarLongitudeDot(), nuDot, omegaDot);
+        QuaternionDouble[] qr = AttitudeConverter.heliotropicToQuaternions(sunDir.getSolarLongitude(), getXiRef(), nu, omega, sunDir.getSolarLongitudeDot(), nuDot, omegaDot);
 
         return new ConcreteAttitude(time, qr[0], qr[1], false);
     }

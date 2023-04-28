@@ -9,7 +9,7 @@ package gaiasky.util.gaia;
 
 import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.gaia.utils.AttitudeUtils;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +68,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     /**
      * Quaterniond corresponding to extraOmega
      */
-    protected Quaterniond qExtraOmega = new Quaterniond(0.0, 0.0, 0.0, 1.0);
+    protected QuaternionDouble qExtraOmega = new QuaternionDouble(0.0, 0.0, 0.0, 1.0);
 
     /**
      * Constructor for given start time and mission length
@@ -179,9 +179,9 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
             double nuDot = msl.getNuDot();
             double omegaDot = msl.getOmegaDot();
 
-            Quaterniond[] qq = AttitudeConverter.heliotropicToQuaternions(lSun, xi, nu, omega, lSunDot, nuDot, omegaDot);
-            Quaterniond q = qq[0];
-            Quaterniond qInvQDot = qq[1].mulLeftInverse(q);
+            QuaternionDouble[] qq = AttitudeConverter.heliotropicToQuaternions(lSun, xi, nu, omega, lSunDot, nuDot, omegaDot);
+            QuaternionDouble q = qq[0];
+            QuaternionDouble qInvQDot = qq[1].mulLeftInverse(q);
             qX[i] = q.x;
             qY[i] = q.y;
             qZ[i] = q.z;
@@ -328,8 +328,8 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
 
         // modify attitude through post-multiplication by qExtraOmega
         if (extraOmega != 0.0) {
-            Quaterniond q = att.getQuaternion();
-            Quaterniond qDot = att.getQuaternionDot();
+            QuaternionDouble q = att.getQuaternion();
+            QuaternionDouble qDot = att.getQuaternionDot();
             q.mul(qExtraOmega);
             qDot.mul(qExtraOmega);
             att = new ConcreteAttitude(t, q, qDot, true);

@@ -9,7 +9,7 @@ package gaiasky.util.math;
 
 import java.io.Serializable;
 
-public class Rayd implements Serializable {
+public class RayDouble implements Serializable {
     private static final long serialVersionUID = -620692054835390878L;
     static Vector3d tmp = new Vector3d();
     public final Vector3d origin = new Vector3d();
@@ -21,14 +21,14 @@ public class Rayd implements Serializable {
      * @param origin    The starting position
      * @param direction The direction
      */
-    public Rayd(Vector3d origin, Vector3d direction) {
+    public RayDouble(Vector3d origin, Vector3d direction) {
         this.origin.set(origin);
         this.direction.set(direction).nor();
     }
 
     /** @return a copy of this Rayd. */
-    public Rayd cpy() {
-        return new Rayd(this.origin, this.direction);
+    public RayDouble cpy() {
+        return new RayDouble(this.origin, this.direction);
     }
 
     /**
@@ -63,7 +63,7 @@ public class Rayd implements Serializable {
      *
      * @return This Rayd for chaining.
      */
-    public Rayd mul(Matrix4d matrix) {
+    public RayDouble mul(Matrix4d matrix) {
         tmp.set(origin).add(direction);
         tmp.mul(matrix);
         origin.mul(matrix);
@@ -84,7 +84,7 @@ public class Rayd implements Serializable {
      *
      * @return this Rayd for chaining
      */
-    public Rayd set(Vector3d origin, Vector3d direction) {
+    public RayDouble set(Vector3d origin, Vector3d direction) {
         this.origin.set(origin);
         this.direction.set(direction);
         return this;
@@ -102,7 +102,7 @@ public class Rayd implements Serializable {
      *
      * @return this Rayd for chaining
      */
-    public Rayd set(float x, float y, float z, float dx, float dy, float dz) {
+    public RayDouble set(float x, float y, float z, float dx, float dy, float dz) {
         this.origin.set(x, y, z);
         this.direction.set(dx, dy, dz);
         return this;
@@ -115,7 +115,7 @@ public class Rayd implements Serializable {
      *
      * @return This Rayd for chaining
      */
-    public Rayd set(Rayd Rayd) {
+    public RayDouble set(RayDouble Rayd) {
         this.origin.set(Rayd.origin);
         this.direction.set(Rayd.direction);
         return this;
@@ -127,7 +127,7 @@ public class Rayd implements Serializable {
             return true;
         if (o == null || o.getClass() != this.getClass())
             return false;
-        Rayd r = (Rayd) o;
+        RayDouble r = (RayDouble) o;
         return this.direction.equals(r.direction) && this.origin.equals(r.origin);
     }
 

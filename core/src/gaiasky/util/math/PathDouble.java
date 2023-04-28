@@ -7,7 +7,7 @@
 
 package gaiasky.util.math;
 
-public interface Pathd<T> {
+public interface PathDouble<T> {
     T derivativeAt(T out, double t);
 
     /** @return The value of the path at t where 0<=t<=1 */

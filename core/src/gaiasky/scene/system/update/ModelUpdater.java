@@ -26,7 +26,7 @@ import gaiasky.util.DecalUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -38,7 +38,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
     private final Vector3d D32;
     private final Matrix4d MD4;
     private final Quaternion QF;
-    private Quaterniond QD;
+    private QuaternionDouble QD;
 
     public ModelUpdater(Family family, int priority) {
         super(family, priority);

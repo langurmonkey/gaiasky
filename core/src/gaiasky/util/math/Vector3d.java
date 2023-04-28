@@ -14,7 +14,7 @@ import net.jafama.FastMath;
 import java.io.Serializable;
 
 @SuppressWarnings("unused")
-public class Vector3d implements Serializable, Vectord<Vector3d> {
+public class Vector3d implements Serializable, VectorDouble<Vector3d> {
     public final static Vector3d X = new Vector3d(1, 0, 0);
     public final static Vector3d Y = new Vector3d(0, 1, 0);
     public final static Vector3d Z = new Vector3d(0, 0, 1);
@@ -559,7 +559,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
      *
      * @return This vector for chaining
      */
-    public Vector3d mul(final Quaterniond quat) {
+    public Vector3d mul(final QuaternionDouble quat) {
         return quat.transform(this);
     }
 
@@ -787,7 +787,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
     }
 
     @Override
-    public Vector3d interpolate(Vector3d vec, double alpha, Interpolationd interpolator) {
+    public Vector3d interpolate(Vector3d vec, double alpha, InterpolationDouble interpolator) {
         return lerp(vec, interpolator.apply(0, 1, alpha));
     }
 
@@ -915,9 +915,9 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
      *
      * @return the rotated vector.
      */
-    public Vector3d rotateVectorByQuaternion(final Quaterniond q) {
-        Quaterniond oldVecQ = new Quaterniond(this.x, this.y, this.z, 0.0);
-        Quaterniond newVecQ = q.cpy().mul(oldVecQ).mulInverse(q);
+    public Vector3d rotateVectorByQuaternion(final QuaternionDouble q) {
+        QuaternionDouble oldVecQ = new QuaternionDouble(this.x, this.y, this.z, 0.0);
+        QuaternionDouble newVecQ = q.cpy().mul(oldVecQ).mulInverse(q);
         this.x = newVecQ.x;
         this.y = newVecQ.y;
         this.z = newVecQ.z;

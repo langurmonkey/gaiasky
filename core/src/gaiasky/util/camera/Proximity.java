@@ -459,7 +459,7 @@ public class Proximity {
         }
 
         @Override
-        public Quaterniond getOrientationQuaternion() {
+        public QuaternionDouble getOrientationQuaternion() {
             return null;
         }
 

@@ -145,7 +145,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     Vector3d point = new Vector3d();
     Vector3d normal = new Vector3d();
     Vector3d intersection = new Vector3d();
-    Planed plane = new Planed(Vector3d.getUnitX(), 0.1 * Constants.M_TO_U);
+    PlaneDouble plane = new PlaneDouble(Vector3d.getUnitX(), 0.1 * Constants.M_TO_U);
     Matrix4d transform = new Matrix4d();
     Matrix4d inverse = new Matrix4d();
 

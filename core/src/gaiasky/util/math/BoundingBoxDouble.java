@@ -13,7 +13,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-public class BoundingBoxd implements Serializable {
+public class BoundingBoxDouble implements Serializable {
     @Serial private static final long serialVersionUID = -1286036817192127343L;
 
     private final static Vector3d tmpVector = new Vector3d();
@@ -31,7 +31,7 @@ public class BoundingBoxd implements Serializable {
      * Constructs a new bounding box with the minimum and maximum vector set to
      * zeros.
      */
-    public BoundingBoxd() {
+    public BoundingBoxDouble() {
         clr();
     }
 
@@ -40,7 +40,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @param bounds The bounding box to copy
      */
-    public BoundingBoxd(BoundingBoxd bounds) {
+    public BoundingBoxDouble(BoundingBoxDouble bounds) {
         this.set(bounds);
     }
 
@@ -51,7 +51,7 @@ public class BoundingBoxd implements Serializable {
      * @param minimum The minimum vector
      * @param maximum The maximum vector
      */
-    public BoundingBoxd(Vector3d minimum, Vector3d maximum) {
+    public BoundingBoxDouble(Vector3d minimum, Vector3d maximum) {
         this.set(minimum, maximum);
     }
 
@@ -235,7 +235,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd set(BoundingBoxd bounds) {
+    public BoundingBoxDouble set(BoundingBoxDouble bounds) {
         return this.set(bounds.min, bounds.max);
     }
 
@@ -251,7 +251,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd set(Vector3d minimum, Vector3d maximum) {
+    public BoundingBoxDouble set(Vector3d minimum, Vector3d maximum) {
         min.set(minimum.x < maximum.x ? minimum.x : maximum.x, minimum.y < maximum.y ? minimum.y : maximum.y, minimum.z < maximum.z ? minimum.z : maximum.z);
         max.set(minimum.x > maximum.x ? minimum.x : maximum.x, minimum.y > maximum.y ? minimum.y : maximum.y, minimum.z > maximum.z ? minimum.z : maximum.z);
         cnt.set(min).add(max).scl(0.5f);
@@ -266,7 +266,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd set(Vector3d[] points) {
+    public BoundingBoxDouble set(Vector3d[] points) {
         this.inf();
         for (Vector3d l_point : points)
             this.ext(l_point);
@@ -280,7 +280,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd set(List<Vector3d> points) {
+    public BoundingBoxDouble set(List<Vector3d> points) {
         this.inf();
         for (Vector3d l_point : points)
             this.ext(l_point);
@@ -292,7 +292,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd inf() {
+    public BoundingBoxDouble inf() {
         min.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
         max.set(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
         cnt.set(0, 0, 0);
@@ -307,7 +307,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd ext(Vector3d point) {
+    public BoundingBoxDouble ext(Vector3d point) {
         return this.set(min.set(min(min.x, point.x), min(min.y, point.y), min(min.z, point.z)), max.set(Math.max(max.x, point.x), Math.max(max.y, point.y), Math.max(max.z, point.z)));
     }
 
@@ -316,7 +316,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd clr() {
+    public BoundingBoxDouble clr() {
         return this.set(min.set(0, 0, 0), max.set(0, 0, 0));
     }
 
@@ -337,7 +337,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd ext(BoundingBoxd a_bounds) {
+    public BoundingBoxDouble ext(BoundingBoxDouble a_bounds) {
         return this.set(min.set(min(min.x, a_bounds.min.x), min(min.y, a_bounds.min.y), min(min.z, a_bounds.min.z)), max.set(max(max.x, a_bounds.max.x), max(max.y, a_bounds.max.y), max(max.z, a_bounds.max.z)));
     }
 
@@ -350,7 +350,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd ext(BoundingBoxd bounds, Matrix4d transform) {
+    public BoundingBoxDouble ext(BoundingBoxDouble bounds, Matrix4d transform) {
         ext(tmpVector.set(bounds.min.x, bounds.min.y, bounds.min.z).mul(transform));
         ext(tmpVector.set(bounds.min.x, bounds.min.y, bounds.max.z).mul(transform));
         ext(tmpVector.set(bounds.min.x, bounds.max.y, bounds.min.z).mul(transform));
@@ -371,7 +371,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd mul(Matrix4d transform) {
+    public BoundingBoxDouble mul(Matrix4d transform) {
         final double x0 = min.x, y0 = min.y, z0 = min.z, x1 = max.x, y1 = max.y, z1 = max.z;
         inf();
         ext(tmpVector.set(x0, y0, z0).mul(transform));
@@ -392,7 +392,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return Whether the given bounding box is contained
      */
-    public boolean contains(BoundingBoxd b) {
+    public boolean contains(BoundingBoxDouble b) {
         return !isValid() || (min.x <= b.min.x && min.y <= b.min.y && min.z <= b.min.z && max.x >= b.max.x && max.y >= b.max.y && max.z >= b.max.z);
     }
 
@@ -404,7 +404,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return Whether the given bounding box is intersected
      */
-    public boolean intersects(BoundingBoxd b) {
+    public boolean intersects(BoundingBoxDouble b) {
         if (!isValid())
             return false;
 
@@ -463,7 +463,7 @@ public class BoundingBoxd implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxd ext(double x, double y, double z) {
+    public BoundingBoxDouble ext(double x, double y, double z) {
         return this.set(min.set(min(min.x, x), min(min.y, y), min(min.z, z)), max.set(max(max.x, x), max(max.y, y), max(max.z, z)));
     }
 }

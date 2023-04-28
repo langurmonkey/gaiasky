@@ -18,7 +18,7 @@ public class IntersectorDouble {
     private static final Vector3d auxd3 = new Vector3d();
 
     /**
-     * Quick check whether the given {@link Ray} and {@link BoundingBoxd}
+     * Quick check whether the given {@link Ray} and {@link BoundingBoxDouble}
      * intersect.
      *
      * @param ray        The ray
@@ -27,7 +27,7 @@ public class IntersectorDouble {
      *
      * @return Whether the ray and the bounding box intersect.
      */
-    public static boolean intersectRayBoundsFast(Rayd ray, Vector3d center, Vector3d dimensions) {
+    public static boolean intersectRayBoundsFast(RayDouble ray, Vector3d center, Vector3d dimensions) {
         final double divX = 1f / ray.direction.x;
         final double divY = 1f / ray.direction.y;
         final double divZ = 1f / ray.direction.z;
@@ -244,14 +244,14 @@ public class IntersectorDouble {
     }
 
     /**
-     * Intersects a {@link Rayd} and a {@link Planed}. The intersection point is stored in intersection in case an intersection is
+     * Intersects a {@link RayDouble} and a {@link PlaneDouble}. The intersection point is stored in intersection in case an intersection is
      * present.
      *
      * @param intersection The vector the intersection point is written to (optional)
      *
      * @return Whether an intersection is present.
      */
-    public static boolean intersectRayPlane(Rayd ray, Planed plane, Vector3d intersection) {
+    public static boolean intersectRayPlane(RayDouble ray, PlaneDouble plane, Vector3d intersection) {
         double denom = ray.direction.dot(plane.getNormal());
         if (denom != 0) {
             double t = -(ray.origin.dot(plane.getNormal()) + plane.getD()) / denom;
@@ -261,7 +261,7 @@ public class IntersectorDouble {
             if (intersection != null)
                 intersection.set(ray.origin).add(auxd1.set(ray.direction).scl(t));
             return true;
-        } else if (plane.testPoint(ray.origin) == Planed.PlaneSide.OnPlane) {
+        } else if (plane.testPoint(ray.origin) == PlaneDouble.PlaneSide.OnPlane) {
             if (intersection != null)
                 intersection.set(ray.origin);
             return true;
@@ -274,7 +274,7 @@ public class IntersectorDouble {
      * intersection happened, the return value is in the range [0,1]. The intersection point can be recovered by point1 + t *
      * (point2 - point1) where t is the return value of this method.
      */
-    public static double intersectLinePlane(float x, float y, float z, float x2, float y2, float z2, Planed plane,
+    public static double intersectLinePlane(float x, float y, float z, float x2, float y2, float z2, PlaneDouble plane,
             Vector3d intersection) {
         Vector3d direction = auxd1.set(x2, y2, z2).sub(x, y, z);
         Vector3d origin = auxd2.set(x, y, z);
@@ -284,7 +284,7 @@ public class IntersectorDouble {
             if (intersection != null)
                 intersection.set(origin).add(direction.scl(t));
             return t;
-        } else if (plane.testPoint(origin) == Planed.PlaneSide.OnPlane) {
+        } else if (plane.testPoint(origin) == PlaneDouble.PlaneSide.OnPlane) {
             if (intersection != null)
                 intersection.set(origin);
             return 0;
@@ -342,7 +342,7 @@ public class IntersectorDouble {
         return 0;
     }
 
-    public static boolean intersectSegmentPlane (Vector3d start, Vector3d end, Planed plane, Vector3d intersection) {
+    public static boolean intersectSegmentPlane (Vector3d start, Vector3d end, PlaneDouble plane, Vector3d intersection) {
         Vector3d dir = auxd1.set(end).sub(start);
         double denominator = dir.dot(plane.getNormal());
         if (denominator == 0f) return false;

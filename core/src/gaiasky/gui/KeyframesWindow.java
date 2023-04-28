@@ -38,7 +38,7 @@ import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Interpolationd;
+import gaiasky.util.math.InterpolationDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
@@ -806,17 +806,17 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     // We can interpolate
                     k0 = keyframes.get(index);
                     k1 = keyframes.get(index + 1);
-                    pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 0.5, Interpolationd.linear);
-                    dir = new Vector3d().set(k0.dir).interpolate(k1.dir, 0.5, Interpolationd.linear);
-                    up = new Vector3d().set(k0.up).interpolate(k1.up, 0.5, Interpolationd.linear);
+                    pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 0.5, InterpolationDouble.linear);
+                    dir = new Vector3d().set(k0.dir).interpolate(k1.dir, 0.5, InterpolationDouble.linear);
+                    up = new Vector3d().set(k0.up).interpolate(k1.up, 0.5, InterpolationDouble.linear);
                     time = k0.time + (long) ((k1.time - k0.time) / 2d);
                 } else {
                     // Last keyframe
                     k0 = keyframes.get(index - 1);
                     k1 = keyframes.get(index);
-                    pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 1.5, Interpolationd.linear);
-                    dir = new Vector3d().set(k0.dir).interpolate(k1.dir, 1.5, Interpolationd.linear);
-                    up = new Vector3d().set(k0.up).interpolate(k1.up, 1.5, Interpolationd.linear);
+                    pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 1.5, InterpolationDouble.linear);
+                    dir = new Vector3d().set(k0.dir).interpolate(k1.dir, 1.5, InterpolationDouble.linear);
+                    up = new Vector3d().set(k0.up).interpolate(k1.up, 1.5, InterpolationDouble.linear);
                     time = k1.time + (long) ((k1.time - k0.time) / 2d);
                 }
                 // Add at end

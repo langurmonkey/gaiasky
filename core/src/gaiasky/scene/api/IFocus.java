@@ -326,7 +326,7 @@ public interface IFocus {
      *
      * @return The orientation quaternion. Can be null.
      */
-    Quaterniond getOrientationQuaternion();
+    QuaternionDouble getOrientationQuaternion();
 
     /**
      * Adds this focus to the hits list if it is hit by the [screenX, screenY]

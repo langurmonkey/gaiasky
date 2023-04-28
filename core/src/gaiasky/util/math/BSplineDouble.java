@@ -9,7 +9,7 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.utils.Array;
 
-public class BSplined<T extends Vectord<T>> implements Pathd<T> {
+public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     private final static double d6 = 1f / 6f;
     public T[] controlPoints;
     public Array<T> knots;
@@ -20,9 +20,9 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
     private T tmp2;
     private T tmp3;
 
-    public BSplined() {
+    public BSplineDouble() {
     }
-    public BSplined(final T[] controlPoints, final int degree, final boolean continuous) {
+    public BSplineDouble(final T[] controlPoints, final int degree, final boolean continuous) {
         set(controlPoints, degree, continuous);
     }
 
@@ -37,7 +37,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T cubic(final T out, final double t, final T[] points, final boolean continuous,
+    public static <T extends VectorDouble<T>> T cubic(final T out, final double t, final T[] points, final boolean continuous,
             final T tmp) {
         return cubic_derivative(out, t, points, continuous, tmp);
     }
@@ -53,7 +53,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T cubic_derivative(final T out, final double t, final T[] points,
+    public static <T extends VectorDouble<T>> T cubic_derivative(final T out, final double t, final T[] points,
             final boolean continuous, final T tmp) {
         final int n = continuous ? points.length : points.length - 3;
         double u = t * n;
@@ -74,7 +74,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T cubic(final T out, final int i, final double u, final T[] points,
+    public static <T extends VectorDouble<T>> T cubic(final T out, final int i, final double u, final T[] points,
             final boolean continuous, final T tmp) {
         final int n = points.length;
         final double dt = 1f - u;
@@ -102,7 +102,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T cubic_derivative(final T out, final int i, final double u, final T[] points,
+    public static <T extends VectorDouble<T>> T cubic_derivative(final T out, final int i, final double u, final T[] points,
             final boolean continuous, final T tmp) {
         final int n = points.length;
         final double dt = 1f - u;
@@ -130,7 +130,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T calculate(final T out, final double t, final T[] points, final int degree,
+    public static <T extends VectorDouble<T>> T calculate(final T out, final double t, final T[] points, final int degree,
             final boolean continuous, final T tmp) {
         final int n = continuous ? points.length : points.length - degree;
         double u = t * n;
@@ -151,7 +151,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T derivative(final T out, final double t, final T[] points, final int degree,
+    public static <T extends VectorDouble<T>> T derivative(final T out, final double t, final T[] points, final int degree,
             final boolean continuous, final T tmp) {
         final int n = continuous ? points.length : points.length - degree;
         double u = t * n;
@@ -173,7 +173,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T calculate(final T out, final int i, final double u, final T[] points, final int degree,
+    public static <T extends VectorDouble<T>> T calculate(final T out, final int i, final double u, final T[] points, final int degree,
             final boolean continuous, final T tmp) {
         switch (degree) {
         case 3:
@@ -195,7 +195,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      *
      * @return The value of out
      */
-    public static <T extends Vectord<T>> T derivative(final T out, final int i, final double u, final T[] points, final int degree,
+    public static <T extends VectorDouble<T>> T derivative(final T out, final int i, final double u, final T[] points, final int degree,
             final boolean continuous, final T tmp) {
         switch (degree) {
         case 3:
@@ -204,7 +204,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
         return out;
     }
 
-    public BSplined set(final T[] controlPoints, final int degree, final boolean continuous) {
+    public BSplineDouble set(final T[] controlPoints, final int degree, final boolean continuous) {
         if (tmp == null)
             tmp = controlPoints[0].cpy();
         if (tmp2 == null)

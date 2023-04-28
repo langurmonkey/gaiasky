@@ -15,8 +15,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.math.CatmullRomSplined;
-import gaiasky.util.math.Lineard;
-import gaiasky.util.math.Pathd;
+import gaiasky.util.math.LinearDouble;
+import gaiasky.util.math.PathDouble;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 
@@ -49,9 +49,9 @@ public class CameraKeyframeManager implements IObserver {
         instance = new CameraKeyframeManager();
     }
 
-    private Pathd<Vector3d> getPath(Vector3d[] data, PathType pathType) {
+    private PathDouble<Vector3d> getPath(Vector3d[] data, PathType pathType) {
         if (pathType == PathType.LINEAR) {
-            return new Lineard<>(data);
+            return new LinearDouble<>(data);
         } else if (pathType == PathType.SPLINE) {
             // Needs extra points at beginning and end
             Vector3d[] extData = new Vector3d[data.length + 2];
@@ -61,7 +61,7 @@ public class CameraKeyframeManager implements IObserver {
             return new CatmullRomSplined<>(extData, false);
         }
         // Default
-        return new Lineard<>(data);
+        return new LinearDouble<>(data);
     }
 
     public Array<Keyframe> loadKeyframesFile(Path file) throws RuntimeException {
@@ -148,7 +148,7 @@ public class CameraKeyframeManager implements IObserver {
                 int nChunks = nSamples - 1;
 
                 Vector3d aux = new Vector3d();
-                Pathd<Vector3d> sampler = getPath(toArray(vec), pathType);
+                PathDouble<Vector3d> sampler = getPath(toArray(vec), pathType);
                 double step = 1d / nChunks;
                 int i = 0;
                 for (double t = 0d; i < nSamples * 3; t += step) {
@@ -209,8 +209,8 @@ public class CameraKeyframeManager implements IObserver {
             }
 
             PathPart[] posSplines = positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position);
-            Pathd<Vector3d> dirSpline = getPath(directions, Settings.settings.camrecorder.keyframe.orientation);
-            Pathd<Vector3d> upSpline = getPath(ups, Settings.settings.camrecorder.keyframe.orientation);
+            PathDouble<Vector3d> dirSpline = getPath(directions, Settings.settings.camrecorder.keyframe.orientation);
+            PathDouble<Vector3d> upSpline = getPath(ups, Settings.settings.camrecorder.keyframe.orientation);
 
             Vector3d aux = new Vector3d();
 
@@ -354,11 +354,11 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     class PathPart {
-        Pathd<Vector3d> path;
+        PathDouble<Vector3d> path;
         int nPoints, nChunks;
         long nFrames;
 
-        public PathPart(Pathd<Vector3d> path, int nPoints, long nFrames) {
+        public PathPart(PathDouble<Vector3d> path, int nPoints, long nFrames) {
             this.path = path;
             this.nPoints = nPoints;
             this.nChunks = nPoints - 1;

@@ -7,7 +7,7 @@
 
 package gaiasky.util.gaia;
 
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 public class Epsl extends AnalyticalAttitudeDataServer {
@@ -70,11 +70,11 @@ public class Epsl extends AnalyticalAttitudeDataServer {
          * 	Y -> X
          */
         // Calculate and set the attitude quaternion
-        Quaterniond q = new Quaterniond(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(nslSun.getSolarLongitude())));
-        q.mul(new Quaterniond(Z_AXIS, Math.toDegrees(super.getNuRef() - PI_HALF)));
-        q.mul(new Quaterniond(X_AXIS, Math.toDegrees(PI_HALF - super.getXiRef())));
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(omega)));
+        QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(nslSun.getSolarLongitude())));
+        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(super.getNuRef() - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - super.getXiRef())));
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
 
         ConcreteAttitude att = new ConcreteAttitude(t, q, null, true);
 
@@ -85,7 +85,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
         spinVector.scaleAdd(getTargetScanRate() * ARCSEC_PER_S_TO_DEG_PER_DAY,
                 att.getSrsAxes(xyz)[2]);
         // ...then convert to quaternion rate using (A.17) in AGIS paper
-        Quaterniond qDot = new Quaterniond(0.5 * spinVector.z,
+        QuaternionDouble qDot = new QuaternionDouble(0.5 * spinVector.z,
                 0.5 * spinVector.x, 0.5 * spinVector.y, 0.0);
         qDot.mul(q);
         att.setQuaternionDot(qDot);

@@ -8,7 +8,7 @@
 package gaiasky.util.coord;
 
 import gaiasky.util.Nature;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 public class NslSun {
@@ -144,7 +144,7 @@ public class NslSun {
      *
      * @return attitude quaternion
      */
-    public Quaterniond heliotropicToQuaternion(long t, double xi, double nu,
+    public QuaternionDouble heliotropicToQuaternion(long t, double xi, double nu,
             double Omega) {
         setTime(t);
         double sLon = getSolarLongitude();
@@ -155,11 +155,11 @@ public class NslSun {
          * 	X -> Z
          * 	Y -> X
          */
-        Quaterniond q = new Quaterniond(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(sLon)));
-        q.mul(new Quaterniond(Z_AXIS, Math.toDegrees(nu - piHalf)));
-        q.mul(new Quaterniond(X_AXIS, Math.toDegrees(piHalf - xi)));
-        q.mul(new Quaterniond(Y_AXIS, Math.toDegrees(Omega)));
+        QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(sLon)));
+        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - piHalf)));
+        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(piHalf - xi)));
+        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(Omega)));
         return q;
     }
 

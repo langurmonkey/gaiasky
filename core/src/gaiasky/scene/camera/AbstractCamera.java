@@ -21,7 +21,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.camera.Proximity.NearbyRecord;
-import gaiasky.util.math.Frustumd;
+import gaiasky.util.math.FrustumDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -72,7 +72,7 @@ public abstract class AbstractCamera implements ICamera {
      **/
     protected PerspectiveCamera[] cameras;
     protected Matrix4d projection, view, combined;
-    protected Frustumd frustumd;
+    protected FrustumDouble frustumd;
     /**
      * Closest non-star body to the camera
      **/
@@ -114,7 +114,7 @@ public abstract class AbstractCamera implements ICamera {
         projection = new Matrix4d();
         view = new Matrix4d();
         combined = new Matrix4d();
-        frustumd = new Frustumd();
+        frustumd = new FrustumDouble();
 
         closestBody = new FocusView();
         closestStarView = new FocusView();

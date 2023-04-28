@@ -7,21 +7,21 @@
 
 package gaiasky.util.math;
 
-public abstract class Interpolationd {
-    static public final Interpolationd linear = new Interpolationd() {
+public abstract class InterpolationDouble {
+    static public final InterpolationDouble linear = new InterpolationDouble() {
         public double apply(double a) {
             return a;
         }
     };
     /** Aka "smoothstep". */
-    static public final Interpolationd smooth = new Interpolationd() {
+    static public final InterpolationDouble smooth = new InterpolationDouble() {
         public double apply(double a) {
             return a * a * (3 - 2 * a);
         }
     };
 
     //
-    static public final Interpolationd smooth2 = new Interpolationd() {
+    static public final InterpolationDouble smooth2 = new InterpolationDouble() {
         public double apply(double a) {
             a = a * a * (3 - 2 * a);
             return a * a * (3 - 2 * a);
@@ -30,12 +30,12 @@ public abstract class Interpolationd {
 
     //
     /** By Ken Perlin. */
-    static public final Interpolationd smoother = new Interpolationd() {
+    static public final InterpolationDouble smoother = new InterpolationDouble() {
         public double apply(double a) {
             return a * a * a * (a * (a * 6 - 15) + 10);
         }
     };
-    static public final Interpolationd fade = smoother;
+    static public final InterpolationDouble fade = smoother;
     static public final Pow pow2 = new Pow(2);
     /** Slow, then fast. */
     static public final PowIn pow2In = new PowIn(2);
@@ -45,12 +45,12 @@ public abstract class Interpolationd {
     /** Fast, then slow. */
     static public final PowOut pow2Out = new PowOut(2);
     static public final PowOut fastSlow = pow2Out;
-    static public final Interpolationd pow2InInverse = new Interpolationd() {
+    static public final InterpolationDouble pow2InInverse = new InterpolationDouble() {
         public double apply(double a) {
             return Math.sqrt(a);
         }
     };
-    static public final Interpolationd pow2OutInverse = new Interpolationd() {
+    static public final InterpolationDouble pow2OutInverse = new InterpolationDouble() {
         public double apply(double a) {
             return 1 - Math.sqrt(-(a - 1));
         }
@@ -58,12 +58,12 @@ public abstract class Interpolationd {
     static public final Pow pow3 = new Pow(3);
     static public final PowIn pow3In = new PowIn(3);
     static public final PowOut pow3Out = new PowOut(3);
-    static public final Interpolationd pow3InInverse = new Interpolationd() {
+    static public final InterpolationDouble pow3InInverse = new InterpolationDouble() {
         public double apply(double a) {
             return Math.cbrt(a);
         }
     };
-    static public final Interpolationd pow3OutInverse = new Interpolationd() {
+    static public final InterpolationDouble pow3OutInverse = new InterpolationDouble() {
         public double apply(double a) {
             return 1 - Math.cbrt(-(a - 1));
         }
@@ -74,17 +74,17 @@ public abstract class Interpolationd {
     static public final Pow pow5 = new Pow(5);
     static public final PowIn pow5In = new PowIn(5);
     static public final PowOut pow5Out = new PowOut(5);
-    static public final Interpolationd sine = new Interpolationd() {
+    static public final InterpolationDouble sine = new InterpolationDouble() {
         public double apply(double a) {
             return (1 - MathUtilsDouble.cos(a * MathUtilsDouble.PI)) / 2;
         }
     };
-    static public final Interpolationd sineIn = new Interpolationd() {
+    static public final InterpolationDouble sineIn = new InterpolationDouble() {
         public double apply(double a) {
             return 1 - MathUtilsDouble.cos(a * MathUtilsDouble.PI / 2);
         }
     };
-    static public final Interpolationd sineOut = new Interpolationd() {
+    static public final InterpolationDouble sineOut = new InterpolationDouble() {
         public double apply(double a) {
             return MathUtilsDouble.sin(a * MathUtilsDouble.PI / 2);
         }
@@ -95,7 +95,7 @@ public abstract class Interpolationd {
     static public final Exp exp5 = new Exp(2, 5);
     static public final ExpIn exp5In = new ExpIn(2, 5);
     static public final ExpOut exp5Out = new ExpOut(2, 5);
-    static public final Interpolationd circle = new Interpolationd() {
+    static public final InterpolationDouble circle = new InterpolationDouble() {
         public double apply(double a) {
             if (a <= 0.5) {
                 a *= 2;
@@ -106,12 +106,12 @@ public abstract class Interpolationd {
             return (Math.sqrt(1 - a * a) + 1) / 2;
         }
     };
-    static public final Interpolationd circleIn = new Interpolationd() {
+    static public final InterpolationDouble circleIn = new InterpolationDouble() {
         public double apply(double a) {
             return 1 - Math.sqrt(1 - a * a);
         }
     };
-    static public final Interpolationd circleOut = new Interpolationd() {
+    static public final InterpolationDouble circleOut = new InterpolationDouble() {
         public double apply(double a) {
             a--;
             return Math.sqrt(1 - a * a);
@@ -137,7 +137,7 @@ public abstract class Interpolationd {
 
     //
 
-    static public class Pow extends Interpolationd {
+    static public class Pow extends InterpolationDouble {
         final int power;
 
         public Pow(int power) {
@@ -173,7 +173,7 @@ public abstract class Interpolationd {
 
     //
 
-    static public class Exp extends Interpolationd {
+    static public class Exp extends InterpolationDouble {
         final double value, power, min, scale;
 
         public Exp(double value, double power) {
@@ -212,7 +212,7 @@ public abstract class Interpolationd {
 
     //
 
-    static public class Elastic extends Interpolationd {
+    static public class Elastic extends InterpolationDouble {
         final double value, power, scale, bounces;
 
         public Elastic(double value, double power, int bounces, double scale) {
@@ -283,7 +283,7 @@ public abstract class Interpolationd {
         }
     }
 
-    static public class BounceOut extends Interpolationd {
+    static public class BounceOut extends InterpolationDouble {
         final double[] widths, heights;
 
         public BounceOut(double[] widths, double[] heights) {
@@ -371,7 +371,7 @@ public abstract class Interpolationd {
 
     //
 
-    static public class Swing extends Interpolationd {
+    static public class Swing extends InterpolationDouble {
         private final double scale;
 
         public Swing(double scale) {
@@ -389,7 +389,7 @@ public abstract class Interpolationd {
         }
     }
 
-    static public class SwingOut extends Interpolationd {
+    static public class SwingOut extends InterpolationDouble {
         private final double scale;
 
         public SwingOut(double scale) {
@@ -402,7 +402,7 @@ public abstract class Interpolationd {
         }
     }
 
-    static public class SwingIn extends Interpolationd {
+    static public class SwingIn extends InterpolationDouble {
         private final double scale;
 
         public SwingIn(double scale) {

@@ -10,12 +10,12 @@ package gaiasky.scene.record;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 public class QuaternionTransform implements ITransform {
 
-    Quaterniond quaternion;
+    QuaternionDouble quaternion;
     Quaternion quatFloat;
 
     @Override
@@ -35,19 +35,19 @@ public class QuaternionTransform implements ITransform {
             mat.rotate(quaternion);
     }
 
-    public void setQuaternion(Quaterniond quaternion) {
-        this.quaternion = new Quaterniond(quaternion);
+    public void setQuaternion(QuaternionDouble quaternion) {
+        this.quaternion = new QuaternionDouble(quaternion);
     }
 
     public void setQuaternion(Vector3d axis, double angle) {
-        this.quaternion = new Quaterniond(axis, angle);
+        this.quaternion = new QuaternionDouble(axis, angle);
     }
 
     public void setQuaternion(double axisX, double axisY, double axisZ, double angle) {
-        this.quaternion = new Quaterniond(new Vector3d(axisX, axisY, axisZ), angle);
+        this.quaternion = new QuaternionDouble(new Vector3d(axisX, axisY, axisZ), angle);
     }
 
     public void setQuaternion(double[] xyzw) {
-        this.quaternion = new Quaterniond(xyzw[0], xyzw[1], xyzw[2], xyzw[3]);
+        this.quaternion = new QuaternionDouble(xyzw[0], xyzw[1], xyzw[2], xyzw[3]);
     }
 }

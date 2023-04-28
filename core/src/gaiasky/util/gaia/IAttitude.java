@@ -7,7 +7,7 @@
 
 package gaiasky.util.gaia;
 
-import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 public interface IAttitude {
@@ -24,13 +24,13 @@ public interface IAttitude {
     /**
      * @return quaternion that represents the attitude
      */
-    Quaterniond getQuaternion();
+    QuaternionDouble getQuaternion();
 
     /**
      * @return time derivative [1/day] of the quaternion returned by
      * {@link #getQuaternion()}
      */
-    Quaterniond getQuaternionDot();
+    QuaternionDouble getQuaternionDot();
 
     /**
      * Get the inertial spin vector in the SRS.
