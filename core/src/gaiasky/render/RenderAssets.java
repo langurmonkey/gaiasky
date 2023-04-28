@@ -147,7 +147,8 @@ public class RenderAssets {
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
         // Initialize point cloud shaders - depends on point cloud mode
         final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
-        particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffix + ".vertex.glsl", "shader/particle.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
+        final String pointTriSuffixParticles = !Settings.settings.runtime.openXr && Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
+        particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffixParticles + ".vertex.glsl", "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
         // Regular stars
