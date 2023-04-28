@@ -62,8 +62,7 @@ public class ModelEntityRenderSystem {
         var model = Mapper.model.get(entity);
         if (model != null) {
             if (model.renderConsumer != null) {
-                //boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
-                boolean relativistic = false;
+                boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
 
                 // Just run consumer.
                 model.renderConsumer.apply(this, entity, model, batch, alpha, t, rc, renderGroup, relativistic, shadow);
