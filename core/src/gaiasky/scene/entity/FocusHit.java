@@ -67,12 +67,11 @@ public class FocusHit {
             var entity = view.getEntity();
 
             Vector3 pos = F31;
-            Vector3b aux = B31;
-            Vector3b posd = EntityUtils.getAbsolutePosition(entity, aux).add(camera.getInversePos());
-            pos.set(posd.valuesf());
+            Vector3b posDouble = EntityUtils.getAbsolutePosition(entity, B31).add(camera.getInversePos());
+            pos.set(posDouble.valuesf());
 
-            if (camera.direction.dot(posd) > 0) {
-                // The object is in front of us
+            if (camera.direction.dot(posDouble) > 0) {
+                // The object is in front of us, roughly.
                 double angle = solidAngleFunction.apply(view, camera.fovFactor) * solidAngleFactor;
 
                 PerspectiveCamera perspectiveCamera;
