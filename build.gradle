@@ -24,7 +24,7 @@ allprojects {
         commonsioVersion = "2.+"
         commonsmathVersion = "3.+"
         py4jVersion = "0.10.9.+"
-        oshiVersion = "5.8.+"
+        oshiVersion = "6.4.+"
         stilVersion = "4.1.+"
         jsampVersion = "1.3.+"
         apfloatVersion = "1.10.+"
