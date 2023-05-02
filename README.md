@@ -112,18 +112,8 @@ More information on how to make the VR version work properly in the [VR.md](VR.m
 
 ##  5. Documentation and help
 
-The most up-to-date documentation of Gaia Sky is always hosted at [gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
+The most up-to-date documentation of Gaia Sky is always hosted at [gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs). The documentation source repository is hosted [here](https://codeberg.org/gaiasky/gaiasky-docs).
 
-### 5.1. Documentation submodule
-
-In order to add the documentation submodule to the project, do:
-
-```console
-git submodule init
-git submodule update
-```
-
-The documentation project will be checked out in the `docs/` folder.
 
 ##  6. Copyright and licensing information
 
