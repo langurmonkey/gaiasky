@@ -26,7 +26,7 @@ project.ext.tmpDir = new File("/tmp/gaiasky-gradle/")
 project.ext.tmpDir.mkdirs()
 project.ext.jreArchive = "jre-archive.tar.gz"
 
-task versionFile {
+tasks.register('versionFile') {
     doLast {
         File versionFile = file('build/classes/java/main/version')
         delete versionFile
@@ -66,7 +66,7 @@ sourceSets {
 
 abstract class GaiaSkyRun extends JavaExec {
     public GaiaSkyRun() {
-        main(project.mainClassName)
+        main(project.mainClassName as String)
     }
 
     public void setup() {
@@ -96,11 +96,13 @@ abstract class GaiaSkyRun extends JavaExec {
     }
 }
 
-task run(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky") {
+tasks.register('run', GaiaSkyRun) {
+    dependsOn jar
     setup()
 }
 
-task runTranslationStatus(dependsOn: jar, type: JavaExec, description: "Runs the translation status utility") {
+tasks.register('runTranslationStatus', JavaExec) {
+    dependsOn jar
     systemProperties['assets.location'] = './assets/'
     classpath = project.ext.sourceSets.main.runtimeClasspath
     classpath += project.files(project.ext.assetsDir)
@@ -109,7 +111,8 @@ task runTranslationStatus(dependsOn: jar, type: JavaExec, description: "Runs the
     main("gaiasky.desktop.util.I18nStatus")
 }
 
-task runI18nFormatter(dependsOn: jar, type: JavaExec, description: "Formats i18n files according to a reference file") {
+tasks.register('runI18nFormatter', JavaExec) {
+    dependsOn jar
     systemProperties['assets.location'] = './assets/'
     classpath = project.ext.sourceSets.main.runtimeClasspath
     classpath += project.files(project.ext.assetsDir)
@@ -118,19 +121,20 @@ task runI18nFormatter(dependsOn: jar, type: JavaExec, description: "Formats i18n
     main("gaiasky.desktop.util.I18nFormatter")
 }
 
-task createDistDir(description: "Creates the releases/dist folder") {
+tasks.register('createDistDir') {
     doLast {
-        File distDir = new File(project.distDir)
+        File distDir = new File(project.distDir as String)
         // Prepare output directory
         delete distDir
         mkdir distDir
     }
 }
 
-task copyToLib(dependsOn: createDistDir, description: "Copies the runtime dependencies to releases/dist/lib") {
+tasks.register('copyToLib') {
+    dependsOn createDistDir
     doLast {
         // Create releases/dist/lib
-        File distLib = new File(project.distDir, 'lib')
+        File distLib = new File(project.distDir as String, 'lib')
         mkdir distLib
         project.ext.distLib = distLib.getPath()
 
@@ -168,7 +172,8 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
     }
 }
 
-task gaiaskyJar(dependsOn: [compileJava, jar, copyToLib], description: "Creates the gaiasky jar and puts it to the dist/lib folder") {
+tasks.register('gaiaskyJar') {
+    dependsOn compileJava, jar, copyToLib
     doLast {
         copy {
             from "$baseDir/core/build/libs/core-" + version + ".jar"
@@ -178,22 +183,23 @@ task gaiaskyJar(dependsOn: [compileJava, jar, copyToLib], description: "Creates 
     }
 }
 
-task execPermission(type: Exec) {
+tasks.register('execPermission', Exec) {
     commandLine "chmod", "ugo+x", "$distDir/gaiasky"
 }
 
-task manGen(type: Exec) {
+tasks.register('manGen', Exec) {
     workingDir "$distDir"
     commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
 }
 
-task genReleaseNotes(type: Exec) {
+tasks.register('genReleaseNotes', Exec) {
     println("generate-releasenotes $tag $distDir/releasenotes.txt")
     workingDir "$baseDir/core/scripts/release/"
     commandLine "/bin/bash", "generate-releasenotes", "$tag", "$distDir/releasenotes.txt"
 }
 
-task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
+tasks.register('dist') {
+    dependsOn gaiaskyJar, genReleaseNotes
     doLast {
         // Version check
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
@@ -302,7 +308,8 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
 dist.dependsOn classes
 
 
-task createTar(dependsOn: dist, description: "Creates application tar package") {
+tasks.register('createTar') {
+    dependsOn dist
     doLast {
         File packageDir = new File(project.packageDir)
 
@@ -328,13 +335,14 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
     }
 }
 
-task downloadJRE(type: Download, description: "Downloads the JRE package into project.tmpDir") {
+tasks.register('downloadJRE', Download) {
     src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.6%2B10/OpenJDK17U-jre_x64_linux_hotspot_17.0.6_10.tar.gz"
     dest new File("$tmpDir", "$jreArchive")
     onlyIfModified true
     overwrite false
 }
-task downloadAndExtractJRE(dependsOn: downloadJRE, description: "Extracts the downloaded JRE into project.tmpDir") {
+tasks.register('downloadAndExtractJRE') {
+    dependsOn downloadJRE
     doLast {
         File jreArchivePath = new File("$tmpDir", "$jreArchive")
         // Delete pre-existing jre
@@ -353,7 +361,8 @@ task downloadAndExtractJRE(dependsOn: downloadJRE, description: "Extracts the do
     }
 }
 
-task createAppimage(dependsOn: [createTar, downloadAndExtractJRE], description: "Creates the appimage package for Gaia Sky") {
+tasks.register('createAppImage') {
+    dependsOn createTar, downloadAndExtractJRE
     doLast {
         String gsId = "gaiasky"
         String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
@@ -368,15 +377,11 @@ task createAppimage(dependsOn: [createTar, downloadAndExtractJRE], description: 
         }
 
         // Package JRE
-        println("Packaging JRE $jreDir into Appimage")
+        println("Packaging JRE $jreDir into AppImage")
         copy {
             from "$jreDir"
             into "$appimgDir/usr"
         }
-        //exec {
-        //    executable "$jreDir/bin/jlink"
-        //    args "--no-header-files", "--no-man-pages", "--compress=2", "--strip-debug", "--add-modules", "java.base,java.compiler,java.datatransfer,java.desktop,java.instrument,java.logging,java.management,java.management.rmi,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.smartcardio,java.sql,java.sql.rowset,java.transaction.xa,java.xml,java.xml.crypto,jdk.accessibility,jdk.attach,jdk.charsets,jdk.compiler,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.dynalink,jdk.editpad,jdk.httpserver,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.jartool,jdk.javadoc,jdk.jconsole,jdk.jdeps,jdk.jdi,jdk.jdwp.agent,jdk.jfr,jdk.jlink,jdk.jshell,jdk.jsobject,jdk.jstatd,jdk.localedata,jdk.management,jdk.management.agent,jdk.management.jfr,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.nio.mapmode,jdk.sctp,jdk.security.auth,jdk.security.jgss,jdk.unsupported,jdk.unsupported.desktop,jdk.xml.dom,jdk.zipfs", "--output", "$appimgDir/usr"
-        //}
 
         // Metadata
         File usrmeta = new File("$appimgDir", "usr/share/metainfo/")
@@ -407,7 +412,8 @@ task createAppimage(dependsOn: [createTar, downloadAndExtractJRE], description: 
     }
 }
 
-task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build scripts PKGBUILD and gaiasky.install and replaces version and md5") {
+tasks.register('createArch') {
+    dependsOn createTar
     doLast {
         File archDir = new File(project.packageDir + "/arch/")
         mkdir archDir
@@ -449,11 +455,12 @@ static def buildTime() {
 }
 
 def distDirSize() {
-    File dist = new File(project.distDir)
+    File dist = new File(project.distDir as String)
     return Math.round(dist.directorySize() / 1024)
 }
 
-task createDeb(dependsOn: createTar, description: "Creates the .deb package") {
+tasks.register('createDeb') {
+    dependsOn createTar
     doLast {
         // Base deb directory
         File debDir = new File(project.packageDir + "/$distName")
@@ -489,7 +496,8 @@ task createDeb(dependsOn: createTar, description: "Creates the .deb package") {
     }
 }
 
-task prepareInstall4jScript(dependsOn: 'createTar', description: "Prepares the install4j script and copies it to the packages folder") {
+tasks.register('prepareInstall4jScript') {
+    dependsOn createTar
     doLast {
         copy {
             from "installerscripts/template.install4j"
@@ -505,8 +513,8 @@ task prepareInstall4jScript(dependsOn: 'createTar', description: "Prepares the i
     }
 }
 
-task install4jMedia(type: Install4jTask, description: "Runs the install4j task to create the installers") {
-    dependsOn 'prepareInstall4jScript'
+tasks.register('install4jMedia', Install4jTask) {
+    dependsOn prepareInstall4jScript
 
     if (project.hasProperty("winKeystorePassword")) {
         winKeystorePassword = project.ext.winKeystorePassword
@@ -528,7 +536,8 @@ task install4jMedia(type: Install4jTask, description: "Runs the install4j task t
 }
 
 
-task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], description: "Creates the releases for windows, mac, linux and the tar package") {
+tasks.register('pack') {
+    dependsOn 'install4jMedia', 'createAppImage', 'createArch'
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz and gaiasky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
