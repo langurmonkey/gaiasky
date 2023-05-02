@@ -173,7 +173,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
                 shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.1f * hl.pointscaling * (Settings.settings.runtime.openXr ? 3f : 1f));
+                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.1f * hl.pointscaling);
                 shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
 
                 // VR scale
