@@ -1368,9 +1368,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public FocusView getObject(String name,
-                               double timeoutSeconds) {
-        if (checkObjectName(name)) {
-            Entity object = getEntity(name, timeoutSeconds);
+                               double timeOutSeconds) {
+        if (checkObjectName(name, timeOutSeconds)) {
+            Entity object = getEntity(name, timeOutSeconds);
             return new FocusView(object);
         }
         return null;
@@ -1383,9 +1383,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public VertsView getLineObject(String name,
-                                   double timeoutSeconds) {
-        if (checkObjectName(name)) {
-            Entity object = getEntity(name, timeoutSeconds);
+                                   double timeOutSeconds) {
+        if (checkObjectName(name, timeOutSeconds)) {
+            Entity object = getEntity(name, timeOutSeconds);
             if (Mapper.verts.has(object)) {
                 return new VertsView(object);
             } else {
@@ -4758,6 +4758,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private boolean checkObjectName(String name) {
         if (getEntity(name) == null) {
+            logger.error(name + ": object with this name does not exist");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkObjectName(String name,
+                                    double timeOutSeconds) {
+        if (getEntity(name, timeOutSeconds) == null) {
             logger.error(name + ": object with this name does not exist");
             return false;
         }
