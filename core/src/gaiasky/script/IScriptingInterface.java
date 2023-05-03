@@ -2986,7 +2986,7 @@ public interface IScriptingInterface {
                                 boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
+     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel. Uses the same color for
      * clusters and labels.
      * The call can be made synchronous or asynchronous.
@@ -3011,7 +3011,7 @@ public interface IScriptingInterface {
                                    boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
+     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
      * The call can be made synchronous or asynchronous.
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -3037,7 +3037,7 @@ public interface IScriptingInterface {
                                    boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
+     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel. Uses the same color
      * for clusters and labels.
      * The call can be made synchronous or asynchronous.
@@ -3064,7 +3064,7 @@ public interface IScriptingInterface {
                                    boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
+     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
      * The call can be made synchronous or asynchronous.
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
