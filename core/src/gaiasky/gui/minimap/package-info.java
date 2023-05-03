@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * The minimap functionality.
  */
-package gaiasky.data.util;
+package gaiasky.gui.minimap;

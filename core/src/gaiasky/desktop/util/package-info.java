@@ -6,6 +6,7 @@
  */
 
 /**
- * Utilities for the data package.
+ * Contains small standalone applications to perform various housekeeping and testing
+ * tasks.
  */
-package gaiasky.data.util;
+package gaiasky.desktop.util;

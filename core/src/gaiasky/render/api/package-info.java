@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Interfaces pertaining to the render module of Gaia Sky.
  */
-package gaiasky.data.util;
+package gaiasky.render.api;

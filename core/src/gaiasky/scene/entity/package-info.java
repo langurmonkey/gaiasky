@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Utilities related to different entity types.
  */
-package gaiasky.data.util;
+package gaiasky.scene.entity;

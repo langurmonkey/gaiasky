@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * The different components in the control panel.
  */
-package gaiasky.data.util;
+package gaiasky.gui.components;

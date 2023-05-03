@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * User interface code specific to virtual reality.
  */
-package gaiasky.data.util;
+package gaiasky.gui.vr;

@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Classes modeling the different entries in combo boxes.
  */
-package gaiasky.data.util;
+package gaiasky.gui.beans;

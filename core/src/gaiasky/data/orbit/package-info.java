@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Data loaders, writers and providers related to orbits and trajectories.
  */
-package gaiasky.data.util;
+package gaiasky.data.orbit;

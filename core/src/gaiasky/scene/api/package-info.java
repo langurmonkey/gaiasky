@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Contains the API for the scene module.
  */
-package gaiasky.data.util;
+package gaiasky.scene.api;

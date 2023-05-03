@@ -6,6 +6,8 @@
  */
 
 /**
- * Utilities for the data package.
+ * This package contains all render mode implementations. These are the
+ * default mode, the cubemap mode, the Gaia FOV mode, the OpenXR mode, and
+ * the stereoscopic (3D) mode.
  */
-package gaiasky.data.util;
+package gaiasky.render.process;

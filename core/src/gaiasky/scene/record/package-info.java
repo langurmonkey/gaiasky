@@ -6,6 +6,7 @@
  */
 
 /**
- * Utilities for the data package.
+ * Contains components which combine data and logic, and do not adhere to the
+ * standard ECS structure.
  */
-package gaiasky.data.util;
+package gaiasky.scene.record;

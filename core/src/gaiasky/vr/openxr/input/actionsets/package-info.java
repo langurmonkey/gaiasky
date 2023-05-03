@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Contains the OpenXR action sets in Gaia Sky.
  */
-package gaiasky.data.util;
+package gaiasky.vr.openxr.input.actionsets;

@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * The input model of OpenXR.
  */
-package gaiasky.data.util;
+package gaiasky.vr.openxr.input;

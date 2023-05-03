@@ -7,5 +7,6 @@
 
 /**
  * The main package of the project.
+ * Contains the main application entry points, plus some additional functionality.
  */
 package gaiasky;

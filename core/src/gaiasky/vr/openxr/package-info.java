@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Contains the implementation of the OpenXR driver, utilities and model.
  */
-package gaiasky.data.util;
+package gaiasky.vr.openxr;

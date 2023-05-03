@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Data loaders and providers pertaining to particle and star sets.
  */
-package gaiasky.data.util;
+package gaiasky.data.group;

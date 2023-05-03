@@ -18,6 +18,7 @@ import gaiasky.util.gdx.shader.attribute.Vector4Attribute;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class RelativisticEffectsComponent {
@@ -101,14 +102,14 @@ public class RelativisticEffectsComponent {
         RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
         if (vc != -1) {
             // v/c
-            ((FloatAttribute) material.get(FloatAttribute.Vc)).value = vc;
+            ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.Vc))).value = vc;
         } else {
 
             // v/c
-            ((FloatAttribute) material.get(FloatAttribute.Vc)).value = rem.vc;
+            ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.Vc))).value = rem.vc;
         }
         // Velocity direction
-        ((Vector3Attribute) material.get(Vector3Attribute.VelDir)).value.set(rem.velDir);
+        ((Vector3Attribute) Objects.requireNonNull(material.get(Vector3Attribute.VelDir))).value.set(rem.velDir);
     }
 
     public void updateGravitationalWavesMaterial(Material material) {
@@ -117,19 +118,19 @@ public class RelativisticEffectsComponent {
         }
         RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
         // hterms
-        ((Vector4Attribute) material.get(Vector4Attribute.Hterms)).value = rem.hterms;
+        ((Vector4Attribute) Objects.requireNonNull(material.get(Vector4Attribute.Hterms))).value = rem.hterms;
 
         // gw
-        ((Vector3Attribute) material.get(Vector3Attribute.Gw)).value.set(rem.gw);
+        ((Vector3Attribute) Objects.requireNonNull(material.get(Vector3Attribute.Gw))).value.set(rem.gw);
 
         // gwmat3
-        ((Matrix3Attribute) material.get(Matrix3Attribute.Gwmat3)).value.set(rem.gwmat3);
+        ((Matrix3Attribute) Objects.requireNonNull(material.get(Matrix3Attribute.Gwmat3))).value.set(rem.gwmat3);
 
         // ts
-        ((FloatAttribute) material.get(FloatAttribute.Ts)).value = rem.gwtime;
+        ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.Ts))).value = rem.gwtime;
 
         // omgw
-        ((FloatAttribute) material.get(FloatAttribute.Omgw)).value = rem.omgw;
+        ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.Omgw))).value = rem.omgw;
     }
 
     public boolean hasGravitationalWaves(Material mat) {

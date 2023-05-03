@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Contains all components in the ECS.
  */
-package gaiasky.data.util;
+package gaiasky.scene.component;

@@ -358,11 +358,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             } else if (manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
                 IntModel model;
                 Pair<IntModel, Map<String, Material>> modMat = initModelFile();
+                assert modMat != null;
                 model = modMat.getFirst();
                 instance = new IntModelInstance(model, localTransform);
 
                 // COLOR IF NO TEXTURE
-                if (mtc == null && instance != null) {
+                if (mtc == null) {
                     addColorToMat();
                 }
 
@@ -404,8 +405,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
                 if (mat.has(Vector3Attribute.VrOffset)) {
-                    cam.vrOffset.put(((Vector3Attribute) mat.get(Vector3Attribute.VrOffset)).value);
-                    ((Vector3Attribute) mat.get(Vector3Attribute.VrOffset)).value.scl(5e4f);
+                    cam.vrOffset.put(((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.VrOffset))).value);
+                    ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.VrOffset))).value.scl(5e4f);
                 } else {
                     Vector3Attribute v3a = new Vector3Attribute(Vector3Attribute.VrOffset, cam.vrOffset.toVector3());
                     mat.set(v3a);
@@ -533,7 +534,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 if (!mat.has(attrib)) {
                     mat.set(new FloatAttribute(attrib, value));
                 } else {
-                    ((FloatAttribute) mat.get(attrib)).value = value;
+                    ((FloatAttribute) Objects.requireNonNull(mat.get(attrib))).value = value;
                 }
             }
         }
@@ -547,7 +548,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 if (!mat.has(attrib)) {
                     mat.set(new ColorAttribute(attrib, new Color(rgba[0], rgba[1], rgba[2], rgba[3])));
                 } else {
-                    ((ColorAttribute) mat.get(attrib)).color.set(rgba[0], rgba[1], rgba[2], rgba[3]);
+                    ((ColorAttribute) Objects.requireNonNull(mat.get(attrib))).color.set(rgba[0], rgba[1], rgba[2], rgba[3]);
                 }
             }
         }
@@ -716,7 +717,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 }
             });
         } else if (event == Event.SSR_CMD) {
-            if (instance != null && instance.materials != null) {
+            if (instance != null) {
                 // Update cubemap
                 boolean active = (Boolean) data[0];
                 if (active) {
@@ -734,6 +735,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         return modelInitialised;
     }
 
+    /**
+     * @return Whether the model is loading or it has finished.
+     */
     public boolean isModelLoading() {
         return modelLoading;
     }

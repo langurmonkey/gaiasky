@@ -6,6 +6,6 @@
  */
 
 /**
- * Utilities for the data package.
+ * Contains all render systems and other classes doing rendering work.
  */
-package gaiasky.data.util;
+package gaiasky.render.system;

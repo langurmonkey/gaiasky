@@ -6,6 +6,6 @@
  */
 
 /**
- * Implements the REST API.
+ * Implements the REST server, providing access to the scripting API via HTTP.
  */
 package gaiasky.rest;
