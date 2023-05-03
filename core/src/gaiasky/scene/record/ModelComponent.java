@@ -500,6 +500,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                     dta = new DepthTestAttribute();
                     mat.set(dta);
                 }
+                assert dta != null;
                 dta.depthFunc = func;
                 dta.depthMask = mask;
             }

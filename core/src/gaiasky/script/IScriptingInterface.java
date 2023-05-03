@@ -71,7 +71,8 @@ public interface IScriptingInterface {
      * @param message  The message text.
      * @param duration The duration in seconds until the notification is removed.
      */
-    void displayPopupNotification(String message, float duration);
+    void displayPopupNotification(String message,
+                                  float duration);
 
     /**
      * Sets a headline message that will appear in a big font in the screen.
@@ -128,7 +129,15 @@ public interface IScriptingInterface {
      *                 the desired size. Scaling can cause artifacts, so to ensure
      *                 the best font quality, stick to the existing sizes.
      */
-    void displayMessageObject(int id, String message, float x, float y, float r, float g, float b, float a, float fontSize);
+    void displayMessageObject(int id,
+                              String message,
+                              float x,
+                              float y,
+                              float r,
+                              float g,
+                              float b,
+                              float a,
+                              float fontSize);
 
     /**
      * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but using an array for the color
@@ -148,7 +157,12 @@ public interface IScriptingInterface {
      *                 the desired size. Scaling can cause artifacts, so to ensure
      *                 the best font quality, stick to the existing sizes.
      */
-    void displayMessageObject(int id, String message, double x, double y, double[] color, double fontSize);
+    void displayMessageObject(int id,
+                              String message,
+                              double x,
+                              double y,
+                              double[] color,
+                              double fontSize);
 
     /**
      * Adds a new multi-line text in the screen with the given id, coordinates
@@ -178,7 +192,17 @@ public interface IScriptingInterface {
      * @param fontSize  The size of the font. The system will use the existing font
      *                  closest to the chosen size.
      */
-    void displayTextObject(int id, String text, float x, float y, float maxWidth, float maxHeight, float r, float g, float b, float a, float fontSize);
+    void displayTextObject(int id,
+                           String text,
+                           float x,
+                           float y,
+                           float maxWidth,
+                           float maxHeight,
+                           float r,
+                           float g,
+                           float b,
+                           float a,
+                           float fontSize);
 
     /**
      * Adds a new image object at the given coordinates. If an object already
@@ -197,7 +221,10 @@ public interface IScriptingInterface {
      * @param y    The y coordinate of the bottom-left corner, in [0,1] from
      *             bottom to top. This is not resolution-dependant.
      */
-    void displayImageObject(int id, String path, float x, float y);
+    void displayImageObject(int id,
+                            String path,
+                            float x,
+                            float y);
 
     /**
      * Adds a new image object at the given coordinates. If an object already
@@ -219,7 +246,14 @@ public interface IScriptingInterface {
      * @param b    The blue component of the color in [0,1].
      * @param a    The alpha component of the color in [0,1].
      */
-    void displayImageObject(int id, final String path, float x, float y, float r, float g, float b, float a);
+    void displayImageObject(int id,
+                            final String path,
+                            float x,
+                            float y,
+                            float r,
+                            float g,
+                            float b,
+                            float a);
 
     /**
      * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but using a
@@ -235,7 +269,11 @@ public interface IScriptingInterface {
      *              bottom to top. This is not resolution-dependant.
      * @param color The color as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
-    void displayImageObject(int id, final String path, double x, double y, double[] color);
+    void displayImageObject(int id,
+                            final String path,
+                            double x,
+                            double y,
+                            double[] color);
 
     /**
      * Removes all objects.
@@ -293,7 +331,8 @@ public interface IScriptingInterface {
      * @param waitTimeSeconds Maximum time in seconds to wait for the camera to face the
      *                        focus. If negative, we wait indefinitely.
      */
-    void setCameraFocus(String focusName, float waitTimeSeconds);
+    void setCameraFocus(String focusName,
+                        float waitTimeSeconds);
 
     /**
      * Sets the camera in focus mode with the given focus object. It also
@@ -381,7 +420,8 @@ public interface IScriptingInterface {
      * @param position  Vector of three components in internal coordinates and Km.
      * @param immediate Whether to apply the changes immediately, or wait for the next frame.
      */
-    void setCameraPosition(double[] position, boolean immediate);
+    void setCameraPosition(double[] position,
+                           boolean immediate);
 
     /**
      * Sets the camera position to the given coordinates, in the internal reference system and in the requested units.
@@ -394,27 +434,41 @@ public interface IScriptingInterface {
      * @param units     The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      * @param immediate Whether to apply the changes immediately, or wait for the next frame.
      */
-    void setCameraPosition(double[] position, String units, boolean immediate);
+    void setCameraPosition(double[] position,
+                           String units,
+                           boolean immediate);
 
     /**
      * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[])}.
      */
-    void setCameraPosition(double x, double y, double z);
+    void setCameraPosition(double x,
+                           double y,
+                           double z);
 
     /**
      * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], String)}.
      */
-    void setCameraPosition(double x, double y, double z, String units);
+    void setCameraPosition(double x,
+                           double y,
+                           double z,
+                           String units);
 
     /**
      * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], boolean)}.
      */
-    void setCameraPosition(double x, double y, double z, boolean immediate);
+    void setCameraPosition(double x,
+                           double y,
+                           double z,
+                           boolean immediate);
 
     /**
      * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], String, boolean)}.
      */
-    void setCameraPosition(double x, double y, double z, String units, boolean immediate);
+    void setCameraPosition(double x,
+                           double y,
+                           double z,
+                           String units,
+                           boolean immediate);
 
     /**
      * Gets the current camera position, in km.
@@ -454,7 +508,8 @@ public interface IScriptingInterface {
      * @param position Vector of three components in internal coordinates and the given units.
      * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      */
-    void setCameraPosition(double[] position, String units);
+    void setCameraPosition(double[] position,
+                           String units);
 
     /**
      * Sets the camera direction vector to the given vector, in the internal reference system.
@@ -466,7 +521,8 @@ public interface IScriptingInterface {
      * @param direction The direction vector in the internal reference system.
      * @param immediate Whether to apply the changes immediately, or wait for the next frame.
      */
-    void setCameraDirection(double[] direction, boolean immediate);
+    void setCameraDirection(double[] direction,
+                            boolean immediate);
 
     /**
      * Gets the current camera direction vector.
@@ -498,7 +554,8 @@ public interface IScriptingInterface {
      * @param up        The up vector in equatorial coordinates.
      * @param immediate Whether to apply the changes immediately, or wait for the next frame.
      */
-    void setCameraUp(double[] up, boolean immediate);
+    void setCameraUp(double[] up,
+                     boolean immediate);
 
     /**
      * Gets the current camera up vector.
@@ -530,7 +587,10 @@ public interface IScriptingInterface {
      * @param rotation   The rotation angle, in degrees.
      * @param solidAngle The target solid angle which determines the distance, in degrees.
      */
-    void setCameraPositionAndFocus(String focus, String other, double rotation, double solidAngle);
+    void setCameraPositionAndFocus(String focus,
+                                   String other,
+                                   double rotation,
+                                   double solidAngle);
 
     /**
      * Sets the camera in free mode and points it to the given coordinates in equatorial system.
@@ -538,7 +598,8 @@ public interface IScriptingInterface {
      * @param ra  Right ascension in degrees.
      * @param dec Declination in degrees.
      */
-    void pointAtSkyCoordinate(double ra, double dec);
+    void pointAtSkyCoordinate(double ra,
+                              double dec);
 
     /**
      * Gets the current physical speed of the camera in km/h.
@@ -660,7 +721,8 @@ public interface IScriptingInterface {
      * @param deltaY The y component, between 0 and 1. Positive is up and negative
      *               is down.
      */
-    void cameraRotate(double deltaX, double deltaY);
+    void cameraRotate(double deltaX,
+                      double deltaY);
 
     /**
      * Adds a roll force to the camera.
@@ -682,7 +744,8 @@ public interface IScriptingInterface {
      * @param deltaY The y component, between 0 and 1. Positive is up and negative
      *               is down.
      */
-    void cameraTurn(double deltaX, double deltaY);
+    void cameraTurn(double deltaX,
+                    double deltaY);
 
     /**
      * Adds a yaw to the camera. Same as {@link #cameraTurn(double, double)} with
@@ -733,7 +796,9 @@ public interface IScriptingInterface {
      * @param dir The direction of the camera.
      * @param up  The up vector of the camera.
      */
-    void setCameraState(double[] pos, double[] dir, double[] up);
+    void setCameraState(double[] pos,
+                        double[] dir,
+                        double[] up);
 
     /**
      * Sets the camera state (position, direction and up vector) plus the current time.
@@ -744,7 +809,10 @@ public interface IScriptingInterface {
      * @param time The new time of the camera as the
      *             number of milliseconds since the epoch (Jan 1, 1970).
      */
-    void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time);
+    void setCameraStateAndTime(double[] pos,
+                               double[] dir,
+                               double[] up,
+                               long time);
 
     /**
      * See {@link #setComponentTypeVisibility(String, boolean)}.
@@ -752,7 +820,8 @@ public interface IScriptingInterface {
      * @deprecated
      */
     @Deprecated
-    void setVisibility(String key, boolean visible);
+    void setVisibility(String key,
+                       boolean visible);
 
     /**
      * Sets the component described by the given name visible or invisible.
@@ -762,7 +831,8 @@ public interface IScriptingInterface {
      *                {@link gaiasky.render.ComponentTypes.ComponentType}.
      * @param visible The visible value.
      */
-    void setComponentTypeVisibility(String key, boolean visible);
+    void setComponentTypeVisibility(String key,
+                                    boolean visible);
 
     /**
      * Gets the visibility of the component type described by the key. Examples of keys are
@@ -783,7 +853,8 @@ public interface IScriptingInterface {
      *
      * @return True if the visibility was set successfully, false if there were errors.
      */
-    boolean setObjectVisibility(String name, boolean visible);
+    boolean setObjectVisibility(String name,
+                                boolean visible);
 
     /**
      * Gets the visibility of a particular object.
@@ -811,7 +882,8 @@ public interface IScriptingInterface {
      * @param name       The object name.
      * @param forceLabel Whether to force the label to render for this object or not.
      */
-    void setForceDisplayLabel(String name, boolean forceLabel);
+    void setForceDisplayLabel(String name,
+                              boolean forceLabel);
 
     /**
      * Sets the label color of the object identified by the given name.
@@ -820,7 +892,8 @@ public interface IScriptingInterface {
      * @param name  The object name.
      * @param color The label color as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
-    void setLabelColor(String name, double[] color);
+    void setLabelColor(String name,
+                       double[] color);
 
     /**
      * Gets the value of the force display label flag for the object identified with the
@@ -943,7 +1016,13 @@ public interface IScriptingInterface {
      * @param sec      The second-of-minute to represent, from 0 to 59.
      * @param millisec The millisecond-of-second, from 0 to 999.
      */
-    void setSimulationTime(int year, int month, int day, int hour, int min, int sec, int millisec);
+    void setSimulationTime(int year,
+                           int month,
+                           int day,
+                           int hour,
+                           int min,
+                           int sec,
+                           int millisec);
 
     /**
      * Returns the current simulation time as the number of milliseconds since
@@ -1031,7 +1110,13 @@ public interface IScriptingInterface {
      * @param sec      The second-of-minute to represent, from 0 to 59.
      * @param milliSec The millisecond-of-second, from 0 to 999.
      */
-    void setTargetTime(int year, int month, int day, int hour, int min, int sec, int milliSec);
+    void setTargetTime(int year,
+                       int month,
+                       int day,
+                       int hour,
+                       int min,
+                       int sec,
+                       int milliSec);
 
     /**
      * Unsets the target time bookmark from the global clock, if any.
@@ -1194,7 +1279,10 @@ public interface IScriptingInterface {
      * @param directory  The output directory path.
      * @param namePrefix The file name prefix.
      */
-    void configureScreenshots(int width, int height, String directory, String namePrefix);
+    void configureScreenshots(int width,
+                              int height,
+                              String directory,
+                              String namePrefix);
 
     /**
      * Sets the screenshot mode. Possible values are 'simple' and 'advanced'.
@@ -1232,7 +1320,11 @@ public interface IScriptingInterface {
      * @deprecated Use {@link IScriptingInterface#configureFrameOutput(int, int, int, String, String)} instead.
      */
     @Deprecated
-    void configureRenderOutput(int width, int height, int fps, String directory, String namePrefix);
+    void configureRenderOutput(int width,
+                               int height,
+                               int fps,
+                               String directory,
+                               String namePrefix);
 
     /**
      * Configures the frame output system, setting the resolution of the images,
@@ -1245,7 +1337,11 @@ public interface IScriptingInterface {
      * @param directory  The output directory path.
      * @param namePrefix The file name prefix.
      */
-    void configureFrameOutput(int width, int height, int fps, String directory, String namePrefix);
+    void configureFrameOutput(int width,
+                              int height,
+                              int fps,
+                              String directory,
+                              String namePrefix);
 
     /**
      * Configures the frame output system, setting the resolution of the images,
@@ -1258,7 +1354,11 @@ public interface IScriptingInterface {
      * @param directory  The output directory path.
      * @param namePrefix The file name prefix.
      */
-    void configureFrameOutput(int width, int height, double fps, String directory, String namePrefix);
+    void configureFrameOutput(int width,
+                              int height,
+                              double fps,
+                              String directory,
+                              String namePrefix);
 
     /**
      * Sets the frame output mode. Possible values are 'simple' and 'advanced'.
@@ -1334,7 +1434,8 @@ public interface IScriptingInterface {
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      * the timeout has passed.
      */
-    FocusView getObject(String name, double timeoutSeconds);
+    FocusView getObject(String name,
+                        double timeoutSeconds);
 
     /**
      * Gets a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
@@ -1356,7 +1457,8 @@ public interface IScriptingInterface {
      * @return The line object as a {@link gaiasky.scene.view.VertsView}, or null
      * if it does not exist.
      */
-    VertsView getLineObject(String name, double timeoutSeconds);
+    VertsView getLineObject(String name,
+                            double timeoutSeconds);
 
     /**
      * Sets the given size scaling factor to the object identified by
@@ -1372,7 +1474,8 @@ public interface IScriptingInterface {
      * @param name          The name or id of the object.
      * @param scalingFactor The scaling factor to scale the size of that object.
      */
-    void setObjectSizeScaling(String name, double scalingFactor);
+    void setObjectSizeScaling(String name,
+                              double scalingFactor);
 
     /**
      * Sets the given orbit coordinates scaling factor to the AbstractOrbitCoordinates identified by
@@ -1391,7 +1494,8 @@ public interface IScriptingInterface {
      *                      heliotropic orbit coordinates. To only select the Gaia orbit provider, use "HeliotropicOrbitCoordinates:Gaia".
      * @param scalingFactor The scaling factor.
      */
-    void setOrbitCoordinatesScaling(String name, double scalingFactor);
+    void setOrbitCoordinatesScaling(String name,
+                                    double scalingFactor);
 
     /**
      * Forces the refresh of the orbit of the object identified by
@@ -1440,7 +1544,8 @@ public interface IScriptingInterface {
      * @param solidAngle The target solid angle of the object, in degrees. The angle
      *                   gets larger and larger as we approach the object.
      */
-    void goToObject(String name, double solidAngle);
+    void goToObject(String name,
+                    double solidAngle);
 
     /**
      * Runs a seamless trip to the object with the name <code>focusName</code>
@@ -1459,7 +1564,9 @@ public interface IScriptingInterface {
      *                        vector from the camera position to the target object to be
      *                        aligned.
      */
-    void goToObject(String name, double solidAngle, float waitTimeSeconds);
+    void goToObject(String name,
+                    double solidAngle,
+                    float waitTimeSeconds);
 
     /**
      * Sets the camera in focus mode with the given focus object and instantly moves
@@ -1486,7 +1593,8 @@ public interface IScriptingInterface {
      * @param name         The proper name of the object.
      * @param locationName The name of the location to land on
      */
-    void landAtObjectLocation(String name, String locationName);
+    void landAtObjectLocation(String name,
+                              String locationName);
 
     /**
      * Lands on the object with the given <code>name</code>, if it is a
@@ -1497,7 +1605,9 @@ public interface IScriptingInterface {
      * @param longitude The location longitude, in degrees.
      * @param latitude  The location latitude, in degrees.
      */
-    void landAtObjectLocation(String name, double longitude, double latitude);
+    void landAtObjectLocation(String name,
+                              double longitude,
+                              double latitude);
 
     /**
      * Returns the distance to the surface of the object identified with the
@@ -1543,7 +1653,8 @@ public interface IScriptingInterface {
      *
      * @return A 3-vector with the object's position in the requested units and internal reference system.
      */
-    double[] getObjectPosition(String name, String units);
+    double[] getObjectPosition(String name,
+                               String units);
 
     /**
      * Gets the predicted position of the object identified by <code>name</code> in
@@ -1570,7 +1681,8 @@ public interface IScriptingInterface {
      *
      * @return A 3-vector with the object's predicted position in the requested units and in the internal reference system.
      */
-    double[] getObjectPredictedPosition(String name, String units);
+    double[] getObjectPredictedPosition(String name,
+                                        String units);
 
     /**
      * Sets the internal position of the object identified by <code>name</code>. Note that
@@ -1580,7 +1692,8 @@ public interface IScriptingInterface {
      * @param name     The name of the object.
      * @param position The position in the internal reference system and internal units.
      */
-    void setObjectPosition(String name, double[] position);
+    void setObjectPosition(String name,
+                           double[] position);
 
     /**
      * Sets the internal position of the object identified by <code>name</code>. Note that
@@ -1591,7 +1704,9 @@ public interface IScriptingInterface {
      * @param position The position in the internal reference system and the given units.
      * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      */
-    void setObjectPosition(String name, double[] position, String units);
+    void setObjectPosition(String name,
+                           double[] position,
+                           String units);
 
     /**
      * Sets the internal position of the given entity object. Note that
@@ -1601,7 +1716,8 @@ public interface IScriptingInterface {
      * @param object   The object in a focus view wrapper.
      * @param position The position in the internal reference system and internal units.
      */
-    void setObjectPosition(FocusView object, double[] position);
+    void setObjectPosition(FocusView object,
+                           double[] position);
 
     /**
      * Sets the internal position of the given entity object. Note that
@@ -1612,7 +1728,9 @@ public interface IScriptingInterface {
      * @param position The position in the internal reference system and the given units.
      * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      */
-    void setObjectPosition(FocusView object, double[] position, String units);
+    void setObjectPosition(FocusView object,
+                           double[] position,
+                           String units);
 
     /**
      * Sets the internal position of the given entity object. Note that
@@ -1622,7 +1740,8 @@ public interface IScriptingInterface {
      * @param object   The object entity.
      * @param position The position in the internal reference system and internal units.
      */
-    void setObjectPosition(Entity object, double[] position);
+    void setObjectPosition(Entity object,
+                           double[] position);
 
     /**
      * Sets the internal position of the given entity object. Note that
@@ -1633,7 +1752,9 @@ public interface IScriptingInterface {
      * @param position The position in the internal reference system and the given units.
      * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      */
-    void setObjectPosition(Entity object, double[] position, String units);
+    void setObjectPosition(Entity object,
+                           double[] position,
+                           String units);
 
     /**
      * Sets the coordinates provider for the object identified with the given name, if possible.
@@ -1644,7 +1765,8 @@ public interface IScriptingInterface {
      * @param name     The name of the object.
      * @param provider The coordinate provider instance.
      */
-    void setObjectCoordinatesProvider(String name, IPythonCoordinatesProvider provider);
+    void setObjectCoordinatesProvider(String name,
+                                      IPythonCoordinatesProvider provider);
 
     /**
      * Removes the current coordinates provider from the object with the given name. This method must
@@ -1668,7 +1790,9 @@ public interface IScriptingInterface {
      *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
      * @param color  The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
-    void addTrajectoryLine(String name, double[] points, double[] color);
+    void addTrajectoryLine(String name,
+                           double[] points,
+                           double[] color);
 
     /**
      * Adds a new trajectory object with the given name, points and color. The trajectory
@@ -1687,7 +1811,10 @@ public interface IScriptingInterface {
      *                 value of 0. Set to 0 to have a full trail. Set to 0.5 to have a trail that spans half the orbit.
      *                 Set to 1 to have no orbit at all. Set to negative to disable the trail.
      */
-    void addTrajectoryLine(String name, double[] points, double[] color, double trailMap);
+    void addTrajectoryLine(String name,
+                           double[] points,
+                           double[] color,
+                           double trailMap);
 
     /**
      * Adds a new polyline with the given name, points and color. The polyline will
@@ -1700,7 +1827,9 @@ public interface IScriptingInterface {
      *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
      * @param color  The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
-    void addPolyline(String name, double[] points, double[] color);
+    void addPolyline(String name,
+                     double[] points,
+                     double[] color);
 
     /**
      * Adds a new polyline with the given name, points, color and line width. The polyline will
@@ -1714,7 +1843,10 @@ public interface IScriptingInterface {
      * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      */
-    void addPolyline(String name, double[] points, double[] color, double lineWidth);
+    void addPolyline(String name,
+                     double[] points,
+                     double[] color,
+                     double lineWidth);
 
     /**
      * Adds a new polyline with the given name, points, color and line width. The polyline will
@@ -1731,7 +1863,11 @@ public interface IScriptingInterface {
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
      */
-    void addPolyline(String name, double[] points, double[] color, double lineWidth, boolean arrowCaps);
+    void addPolyline(String name,
+                     double[] points,
+                     double[] color,
+                     double lineWidth,
+                     boolean arrowCaps);
 
     /**
      * Adds a new polyline with the given name, points, color, line width and primitive. The polyline will
@@ -1745,7 +1881,11 @@ public interface IScriptingInterface {
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
      */
-    void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive);
+    void addPolyline(String name,
+                     double[] points,
+                     double[] color,
+                     double lineWidth,
+                     int primitive);
 
     /**
      * Adds a new polyline with the given name, points, color, line width, primitive and arrow caps. The polyline will
@@ -1762,7 +1902,12 @@ public interface IScriptingInterface {
      * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
      * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
      */
-    void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps);
+    void addPolyline(String name,
+                     double[] points,
+                     double[] color,
+                     double lineWidth,
+                     int primitive,
+                     boolean arrowCaps);
 
     /**
      * <p>
@@ -1831,7 +1976,8 @@ public interface IScriptingInterface {
      * @param y The new y coordinate of the new top-left corner of the window,
      *          in [0,1] from bottom to top.
      */
-    void setGuiPosition(float x, float y);
+    void setGuiPosition(float x,
+                        float y);
 
     /**
      * Blocks the execution until any kind of input (keyboard, mouse, etc.) is
@@ -1895,7 +2041,8 @@ public interface IScriptingInterface {
      *
      * @return True if the timeout ran out. False otherwise.
      */
-    boolean waitFocus(String name, long timeoutMs);
+    boolean waitFocus(String name,
+                      long timeoutMs);
 
     /**
      * Sets the target frame rate of the camera recorder. This will cap the frame rate of Gaia
@@ -1960,12 +2107,14 @@ public interface IScriptingInterface {
      * @param sync If true, the call is synchronous and waits for the camera
      *             file to finish. Otherwise, it returns immediately.
      */
-    void runCameraPath(String file, boolean sync);
+    void runCameraPath(String file,
+                       boolean sync);
 
     /**
      * Alias for {@link IScriptingInterface#runCameraPath(String, boolean)}
      */
-    void playCameraPath(String file, boolean sync);
+    void playCameraPath(String file,
+                        boolean sync);
 
     /**
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
@@ -1979,7 +2128,10 @@ public interface IScriptingInterface {
      * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
      */
-    void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds);
+    void cameraTransition(double[] camPos,
+                          double[] camDir,
+                          double[] camUp,
+                          double seconds);
 
     /**
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
@@ -1994,7 +2146,11 @@ public interface IScriptingInterface {
      * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
      */
-    void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds);
+    void cameraTransition(double[] camPos,
+                          String units,
+                          double[] camDir,
+                          double[] camUp,
+                          double seconds);
 
     /**
      * Same as {@link IScriptingInterface#cameraTransition(double[], double[], double[], double)} but the
@@ -2005,7 +2161,10 @@ public interface IScriptingInterface {
      * @param camUp   The target camera up vector.
      * @param seconds The duration of the transition in seconds.
      */
-    void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds);
+    void cameraTransitionKm(double[] camPos,
+                            double[] camDir,
+                            double[] camUp,
+                            double seconds);
 
     /**
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
@@ -2020,7 +2179,11 @@ public interface IScriptingInterface {
      * @param seconds The duration of the transition in seconds.
      * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
      */
-    void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync);
+    void cameraTransition(double[] camPos,
+                          double[] camDir,
+                          double[] camUp,
+                          double seconds,
+                          boolean sync);
 
     /**
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
@@ -2036,7 +2199,12 @@ public interface IScriptingInterface {
      * @param seconds The duration of the transition in seconds.
      * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
      */
-    void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds, boolean sync);
+    void cameraTransition(double[] camPos,
+                          String units,
+                          double[] camDir,
+                          double[] camUp,
+                          double seconds,
+                          boolean sync);
 
     /**
      * Sleeps for the given number of seconds in the application time (FPS), so
@@ -2081,7 +2249,9 @@ public interface IScriptingInterface {
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      * internal reference system, in internal units.
      */
-    double[] galacticToInternalCartesian(double l, double b, double r);
+    double[] galacticToInternalCartesian(double l,
+                                         double b,
+                                         double r);
 
     /**
      * Converts ecliptic coordinates to the internal cartesian coordinate
@@ -2094,7 +2264,9 @@ public interface IScriptingInterface {
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      * internal reference system, in internal units.
      */
-    double[] eclipticToInternalCartesian(double l, double b, double r);
+    double[] eclipticToInternalCartesian(double l,
+                                         double b,
+                                         double r);
 
     /**
      * Converts equatorial coordinates to the internal cartesian coordinate
@@ -2107,7 +2279,9 @@ public interface IScriptingInterface {
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      * internal reference system, in internal units.
      */
-    double[] equatorialToInternalCartesian(double ra, double dec, double r);
+    double[] equatorialToInternalCartesian(double ra,
+                                           double dec,
+                                           double r);
 
     /**
      * Converts internal cartesian coordinates to equatorial
@@ -2122,7 +2296,9 @@ public interface IScriptingInterface {
      * <code>distance</code> in the same distance units as the input
      * position.
      */
-    double[] internalCartesianToEquatorial(double x, double y, double z);
+    double[] internalCartesianToEquatorial(double x,
+                                           double y,
+                                           double z);
 
     /**
      * Converts regular cartesian coordinates, where XY is the equatorial plane, with X pointing to
@@ -2134,7 +2310,8 @@ public interface IScriptingInterface {
      *
      * @return Internal coordinates ready to be fed in other scripting functions
      */
-    double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor);
+    double[] equatorialCartesianToInternalCartesian(double[] eq,
+                                                    double kmFactor);
 
     /**
      * Converts equatorial cartesian coordinates (in the internal reference system)
@@ -2251,7 +2428,8 @@ public interface IScriptingInterface {
      * @param state      The boolean state. True to activate, false to deactivate.
      * @param projection The projection as a string.
      */
-    void setCubemapMode(boolean state, String projection);
+    void setCubemapMode(boolean state,
+                        String projection);
 
     /**
      * Enables or disables the panorama mode.
@@ -2370,6 +2548,7 @@ public interface IScriptingInterface {
      * @param state Activate (true) or deactivate (false).
      */
     void setLensFlare(boolean state);
+
     /**
      * Sets the strength of the lens flare effect, in [0,1].
      * Set to 0 to disable the effect.
@@ -2499,7 +2678,8 @@ public interface IScriptingInterface {
     /**
      * See {@link IScriptingInterface#parkSceneRunnable(String, Runnable)}.
      */
-    void parkRunnable(String id, Runnable runnable);
+    void parkRunnable(String id,
+                      Runnable runnable);
 
     /**
      * <p>
@@ -2517,7 +2697,8 @@ public interface IScriptingInterface {
      * @param id       The string id to identify the runnable.
      * @param runnable The scene update runnable to park.
      */
-    void parkSceneRunnable(String id, Runnable runnable);
+    void parkSceneRunnable(String id,
+                           Runnable runnable);
 
     /**
      * <p>
@@ -2534,7 +2715,8 @@ public interface IScriptingInterface {
      * @param id       The string id to identify the runnable.
      * @param runnable The camera update runnable to park.
      */
-    void parkCameraRunnable(String id, Runnable runnable);
+    void parkCameraRunnable(String id,
+                            Runnable runnable);
 
     /**
      * Removes the runnable with the given id, if any. Use this method to remove previously parked scene and camera runnables.
@@ -2568,7 +2750,8 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded, true otherwise.
      */
-    boolean loadDataset(String dsName, String path);
+    boolean loadDataset(String dsName,
+                        String path);
 
     /**
      * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
@@ -2589,7 +2772,9 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadDataset(final String dsName, final String path, final boolean sync);
+    boolean loadDataset(final String dsName,
+                        final String path,
+                        final boolean sync);
 
     /**
      * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
@@ -2613,7 +2798,11 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadDataset(final String dsName, final String path, final CatalogInfoSource type, final DatasetOptions options, final boolean sync);
+    boolean loadDataset(final String dsName,
+                        final String path,
+                        final CatalogInfoSource type,
+                        final DatasetOptions options,
+                        final boolean sync);
 
     /**
      * Loads a star dataset from a VOTable, a CSV or a FITS file.
@@ -2629,7 +2818,9 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarDataset(String dsName, String path, boolean sync);
+    boolean loadStarDataset(String dsName,
+                            String path,
+                            boolean sync);
 
     /**
      * Loads a star dataset from a VOTable, a CSV or a FITS file.
@@ -2646,7 +2837,10 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync);
+    boolean loadStarDataset(String dsName,
+                            String path,
+                            double magnitudeScale,
+                            boolean sync);
 
     /**
      * Loads a star dataset from a VOTable, a CSV or a FITS file.
@@ -2663,7 +2857,11 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, boolean sync);
+    boolean loadStarDataset(String dsName,
+                            String path,
+                            double magnitudeScale,
+                            double[] labelColor,
+                            boolean sync);
 
     /**
      * Loads a star dataset from a VOTable, a CSV or a FITS file.
@@ -2682,7 +2880,13 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadStarDataset(String dsName,
+                            String path,
+                            double magnitudeScale,
+                            double[] labelColor,
+                            double[] fadeIn,
+                            double[] fadeOut,
+                            boolean sync);
 
     /**
      * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
@@ -2703,7 +2907,15 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, boolean sync);
+    boolean loadParticleDataset(String dsName,
+                                String path,
+                                double profileDecay,
+                                double[] particleColor,
+                                double colorNoise,
+                                double[] labelColor,
+                                double particleSize,
+                                String ct,
+                                boolean sync);
 
     /**
      * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
@@ -2726,7 +2938,17 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadParticleDataset(String dsName,
+                                String path,
+                                double profileDecay,
+                                double[] particleColor,
+                                double colorNoise,
+                                double[] labelColor,
+                                double particleSize,
+                                String ct,
+                                double[] fadeIn,
+                                double[] fadeOut,
+                                boolean sync);
 
     /**
      * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
@@ -2750,7 +2972,18 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] particleSizeLimits, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadParticleDataset(String dsName,
+                                String path,
+                                double profileDecay,
+                                double[] particleColor,
+                                double colorNoise,
+                                double[] labelColor,
+                                double particleSize,
+                                double[] particleSizeLimits,
+                                String ct,
+                                double[] fadeIn,
+                                double[] fadeOut,
+                                boolean sync);
 
     /**
      * Loads a star cluster dataset from a CSV file. The file needs the columns with the
@@ -2770,7 +3003,12 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadStarClusterDataset(String dsName,
+                                   String path,
+                                   double[] particleColor,
+                                   double[] fadeIn,
+                                   double[] fadeOut,
+                                   boolean sync);
 
     /**
      * Loads a star cluster dataset from a CSV file. The file needs the columns with the
@@ -2790,7 +3028,13 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadStarClusterDataset(String dsName,
+                                   String path,
+                                   double[] particleColor,
+                                   double[] labelColor,
+                                   double[] fadeIn,
+                                   double[] fadeOut,
+                                   boolean sync);
 
     /**
      * Loads a star cluster dataset from a CSV file. The file needs the columns with the
@@ -2811,7 +3055,13 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadStarClusterDataset(String dsName,
+                                   String path,
+                                   double[] particleColor,
+                                   String ct,
+                                   double[] fadeIn,
+                                   double[] fadeOut,
+                                   boolean sync);
 
     /**
      * Loads a star cluster dataset from a CSV file. The file needs the columns with the
@@ -2832,7 +3082,14 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadStarClusterDataset(String dsName,
+                                   String path,
+                                   double[] particleColor,
+                                   double[] labelColor,
+                                   String ct,
+                                   double[] fadeIn,
+                                   double[] fadeOut,
+                                   boolean sync);
 
     /**
      * Loads a variable star dataset from a VOTable, CSV or FITS file.
@@ -2857,12 +3114,18 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadVariableStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
+    boolean loadVariableStarDataset(String dsName,
+                                    String path,
+                                    double magnitudeScale,
+                                    double[] labelColor,
+                                    double[] fadeIn,
+                                    double[] fadeOut,
+                                    boolean sync);
 
     /**
      * Loads a Gaia Sky JSON dataset file asynchronously. The call returns immediately, and the
      * dataset becomes available when it finished loading.
-     * The Gaia Sky JSON data format is described 
+     * The Gaia Sky JSON data format is described
      * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
      *
      * @param dsName The name of the dataset.
@@ -2870,12 +3133,13 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded. True otherwise.
      */
-    boolean loadJsonCatalog(String dsName, String path);
+    boolean loadJsonCatalog(String dsName,
+                            String path);
 
     /**
      * Loads a JSON Gaia Sky dataset file asynchronously. The call returns immediately, and the
      * dataset becomes available when it finished loading.
-     * The Gaia Sky JSON data format is described 
+     * The Gaia Sky JSON data format is described
      * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
      *
      * @param dsName The name of the dataset.
@@ -2883,11 +3147,12 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded. True otherwise.
      */
-    boolean loadJsonDataset(String dsName, String path);
+    boolean loadJsonDataset(String dsName,
+                            String path);
 
     /**
      * Loads a Gaia Sky JSON dataset file in a synchronous or asynchronous manner.
-     * The Gaia Sky JSON data format is described 
+     * The Gaia Sky JSON data format is described
      * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
      *
      * @param dsName The name of the dataset.
@@ -2896,7 +3161,9 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be loaded. True otherwise.
      */
-    boolean loadJsonDataset(String dsName, String path, boolean sync);
+    boolean loadJsonDataset(String dsName,
+                            String path,
+                            boolean sync);
 
     /**
      * Removes the dataset identified by the given name, if it exists.
@@ -2961,7 +3228,9 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be found.
      */
-    boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
+    boolean highlightDataset(String dsName,
+                             int colorIndex,
+                             boolean highlight);
 
     /**
      * Enables or disables the dataset highlight using a plain color chosen by the system.
@@ -2971,7 +3240,8 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be found.
      */
-    boolean highlightDataset(String dsName, boolean highlight);
+    boolean highlightDataset(String dsName,
+                             boolean highlight);
 
     /**
      * Enables or disables the dataset highlight, using a given plain color.
@@ -2982,7 +3252,12 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be found.
      */
-    boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight);
+    boolean highlightDataset(String dsName,
+                             float r,
+                             float g,
+                             float b,
+                             float a,
+                             boolean highlight);
 
     /**
      * Enables or disables the dataset highlight, using the given color map on the given attribute with the given
@@ -3001,7 +3276,12 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be found.
      */
-    boolean highlightDataset(String dsName, String attributeName, String colorMap, double minMap, double maxMap, boolean highlight);
+    boolean highlightDataset(String dsName,
+                             String attributeName,
+                             String colorMap,
+                             double minMap,
+                             double maxMap,
+                             boolean highlight);
 
     /**
      * Sets the size increase factor of this dataset when highlighted.
@@ -3011,7 +3291,8 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be found.
      */
-    boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor);
+    boolean setDatasetHighlightSizeFactor(String dsName,
+                                          float sizeFactor);
 
     /**
      * Sets the 'all visible' property of datasets when highlighted. If set to true, all stars in the dataset have an increased minimum
@@ -3022,7 +3303,8 @@ public interface IScriptingInterface {
      *
      * @return False if the dataset could not be found.
      */
-    boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible);
+    boolean setDatasetHighlightAllVisible(String dsName,
+                                          boolean allVisible);
 
     /**
      * Sets the dataset point size multiplier.
@@ -3030,7 +3312,8 @@ public interface IScriptingInterface {
      * @param dsName     The dataset name.
      * @param multiplier The multiplier, as a positive floating point number.
      */
-    void setDatasetPointSizeMultiplier(String dsName, double multiplier);
+    void setDatasetPointSizeMultiplier(String dsName,
+                                       double multiplier);
 
     /**
      * Creates a shape object of the given type with the given size around the object with the given name.
@@ -3047,7 +3330,17 @@ public interface IScriptingInterface {
      * @param showLabel   Whether to show a label with the name of the shape.
      * @param trackObject Whether to track the object if/when it moves.
      */
-    void addShapeAroundObject(String shapeName, String shape, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject);
+    void addShapeAroundObject(String shapeName,
+                              String shape,
+                              String primitive,
+                              double size,
+                              String objectName,
+                              float r,
+                              float g,
+                              float b,
+                              float a,
+                              boolean showLabel,
+                              boolean trackObject);
 
     /**
      * Sets the maximum simulation time allowed, in years. This sets the maximum time in the future (years)
@@ -3164,7 +3457,9 @@ public interface IScriptingInterface {
      *
      * @return The new vector, rotated.
      */
-    double[] rotate3(double[] vector, double[] axis, double angle);
+    double[] rotate3(double[] vector,
+                     double[] axis,
+                     double angle);
 
     /**
      * Rotates a 2D vector by the specified angle in degrees, counter-clockwise assuming that
@@ -3174,7 +3469,8 @@ public interface IScriptingInterface {
      *
      * @return The new vector, rotated.
      */
-    double[] rotate2(double[] vector, double angle);
+    double[] rotate2(double[] vector,
+                     double angle);
 
     /**
      * Computes the cross product between the two 3D vectors.
@@ -3184,7 +3480,8 @@ public interface IScriptingInterface {
      *
      * @return Cross product 3D vector.
      */
-    double[] cross3(double[] vec1, double[] vec2);
+    double[] cross3(double[] vec1,
+                    double[] vec2);
 
     /**
      * Computes the dot product between the two 3D vectors.
@@ -3194,7 +3491,8 @@ public interface IScriptingInterface {
      *
      * @return The dot product scalar.
      */
-    double dot3(double[] vec1, double[] vec2);
+    double dot3(double[] vec1,
+                double[] vec2);
 
     /**
      * Print text using the internal logging system.

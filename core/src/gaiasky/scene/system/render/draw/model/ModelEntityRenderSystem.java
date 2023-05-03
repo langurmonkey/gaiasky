@@ -27,7 +27,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.Environment;
-import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
@@ -58,7 +57,14 @@ public class ModelEntityRenderSystem {
      * @param renderGroup The render group.
      * @param shadow      Whether to prepare the shadow environment, to render the shadow map.
      */
-    public void render(Entity entity, IntModelBatch batch, ICamera camera, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow) {
+    public void render(Entity entity,
+                       IntModelBatch batch,
+                       ICamera camera,
+                       float alpha,
+                       double t,
+                       RenderingContext rc,
+                       RenderGroup renderGroup,
+                       boolean shadow) {
         var model = Mapper.model.get(entity);
         if (model != null) {
             if (model.renderConsumer != null) {
@@ -78,7 +84,10 @@ public class ModelEntityRenderSystem {
      * @param alpha      The alpha value.
      * @param shadow     Shadow environment.
      */
-    public void renderOpaque(Entity entity, IntModelBatch modelBatch, float alpha, boolean shadow) {
+    public void renderOpaque(Entity entity,
+                             IntModelBatch modelBatch,
+                             float alpha,
+                             boolean shadow) {
         var scaffolding = Mapper.modelScaffolding.get(entity);
         var model = Mapper.model.get(entity);
 
@@ -98,7 +107,15 @@ public class ModelEntityRenderSystem {
         }
     }
 
-    public void renderVRDeviceModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
+    public void renderVRDeviceModel(Entity entity,
+                                    Model model,
+                                    IntModelBatch batch,
+                                    float alpha,
+                                    double t,
+                                    RenderingContext rc,
+                                    RenderGroup renderGroup,
+                                    boolean relativistic,
+                                    boolean shadow) {
         model.model.setTransparency(alpha);
         batch.render(model.model.instance, model.model.env);
     }
@@ -116,7 +133,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderGenericModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
+    public void renderGenericModel(Entity entity,
+                                   Model model,
+                                   IntModelBatch batch,
+                                   float alpha,
+                                   double t,
+                                   RenderingContext rc,
+                                   RenderGroup renderGroup,
+                                   boolean relativistic,
+                                   boolean shadow) {
         var scaffolding = Mapper.modelScaffolding.get(entity);
 
         ModelComponent mc = model.model;
@@ -152,7 +177,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderShape(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
+    public void renderShape(Entity entity,
+                            Model model,
+                            IntModelBatch batch,
+                            float alpha,
+                            double t,
+                            RenderingContext rc,
+                            RenderGroup renderGroup,
+                            boolean relativistic,
+                            boolean shadow) {
         var mc = model.model;
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
@@ -180,7 +213,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderRecursiveGridModel(Entity entity, Model model, IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
+    public void renderRecursiveGridModel(Entity entity,
+                                         Model model,
+                                         IntModelBatch modelBatch,
+                                         float alpha,
+                                         double t,
+                                         RenderingContext rc,
+                                         RenderGroup renderGroup,
+                                         boolean shadow,
+                                         boolean relativistic) {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var gr = Mapper.gridRec.get(entity);
@@ -214,7 +255,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderMeshModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
+    public void renderMeshModel(Entity entity,
+                                Model model,
+                                IntModelBatch batch,
+                                float alpha,
+                                double t,
+                                RenderingContext rc,
+                                RenderGroup renderGroup,
+                                boolean relativistic,
+                                boolean shadow) {
         if (model.model != null) {
             var graph = Mapper.graph.get(entity);
             var base = Mapper.base.get(entity);
@@ -250,7 +299,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderStarClusterModel(Entity entity, Model model, IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
+    public void renderStarClusterModel(Entity entity,
+                                       Model model,
+                                       IntModelBatch modelBatch,
+                                       float alpha,
+                                       double t,
+                                       RenderingContext rc,
+                                       RenderGroup renderGroup,
+                                       boolean shadow,
+                                       boolean relativistic) {
         ModelComponent mc = model.model;
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
@@ -275,7 +332,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderParticleStarSetModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
+    public void renderParticleStarSetModel(Entity entity,
+                                           Model model,
+                                           IntModelBatch batch,
+                                           float alpha,
+                                           double t,
+                                           RenderingContext rc,
+                                           RenderGroup renderGroup,
+                                           boolean shadow,
+                                           boolean relativistic) {
         var set = Mapper.starSet.get(entity);
 
         var mc = model.model;
@@ -295,7 +360,8 @@ public class ModelEntityRenderSystem {
                     int idx = set.proximity.updating[0].index;
                     // We need to fetch the position again, for the camera position is different in stereoscopic mode.
                     var pos = set.fetchPosition(set.get(idx), GaiaSky.instance.getICamera().getPos().put(aux3d1), aux3d2, set.currDeltaYears);
-                    mc.instance.transform.idt().translate((float) pos.x, (float) pos.y, (float) pos.z).scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
+                    mc.instance.transform.idt().translate((float) pos.x, (float) pos.y, (float) pos.z).scl(
+                            (float) (set.getRadius(set.active[0]) * 2d * variableScaling));
                     if (relativistic) {
                         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
                     }
@@ -319,7 +385,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderParticleStarModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
+    public void renderParticleStarModel(Entity entity,
+                                        Model model,
+                                        IntModelBatch batch,
+                                        float alpha,
+                                        double t,
+                                        RenderingContext rc,
+                                        RenderGroup renderGroup,
+                                        boolean shadow,
+                                        boolean relativistic) {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var extra = Mapper.extra.get(entity);
@@ -353,7 +427,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderSpacecraft(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
+    public void renderSpacecraft(Entity entity,
+                                 Model model,
+                                 IntModelBatch batch,
+                                 float alpha,
+                                 double t,
+                                 RenderingContext rc,
+                                 RenderGroup renderGroup,
+                                 boolean shadow,
+                                 boolean relativistic) {
         var scaffolding = Mapper.modelScaffolding.get(entity);
         var graph = Mapper.graph.get(entity);
 
@@ -391,7 +473,15 @@ public class ModelEntityRenderSystem {
      * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderPlanet(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
+    public void renderPlanet(Entity entity,
+                             Model model,
+                             IntModelBatch batch,
+                             float alpha,
+                             double t,
+                             RenderingContext rc,
+                             RenderGroup renderGroup,
+                             boolean shadow,
+                             boolean relativistic) {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var scaffolding = Mapper.modelScaffolding.get(entity);
@@ -410,7 +500,8 @@ public class ModelEntityRenderSystem {
                 if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0) {
                     var graph = Mapper.graph.get(entity);
                     var rotation = Mapper.rotation.get(entity);
-                    atmosphere.atmosphere.updateAtmosphericScatteringParams(model.model.instance.materials.first(), alpha * atmOpacity, true, graph, rotation, scaffolding, rc.vrOffset);
+                    atmosphere.atmosphere.updateAtmosphericScatteringParams(model.model.instance.materials.first(), alpha * atmOpacity, true, graph,
+                                                                            rotation, scaffolding, rc.vrOffset);
                 } else {
                     atmosphere.atmosphere.removeAtmosphericScattering(model.model.instance.materials.first());
                 }
@@ -427,7 +518,14 @@ public class ModelEntityRenderSystem {
     /**
      * Renders the atmosphere of a planet.
      */
-    public void renderAtmosphere(Entity entity, Body body, Model model, ModelScaffolding scaffolding, IntModelBatch batch, Atmosphere atmosphere, float alpha, RenderingContext rc) {
+    public void renderAtmosphere(Entity entity,
+                                 Body body,
+                                 Model model,
+                                 ModelScaffolding scaffolding,
+                                 IntModelBatch batch,
+                                 Atmosphere atmosphere,
+                                 float alpha,
+                                 RenderingContext rc) {
 
         // Atmosphere fades in between 1 and 2 degrees of view angle apparent
         ICamera cam = GaiaSky.instance.getICamera();
@@ -436,7 +534,8 @@ public class ModelEntityRenderSystem {
             var graph = Mapper.graph.get(entity);
             var rotation = Mapper.rotation.get(entity);
             AtmosphereComponent ac = atmosphere.atmosphere;
-            ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, graph, rotation, scaffolding, rc.vrOffset);
+            ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, graph, rotation, scaffolding,
+                                                 rc.vrOffset);
             ac.mc.updateRelativisticEffects(cam);
             batch.render(ac.mc.instance, model.model.env);
         }
@@ -445,7 +544,13 @@ public class ModelEntityRenderSystem {
     /**
      * Renders the cloud layer of a planet.
      */
-    public void renderClouds(Entity entity, Base base, Model model, Cloud cloud, IntModelBatch batch, float alpha, double t) {
+    public void renderClouds(Entity entity,
+                             Base base,
+                             Model model,
+                             Cloud cloud,
+                             IntModelBatch batch,
+                             float alpha,
+                             double t) {
         // Update cull face depending on distance.
         cloud.cloud.updateCullFace(Mapper.body.get(entity).distToCamera);
         cloud.cloud.touch();
@@ -459,7 +564,9 @@ public class ModelEntityRenderSystem {
     /**
      * Prepares the shadow environment for shadow mapping.
      */
-    protected void prepareShadowEnvironment(Entity entity, Model model, ModelScaffolding scaffolding) {
+    protected void prepareShadowEnvironment(Entity entity,
+                                            Model model,
+                                            ModelScaffolding scaffolding) {
         if (Settings.settings.scene.renderer.shadow.active) {
             Environment env = model.model.env;
             var shadowMapPass = sceneRenderer.getShadowMapPass();
