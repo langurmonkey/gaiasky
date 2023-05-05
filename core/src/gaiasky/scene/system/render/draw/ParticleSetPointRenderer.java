@@ -166,7 +166,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                 shaderProgram.setUniformf("u_falloff", set.profileDecay);
-                shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.5)) * sizeFactor * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.1)) * sizeFactor * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                 shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()), (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
 
                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());

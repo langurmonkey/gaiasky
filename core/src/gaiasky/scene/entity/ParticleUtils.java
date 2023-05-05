@@ -50,7 +50,7 @@ public class ParticleUtils {
     }
 
     public float getPointScaling(Highlight hl, GraphNode graph) {
-        if (hl != null) {
+        if (hl != null && graph.parent != null) {
             if (Mapper.octree.has(graph.parent)) {
                 var hlParent = Mapper.highlight.get(graph.parent);
                 return hl.pointscaling * hlParent.pointscaling;
