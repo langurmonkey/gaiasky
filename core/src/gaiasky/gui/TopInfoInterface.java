@@ -22,7 +22,9 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.ClickableLabel;
 import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -30,6 +32,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
 
+/**
+ * Implements the information line displayed at the top of the main window (and in the gamepad
+ * GUI in VR) containing the current time, and the home, closest and focus objects.
+ */
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     private final ZoneId timeZone;
@@ -52,7 +58,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     private final FocusView view;
     private String lastFocusName;
 
-    public TopInfoInterface(Skin skin, Scene scene) {
+    public TopInfoInterface(Skin skin,
+                            Scene scene) {
         super(skin);
         this.setBackground("table-bg");
 
@@ -66,11 +73,13 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
 
-        date = new OwnLabel(I18n.msg("gui.top.date.ut"), skin, "mono");
+        date = new ClickableLabel(I18n.msg("gui.top.date.ut"), skin, "mono", () -> EventManager.publish(Event.SHOW_DATE_TIME_EDIT_ACTION, this));
         date.setName("label date tii");
+        date.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
-        time = new OwnLabel(I18n.msg("gui.top.time.ut"), skin, "mono");
+        time = new ClickableLabel(I18n.msg("gui.top.time.ut"), skin, "mono", () -> EventManager.publish(Event.SHOW_DATE_TIME_EDIT_ACTION, this));
         time.setName("label time tii");
+        time.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
         pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "mono");
         pace.setName("pace tii");
@@ -102,7 +111,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         pack();
 
-        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_STATE_CMD, Event.CAMERA_CLOSEST_INFO, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_STATE_CMD,
+                                        Event.CAMERA_CLOSEST_INFO, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
     }
 
     private void unsubscribe() {
@@ -110,7 +120,9 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
         case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
             // Update input time

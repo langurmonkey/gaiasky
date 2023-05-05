@@ -1027,6 +1027,8 @@ public enum Event {
     SCROLLED,
 
     SHOW_ABOUT_ACTION,
+    /** Brings up the date/time edit window. **/
+    SHOW_DATE_TIME_EDIT_ACTION,
 
     /** Brings up the VR user interface. **/
     SHOW_VR_UI,

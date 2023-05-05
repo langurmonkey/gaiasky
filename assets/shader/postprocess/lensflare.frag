@@ -186,7 +186,7 @@ void main(void) {
 
             // Compute intensity of light.
             float t = 0;
-            float a = 0.001;
+            float a = 0.01;
             float dt = 3.0 * 3.14159 / N_SAMPLES;
             float lum = 0.0;
             for (int idx = 0; idx < N_SAMPLES; idx++){

@@ -45,7 +45,6 @@ public class TimeComponent extends GuiComponent implements IObserver {
     protected OwnLabel time;
     protected ImageButton plus, minus;
     protected OwnTextIconButton dateEdit;
-    protected DateDialog dateDialog;
     protected OwnSliderPlus warp;
     protected double[] timeWarpVector;
     // Guard to know when to fire warp events
@@ -77,12 +76,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                // Left button click
-                if (dateDialog == null) {
-                    dateDialog = new DateDialog(stage, skin);
-                }
-                dateDialog.updateTime(GaiaSky.instance.time.getTime(), timeZone);
-                dateDialog.show(stage);
+                EventManager.publish(Event.SHOW_DATE_TIME_EDIT_ACTION, this);
             }
             return false;
         });

@@ -77,6 +77,7 @@ public class GuiRegistry implements IObserver {
     private PreferencesWindow preferencesWindow;
     private AboutWindow aboutWindow;
     private SearchDialog searchDialog;
+    private DateDialog dateDialog;
     /**
      * Keyframes window.
      **/
@@ -101,7 +102,9 @@ public class GuiRegistry implements IObserver {
     /**
      * Create new GUI registry object.
      */
-    public GuiRegistry(final Skin skin, final Scene scene, final CatalogManager catalogManager) {
+    public GuiRegistry(final Skin skin,
+                       final Scene scene,
+                       final CatalogManager catalogManager) {
         super();
         this.skin = skin;
         this.scene = scene;
@@ -110,9 +113,11 @@ public class GuiRegistry implements IObserver {
         this.view = new FocusView();
         // Windows which are visible from any GUI.
         EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION,
-                Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO,
-                Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION,
-                Event.CLOSE_ALL_GUI_WINDOWS_CMD);
+                                        Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION,
+                                        Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO,
+                                        Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION,
+                                        Event.SHOW_RESTART_ACTION,
+                                        Event.CLOSE_ALL_GUI_WINDOWS_CMD, Event.SHOW_DATE_TIME_EDIT_ACTION);
     }
 
     public InputMultiplexer getInputMultiplexer() {
@@ -130,7 +135,8 @@ public class GuiRegistry implements IObserver {
      * @param gui      The new GUI.
      * @param previous The new previous GUI.
      */
-    public void change(IGui gui, IGui previous) {
+    public void change(IGui gui,
+                       IGui previous) {
         if (current != gui) {
             unset(previous);
             set(gui);
@@ -229,7 +235,8 @@ public class GuiRegistry implements IObserver {
      * @param rw The render width.
      * @param rh The render height.
      */
-    public void render(int rw, int rh) {
+    public void render(int rw,
+                       int rh) {
         if (Settings.settings.runtime.displayGui) {
             synchronized (renderLock) {
                 for (int i = 0; i < guis.size; i++) {
@@ -306,7 +313,9 @@ public class GuiRegistry implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (current != null) {
             Stage stage = current.getGuiStage();
             // Treats windows that can appear in any GUI.
@@ -387,7 +396,8 @@ public class GuiRegistry implements IObserver {
                 }
             }
             case SHOW_LOAD_CATALOG_ACTION -> {
-                if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
+                if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null
+                        && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
                     try {
                         lastOpenLocation = Paths.get(Settings.settings.program.fileChooser.lastLocation);
                     } catch (Exception e) {
@@ -403,7 +413,8 @@ public class GuiRegistry implements IObserver {
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv")
+                        || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
                 fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
                 fc.setResultListener((success, result) -> {
                     if (success) {
@@ -425,7 +436,8 @@ public class GuiRegistry implements IObserver {
                                         GaiaSky.instance.getExecutorService().execute(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
                                             // Load dataset.
-                                            GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI, datasetOptions, true);
+                                            GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI,
+                                                                                     datasetOptions, true);
                                             // Select first.
                                             CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
                                             if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
@@ -436,7 +448,8 @@ public class GuiRegistry implements IObserver {
                                                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
                                                         EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getRandomParticleName());
                                                     }
-                                                } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(view.getGraph().children.get(0))) {
+                                                } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
+                                                        view.getGraph().children.get(0))) {
                                                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
                                                     EventManager.publish(Event.FOCUS_CHANGE_CMD, this, EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
                                                 }
@@ -512,6 +525,13 @@ public class GuiRegistry implements IObserver {
                 }
                 textureWindow.setFlip(flipX, flipY);
                 textureWindow.show(stage, 0, 50);
+            }
+            case SHOW_DATE_TIME_EDIT_ACTION -> {
+                if (dateDialog == null) {
+                    dateDialog = new DateDialog(stage, skin);
+                }
+                dateDialog.updateTime(GaiaSky.instance.time.getTime(), Settings.settings.program.timeZone.getTimeZone());
+                dateDialog.show(stage);
             }
             case UI_THEME_RELOAD_INFO -> {
                 if (keyframesWindow != null) {
