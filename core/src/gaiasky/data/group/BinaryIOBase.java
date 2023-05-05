@@ -21,14 +21,17 @@ public abstract class BinaryIOBase implements BinaryIO {
 
     protected boolean tychoIds;
 
-    protected BinaryIOBase(int nDoubles, int nFloats, boolean tychoIds) {
+    protected BinaryIOBase(int nDoubles,
+                           int nFloats,
+                           boolean tychoIds) {
         this.tychoIds = tychoIds;
         this.nDoubles = nDoubles;
         this.nFloats = nFloats;
     }
 
     @Override
-    public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) {
+    public ParticleRecord readParticleRecord(MappedByteBuffer mem,
+                                             double factor) {
         double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
         float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
         int floatOffset = 0;
@@ -39,9 +42,13 @@ public abstract class BinaryIOBase implements BinaryIO {
                 dataD[i] = mem.getDouble();
                 dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
-                // Goes to float array
+                // Goes to float array.
                 int idx = i - ParticleRecord.STAR_SIZE_D;
                 dataF[idx] = (float) mem.getDouble();
+                if (idx < 3) {
+                    // Proper motions.
+                    dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
+                }
                 floatOffset = idx + 1;
             }
         }
@@ -49,8 +56,11 @@ public abstract class BinaryIOBase implements BinaryIO {
         for (int i = 0; i < nFloats; i++) {
             int idx = i + floatOffset;
             dataF[idx] = mem.getFloat();
-            if (idx == ParticleRecord.I_FSIZE)
+            if (idx == ParticleRecord.I_FSIZE || (nFloats == 10  && idx < 3)) {
+                // 0-2 - Proper motions (only in version 2).
+                // 9 | 3 - Size (version 2 | 0-1).
                 dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
+            }
         }
         // HIP
         dataF[ParticleRecord.I_FHIP] = mem.getInt();
@@ -82,7 +92,8 @@ public abstract class BinaryIOBase implements BinaryIO {
     }
 
     @Override
-    public ParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException {
+    public ParticleRecord readParticleRecord(DataInputStream in,
+                                             double factor) throws IOException {
         double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
         float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
         int floatOffset = 0;
