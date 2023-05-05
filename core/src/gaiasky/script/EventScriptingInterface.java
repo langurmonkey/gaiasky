@@ -3937,19 +3937,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     objects.forEach(scene.engine::addEntity);
                     objects.forEach(scene::initializeEntity);
                     objects.forEach(scene::addToIndex);
-                    while (!GaiaSky.instance.assetManager.isFinished()) {
-                        // Active wait
-                        sleepFrames(1);
-                    }
-                    objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
-                    objects.forEach(scene::setUpEntity);
 
-                    GaiaSky.postRunnable(GaiaSky.instance::touchSceneGraph);
+                    // Wait for entity in new task.
+                    GaiaSky.instance.getExecutorService().execute(() -> {
+                        while (!GaiaSky.instance.assetManager.isFinished()) {
+                            // Active wait
+                            sleepFrames(1);
+                        }
+
+                        // Finish initialization and touch scene graph.
+                        GaiaSky.postRunnable(() -> {
+                            objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
+                            objects.forEach(scene::setUpEntity);
+                            GaiaSky.instance.touchSceneGraph();
+
+                        });
+                    });
                 });
-                // Sync waiting until the node is in the scene graph
-                while (sync && (objects.get(0) == null || Mapper.graph.get(objects.get(0)).parent != null)) {
-                    sleepFrames(1);
-                }
             }
 
         } catch (Exception e) {

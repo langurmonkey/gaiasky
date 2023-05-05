@@ -20,12 +20,14 @@ import net.jafama.FastMath;
 
 public class ModelExtractor extends AbstractExtractSystem {
 
-    public ModelExtractor(Family family, int priority) {
+    public ModelExtractor(Family family,
+                          int priority) {
         super(family, priority);
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity,
+                                 float deltaTime) {
         extractEntity(entity);
     }
 
@@ -33,9 +35,13 @@ public class ModelExtractor extends AbstractExtractSystem {
         addToRenderLists(entity, camera);
     }
 
-    protected void addToRenderLists(Entity entity, ICamera camera) {
+    protected void addToRenderLists(Entity entity,
+                                    ICamera camera) {
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
+        if (graph.parent == null) {
+            return;
+        }
         var coord = Mapper.coordinates.get(entity);
         Coordinates parentCoord = Mapper.coordinates.get(graph.parent);
 
@@ -117,7 +123,8 @@ public class ModelExtractor extends AbstractExtractSystem {
         }
     }
 
-    private void addToRenderModel(Render render, Model model) {
+    private void addToRenderModel(Render render,
+                                  Model model) {
         RenderGroup rg;
         var rt = Mapper.renderType.get(render.entity);
         if (rt != null && rt.renderGroup != null) {
@@ -132,7 +139,10 @@ public class ModelExtractor extends AbstractExtractSystem {
         return Settings.settings.scene.renderer.elevation.type.isTessellation() && model.model.hasHeight();
     }
 
-    private boolean renderText(Base base, Body body, SolidAngle sa, Label label) {
+    private boolean renderText(Base base,
+                               Body body,
+                               SolidAngle sa,
+                               Label label) {
         return base.names != null
                 && renderer.isOn(ComponentTypes.ComponentType.Labels)
                 && (label.forceLabel || FastMath.pow(body.solidAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
