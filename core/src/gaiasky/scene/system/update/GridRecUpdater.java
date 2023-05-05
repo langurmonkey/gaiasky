@@ -142,8 +142,8 @@ public class GridRecUpdater extends AbstractUpdateSystem {
 
     }
 
-    private Pair<Double, Double> getGridScaling(double camdist, Pair<Double, Double> res) {
-        double au = camdist * Constants.U_TO_AU;
+    private void getGridScaling(double cameraDistance, Pair<Double, Double> res) {
+        double au = cameraDistance * Constants.U_TO_AU;
         res.set(au, 0d);
 
         for (int i = -25; i < 25; i++) {
@@ -151,10 +151,9 @@ public class GridRecUpdater extends AbstractUpdateSystem {
                 double fading = MathUtilsDouble.lint(au, Math.pow(10d, i - 1), Math.pow(10d, i), 1d, 0d);
                 res.setFirst(au * Math.pow(10, -i));
                 res.setSecond(fading);
-                return res;
+                return;
             }
         }
-        return res;
     }
 
     private double getDistanceToOrigin(ICamera camera) {
