@@ -11,23 +11,23 @@ import com.badlogic.ashley.core.Component;
 
 public class SolidAngle implements Component {
     /**
-     * radius/distance limit for rendering at all. If angle is smaller than this
+     * Solid angle limit for rendering at all, in radians. If angle is smaller than this
      * quantity, no rendering happens.
      */
     public double thresholdNone;
 
     /**
-     * radius/distance limit for rendering as shader. If angle is any bigger, we
+     * Solid angle limit for rendering as a billboard, in radians. If angle is any bigger, we
      * render as a model.
      */
     public double thresholdQuad;
 
     /**
-     * radius/distance limit for rendering as point. If angle is any bigger, we
-     * render with shader.
+     * Solid angle limit for rendering as point, in radians. If angle is any bigger, we
+     * render as a billboard.
      */
     public double thresholdPoint;
 
-    /** Minimum solid angle for rendering the lable of this object. */
+    /** Minimum solid angle for rendering the label of this object, in radians. */
     public double thresholdLabel;
 }

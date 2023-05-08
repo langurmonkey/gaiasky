@@ -62,8 +62,9 @@ public class ClusterInitializer extends AbstractInitSystem {
         focus.hitRayConsumer = FocusHit::addHitRayCluster;
 
         // Solid angle.
-        sa.thresholdQuad = Math.toRadians(1.3);
-        sa.thresholdPoint = Math.toRadians(1.0);
+        sa.thresholdQuad = Math.toRadians(2.0);
+        sa.thresholdPoint = Math.toRadians(1.5);
+        sa.thresholdLabel = sa.thresholdPoint;
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units

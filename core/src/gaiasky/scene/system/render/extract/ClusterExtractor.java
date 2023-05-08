@@ -32,7 +32,7 @@ public class ClusterExtractor extends AbstractExtractSystem {
             if (body.solidAngleApparent >= sa.thresholdPoint) {
                 addToRender(render, RenderGroup.MODEL_VERT_ADDITIVE);
             }
-            if (body.solidAngleApparent >= sa.thresholdPoint || label.forceLabel) {
+            if (body.solidAngleApparent >= sa.thresholdLabel || label.forceLabel) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
 
