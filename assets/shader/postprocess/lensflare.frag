@@ -169,6 +169,8 @@ float fy(float t, float a) {
     return a * t * sin(t);
 }
 
+#include shader/lib_luma.glsl
+
 #define N_SAMPLES 6
 void main(void) {
     if (u_intensity > 0.0) {
@@ -186,12 +188,12 @@ void main(void) {
 
             // Compute intensity of light.
             float t = 0;
-            float a = 0.01;
+            float a = 0.02;
             float dt = 3.0 * 3.14159 / N_SAMPLES;
             float lum = 0.0;
             for (int idx = 0; idx < N_SAMPLES; idx++){
                 vec2 curr_coord = clamp(light_pos + vec2(0.5) + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
-                lum += (clamp(texture(u_texture0, curr_coord), 0.0, 1.0)).r;
+                lum += (clamp(luma(texture(u_texture0, curr_coord).rgb), 0.0, 1.0));
                 t += dt;
             }
             lum /= N_SAMPLES;
