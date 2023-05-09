@@ -9,6 +9,7 @@ package gaiasky.scene.system.render.draw.model;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
@@ -118,6 +119,13 @@ public class ModelEntityRenderSystem {
                                     boolean shadow) {
         model.model.setTransparency(alpha);
         batch.render(model.model.instance, model.model.env);
+
+        var vr = Mapper.vr.get(entity);
+        var intersectionModel = vr.intersectionModel;
+        // Intersection
+        if (vr.intersection != null && vr.interacting && vr.hitUI) {
+            batch.render(intersectionModel, model.model.env);
+        }
     }
 
     /**

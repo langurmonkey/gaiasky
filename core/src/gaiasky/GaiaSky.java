@@ -1195,9 +1195,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Update GUI.
         guiRegistry.update(dtGs);
-        if (mainVRGui != null) {
-            mainVRGui.update(dtGs);
-        }
         EventManager.publish(Event.UPDATE_GUI, this, dtGs);
 
         // Update clock.
@@ -1208,6 +1205,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Update cameras.
         cameraManager.update(dtGs, time);
+
+        // Update VR UI.
+        if (mainVRGui != null) {
+            mainVRGui.update(dtGs);
+        }
 
         // Run parked update-scene runnables.
         runParkedProcesses(parkedCameraRunnables);

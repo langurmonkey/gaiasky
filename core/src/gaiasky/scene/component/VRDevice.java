@@ -14,12 +14,17 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 
 public class VRDevice implements Component, IObserver {
 
     public XrControllerDevice device;
+
+    // Intersection sphere.
+    public IntModelInstance intersectionModel;
+    public Vector3d intersection;
 
     // Points in the beam.
     public Vector3d beamP0 = new Vector3d();
@@ -88,7 +93,6 @@ public class VRDevice implements Component, IObserver {
                     colorP2[3] = 0.0f;
                 }
             }
-
         }
     }
 }

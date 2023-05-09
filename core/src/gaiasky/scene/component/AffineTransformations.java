@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.record.*;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
 public class AffineTransformations implements Component {
@@ -60,6 +61,13 @@ public class AffineTransformations implements Component {
         initialize();
         QuaternionTransform qt = new QuaternionTransform();
         qt.setQuaternion(new Vector3d(axis), angle);
+        this.transformations.add(qt);
+    }
+
+    public void setQuaternion(QuaternionDouble q) {
+        initialize();
+        QuaternionTransform qt = new QuaternionTransform();
+        qt.setQuaternion(q);
         this.transformations.add(qt);
     }
 

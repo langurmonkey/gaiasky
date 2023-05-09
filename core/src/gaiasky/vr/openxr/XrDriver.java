@@ -517,7 +517,7 @@ public class XrDriver implements Disposable {
             check(xrEndFrame(xrSession, XrFrameEndInfo.malloc(stack)
                     .type$Default()
                     .next(NULL)
-                    .displayTime(frameState.predictedDisplayTime())
+                    .displayTime(currentFrameTime)
                     .environmentBlendMode(XR_ENVIRONMENT_BLEND_MODE_OPAQUE)
                     .layers(didRender ? layers : null)
                     .layerCount(didRender ? layers.remaining() : 0)));

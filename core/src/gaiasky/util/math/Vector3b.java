@@ -220,11 +220,11 @@ public class Vector3b implements Serializable {
     }
 
     public Vector3d tov3d() {
-        return new Vector3d(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
+        return new Vector3d(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
     }
 
     public Vector3d tov3d(Vector3d out) {
-        return out.set(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
+        return out.set(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
     }
 
     public Vector3b put(final Vector3b vec) {

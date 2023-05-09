@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -49,6 +50,7 @@ import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.*;
@@ -63,8 +65,15 @@ import java.util.Set;
 
 public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserver, Disposable {
 
+    /** Width of the UI frame buffer. **/
     public static final int WIDTH = (int) (1920 * 0.85);
+    /** Height of the UI frame buffer. **/
     public static final int HEIGHT = (int) (1080 * 0.85);
+
+    /** Ratio between height and width. **/
+    public static final double HEIGHT_OVER_WIDTH = (double) HEIGHT / (double) WIDTH;
+    /** Half of the ratio between height and width. **/
+    public static final double HEIGHT_OVER_2WIDTH = (double) HEIGHT / (2.0 * WIDTH);
 
     Scene scene;
     Stage stage;
@@ -85,16 +94,34 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     Set<VRDevice> vrControllers;
     Map<XrControllerDevice, VRDevice> deviceToDevice;
 
-    GamepadGui gamepadGui;
+    private GamepadGui gamepadGui;
 
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
-    XrControllerDevice interactingController;
+    private XrControllerDevice interactingController;
+
+    private final Vector3d auxDouble = new Vector3d();
+    private final Vector3 aux = new Vector3();
+    private final Vector3d mouseP0 = new Vector3d();
+    private final Vector3d mouseP1 = new Vector3d();
+    private final Vector3d point = new Vector3d();
+    private final Vector3d normal = new Vector3d();
+    private final Vector3d p0 = new Vector3d();
+    private final Vector3d p1 = new Vector3d();
+    private final Vector3d intersection3D = new Vector3d();
+    private final Vector3d intersection2D = new Vector3d();
+    private final Matrix4d transform = new Matrix4d();
+    private final Matrix4d inverse = new Matrix4d();
+    private final Vector3d camDir = new Vector3d();
+    private final Vector3d camUp = new Vector3d();
+    private final Vector3d up = new Vector3d();
+    private final Vector3d side = new Vector3d();
 
     public MainVRGui(Skin skin) {
         setSkin(skin);
     }
 
-    public void initialize(AssetManager manager, SpriteBatch batch) {
+    public void initialize(AssetManager manager,
+                           SpriteBatch batch) {
         setVR(Settings.settings.runtime.openXr);
         this.batch = new SpriteBatch(20, GaiaSky.instance.getGlobalResources().getSpriteShader());
         this.shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
@@ -139,15 +166,6 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
         stage.addActor(content);
     }
 
-    Vector3 aux = new Vector3();
-    Vector3d mouseP0 = new Vector3d();
-    Vector3d mouseP1 = new Vector3d();
-    Vector3d point = new Vector3d();
-    Vector3d normal = new Vector3d();
-    Vector3d intersection = new Vector3d();
-    PlaneDouble plane = new PlaneDouble(Vector3d.getUnitX(), 0.1 * Constants.M_TO_U);
-    Matrix4d transform = new Matrix4d();
-    Matrix4d inverse = new Matrix4d();
 
     public void update(double dt) {
         // Compute screen-space vertex coordinates for the current camera.
@@ -157,15 +175,17 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                 // Handle controller interaction.
                 if (!vr || !vrControllers.isEmpty()) {
                     var model = Mapper.model.get(entity);
+                    var affine = Mapper.affine.get(entity);
                     transform.set(model.model.instance.transform);
                     inverse.set(transform).inv();
                     // Original plane in object space.
-                    point.set(0, 0, 0);
-                    normal.set(0, 1, 0);
+                    ICamera camera = GaiaSky.instance.getICamera();
+
+                    point.set(0.0, 0.0, 0.0);
+                    normal.set(0.0, -1.0, 0.0);
                     // Move to world space by applying transform.
                     point.mul(transform);
-                    normal.mul(transform);
-                    plane.set(point, normal);
+                    normal.mul(affine.apply(transform.idt()));
                     // Check intersection with each controller.
                     int intersecting = 0;
                     for (var device : vrControllers) {
@@ -173,7 +193,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                             if (!deviceToDevice.containsKey(device.device)) {
                                 deviceToDevice.put(device.device, device);
                             }
-                            intersecting += processDevice(device, device.beamP0, device.beamPn);
+                            intersecting += processDevice(device, p0.set(device.beamP0), p1.set(device.beamPn));
                         } else {
                             deviceToDevice.remove(device.device);
                         }
@@ -187,7 +207,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                         mouseP0.set(aux).scl(3200.0);
                         mouseP1.set(cam.getDirection()).nor().scl(10.0 * Constants.KM_TO_U).add(mouseP0);
 
-                        var nHits = processDevice(null, mouseP0, mouseP1);
+                        var nHits = processDevice(null, p0.set(mouseP0), p1.set(mouseP1));
                         mouseHit = nHits > 0;
                         intersecting += nHits;
                     }
@@ -199,7 +219,6 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                 stage.act((float) dt);
             }
         }
-
     }
 
     /**
@@ -211,20 +230,25 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
      *
      * @return 1 if the intersection is successful, 0 otherwise.
      */
-    private int processDevice(VRDevice device, Vector3d beamP0, Vector3d beamP1) {
+    private int processDevice(VRDevice device,
+                              Vector3d beamP0,
+                              Vector3d beamP1) {
 
-        var intersects = IntersectorDouble.intersectSegmentPlane(beamP0, beamP1, plane, intersection);
+        ICamera cam = GaiaSky.instance.getICamera();
+
+        var intersects = IntersectorDouble.intersectLineSegmentPlane(beamP0, beamP1, normal, point, intersection3D);
 
         if (intersects) {
             // Use inverse transform to position on ZX plane.
-            intersection.mul(inverse);
-            double x3d = MathUtilsDouble.clamp(intersection.x, -0.28125, 0.28125);
-            double z3d = MathUtilsDouble.clamp(intersection.z, -0.5, 0.5);
+            intersection2D.set(intersection3D).mul(inverse);
+            double x3d = intersection2D.x;
+            double v = (x3d + HEIGHT_OVER_2WIDTH) / HEIGHT_OVER_WIDTH;
+            double z3d = intersection2D.z;
             double u = z3d + 0.5;
-            double v = (x3d + 0.28125) * 1 / 0.5625;
 
             // Update hit.
             if (device != null) {
+                device.intersection.set(intersection3D);
                 device.hitUI = u > 0 && u < 1 && v > 0 && v < 1;
                 // Default to current.
                 if (interactingController == null) {
@@ -261,6 +285,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                 var camera = GaiaSky.instance.getICamera();
                 var body = Mapper.body.get(entity);
                 var coord = Mapper.coordinates.get(entity);
+                var affine = Mapper.affine.get(entity);
                 // Update VR UI position.
                 body.pos.set(camera.getPos()).add(relativePosition);
                 ((StaticCoordinates) coord.coordinates).setPosition(body.pos);
@@ -326,7 +351,9 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
      *
      * @return Whether the point is in the polygon.
      */
-    public boolean contains(int x, int y, Vector3[] points) {
+    public boolean contains(int x,
+                            int y,
+                            Vector3[] points) {
         int i;
         int j;
         boolean result = false;
@@ -339,26 +366,19 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public void render(int rw, int rh) {
+    public void render(int rw,
+                       int rh) {
         if (stage != null) {
             buffer.begin();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
             stage.draw();
-
-            if (isVRUIVisible() && pointer != null) {
-                shapeRenderer.begin(ShapeType.Filled);
-                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y)) {
-                    shapeRenderer.setColor(1f, 0f, 0f, 1f);
-                    shapeRenderer.circle(pointer.x, pointer.y, 10);
-                }
-                shapeRenderer.end();
-            }
             buffer.end();
         }
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize(int width,
+                       int height) {
         if (shapeRenderer != null) {
             shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, WIDTH, HEIGHT);
             shapeRenderer.updateMatrices();
@@ -369,7 +389,8 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public void resizeImmediate(int width, int height) {
+    public void resizeImmediate(int width,
+                                int height) {
     }
 
     @Override
@@ -383,7 +404,8 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public void setVisibilityToggles(ComponentType[] entities, ComponentTypes visible) {
+    public void setVisibilityToggles(ComponentType[] entities,
+                                     ComponentTypes visible) {
     }
 
     @Override
@@ -412,7 +434,8 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public void setBackBufferSize(int width, int height) {
+    public void setBackBufferSize(int width,
+                                  int height) {
 
     }
 
@@ -427,7 +450,9 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         if (event == Event.SHOW_VR_UI) {
 
             GaiaSky.postRunnable(() -> {
@@ -513,16 +538,15 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                         // ~2 meters in front of the camera, on the equatorial plane.
                         // This should NOT depend on internal units, and neither should the size!
                         ICamera camera = GaiaSky.instance.getICamera();
-                        var dir = camera.getDirection().cpy();
+                        var dir = camDir.set(camera.getDirection());
                         dir.y = 0;
                         dir.nor();
                         var body = Mapper.body.get(entity);
+                        body.setSize(0.95);
                         if (vr) {
-                            body.pos.set(camera.getPos().cpy().add(camera.getCamera().position).add(dir.scl(2.0)));
-                            body.pos.add(0, 0.0, 0);
+                            body.pos.set(camera.getPos().cpy().add(camera.getCamera().position).add(dir.scl(0.9)));
                         } else {
                             body.pos.set(camera.getPos().cpy().add(dir.scl(2.0 * Constants.KM_TO_U)));
-                            body.pos.add(0, 0, 0);
                         }
 
                         // Save relative position.
@@ -535,14 +559,14 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                         // Set rotation.
                         var affine = Mapper.affine.get(entity);
                         affine.transformations.clear();
-                        dir.nor();
-                        var angle = dir.anglePrecise(new Vector3d(0, 0, 1));
+                        dir.set(camera.getCamera().direction);
+                        var angle = dir.angle(new Vector3d(0, 0, 1));
                         if (dir.x < 0) {
                             angle = -angle;
                         }
                         affine.setQuaternion(new double[] { 0, 1, 0 }, angle);
-                        affine.setQuaternion(new double[] { 1, 0, 0 }, 90);
-                        affine.setQuaternion(new double[] { 0, 1, 0 }, -90);
+                        affine.setQuaternion(new double[] { 1, 0, 0 }, 90.0);
+                        affine.setQuaternion(new double[] { 0, 1, 0 }, -90.0);
                     }
                 };
 
@@ -580,7 +604,10 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+    public boolean touchDown(int screenX,
+                             int screenY,
+                             int pointer,
+                             int button) {
         if (!vr) {
             if (button == Input.Buttons.LEFT && mouseHit) {
                 stage.touchDown((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, button);
@@ -592,7 +619,10 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+    public boolean touchUp(int screenX,
+                           int screenY,
+                           int pointer,
+                           int button) {
         if (!vr) {
             if (button == Input.Buttons.LEFT && mouseHit) {
                 stage.touchUp((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, button);
@@ -604,47 +634,57 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
+    public boolean touchDragged(int screenX,
+                                int screenY,
+                                int pointer) {
         return false;
     }
 
     @Override
-    public boolean mouseMoved(int screenX, int screenY) {
+    public boolean mouseMoved(int screenX,
+                              int screenY) {
         return false;
     }
 
     @Override
-    public boolean scrolled(float amountX, float amountY) {
+    public boolean scrolled(float amountX,
+                            float amountY) {
         return false;
     }
 
     @Override
-    public boolean showUI(boolean value, XrControllerDevice device) {
+    public boolean showUI(boolean value,
+                          XrControllerDevice device) {
         return false;
     }
 
     @Override
-    public boolean accept(boolean value, XrControllerDevice device) {
+    public boolean accept(boolean value,
+                          XrControllerDevice device) {
         return false;
     }
 
     @Override
-    public boolean cameraMode(boolean value, XrControllerDevice device) {
+    public boolean cameraMode(boolean value,
+                              XrControllerDevice device) {
         return false;
     }
 
     @Override
-    public boolean rotate(boolean value, XrControllerDevice device) {
+    public boolean rotate(boolean value,
+                          XrControllerDevice device) {
         return false;
     }
 
     @Override
-    public boolean move(Vector2 value, XrControllerDevice device) {
+    public boolean move(Vector2 value,
+                        XrControllerDevice device) {
         return false;
     }
 
     @Override
-    public boolean select(float value, XrControllerDevice device) {
+    public boolean select(float value,
+                          XrControllerDevice device) {
         if (visible) {
             if (value > 0) {
                 // Pressed.

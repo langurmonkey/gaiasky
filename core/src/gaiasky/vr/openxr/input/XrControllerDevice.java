@@ -81,14 +81,17 @@ public class XrControllerDevice {
      * @param frequency   The frequency in Hz.
      * @param amplitude   The amplitude in [0,1].
      */
-    public void sendHapticPulse(XrDriver driver, long nanoseconds, float frequency, float amplitude) {
+    public void sendHapticPulse(XrDriver driver,
+                                long nanoseconds,
+                                float frequency,
+                                float amplitude) {
         if (haptics != null) {
             haptics.sendHapticPulse(driver, nanoseconds, frequency, amplitude);
         }
     }
 
     public void setGripPose(XrPosef grip) {
-        if(modelInstance != null) {
+        if (modelInstance != null) {
             setFromXrPose(grip, modelInstance.transform);
         }
     }
@@ -98,7 +101,8 @@ public class XrControllerDevice {
         aimTransform.rotate(1, 0, 0, 20);
     }
 
-    private void setFromXrPose(XrPosef pose, Matrix4 transform) {
+    private void setFromXrPose(XrPosef pose,
+                               Matrix4 transform) {
         var pos = pose.position$();
         var ori = pose.orientation();
         position.set(pos.x(), pos.y(), pos.z());
@@ -118,31 +122,36 @@ public class XrControllerDevice {
         processMoveAction(move, listener);
     }
 
-    private void processShowUIAction(BoolAction action, XrInputListener listener) {
+    private void processShowUIAction(BoolAction action,
+                                     XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.showUI(action.currentState, action.getControllerDevice());
         }
     }
 
-    private void processCameraModeAction(BoolAction action, XrInputListener listener) {
+    private void processCameraModeAction(BoolAction action,
+                                         XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.cameraMode(action.currentState, action.getControllerDevice());
         }
     }
 
-    private void processAcceptAction(BoolAction action, XrInputListener listener) {
+    private void processAcceptAction(BoolAction action,
+                                     XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.accept(action.currentState, action.getControllerDevice());
         }
     }
 
-    private void processSelectAction(FloatAction action, XrInputListener listener) {
+    private void processSelectAction(FloatAction action,
+                                     XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.select(action.currentState, action.getControllerDevice());
         }
     }
 
-    private void processMoveAction(Vec2fAction action, XrInputListener listener) {
+    private void processMoveAction(Vec2fAction action,
+                                   XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.move(action.currentState, action.getControllerDevice());
         }
