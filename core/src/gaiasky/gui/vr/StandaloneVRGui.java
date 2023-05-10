@@ -228,11 +228,14 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
             positionSet = true;
         }
 
-        frameBuffer.begin();
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
-
+        // Update camera with view position and orientation.
         viewManager.updateCamera(layerView, camera);
 
+        frameBuffer.begin();
+        // Attach swapchain image to frame buffer.
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
+
+        // Actual rendering.
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         batch.begin(camera);
         batch.render(instance, uiEnvironment);

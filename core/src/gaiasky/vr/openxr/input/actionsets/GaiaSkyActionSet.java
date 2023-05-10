@@ -21,7 +21,8 @@ public class GaiaSkyActionSet extends ActionSet {
     public final XrControllerDevice deviceLeft, deviceRight;
     public final List<Action> actions;
 
-    public GaiaSkyActionSet(XrControllerDevice deviceLeft, XrControllerDevice deviceRight) {
+    public GaiaSkyActionSet(XrControllerDevice deviceLeft,
+                            XrControllerDevice deviceRight) {
         super("gaiasky", "Gaia Sky actions", 0);
         this.deviceLeft = deviceLeft;
         this.deviceRight = deviceRight;
@@ -114,7 +115,7 @@ public class GaiaSkyActionSet extends ActionSet {
                         new Pair<>(deviceRight.move, "/user/hand/right/input/thumbstick")
                 ));
 
-        // Valve index
+        // Valve index.
         map.computeIfAbsent("/interaction_profiles/valve/index_controller", aLong -> new ArrayList<>()).addAll(
                 List.of(
                         new Pair<>(deviceLeft.aimPose, "/user/hand/left/input/aim/pose"),
@@ -142,7 +143,7 @@ public class GaiaSkyActionSet extends ActionSet {
                         new Pair<>(deviceRight.move, "/user/hand/right/input/thumbstick")
                 ));
 
-        // HTC vive controller
+        // HTC vive.
         map.computeIfAbsent("/interaction_profiles/htc/vive_controller", aLong -> new ArrayList<>()).addAll(
                 List.of(
                         new Pair<>(deviceLeft.aimPose, "/user/hand/left/input/aim/pose"),
@@ -170,7 +171,7 @@ public class GaiaSkyActionSet extends ActionSet {
                         new Pair<>(deviceRight.move, "/user/hand/right/input/trackpad")
                 ));
 
-        // Microsoft motion controller
+        // Microsoft motion controller.
         map.computeIfAbsent("/interaction_profiles/microsoft/motion_controller", aLong -> new ArrayList<>()).addAll(
                 List.of(
                         new Pair<>(deviceLeft.aimPose, "/user/hand/left/input/aim/pose"),

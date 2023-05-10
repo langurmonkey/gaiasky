@@ -67,7 +67,7 @@ public class XrDriver implements Disposable {
 
     private final Array<XrInputListener> listeners;
     // One swap-chain per view.
-    public Swapchain[] swapchains;
+    public SwapChain[] swapChains;
     public XrViewConfigurationView.Buffer viewConfigs;
     public final int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
     private FrameBuffer[] viewFrameBuffers;
@@ -81,7 +81,7 @@ public class XrDriver implements Disposable {
     boolean sessionRunning, disposing = false;
     public long currentFrameTime = 0L;
 
-    public static class Swapchain {
+    public static class SwapChain {
         public XrSwapchain handle;
         public int width;
         public int height;
@@ -125,7 +125,7 @@ public class XrDriver implements Disposable {
 
             check(xrEnumerateInstanceExtensionProperties((ByteBuffer) null, pi, properties));
 
-            PointerBuffer extensions = stack.mallocPointer(2);
+            PointerBuffer wantedExtensions = stack.mallocPointer(2);
 
             boolean missingOpenGL = true;
             missingXrDebug = true;
@@ -136,18 +136,18 @@ public class XrDriver implements Disposable {
                 logger.info(I18n.msg("vr.init.extension", extensionName));
                 if (extensionName.equals(XR_KHR_OPENGL_ENABLE_EXTENSION_NAME)) {
                     missingOpenGL = false;
-                    extensions.put(prop.extensionName());
+                    wantedExtensions.put(prop.extensionName());
                 }
                 if (extensionName.equals(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
                     missingXrDebug = false;
-                    extensions.put(prop.extensionName());
+                    wantedExtensions.put(prop.extensionName());
                 }
             }
-            extensions.flip();
+            wantedExtensions.flip();
             logger.info(I18n.msg("vr.init.extensions", numExtensions));
 
             if (missingOpenGL) {
-                throw new IllegalStateException("OpenXR library does not provide required extension: " + XR_KHR_OPENGL_ENABLE_EXTENSION_NAME);
+                throw new IllegalStateException("OpenXR runtime does not provide required extension: " + XR_KHR_OPENGL_ENABLE_EXTENSION_NAME);
             }
 
             PointerBuffer wantedLayers;
@@ -167,7 +167,7 @@ public class XrDriver implements Disposable {
                             .applicationName(stack.UTF8(Settings.getApplicationName(false)))
                             .apiVersion(XR_CURRENT_API_VERSION))
                     .enabledApiLayerNames(wantedLayers)
-                    .enabledExtensionNames(extensions);
+                    .enabledExtensionNames(wantedExtensions);
 
             PointerBuffer pp = stack.mallocPointer(1);
             check(xrCreateInstance(createInfo, pp));
@@ -381,11 +381,11 @@ public class XrDriver implements Disposable {
                     throw new IllegalStateException("No compatable swapchain / framebuffer format availible");
                 }
 
-                swapchains = new Swapchain[viewCountNumber];
+                swapChains = new SwapChain[viewCountNumber];
                 for (int i = 0; i < viewCountNumber; i++) {
                     XrViewConfigurationView viewConfig = viewConfigs.get(i);
 
-                    Swapchain swapchainWrapper = new Swapchain();
+                    SwapChain swapchainWrapper = new SwapChain();
 
                     XrSwapchainCreateInfo swapchainCreateInfo = XrSwapchainCreateInfo.malloc(stack)
                             .type$Default()
@@ -413,7 +413,7 @@ public class XrDriver implements Disposable {
 
                     check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi, XrSwapchainImageBaseHeader.create(swapchainImageBuffer.address(), swapchainImageBuffer.capacity())));
                     swapchainWrapper.images = swapchainImageBuffer;
-                    swapchains[i] = swapchainWrapper;
+                    swapChains[i] = swapchainWrapper;
                 }
             }
         }
@@ -429,7 +429,7 @@ public class XrDriver implements Disposable {
         frameBufferBuilder.addBasicDepthRenderBuffer();
 
         // Create actual frame buffers.
-        int count = swapchains.length;
+        int count = swapChains.length;
         viewFrameBuffers = new FrameBuffer[count];
         for (int view = 0; view < count; view++) {
             viewFrameBuffers[view] = frameBufferBuilder.build();
@@ -537,7 +537,7 @@ public class XrDriver implements Disposable {
         int viewCountOutput = pi.get(0);
         assert (viewCountOutput == views.capacity());
         assert (viewCountOutput == viewConfigs.capacity());
-        assert (viewCountOutput == swapchains.length);
+        assert (viewCountOutput == swapChains.length);
 
         XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(XrCompositionLayerProjectionView.calloc(viewCountOutput, stack), // Use calloc() since malloc() messes up the `next` field
                 XrCompositionLayerProjectionView.TYPE, XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW);
@@ -545,7 +545,7 @@ public class XrDriver implements Disposable {
         // Render view to the appropriate part of the swapchain image.
         for (int viewIndex = 0; viewIndex < viewCountOutput; viewIndex++) {
             // Each view has a separate swapchain which is acquired, rendered to, and released.
-            Swapchain viewSwapchain = swapchains[viewIndex];
+            SwapChain viewSwapchain = swapChains[viewIndex];
 
             check(xrAcquireSwapchainImage(viewSwapchain.handle, XrSwapchainImageAcquireInfo.calloc(stack).type$Default(), pi));
             int swapchainImageIndex = pi.get(0);
@@ -714,8 +714,8 @@ public class XrDriver implements Disposable {
         if (viewConfigs != null)
             viewConfigs.free();
 
-        if (swapchains != null)
-            for (Swapchain swapchain : swapchains) {
+        if (swapChains != null)
+            for (SwapChain swapchain : swapChains) {
                 xrDestroySwapchain(swapchain.handle);
                 swapchain.images.free();
             }
@@ -796,11 +796,11 @@ public class XrDriver implements Disposable {
     }
 
     public int getWidth() {
-        return swapchains[0].width;
+        return swapChains[0].width;
     }
 
     public int getHeight() {
-        return swapchains[0].height;
+        return swapChains[0].height;
     }
 
     public Array<XrControllerDevice> getControllerDevices() {

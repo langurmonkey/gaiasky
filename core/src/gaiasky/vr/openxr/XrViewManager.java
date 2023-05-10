@@ -20,18 +20,21 @@ import org.lwjgl.openxr.XrQuaternionf;
 import org.lwjgl.openxr.XrVector3f;
 import org.lwjgl.system.MemoryStack;
 
-import static com.badlogic.gdx.math.Matrix4.M00;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class XrViewManager {
 
     private final Quaternion quaternion = new Quaternion();
 
-    public void updateCamera(XrCompositionLayerProjectionView layerView, PerspectiveCamera camera) {
+    public void updateCamera(XrCompositionLayerProjectionView layerView,
+                             PerspectiveCamera camera) {
         updateCamera(layerView, camera, null, null);
     }
 
-    public void updateCamera(XrCompositionLayerProjectionView layerView, PerspectiveCamera camera, NaturalCamera naturalCamera, RenderingContext rc) {
+    public void updateCamera(XrCompositionLayerProjectionView layerView,
+                             PerspectiveCamera camera,
+                             NaturalCamera naturalCamera,
+                             RenderingContext rc) {
         XrPosef pose = layerView.pose();
         XrVector3f position = pose.position$();
         XrQuaternionf orientation = pose.orientation();

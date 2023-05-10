@@ -57,7 +57,9 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
     private Vector2 lastSize;
 
-    public RenderModeOpenXR(final Scene scene, final XrDriver xrDriver, final ExtSpriteBatch spriteBatch) {
+    public RenderModeOpenXR(final Scene scene,
+                            final XrDriver xrDriver,
+                            final ExtSpriteBatch spriteBatch) {
         super();
         this.scene = scene;
         this.driver = xrDriver;
@@ -104,7 +106,15 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
     private double t;
 
     @Override
-    public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(ISceneRenderer sgr,
+                       ICamera camera,
+                       double t,
+                       int rw,
+                       int rh,
+                       int tw,
+                       int th,
+                       FrameBuffer fb,
+                       PostProcessBean ppb) {
         if (driver != null && !driver.getLastPollEventsResult()) {
             rc.ppb = null;
 
@@ -132,7 +142,10 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
     }
 
     @Override
-    public void renderOpenXRView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, FrameBuffer frameBuffer, int viewIndex) {
+    public void renderOpenXRView(XrCompositionLayerProjectionView layerView,
+                                 XrSwapchainImageOpenGLKHR swapchainImage,
+                                 FrameBuffer frameBuffer,
+                                 int viewIndex) {
         rc.ppb = null;
         sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
@@ -162,13 +175,17 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         }
     }
 
-    public void resize(int rw, int rh, int tw, int th) {
+    public void resize(int rw,
+                       int rh,
+                       int tw,
+                       int th) {
         if (lastSize != null) {
             lastSize.set(-1, -1);
         }
     }
 
-    private Entity newVRDeviceModelEntity(XrControllerDevice device, Environment environment) {
+    private Entity newVRDeviceModelEntity(XrControllerDevice device,
+                                          Environment environment) {
         var archetype = scene.archetypes().get("gaiasky.scenegraph.VRDeviceModel");
         var entity = archetype.createEntity();
         var vr = Mapper.vr.get(entity);

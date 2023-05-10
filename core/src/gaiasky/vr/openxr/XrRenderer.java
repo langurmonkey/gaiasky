@@ -21,6 +21,9 @@ public interface XrRenderer {
      * @param frameBuffer    The frame buffer to draw to.
      * @param viewIndex      The view index.
      */
-    void renderOpenXRView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, FrameBuffer frameBuffer, int viewIndex);
+    void renderOpenXRView(XrCompositionLayerProjectionView layerView,
+                          XrSwapchainImageOpenGLKHR swapchainImage,
+                          FrameBuffer frameBuffer,
+                          int viewIndex);
 
 }
