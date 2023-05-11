@@ -47,44 +47,48 @@ public class Nature {
     /** Kilometers to light years **/
     public static final double KM_TO_LY = 1.0 / LY_TO_KM;
     /** Kilometers to metres **/
-    public static final double KM_TO_M = 1000d;
+    public static final double KM_TO_M = 1000.0;
 
     /*
      * ======= TIME UNITS =======
      */
     /** Seconds to milliseconds **/
-    public static final double S_TO_MS = 1000;
+    public static final double S_TO_MS = 1000.0;
     /** Milliseconds to seconds **/
-    public static final double MS_TO_S = 1 / S_TO_MS;
+    public static final double MS_TO_S = 1.0 / S_TO_MS;
+    /** Milliseconds to nanoseconds **/
+    public static final double MS_TO_NS = 1.0e6;
+    /** Seconds to nanoseconds **/
+    public static final double S_TO_NS = S_TO_MS * MS_TO_NS;
     /** Hours to seconds **/
-    public static final double H_TO_S = 3600;
+    public static final double H_TO_S = 3600.0;
     /** Seconds to hours **/
-    public static final double S_TO_H = 1 / H_TO_S;
+    public static final double S_TO_H = 1.0 / H_TO_S;
     /** Hours to milliseconds **/
-    public static final double H_TO_MS = H_TO_S * 1000;
+    public static final double H_TO_MS = H_TO_S * 1000.0;
     /** Milliseconds to hours **/
-    public static final double MS_TO_H = 1 / H_TO_MS;
+    public static final double MS_TO_H = 1.0 / H_TO_MS;
     /** Days to seconds **/
-    public static final double D_TO_S = 86400d;
+    public static final double D_TO_S = 86400.0;
     /** Seconds to days **/
-    public static final double S_TO_D = 1 / D_TO_S;
+    public static final double S_TO_D = 1.0 / D_TO_S;
     /** Days to milliseconds **/
-    public static final double D_TO_MS = 86400d * 1000d;
+    public static final double D_TO_MS = D_TO_S * 1000.0;
     /** Milliseconds to days **/
-    public static final double MS_TO_D = 1 / D_TO_MS;
+    public static final double MS_TO_D = 1.0 / D_TO_MS;
     /** Days to nanoseconds **/
-    public static final double D_TO_NS = 86400e9;
+    public static final double D_TO_NS = D_TO_S * 1.0e9;
     /** Nanoseconds to days **/
-    public static final double NS_TO_D = 1 / D_TO_NS;
+    public static final double NS_TO_D = 1.0 / D_TO_NS;
     /** Years to seconds **/
-    public static final double Y_TO_S = 31557600;
+    public static final double Y_TO_S = 31557600.0;
     /** Seconds to years **/
-    public static final double S_TO_Y = 1 / Y_TO_S;
+    public static final double S_TO_Y = 1.0 / Y_TO_S;
     /** Years to milliseconds **/
-    public static final double Y_TO_MS = Y_TO_S * 1000;
+    public static final double Y_TO_MS = Y_TO_S * 1000.0;
     /** Milliseconds to year **/
-    public static final double MS_TO_Y = 1 / Y_TO_MS;
+    public static final double MS_TO_Y = 1.0 / Y_TO_MS;
     /** Minutes to seconds **/
-    public static final double MIN_TO_S = 60;
+    public static final double MIN_TO_S = 60.0;
 
 }

@@ -44,6 +44,9 @@ import static org.lwjgl.openxr.XR10.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
+/**
+ * Handles initialization and lifecycle of OpenXR. Only active when Gaia Sky is run in VR mode.
+ */
 public class XrDriver implements Disposable {
     private static final Log logger = Logger.getLogger(XrDriver.class);
 
@@ -164,8 +167,8 @@ public class XrDriver implements Disposable {
                     .next(NULL)
                     .createFlags(0)
                     .applicationInfo(XrApplicationInfo.calloc(stack)
-                            .applicationName(stack.UTF8(Settings.getApplicationName(false)))
-                            .apiVersion(XR_CURRENT_API_VERSION))
+                                             .applicationName(stack.UTF8(Settings.getApplicationName(false)))
+                                             .apiVersion(XR_CURRENT_API_VERSION))
                     .enabledApiLayerNames(wantedLayers)
                     .enabledExtensionNames(wantedExtensions);
 
@@ -237,14 +240,14 @@ public class XrDriver implements Disposable {
 
             if (minMajorVersion > actualMajorVersion || (minMajorVersion == actualMajorVersion && minMinorVersion > actualMinorVersion)) {
                 throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + minMajorVersion + "." + minMinorVersion
-                        + " and later, but we got OpenGL "
-                        + actualMajorVersion + "." + actualMinorVersion);
+                                                        + " and later, but we got OpenGL "
+                                                        + actualMajorVersion + "." + actualMinorVersion);
             }
 
             if (actualMajorVersion > maxMajorVersion || (actualMajorVersion == maxMajorVersion && actualMinorVersion > maxMinorVersion)) {
                 throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + maxMajorVersion + "." + minMajorVersion
-                        + " and earlier, but we got OpenGL "
-                        + actualMajorVersion + "." + actualMinorVersion);
+                                                        + " and earlier, but we got OpenGL "
+                                                        + actualMajorVersion + "." + actualMinorVersion);
             }
         }
     }
@@ -260,9 +263,9 @@ public class XrDriver implements Disposable {
 
             XrSessionCreateInfo sessionCreateInfo = XrSessionCreateInfo.calloc(stack)
                     .set(XR10.XR_TYPE_SESSION_CREATE_INFO,
-                            graphicsBinding.address(),
-                            0,
-                            systemId);
+                         graphicsBinding.address(),
+                         0,
+                         systemId);
 
             PointerBuffer pp = stack.mallocPointer(1);
             check(xrCreateSession(xrInstance, sessionCreateInfo, pp));
@@ -273,8 +276,8 @@ public class XrDriver implements Disposable {
                 XrDebugUtilsMessengerCreateInfoEXT ciDebugUtils = XrDebugUtilsMessengerCreateInfoEXT.calloc(stack)
                         .type$Default()
                         .messageSeverities(XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-                                | XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-                                | XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+                                                   | XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                                                   | XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
                         .messageTypes(
                                 XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
                                         | XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
@@ -306,12 +309,12 @@ public class XrDriver implements Disposable {
                     .next(NULL)
                     .referenceSpaceType(XR_REFERENCE_SPACE_TYPE_LOCAL)
                     .poseInReferenceSpace(XrPosef.malloc(stack)
-                            .orientation(XrQuaternionf.malloc(stack)
-                                    .x(0)
-                                    .y(0)
-                                    .z(0)
-                                    .w(1))
-                            .position$(XrVector3f.calloc(stack))), pp));
+                                                  .orientation(XrQuaternionf.malloc(stack)
+                                                                       .x(0)
+                                                                       .y(0)
+                                                                       .z(0)
+                                                                       .w(1))
+                                                  .position$(XrVector3f.calloc(stack))), pp));
 
             xrAppSpace = new XrSpace(pp.get(0), xrSession);
         }
@@ -346,7 +349,7 @@ public class XrDriver implements Disposable {
 
             check(xrEnumerateViewConfigurationViews(xrInstance, systemId, viewConfigType, pi, null));
             viewConfigs = XrHelper.fill(XrViewConfigurationView.calloc(pi.get(0)), // Don't use malloc() because that would mess up the `next` field
-                    XrViewConfigurationView.TYPE, XR_TYPE_VIEW_CONFIGURATION_VIEW);
+                                        XrViewConfigurationView.TYPE, XR_TYPE_VIEW_CONFIGURATION_VIEW);
 
             check(xrEnumerateViewConfigurationViews(xrInstance, systemId, viewConfigType, pi, viewConfigs));
             int viewCountNumber = pi.get(0);
@@ -409,9 +412,11 @@ public class XrDriver implements Disposable {
                     check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi, null));
                     int imageCount = pi.get(0);
 
-                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XrHelper.fill(XrSwapchainImageOpenGLKHR.create(imageCount), XrSwapchainImageOpenGLKHR.TYPE, XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR);
+                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XrHelper.fill(XrSwapchainImageOpenGLKHR.create(imageCount), XrSwapchainImageOpenGLKHR.TYPE,
+                                                                                          XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR);
 
-                    check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi, XrSwapchainImageBaseHeader.create(swapchainImageBuffer.address(), swapchainImageBuffer.capacity())));
+                    check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi,
+                                                     XrSwapchainImageBaseHeader.create(swapchainImageBuffer.address(), swapchainImageBuffer.capacity())));
                     swapchainWrapper.images = swapchainImageBuffer;
                     swapChains[i] = swapchainWrapper;
                 }
@@ -524,11 +529,15 @@ public class XrDriver implements Disposable {
         }
     }
 
-    private boolean renderLayerOpenXR(MemoryStack stack, long predictedDisplayTime, XrCompositionLayerProjection layer) {
+    private boolean renderLayerOpenXR(MemoryStack stack,
+                                      long predictedDisplayTime,
+                                      XrCompositionLayerProjection layer) {
         XrViewState viewState = XrViewState.calloc(stack).type$Default();
 
         IntBuffer pi = stack.mallocInt(1);
-        check(xrLocateViews(xrSession, XrViewLocateInfo.malloc(stack).type$Default().next(NULL).viewConfigurationType(viewConfigType).displayTime(predictedDisplayTime).space(xrAppSpace), viewState, pi, views));
+        check(xrLocateViews(xrSession,
+                            XrViewLocateInfo.malloc(stack).type$Default().next(NULL).viewConfigurationType(viewConfigType).displayTime(predictedDisplayTime).space(
+                                    xrAppSpace), viewState, pi, views));
 
         if ((viewState.viewStateFlags() & XR_VIEW_STATE_POSITION_VALID_BIT) == 0 || (viewState.viewStateFlags() & XR_VIEW_STATE_ORIENTATION_VALID_BIT) == 0) {
             return false;  // There is no valid tracking poses for the views.
@@ -539,8 +548,9 @@ public class XrDriver implements Disposable {
         assert (viewCountOutput == viewConfigs.capacity());
         assert (viewCountOutput == swapChains.length);
 
-        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(XrCompositionLayerProjectionView.calloc(viewCountOutput, stack), // Use calloc() since malloc() messes up the `next` field
-                XrCompositionLayerProjectionView.TYPE, XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW);
+        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(XrCompositionLayerProjectionView.calloc(viewCountOutput, stack),
+                                                                                     // Use calloc() since malloc() messes up the `next` field
+                                                                                     XrCompositionLayerProjectionView.TYPE, XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW);
 
         // Render view to the appropriate part of the swapchain image.
         for (int viewIndex = 0; viewIndex < viewCountOutput; viewIndex++) {
@@ -552,10 +562,13 @@ public class XrDriver implements Disposable {
 
             check(xrWaitSwapchainImage(viewSwapchain.handle, XrSwapchainImageWaitInfo.malloc(stack).type$Default().next(NULL).timeout(XR_INFINITE_DURATION)));
 
-            XrCompositionLayerProjectionView projectionLayerView = projectionLayerViews.get(viewIndex).pose(views.get(viewIndex).pose()).fov(views.get(viewIndex).fov()).subImage(si -> si.swapchain(viewSwapchain.handle).imageRect(rect -> rect.offset(offset -> offset.x(0).y(0)).extent(extent -> extent.width(viewSwapchain.width).height(viewSwapchain.height))));
+            XrCompositionLayerProjectionView projectionLayerView = projectionLayerViews.get(viewIndex).pose(views.get(viewIndex).pose()).fov(
+                    views.get(viewIndex).fov()).subImage(si -> si.swapchain(viewSwapchain.handle).imageRect(
+                    rect -> rect.offset(offset -> offset.x(0).y(0)).extent(extent -> extent.width(viewSwapchain.width).height(viewSwapchain.height))));
 
             if (currentRenderer.get() != null) {
-                currentRenderer.get().renderOpenXRView(projectionLayerView, viewSwapchain.images.get(swapchainImageIndex), viewFrameBuffers == null ? null : viewFrameBuffers[viewIndex], viewIndex);
+                currentRenderer.get().renderOpenXRView(projectionLayerView, viewSwapchain.images.get(swapchainImageIndex),
+                                                       viewFrameBuffers == null ? null : viewFrameBuffers[viewIndex], viewIndex);
             }
 
             check(xrReleaseSwapchainImage(viewSwapchain.handle, XrSwapchainImageReleaseInfo.calloc(stack).type$Default()));
@@ -648,7 +661,8 @@ public class XrDriver implements Disposable {
         int oldState = sessionState;
         sessionState = stateChangedEvent.state();
 
-        logger.debug("XrEventDataSessionStateChanged: state " + oldState + "->" + sessionState + " session=" + stateChangedEvent.session() + " time=" + stateChangedEvent.time());
+        logger.debug("XrEventDataSessionStateChanged: state " + oldState + "->" + sessionState + " session=" + stateChangedEvent.session() + " time="
+                             + stateChangedEvent.time());
 
         if ((stateChangedEvent.session() != NULL) && (stateChangedEvent.session() != xrSession.address())) {
             logger.error("XrEventDataSessionStateChanged for unknown session");
@@ -748,7 +762,8 @@ public class XrDriver implements Disposable {
         check(result, null);
     }
 
-    public void check(int result, String method) {
+    public void check(int result,
+                      String method) {
         if (XR_SUCCEEDED(result))
             return;
 
@@ -770,7 +785,8 @@ public class XrDriver implements Disposable {
         checkNoException(result, null);
     }
 
-    public void checkNoException(int result, String method) {
+    public void checkNoException(int result,
+                                 String method) {
         if (XR_SUCCEEDED(result))
             return;
 

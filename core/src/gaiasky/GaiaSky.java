@@ -43,7 +43,6 @@ import gaiasky.gui.vr.WelcomeGuiVR;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IPostProcessor;
-import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -261,7 +260,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * The SAMP client
      */
     private SAMPClient sampClient;
-    private long start = System.currentTimeMillis();
+    private long startNanos = System.nanoTime();
     private long lastResizeTime = Long.MAX_VALUE;
     private int resizeWidth, resizeHeight;
 
@@ -291,7 +290,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             }
             // Poll OpenXR.
             if (settings.runtime.openXr) {
-               xrDriver.pollEvents();
+                xrDriver.pollEvents();
             }
 
             /*
@@ -321,7 +320,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 sceneRenderer.clearScreen();
 
                 if (settings.runtime.openXr) {
-                    sceneRenderer.render(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null, postProcessor.getPostProcessBean(RenderType.screen));
+                    sceneRenderer.render(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null,
+                                         postProcessor.getPostProcessBean(RenderType.screen));
                 } else {
                     var ppb = postProcessor.getPostProcessBean(RenderType.screen);
                     if (ppb != null)
@@ -347,7 +347,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (settings.graphics.fpsLimit > 0.0) {
             // If FPS limit is on, dynamic resolution is off
             sleep(settings.graphics.fpsLimit);
-        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openXr) {
+        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000
+                && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openXr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate
             var fps = 1f / graphics.getDeltaTime();
 
@@ -363,6 +364,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 lastDynamicResolutionChange = TimeUtils.millis();
             }
         }
+
     };
 
     /**
@@ -388,6 +390,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             // Render to screen.
             renderGui(loadingGui);
         }
+
     };
 
     /**
@@ -406,7 +409,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param headless     Launch in headless mode, without window.
      * @param debugMode    Output debug information.
      */
-    public GaiaSky(final boolean skipWelcome, final boolean vr, final boolean externalView, final boolean headless, final boolean noScriptingServer, final boolean debugMode) {
+    public GaiaSky(final boolean skipWelcome,
+                   final boolean vr,
+                   final boolean externalView,
+                   final boolean headless,
+                   final boolean noScriptingServer,
+                   final boolean debugMode) {
         super();
 
         // Instance and settings.
@@ -572,12 +580,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new XrInputListener() {
 
                 @Override
-                public boolean showUI(boolean value, XrControllerDevice device) {
+                public boolean showUI(boolean value,
+                                      XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean accept(boolean value, XrControllerDevice device) {
+                public boolean accept(boolean value,
+                                      XrControllerDevice device) {
                     if (value) {
                         return proceedToLoading(device);
                     }
@@ -585,25 +595,29 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 @Override
-                public boolean cameraMode(boolean value, XrControllerDevice device) {
+                public boolean cameraMode(boolean value,
+                                          XrControllerDevice device) {
                     if (value) {
-                         return proceedToLoading(device);
+                        return proceedToLoading(device);
                     }
                     return false;
                 }
 
                 @Override
-                public boolean rotate(boolean value, XrControllerDevice device) {
+                public boolean rotate(boolean value,
+                                      XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean move(Vector2 value, XrControllerDevice device) {
+                public boolean move(Vector2 value,
+                                    XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean select(float value, XrControllerDevice device) {
+                public boolean select(float value,
+                                      XrControllerDevice device) {
                     return false;
                 }
 
@@ -621,6 +635,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
             });
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
             xrDriver.setRenderer(welcomeGuiVR);
+        } else {
+            // In normal mode (no VR) we activate V-Sync during the welcome and loading GUIs.
+            graphics.setVSync(true);
         }
 
     }
@@ -652,9 +669,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 xrDriver.pollEvents();
 
-
                 if (settings.graphics.resolution[0] != xrDriver.getWidth()) {
-                    logger.info("Resizing to XR system values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
+                    logger.info(
+                            "Resizing to XR system values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth()
+                                    + "x" + xrDriver.getHeight() + "]");
                     // Do not resize the screen!
                     settings.graphics.backBufferResolution[1] = xrDriver.getHeight();
                     settings.graphics.backBufferResolution[0] = xrDriver.getWidth();
@@ -727,7 +745,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (assetManager.isLoaded(sceneName)) {
             scene = assetManager.get(sceneName);
         } else {
-            throw new RuntimeException("Error loading scene from data load string: " + sceneName + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
+            throw new RuntimeException(
+                    "Error loading scene from data load string: " + sceneName + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
         }
 
 
@@ -746,7 +765,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
          * Complete scene renderer loading.
          */
         sceneRenderer.doneLoading(assetManager);
-        sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
+        sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale),
+                             (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
 
         // Set up entities.
         scene.setUpEntities();
@@ -780,7 +800,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events.
-        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE, Event.GO_HOME_INSTANT_CMD);
+        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE,
+                                        Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
+                                        Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
+                                        Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE, Event.GO_HOME_INSTANT_CMD);
 
         // Re-enable input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -886,6 +909,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Initialized.
         EventManager.publish(Event.INITIALIZED_INFO, this);
         sceneRenderer.setRendering(true);
+
+        // Restore VSync to user setting.
+        graphics.setVSync(settings.graphics.vsync);
+
         initialized = true;
     }
 
@@ -1153,17 +1180,23 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param fps The target frame rate.
      */
     private void sleep(double fps) {
-        if (fps > 0) {
-            var diff = System.currentTimeMillis() - start;
-            var targetDelay = Math.round((1000.0 / fps));
-            if (diff < targetDelay) {
-                try {
-                    Thread.sleep(targetDelay - diff);
-                } catch (InterruptedException ignored) {
-                }
+        if (fps > 0.0) {
+            var currentFrameTimeNanos = (System.nanoTime() - startNanos);
+            var targetFrameTimeNanos = Nature.S_TO_NS / fps;
+            if (currentFrameTimeNanos < targetFrameTimeNanos) {
+                busySleep((long) (targetFrameTimeNanos - currentFrameTimeNanos));
+                //Thread.sleep((long) Math.ceil(targetFrameTimeMs - currentFrameTimeMs));
             }
-            start = System.currentTimeMillis();
+            startNanos = System.nanoTime();
         }
+    }
+
+    private static void busySleep(long nanos) {
+        long elapsed;
+        final long startTime = System.nanoTime();
+        do {
+            elapsed = System.nanoTime() - startTime;
+        } while (elapsed < nanos);
     }
 
     /**
@@ -1254,7 +1287,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     @Override
-    public void resize(final int width, final int height) {
+    public void resize(final int width,
+                       final int height) {
         if (width != 0 && height != 0) {
             if (!initialized) {
                 resizeImmediate(width, height, true, true, true, true);
@@ -1281,7 +1315,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
         }
     }
 
-    public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis, boolean resizeScreenConf) {
+    public void resizeImmediate(final int width,
+                                final int height,
+                                boolean resizePostProcessors,
+                                boolean resizeRenderSys,
+                                boolean resizeGuis,
+                                boolean resizeScreenConf) {
         try {
             final var renderWidth = (int) Math.round(width * settings.graphics.backBufferScale);
             final var renderHeight = (int) Math.round(height * settings.graphics.backBufferScale);
@@ -1387,7 +1426,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
         case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
             reinitialiseGUI1();
@@ -1603,7 +1644,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param key      The key to identify the runnable.
      * @param runnable The runnable to park.
      */
-    public void parkUpdateRunnable(final String key, final Runnable runnable) {
+    public void parkUpdateRunnable(final String key,
+                                   final Runnable runnable) {
         parkRunnable(key, runnable, parkedUpdateRunnablesMap, parkedUpdateRunnables);
     }
 
@@ -1614,7 +1656,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param key      The key to identify the runnable.
      * @param runnable The runnable to park.
      */
-    public void parkCameraRunnable(final String key, final Runnable runnable) {
+    public void parkCameraRunnable(final String key,
+                                   final Runnable runnable) {
         parkRunnable(key, runnable, parkedCameraRunnablesMap, parkedCameraRunnables);
     }
 
@@ -1626,7 +1669,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param map       The map to use.
      * @param runnables The runnables list.
      */
-    public void parkRunnable(final String key, final Runnable runnable, final Map<String, Runnable> map, final Array<Runnable> runnables) {
+    public void parkRunnable(final String key,
+                             final Runnable runnable,
+                             final Map<String, Runnable> map,
+                             final Array<Runnable> runnables) {
         map.put(key, runnable);
         runnables.add(runnable);
     }
@@ -1641,7 +1687,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
         removeRunnable(key, parkedCameraRunnablesMap, parkedCameraRunnables);
     }
 
-    private void removeRunnable(final String key, final Map<String, Runnable> map, final Array<Runnable> runnables) {
+    private void removeRunnable(final String key,
+                                final Map<String, Runnable> map,
+                                final Array<Runnable> runnables) {
         if (map.containsKey(key)) {
             final var r = map.get(key);
             if (r != null) {
