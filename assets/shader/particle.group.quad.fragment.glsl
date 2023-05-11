@@ -6,10 +6,12 @@
 uniform float u_falloff;
 uniform float u_zfar;
 uniform float u_k;
+uniform sampler2DArray u_textures;
 
 // INPUT
 in vec4 v_col;
 in vec2 v_uv;
+in float v_textureIndex;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -24,24 +26,30 @@ layout (location = 0) out vec4 fragColor;
 #include shader/lib_velbuffer.frag.glsl
 #endif
 
-float programmatic(float dist) {
-    return 1.0 - pow(abs(sin(PI * dist / 2.0)), u_falloff);
+vec4 programmatic(float dist) {
+    float profile =  1.0 - pow(abs(sin(PI * dist / 2.0)), u_falloff);
+    return vec4(v_col.rgb * profile, 1.0) * v_col.a;
+}
+
+vec4 textured() {
+    vec4 c = texture(u_textures, vec3(v_uv, v_textureIndex));
+    return vec4(c.rgb * v_col.rgb, 1.0) * c.a * v_col.a;
 }
 
 void main() {
-    vec2 uv = v_uv;
-    float dist = distance(vec2(0.5), uv) * 2.0;
-    if (dist > 1.0) {
-        discard;
+    if (v_textureIndex < 0.0) {
+        float dist = distance(vec2(0.5), v_uv) * 2.0;
+        if (dist > 1.0) {
+            discard;
+        }
+        fragColor = programmatic(dist);
+    } else {
+        fragColor = textured();
     }
-
-    float profile = programmatic(dist);
-
-    fragColor = vec4(v_col.rgb * profile, 1.0) * v_col.a;
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     // Add outline
-    //if(uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
+    //if(v_uv.x > 0.99 || v_uv.x < 0.01 || v_uv.y > 0.99 || v_uv.y < 0.01) {
     //    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
     //}
 

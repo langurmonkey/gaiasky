@@ -42,7 +42,7 @@ public class ParticleSetRenderer extends PointCloudQuadRenderer implements IObse
     private final Random rand;
     private final Colormap cmap;
     private final ParticleUtils utils;
-    private int posOffset, sizeOffset, particlePosOffset, uvOffset;
+    private int posOffset, sizeOffset, textureIndexOffset, particlePosOffset, uvOffset;
 
     public ParticleSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -65,6 +65,7 @@ public class ParticleSetRenderer extends PointCloudQuadRenderer implements IObse
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
         attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
+        attributes.add(new VertexAttribute(OwnUsage.TextureIndex, 1, "a_textureIndex"));
     }
 
     protected void offsets(MeshData curr) {
@@ -72,6 +73,7 @@ public class ParticleSetRenderer extends PointCloudQuadRenderer implements IObse
         posOffset = curr.mesh.getVertexAttribute(Usage.Position) != null ? curr.mesh.getVertexAttribute(Usage.Position).offset / 4 : 0;
         uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
+        textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
         particlePosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
@@ -152,6 +154,9 @@ public class ParticleSetRenderer extends PointCloudQuadRenderer implements IObse
 
                             // SIZE
                             tempVerts[curr.vertexIdx + sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor;
+
+                            // TEXTURE INDEX
+                            tempVerts[curr.vertexIdx + textureIndexOffset] = -1.0f;
 
                             // PARTICLE POSITION
                             tempVerts[curr.vertexIdx + particlePosOffset] = (float) p[0];

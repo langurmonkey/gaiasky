@@ -43,9 +43,12 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     private final Random rand;
     private final Colormap cmap;
     private final ParticleUtils utils;
-    private int sizeOffset, particlePosOffset;
+    private int sizeOffset, particlePosOffset, textureIndexOffset;
 
-    public ParticleSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public ParticleSetInstancedRenderer(SceneRenderer sceneRenderer,
+                                        RenderGroup rg,
+                                        float[] alphas,
+                                        ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
 
@@ -68,6 +71,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
         attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
+        attributes.add(new VertexAttribute(OwnUsage.TextureIndex, 1, "a_textureIndex"));
     }
 
     @Override
@@ -79,6 +83,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     protected void offsets1(MeshData curr) {
         curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
         sizeOffset = curr.mesh.getInstancedAttribute(OwnUsage.Size) != null ? curr.mesh.getInstancedAttribute(OwnUsage.Size).offset / 4 : 0;
+        textureIndexOffset = curr.mesh.getInstancedAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getInstancedAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
         particlePosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
@@ -87,14 +92,16 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         // Empty
     }
 
-    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void preRenderObjects(ExtShaderProgram shaderProgram,
+                                    ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         addEffectsUniforms(shaderProgram, camera);
     }
 
     @Override
-    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
+    protected void renderObject(ExtShaderProgram shaderProgram,
+                                IRenderable renderable) {
         final Render render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
         var body = Mapper.body.get(render.entity);
@@ -148,11 +155,21 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                 g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                 b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                             }
-                            tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                            tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1),
+                                                                                                         MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
                         }
 
                         // SIZE
                         tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor;
+
+                        // TEXTURE INDEX
+                        float textureIndex = -1.0f;
+                        if (set.textureArray != null) {
+                            int nTextures = set.textureArray.getDepth();
+                            int idx = rand.nextInt(nTextures);
+                            textureIndex = (float) (idx + 1) / (float) nTextures;
+                        }
+                        tempInstanceAttribs[curr.instanceIdx + textureIndexOffset] = textureIndex;
 
                         // PARTICLE POSITION
                         tempInstanceAttribs[curr.instanceIdx + particlePosOffset] = (float) p[0];
@@ -179,6 +196,10 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
              */
             curr = meshes.get(getOffset(render));
             if (curr != null) {
+                if (set.textureArray != null) {
+                    set.textureArray.bind(0);
+                    shaderProgram.setUniformi("u_textures", 0);
+                }
                 float meanDist = (float) (set.getMeanDistance());
 
                 double s = .3e-4f;
@@ -196,7 +217,10 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         }
     }
 
-    private void interpolateColor(float[] c0, float[] c1, float[] result, double factor) {
+    private void interpolateColor(float[] c0,
+                                  float[] c1,
+                                  float[] result,
+                                  double factor) {
         float f = (float) factor;
         result[0] = (1 - f) * c0[0] + f * c1[0];
         result[1] = (1 - f) * c0[1] + f * c1[1];
@@ -204,7 +228,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         result[3] = (1 - f) * c0[3] + f * c1[3];
     }
 
-    protected void setInGpu(IRenderable renderable, boolean state) {
+    protected void setInGpu(IRenderable renderable,
+                            boolean state) {
         if (inGpu != null) {
             if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, renderable);
@@ -218,7 +243,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (event == Event.GPU_DISPOSE_PARTICLE_GROUP) {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);

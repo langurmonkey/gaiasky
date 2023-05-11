@@ -515,7 +515,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg) {
-        configureWindowSize(cfg, 1f, 1f, true);
+        configureWindowSize(cfg, 1f, 1f, false);
     }
 
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg, float widthFactor, float heightFactor, boolean force169Ratio) {

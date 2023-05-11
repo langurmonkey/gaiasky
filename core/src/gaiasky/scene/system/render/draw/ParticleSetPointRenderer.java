@@ -9,6 +9,7 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -41,7 +42,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     private final Random rand;
     private final Colormap cmap;
     private final ParticleUtils utils;
-    private int additionalOffset;
+    private int additionalOffset, textureIndexOffset;
     private ICamera camera;
     private boolean stereoHalfWidth;
 
@@ -63,12 +64,14 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     protected void offsets(MeshData curr) {
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         additionalOffset = curr.mesh.getVertexAttribute(OwnUsage.Additional) != null ? curr.mesh.getVertexAttribute(OwnUsage.Additional).offset / 4 : 0;
+        textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getVertexAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
     }
 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.Additional, 2, "a_additional"));
+        attributes.add(new VertexAttribute(OwnUsage.TextureIndex, 1, "a_textureIndex"));
     }
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
@@ -93,6 +96,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         var desc = Mapper.datasetDescription.get(render.entity);
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
+
 
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
@@ -142,6 +146,9 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
                         // SIZE, CMAP_VALUE
                         tempVerts[curr.vertexIdx + additionalOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
+
+                        // TEXTURE INDEX
+                        tempVerts[curr.vertexIdx + textureIndexOffset] = -1.0f;
 
                         // POSITION
                         final int idx = curr.vertexIdx;

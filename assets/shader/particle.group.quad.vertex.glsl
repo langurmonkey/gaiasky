@@ -18,10 +18,12 @@ layout (location=1) in vec2 a_texCoord;
 layout (location=2) in vec3 a_particlePos;
 layout (location=3) in vec4 a_color;
 layout (location=4) in float a_size;
+layout (location=5) in float a_textureIndex;
 
 // OUTPUT
 out vec4 v_col;
 out vec2 v_uv;
+out float v_textureIndex;
 
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
@@ -64,6 +66,7 @@ void main() {
     gl_Position = gpos;
 
     v_uv = a_texCoord;
+    v_textureIndex = a_textureIndex;
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, a_particlePos, s_size, a_position, s_quat, s_quat_conj);

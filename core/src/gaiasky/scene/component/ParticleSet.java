@@ -9,6 +9,8 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.TextureArray;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -75,6 +77,10 @@ public class ParticleSet implements Component, IDisposable {
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
      */
     public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
+    /** Texture files to use for rendering the particles, at random. **/
+    public String[] textureFiles = null;
+    /** Reference to the texture array containing the textures for this set, if any. **/
+    public TextureArray textureArray;
     /**
      * Temporary storage for the mean position of this particle set, if it is given externally.
      * If this is set, the mean position is not computed from the positions of all the particles automatically.
@@ -202,7 +208,8 @@ public class ParticleSet implements Component, IDisposable {
         setData(pointData, true);
     }
 
-    public void setData(List<IParticleRecord> pointData, boolean regenerateIndex) {
+    public void setData(List<IParticleRecord> pointData,
+                        boolean regenerateIndex) {
         this.pointData = pointData;
 
         // Regenerate index
@@ -346,6 +353,14 @@ public class ParticleSet implements Component, IDisposable {
         setParticleSizeLimits(sizeLimits);
     }
 
+    public void setTexture(String texture) {
+        this.textureFiles = new String[] { texture };
+    }
+
+    public void setTextures(String[] textures) {
+        this.textureFiles = textures;
+    }
+
     public void setRenderParticles(Boolean renderParticles) {
         this.renderParticles = renderParticles;
     }
@@ -462,7 +477,9 @@ public class ParticleSet implements Component, IDisposable {
         return visibilityArray != null && visibilityArray[index] != (byte) 0;
     }
 
-    public void setVisible(boolean visible, String name, Render render) {
+    public void setVisible(boolean visible,
+                           String name,
+                           Render render) {
         if (index.containsKey(name)) {
             this.setVisible(index.get(name), visible, render);
         }
@@ -475,7 +492,9 @@ public class ParticleSet implements Component, IDisposable {
      * @param index   The index of the particle
      * @param visible Visibility flag
      */
-    public void setVisible(int index, boolean visible, Render render) {
+    public void setVisible(int index,
+                           boolean visible,
+                           Render render) {
         boolean previousVisibility = this.visibilityArray[index] != 0;
         this.visibilityArray[index] = (byte) (visible ? 1 : 0);
         if (previousVisibility != visible) {
@@ -490,7 +509,8 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     /** Returns the current focus position, if any, in the out vector. **/
-    public Vector3b getAbsolutePosition(Instant date, Vector3b out) {
+    public Vector3b getAbsolutePosition(Instant date,
+                                        Vector3b out) {
         return getAbsolutePosition(out);
     }
 
@@ -500,7 +520,8 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     /** Returns the position of the particle with the given name, if any, in the out vector. **/
-    public Vector3b getAbsolutePosition(String name, Vector3b out) {
+    public Vector3b getAbsolutePosition(String name,
+                                        Vector3b out) {
         if (name == null || out == null) {
             return null;
         }
@@ -528,7 +549,10 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return The vector for chaining
      */
-    public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
+    public Vector3d fetchPosition(IParticleRecord pb,
+                                  Vector3d campos,
+                                  Vector3d destination,
+                                  double deltaYears) {
         if (campos != null)
             return destination.set(pb.x(), pb.y(), pb.z()).sub(campos);
         else

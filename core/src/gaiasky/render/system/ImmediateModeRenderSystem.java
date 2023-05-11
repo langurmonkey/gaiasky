@@ -250,6 +250,7 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
     protected static class OwnUsage {
         public static final int Size = 512;
+        public static final int TextureIndex = 612;
         public static final int NumVariablePoints = 1024;
         public static final int VariableMagnitudes = 2048;
         public static final int VariableTimes = 4096;

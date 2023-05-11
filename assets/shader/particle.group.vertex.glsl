@@ -8,6 +8,7 @@ in vec4 a_color;
 // x - size
 // y - colmap_attribute_value
 in vec2 a_additional;
+in float a_textureIndex;
 
 uniform float u_alpha;
 
@@ -28,6 +29,7 @@ uniform float u_vrScale;
 #endif // gravitationalWaves
     
 out vec4 v_col;
+out float v_textureIndex;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
@@ -57,6 +59,7 @@ void main() {
     #endif // gravitationalWaves
     
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
+    v_textureIndex = a_textureIndex;
 
     float viewAngle = a_additional.x / dist;
 

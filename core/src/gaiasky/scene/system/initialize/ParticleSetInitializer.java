@@ -9,6 +9,9 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.TextureArray;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
@@ -28,23 +31,28 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import org.apache.commons.io.FileUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 public class ParticleSetInitializer extends AbstractInitSystem {
     private static final Log logger = Logger.getLogger(ParticleSetInitializer.class);
 
     private final ParticleUtils utils;
 
-    public ParticleSetInitializer(boolean setUp, Family family, int priority) {
+    public ParticleSetInitializer(boolean setUp,
+                                  Family family,
+                                  int priority) {
         super(setUp, family, priority);
         this.utils = new ParticleUtils();
     }
@@ -73,6 +81,14 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
+        // Textures.
+        var base = Mapper.base.get(entity);
+        var particleSet = Mapper.particleSet.get(entity);
+        AssetManager manager = AssetBean.manager();
+        if (manager.contains(base.getName() + " Textures")) {
+            particleSet.textureArray = manager.get(base.getName() + " Textures");
+        }
+
         var starSet = Mapper.starSet.get(entity);
 
         if (starSet != null) {
@@ -90,7 +106,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
     }
 
-    private void initializeCommon(Base base, ParticleSet set) {
+    private void initializeCommon(Base base,
+                                  ParticleSet set) {
         if (base.id < 0) {
             base.id = ParticleSet.idSeq++;
         }
@@ -103,6 +120,35 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.proximity = new Proximity(Constants.N_DIR_LIGHTS);
         set.focusPosition = new Vector3d();
         set.focusPositionSph = new Vector2d();
+
+        // Textures.
+        AssetManager manager = AssetBean.manager();
+        if (set.textureFiles != null) {
+            // Convert to a list of actual file paths.
+            Array<String> actualFilePaths = new Array<>();
+            for (String textureFile : set.textureFiles) {
+                String unpackedFile = Settings.settings.data.dataFile(textureFile);
+                Path galLocationPath = Path.of(unpackedFile);
+                if (Files.exists(galLocationPath)) {
+                    if (Files.isDirectory(galLocationPath)) {
+                        // Directory.
+                        Collection<File> galaxyFiles = FileUtils.listFiles(galLocationPath.toFile(), new String[] { "png", "jpeg", "jpg" }, true);
+                        if (!galaxyFiles.isEmpty()) {
+                            for (File f : galaxyFiles) {
+                                actualFilePaths.add(f.getAbsolutePath());
+                            }
+                        }
+                    } else {
+                        // File.
+                        actualFilePaths.add(galLocationPath.toAbsolutePath().toString());
+                    }
+                }
+            }
+            // Send to load.
+            if (!actualFilePaths.isEmpty()) {
+                manager.load(base.getName() + " Textures", TextureArray.class, new TextureArrayParameter(actualFilePaths));
+            }
+        }
     }
 
     /**
@@ -112,7 +158,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      * @param set       The particle set.
      * @param transform The transform.
      */
-    private void initializeParticleSet(Entity entity, ParticleSet set, RefSysTransform transform) {
+    private void initializeParticleSet(Entity entity,
+                                       ParticleSet set,
+                                       RefSysTransform transform) {
         set.isStars = false;
         boolean initializeData = set.pointData == null;
 
@@ -153,7 +201,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      * @param set       The star set.
      * @param transform The transform.
      */
-    public void initializeStarSet(Entity entity, StarSet set, RefSysTransform transform) {
+    public void initializeStarSet(Entity entity,
+                                  StarSet set,
+                                  RefSysTransform transform) {
         set.isStars = true;
         boolean initializeData = set.pointData == null;
 
@@ -229,7 +279,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.meanDistance = distances.get(idx - 1) / 2d;
     }
 
-    public void computeMeanPosition(Entity entity, ParticleSet set) {
+    public void computeMeanPosition(Entity entity,
+                                    ParticleSet set) {
         var body = Mapper.body.get(entity);
         if (set.meanPosition != null) {
             // Use given mean position.
@@ -260,11 +311,14 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         }
     }
 
-    private double len(double x, double y, double z) {
+    private double len(double x,
+                       double y,
+                       double z) {
         return Math.sqrt(x * x + y * y + z * z);
     }
 
-    private void initSortingData(Entity entity, StarSet starSet) {
+    private void initSortingData(Entity entity,
+                                 StarSet starSet) {
         var pointData = starSet.pointData;
 
         // Metadata
