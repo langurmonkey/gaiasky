@@ -196,8 +196,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             curr = meshes.get(getOffset(render));
             if (curr != null) {
                 if (set.textureArray != null) {
-                    set.textureArray.bind(50);
-                    shaderProgram.setUniformi("u_textures", 50);
+                    set.textureArray.bind(2201);
+                    shaderProgram.setUniformi("u_textures", 2201);
                 }
                 float meanDist = (float) (set.getMeanDistance());
 

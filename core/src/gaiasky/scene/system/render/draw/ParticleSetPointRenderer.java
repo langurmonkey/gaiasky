@@ -9,6 +9,7 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -175,8 +176,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
             curr = meshes.get(getOffset(render));
             if (curr != null) {
                 if (set.textureArray != null) {
-                    set.textureArray.bind(50);
-                    shaderProgram.setUniformi("u_textures", 50);
+                    set.textureArray.bind(2200);
+                    shaderProgram.setUniformi("u_textures", 2200);
                 }
                 float meanDist = (float) (set.getMeanDistance());
 

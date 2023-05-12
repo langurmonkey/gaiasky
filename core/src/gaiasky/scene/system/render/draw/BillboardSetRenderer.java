@@ -68,8 +68,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     public BillboardSetRenderer(SceneRenderer sceneRenderer,
                                 RenderGroup rg,
                                 float[] alphas,
-                                ExtShaderProgram[] starShaders) {
-        super(sceneRenderer, rg, alphas, starShaders);
+                                ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         aux3f1 = new Vector3();
 
         starColorGenerator = new StarColorGenerator();
@@ -106,16 +106,9 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         FileHandle d04 = unpack("dust-04" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle d05 = unpack("dust-05" + Constants.STAR_SUBSTITUTE + ".png", gq);
 
-        for (ExtShaderProgram shaderProgram : programs) {
-            if (shaderProgram.isCompiled()) {
-                if (ta == null) {
-                    ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
-                    ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-                }
-                shaderProgram.begin();
-                ta.bind(0);
-                shaderProgram.setUniformi("u_textures", 0);
-            }
+        if (ta == null) {
+            ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
+            ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         }
     }
 
@@ -339,6 +332,10 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     shaderProgram.begin();
 
                     // Global uniforms
+                    if (ta != null) {
+                        ta.bind(2400);
+                        shaderProgram.setUniformi("u_textures", 2400);
+                    }
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
                     shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha);
