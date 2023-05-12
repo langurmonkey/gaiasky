@@ -166,8 +166,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         float textureIndex = -1.0f;
                         if (set.textureArray != null) {
                             int nTextures = set.textureArray.getDepth();
-                            int idx = rand.nextInt(nTextures);
-                            textureIndex = (float) (idx + 1) / (float) nTextures;
+                            textureIndex = (float) rand.nextInt(nTextures);
                         }
                         tempInstanceAttribs[curr.instanceIdx + textureIndexOffset] = textureIndex;
 
@@ -197,8 +196,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             curr = meshes.get(getOffset(render));
             if (curr != null) {
                 if (set.textureArray != null) {
-                    set.textureArray.bind(0);
-                    shaderProgram.setUniformi("u_textures", 0);
+                    set.textureArray.bind(50);
+                    shaderProgram.setUniformi("u_textures", 50);
                 }
                 float meanDist = (float) (set.getMeanDistance());
 
@@ -213,6 +212,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }
+
             }
         }
     }

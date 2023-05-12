@@ -33,14 +33,14 @@ vec4 programmatic(float dist) {
 
 vec4 textured(vec2 uv) {
     vec4 c = texture(u_textures, vec3(uv, v_textureIndex));
-    return vec4(c.rgb * v_col.rgb, c.a) * v_col.a;
+    return vec4(c.rgb * v_col.rgb, 1.0) * c.a * v_col.a;
 }
 
 void main() {
     vec2 uv = vec2(gl_PointCoord.x, gl_PointCoord.y);
     uv.y = uv.y * u_ar;
 
-    if (v_textureIndex < 0) {
+    if (v_textureIndex < 0.0) {
         float dist = distance(vec2(0.5, 0.5 * u_ar), uv) * 2.0;
         if (dist > 1.0) {
             discard;

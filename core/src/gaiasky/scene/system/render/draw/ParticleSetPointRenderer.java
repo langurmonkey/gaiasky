@@ -148,7 +148,12 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                         tempVerts[curr.vertexIdx + additionalOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
 
                         // TEXTURE INDEX
-                        tempVerts[curr.vertexIdx + textureIndexOffset] = -1.0f;
+                        float textureIndex = -1.0f;
+                        if (set.textureArray != null) {
+                            int nTextures = set.textureArray.getDepth();
+                            textureIndex = (float) rand.nextInt(nTextures);
+                        }
+                        tempVerts[curr.vertexIdx + textureIndexOffset] = textureIndex;
 
                         // POSITION
                         final int idx = curr.vertexIdx;
@@ -169,6 +174,10 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
             curr = meshes.get(getOffset(render));
             if (curr != null) {
+                if (set.textureArray != null) {
+                    set.textureArray.bind(50);
+                    shaderProgram.setUniformi("u_textures", 50);
+                }
                 float meanDist = (float) (set.getMeanDistance());
 
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);

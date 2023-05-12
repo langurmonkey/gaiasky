@@ -57,14 +57,18 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
     private final Vector3 aux3f1;
 
-    private Map<Render, MeshDataWrap[]> meshes;
-    private Map<Render, GpuData[]> gpus;
+    private final Map<Render, MeshDataWrap[]> meshes;
+    private final Map<Render, GpuData[]> gpus;
 
     private TextureArray ta;
 
-    private ColorGenerator starColorGenerator, dustColorGenerator;
+    private final ColorGenerator starColorGenerator;
+    private final ColorGenerator dustColorGenerator;
 
-    public BillboardSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
+    public BillboardSetRenderer(SceneRenderer sceneRenderer,
+                                RenderGroup rg,
+                                float[] alphas,
+                                ExtShaderProgram[] starShaders) {
         super(sceneRenderer, rg, alphas, starShaders);
         aux3f1 = new Vector3();
 
@@ -115,7 +119,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         }
     }
 
-    private FileHandle unpack(String texName, GraphicsQuality gq) {
+    private FileHandle unpack(String texName,
+                              GraphicsQuality gq) {
         return Settings.settings.data.dataFileHandle(GlobalResources.unpackAssetPath(texFolder + texName, gq));
     }
 
@@ -158,7 +163,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     protected void initVertices() {
     }
 
-    private MeshDataWrap toMeshData(GpuData ad, MeshDataWrap mdw) {
+    private MeshDataWrap toMeshData(GpuData ad,
+                                    MeshDataWrap mdw) {
         if (ad != null && ad.vertices != null) {
             if (mdw != null && mdw.meshData != null) {
                 mdw.meshData.dispose();
@@ -190,8 +196,9 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
      *
      * @return The GPU data object.
      */
-    private GpuData convertDataToGpu(BillboardDataset bd, ColorGenerator cg) {
-        StdRandom.setSeed(11447799l);
+    private GpuData convertDataToGpu(BillboardDataset bd,
+                                     ColorGenerator cg) {
+        StdRandom.setSeed(11447799L);
         GpuData ad = new GpuData();
         // Dataset
         ad.dataset = bd;
@@ -254,14 +261,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     }
 
     private ColorGenerator getColorGenerator(final ParticleType type) {
-        return switch (type) {
-            case BULGE -> starColorGenerator;
-            case STAR -> starColorGenerator;
-            case HII -> starColorGenerator;
-            case GAS -> starColorGenerator;
-            case DUST -> dustColorGenerator;
-            default -> starColorGenerator;
-        };
+        return type == ParticleType.DUST ? dustColorGenerator : starColorGenerator;
     }
 
     /**
@@ -271,7 +271,9 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
      * @param base   The base component.
      * @param set    The billboard set component.
      */
-    private void convertDataToGpuFormat(Render render, Base base, BillboardSet set) {
+    private void convertDataToGpuFormat(Render render,
+                                        Base base,
+                                        BillboardSet set) {
         logger.info("Converting billboard data to VRAM format: " + base.getLocalizedName());
         BillboardDataset[] datasets = set.datasets;
         GpuData[] g = new GpuData[datasets.length];
@@ -288,7 +290,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
      * @param render The render object.
      * @param base   The base component.
      */
-    private void streamToGpu(Render render, Base base) {
+    private void streamToGpu(Render render,
+                             Base base) {
         logger.info("Streaming billboard datasets to GPU: " + base.getLocalizedName());
         GpuData[] g = gpus.get(render);
         if (g != null) {
@@ -302,7 +305,9 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables,
+                           ICamera camera,
+                           double t) {
         for (IRenderable renderable : renderables) {
             Render render = (Render) renderable;
             var base = Mapper.base.get(render.entity);
@@ -358,7 +363,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                         case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                         case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
                         }
-                        ;
                         // Depth mask
                         Gdx.gl20.glDepthMask(dataset.depthMask);
 
@@ -391,7 +395,9 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
             if (source instanceof Render) {
                 disposeMeshes((Render) source);

@@ -2,16 +2,8 @@
 
 #include shader/lib_geometry.glsl
 
-in vec4 a_position;
-in vec4 a_color;
-// Additional attributes:
-// x - size
-// y - colmap_attribute_value
-in vec2 a_additional;
-in float a_textureIndex;
-
+// UNIFORMS
 uniform float u_alpha;
-
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
@@ -20,6 +12,19 @@ uniform int u_cubemap;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
 
+// INPUT
+in vec4 a_position;
+in vec4 a_color;
+// Additional attributes:
+// x - size
+// y - colmap_attribute_value
+in vec2 a_additional;
+in float a_textureIndex;
+
+// OUTPUT
+out vec4 v_col;
+out float v_textureIndex;
+
 #ifdef relativisticEffects
     #include shader/lib_relativity.glsl
 #endif // relativisticEffects
@@ -27,9 +32,6 @@ uniform float u_vrScale;
 #ifdef gravitationalWaves
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
-    
-out vec4 v_col;
-out float v_textureIndex;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
