@@ -44,6 +44,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 
 import java.nio.file.Files;
@@ -57,6 +58,7 @@ import java.util.Map;
  */
 public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
+
     /**
      * Contains a map by name with
      * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
@@ -676,9 +678,26 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             var lightPos = (float[]) data[1];
             var angles = (float[]) data[2];
             var colors = (float[]) data[3];
+            var alphas = new float[nLights];
             var prePass = (Texture) data[4];
             var lensFlareSettings = Settings.settings.postprocess.lensFlare;
-            for (int i = 0; i < RenderType.values().length; i++) {
+            var nLightsFlare = 0;
+            int i = 0;
+            for (float angle : angles) {
+                // Lens flare fade start solid angle, end 1
+                float lensFlareAngle0 = 1e-6f;
+                // Lens flare fade end solid angle, end 2
+                float lensFlareAngle1 = 0.5e-7f;
+                if (angle > lensFlareAngle1) {
+                    nLightsFlare++;
+                    alphas[i] = 1;
+                    if(angle < lensFlareAngle0) {
+                        alphas[i] = MathUtilsDouble.lint(angle, lensFlareAngle1, lensFlareAngle0, 0f, 1f);
+                    }
+                }
+                i++;
+            }
+            for (i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
@@ -692,7 +711,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     if (!lensFlareSettings.type.isPseudoLensFlare()) {
                         LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
                         if (lensFlare != null && lensFlare.isEnabled()) {
-                            lensFlare.setLightPositions(nLights, lightPos);
+                            lensFlare.setLightPositions(nLightsFlare, lightPos, alphas);
                             if (nLights <= 0) {
                                 lensFlare.setIntensity(0);
                             } else {

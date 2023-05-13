@@ -54,8 +54,8 @@ public class LensFlare extends PostProcessorEffect {
         flare.setViewportSize(width, height);
     }
 
-    public void setLightPositions(int nLights, float[] vec) {
-        flare.setLightPositions(nLights, vec);
+    public void setLightPositions(int nLights, float[] positions, float[] intensities) {
+        flare.setLightPositions(nLights, positions, intensities);
     }
 
     public void setIntensity(float intensity) {

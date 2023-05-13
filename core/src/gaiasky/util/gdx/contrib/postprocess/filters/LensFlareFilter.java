@@ -19,6 +19,7 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
     private int type;
     private final Vector2 viewport;
     private float[] lightPositions;
+    private float[] lightIntensities;
     private int nLights = 0;
     private final Vector3 color;
     private float intensity;
@@ -64,11 +65,13 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         setParam(Param.Viewport, this.viewport);
     }
 
-    public void setLightPositions(int nLights, float[] vec) {
+    public void setLightPositions(int nLights, float[] positions, float[] intensities) {
         this.nLights = nLights;
-        this.lightPositions = vec;
-        setParam(GlowFilter.Param.NLights, this.nLights);
-        setParamv(GlowFilter.Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
+        this.lightPositions = positions;
+        this.lightIntensities = intensities;
+        setParam(Param.NLights, this.nLights);
+        setParamv(Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
+        setParamv(Param.LightIntensities, this.lightIntensities, 0, this.nLights);
     }
 
     public void setIntensity(float intensity) {
@@ -103,6 +106,7 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         // @formatter:off
         Texture("u_texture0", 0),
         LightPositions("u_lightPositions", 2),
+        LightIntensities("u_lightIntensities", 1),
         NLights("u_nLights", 0),
         Color("u_color", 3),
         Intensity("u_intensity", 0),

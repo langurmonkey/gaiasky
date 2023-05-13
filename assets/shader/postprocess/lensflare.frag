@@ -9,6 +9,7 @@ uniform sampler2D u_texture0;
 uniform vec2 u_viewport;
 uniform float u_intensity;
 uniform vec2 u_lightPositions[MAX_LIGHTS];
+uniform float u_lightIntensities[MAX_LIGHTS];
 uniform int u_nLights;
 uniform vec3 u_color;
 
@@ -185,10 +186,11 @@ void main(void) {
 
         for (int light = 0; light < u_nLights; light++) {
             vec2 light_pos = u_lightPositions[light] - 0.5;
+            float light_intensity = u_lightIntensities[light];
 
             // Compute intensity of light.
             float t = 0;
-            float a = 0.02;
+            float a = 0.01;
             float dt = 3.0 * 3.14159 / N_SAMPLES;
             float lum = 0.0;
             for (int idx = 0; idx < N_SAMPLES; idx++){
@@ -199,7 +201,7 @@ void main(void) {
             lum /= N_SAMPLES;
 
             float weight = clamp(1.6 - 2.0 * length(light_pos), 0.0, 1.0);
-            float intensity = u_intensity * lum * weight;
+            float intensity = u_intensity * lum * weight * light_intensity;
 
             if (intensity > 0.0) {
                 color += lens_flare(uv, intensity, light_pos);
