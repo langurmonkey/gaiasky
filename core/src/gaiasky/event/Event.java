@@ -1485,14 +1485,6 @@ public enum Event {
     DATASET_DOWNLOAD_FINISH_INFO,
 
     /**
-     * Sparse virtual texture operation.
-     * Triggers the processing of the SVT view determination buffer and the loading/updating
-     * of the SVT cache and indirection buffers. Contains the {@link java.nio.FloatBuffer}
-     * with the contents of the view determination buffer.
-     */
-    SVT_TILE_DETECTION_READY,
-
-    /**
      * Broadcasts material component [1] which has at least one sparse virtual
      * texture, and the sparse virtual texture ID for that material [0].
      */

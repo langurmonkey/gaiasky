@@ -8,6 +8,7 @@
 package gaiasky.scene.system.render.pass;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
@@ -23,18 +24,25 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.ModelView;
+import gaiasky.util.GaiaSkyAssets;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.svt.SVTManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
 import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
 
+/**
+ * Render pass for the sparse virtual textures. The operation is distributed over 5 consecutive frames
+ * to even out the contributions and achieve regular frame pacing.
+ */
 public class SVTRenderPass {
     /**
      * The tile detection buffer is smaller than the main window by this factor.
@@ -54,6 +62,18 @@ public class SVTRenderPass {
     /** The frame buffer to render the SVT tile detection. Format should be at least RGBAF16. **/
     private FrameBuffer frameBuffer;
     private FloatBuffer pixels;
+
+    private SVTManager svtManager;
+
+    /** Marks candidate lists as ready with new objects. **/
+    private final AtomicBoolean candidatesReady = new AtomicBoolean(false);
+    /**
+     * Signal the readiness of the SVT tile detection frame buffer.
+     * We split the operation into several frames using this little trick. Good developers hate this!
+     */
+    private final AtomicBoolean frameBufferReady = new AtomicBoolean(false);
+    /** Marks the pixels array as ready for the SVT manager to consume. **/
+    private final AtomicBoolean pixelsReady = new AtomicBoolean(false);
 
     private boolean uiViewCreated = true;
 
@@ -78,13 +98,18 @@ public class SVTRenderPass {
         pixels = BufferUtils.createFloatBuffer(w * h * 4);
     }
 
+    public void doneLoading(AssetManager manager) {
+        svtManager = manager.get("gaiasky-assets", GaiaSkyAssets.class).svtManager;
+    }
+
     /**
      * Collects the candidate entities in the given render group that have a non-cloud SVT.
      *
      * @param renderGroup The render group.
      * @param candidates  The entities in the given render group with at least one non-cloud SVT.
      */
-    private void fetchCandidates(RenderGroup renderGroup, Array<IRenderable> candidates) {
+    private void fetchCandidates(RenderGroup renderGroup,
+                                 Array<IRenderable> candidates) {
         List<IRenderable> models = sceneRenderer.getRenderLists().get(renderGroup.ordinal());
         candidates.clear();
         // Collect SVT-enabled models.
@@ -103,7 +128,8 @@ public class SVTRenderPass {
      * @param renderGroups The render groups.
      * @param candidates   The candidates with only cloud SVT.
      */
-    private void fetchCandidatesCloud(RenderGroup[] renderGroups, Array<IRenderable> candidates) {
+    private void fetchCandidatesCloud(RenderGroup[] renderGroups,
+                                      Array<IRenderable> candidates) {
         List<IRenderable> models = new ArrayList<>();
         for (var rg : renderGroups) {
             models.addAll(sceneRenderer.getRenderLists().get(rg.ordinal()));
@@ -120,77 +146,141 @@ public class SVTRenderPass {
 
     private final RenderGroup[] renderGroups = new RenderGroup[] { MODEL_PIX, MODEL_PIX_TESS };
 
+    /**
+     * We distribute the operation into five frames to distribute the load a bit.
+     *
+     * @param camera The camera.
+     */
     public void render(ICamera camera) {
-        // Costly operation, every 4th frame.
-        if (GaiaSky.instance.frames % 4 == 0) {
-            fetchCandidates(renderGroups[0], candidates);
-            fetchCandidates(renderGroups[1], candidatesTess);
-            fetchCandidatesCloud(renderGroups, candidatesCloud);
-
-            var renderAssets = sceneRenderer.getRenderAssets();
-
-            int rendered = 0;
-
-            // Render SVT tile detection to frame buffer.
-            if(!candidates.isEmpty() || !candidatesTess.isEmpty() || !candidatesCloud.isEmpty()) {
-                frameBuffer.begin();
-                Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
-                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-                // Non-tessellated models.
-                if (!candidates.isEmpty() || !candidatesCloud.isEmpty()) {
-                    renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
-                    for (var candidate : candidates) {
-                        pushBlend(candidate);
-                        sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
-                        popBlend(candidate);
-                        rendered++;
-                    }
-                    // Models with only cloud SVT.
-                    for (var candidate : candidatesCloud) {
-                        var e = ((Render) candidate).getEntity();
-                        var m = Mapper.model.get(e);
-                        var c = Mapper.cloud.get(e);
-                        if (c.cloud.hasSVT()) {
-                            sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
-                            rendered++;
-                        }
-                    }
-                    renderAssets.mbPixelLightingSvtDetection.end();
-                }
-
-                // Tessellated models.
-                if (!candidatesTess.isEmpty()) {
-                    renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
-                    for (var candidate : candidatesTess) {
-                        pushBlend(candidate);
-                        sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
-                        popBlend(candidate);
-                        rendered++;
-                    }
-                    renderAssets.mbPixelLightingSvtDetectionTessellation.end();
-                }
-
-                frameBuffer.end();
-            }
-
-            if (rendered > 0) {
-                // Read out pixels to float buffer.
-                frameBuffer.getColorBufferTexture().bind();
-                GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
-
-                // Send message informing a new tile detection buffer is ready.
-                EventManager.publish(Event.SVT_TILE_DETECTION_READY, this, pixels);
-
-                if (!uiViewCreated) {
-                    GaiaSky.postRunnable(() -> {
-                        // Create UI view
-                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
-                    });
-                    uiViewCreated = true;
-                }
-            }
+        // We use three stages.
+        final long f = GaiaSky.instance.frames % 5;
+        switch ((int) f) {
+        case 0 -> stage0();
+        case 1 -> stage1(camera);
+        case 2 -> stage2();
+        case 3 -> stage3();
+        case 4 -> stage4();
         }
+    }
+
+    /**
+     * Stage 0: fetch candidates.
+     */
+    private void stage0() {
+        fetchCandidates(renderGroups[0], candidates);
+        fetchCandidates(renderGroups[1], candidatesTess);
+        fetchCandidatesCloud(renderGroups, candidatesCloud);
+        candidatesReady.set(!(candidates.isEmpty() && candidatesTess.isEmpty() && candidatesCloud.isEmpty()));
+    }
+
+    /**
+     * First stage: render the SVT tile detection to a frame buffer.
+     *
+     * @param camera The camera.
+     */
+    private void stage1(ICamera camera) {
+        // Must have candidates ready to be rendered.
+        if (!candidatesReady.get()) {
+            return;
+        }
+
+        int rendered = 0;
+        var renderAssets = sceneRenderer.getRenderAssets();
+        frameBuffer.begin();
+        Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+        // Non-tessellated models.
+        if (!candidates.isEmpty() || !candidatesCloud.isEmpty()) {
+            renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
+            for (var candidate : candidates) {
+                pushBlend(candidate);
+                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
+                popBlend(candidate);
+                rendered++;
+            }
+            // Models with only cloud SVT.
+            for (var candidate : candidatesCloud) {
+                var e = ((Render) candidate).getEntity();
+                var m = Mapper.model.get(e);
+                var c = Mapper.cloud.get(e);
+                if (c.cloud.hasSVT()) {
+                    sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
+                    rendered++;
+                }
+            }
+            renderAssets.mbPixelLightingSvtDetection.end();
+        }
+
+        // Tessellated models.
+        if (!candidatesTess.isEmpty()) {
+            renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
+            for (var candidate : candidatesTess) {
+                pushBlend(candidate);
+                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
+                popBlend(candidate);
+                rendered++;
+            }
+            renderAssets.mbPixelLightingSvtDetectionTessellation.end();
+        }
+
+        frameBuffer.end();
+
+        // Flip readiness flag, if needed.
+        if (rendered > 0) {
+            frameBufferReady.set(true);
+        }
+        // Flip candidates flag.
+        candidatesReady.set(false);
+    }
+
+    /**
+     * Second stage: use the frame buffer to inform the SVT manager about what tiles to load.
+     */
+    private void stage2() {
+        // We must be ready.
+        if (!frameBufferReady.get()) {
+            return;
+        }
+
+        // Read out pixels to float buffer.
+        frameBuffer.getColorBufferTexture().bind();
+        GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
+
+        if (!uiViewCreated) {
+            GaiaSky.postRunnable(() -> {
+                // Create UI view
+                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
+            });
+            uiViewCreated = true;
+        }
+
+        // Flip pixels flag.
+        pixelsReady.set(true);
+        // Flip readiness flag.
+        frameBufferReady.set(false);
+    }
+
+    /**
+     * Third stage: use SVT manager to update the observed tiles queue using the tile detection buffer.
+     */
+    private void stage3() {
+        if (!pixelsReady.get()) {
+            return;
+        }
+
+        svtManager.updateObservedTiles(pixels);
+
+        // Flip pixels flag.
+        pixelsReady.set(false);
+    }
+
+    /**
+     * Final stage: use SVT manager to actually process the queue of observed tiles and load/unload the
+     * required tiles.
+     */
+    private void stage4() {
+        svtManager.processObservedTiles();
     }
 
     BlendMode blendBak = null;

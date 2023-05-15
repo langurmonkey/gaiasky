@@ -127,10 +127,15 @@ public class SVTManager implements IObserver {
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
 
-        EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY, Event.SVT_MATERIAL_INFO);
+        EventManager.instance.subscribe(this, Event.SVT_MATERIAL_INFO);
     }
 
-    public void update(final FloatBuffer tileDetectionBuffer) {
+    /**
+     * Flushes the current observed tiles queue, and refills it using the data in the given tile detection buffer.
+     *
+     * @param tileDetectionBuffer The tile detection buffer data.
+     */
+    public void updateObservedTiles(final FloatBuffer tileDetectionBuffer) {
         observedTiles.clear();
         int size = tileDetectionBuffer.capacity() / 4;
         tileDetectionBuffer.rewind();
@@ -160,9 +165,34 @@ public class SVTManager implements IObserver {
             floatBuffer = BufferUtils.createFloatBuffer(4);
         }
 
-        var now = TimeUtils.millis();
-
         // Process observed tiles.
+        processObservedTiles();
+
+    }
+
+    private void observeSvt(VirtualTextureComponent svt,
+                            float level,
+                            float x,
+                            float y) {
+        // Initialize tile size first time.
+        if (tileSize < 0) {
+            tileSize = svt.tileSize;
+            // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
+            cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
+            cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
+        }
+
+        var tile = svt.tree.getTile((int) level, (int) x, (int) y);
+        if (tile != null && !observedTiles.contains(tile, true)) {
+            observedTiles.add(tile);
+        }
+    }
+
+    /**
+     * Processes the current observed tiles queue.
+     */
+    public void processObservedTiles() {
+        var now = TimeUtils.millis();
         for (var tile : observedTiles) {
             var path = tile.object.toString();
             switch (tile.state) {
@@ -187,8 +217,8 @@ public class SVTManager implements IObserver {
                         logger.warn("Rescaling tile: " + tile.toStringShort());
                         Pixmap aux = new Pixmap(tile.tree.tileSize, tile.tree.tileSize, pixmap.getFormat());
                         aux.drawPixmap(pixmap,
-                                0, 0, pixmap.getWidth(), pixmap.getHeight(),
-                                0, 0, tile.tree.tileSize, tile.tree.tileSize);
+                                       0, 0, pixmap.getWidth(), pixmap.getHeight(),
+                                       0, 0, tile.tree.tileSize, tile.tree.tileSize);
                         manager.unload(path);
                         pixmap = aux;
                     }
@@ -282,21 +312,6 @@ public class SVTManager implements IObserver {
 
     }
 
-    private void observeSvt(VirtualTextureComponent svt, float level, float x, float y) {
-        // Initialize tile size first time.
-        if (tileSize < 0) {
-            tileSize = svt.tileSize;
-            // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
-            cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
-            cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
-        }
-
-        var tile = svt.tree.getTile((int) level, (int) x, (int) y);
-        if (tile != null && !observedTiles.contains(tile, true)) {
-            observedTiles.add(tile);
-        }
-    }
-
     /**
      * Puts the given tile at the given location in the cache buffer.
      *
@@ -305,7 +320,10 @@ public class SVTManager implements IObserver {
      * @param j    The row in the cache.
      * @param now  The current time.
      */
-    private void putTileInCache(SVTQuadtreeNode<Path> tile, int i, int j, long now) {
+    private void putTileInCache(SVTQuadtreeNode<Path> tile,
+                                int i,
+                                int j,
+                                long now) {
         assert !tileLocation.containsKey(tile) : "Tile is already in the cache: " + tile;
         tileLocation.put(tile, new int[] { i, j });
         cacheBufferArray[i][j] = tile;
@@ -391,7 +409,9 @@ public class SVTManager implements IObserver {
      * @param cacheX The tile column in the cache buffer.
      * @param cacheY The tile row in the cache buffer.
      */
-    private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile, int cacheX, int cacheY) {
+    private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile,
+                                       int cacheX,
+                                       int cacheY) {
         var x = (float) cacheX;
         var y = (float) cacheY;
         fillIndirectionTileWith(tile, x, y, tile.level, 1f);
@@ -406,7 +426,11 @@ public class SVTManager implements IObserver {
      * @param b    The blue channel, in [0,1].
      * @param a    The alpha channel, in [0,1].
      */
-    private void fillIndirectionTileWith(SVTQuadtreeNode<Path> tile, float r, float g, float b, float a) {
+    private void fillIndirectionTileWith(SVTQuadtreeNode<Path> tile,
+                                         float r,
+                                         float g,
+                                         float b,
+                                         float a) {
         // a=0 means the tile is not valid.
         floatBuffer.rewind();
         floatBuffer.put(0, r);
@@ -427,12 +451,10 @@ public class SVTManager implements IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
-        if (event == Event.SVT_TILE_DETECTION_READY) {
-            // Compute visible tiles.
-            var pixels = (FloatBuffer) data[0];
-            update(pixels);
-        } else if (event == Event.SVT_MATERIAL_INFO) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
+        if (event == Event.SVT_MATERIAL_INFO) {
             // Put in list.
             var id = (Integer) data[0];
             var comp = (NamedComponent) data[1];
@@ -448,7 +470,8 @@ public class SVTManager implements IObserver {
         }
     }
 
-    private void addToVTMap(int id, VirtualTextureComponent component) {
+    private void addToVTMap(int id,
+                            VirtualTextureComponent component) {
         if (component == null) {
             return;
         }

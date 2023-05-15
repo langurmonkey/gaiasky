@@ -167,10 +167,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     public void doneLoading(final AssetManager manager) {
-        // Prepare render assets
+        // Prepare render assets.
         renderAssets.doneLoading(manager);
 
-        // Initialize render lists
+        // SVT pass.
+        svtPass.doneLoading(manager);
+
+        // Initialize render lists.
         RenderGroup[] renderGroups = values();
         renderLists = (new ArrayList<>(renderGroups.length));
         for (int i = 0; i < renderGroups.length; i++) {
