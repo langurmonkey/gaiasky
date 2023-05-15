@@ -683,7 +683,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             var lensFlareSettings = Settings.settings.postprocess.lensFlare;
             var nLightsFlare = 0;
             int i = 0;
-            for (float angle : angles) {
+            for (int k = 0; k < nLights; k++) {
+                var angle = angles[k];
                 // Lens flare fade start solid angle, end 1
                 float lensFlareAngle0 = 1e-6f;
                 // Lens flare fade end solid angle, end 2
