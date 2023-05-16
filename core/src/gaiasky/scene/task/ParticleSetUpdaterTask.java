@@ -16,6 +16,7 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.Base;
 import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
@@ -31,17 +32,21 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
     // Minimum amount of time [ms] between two update calls
-    protected static final double UPDATE_INTERVAL_MS = 1500;
+    protected static final double UPDATE_INTERVAL_MS = 500;
     protected static final double UPDATE_INTERVAL_MS_2 = UPDATE_INTERVAL_MS * 2;
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
+    protected static final double CAM_DX_TH_SQ = CAM_DX_TH * CAM_DX_TH;
     /** Reference to the entity. **/
     private final Entity entity;
+    /** Base component. **/
+    private final Base base;
     /** Reference to the particle set component. **/
     private final ParticleSet particleSet;
     /** Reference to the star set component. **/
@@ -60,6 +65,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                                   ParticleSet particleSet,
                                   StarSet starSet) {
         this.entity = entity;
+        this.base = Mapper.base.get(entity);
         this.particleSet = particleSet;
         this.starSet = starSet;
         this.datasetDescription = Mapper.datasetDescription.get(entity);
@@ -72,7 +78,33 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             updateConsumer = this::updateMetadataParticles;
         }
 
-        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.CAMERA_MOTION_UPDATE);
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
+    }
+
+    /**
+     * Triggers the update task if the requirements for it are met:
+     * <ul>
+     *     <li>Set is not updating.</li>
+     *     <li>Opacity is not 0.</li>
+     *     <li>Time since last update is not larger than updateInterval*2.</li>
+     *     <li>The camera has moved a lot.</li>
+     *     <li>Time is on and very fast.</li>
+     * </ul>
+     *
+     * @param camera The camera.
+     */
+    public void update(ICamera camera) {
+        var pointData = particleSet.pointData;
+        if (pointData != null && pointData.size() > 0 && pointData.get(0).names() != null) {
+            long t = TimeUtils.millis() - particleSet.lastSortTime;
+            if (!particleSet.updating.get()
+                    && base.opacity > 0
+                    && (t > UPDATE_INTERVAL_MS_2
+                    || (particleSet.lastSortCameraPos.dst2(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_MS)
+                    || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_MS))) {
+                particleSet.updating.set(GaiaSky.instance.getExecutorService().execute(this));
+            }
+        }
     }
 
     @Override
@@ -93,8 +125,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         // Synchronously with the render thread, update indices, lastSortTime and updating state.
         GaiaSky.postRunnable(() -> {
             swapBuffers();
+            particleSet.lastSortCameraPos.set(camera.getPos());
             particleSet.lastSortTime = TimeUtils.millis();
-            particleSet.updating = false;
+            particleSet.updating.set(false);
         });
     }
 
@@ -159,9 +192,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     public void notify(Event event,
                        Object source,
                        Object... data) {
-        var base = Mapper.base.get(entity);
-        switch (event) {
-        case FOCUS_CHANGED -> {
+        if (Objects.requireNonNull(event) == Event.FOCUS_CHANGED) {
             if (data[0] instanceof String) {
                 particleSet.focusIndex = data[0].equals(base.getName()) ? particleSet.focusIndex : -1;
             } else {
@@ -169,21 +200,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 particleSet.focusIndex = (view.getSet() == particleSet) ? particleSet.focusIndex : -1;
             }
             utils.updateFocusDataPos(particleSet);
-        }
-        case CAMERA_MOTION_UPDATE -> {
-            // Check that the particles have names.
-            var pointData = particleSet.pointData;
-            if (pointData != null && particleSet.updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
-                final Vector3b currentCameraPos = (Vector3b) data[0];
-                long t = TimeUtils.millis() - particleSet.lastSortTime;
-                if (!particleSet.updating && base.opacity > 0 && (t > UPDATE_INTERVAL_MS_2 || (particleSet.lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH
-                        && t > UPDATE_INTERVAL_MS))) {
-                    particleSet.updating = GaiaSky.instance.getExecutorService().execute(this);
-                }
-            }
-        }
-        default -> {
-        }
         }
     }
 

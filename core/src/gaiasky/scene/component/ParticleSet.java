@@ -32,6 +32,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParticleSet implements Component, IDisposable {
 
@@ -151,7 +152,7 @@ public class ParticleSet implements Component, IDisposable {
     public byte[] visibilityArray;
 
     // Is it updating?
-    public volatile boolean updating = false;
+    public final AtomicBoolean updating = new AtomicBoolean(false);
 
     // Updater task.
     public ParticleSetUpdaterTask updaterTask;

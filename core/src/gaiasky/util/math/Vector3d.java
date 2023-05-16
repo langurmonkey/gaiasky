@@ -418,6 +418,13 @@ public class Vector3d implements Serializable, VectorDouble<Vector3d> {
         return FastMath.sqrt(a * a + b * b + c * c);
     }
 
+    public double dst2(Vector3b vec) {
+        final double a = vec.x.doubleValue() - x;
+        final double b = vec.y.doubleValue() - y;
+        final double c = vec.z.doubleValue() - z;
+        return a * a + b * b + c * c;
+    }
+
     public double dst2(Vector3d vec) {
         final double a = vec.x - x;
         final double b = vec.y - y;

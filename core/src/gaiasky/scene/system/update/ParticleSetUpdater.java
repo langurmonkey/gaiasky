@@ -24,18 +24,21 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
 
     private final ParticleUtils utils;
 
-    public ParticleSetUpdater(Family family, int priority) {
+    public ParticleSetUpdater(Family family,
+                              int priority) {
         super(family, priority);
         this.utils = new ParticleUtils();
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity,
+                                 float deltaTime) {
         updateEntity(entity, deltaTime);
     }
 
     @Override
-    public void updateEntity(Entity entity, float deltaTime) {
+    public void updateEntity(Entity entity,
+                             float deltaTime) {
         var camera = GaiaSky.instance.cameraManager;
         if (Mapper.starSet.has(entity)) {
             updateStarSet(camera, Mapper.starSet.get(entity), Mapper.datasetDescription.get(entity));
@@ -44,17 +47,26 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void updateParticleSet(ICamera camera, ParticleSet particleSet) {
+    private void updateParticleSet(ICamera camera,
+                                   ParticleSet particleSet) {
         if (particleSet.pointData != null) {
             particleSet.cPosD.set(camera.getPos());
 
             if (particleSet.focusIndex >= 0) {
                 particleSet.updateFocus(camera);
             }
+
+            // Touch task.
+            if (particleSet.updaterTask != null) {
+                particleSet.updaterTask.update(camera);
+            }
+
         }
     }
 
-    private void updateStarSet(ICamera camera, StarSet starSet, DatasetDescription datasetDesc) {
+    private void updateStarSet(ICamera camera,
+                               StarSet starSet,
+                               DatasetDescription datasetDesc) {
         // Fade node visibility
         if (starSet.active.length > 0) {
             starSet.cPosD.set(camera.getPos());
