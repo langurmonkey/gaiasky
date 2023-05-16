@@ -38,7 +38,7 @@ public class ParticleSet implements Component, IDisposable {
     public static long idSeq = 0;
     public final Vector3d D31 = new Vector3d();
     /**
-     * List that contains the point data. It contains only [x y z]
+     * List that contains the point data. It contains only [x y z].
      */
     public List<IParticleRecord> pointData;
     /** This flag enables muting particle rendering. **/
@@ -46,21 +46,21 @@ public class ParticleSet implements Component, IDisposable {
     /** Flag indicating whether the particle set holds stars or particles. **/
     public boolean isStars;
     /**
-     * Fully qualified name of data provider class
+     * Fully qualified name of data provider class.
      */
     public String provider;
     /**
-     * Path of data file
+     * Path of data file.
      */
     public String datafile;
     // Parameters for the data provider
     public Map<String, Object> providerParams;
     /**
-     * Profile decay of the particles in the shader
+     * Profile decay of the particles in the shader.
      */
     public float profileDecay = 0.2f;
     /**
-     * Noise factor for the color in [0,1]
+     * Noise factor for the color in [0,1].
      */
     public float colorNoise = 0;
 
@@ -74,7 +74,7 @@ public class ParticleSet implements Component, IDisposable {
     public double[] particleSizeLimitsPoint = new double[] { 2d, 50d };
     /**
      * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
-     * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
+     * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
     public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
     /** Texture files to use for rendering the particles, at random. **/
@@ -87,15 +87,15 @@ public class ParticleSet implements Component, IDisposable {
      **/
     public Vector3d meanPosition;
     /**
-     * Factor to apply to the data points, usually to normalise distances
+     * Factor to apply to the data points, usually to normalise distances.
      */
     public Double factor = null;
     /**
-     * Mapping colors
+     * Mapping colors.
      */
     public float[] ccMin = null, ccMax = null;
     /**
-     * Stores the time when the last sort operation finished, in ms
+     * Stores the time when the last sort operation finished, in ms.
      */
     public long lastSortTime;
     /**
@@ -117,48 +117,48 @@ public class ParticleSet implements Component, IDisposable {
      */
     public int candidateFocusIndex = -1;
     /**
-     * Position of the current focus
+     * Position of the current focus.
      */
     public Vector3d focusPosition;
     /**
-     * Position in equatorial coordinates of the current focus in radians
+     * Position in equatorial coordinates of the current focus in radians.
      */
     public Vector2d focusPositionSph;
     /**
-     * FOCUS_MODE attributes
+     * FOCUS_MODE attributes.
      */
     public double focusDistToCamera, focusSolidAngle, focusSolidAngleApparent, focusSize;
     /**
-     * Proximity particles
+     * Proximity particles.
      */
     public Proximity proximity;
-    // Has been disposed
+    // Has been disposed.
     public boolean disposed = false;
-    // Name index
+    // Name index.
     public Map<String, Integer> index;
     // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
-    // Indices list buffer 1
+    // Indices list buffer 1.
     public Integer[] indices1;
-    // Indices list buffer 2
+    // Indices list buffer 2.
     public Integer[] indices2;
-    // Active indices list
+    // Active indices list.
     public Integer[] active;
-    // Background indices list (the one we sort)
+    // Background indices list (the one we sort).
     public Integer[] background;
 
-    // Visibility array with 1 (visible) or 0 (hidden) for each particle
+    // Visibility array with 1 (visible) or 0 (hidden) for each particle.
     public byte[] visibilityArray;
 
     // Is it updating?
     public volatile boolean updating = false;
 
-    // Updater task
+    // Updater task.
     public ParticleSetUpdaterTask updaterTask;
 
-    // Last sort position
+    // Last sort position.
     public Vector3d lastSortCameraPos, cPosD;
-    // Comparator
+    // Comparator.
     private Comparator<Integer> comp;
 
     public float[] getColorMin() {
