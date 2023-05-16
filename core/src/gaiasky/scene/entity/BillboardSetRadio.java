@@ -19,7 +19,7 @@ import gaiasky.util.tree.LoadStatus;
 public class BillboardSetRadio extends EntityRadio {
 
     private final BillboardSetInitializer initializer;
-    private BillboardSet billboardSet;
+    private final BillboardSet billboardSet;
 
     public BillboardSetRadio(Entity entity) {
         super(entity);
@@ -37,7 +37,7 @@ public class BillboardSetRadio extends EntityRadio {
                 GaiaSky.postRunnable(() -> {
                     initializer.transformData(entity);
                     EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, entity);
-                    billboardSet.status = LoadStatus.NOT_LOADED;
+                    billboardSet.status.set(LoadStatus.NOT_LOADED);
                 });
             }
         }

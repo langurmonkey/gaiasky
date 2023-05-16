@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -59,6 +60,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
     private final Map<Render, MeshDataWrap[]> meshes;
     private final Map<Render, GpuData[]> gpus;
+    private final Map<Render, Integer> loadIndices;
 
     private TextureArray ta;
 
@@ -77,6 +79,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
         meshes = new HashMap<>();
         gpus = new HashMap<>();
+        loadIndices = new HashMap<>();
 
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_BILLBOARD_DATASET);
     }
@@ -176,6 +179,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
             mdw.dataset = ad.dataset;
 
             ad.vertices = null;
+            ad.indices = null;
             return mdw;
         }
         return null;
@@ -278,23 +282,46 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
     /**
      * Converts the GPU data objects for the given dataset provider to mesh data
-     * objects and stores them.
+     * objects, and streams them to the GPU, one at a time (in each call to this method).
+     * When all objects have been converted and streamed, this method returns true.
      *
      * @param render The render object.
      * @param base   The base component.
+     *
+     * @return True if all data is already in the GPU.
      */
-    private void streamToGpu(Render render,
-                             Base base) {
-        logger.info("Streaming billboard datasets to GPU: " + base.getLocalizedName());
+    private boolean streamToGpu(Render render,
+                                Base base) {
         GpuData[] g = gpus.get(render);
         if (g != null) {
-            MeshDataWrap[] m = new MeshDataWrap[g.length];
-            for (int i = 0; i < g.length; i++) {
-                m[i] = toMeshData(g[i], m[i]);
+            int index;
+            if (!loadIndices.containsKey(render)) {
+                loadIndices.put(render, 0);
+                index = 0;
+            } else {
+                index = loadIndices.get(render) + 1;
+                loadIndices.put(render, index);
             }
-            gpus.remove(render);
-            meshes.put(render, m);
+
+            MeshDataWrap[] m;
+            if (!meshes.containsKey(render)) {
+                m = new MeshDataWrap[g.length];
+                meshes.put(render, m);
+            } else {
+                m = meshes.get(render);
+            }
+
+            if (index >= m.length) {
+                // Done!
+                gpus.remove(render);
+                return true;
+            } else {
+                logger.info(String.format("Streaming dataset to GPU (%d/%d): %s", index + 1, m.length, base.getLocalizedName()));
+                m[index] = toMeshData(g[index], m[index]);
+                return false;
+            }
         }
+        return false;
     }
 
     @Override
@@ -306,20 +333,20 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
             var base = Mapper.base.get(render.entity);
             var set = Mapper.billboardSet.get(render.entity);
 
-            switch (set.status) {
+            switch (set.status.get()) {
             case NOT_LOADED -> {
                 // PRELOAD
                 set.setStatus(LoadStatus.LOADING);
-                Thread loader = new Thread(() -> {
+                GaiaSky.instance.getExecutorService().execute(() -> {
                     convertDataToGpuFormat(render, base, set);
                     set.setStatus(LoadStatus.READY);
                 });
-                loader.start();
             }
             case READY -> {
-                // TO GPU
-                streamToGpu(render, base);
-                set.setStatus(LoadStatus.LOADED);
+                // TO GPU, one component at a time.
+                if (streamToGpu(render, base)) {
+                    set.setStatus(LoadStatus.LOADED);
+                }
             }
             case LOADED -> {
                 // RENDER
@@ -331,7 +358,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
                     shaderProgram.begin();
 
-                    // Global uniforms
+                    // Global uniforms.
                     if (ta != null) {
                         ta.bind(2400);
                         shaderProgram.setUniformi("u_textures", 2400);

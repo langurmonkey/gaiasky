@@ -251,7 +251,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     private IScriptingInterface scripting;
     /**
-     * The dataset updater -- sorts and updates dataset metadata
+     * Main executor service, used to run asynchronous tasks in separate threads.
      */
     private GaiaSkyExecutorService executorService;
     /**
@@ -1373,10 +1373,20 @@ public class GaiaSky implements ApplicationListener, IObserver {
         gui.render(graphics.getWidth(), graphics.getHeight());
     }
 
+    /**
+     * Gets the main scripting interface object.
+     *
+     * @return The main scripting interface object of Gaia Sky.
+     */
     public IScriptingInterface scripting() {
         return this.scripting;
     }
 
+    /**
+     * Returns the main executor service, used to run asynchronous tasks in different threads.
+     *
+     * @return The main executor service of Gaia Sky.
+     */
     public GaiaSkyExecutorService getExecutorService() {
         return this.executorService;
     }

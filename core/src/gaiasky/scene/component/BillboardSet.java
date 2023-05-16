@@ -11,11 +11,13 @@ import com.badlogic.ashley.core.Component;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.util.tree.LoadStatus;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public class BillboardSet implements Component {
 
     public BillboardDataset[] datasets;
     public String provider;
-    public LoadStatus status = LoadStatus.NOT_LOADED;
+    public AtomicReference<LoadStatus> status = new AtomicReference<>(LoadStatus.NOT_LOADED);
 
     public void setData(Object[] data) {
         int nData = data.length;
@@ -26,10 +28,10 @@ public class BillboardSet implements Component {
     }
 
     public LoadStatus getStatus() {
-        return status;
+        return status.get();
     }
 
     public void setStatus(LoadStatus status) {
-        this.status = status;
+        this.status.set(status);
     }
 }

@@ -12,10 +12,13 @@ import gaiasky.util.Settings;
 
 import java.util.concurrent.*;
 
+/**
+ * Executor service of Gaia Sky, backed by a {@link ThreadPoolExecutor}
+ */
 public class GaiaSkyExecutorService {
     private static final Logger.Log logger = Logger.getLogger(GaiaSkyExecutorService.class);
     /**
-     * Thread pool executor
+     * Thread pool executor.
      */
     private ThreadPoolExecutor pool;
     private BlockingQueue<Runnable> workQueue;
@@ -26,8 +29,9 @@ public class GaiaSkyExecutorService {
 
     public void initialize() {
         workQueue = new LinkedBlockingQueue<>();
-        int nThreads = !Settings.settings.performance.multithreading ? 1 : Math.max(1, Settings.settings.performance.getNumberOfThreads() + 1);
-        pool = new ThreadPoolExecutor(nThreads, nThreads, 5, TimeUnit.SECONDS, workQueue);
+        int nThreads = !Settings.settings.performance.multithreading ? 1 : Math.max(1, Settings.settings.performance.getNumberOfThreads());
+        // Create fixed thread pool executor, with a static number of threads.
+        pool = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.SECONDS, workQueue);
         pool.setThreadFactory(new DaemonThreadFactory());
     }
 
