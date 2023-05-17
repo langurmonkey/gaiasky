@@ -63,7 +63,7 @@ public class AxesInitializer extends AbstractInitSystem {
             axis.b2.mul(transform.matrix);
         }
 
-        // Axes colors, RGB default
+        // Axes colors, RGB by default.
         if (axis.axesColors == null) {
             axis.axesColors = new float[][] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
         }

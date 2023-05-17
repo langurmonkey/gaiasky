@@ -17,16 +17,17 @@ if (isnan(u_camUp.x)) {
     // Mode CUBEMAP.
     // In panorama mode, we need a global orientation, so we use [0,1,0] as up.
     s_obj = normalize(s_obj_pos);
-    vec3 s_obj_x_up = cross(s_obj, vec3(0.0, 1.0, 0.0));
+    vec3 s_right = cross(s_obj, vec3(0.0, 1.0, 0.0));
     // s_obj_x_up is parallel to s_obj in some places, fix
-    float quality = abs(dot(s_obj, s_obj_x_up));
-    s_obj_x_up = quality * s_obj_x_up + (1.0 - quality) * cross(s_obj, vec3(1.0, 0.0, 0.0));
-    s_up = normalize(cross(s_obj, s_obj_x_up));
+    float quality = abs(dot(s_obj, s_right));
+    s_right = quality * s_right + (1.0 - quality) * cross(s_obj, vec3(1.0, 0.0, 0.0));
+    s_up = normalize(cross(s_obj, s_right));
 } else {
     // Mode REGULAR.
     // In normal mode, use camera up.
     s_obj = normalize(s_obj_pos);
-    s_up = normalize(cross(s_obj, u_camUp));
+    vec3 s_right = normalize(cross(u_camUp, s_obj));
+    s_up = normalize(cross(s_obj, s_right));
 }
 
 vec4 s_quat = billboard_quaternion(s_obj, s_up);

@@ -216,7 +216,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      */
     protected void addCameraUpCubemapMode(ExtShaderProgram shaderProgram,
                                           ICamera camera) {
-        if (settings.program.modeCubemap.active) {
+        // TODO deactivate for now.
+        if (settings.program.modeCubemap.active || true) {
             // Set NaN to first component.
             shaderProgram.setUniformf("u_camUp", auxf.set(Float.NaN, 0, 0));
         } else {

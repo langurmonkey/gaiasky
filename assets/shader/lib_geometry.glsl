@@ -61,4 +61,21 @@ vec4 billboard_quaternion(vec3 dir, vec3 up) {
     q.z = (right.y - up.x) * w4;
     return q;
 }
+// Get perpendicular vector
+vec3 perpendicular_vec(vec3 vector) {
+    // Find a vector that is not parallel to the input vector
+    vec3 arbitrary_vec = vec3(1.0, 0.0, 0.0);
+
+    // Calculate the cross product between the input vector and the arbitrary vector
+    vec3 perpendicular_vec = cross(vector, arbitrary_vec);
+
+    // If the cross product is nearly zero (indicating that the vectors are parallel),
+    // choose a different arbitrary vector and recalculate
+    if (length(perpendicular_vec) < 0.001) {
+        arbitrary_vec = vec3(0.0, 1.0, 0.0);
+        perpendicular_vec = cross(vector, arbitrary_vec);
+    }
+
+    return normalize(perpendicular_vec);
+}
 #endif
