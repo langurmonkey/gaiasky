@@ -207,11 +207,10 @@ scene:
     fade: true
   # Renderer settings.
   renderer:
-    # Point cloud mode, one of [TRIANGLES|TRIANGLES_INSTANCED|POINTS].
-    # TRIANGLES is the new mode. Triangles are sent to the GPU in VBOs with VAOs. Faster on newer hardware and geometrically correct.
-    # TRIANGLES_INSTANCED is a variation of TRIANGLES. Saves x4 graphics memory. Your mileage may vary with this one.
-    # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes.
-    pointCloud: TRIANGLES_INSTANCED
+    # Point cloud mode, one of [TRIANGLES|POINTS]
+    # TRIANGLES is the default mode. Triangles are sent to the GPU in VBOs with VAOs, using instancing. Faster on newer hardware and geometrically correct.
+    # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes. To be used in VR.
+    pointCloud: POINTS
     # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP].
     line: GL_LINES
     # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO].

@@ -5,6 +5,7 @@
 // UNIFORMS
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
+uniform vec3 u_camUp;
 uniform float u_alpha;
 uniform float u_sizeFactor;
 uniform vec2 u_sizeLimits;

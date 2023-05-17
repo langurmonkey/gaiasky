@@ -7,6 +7,7 @@ uniform float u_pointAlphaMax;
 uniform float u_starBrightness;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
+uniform vec3 u_camUp;
 uniform float u_sizeFactor;
 uniform float u_intensity;
 uniform vec2 u_edges;

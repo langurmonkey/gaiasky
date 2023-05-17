@@ -49,7 +49,7 @@ void main() {
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     // Add outline
-    //if(v_uv.x > 0.99 || v_uv.x < 0.01 || v_uv.y > 0.99 || v_uv.y < 0.01) {
+    //if (v_uv.x > 0.99 || v_uv.x < 0.01 || v_uv.y > 0.99 || v_uv.y < 0.01) {
     //    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
     //}
 
@@ -58,6 +58,6 @@ void main() {
     #endif // ssrFlag
 
     #ifdef velocityBufferFlag
-    velocityBuffer(profile);
+    velocityBuffer(fragColor.a);
     #endif
 }

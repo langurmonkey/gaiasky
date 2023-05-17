@@ -127,8 +127,8 @@ public class RenderAssets {
         /* DATA LOAD */
 
         // Build arrays of names and defines.
-        Array<String> namesSource = new Array<>(String.class);
-        Array<String> definesSource = new Array<>(String.class);
+        var namesSource = new Array<String>(String.class);
+        var definesSource = new Array<String>(String.class);
         namesSource.add(SUFFIX_SSR, SUFFIX_VELBUFF);
         definesSource.add("#define ssrFlag\n", "#define velocityBufferFlag\n");
         if (Settings.settings.runtime.relativisticAberration && Settings.settings.runtime.gravitationalWaves) {
@@ -138,11 +138,13 @@ public class RenderAssets {
         String[] defines = GlobalResources.combinations(definesSource.toArray());
         String[] names = GlobalResources.combinations(namesSource.toArray());
 
-        // Color mapping in shaders
-        namesSource.add(SUFFIX_COLMAP);
-        definesSource.add("#define colorMap\n");
-        String[] definesCmap = GlobalResources.combinations(definesSource.toArray());
-        String[] namesCmap = GlobalResources.combinations(namesSource.toArray());
+        // Color mapping in particle and star shaders.
+        var namesSourceColMap = new Array<>(namesSource);
+        var definesSourceColMap = new Array<>(definesSource);
+        namesSourceColMap.add(SUFFIX_COLMAP);
+        definesSourceColMap.add("#define colorMap\n");
+        String[] definesColMap = GlobalResources.combinations(definesSourceColMap.toArray());
+        String[] namesColMap = GlobalResources.combinations(namesSourceColMap.toArray());
 
         // Direct shaders
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names),
@@ -162,12 +164,12 @@ public class RenderAssets {
         final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
         final String pointTriSuffixParticles = !Settings.settings.runtime.openXr && Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
         particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffixParticles + ".vertex.glsl",
-                                       "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap),
-                                       definesCmap);
+                                       "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesColMap),
+                                       definesColMap);
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
-                                   TextUtils.concatAll("star.group", namesCmap), definesCmap);
+                                   TextUtils.concatAll("star.group", namesColMap), definesColMap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
-                                       TextUtils.concatAll("variable.group", namesCmap), definesCmap);
+                                       TextUtils.concatAll("variable.group", namesColMap), definesColMap);
         // Regular stars
         starPointDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.point", names), defines);
 

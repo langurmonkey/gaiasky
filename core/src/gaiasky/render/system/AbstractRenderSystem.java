@@ -42,7 +42,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     protected Array<RenderSystemRunnable> preRunnables, postRunnables;
     private boolean vrScaleFlag = false, depthBufferFlag = false;
 
-    protected AbstractRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+    protected AbstractRenderSystem(SceneRenderer sceneRenderer,
+                                   RenderGroup rg,
+                                   float[] alphas,
+                                   ExtShaderProgram[] programs) {
         super();
         this.sceneRenderer = sceneRenderer;
         this.settings = Settings.settings;
@@ -61,7 +64,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     @Override
-    public void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
+    public void render(List<IRenderable> renderables,
+                       ICamera camera,
+                       double t,
+                       RenderingContext rc) {
         if (renderables != null && renderables.size() != 0) {
             this.rc = rc;
             run(preRunnables, renderables, camera);
@@ -70,7 +76,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
     }
 
-    public abstract void renderStud(List<IRenderable> renderables, ICamera camera, double t);
+    public abstract void renderStud(List<IRenderable> renderables,
+                                    ICamera camera,
+                                    double t);
 
     public void addPreRunnables(RenderSystemRunnable... r) {
         preRunnables.addAll(r);
@@ -80,7 +88,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         postRunnables.addAll(r);
     }
 
-    protected void run(Array<RenderSystemRunnable> runnables, List<IRenderable> renderables, ICamera camera) {
+    protected void run(Array<RenderSystemRunnable> runnables,
+                       List<IRenderable> renderables,
+                       ICamera camera) {
         if (runnables != null) {
             for (RenderSystemRunnable runnable : runnables)
                 runnable.run(this, renderables, camera);
@@ -114,16 +124,19 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     @Override
-    public void resize(int w, int h) {
+    public void resize(int w,
+                       int h) {
         // Empty, to override in subclasses if needed
     }
 
     @Override
-    public void updateBatchSize(int w, int h) {
+    public void updateBatchSize(int w,
+                                int h) {
         // Empty by default
     }
 
-    protected void addEffectsUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void addEffectsUniforms(ExtShaderProgram shaderProgram,
+                                      ICamera camera) {
         addRelativisticUniforms(shaderProgram, camera);
         addGravWaveUniforms(shaderProgram);
         addDepthBufferUniforms(shaderProgram, camera);
@@ -138,7 +151,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
     }
 
-    protected void addRelativisticUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void addRelativisticUniforms(ExtShaderProgram shaderProgram,
+                                           ICamera camera) {
         if (settings.runtime.relativisticAberration) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             shaderProgram.setUniformf("u_velDir", rem.velDir);
@@ -168,7 +182,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      * @param shaderProgram The program.
      * @param camera        The camera.
      */
-    protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram,
+                                          ICamera camera) {
         if (!depthBufferFlag) {
             shaderProgram.setUniformf("u_zfar", (float) camera.getFar());
             shaderProgram.setUniformf("u_k", Constants.getCameraK());
@@ -182,12 +197,31 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      * @param shaderProgram The program
      * @param camera        The camera
      */
-    protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram,
+                                            ICamera camera) {
         // Velocity buffer
         if (settings.postprocess.motionBlur.active) {
             shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(auxf));
             shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(auxf));
             shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
+        }
+    }
+
+    /**
+     * Adds the camera up vector (only in non-cubemap mode) to compute
+     * the billboard rotation. In regular mode, we use the camera up vector to
+     * have screen-aligned billboards. In cubemap mode(s), we use a global up direction.
+     * @param shaderProgram The program.
+     * @param camera The camera.
+     */
+    protected void addCameraUpCubemapMode(ExtShaderProgram shaderProgram,
+                                          ICamera camera) {
+        if (settings.program.modeCubemap.active) {
+            // Set NaN to first component.
+            shaderProgram.setUniformf("u_camUp", auxf.set(Float.NaN, 0, 0));
+        } else {
+            // Add real camera up.
+            shaderProgram.setUniformf("u_camUp", camera.getUp().put(auxf));
         }
     }
 
@@ -232,6 +266,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     public interface RenderSystemRunnable {
-        void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera);
+        void run(AbstractRenderSystem renderSystem,
+                 List<IRenderable> renderables,
+                 ICamera camera);
     }
 }

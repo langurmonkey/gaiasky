@@ -418,7 +418,6 @@ public class Settings {
 
     public enum PointCloudMode {
         TRIANGLES,
-        TRIANGLES_INSTANCED,
         POINTS;
 
         public boolean isPoints() {
@@ -426,7 +425,7 @@ public class Settings {
         }
 
         public boolean isTriangles() {
-            return this.equals(TRIANGLES) || this.equals(TRIANGLES_INSTANCED);
+            return this.equals(TRIANGLES);
         }
     }
 
@@ -1098,6 +1097,9 @@ public class Settings {
                 if (pointCloud.startsWith("GL_")) {
                     pointCloud = pointCloud.substring(3);
                 }
+                if (pointCloud.equalsIgnoreCase("TRIANGLES_INSTANCED")) {
+                    pointCloud = "TRIANGLES";
+                }
                 this.pointCloud = PointCloudMode.valueOf(pointCloud.toUpperCase(Locale.ROOT));
             }
 
@@ -1417,9 +1419,9 @@ public class Settings {
             }
 
             /**
-             * Checks whether the program is in planetarium mode
+             * Checks whether the program is in planetarium mode.
              *
-             * @return Whether planetarium mode is on
+             * @return Whether planetarium mode is on.
              */
             @JsonIgnore
             public boolean isPlanetariumOn() {
@@ -1427,9 +1429,9 @@ public class Settings {
             }
 
             /**
-             * Checks whether the program is in panorama mode
+             * Checks whether the program is in panorama mode.
              *
-             * @return Whether panorama mode is on
+             * @return Whether panorama mode is on.
              */
             @JsonIgnore
             public boolean isPanoramaOn() {
@@ -1437,9 +1439,9 @@ public class Settings {
             }
 
             /**
-             * Checks whether the program is in orthosphere view mode
+             * Checks whether the program is in orthosphere view mode.
              *
-             * @return Whether orthosphere view mode is on
+             * @return Whether orthosphere view mode is on.
              */
             @JsonIgnore
             public boolean isOrthosphereOn() {
@@ -1447,9 +1449,9 @@ public class Settings {
             }
 
             /**
-             * Checks whether we are in fixed fov mode (slave, planetarium, panorama)
+             * Checks whether we are in fixed fov mode (slave, planetarium, panorama).
              *
-             * @return Whether we are in a fixed-fov mode
+             * @return Whether we are in a fixed-fov mode.
              */
             @JsonIgnore
             public boolean isFixedFov() {

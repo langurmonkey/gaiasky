@@ -14,7 +14,7 @@ import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleRecord;
 import gaiasky.scene.record.VariableRecord;
-import gaiasky.scene.system.render.draw.VariableSetRenderer;
+import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.BVToTeff_ballesteros;
@@ -405,7 +405,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 }
 
                                 // RESAMPLE (only if too many samples)
-                                final int MAX_VARI = VariableSetRenderer.MAX_VARI;
+                                final int MAX_VARI = VariableSetInstancedRenderer.MAX_VARI;
                                 if (variMagsDouble.length > MAX_VARI) {
                                     nVari = MAX_VARI;
                                     double t0 = variTimes[0];
@@ -578,7 +578,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         logger.warn("Found " + nInvalidParallaxes + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
                     }
                     if (resampledLightCurves > 0) {
-                        logger.warn(resampledLightCurves + " light curves resampled to fit in default array size (=" + VariableSetRenderer.MAX_VARI + ")");
+                        logger.warn(resampledLightCurves + " light curves resampled to fit in default array size (=" + VariableSetInstancedRenderer.MAX_VARI + ")");
                     }
                     if (noPeriods > 0) {
                         logger.warn("Skipped " + noPeriods + " variable stars without a period");

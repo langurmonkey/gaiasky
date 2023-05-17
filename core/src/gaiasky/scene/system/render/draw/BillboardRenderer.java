@@ -160,6 +160,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             }
 
             // Global uniforms
+            addCameraUpCubemapMode(shaderProgram, camera);
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_time", (float) t);
 

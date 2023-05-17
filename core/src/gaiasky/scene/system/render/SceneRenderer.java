@@ -293,8 +293,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = switch (pointCloudModeParticles) {
-            case TRIANGLES -> new ParticleSetRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
-            case TRIANGLES_INSTANCED -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case TRIANGLES -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
             case POINTS -> new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
         };
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -302,8 +301,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // STAR GROUP
         AbstractRenderSystem starGroupProc = switch (pointCloudMode) {
-            case TRIANGLES -> new StarSetRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
-            case TRIANGLES_INSTANCED -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
             case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
         };
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -311,8 +309,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // VARIABLE GROUP
         AbstractRenderSystem variableGroupProc = switch (pointCloudMode) {
-            case TRIANGLES -> new VariableSetRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-            case TRIANGLES_INSTANCED -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case TRIANGLES -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
             case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
         };
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);

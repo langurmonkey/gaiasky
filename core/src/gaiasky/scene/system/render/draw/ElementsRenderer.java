@@ -50,7 +50,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     private int elems02Offset;
     private int sizeOffset;
     private boolean forceAdd = false;
-    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
+    private final double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
 
     public ElementsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -157,6 +157,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+                addCameraUpCubemapMode(shaderProgram, camera);
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * first.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
                 shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.08f);

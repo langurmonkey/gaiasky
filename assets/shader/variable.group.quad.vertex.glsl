@@ -13,6 +13,7 @@ uniform vec2 u_t;
 uniform float u_s;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
+uniform vec3 u_camUp;
 uniform vec2 u_solidAngleMap;
 // VR scale factor
 uniform float u_vrScale;

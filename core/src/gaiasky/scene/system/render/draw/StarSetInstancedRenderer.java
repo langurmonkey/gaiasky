@@ -37,6 +37,9 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
+/**
+ * Renders star sets as instanced triangles.
+ */
 public class StarSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(StarSetInstancedRenderer.class);
 
@@ -95,6 +98,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
         triComponent.fovMode = camera.getMode().getGaiaFovMode();

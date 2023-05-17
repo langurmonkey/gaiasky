@@ -57,6 +57,6 @@ void main() {
     #endif // ssrFlag
 
     #ifdef velocityBufferFlag
-    velocityBuffer(profile);
+    velocityBuffer(fragColor.a);
     #endif
 }

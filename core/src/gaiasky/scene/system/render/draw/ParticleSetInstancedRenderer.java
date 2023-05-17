@@ -29,6 +29,7 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -36,6 +37,9 @@ import gaiasky.util.math.StdRandom;
 
 import java.util.Random;
 
+/**
+ * Renders particle sets as instanced triangles.
+ */
 public class ParticleSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ParticleSetInstancedRenderer.class);
 
@@ -56,6 +60,11 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         aux1 = new Vector3();
         cmap = new Colormap();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_PARTICLE_GROUP);
+    }
+
+    @Override
+    protected void initShaderProgram() {
+        // Empty
     }
 
     @Override
@@ -87,22 +96,18 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         particlePosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
-    @Override
-    protected void initShaderProgram() {
-        // Empty
-    }
-
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }
 
     @Override
     protected void renderObject(ExtShaderProgram shaderProgram,
                                 IRenderable renderable) {
-        final Render render = (Render) renderable;
+        final var render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
         var body = Mapper.body.get(render.entity);
         var set = Mapper.particleSet.get(render.entity);
@@ -199,6 +204,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                     set.textureArray.bind(2201);
                     shaderProgram.setUniformi("u_textures", 2201);
                 }
+
                 float meanDist = (float) (set.getMeanDistance());
 
                 double s = .3e-4f;
@@ -212,7 +218,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }
-
             }
         }
     }
@@ -234,11 +239,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, renderable);
             }
-            if (state) {
-                inGpu.add(renderable);
-            } else {
-                inGpu.remove(renderable);
-            }
+            super.setInGpu(renderable, state);
         }
     }
 

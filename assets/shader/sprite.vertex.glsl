@@ -9,6 +9,7 @@ uniform mat4 u_projView;
 uniform vec4 u_color;
 uniform vec3 u_pos;
 uniform float u_size;
+uniform vec3 u_camUp;
 uniform vec3 u_camShift;
 
 #ifdef relativisticEffects

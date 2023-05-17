@@ -45,6 +45,11 @@ void main() {
 	fragColor = drawSimple(v_texCoords);
 	fragColor *= fragColor.a;
 
+	// Add outline
+	//if (v_texCoords.x > 0.99 || v_texCoords.x < 0.01 || v_texCoords.y > 0.99 || v_texCoords.y < 0.01) {
+	//    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	//}
+
 	#ifdef ssrFlag
 	ssrBuffers();
 	#endif // ssrFlag

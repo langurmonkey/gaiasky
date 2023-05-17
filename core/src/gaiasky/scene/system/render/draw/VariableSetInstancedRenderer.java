@@ -37,6 +37,9 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
+/**
+ * Renders variable star sets as instanced triangles.
+ */
 public class VariableSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;
@@ -109,6 +112,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
         triComponent.fovMode = camera.getMode().getGaiaFovMode();

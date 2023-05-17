@@ -365,6 +365,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     }
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
+                    addCameraUpCubemapMode(shaderProgram, camera);
                     shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha);
                     shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
                     double pointScaleFactor = 1.8e7;

@@ -13,6 +13,7 @@ uniform float u_size;
 uniform float u_distance;
 uniform float u_apparent_angle;
 uniform float u_vrScale;
+uniform vec3 u_camUp;
 
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
