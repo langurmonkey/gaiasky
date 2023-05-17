@@ -6,11 +6,77 @@
 #endif // PI
 #ifndef PI2
 #define PI2 3.14159265358979323846264338 * 2.0
-#endif //PI2
+#endif // PI2
+
+#ifndef QUATERNION_IDENTITY
+#define QUATERNION_IDENTITY vec4(0.0, 0.0, 0.0, 1.0)
+#endif // QUATERNION_IDENTITY
 
 // Returns >=0 if visible, <0 if not visible 
 float in_view(vec3 pos, vec3 dir, float dist, float angle_edge) {
     return angle_edge - acos(dot(pos, dir) / dist);
+}
+
+vec4 q_conj(vec4 q) {
+    return vec4(-q.x, -q.y, -q.z, q.w);
+}
+
+vec4 q_look_at(vec3 forward, vec3 up) {
+    vec3 right = normalize(cross(forward, up));
+    up = normalize(cross(forward, right));
+
+    float m00 = right.x;
+    float m01 = right.y;
+    float m02 = right.z;
+    float m10 = up.x;
+    float m11 = up.y;
+    float m12 = up.z;
+    float m20 = forward.x;
+    float m21 = forward.y;
+    float m22 = forward.z;
+
+    float num8 = (m00 + m11) + m22;
+    vec4 q = QUATERNION_IDENTITY;
+    if (num8 > 0.0)
+    {
+        float num = sqrt(num8 + 1.0);
+        q.w = num * 0.5;
+        num = 0.5 / num;
+        q.x = (m12 - m21) * num;
+        q.y = (m20 - m02) * num;
+        q.z = (m01 - m10) * num;
+        return q;
+    }
+
+    if ((m00 >= m11) && (m00 >= m22))
+    {
+        float num7 = sqrt(((1.0 + m00) - m11) - m22);
+        float num4 = 0.5 / num7;
+        q.x = 0.5 * num7;
+        q.y = (m01 + m10) * num4;
+        q.z = (m02 + m20) * num4;
+        q.w = (m12 - m21) * num4;
+        return q;
+    }
+
+    if (m11 > m22)
+    {
+        float num6 = sqrt(((1.0 + m11) - m00) - m22);
+        float num3 = 0.5 / num6;
+        q.x = (m10 + m01) * num3;
+        q.y = 0.5 * num6;
+        q.z = (m21 + m12) * num3;
+        q.w = (m20 - m02) * num3;
+        return q;
+    }
+
+    float num5 = sqrt(((1.0 + m22) - m00) - m11);
+    float num2 = 0.5 / num5;
+    q.x = (m20 + m02) * num2;
+    q.y = (m21 + m12) * num2;
+    q.z = 0.5 * num5;
+    q.w = (m01 - m10) * num2;
+    return q;
 }
 
 /*
@@ -29,18 +95,32 @@ vec4 get_quat_rotation(vec3 axis, float radians) {
     return  normalize(vec4(d * axis.x * l_sin, d * axis.y * l_sin, d * axis.z * l_sin, l_cos));
 }
 
-// Quaternoion multiplication
-vec4 quat_mult(vec4 q1, vec4 q2) { 
-  vec4 qr;
-  qr.x = (q1.w * q2.x) + (q1.x * q2.w) + (q1.y * q2.z) - (q1.z * q2.y);
-  qr.y = (q1.w * q2.y) - (q1.x * q2.z) + (q1.y * q2.w) + (q1.z * q2.x);
-  qr.z = (q1.w * q2.z) + (q1.x * q2.y) - (q1.y * q2.x) + (q1.z * q2.w);
-  qr.w = (q1.w * q2.w) - (q1.x * q2.x) - (q1.y * q2.y) - (q1.z * q2.z);
-  return qr;
+// Quaternion multiplication
+// http://mathworld.wolfram.com/Quaternion.html
+vec4 qmul(vec4 q1, vec4 q2) {
+    return vec4(
+    q2.xyz * q1.w + q1.xyz * q2.w + cross(q1.xyz, q2.xyz),
+    q1.w * q2.w - dot(q1.xyz, q2.xyz)
+    );
 }
 
-vec4 quat_conj(vec4 q) { 
-  return vec4(-q.x, -q.y, -q.z, q.w); 
+// Vector rotation with a quaternion
+// http://mathworld.wolfram.com/Quaternion.html
+vec3 rotate_vector(vec3 v, vec4 r) {
+    vec4 r_c = r * vec4(-1, -1, -1, 1);
+    return qmul(r, qmul(vec4(v, 0), r_c)).xyz;
+}
+
+vec3 rotate_vector_at(vec3 v, vec3 center, vec4 r) {
+    vec3 dir = v - center;
+    return center + rotate_vector(dir, r);
+}
+
+// A given angle of rotation about a given axis
+vec4 rotate_angle_axis(float angle, vec3 axis) {
+    float sn = sin(angle * 0.5);
+    float cs = cos(angle * 0.5);
+    return vec4(axis * sn, cs);
 }
 
 vec3 rotate_vertex_position(vec3 position, vec3 axis, float angle) {
@@ -48,19 +128,6 @@ vec3 rotate_vertex_position(vec3 position, vec3 axis, float angle) {
   return position.xyz + 2.0 * cross(q.xyz, cross(q.xyz, position.xyz) + q.w * position.xyz);
 }
 
-// Gets the billboard quaternion from the direction and up vectors
-vec4 billboard_quaternion(vec3 dir, vec3 up) {
-    up = up - (dir * dot(up, dir));
-    vec3 right = cross(up, dir);
-
-    vec4 q = vec4(0.0);
-    q.w = sqrt(1.0 + right.x + up.y + dir.z) * 0.5;
-    float w4 = 1.0 / (4.0 * q.w);
-    q.x = (up.z - dir.y) * w4;
-    q.y = (dir.x - right.z) * w4;
-    q.z = (right.y - up.x) * w4;
-    return q;
-}
 // Get perpendicular vector
 vec3 perpendicular_vec(vec3 vector) {
     // Find a vector that is not parallel to the input vector

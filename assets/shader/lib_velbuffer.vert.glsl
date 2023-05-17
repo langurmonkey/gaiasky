@@ -14,8 +14,8 @@ void velocityBufferBillboard(vec4 gpos, vec3 obj_pos, float size, vec4 vert_pos,
     // Scaling
     vec4 prev_vert_pos = vec4(vert_pos.x * size, vert_pos.y * size, vert_pos.z * size, vert_pos.w);
     // Rotation
-    vec4 q_tmp = quat_mult(s_quat, prev_vert_pos);
-    prev_vert_pos = quat_mult(q_tmp, s_quat_conj);
+    vec4 q_tmp = qmul(s_quat, prev_vert_pos);
+    prev_vert_pos = qmul(q_tmp, s_quat_conj);
     // Translation
     prev_vert_pos = prev_vert_pos + vec4(prev_obj_pos, 0.0);
 
