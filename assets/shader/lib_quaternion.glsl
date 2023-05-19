@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_QUATERNION
+#define GLSL_LIB_QUATERNION
+
 #define QUATERNION_IDENTITY vec4(0, 0, 0, 1)
 
 #ifndef PI
@@ -137,3 +140,4 @@ vec4 q_slerp(vec4 a, vec4 b, float t) {
     }
     return QUATERNION_IDENTITY;
 }
+#endif // GLSL_LIB_QUATERNION
