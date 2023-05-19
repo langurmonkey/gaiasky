@@ -10,8 +10,13 @@ package gaiasky.util.tree;
 public enum LoadStatus {
     NOT_LOADED,
     QUEUED,
+    /** Loading. **/
     LOADING,
     LOADING_FAILED,
+    /** Ready to stream data to GPU. **/
     READY,
+    /** Data partially available in GPU. **/
+    PARTIALLY_LOADED,
+    /** Data totally available in GPU. **/
     LOADED
 }

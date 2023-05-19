@@ -342,67 +342,76 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     set.setStatus(LoadStatus.READY);
                 });
             }
-            case READY -> {
+            case READY, PARTIALLY_LOADED -> {
                 // TO GPU, one component at a time.
                 if (streamToGpu(render, base)) {
                     set.setStatus(LoadStatus.LOADED);
+                } else {
+                    set.setStatus(LoadStatus.PARTIALLY_LOADED);
+                }
+                render(renderable, render, camera);
+            }
+            case LOADED -> render(renderable, render, camera);
+            }
+        }
+    }
+
+    private void render(IRenderable renderable,
+                        Render render,
+                        ICamera camera) {
+        // RENDER
+        float alpha = getAlpha(renderable);
+        if (alpha > 0) {
+            var fade = Mapper.fade.get(render.entity);
+
+            ExtShaderProgram shaderProgram = getShaderProgram();
+
+            shaderProgram.begin();
+
+            // Global uniforms.
+            if (ta != null) {
+                ta.bind(2400);
+                shaderProgram.setUniformi("u_textures", 2400);
+            }
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+            shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
+            addCameraUpCubemapMode(shaderProgram, camera);
+            shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha);
+            shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
+            double pointScaleFactor = 1.8e7;
+
+            // Rel, grav, z-buffer
+            addEffectsUniforms(shaderProgram, camera);
+
+            int qualityIndex = Settings.settings.graphics.quality.ordinal();
+
+            // General settings for all
+            Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+
+            MeshDataWrap[] m = meshes.get(render);
+            for (MeshDataWrap meshDataWrap : m) {
+                if (meshDataWrap != null) {
+                    MeshData meshData = meshDataWrap.meshData;
+                    BillboardDataset dataset = meshDataWrap.dataset;
+                    // Blend mode
+                    switch (dataset.blending) {
+                    case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                    case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                    }
+                    // Depth mask
+                    Gdx.gl20.glDepthMask(dataset.depthMask);
+
+                    // Specific uniforms
+                    shaderProgram.setUniformf("u_maxPointSize", (float) dataset.maxSizes[qualityIndex]);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", dataset.intensity);
+
+                    // Render mesh
+                    meshData.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
                 }
             }
-            case LOADED -> {
-                // RENDER
-                float alpha = getAlpha(renderable);
-                if (alpha > 0) {
-                    var fade = Mapper.fade.get(render.entity);
-
-                    ExtShaderProgram shaderProgram = getShaderProgram();
-
-                    shaderProgram.begin();
-
-                    // Global uniforms.
-                    if (ta != null) {
-                        ta.bind(2400);
-                        shaderProgram.setUniformi("u_textures", 2400);
-                    }
-                    shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-                    shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
-                    addCameraUpCubemapMode(shaderProgram, camera);
-                    shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha);
-                    shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
-                    double pointScaleFactor = 1.8e7;
-
-                    // Rel, grav, z-buffer
-                    addEffectsUniforms(shaderProgram, camera);
-
-                    int qualityIndex = Settings.settings.graphics.quality.ordinal();
-
-                    // General settings for all
-                    Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
-                    Gdx.gl20.glEnable(GL20.GL_BLEND);
-
-                    MeshDataWrap[] m = meshes.get(render);
-                    for (MeshDataWrap meshDataWrap : m) {
-                        MeshData meshData = meshDataWrap.meshData;
-                        BillboardDataset dataset = meshDataWrap.dataset;
-                        // Blend mode
-                        switch (dataset.blending) {
-                        case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-                        case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                        }
-                        // Depth mask
-                        Gdx.gl20.glDepthMask(dataset.depthMask);
-
-                        // Specific uniforms
-                        shaderProgram.setUniformf("u_maxPointSize", (float) dataset.maxSizes[qualityIndex]);
-                        shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
-                        shaderProgram.setUniformf("u_intensity", dataset.intensity);
-
-                        // Render mesh
-                        meshData.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-                    }
-                    shaderProgram.end();
-                }
-            }
-            }
+            shaderProgram.end();
         }
     }
 
