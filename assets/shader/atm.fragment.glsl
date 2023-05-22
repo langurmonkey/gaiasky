@@ -26,7 +26,7 @@ layout (location = 1) out vec4 velMap;
 #include shader/lib_ssr.frag.glsl
 #endif // ssrFlag
 
-float luma(vec3 color){
+float luma(vec3 color) {
     return dot(color, vec3(0.2126, 0.7152, 0.0722));
 }
 
@@ -37,7 +37,7 @@ void main(void) {
     float fRayleighPhase = 0.75 + 0.75 * fCos2;
     float fMiePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow (1.0 + g2 - 2.0 * g * fCos, 1.5);
 
-    fragColor.rgb = (fRayleighPhase * v_frontColor.rgb + fMiePhase * v_frontSecondaryColor.rgb);
+    fragColor.rgb = (fRayleighPhase * v_frontColor.rgb + fMiePhase * v_frontSecondaryColor);
     fragColor.rgb = vec3(1.0) - exp(-exposure * fragColor.rgb);
 
     float lma = luma(fragColor.rbg);

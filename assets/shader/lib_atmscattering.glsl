@@ -1,4 +1,3 @@
-
 #if defined(atmosphereGround) || defined(atmosphericScattering)
 uniform vec3 v3PlanetPos; /* The position of the planet */
 uniform vec3 v3CameraPos; /* The camera's current position*/
@@ -103,7 +102,6 @@ void computeAtmosphericScatteringGround(){}
 #endif // atmosphereGround
 
 #ifdef atmosphericScattering
-
 out vec4 v_frontColor;
 out vec3 v_frontSecondaryColor;
 out vec3 v_direction;
@@ -162,7 +160,7 @@ void computeAtmosphericScattering() {
     // Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
     v_frontColor.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
     v_frontColor.a = fAlpha;
-    v_frontSecondaryColor.rgb = v3FrontColor * fKmESun;
+    v_frontSecondaryColor = v3FrontColor * fKmESun;
 
     // Height normalized to control the opacity
     // Normalized in [1,0], for [ground,space]
@@ -174,5 +172,5 @@ void computeAtmosphericScattering() {
     v_direction = v3CameraPos - v3Pos;
 }
 #else
-void computeAtmosphericScattering(){}
-#endif // atmosphericScattering
+void computeAtmosphericScattering(){ }
+#endif// atmosphericScattering
