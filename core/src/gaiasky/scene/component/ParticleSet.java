@@ -45,6 +45,8 @@ public class ParticleSet implements Component, IDisposable {
     public boolean renderParticles = true;
     /** Flag indicating whether the particle set holds stars or particles. **/
     public boolean isStars;
+    /** Whether to render the global set label or not. **/
+    public boolean renderSetLabel = true;
     /** Number of labels to render for this group. **/
     public int numLabels = -1;
     /**

@@ -891,7 +891,7 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ParticleSettings {
             /** Default number of labels for particle groups. **/
-            public int numLabels = 100;
+            public int numLabels = 0;
         }
 
 

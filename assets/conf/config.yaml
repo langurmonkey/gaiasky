@@ -129,7 +129,7 @@ scene:
   # Particle group settings.
   particleGroups:
     # Default number of labels for particle groups. Applies unless overwritten.
-    numLabels: 100
+    numLabels: 0
   # Star settings.
   star:
     # Star brightness factor.

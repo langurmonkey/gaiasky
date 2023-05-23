@@ -59,7 +59,8 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
 
     /** For particle sets. **/
     private void addToRenderLists(Render render) {
-        if (Mapper.particleSet.get(render.entity).renderParticles) {
+        var set = Mapper.particleSet.get(render.entity);
+        if (set.renderParticles) {
             addToRender(render, RenderGroup.PARTICLE_GROUP);
         }
         addToRender(render, RenderGroup.FONT_LABEL);

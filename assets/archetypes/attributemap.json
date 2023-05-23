@@ -529,6 +529,10 @@
         "units" : "Double",
         "aliases" : [ "fixedAngularSizeDeg", "fixedAngularSizeRad" ]
       },
+      "renderSetLabel" : {
+        "description" : "Enable or disable the global label of this particle set. If true, the name of this particle set is rendered at the given label position.",
+        "units" : "Boolean"
+      },
       "renderParticles" : {
         "description" : "Disable particle rendering by setting this to false. Labels, in case of star sets, will still be rendered.",
         "units" : "Boolean"

@@ -252,7 +252,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
         // Labels.
         var label = Mapper.label.get(entity);
-        label.label = true;
         label.textScale = 0.5f;
         label.renderConsumer = LabelEntityRenderSystem::renderStarSet;
         label.renderFunction = LabelView::renderTextBase;
