@@ -38,8 +38,6 @@ import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 
-import static gaiasky.scene.Mapper.base;
-
 public class LabelEntityRenderSystem {
 
     private final Vector3d D31 = new Vector3d();
@@ -236,7 +234,7 @@ public class LabelEntityRenderSystem {
     }
 
     public void renderParticleSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        // Dataset label
+        // Dataset label.
         var pos = D31;
         pos.set(view.label.labelPosition).add(camera.getInversePos());
         shader.setUniformf("u_viewAngle", 90f);
@@ -244,17 +242,18 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_thLabel", 1f);
         render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, pos.len(), view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
 
-        // Particle labels
+        // Particle labels.
         var active = view.particleSet.active;
         if (active != null) {
-            float thresholdLabel = 1e-15f;
+            float thresholdLabel = 1f;
             var pointData = view.particleSet.pointData;
-            for (int i = 0; i < Math.min(50, pointData.size()); i++) {
+            int n = Math.min(pointData.size(), view.particleSet.numLabels);
+            for (int i = 0; i < n; i++) {
                 IParticleRecord pb = pointData.get(active[i]);
                 if (pb.names() != null) {
                     Vector3d camPos = fetchPosition(pb, view.particleSet.cPosD, D31, 0);
                     float distToCamera = (float) camPos.len();
-                    float viewAngle = 1e-4f / camera.getFovFactor();
+                    float viewAngle = (4e15f / distToCamera) / camera.getFovFactor();
 
                     textPosition(camera, camPos.put(D31), distToCamera, 0);
 
@@ -299,7 +298,7 @@ public class LabelEntityRenderSystem {
         var active = set.active;
 
         Vector3d starPosition = D31;
-        int n = Math.min(pointData.size(), Settings.settings.scene.star.group.numLabel);
+        int n = Math.min(pointData.size(), set.numLabels);
         if (camera.getCurrent() instanceof FovCamera) {
             for (int i = 0; i < n; i++) {
                 IParticleRecord star = pointData.get(active[i]);

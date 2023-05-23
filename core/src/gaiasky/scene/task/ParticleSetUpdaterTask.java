@@ -26,7 +26,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -43,8 +42,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
     protected static final double CAM_DX_TH_SQ = CAM_DX_TH * CAM_DX_TH;
-    /** Reference to the entity. **/
-    private final Entity entity;
     /** Base component. **/
     private final Base base;
     /** Reference to the particle set component. **/
@@ -64,7 +61,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     public ParticleSetUpdaterTask(Entity entity,
                                   ParticleSet particleSet,
                                   StarSet starSet) {
-        this.entity = entity;
         this.base = Mapper.base.get(entity);
         this.particleSet = particleSet;
         this.starSet = starSet;
@@ -110,6 +106,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     @Override
     public void run() {
         if (particleSet != null) {
+            if (starSet == null) {
+                System.out.println("Update particle set: " + base.getName());
+            }
             updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
         }
     }
@@ -163,7 +162,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 // Pos
                 Vector3d x = D31.set(d.x(), d.y(), d.z()).add(dx);
 
-                starSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ?
+                starSet.metadata[i] = utils.filter(i, starSet, datasetDescription) ?
                         (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst2(x)) / camera.getFovFactor()) * Settings.settings.scene.star.brightness) :
                         Double.MAX_VALUE;
             }
@@ -180,11 +179,12 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     private void updateMetadataParticles(ITimeFrameProvider time,
                                          ICamera camera) {
         // Particles, only distance.
-        Vector3b camPos = camera.getPos();
+        Vector3d camPos = camera.getPos().tov3d(D34);
         int n = particleSet.pointData.size();
         for (int i = 0; i < n; i++) {
             IParticleRecord d = particleSet.pointData.get(i);
-            particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? camPos.dst2d(d.x(), d.y(), d.z()) : Double.MAX_VALUE;
+            Vector3d x = D31.set(d.x(), d.y(), d.z());
+            particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? camPos.dst2(x) : Double.MAX_VALUE;
         }
     }
 

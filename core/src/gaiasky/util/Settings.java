@@ -728,6 +728,7 @@ public class Settings {
         public String homeObject;
         public long fadeMs;
         public CameraSettings camera;
+        public ParticleSettings particleGroups;
         public StarSettings star;
         public LabelSettings label;
         public float lineWidth;
@@ -886,6 +887,13 @@ public class Settings {
                 public boolean orientation;
             }
         }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class ParticleSettings {
+            /** Default number of labels for particle groups. **/
+            public int numLabels = 100;
+        }
+
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class StarSettings implements IObserver {

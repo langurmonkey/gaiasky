@@ -17,6 +17,7 @@ import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
+import gaiasky.util.Settings.SceneSettings.ParticleSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.VirtualTextureSettings;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsDouble;
@@ -70,7 +71,8 @@ public class SettingsManager {
         }
     }
 
-    public SettingsManager(InputStream fis, InputStream vis) {
+    public SettingsManager(InputStream fis,
+                           InputStream vis) {
         super();
         try {
             vp = new Properties();
@@ -89,16 +91,20 @@ public class SettingsManager {
         instance.initSettings();
     }
 
-    public static void initialize(FileInputStream fis, FileInputStream vis) throws Exception {
+    public static void initialize(FileInputStream fis,
+                                  FileInputStream vis) throws Exception {
         SettingsManager.instance = new SettingsManager(fis, vis);
         instance.initSettings();
     }
 
-    private static void setProxySettings(ProxyBean proxy, String protocol) {
+    private static void setProxySettings(ProxyBean proxy,
+                                         String protocol) {
         setProxySettings(proxy, protocol, protocol);
     }
 
-    private static void setProxySettings(ProxyBean proxy, String protocol, String nonProxyHostsProtocol) {
+    private static void setProxySettings(ProxyBean proxy,
+                                         String protocol,
+                                         String nonProxyHostsProtocol) {
         if (proxy.host != null)
             System.setProperty(protocol + ".proxyHost", proxy.host);
         if (proxy.port != null)
@@ -112,7 +118,8 @@ public class SettingsManager {
             System.setProperty(protocol + ".proxyPassword", proxy.password);
     }
 
-    private static void setSocksProxySettings(ProxyBean proxy, String prefix) {
+    private static void setSocksProxySettings(ProxyBean proxy,
+                                              String prefix) {
         if (proxy.version != null)
             System.setProperty(prefix + "ProxyVersion", Integer.toString(proxy.version));
         if (proxy.host != null)
@@ -200,7 +207,8 @@ public class SettingsManager {
         }
 
         // UI scale mapping
-        settings.program.ui.scale = MathUtilsDouble.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+        settings.program.ui.scale = MathUtilsDouble.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN,
+                                                         Constants.UI_SCALE_INTERNAL_MAX);
 
         // Default distance units
         if (settings.program.ui.distanceUnits == null) {
@@ -219,6 +227,11 @@ public class SettingsManager {
 
         // Minimap size
         settings.program.minimap.size = MathUtilsDouble.clamp(settings.program.minimap.size, Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
+
+        // Particle groups
+        if (settings.scene.particleGroups == null) {
+            settings.scene.particleGroups = new ParticleSettings();
+        }
 
         // Limit draw distance in 32-bit JVM
         if (arch.equals("32")) {

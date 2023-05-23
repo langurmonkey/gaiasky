@@ -10,7 +10,6 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.TextureArray;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -46,6 +45,8 @@ public class ParticleSet implements Component, IDisposable {
     public boolean renderParticles = true;
     /** Flag indicating whether the particle set holds stars or particles. **/
     public boolean isStars;
+    /** Number of labels to render for this group. **/
+    public int numLabels = -1;
     /**
      * Fully qualified name of data provider class.
      */
@@ -366,6 +367,10 @@ public class ParticleSet implements Component, IDisposable {
         this.renderParticles = renderParticles;
     }
 
+    public void setNumLabels(Long numLabels) {
+        this.numLabels = Math.toIntExact(numLabels);
+    }
+
     public IParticleRecord get(int index) {
         return pointData.get(index);
     }
@@ -591,6 +596,9 @@ public class ParticleSet implements Component, IDisposable {
 
     public String getLocalizedName() {
         String name = getName();
+        if (name == null) {
+            return null;
+        }
         String base = name.toLowerCase(Locale.ROOT).replace(' ', '_');
         if (I18n.hasObject(base)) {
             return I18n.obj(base);

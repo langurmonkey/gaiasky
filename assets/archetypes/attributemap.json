@@ -497,6 +497,10 @@
         "description" : "A multiplicative factor to apply to the positions of all particles during loading.",
         "units" : "Double"
       },
+      "numLabels" : {
+        "description" : "Number of labels to render for this particle group. Defaults to properties setting.",
+        "units" : "Integer"
+      },
       "profileDecay" : {
         "description" : "The profile decay of the particles in the shader. Controls how sudden is the color and intensity falloff from the center.",
         "units" : "Double",

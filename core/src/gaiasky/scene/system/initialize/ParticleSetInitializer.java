@@ -92,9 +92,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var starSet = Mapper.starSet.get(entity);
 
         if (starSet != null) {
+            // Stars.
             // Is it a catalog of variable stars?
             starSet.variableStars = starSet.pointData.size() > 0 && starSet.pointData.get(0) instanceof VariableRecord;
-            initSortingData(entity, starSet);
+            if (starSet.numLabels > 0) {
+                initSortingData(entity, starSet, starSet);
+            }
 
             var model = Mapper.model.get(entity);
             // Star set.
@@ -102,6 +105,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
             // Load model in main thread
             GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
+        } else {
+            // Particles.
+            if (particleSet.numLabels > 0) {
+                initSortingData(entity, particleSet, null);
+            }
         }
 
     }
@@ -191,6 +199,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         label.labelFactor = 1e-3f;
         label.renderConsumer = LabelEntityRenderSystem::renderParticleSet;
         label.renderFunction = LabelView::renderTextBase;
+        set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.particleGroups.numLabels;
     }
 
     /**
@@ -247,6 +256,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         label.textScale = 0.5f;
         label.renderConsumer = LabelEntityRenderSystem::renderStarSet;
         label.renderFunction = LabelView::renderTextBase;
+        set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.star.group.numLabel;
 
         // Lines.
         var line = Mapper.line.get(entity);
@@ -318,23 +328,24 @@ public class ParticleSetInitializer extends AbstractInitSystem {
     }
 
     private void initSortingData(Entity entity,
+                                 ParticleSet particleSet,
                                  StarSet starSet) {
-        var pointData = starSet.pointData;
+        var pointData = particleSet.pointData;
 
         // Metadata
-        starSet.metadata = new double[pointData.size()];
+        particleSet.metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order
-        starSet.indices1 = new Integer[pointData.size()];
-        starSet.indices2 = new Integer[pointData.size()];
+        particleSet.indices1 = new Integer[pointData.size()];
+        particleSet.indices2 = new Integer[pointData.size()];
         for (int i = 0; i < pointData.size(); i++) {
-            starSet.indices1[i] = i;
-            starSet.indices2[i] = i;
+            particleSet.indices1[i] = i;
+            particleSet.indices2[i] = i;
         }
-        starSet.active = starSet.indices1;
-        starSet.background = starSet.indices2;
+        particleSet.active = particleSet.indices1;
+        particleSet.background = particleSet.indices2;
 
         // Initialize updater task
-        starSet.updaterTask = new ParticleSetUpdaterTask(entity, starSet, starSet);
+        particleSet.updaterTask = new ParticleSetUpdaterTask(entity, particleSet, starSet);
     }
 }

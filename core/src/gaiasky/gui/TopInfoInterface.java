@@ -180,9 +180,11 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             }
             if (f != null) {
                 String candidate = f.getCandidateName();
-                lastFocusName = TextUtils.capString(candidate, maxNameLen);
-                focus.setText(I18n.msg("gui.top.focus", lastFocusName));
-                s1.setText("|");
+                if (candidate != null) {
+                    lastFocusName = TextUtils.capString(candidate, maxNameLen);
+                    focus.setText(I18n.msg("gui.top.focus", lastFocusName));
+                    s1.setText("|");
+                }
             }
         }
         default -> {

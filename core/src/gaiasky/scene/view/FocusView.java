@@ -159,7 +159,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public String getLocalizedName() {
         var set = getSet();
         if (set != null) {
-            return set.getLocalizedName();
+            String particleName = set.getLocalizedName();
+            if (particleName == null) {
+                return base.getLocalizedName();
+            } else {
+                return particleName;
+            }
         } else {
             return base.getLocalizedName();
         }
@@ -197,7 +202,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public boolean hasName(String name, boolean matchCase) {
+    public boolean hasName(String name,
+                           boolean matchCase) {
         return base.hasName(name, matchCase);
     }
 
@@ -270,7 +276,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public void setVisible(boolean visible, String name) {
+    public void setVisible(boolean visible,
+                           String name) {
         var set = getSet();
         if (set != null) {
             set.setVisible(visible, name, Mapper.render.get(entity));
@@ -363,7 +370,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getAbsolutePosition(String name, Vector3b out) {
+    public Vector3b getAbsolutePosition(String name,
+                                        Vector3b out) {
         if (getSet() != null) {
             return getSet().getAbsolutePosition(name, out);
         } else {
@@ -380,7 +388,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * @param distance  The distance in km
      * @param out       The vector to store the result
      */
-    public void getPositionAboveSurface(double longitude, double latitude, double distance, Vector3b out) {
+    public void getPositionAboveSurface(double longitude,
+                                        double latitude,
+                                        double distance,
+                                        Vector3b out) {
         Vector3d aux1 = D31;
         Vector3d aux2 = D32;
 
@@ -433,7 +444,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getPredictedPosition(Vector3b out, ITimeFrameProvider time, ICamera camera, boolean force) {
+    public Vector3b getPredictedPosition(Vector3b out,
+                                         ITimeFrameProvider time,
+                                         ICamera camera,
+                                         boolean force) {
         if (getSet() != null) {
             Instant futureTime = time.getTime().plus((long) (time.getHdiff() * Nature.H_TO_MS), ChronoUnit.MILLIS);
             return getSet().getAbsolutePosition(futureTime, out);
@@ -562,7 +576,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public double getElevationAt(Vector3b camPos, boolean useFuturePosition) {
+    public double getElevationAt(Vector3b camPos,
+                                 boolean useFuturePosition) {
         if (isModel()) {
             if (useFuturePosition) {
                 Vector3b nextPos = getPredictedPosition(B33, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
@@ -578,7 +593,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
 
     @Override
-    public double getElevationAt(Vector3b camPos, Vector3b nextPos) {
+    public double getElevationAt(Vector3b camPos,
+                                 Vector3b nextPos) {
         if (isModel()) {
             var model = Mapper.model.get(entity);
             var mc = model.model;
@@ -693,24 +709,42 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinate(int screenX,
+                                 int screenY,
+                                 int w,
+                                 int h,
+                                 int pixelDist,
+                                 NaturalCamera camera,
+                                 Array<IFocus> hits) {
 
     }
 
     @Override
-    public void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+    public void addEntityHitCoordinate(int screenX,
+                                       int screenY,
+                                       int w,
+                                       int h,
+                                       int pixelDist,
+                                       NaturalCamera camera,
+                                       Array<Entity> hits) {
         if (focus != null && focus.hitCoordinatesConsumer != null) {
             focus.hitCoordinatesConsumer.apply(focusHit, this, screenX, screenY, w, h, pixelDist, camera, hits);
         }
     }
 
     @Override
-    public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRay(Vector3d p0,
+                          Vector3d p1,
+                          NaturalCamera camera,
+                          Array<IFocus> hits) {
 
     }
 
     @Override
-    public void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+    public void addEntityHitRay(Vector3d p0,
+                                Vector3d p1,
+                                NaturalCamera camera,
+                                Array<Entity> hits) {
         if (focus != null && focus.hitRayConsumer != null) {
             focus.hitRayConsumer.apply(focusHit, this, p0, p1, camera, hits);
         }
@@ -727,10 +761,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public IFocus getFocus(String name) {
-        if (particleSet != null) {
-            particleSet.setFocusIndex(name);
-        } else if (starSet != null) {
-            starSet.setFocusIndex(name);
+        if (name != null) {
+            if (particleSet != null) {
+                particleSet.setFocusIndex(name);
+            } else if (starSet != null) {
+                starSet.setFocusIndex(name);
+            }
         }
         return this;
     }
@@ -760,7 +796,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return -1;
     }
 
-    public void setForceLabel(Boolean forceLabel, String name) {
+    public void setForceLabel(Boolean forceLabel,
+                              String name) {
         if (starSet != null) {
             starSet.setForceLabel(forceLabel, name);
         } else if (Mapper.label.has(entity)) {
@@ -793,7 +830,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         body.labelColor = color;
     }
 
-    public void setLabelColor(float[] color, String name) {
+    public void setLabelColor(float[] color,
+                              String name) {
         if (starSet != null) {
             starSet.setLabelColor(color, name);
         } else {
@@ -911,7 +949,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return 0;
     }
 
-    public Entity getChildByNameAndArchetype(String name, Archetype archetype) {
+    public Entity getChildByNameAndArchetype(String name,
+                                             Archetype archetype) {
         int size = graph.children.size;
         for (int i = 0; i < size; i++) {
             Entity child = graph.children.get(i);
@@ -959,7 +998,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * @param color      The plain color.
      * @param allVisible All visible.
      */
-    public void highlight(boolean state, float[] color, boolean allVisible) {
+    public void highlight(boolean state,
+                          float[] color,
+                          boolean allVisible) {
         initHighlight();
         markForUpdate();
 
@@ -993,7 +1034,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * @param cmmin Min mapping value.
      * @param cmmax Max mapping value.
      */
-    public void highlight(boolean state, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
+    public void highlight(boolean state,
+                          int cmi,
+                          IAttribute cma,
+                          double cmmin,
+                          double cmmax,
+                          boolean allVisible) {
         initHighlight();
         markForUpdate();
 
@@ -1040,7 +1086,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return isValid() && base.archetype != null && base.archetype.getName().equals("Planet");
     }
 
-    private Array<Entity> getOctreeObjects(OctreeNode node, Array<Entity> list) {
+    private Array<Entity> getOctreeObjects(OctreeNode node,
+                                           Array<Entity> list) {
         if (node != null && node.objects != null) {
             for (IOctreeObject object : node.objects) {
                 if (object instanceof OctreeObjectView) {

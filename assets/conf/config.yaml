@@ -126,6 +126,10 @@ scene:
       position: true
       # Lock camera position to focus orientation.
       orientation: false
+  # Particle group settings.
+  particleGroups:
+    # Default number of labels for particle groups. Applies unless overwritten.
+    numLabels: 100
   # Star settings.
   star:
     # Star brightness factor.
@@ -153,7 +157,7 @@ scene:
       billboard: true
       # Maximum number of star billboards per group.
       numBillboard: 30
-      # Maximum number of labels per star group.
+      # Maximum number of labels per star group. Applies unless overwritten.
       numLabel: 50
       # Maximum number of velocity vectors per star group.
       numVelocityVector: 500
