@@ -106,9 +106,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     @Override
     public void run() {
         if (particleSet != null) {
-            if (starSet == null) {
-                System.out.println("Update particle set: " + base.getName());
-            }
             updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
         }
     }
