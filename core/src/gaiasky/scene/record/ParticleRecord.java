@@ -23,6 +23,29 @@ import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
 public class ParticleRecord implements IParticleRecord {
+
+    /**
+     * Enumeration to identify the type of record.
+     */
+    public enum ParticleRecordType {
+        PARTICLE(3, 0, new int[] { 0, 1, 2 }, new int[] {}),
+        STAR(3, 11, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }),
+        PARTICLE_EXT(3, 10, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+
+        final int doubleArraySize, floatArraySize;
+        final int[] doubleIndexIndireciton, floatIndexIndirection;
+
+        ParticleRecordType(int doubleArraySize,
+                           int floatArraySize,
+                           int[] doubleIndexIndireciton,
+                           int[] floatIndexIndirection) {
+            this.doubleArraySize = doubleArraySize;
+            this.floatArraySize = floatArraySize;
+            this.doubleIndexIndireciton = doubleIndexIndireciton;
+            this.floatIndexIndirection = floatIndexIndirection;
+        }
+    }
+
     public static final int STAR_SIZE_D = 3;
     public static final int STAR_SIZE_F = 11;
     /* INDICES */
@@ -43,63 +66,98 @@ public class ParticleRecord implements IParticleRecord {
     public static final int I_FSIZE = 9;
     /* int */
     public static final int I_FHIP = 10;
+
+    // Aux vectors.
     protected static TLV3D aux3d1 = new TLV3D();
     protected static TLV3D aux3d2 = new TLV3D();
-    // Particle ID
+
+    // Type.
+    public final ParticleRecordType type;
+
+    // Particle ID.
     public long id;
 
-    // Double data array
+    // Double data array.
     public double[] dataD;
 
-    // Float data array
+    // Float data array.
     public float[] dataF;
 
-    // Particle names (optional)
+    // Particle names (optional).
     public String[] names;
 
-    // Extra attributes (optional)
+    // Extra attributes (optional).
     public ObjectDoubleMap<UCD> extra;
 
-    // Octant, if in octree
+    // Octant, if in octree.
     public OctreeNode octant;
 
-    public ParticleRecord(double[] dataD) {
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD) {
+        this.type = type;
         this.dataD = dataD;
         this.dataF = null;
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF) {
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD,
+                          float[] dataF) {
+        this.type = type;
         this.dataD = dataD;
         this.dataF = dataF;
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, Long id) {
-        this(dataD, dataF);
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD,
+                          float[] dataF,
+                          Long id) {
+        this(type, dataD, dataF);
         this.id = id != null ? id : -1;
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, String[] names) {
-        this(dataD, dataF);
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD,
+                          float[] dataF,
+                          String[] names) {
+        this(type, dataD, dataF);
         this.names = names;
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, Long id, String[] names) {
-        this(dataD, dataF, id);
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD,
+                          float[] dataF,
+                          Long id,
+                          String[] names) {
+        this(type, dataD, dataF, id);
         this.names = names;
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, Long id, String[] names, ObjectDoubleMap<UCD> extra) {
-        this(dataD, dataF, id, names);
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD,
+                          float[] dataF,
+                          Long id,
+                          String[] names,
+                          ObjectDoubleMap<UCD> extra) {
+        this(type, dataD, dataF, id, names);
         this.names = names;
         this.extra = extra;
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, Long id, String name) {
-        this(dataD, dataF, id, name == null ? new String[] {} : new String[] { name });
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD,
+                          float[] dataF,
+                          Long id,
+                          String name) {
+        this(type, dataD, dataF, id, name == null ? new String[] {} : new String[] { name });
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, Long id, String name, ObjectDoubleMap<UCD> extra) {
-        this(dataD, dataF, id, name == null ? new String[] {} : new String[] { name }, extra);
+    public ParticleRecord(ParticleRecordType type,
+                          double[] dataD,
+                          float[] dataF,
+                          Long id,
+                          String name,
+                          ObjectDoubleMap<UCD> extra) {
+        this(type, dataD, dataF, id, name == null ? new String[] {} : new String[] { name }, extra);
     }
 
     @Override
@@ -114,85 +172,92 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public double x() {
-        return dataD[I_X];
+        return dataD[type.doubleIndexIndireciton[I_X]];
     }
 
     @Override
     public double y() {
-        return dataD[I_Y];
+        return dataD[type.doubleIndexIndireciton[I_Y]];
     }
 
     @Override
     public double z() {
-        return dataD[I_Z];
+        return dataD[type.doubleIndexIndireciton[I_Z]];
     }
 
     @Override
-    public void setPos(double x, double y, double z) {
-        dataD[I_X] = x;
-        dataD[I_Y] = y;
-        dataD[I_Z] = z;
+    public void setPos(double x,
+                       double y,
+                       double z) {
+        dataD[type.doubleIndexIndireciton[I_X]] = x;
+        dataD[type.doubleIndexIndireciton[I_Y]] = y;
+        dataD[type.doubleIndexIndireciton[I_Z]] = z;
     }
 
     @Override
     public double pmx() {
-        return dataF[I_FPMX];
+        return dataF[type.floatIndexIndirection[I_FPMX]];
     }
 
     @Override
     public double pmy() {
-        return dataF[I_FPMY];
+        return dataF[type.floatIndexIndirection[I_FPMY]];
     }
 
     @Override
     public double pmz() {
-        return dataF[I_FPMZ];
+        return dataF[type.floatIndexIndirection[I_FPMZ]];
     }
 
     @Override
-    public void setVelocityVector(double vx, double vy, double vz) {
-        dataF[I_FPMX] = (float) vx;
-        dataF[I_FPMY] = (float) vy;
-        dataF[I_FPMZ] = (float) vz;
+    public void setVelocityVector(double vx,
+                                  double vy,
+                                  double vz) {
+        dataF[type.floatIndexIndirection[I_FPMX]] = (float) vx;
+        dataF[type.floatIndexIndirection[I_FPMY]] = (float) vy;
+        dataF[type.floatIndexIndirection[I_FPMZ]] = (float) vz;
     }
 
     @Override
     public float mualpha() {
-        return dataF[I_FMUALPHA];
+        return dataF[type.floatIndexIndirection[I_FMUALPHA]];
     }
 
     @Override
     public float mudelta() {
-        return dataF[I_FMUDELTA];
+        return dataF[type.floatIndexIndirection[I_FMUDELTA]];
     }
 
     @Override
     public float radvel() {
-        return dataF[I_FRADVEL];
+        return dataF[type.floatIndexIndirection[I_FRADVEL]];
     }
 
     @Override
-    public void setProperMotion(float mualpha, float mudelta, float radvel) {
-        dataF[I_FMUALPHA] = mualpha;
-        dataF[I_FMUDELTA] = mudelta;
-        dataF[I_FRADVEL] = radvel;
+    public void setProperMotion(float mualpha,
+                                float mudelta,
+                                float radvel) {
+        dataF[type.floatIndexIndirection[I_FMUALPHA]] = mualpha;
+        dataF[type.floatIndexIndirection[I_FMUDELTA]] = mudelta;
+        dataF[type.floatIndexIndirection[I_FRADVEL]] = radvel;
 
     }
 
     @Override
     public float appmag() {
-        return dataF[I_FAPPMAG];
+        return dataF[type.floatIndexIndirection[I_FAPPMAG]];
     }
 
     @Override
     public float absmag() {
-        return dataF[I_FABSMAG];
+        return dataF[type.floatIndexIndirection[I_FABSMAG]];
     }
 
     @Override
-    public void setMag(float appmag, float absmag) {
-        dataF[I_FAPPMAG] = appmag;
-        dataF[I_FABSMAG] = absmag;
+    public void setMag(float appmag,
+                       float absmag) {
+        dataF[type.floatIndexIndirection[I_FAPPMAG]] = appmag;
+        dataF[type.floatIndexIndirection[I_FABSMAG]] = absmag;
     }
 
     @Override
@@ -202,27 +267,27 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public float col() {
-        return dataF[I_FCOL];
+        return dataF[type.floatIndexIndirection[I_FCOL]];
     }
 
     @Override
     public void setCol(float col) {
-        dataF[I_FCOL] = col;
+        dataF[type.floatIndexIndirection[I_FCOL]] = col;
     }
 
     @Override
     public float size() {
-        return dataF[I_FSIZE];
+        return dataF[type.floatIndexIndirection[I_FSIZE]];
     }
 
     @Override
     public void setSize(float size) {
-        dataF[I_FSIZE] = size;
+        dataF[type.floatIndexIndirection[I_FSIZE]] = size;
     }
 
     @Override
     public int hip() {
-        return (int) dataF[I_FHIP];
+        return (int) dataF[type.floatIndexIndirection[I_FHIP]];
     }
 
     @Override
@@ -232,7 +297,7 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public void setHip(int hip) {
-        dataF[I_FHIP] = hip;
+        dataF[type.floatIndexIndirection[I_FHIP]] = hip;
     }
 
     @Override
@@ -251,7 +316,8 @@ public class ParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public boolean hasName(String candidate, boolean matchCase) {
+    public boolean hasName(String candidate,
+                           boolean matchCase) {
         if (names == null) {
             return false;
         } else {
@@ -314,7 +380,7 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public double[] rgb() {
-        Color c = new Color(NumberUtils.floatToIntColor(dataF[I_FCOL]));
+        Color c = new Color(NumberUtils.floatToIntColor(dataF[type.floatIndexIndirection[I_FCOL]]));
         return new double[] { c.r, c.g, c.b };
     }
 

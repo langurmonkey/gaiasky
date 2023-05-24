@@ -83,7 +83,13 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Constructs an octree node.
      */
-    private OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
+    private OctreeNode(double x,
+                       double y,
+                       double z,
+                       double hsx,
+                       double hsy,
+                       double hsz,
+                       int depth) {
         this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
         this.max = new Vector3d(x + hsx, y + hsy, z + hsz);
         this.centre = new Vector3d(x, y, z);
@@ -97,7 +103,14 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Constructs an octree node.
      */
-    public OctreeNode(long pageId, double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
+    public OctreeNode(long pageId,
+                      double x,
+                      double y,
+                      double z,
+                      double hsx,
+                      double hsy,
+                      double hsz,
+                      int depth) {
         this.pageId = pageId;
         this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
         this.max = new Vector3d(x + hsx, y + hsy, z + hsz);
@@ -112,7 +125,15 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Constructs an octree node.
      */
-    public OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth, OctreeNode parent, int i) {
+    public OctreeNode(double x,
+                      double y,
+                      double z,
+                      double hsx,
+                      double hsy,
+                      double hsz,
+                      int depth,
+                      OctreeNode parent,
+                      int i) {
         this(x, y, z, hsx, hsy, hsz, depth);
         this.parent = parent;
         parent.children[i] = this;
@@ -134,7 +155,16 @@ public class OctreeNode implements ILineRenderable {
      * @param ownObjects    Number of objects contained in this node. Same as
      *                      objects.size().
      */
-    public OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int childrenCount, int nObjects, int ownObjects, int depth) {
+    public OctreeNode(double x,
+                      double y,
+                      double z,
+                      double hsx,
+                      double hsy,
+                      double hsz,
+                      int childrenCount,
+                      int nObjects,
+                      int ownObjects,
+                      int depth) {
         this(x, y, z, hsx, hsy, hsz, depth);
         this.numChildren = childrenCount;
         this.numObjectsRec = nObjects;
@@ -157,14 +187,26 @@ public class OctreeNode implements ILineRenderable {
      * @param ownObjects    Number of objects contained in this node. Same as
      *                      objects.size().
      */
-    public OctreeNode(long pageid, double x, double y, double z, double hsx, double hsy, double hsz, int childrenCount, int nObjects, int ownObjects, int depth) {
+    public OctreeNode(long pageid,
+                      double x,
+                      double y,
+                      double z,
+                      double hsx,
+                      double hsy,
+                      double hsz,
+                      int childrenCount,
+                      int nObjects,
+                      int ownObjects,
+                      int depth) {
         this(pageid, x, y, z, hsx, hsy, hsz, depth);
         this.numChildren = childrenCount;
         this.numObjectsRec = nObjects;
         this.numObjects = ownObjects;
     }
 
-    public static long hash(double x, double y, double z) {
+    public static long hash(double x,
+                            double y,
+                            double z) {
         long result = 3;
         result = result * 31 + hash(x);
         result = result * 31 + hash(y);
@@ -293,7 +335,8 @@ public class OctreeNode implements ILineRenderable {
         numObjects = objects.size();
     }
 
-    public boolean insert(IOctreeObject e, int level) {
+    public boolean insert(IOctreeObject e,
+                          int level) {
         int node = 0;
         if (e.getPosition().y.doubleValue() > min.y + ((max.y - min.y) / 2))
             node += 4;
@@ -461,7 +504,9 @@ public class OctreeNode implements ILineRenderable {
         return 0;
     }
 
-    public boolean contains(double x, double y, double z) {
+    public boolean contains(double x,
+                            double y,
+                            double z) {
         return min.x <= x && max.x >= x && min.y <= y && max.y >= y && min.z <= z && max.z >= z;
     }
 
@@ -525,7 +570,10 @@ public class OctreeNode implements ILineRenderable {
      * @param roulette        List where the nodes to be processed are to be added.
      * @param opacity         The opacity to set.
      */
-    public void update(Vector3b parentTransform, ICamera cam, List<IOctreeObject> roulette, float opacity) {
+    public void update(Vector3b parentTransform,
+                       ICamera cam,
+                       List<IOctreeObject> roulette,
+                       float opacity) {
         this.opacity = opacity;
         this.observed = false;
 
@@ -538,10 +586,11 @@ public class OctreeNode implements ILineRenderable {
         float th0 = Settings.settings.scene.octree.threshold[0] * cf;
         float th1 = Settings.settings.scene.octree.threshold[1] * cf;
 
-        if (viewAngle < th0) {
+        var isCameraFocus = hasFocusObject(cam);
+        if (viewAngle < th0 && !isCameraFocus) {
             // Not observed
             setChildrenObserved(false);
-        } else if (this.observed = computeObserved(cam)) {
+        } else if ((this.observed = computeObserved(cam)) || isCameraFocus) {
             nOctantsObserved++;
             /*
              * Load lists of pages
@@ -574,6 +623,17 @@ public class OctreeNode implements ILineRenderable {
             }
 
         }
+    }
+
+    /**
+     * Check if this octree node contains the current focus object of the given camera.
+     *
+     * @param camera The camera.
+     *
+     * @return True if this octree node contains the camera's focus object.
+     */
+    private boolean hasFocusObject(ICamera camera) {
+        return objects.stream().anyMatch((o) -> camera.isFocus(((OctreeObjectView) o).getEntity()));
     }
 
     private void addObjectsTo(List<IOctreeObject> roulette) {
@@ -648,7 +708,8 @@ public class OctreeNode implements ILineRenderable {
      * @param status The new status.
      * @param depth  The depth.
      */
-    public void setStatus(LoadStatus status, int depth) {
+    public void setStatus(LoadStatus status,
+                          int depth) {
         if (depth >= this.depth) {
             setStatus(status);
             for (int i = 0; i < 8; i++) {
@@ -769,7 +830,9 @@ public class OctreeNode implements ILineRenderable {
     }
 
     @Override
-    public void render(LineRenderSystem sr, ICamera camera, float alpha) {
+    public void render(LineRenderSystem sr,
+                       ICamera camera,
+                       float alpha) {
         if (this.observed) {
             this.col.set(ColorUtils.gGreenC);
         } else {
@@ -822,7 +885,14 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /** Draws a line **/
-    private void line(LineRenderSystem sr, double x1, double y1, double z1, double x2, double y2, double z2, com.badlogic.gdx.graphics.Color col) {
+    private void line(LineRenderSystem sr,
+                      double x1,
+                      double y1,
+                      double z1,
+                      double x2,
+                      double y2,
+                      double z2,
+                      com.badlogic.gdx.graphics.Color col) {
         sr.addLine(this, (float) x1, (float) y1, (float) z1, (float) x2, (float) y2, (float) z2, col);
     }
 
@@ -859,7 +929,8 @@ public class OctreeNode implements ILineRenderable {
      * @param loader    The loader to set.
      * @param recursive Whether to set the loader recursively to the children nodes.
      */
-    public void setOctantLoader(IOctantLoader loader, boolean recursive) {
+    public void setOctantLoader(IOctantLoader loader,
+                                boolean recursive) {
         this.loader = loader;
         if (recursive && children != null) {
             for (OctreeNode child : children) {

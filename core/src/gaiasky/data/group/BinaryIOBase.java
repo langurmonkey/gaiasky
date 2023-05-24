@@ -9,6 +9,7 @@ package gaiasky.data.group;
 
 import gaiasky.data.api.BinaryIO;
 import gaiasky.scene.record.ParticleRecord;
+import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.util.Constants;
 
 import java.io.DataInputStream;
@@ -88,7 +89,7 @@ public abstract class BinaryIOBase implements BinaryIO {
             names = namesConcat.toString().split(Constants.nameSeparatorRegex);
         }
 
-        return new ParticleRecord(dataD, dataF, id, names);
+        return new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names);
     }
 
     @Override
@@ -143,7 +144,7 @@ public abstract class BinaryIOBase implements BinaryIO {
             names = namesConcat.toString().split(Constants.nameSeparatorRegex);
         }
 
-        return new ParticleRecord(dataD, dataF, id, names);
+        return new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names);
     }
 
 }

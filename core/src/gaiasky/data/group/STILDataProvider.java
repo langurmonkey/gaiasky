@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleRecord;
+import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.scene.record.VariableRecord;
 import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
 import gaiasky.util.*;
@@ -545,7 +546,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
                                     sb = new VariableRecord(dataD, dataF, nVari, pf, variMags, variTimes, id, names, extraAttributes);
                                 } else {
-                                    sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
+                                    sb = new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names, extraAttributes);
                                 }
 
                                 list.add(sb);
@@ -561,7 +562,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
 
-                                IParticleRecord pb = new ParticleRecord(point, null, null, names, extraAttributes);
+                                IParticleRecord pb = new ParticleRecord(ParticleRecordType.PARTICLE, point, null, null, names, extraAttributes);
                                 list.add(pb);
                             }
 
