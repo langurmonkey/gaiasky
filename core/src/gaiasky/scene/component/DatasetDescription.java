@@ -30,6 +30,9 @@ public class DatasetDescription implements Component {
      */
     public float previousAlpha = 1f;
 
+    /** Whether to add this as a dataset. **/
+    public boolean addDataset = true;
+
     public void setCatalogInfoBare(CatalogInfo info) {
         this.catalogInfo = info;
     }
@@ -89,6 +92,10 @@ public class DatasetDescription implements Component {
             }
         }
         return defaultValue;
+    }
+
+    public void setAddToDatasetManager(Boolean b) {
+        this.addDataset = b;
     }
 
 }

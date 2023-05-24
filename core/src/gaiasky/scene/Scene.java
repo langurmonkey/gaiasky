@@ -317,7 +317,6 @@ public class Scene {
             addUpdater(new DatasetDescriptionUpdater(families.datasets, priority++));
             addUpdater(new ElementsSetUpdater(families.orbitalElementSets, priority++));
             addUpdater(new ParticleSetUpdater(families.particleSets, priority++));
-            addUpdater(new ParticleUpdater(families.particles, priority++));
             addUpdater(new ModelUpdater(families.models, priority++));
             addUpdater(new TrajectoryUpdater(families.orbits, priority++));
             addUpdater(new VertsUpdater(families.verts, priority++));

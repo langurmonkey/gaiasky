@@ -365,6 +365,11 @@
         "units" : "Map",
         "aliases" : [ "datasetInfo", "cataloginfo" ]
       },
+      "addDataset" : {
+        "description" : "Whether to add the dataset to the dataset manager or not. Typically used with star and particle sets that already belong to a higher-level dataset.",
+        "units" : "Boolean",
+        "aliases" : [ "addToDatasetManager" ]
+      },
       "description:MeshObject" : null
     },
 

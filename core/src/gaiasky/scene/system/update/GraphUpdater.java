@@ -47,7 +47,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
      *
      * @param family The family of entities iterated over in this System. In this case, it should be just one ({@link GraphRoot}.
      */
-    public GraphUpdater(Family family, int priority, ITimeFrameProvider time) {
+    public GraphUpdater(Family family,
+                        int priority,
+                        ITimeFrameProvider time) {
         super(family, priority);
         this.time = time;
         this.D31 = new Vector3d();
@@ -59,7 +61,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
         this.camera = camera;
     }
 
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity,
+                                 float deltaTime) {
         processed = 0;
         updateEntity(entity, deltaTime);
         if (lastProcessed != processed) {
@@ -70,7 +73,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
     }
 
     @Override
-    public void updateEntity(Entity entity, float deltaTime) {
+    public void updateEntity(Entity entity,
+                             float deltaTime) {
         // This runs the root node
         var root = entity.getComponent(GraphNode.class);
 
@@ -78,7 +82,10 @@ public class GraphUpdater extends AbstractUpdateSystem {
         update(entity, time, null, 1);
     }
 
-    public void printTree(Entity entity, String tab, int level, AtomicInteger count) {
+    public void printTree(Entity entity,
+                          String tab,
+                          int level,
+                          AtomicInteger count) {
         var graph = Mapper.graph.get(entity);
 
         if (graph.mustUpdateFunction == null ||
@@ -87,8 +94,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
             var base = Mapper.base.get(entity);
 
             logger.debug(count.getAndIncrement() + "|" + level + ":" + tab + base.getName()
-                    + " (" + (graph.children != null ? graph.children.size : 0) + ")"
-                    + (base.archetype != null ? " [" + base.archetype.getName() + "]" : ""));
+                                 + " (" + (graph.children != null ? graph.children.size : 0) + ")"
+                                 + (base.archetype != null ? " [" + base.archetype.getName() + "]" : ""));
 
             boolean processChildren = !Mapper.tagNoProcessChildren.has(entity);
             if (processChildren && graph.children != null) {
@@ -101,7 +108,10 @@ public class GraphUpdater extends AbstractUpdateSystem {
         }
     }
 
-    public void update(Entity entity, ITimeFrameProvider time, final Vector3b parentTranslation, float opacity) {
+    public void update(Entity entity,
+                       ITimeFrameProvider time,
+                       final Vector3b parentTranslation,
+                       float opacity) {
         processed++;
         var graph = Mapper.graph.get(entity);
 
@@ -137,10 +147,21 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 // If the bottom part of our fade in is mapped to a value
                 // greater than zero, we do not use the parent opacity; the
                 // children's fadeInMap attribute takes precedence.
+                // This is so that the NEARGALCAT billboards are shown from within the MW.
                 if (fade.fadeInMap == null || fade.fadeInMap.x <= 0) {
                     base.opacity = opacity;
                 } else {
-                    base.opacity = 1;
+                    // Use parent visibility, if available.
+                    if (graph.parent != null) {
+                        var parentBase = Mapper.base.get(graph.parent);
+                        if (parentBase.isVisible()) {
+                            base.opacity = parentBase.getVisibilityOpacityFactor();
+                        } else {
+                            base.opacity = 0;
+                        }
+                    } else {
+                        base.opacity = 1;
+                    }
                 }
                 updateFadeDistance(body, fade);
                 updateFadeOpacity(base, fade);
@@ -177,7 +198,10 @@ public class GraphUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private float getChildrenOpacity(Entity entity, Base base, Fade fade, float opacity) {
+    private float getChildrenOpacity(Entity entity,
+                                     Base base,
+                                     Fade fade,
+                                     float opacity) {
         if (Mapper.billboardSet.has(entity)) {
             return 1 - base.opacity;
         } else if (fade != null) {
@@ -187,7 +211,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void updateFadeDistance(Body body, Fade fade) {
+    private void updateFadeDistance(Body body,
+                                    Fade fade) {
         if (fade.fadePositionObject != null) {
             fade.currentDistance = Mapper.body.get(fade.fadePositionObject).distToCamera;
         } else if (fade.fadePosition != null) {
@@ -198,7 +223,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
         body.distToCamera = fade.fadePositionObject == null ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.fadePositionObject).distToCamera;
     }
 
-    private void updateFadeOpacity(Base base, Fade fade) {
+    private void updateFadeOpacity(Base base,
+                                   Fade fade) {
         if (fade.fadeIn != null) {
             base.opacity *= MathUtilsDouble.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, fade.fadeInMap.x, fade.fadeInMap.y);
         }
@@ -234,7 +260,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
      *
      * @return Whether the perimeter must be processed.
      */
-    public boolean mustUpdatePerimeter(Entity entity, GraphNode graph) {
+    public boolean mustUpdatePerimeter(Entity entity,
+                                       GraphNode graph) {
         boolean enabled = GaiaSky.instance.sceneRenderer.isOn(ComponentType.Countries);
         if (enabled) {
             entity.remove(TagNoProcess.class);
@@ -253,7 +280,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
      *
      * @return Whether the perimeter must be processed.
      */
-    public boolean mustUpdateLoc(Entity entity, GraphNode graph) {
+    public boolean mustUpdateLoc(Entity entity,
+                                 GraphNode graph) {
         boolean enabled = GaiaSky.instance.sceneRenderer.isOn(ComponentType.Locations);
         if (enabled) {
             var parentBody = Mapper.body.get(graph.parent);
@@ -280,7 +308,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
      * @param body   The body component.
      * @param graph  The graph component.
      */
-    public void updatePositionDefault(Entity entity, Body body, GraphNode graph) {
+    public void updatePositionDefault(Entity entity,
+                                      Body body,
+                                      GraphNode graph) {
         var pm = Mapper.pm.get(entity);
         if (time.getHdiff() != 0 || (pm != null && pm.hasPm)) {
             var coordinates = Mapper.coordinates.get(entity);
@@ -308,7 +338,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
      * @param body   The body component.
      * @param graph  The graph component.
      */
-    public void updateShapeObject(Entity entity, Body body, GraphNode graph) {
+    public void updateShapeObject(Entity entity,
+                                  Body body,
+                                  GraphNode graph) {
         var shape = Mapper.shape.get(entity);
         if (shape != null && shape.track != null) {
             // Overwrite position if track object is set.
@@ -325,7 +357,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
      * @param body   The body component.
      * @param graph  The graph component.
      */
-    public void updateSpacecraft(Entity entity, Body body, GraphNode graph) {
+    public void updateSpacecraft(Entity entity,
+                                 Body body,
+                                 GraphNode graph) {
         view.setEntity(entity);
         var engine = view.engine;
 

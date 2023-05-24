@@ -21,6 +21,7 @@ import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
+import gaiasky.util.CatalogInfo;
 import gaiasky.util.math.Vector3b;
 
 import java.util.List;
@@ -241,6 +242,16 @@ public class EntityUtils {
         } else if (Mapper.starSet.has(entity)) {
             return Mapper.starSet.get(entity);
         }
+        return null;
+    }
+
+    /**
+     * Gets the first dataset ancestor of this entity.
+     * @param entity The entity.
+     *
+     * @return The catalog info.
+     */
+    public static CatalogInfo getDatasetAncestor(Entity entity) {
         return null;
     }
 

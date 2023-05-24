@@ -25,7 +25,9 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
 
     private final FocusView view;
 
-    public DatasetDescriptionInitializer(boolean setUp, Family family, int priority) {
+    public DatasetDescriptionInitializer(boolean setUp,
+                                         Family family,
+                                         int priority) {
         super(setUp, family, priority);
         this.view = new FocusView();
     }
@@ -41,7 +43,11 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
         initializeCatalogInfo(entity, datasetDesc, true, base.getName(), datasetDesc.description);
     }
 
-    protected void initializeCatalogInfo(Entity entity, DatasetDescription dd, boolean create, String name, String description) {
+    protected void initializeCatalogInfo(Entity entity,
+                                         DatasetDescription dd,
+                                         boolean create,
+                                         String name,
+                                         String description) {
         view.setEntity(entity);
         String dataFile = view.getDataFile();
 
@@ -49,7 +55,7 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
             dd.catalogInfo = new CatalogInfo(name, description, dataFile, CatalogInfoSource.INTERNAL, 1f, entity);
         }
 
-        if (dd.catalogInfo != null) {
+        if (dd.catalogInfo != null && dd.addDataset) {
             if (dd.catalogInfo.nParticles <= 0) {
                 dd.catalogInfo.nParticles = view.getNumParticles();
             }
