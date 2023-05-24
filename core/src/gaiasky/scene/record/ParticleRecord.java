@@ -25,10 +25,9 @@ import net.jafama.FastMath;
 public class ParticleRecord implements IParticleRecord {
     public static final int STAR_SIZE_D = 3;
     public static final int STAR_SIZE_F = 11;
+    /* INDICES */
     /* doubles */
     public static final int I_X = 0;
-
-    /* INDICES */
     public static final int I_Y = 1;
     public static final int I_Z = 2;
     /* floats (stars) */
