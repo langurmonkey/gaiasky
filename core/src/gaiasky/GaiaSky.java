@@ -540,6 +540,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         this.executorService = new GaiaSkyExecutorService();
 
         // Initialise Cameras.
+        initializeConstants();
         cameraManager = new CameraManager(assetManager, CameraMode.FOCUS_MODE, vr, globalResources);
 
         // Set asset manager to asset bean.
@@ -645,6 +646,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     }
 
+    private void initializeConstants() {
+        if(vr) {
+            Constants.initialize(settings.scene.distanceScaleVr);
+        } else {
+            Constants.initialize(settings.scene.distanceScaleDesktop);
+        }
+    }
+
+
     /**
      * Attempt to create a VR context. This operation succeeds if:
      * <ul>
@@ -658,7 +668,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             // Initializing the VRContext may fail if no HMD is connected or no OpenXR runtime is found.
             try {
                 settings.runtime.openXr = true;
-                Constants.initialize(settings.scene.distanceScaleVr);
 
                 xrDriver = new XrDriver();
                 xrDriver.createOpenXRInstance();
@@ -708,7 +717,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         } else {
             // Desktop mode.
             settings.runtime.openXr = false;
-            Constants.initialize(settings.scene.distanceScaleDesktop);
         }
         return XrLoadStatus.NO_VR;
     }

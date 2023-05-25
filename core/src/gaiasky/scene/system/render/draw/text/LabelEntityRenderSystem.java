@@ -330,7 +330,7 @@ public class LabelEntityRenderSystem {
                 if (pb.names() != null) {
                     Vector3d camPos = fetchPosition(pb, view.particleSet.cPosD, D31, 0);
                     float distToCamera = (float) camPos.len();
-                    float viewAngle = (4e15f / distToCamera) / camera.getFovFactor();
+                    float viewAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
 
                     textPosition(camera, camPos.put(D31), distToCamera, 0);
 

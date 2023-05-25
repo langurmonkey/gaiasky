@@ -39,7 +39,7 @@ out float v_textureIndex;
 #endif
 
 void main() {
-    vec3 pos = a_particlePos - u_camPos;
+    vec3 pos = (a_particlePos - u_camPos) / u_vrScale;
 
     // Distance to point - watch out, if position contains large values, this produces overflow!
     // Downscale before computing length()
@@ -64,7 +64,7 @@ void main() {
     float s_size = quadSize;
     #include shader/snip_billboard.glsl
 
-    gl_Position = gpos;
+    gl_Position = gpos * u_vrScale;
 
     v_uv = a_texCoord;
     v_textureIndex = a_textureIndex;
