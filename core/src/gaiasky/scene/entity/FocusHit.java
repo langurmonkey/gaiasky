@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.view.FilterView;
@@ -36,7 +35,7 @@ public class FocusHit {
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D33 = new Vector3d();
     private final Vector3b B31 = new Vector3b();
-    private FilterView filter;
+    private final FilterView filter;
 
     public FocusHit() {
         filter = new FilterView();
@@ -50,19 +49,41 @@ public class FocusHit {
         return GaiaSky.instance.isOn(view.base.ct) && view.getOpacity() > 0;
     }
 
-    protected boolean checkClickDistance(int screenX, int screenY, Vector3 pos, NaturalCamera camera, PerspectiveCamera pcamera, double pixelSize) {
+    protected boolean checkClickDistance(int screenX,
+                                         int screenY,
+                                         Vector3 pos,
+                                         NaturalCamera camera,
+                                         PerspectiveCamera pcamera,
+                                         double pixelSize) {
         return pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize;
     }
 
-    private double computeHitSolidAngleCelestial(FocusView view, float fovFactor) {
+    private double computeHitSolidAngleCelestial(FocusView view,
+                                                 float fovFactor) {
         return view.getSolidAngle();
     }
 
-    public void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitCoordinateCelestial(FocusView view,
+                                          int screenX,
+                                          int screenY,
+                                          int w,
+                                          int h,
+                                          int pixelDist,
+                                          NaturalCamera camera,
+                                          Array<Entity> hits) {
         addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, 1, this::computeHitSolidAngleCelestial, camera, hits);
     }
 
-    private void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, float solidAngleFactor, Function2<FocusView, Float, Double> solidAngleFunction, NaturalCamera camera, Array<Entity> hits) {
+    private void addHitCoordinateCelestial(FocusView view,
+                                           int screenX,
+                                           int screenY,
+                                           int w,
+                                           int h,
+                                           int pixelDist,
+                                           float solidAngleFactor,
+                                           Function2<FocusView, Float, Double> solidAngleFunction,
+                                           NaturalCamera camera,
+                                           Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
 
@@ -102,12 +123,15 @@ public class FocusHit {
         }
     }
 
-    public void addHitRayCelestial(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitRayCelestial(FocusView view,
+                                   Vector3d p0,
+                                   Vector3d p1,
+                                   NaturalCamera camera,
+                                   Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
 
-            Vector3b aux = B31;
-            Vector3b posb = EntityUtils.getAbsolutePosition(entity, aux).add(camera.getInversePos());
+            Vector3b posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.getInversePos());
 
             if (camera.direction.dot(posb) > 0) {
                 // The star is in front of us
@@ -128,7 +152,14 @@ public class FocusHit {
      * If we render the model, we set up a sphere at the object's position with
      * its radius and check for intersections with the ray
      */
-    public void addHitCoordinateModel(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitCoordinateModel(FocusView view,
+                                      int screenX,
+                                      int screenY,
+                                      int w,
+                                      int h,
+                                      int pixelDist,
+                                      NaturalCamera camera,
+                                      Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
             var sa = Mapper.sa.get(entity);
@@ -168,7 +199,11 @@ public class FocusHit {
         }
     }
 
-    public void addHitRayModel(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitRayModel(FocusView view,
+                               Vector3d p0,
+                               Vector3d p1,
+                               NaturalCamera camera,
+                               Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
             var sa = Mapper.sa.get(entity);
@@ -192,7 +227,8 @@ public class FocusHit {
         }
     }
 
-    private double computeHitSolidAngleStar(FocusView view, float fovFactor) {
+    private double computeHitSolidAngleStar(FocusView view,
+                                            float fovFactor) {
         double solidAngle = view.getSolidAngle();
         if (solidAngle > Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor && solidAngle < Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP / fovFactor) {
             return 20f * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor;
@@ -200,11 +236,25 @@ public class FocusHit {
         return solidAngle;
     }
 
-    public void addHitCoordinateStar(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitCoordinateStar(FocusView view,
+                                     int screenX,
+                                     int screenY,
+                                     int w,
+                                     int h,
+                                     int pixelDist,
+                                     NaturalCamera camera,
+                                     Array<Entity> hits) {
         addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness * 1e3f, this::computeHitSolidAngleStar, camera, hits);
     }
 
-    public void addHitCoordinateParticleSet(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitCoordinateParticleSet(FocusView view,
+                                            int screenX,
+                                            int screenY,
+                                            int w,
+                                            int h,
+                                            int pixelDist,
+                                            NaturalCamera camera,
+                                            Array<Entity> hits) {
         var set = view.getSet();
         List<IParticleRecord> pointData = set.pointData;
         int n = pointData.size();
@@ -226,6 +276,9 @@ public class FocusHit {
                         // when we are close by
                         double dist = posd.len();
                         double angle = set.getRadius(i) / dist / camera.getFovFactor();
+                        if (set.isExtended) {
+                            angle *= 0.8e8;
+                        }
 
                         PerspectiveCamera perspectiveCamera;
                         if (Settings.settings.program.modeStereo.active) {
@@ -277,7 +330,11 @@ public class FocusHit {
         set.updateFocusDataPos();
     }
 
-    public void addHitRayParticleSet(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitRayParticleSet(FocusView view,
+                                     Vector3d p0,
+                                     Vector3d p1,
+                                     NaturalCamera camera,
+                                     Array<Entity> hits) {
         var set = view.getSet();
         List<IParticleRecord> pointData = set.pointData;
         int n = pointData.size();
@@ -329,7 +386,14 @@ public class FocusHit {
         set.updateFocusDataPos();
     }
 
-    public void addHitCoordinateCluster(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitCoordinateCluster(FocusView view,
+                                        int screenX,
+                                        int screenY,
+                                        int w,
+                                        int h,
+                                        int pixelDist,
+                                        NaturalCamera camera,
+                                        Array<Entity> hits) {
         if (hitCondition(view)) {
             var entity = view.getEntity();
 
@@ -372,7 +436,11 @@ public class FocusHit {
         }
     }
 
-    public void addHitRayCluster(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitRayCluster(FocusView view,
+                                 Vector3d p0,
+                                 Vector3d p1,
+                                 NaturalCamera camera,
+                                 Array<Entity> hits) {
         if (hitCondition(view)) {
             var entity = view.getEntity();
 

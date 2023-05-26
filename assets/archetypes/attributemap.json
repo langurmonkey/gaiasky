@@ -69,7 +69,7 @@
 
     "Coordinates" : {
       "description" : "Defines attributes that provide coordinates and positions to objects.",
-      "coordinatesProvider" : { 
+      "coordinatesProvider" : {
         "description" : "The coordinates provider object for this object. The coordinates provider computes the position of the object for each time. This is an object containing, at least, the full reference to a Java class that implements ``IBodyCoordinates`` in the \"impl\" attribute. Examples are ``gaiasky.util.coord.StaticCoordinates`` or ``gaiasky.util.coord.OrbitLintCoordinates``. See :ref:`coordinate-providers` for more information.",
         "unit" : "Map",
         "aliases" : [ "coordinates" ]
@@ -86,7 +86,7 @@
 
     "Celestial" : {
       "description" : "Defines attributes common to all celestial objects (stars, planets, moons, etc.).",
-      "wikiName" : { 
+      "wikiName" : {
         "description": "The name to look up this object in the wikipedia, if any. If this is set, a '+ info' button appears in the focus info interface when this object is the focus, enabling the user to pull information on the object directly from Gaia Sky and display it in a window.",
         "unit" : "String",
         "aliases" : [ "wikiname" ]
@@ -100,7 +100,7 @@
 
     "Magnitude" : {
       "description" : "Defines magnitude attributes, both apparent and absolute.",
-      "appMag" : { 
+      "appMag" : {
         "description": "The apparent magnitude. If it is not given, it is computed automatically from the absolute magnitude (if present) and the distance.",
         "unit" : "Double",
         "aliases" : [ "appmag", "apparentMagnitude" ]
@@ -549,6 +549,10 @@
       "textures" : {
         "description" : "List of texture files to render the particles of this group. If more than one texture is provided, each particle is assigned a texture randomly. This can also point to one or more directories, in which case all the image files within are used. All images must have the same dimensions. If this is provided, ``profileDecay`` is ignored.",
         "units" : "String[]"
+      },
+      "modelType" : {
+        "description" : "The model type to use for this particle set. One of (QUAD|ICOSPHERE). This only takes effect in extended particle groups. To enable extended particle groups, you need to set 'type' to 'PARTICLES_EXT' in the 'providerParams' map.",
+        "units" : "String"
       }
     },
 

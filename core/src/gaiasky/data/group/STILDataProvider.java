@@ -34,6 +34,8 @@ import gaiasky.util.units.Position;
 import gaiasky.util.units.Position.PositionType;
 import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
+import gaiasky.util.units.Quantity.Length;
+import gaiasky.util.units.Quantity.Length.LengthUnit;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
@@ -85,7 +87,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<IParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file,
+                                          double factor) {
         logger.info(I18n.msg("notif.datafile", file));
         try {
             loadData(new FileDataSource(Settings.settings.data.dataFile(file)), factor);
@@ -107,9 +110,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
+     *
      * @return Pair of <UCD,Double>
      */
-    private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs, Object[] row) {
+    private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs,
+                                           Object[] row) {
         for (UCD ucd : UCDs) {
             try {
                 double num = ((Number) row[ucd.index]).doubleValue();
@@ -138,9 +143,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
+     *
      * @return Pair of <UCD,double[]>
      */
-    private Pair<UCD, double[]> getDoubleArrayUcd(Array<UCD> UCDs, Object[] row) {
+    private Pair<UCD, double[]> getDoubleArrayUcd(Array<UCD> UCDs,
+                                                  Object[] row) {
         for (UCD ucd : UCDs) {
             try {
                 double[] nums = (double[]) row[ucd.index];
@@ -163,9 +170,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The set of UCD objects
      * @param row  The row
+     *
      * @return A pair with the UCD and the string
      */
-    private Pair<UCD, String> getStringUcd(Array<UCD> UCDs, Object[] row) {
+    private Pair<UCD, String> getStringUcd(Array<UCD> UCDs,
+                                           Object[] row) {
         for (UCD ucd : UCDs) {
             try {
                 String str = row[ucd.index].toString().strip();
@@ -177,7 +186,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
-    private Pair<UCD, String>[] getAllStringsUcd(Array<UCD> UCDs, Object[] row) {
+    private Pair<UCD, String>[] getAllStringsUcd(Array<UCD> UCDs,
+                                                 Object[] row) {
         Array<Pair<UCD, String>> strings = new Array<>(false, 2);
         for (UCD ucd : UCDs) {
             try {
@@ -196,7 +206,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    public List<IParticleRecord> loadData(DataSource ds, double factor) {
+    public List<IParticleRecord> loadData(DataSource ds,
+                                          double factor) {
         return loadData(ds, factor, null, null, null);
     }
 
@@ -207,9 +218,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the current number of loaded objects and the
      *                       second holds the total number of objects to load.
      * @param postCallback   A function that runs after the data has been loaded.
+     *
      * @return The list of particle records.
      */
-    public List<IParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
+    public List<IParticleRecord> loadData(DataSource ds,
+                                          double factor,
+                                          Runnable preCallback,
+                                          RunnableLongLong updateCallback,
+                                          Runnable postCallback) {
         try {
             if (factory != null) {
                 // RNG
@@ -317,35 +333,55 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (!ucdParser.MAG.isEmpty()) {
                                 Pair<UCD, Double> appMagPair = getDoubleUcd(ucdParser.MAG, row);
                                 if (appMagPair == null) {
-                                    // Default magnitude
+                                    // Default magnitude.
                                     appMag = 15;
                                 } else {
                                     appMag = appMagPair.getSecond();
                                 }
                             } else {
-                                // Default magnitude
+                                // Default magnitude.
                                 appMag = 15;
                             }
-                            // Scale magnitude if needed
-                            double magScl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES)) ? datasetOptions.magnitudeScale : 0f;
+                            // Scale magnitude if needed.
+                            double magScl = isAnyType(DatasetLoadType.STARS, DatasetLoadType.VARIABLES) ? datasetOptions.magnitudeScale : 0f;
                             appMag = appMag - magScl;
 
-                            // Absolute magnitude to pseudo-size
+                            // Absolute magnitude to pseudo-size.
                             final double absMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
-                            final float size = (float) AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
+                            double size = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
 
-                            // COLOR
-                            float color;
+                            // RADIUS/SIZE
+                            if (!ucdParser.SIZE.isEmpty() && !isOfType(DatasetLoadType.STARS)) {
+                                Pair<UCD, Double> sizePair = getDoubleUcd(ucdParser.SIZE, row);
+                                UCD sizeUcd = sizePair.getFirst();
+                                if (sizeUcd != null && sizeUcd.unit != null) {
+                                    if (Angle.isAngle(sizeUcd.unit)) {
+                                        // Solid angle in radians.
+                                        double sa = new Angle(sizePair.getSecond(), sizePair.getFirst().unit).get(AngleUnit.RAD);
+                                        // Size in parsecs = tan(sa) * distPc
+                                        size = Math.tan(sa) * p.realPosition.len();
+                                    } else if (Length.isLength(sizeUcd.unit)) {
+                                        // Size in parsecs, directly.
+                                        size = new Length(sizePair.getSecond(), sizePair.getFirst().unit).get(LengthUnit.PC);
+                                    }
+                                } else {
+                                    // We hope size is already in parsecs.
+                                    size = sizePair.getSecond().floatValue();
+                                }
+                            }
+
+                            // COLOR INDEX
+                            float colorIndex;
                             if (!ucdParser.COL.isEmpty()) {
                                 Pair<UCD, Double> colPair = getDoubleUcd(ucdParser.COL, row);
                                 if (colPair == null) {
-                                    color = 0.656f;
+                                    colorIndex = 0.656f;
                                 } else {
-                                    color = colPair.getSecond().floatValue();
+                                    colorIndex = colPair.getSecond().floatValue();
                                 }
                             } else {
-                                // Default color
-                                color = 0.656f;
+                                // Default color index for stars, NaN for others.
+                                colorIndex = isAnyType(DatasetLoadType.STARS, DatasetLoadType.VARIABLES) ? 0.656f : Float.NaN;
                             }
 
                             // VARIABILITY
@@ -442,14 +478,22 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 tEff = tEffPair.getSecond().floatValue();
                             } else {
                                 // Convert B-V to T_eff using Ballesteros 2012
-                                tEff = (float) bvToTEff.bvToTeff(color);
+                                tEff = (float) bvToTEff.bvToTeff(colorIndex);
                             }
 
-                            // RGB
-                            float[] rgb = ColorUtils.BVtoRGB(color);
-                            //float[] rgb = ColorUtils.teffToRGB_harre(teff);
-
-                            float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+                            // RGB COLOR (PACKED) from COLOR INDEX or Teff
+                            float colorPacked;
+                            float[] rgb = null;
+                            if (Float.isFinite(colorIndex)) {
+                                // Convert color index to RGB.
+                                rgb = ColorUtils.BVtoRGB(colorIndex);
+                                colorPacked = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+                            } else if (Float.isFinite(tEff)) {
+                                rgb = ColorUtils.teffToRGB_harre(tEff);
+                                colorPacked = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+                            } else {
+                                colorPacked = Float.NaN;
+                            }
 
                             // IDENTIFIER AND NAME
                             String[] names;
@@ -510,12 +554,16 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
 
                             // Populate provider lists
-                            colors.put(id, rgb);
+                            if (rgb != null) {
+                                colors.put(id, rgb);
+                            }
                             sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
-                            if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {
-                                double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
-                                float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+                            if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS
+                                    || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {
+                                double[] dataD = new double[ParticleRecordType.STAR.doubleArraySize];
+                                float[] dataF = new float[ParticleRecordType.STAR.floatArraySize];
+
                                 dataD[ParticleRecord.I_X] = p.realPosition.x;
                                 dataD[ParticleRecord.I_Y] = p.realPosition.y;
                                 dataD[ParticleRecord.I_Z] = p.realPosition.z;
@@ -528,8 +576,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 dataF[ParticleRecord.I_FRADVEL] = (float) radVel;
                                 dataF[ParticleRecord.I_FAPPMAG] = (float) appMag;
                                 dataF[ParticleRecord.I_FABSMAG] = (float) absMag;
-                                dataF[ParticleRecord.I_FCOL] = col;
-                                dataF[ParticleRecord.I_FSIZE] = size;
+                                dataF[ParticleRecord.I_FCOL] = colorPacked;
+                                dataF[ParticleRecord.I_FSIZE] = (float) size;
                                 dataF[ParticleRecord.I_FHIP] = hip;
 
                                 // Extra
@@ -554,15 +602,40 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 int appMagClamp = (int) MathUtilsDouble.clamp(appMag, 0, 21);
                                 countsPerMag[appMagClamp] += 1;
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
-                                double[] point = new double[3];
-                                point[ParticleRecord.I_X] = p.realPosition.x;
-                                point[ParticleRecord.I_Y] = p.realPosition.y;
-                                point[ParticleRecord.I_Z] = p.realPosition.z;
+                                double[] dataD = new double[ParticleRecordType.PARTICLE.doubleArraySize];
+
+                                dataD[ParticleRecord.I_X] = p.realPosition.x;
+                                dataD[ParticleRecord.I_Y] = p.realPosition.y;
+                                dataD[ParticleRecord.I_Z] = p.realPosition.z;
 
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
 
-                                IParticleRecord pb = new ParticleRecord(ParticleRecordType.PARTICLE, point, null, null, names, extraAttributes);
+                                IParticleRecord pb = new ParticleRecord(ParticleRecordType.PARTICLE, dataD, null, null, names, extraAttributes);
+                                list.add(pb);
+                            } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES_EXT) {
+                                double[] dataD = new double[ParticleRecordType.PARTICLE_EXT.doubleArraySize];
+                                float[] dataF = new float[ParticleRecordType.PARTICLE_EXT.floatArraySize];
+
+                                dataD[ParticleRecord.I_X] = p.realPosition.x;
+                                dataD[ParticleRecord.I_Y] = p.realPosition.y;
+                                dataD[ParticleRecord.I_Z] = p.realPosition.z;
+
+                                dataF[ParticleRecord.I_FPMX] = (float) pm.x;
+                                dataF[ParticleRecord.I_FPMY] = (float) pm.y;
+                                dataF[ParticleRecord.I_FPMZ] = (float) pm.z;
+                                dataF[ParticleRecord.I_FMUALPHA] = (float) muAlphaStar;
+                                dataF[ParticleRecord.I_FMUDELTA] = (float) muDelta;
+                                dataF[ParticleRecord.I_FRADVEL] = (float) radVel;
+                                dataF[ParticleRecord.I_FAPPMAG] = (float) appMag;
+                                dataF[ParticleRecord.I_FABSMAG] = (float) absMag;
+                                dataF[ParticleRecord.I_FCOL] = colorPacked;
+                                dataF[ParticleRecord.I_FSIZE] = (float) size;
+
+                                // Extra
+                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
+
+                                IParticleRecord pb = new ParticleRecord(ParticleRecordType.PARTICLE_EXT, dataD, dataF, id, names, extraAttributes);
                                 list.add(pb);
                             }
 
@@ -598,7 +671,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    private void exportCsv(double[] x, double[] y, int n, Path p, String... cols) {
+    private void exportCsv(double[] x,
+                           double[] y,
+                           int n,
+                           Path p,
+                           String... cols) {
         try {
             FileWriter myWriter = new FileWriter(p.toString());
             if (cols != null && cols.length >= 2) {
@@ -620,7 +697,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return extra;
     }
 
-    private ObjectDoubleMap<UCD> addExtraAttributes(UCDParser ucdp, Object[] row) {
+    private ObjectDoubleMap<UCD> addExtraAttributes(UCDParser ucdp,
+                                                    Object[] row) {
         // Extra
         ObjectDoubleMap<UCD> extraAttributes = null;
         for (UCD extra : ucdp.extra) {
@@ -643,7 +721,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return extraAttributes;
     }
 
-    private double getStringAttributeValue(UCD extra, Object o) {
+    private double getStringAttributeValue(UCD extra,
+                                           Object o) {
         double val;
         String value = (String) o;
         if (value == null || value.isEmpty()) {
@@ -667,13 +746,28 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return val;
     }
 
+    private boolean isOfType(DatasetLoadType type) {
+        return datasetOptions != null && datasetOptions.type != null && datasetOptions.type == type;
+    }
+
+    private boolean isAnyType(DatasetLoadType... types) {
+        for (var type : types) {
+            if (isOfType(type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
-    public List<IParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is,
+                                          double factor) {
         return null;
     }
 
     @Override
-    public List<IParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file,
+                                                double factor) {
         return null;
     }
 

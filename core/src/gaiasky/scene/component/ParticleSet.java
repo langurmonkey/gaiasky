@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.TextureArray;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.system.InstancedRenderSystem.ModelType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
@@ -20,8 +21,10 @@ import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.FilterView;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -36,15 +39,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ParticleSet implements Component, IDisposable {
 
     public static long idSeq = 0;
-    public final Vector3d D31 = new Vector3d();
+
+    // Auxiliary vectors.
+    protected final Vector3d D31 = new Vector3d();
+    protected final Vector3d D32 = new Vector3d();
+    protected final Vector3d D33 = new Vector3d();
+
     /**
      * List that contains the point data. It contains only [x y z].
      */
     public List<IParticleRecord> pointData;
     /** This flag enables muting particle rendering. **/
     public boolean renderParticles = true;
-    /** Flag indicating whether the particle set holds stars or particles. **/
+    /** Flag indicating whether the particle set holds stars or particles (extended or not). **/
     public boolean isStars;
+    /** Flag indicating whether the particle set holds extended particles. **/
+    public boolean isExtended;
     /** Whether to render the global set label or not. **/
     public boolean renderSetLabel = true;
     /** Number of labels to render for this group. **/
@@ -59,8 +69,15 @@ public class ParticleSet implements Component, IDisposable {
     public String datafile;
     // Parameters for the data provider
     public Map<String, Object> providerParams;
+
     /**
-     * Profile decay of the particles in the shader.
+     * Default model type to use for the particles of this set.
+     * Only affects extended particle groups.
+     **/
+    public ModelType modelType = ModelType.QUAD;
+
+    /**
+     * Profile decay of the particles in the shader, when using quads.
      */
     public float profileDecay = 0.2f;
     /**
@@ -69,7 +86,7 @@ public class ParticleSet implements Component, IDisposable {
     public float colorNoise = 0;
 
     /**
-     * Fixed angular size for all particles in this set, in radians. Negative to disable.
+     * Fixed angular size for all particles in this set, in radians. Applies only to quads. Negative to disable.
      */
     public double fixedAngularSize = -1;
     /**
@@ -81,9 +98,9 @@ public class ParticleSet implements Component, IDisposable {
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
     public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
-    /** Texture files to use for rendering the particles, at random. **/
+    /** Texture files to use for rendering the particles, at random. Applies only to quads. **/
     public String[] textureFiles = null;
-    /** Reference to the texture array containing the textures for this set, if any. **/
+    /** Reference to the texture array containing the textures for this set, if any. Applies only to quads. **/
     public TextureArray textureArray;
     /**
      * Temporary storage for the mean position of this particle set, if it is given externally.
@@ -98,6 +115,12 @@ public class ParticleSet implements Component, IDisposable {
      * Mapping colors.
      */
     public float[] ccMin = null, ccMax = null;
+
+    /** Particles for which forceLabel is enabled. **/
+    public Set<Integer> forceLabel;
+    /** Particles with special label colors. **/
+    public Map<Integer, float[]> labelColors;
+
     /**
      * Stores the time when the last sort operation finished, in ms.
      */
@@ -108,6 +131,14 @@ public class ParticleSet implements Component, IDisposable {
      */
     public double meanDistance;
     public double maxDistance, minDistance;
+    /**
+     * Epoch for positions/proper motions in julian days.
+     **/
+    public double epochJd;
+    /**
+     * Current computed epoch time.
+     **/
+    public double currDeltaYears = 0;
     /**
      * Reference to the current focus.
      */
@@ -391,6 +422,12 @@ public class ParticleSet implements Component, IDisposable {
         return null;
     }
 
+    public void setModelType(String modelType) {
+        try {
+            this.modelType = ModelType.valueOf(modelType.toUpperCase());
+        } catch (Exception ignored) {}
+    }
+
     // FOCUS_MODE size
     public double getSize() {
         return focusSize;
@@ -434,7 +471,7 @@ public class ParticleSet implements Component, IDisposable {
 
     // Radius in stars is different!
     public double getRadius(int i) {
-        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : getRadius();
+        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) : getRadius();
     }
 
     /**
@@ -519,7 +556,14 @@ public class ParticleSet implements Component, IDisposable {
     /** Returns the current focus position, if any, in the out vector. **/
     public Vector3b getAbsolutePosition(Instant date,
                                         Vector3b out) {
-        return getAbsolutePosition(out);
+        double deltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), epochJd) * Nature.MS_TO_Y;
+        IParticleRecord focus = pointData.get(focusIndex);
+        if (focus.hasProperMotion()) {
+            Vector3d aux = this.fetchPosition(focus, cPosD, D31, deltaYears);
+            return out.set(aux).add(GaiaSky.instance.getICamera().getPos());
+        } else {
+            return getAbsolutePosition(out);
+        }
     }
 
     /** Returns the current focus position, if any, in the out vector. **/
@@ -527,17 +571,36 @@ public class ParticleSet implements Component, IDisposable {
         return out.set(focusPosition);
     }
 
-    /** Returns the position of the particle with the given name, if any, in the out vector. **/
+    /**
+     * Returns the absolute position of the particle with the given name.
+     *
+     * @param name The name.
+     * @param out  The out vector.
+     *
+     * @return The absolute position in the out vector.
+     */
     public Vector3b getAbsolutePosition(String name,
                                         Vector3b out) {
-        if (name == null || out == null) {
-            return null;
-        }
+        Vector3d vec = getAbsolutePosition(name, D31);
+        out.set(vec);
+        return out;
+    }
+
+    /**
+     * Returns the absolute position of the particle with the given name.
+     *
+     * @param name The name.
+     * @param out  The out vector.
+     *
+     * @return The absolute position in the out vector.
+     */
+    public Vector3d getAbsolutePosition(String name,
+                                        Vector3d out) {
         name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
             IParticleRecord pb = pointData.get(idx);
-            out.set(pb.x(), pb.y(), pb.z());
+            fetchPosition(pb, null, out, currDeltaYears);
             return out;
         } else {
             return null;
@@ -548,23 +611,48 @@ public class ParticleSet implements Component, IDisposable {
      * Fetches the real position of the particle. It will apply the necessary
      * integrations (i.e. proper motion).
      *
-     * @param pb          The particle bean
-     * @param campos      The position of the camera. If null, the camera position is
-     *                    not subtracted so that the coordinates are given in the global
-     *                    reference system instead of the camera reference system.
-     * @param destination The destination factor
-     * @param deltaYears  The delta years
+     * @param pb         The particle bean
+     * @param campos     The position of the camera. If null, the camera position is
+     *                   not subtracted so that the coordinates are given in the global
+     *                   reference system instead of the camera reference system.
+     * @param out        The output vector
+     * @param deltaYears The delta years
      *
      * @return The vector for chaining
      */
     public Vector3d fetchPosition(IParticleRecord pb,
                                   Vector3d campos,
-                                  Vector3d destination,
+                                  Vector3d out,
                                   double deltaYears) {
-        if (campos != null)
-            return destination.set(pb.x(), pb.y(), pb.z()).sub(campos);
+        Vector3d pm = D32.set(0, 0, 0);
+        if (pb.hasProperMotion()) {
+            pm.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
+        }
+        Vector3d destination = out.set(pb.x(), pb.y(), pb.z());
+        if (campos != null && !campos.hasNaN())
+            destination.sub(campos).add(pm);
         else
-            return destination.set(pb.x(), pb.y(), pb.z());
+            destination.add(pm);
+
+        return destination;
+    }
+
+    /**
+     * Sets the epoch to use for the stars in this set.
+     *
+     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE).
+     */
+    public void setEpoch(Double epochJd) {
+        setEpochJd(epochJd);
+    }
+
+    /**
+     * Sets the epoch to use for the stars in this set.
+     *
+     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE).
+     */
+    public void setEpochJd(Double epochJd) {
+        this.epochJd = epochJd;
     }
 
     /**
@@ -573,15 +661,11 @@ public class ParticleSet implements Component, IDisposable {
      * @return The current delta years.
      */
     public double getDeltaYears() {
-        return 0;
+        return currDeltaYears;
     }
 
     public long getId() {
         return 123L;
-    }
-
-    public String getCandidateName() {
-        return pointData.get(candidateFocusIndex).names() != null ? pointData.get(candidateFocusIndex).names()[0] : getName();
     }
 
     public String getName() {
@@ -610,7 +694,12 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public long getCandidateId() {
-        return 123L;
+        return pointData.get(candidateFocusIndex).id();
+    }
+
+    public String getCandidateName() {
+        return pointData.get(candidateFocusIndex).names() != null ?
+                pointData.get(candidateFocusIndex).names()[0] : getName();
     }
 
     public double getCandidateSolidAngleApparent() {
@@ -618,7 +707,8 @@ public class ParticleSet implements Component, IDisposable {
             IParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
-            return (float) ((.5e2f / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
+            float size = candidate.hasSize() ? candidate.size() : 0.5e2f;
+            return (float) ((size / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
         } else {
             return -1;
         }
@@ -655,6 +745,41 @@ public class ParticleSet implements Component, IDisposable {
     // FOCUS_MODE apparent view angle
     public double getSolidAngleApparent() {
         return focusSolidAngleApparent;
+    }
+
+    public void setForceLabel(Boolean forceLabel,
+                              String name) {
+        name = name.toLowerCase().trim();
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            if (this.forceLabel.contains(idx)) {
+                if (!forceLabel) {
+                    // Remove from forceLabelStars
+                    this.forceLabel.remove(idx);
+                }
+            } else if (forceLabel) {
+                // Add to forceLabelStars
+                this.forceLabel.add(idx);
+            }
+        }
+    }
+
+    public boolean isForceLabel(String name) {
+        name = name.toLowerCase().trim();
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            return forceLabel.contains(idx);
+        }
+        return false;
+    }
+
+    public void setLabelColor(float[] color,
+                              String name) {
+        name = name.toLowerCase().trim();
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            labelColors.put(idx, color);
+        }
     }
 
     @Override

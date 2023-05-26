@@ -10,7 +10,6 @@ package gaiasky.render;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.GlobalResources;
@@ -23,8 +22,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.loader.BitmapFontLoader.BitmapFontParameter;
-import gaiasky.util.gdx.loader.OwnTextureLoader;
-import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.loader.AtmosphereShaderProviderLoader.AtmosphereShaderProviderParameter;
 import gaiasky.util.gdx.shader.loader.GroundShaderProviderLoader.GroundShaderProviderParameter;
@@ -32,14 +29,6 @@ import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader.Relativis
 import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader.TessellationShaderProviderParameter;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParameter;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class RenderAssets {
     /**
@@ -64,6 +53,8 @@ public class RenderAssets {
             billboardGroupShaders,
             particleEffectShaders,
             particleGroupShaders,
+            particleGroupExtShaders,
+            particleGroupExtModelShaders,
             starGroupShaders,
             variableGroupShaders,
             starPointShaders,
@@ -97,6 +88,8 @@ public class RenderAssets {
     private AssetDescriptor<ExtShaderProgram>[]
             starGroupDesc,
             particleGroupDesc,
+            particleGroupExtDesc,
+            particleGroupExtModelDesc,
             variableGroupDesc,
             particleEffectDesc,
             orbitElemDesc,
@@ -166,6 +159,12 @@ public class RenderAssets {
         particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffixParticles + ".vertex.glsl",
                                        "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesColMap),
                                        definesColMap);
+        particleGroupExtDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl",
+                                          TextUtils.concatAll("particle.group.ext", namesColMap),
+                                          definesColMap, "#define extendedParticlesFlag");
+        particleGroupExtModelDesc = loadShader(manager, "shader/particle.group.model.vertex.glsl", "shader/particle.group.model.fragment.glsl",
+                                          TextUtils.concatAll("particle.group.ext.model", namesColMap),
+                                          definesColMap, "#define extendedParticlesFlag");
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
                                    TextUtils.concatAll("star.group", namesColMap), definesColMap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
@@ -291,6 +290,16 @@ public class RenderAssets {
         particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, TextUtils.concatAll("particle.group", names));
 
         /*
+         * PARTICLE GROUP EXT (TRI) - default and relativistic
+         */
+        particleGroupExtShaders = fetchShaderProgram(manager, particleGroupExtDesc, TextUtils.concatAll("particle.group.ext", names));
+
+        /*
+         * PARTICLE GROUP EXT MODEL - default and relativistic
+         */
+        particleGroupExtModelShaders = fetchShaderProgram(manager, particleGroupExtModelDesc, TextUtils.concatAll("particle.group.ext.model", names));
+
+        /*
          * STAR GROUP (TRI) - default and relativistic
          */
         starGroupShaders = fetchShaderProgram(manager, starGroupDesc, TextUtils.concatAll("star.group", names));
@@ -393,14 +402,35 @@ public class RenderAssets {
                                                            String fragmentShader,
                                                            String[] names,
                                                            String[] prepend) {
+        return loadShader(manager, vertexShader, fragmentShader, names, prepend, null);
+    }
+
+    /**
+     * Prepares a shader program for asynchronous loading.
+     *
+     * @param manager        The asset manager.
+     * @param vertexShader   The vertex shader file.
+     * @param fragmentShader The fragment shader file.
+     * @param names          The shader names or identifiers.
+     * @param prepend        The pre-processor defines for each shader name.
+     * @param fixedPrepend   The fixed defines that must appear in all shaders, if any.
+     *
+     * @return The asset descriptor for the shader program.
+     */
+    private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
+                                                           String vertexShader,
+                                                           String fragmentShader,
+                                                           String[] names,
+                                                           String[] prepend,
+                                                           String fixedPrepend) {
         AssetDescriptor<ExtShaderProgram>[] result = new AssetDescriptor[prepend.length];
 
         int i = 0;
         for (String prep : prepend) {
             ShaderProgramParameter spp = new ShaderProgramParameter();
             spp.name = names[i];
-            spp.prependVertexCode = prep;
-            spp.prependFragmentCode = prep;
+            spp.prependVertexCode = fixedPrepend != null ? fixedPrepend + "\n" + prep : prep;
+            spp.prependFragmentCode = spp.prependVertexCode;
             spp.vertexFile = vertexShader;
             spp.fragmentFile = fragmentShader;
             manager.load(names[i], ExtShaderProgram.class, spp);

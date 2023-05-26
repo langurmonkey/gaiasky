@@ -11,161 +11,167 @@ import com.badlogic.gdx.utils.Bits;
 
 public enum RenderGroup {
     /**
-     * Using normal shader for per-pixel lighting.
+     * None
      **/
-    MODEL_PIX,
-    /**
-     * Using normal shader for per-pixel lighting, rendered late for items with transparency.
-     **/
-    MODEL_PIX_TRANSPARENT,
-    /**
-     * Using default shader, no normal map
-     **/
-    MODEL_BG,
-    /**
-     * IntShader - stars
-     **/
-    BILLBOARD_STAR,
-    /**
-     * IntShader - galaxies
-     **/
-    BILLBOARD_GAL,
-    /**
-     * IntShader - front (planets, satellites...)
-     **/
-    BILLBOARD_SSO,
-    /**
-     * Billboard with custom texture
-     **/
-    BILLBOARD_TEX,
-    /**
-     * Single pixel
-     **/
-    POINT_STAR,
-    /**
-     * Line
-     **/
-    LINE,
-    /**
-     * Line late
-     **/
-    LINE_LATE,
-    /**
-     * Annotations
-     **/
-    FONT_ANNOTATION,
-    /**
-     * Atmospheres of planets
-     **/
-    MODEL_ATM,
-    /**
-     * Label
-     **/
-    FONT_LABEL,
-    /**
-     * Model star
-     **/
-    MODEL_VERT_STAR,
-    /**
-     * Group of billboard datasets
-     **/
-    BILLBOARD_GROUP,
-    /**
-     * Model close up
-     **/
-    MODEL_CLOSEUP,
-    /**
-     * Beams
-     **/
-    MODEL_VERT_BEAM,
-    /**
-     * Particle group
-     **/
-    PARTICLE_GROUP,
-    /**
-     * Star group
-     **/
-    STAR_GROUP,
-    /**
-     * Shapes
-     **/
-    SHAPE,
-    /**
-     * Regular billboard sprite
-     **/
-    BILLBOARD_SPRITE,
-    /**
-     * Line GPU
-     **/
-    LINE_GPU,
-    /**
-     * A particle defined by orbital elements
-     **/
-    ORBITAL_ELEMENTS_PARTICLE,
-    /**
-     * A particle group defined by orbital elements
-     **/
-    ORBITAL_ELEMENTS_GROUP,
-    /**
-     * Transparent additive-blended meshes
-     **/
-    MODEL_VERT_ADDITIVE,
-    /**
-     * Grids shader
-     **/
-    MODEL_VERT_GRID,
-    /**
-     * Clouds
-     **/
-    MODEL_CLOUD,
-    /**
-     * Point
-     **/
-    POINT,
-    /**
-     * Point GPU
-     **/
-    POINT_GPU,
-    /**
-     * Opaque meshes (dust, etc.)
-     **/
-    MODEL_PIX_DUST,
-    /**
-     * Tessellated model
-     **/
-    MODEL_PIX_TESS,
-    /**
-     * Only diffuse
-     **/
-    MODEL_DIFFUSE,
-    /**
-     * Recursive grid
-     */
-    MODEL_VERT_RECGRID,
-    /**
-     * Thrusters
-     */
-    MODEL_VERT_THRUSTER,
-    /**
-     * Variable star group
-     **/
-    VARIABLE_GROUP,
-    /**
-     * Per-pixel lighting (early in the rendering pipeline)
-     **/
-    MODEL_PIX_EARLY,
-    /**
-     * Per-vertex lighting (early in the rendering pipeline)
-     **/
-    MODEL_VERT_EARLY,
+    NONE(-100),
     /**
      * A skybox rendered with a cubemap
      */
-    SKYBOX,
+    SKYBOX(0),
     /**
-     * None
+     * Using default shader, no normal map
      **/
-    NONE;
+    MODEL_BG(100),
+    /**
+     * Grids shader
+     **/
+    MODEL_VERT_GRID(200),
+    /**
+     * Single pixel
+     **/
+    POINT_STAR(300),
+    /**
+     * Annotations
+     **/
+    FONT_ANNOTATION(400),
+    /**
+     * Opaque meshes (dust, etc.)
+     **/
+    MODEL_PIX_DUST(500),
+    /**
+     * Per-pixel lighting (early in the rendering pipeline)
+     **/
+    MODEL_PIX_EARLY(600),
+    /**
+     * Per-vertex lighting (early in the rendering pipeline)
+     **/
+    MODEL_VERT_EARLY(700),
+    /**
+     * Group of billboard datasets
+     **/
+    BILLBOARD_GROUP(800),
+    /**
+     * Star billboards
+     **/
+    BILLBOARD_STAR(900),
+    /**
+     * Particle group
+     **/
+    PARTICLE_GROUP(1000),
+    /**
+     * Particle group (extended)
+     **/
+    PARTICLE_GROUP_EXT(1100),
+    /**
+     * Particle group (extended, model)
+     **/
+    PARTICLE_GROUP_EXT_SPHERE(1200),
+    /**
+     * Star group
+     **/
+    STAR_GROUP(1300),
+    /**
+     * Variable star group
+     **/
+    VARIABLE_GROUP(1400),
+    /**
+     * A particle defined by orbital elements
+     **/
+    ORBITAL_ELEMENTS_PARTICLE(1500),
+    /**
+     * A particle group defined by orbital elements
+     **/
+    ORBITAL_ELEMENTS_GROUP(1600),
+    /**
+     * Models with only diffuse lighting
+     **/
+    MODEL_DIFFUSE(1700),
+    /**
+     * Using normal shader for per-pixel lighting.
+     **/
+    MODEL_PIX(1800),
+    /**
+     * Tessellated model
+     **/
+    MODEL_PIX_TESS(1900),
+    /**
+     * Beams
+     **/
+    MODEL_VERT_BEAM(2000),
+    /**
+     * Model star
+     **/
+    MODEL_VERT_STAR(2100),
+    /**
+     * Label
+     **/
+    FONT_LABEL(2200),
+    /**
+     * Regular billboard sprite
+     **/
+    BILLBOARD_SPRITE(2300),
+    /**
+     * IntShader - galaxies
+     **/
+    BILLBOARD_GAL(2400),
+    /**
+     * Recursive grid
+     */
+    MODEL_VERT_RECGRID(2500),
+    /**
+     * Point
+     **/
+    POINT(3000),
+    /**
+     * Point GPU
+     **/
+    POINT_GPU(3100),
+    /**
+     * Line
+     **/
+    LINE(4000),
+    /**
+     * Line GPU
+     **/
+    LINE_GPU(4100),
+    /**
+     * IntShader - front (planets, satellites...)
+     **/
+    BILLBOARD_SSO(5000),
+    /**
+     * Atmospheres of planets
+     **/
+    MODEL_ATM(6000),
+    /**
+     * Clouds
+     **/
+    MODEL_CLOUD(6500),
+    /**
+     * Using normal shader for per-pixel lighting, rendered late for items with transparency.
+     **/
+    MODEL_PIX_TRANSPARENT(7000),
+    /**
+     * Line late
+     **/
+    LINE_LATE(8000),
+    /**
+     * Shapes
+     **/
+    SHAPE(9000),
+    /**
+     * Particle effects
+     */
+    PARTICLE_EFFECTS(10000),
+    /**
+     * Transparent additive-blended meshes
+     **/
+    MODEL_VERT_ADDITIVE(11000);
+
+    public final int priority;
+
+    RenderGroup(int priority) {
+       this.priority = priority;
+    }
 
     /**
      * Adds the given render groups to the given Bits mask

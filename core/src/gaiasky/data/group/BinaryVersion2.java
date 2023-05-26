@@ -32,8 +32,8 @@ public class BinaryVersion2 extends BinaryIOBase {
         out.writeFloat(sb.mualpha());
         out.writeFloat(sb.mudelta());
         out.writeFloat(sb.radvel());
-        out.writeFloat(sb.appmag());
-        out.writeFloat(sb.absmag());
+        out.writeFloat(sb.appMag());
+        out.writeFloat(sb.absMag());
         out.writeFloat(sb.col());
         out.writeFloat(sb.size());
 

@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.process.RenderModeOpenXR;
 import gaiasky.render.system.AbstractRenderSystem;
+import gaiasky.render.system.IRenderSystem;
 import gaiasky.render.system.LightPositionUpdater;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
@@ -39,7 +40,7 @@ public class LightGlowPass {
     private final List<IRenderable> stars;
     private final LightPositionUpdater lpu;
     private final Array<Entity> controllers = new Array<>();
-    private AbstractRenderSystem billboardStarsRenderer;
+    private IRenderSystem billboardStarsRenderer = null;
 
     public LightGlowPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
@@ -56,7 +57,8 @@ public class LightGlowPass {
         }
     }
 
-    public void renderGlowPass(ICamera camera, FrameBuffer frameBuffer) {
+    public void renderGlowPass(ICamera camera,
+                               FrameBuffer frameBuffer) {
         if (frameBuffer == null) {
             frameBuffer = glowFrameBuffer;
         }
@@ -96,6 +98,9 @@ public class LightGlowPass {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // Render billboard stars
+            if (billboardStarsRenderer == null) {
+                billboardStarsRenderer = sceneRenderer.getOrInitializeRenderSystem(BILLBOARD_STAR);
+            }
             billboardStarsRenderer.render(stars, camera, 0, null);
 
             // Render models
@@ -128,7 +133,7 @@ public class LightGlowPass {
         this.billboardStarsRenderer = system;
     }
 
-    public FrameBuffer getGlowFrameBuffer(){
+    public FrameBuffer getGlowFrameBuffer() {
         return glowFrameBuffer;
     }
 

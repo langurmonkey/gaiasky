@@ -24,7 +24,6 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -71,7 +70,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         if (this.starSet != null) {
             updateConsumer = this::updateMetadataStars;
         } else {
-            updateConsumer = this::updateMetadataParticles;
+            updateConsumer = this.particleSet.isExtended ? this::updateMetadataParticlesExt : this::updateMetadataParticles;
         }
 
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
@@ -160,7 +159,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 Vector3d x = D31.set(d.x(), d.y(), d.z()).add(dx);
 
                 starSet.metadata[i] = utils.filter(i, starSet, datasetDescription) ?
-                        (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst2(x)) / camera.getFovFactor()) * Settings.settings.scene.star.brightness) :
+                        -((d.size() / camPos.dst2(x)) / camera.getFovFactor()) :
                         Double.MAX_VALUE;
             }
         }
@@ -182,6 +181,35 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             IParticleRecord d = particleSet.pointData.get(i);
             Vector3d x = D31.set(d.x(), d.y(), d.z());
             particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? camPos.dst2(x) : Double.MAX_VALUE;
+        }
+    }
+
+    /**
+     * Updates the extended particle metadata information, used for sorting. In this case, the position (distance
+     * from camera), the proper motion, and the size are important.
+     *
+     * @param time   The time frame provider.
+     * @param camera The camera.
+     */
+    private void updateMetadataParticlesExt(ITimeFrameProvider time,
+                                            ICamera camera) {
+        // Particles, only distance.
+        Vector3d camPos = camera.getPos().tov3d(D34);
+        double deltaYears = AstroUtils.getMsSince(time.getTime(), particleSet.epochJd) * Nature.MS_TO_Y;
+        if (particleSet.pointData != null) {
+            int n = particleSet.pointData.size();
+            for (int i = 0; i < n; i++) {
+                IParticleRecord d = particleSet.pointData.get(i);
+
+                // Pm
+                Vector3d dx = D32.set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
+                // Pos
+                Vector3d pos = D31.set(d.x(), d.y(), d.z()).add(dx);
+
+                particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ?
+                        (-(d.size() / camPos.dst2(pos)) / camera.getFovFactor()) :
+                        Double.MAX_VALUE;
+            }
         }
     }
 

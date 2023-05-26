@@ -17,12 +17,14 @@ import gaiasky.scene.component.StarSet;
 import gaiasky.util.Settings;
 
 public class ParticleSetExtractor extends AbstractExtractSystem {
-    public ParticleSetExtractor(Family family, int priority) {
+    public ParticleSetExtractor(Family family,
+                                int priority) {
         super(family, priority);
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity,
+                                 float deltaTime) {
         extractEntity(entity);
     }
 
@@ -39,7 +41,8 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
     }
 
     /** For star sets. **/
-    private void addToRenderLists(Render render, StarSet starSet) {
+    private void addToRenderLists(Render render,
+                                  StarSet starSet) {
         if (starSet.renderParticles) {
             if (starSet.variableStars) {
                 addToRender(render, RenderGroup.VARIABLE_GROUP);
@@ -61,7 +64,11 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
     private void addToRenderLists(Render render) {
         var set = Mapper.particleSet.get(render.entity);
         if (set.renderParticles) {
-            addToRender(render, RenderGroup.PARTICLE_GROUP);
+            if (set.isExtended) {
+                addToRender(render, set.modelType.rg);
+            } else {
+                addToRender(render, RenderGroup.PARTICLE_GROUP);
+            }
         }
         addToRender(render, RenderGroup.FONT_LABEL);
     }

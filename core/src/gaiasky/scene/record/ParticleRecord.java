@@ -28,32 +28,37 @@ public class ParticleRecord implements IParticleRecord {
      * Enumeration to identify the type of record.
      */
     public enum ParticleRecordType {
+        /** Simple positional particles. **/
         PARTICLE(3, 0, new int[] { 0, 1, 2 }, new int[] {}),
+        /** Stars. **/
         STAR(3, 11, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }),
-        PARTICLE_EXT(3, 10, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+        /** Extended particles, with proper motions, colors and sizes. **/
+        PARTICLE_EXT(3, 10, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }),
+        /** Fake particle record, not implemented by this class! **/
+        FAKE(0, 0, null, null);
 
-        final int doubleArraySize, floatArraySize;
-        final int[] doubleIndexIndireciton, floatIndexIndirection;
+        final public int doubleArraySize, floatArraySize;
+        final int[] doubleIndexIndirection, floatIndexIndirection;
 
         ParticleRecordType(int doubleArraySize,
                            int floatArraySize,
-                           int[] doubleIndexIndireciton,
+                           int[] doubleIndexIndirection,
                            int[] floatIndexIndirection) {
             this.doubleArraySize = doubleArraySize;
             this.floatArraySize = floatArraySize;
-            this.doubleIndexIndireciton = doubleIndexIndireciton;
+            this.doubleIndexIndirection = doubleIndexIndirection;
             this.floatIndexIndirection = floatIndexIndirection;
         }
     }
 
     public static final int STAR_SIZE_D = 3;
     public static final int STAR_SIZE_F = 11;
-    /* INDICES */
-    /* doubles */
+
+    /* Double data type indices in double indirection table. */
     public static final int I_X = 0;
     public static final int I_Y = 1;
     public static final int I_Z = 2;
-    /* floats (stars) */
+    /* Float data type indices in float indirection table. */
     public static final int I_FPMX = 0;
     public static final int I_FPMY = 1;
     public static final int I_FPMZ = 2;
@@ -64,7 +69,7 @@ public class ParticleRecord implements IParticleRecord {
     public static final int I_FABSMAG = 7;
     public static final int I_FCOL = 8;
     public static final int I_FSIZE = 9;
-    /* int */
+    /* HIP number is still in float array. */
     public static final int I_FHIP = 10;
 
     // Aux vectors.
@@ -172,26 +177,31 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public double x() {
-        return dataD[type.doubleIndexIndireciton[I_X]];
+        return dataD[type.doubleIndexIndirection[I_X]];
     }
 
     @Override
     public double y() {
-        return dataD[type.doubleIndexIndireciton[I_Y]];
+        return dataD[type.doubleIndexIndirection[I_Y]];
     }
 
     @Override
     public double z() {
-        return dataD[type.doubleIndexIndireciton[I_Z]];
+        return dataD[type.doubleIndexIndirection[I_Z]];
     }
 
     @Override
     public void setPos(double x,
                        double y,
                        double z) {
-        dataD[type.doubleIndexIndireciton[I_X]] = x;
-        dataD[type.doubleIndexIndireciton[I_Y]] = y;
-        dataD[type.doubleIndexIndireciton[I_Z]] = z;
+        dataD[type.doubleIndexIndirection[I_X]] = x;
+        dataD[type.doubleIndexIndirection[I_Y]] = y;
+        dataD[type.doubleIndexIndirection[I_Z]] = z;
+    }
+
+    @Override
+    public boolean hasProperMotion() {
+        return dataF != null && dataF.length > type.floatIndexIndirection[I_FPMZ];
     }
 
     @Override
@@ -234,35 +244,35 @@ public class ParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public void setProperMotion(float mualpha,
-                                float mudelta,
-                                float radvel) {
-        dataF[type.floatIndexIndirection[I_FMUALPHA]] = mualpha;
-        dataF[type.floatIndexIndirection[I_FMUDELTA]] = mudelta;
-        dataF[type.floatIndexIndirection[I_FRADVEL]] = radvel;
+    public void setProperMotion(float muAlpha,
+                                float muDelta,
+                                float radVel) {
+        dataF[type.floatIndexIndirection[I_FMUALPHA]] = muAlpha;
+        dataF[type.floatIndexIndirection[I_FMUDELTA]] = muDelta;
+        dataF[type.floatIndexIndirection[I_FRADVEL]] = radVel;
 
     }
 
     @Override
-    public float appmag() {
+    public float appMag() {
         return dataF[type.floatIndexIndirection[I_FAPPMAG]];
     }
 
     @Override
-    public float absmag() {
+    public float absMag() {
         return dataF[type.floatIndexIndirection[I_FABSMAG]];
     }
 
     @Override
-    public void setMag(float appmag,
-                       float absmag) {
-        dataF[type.floatIndexIndirection[I_FAPPMAG]] = appmag;
-        dataF[type.floatIndexIndirection[I_FABSMAG]] = absmag;
+    public void setMag(float appMag,
+                       float absMag) {
+        dataF[type.floatIndexIndirection[I_FAPPMAG]] = appMag;
+        dataF[type.floatIndexIndirection[I_FABSMAG]] = absMag;
     }
 
     @Override
-    public boolean hasCol() {
-        return dataF != null && dataF.length >= I_FCOL;
+    public boolean hasColor() {
+        return dataF != null && dataF.length > type.floatIndexIndirection[I_FCOL];
     }
 
     @Override
@@ -273,6 +283,11 @@ public class ParticleRecord implements IParticleRecord {
     @Override
     public void setCol(float col) {
         dataF[type.floatIndexIndirection[I_FCOL]] = col;
+    }
+
+    @Override
+    public boolean hasSize() {
+        return dataF != null && dataF.length > type.floatIndexIndirection[I_FSIZE];
     }
 
     @Override
@@ -494,6 +509,11 @@ public class ParticleRecord implements IParticleRecord {
     @Override
     public Keys<UCD> extraKeys() {
         return extra.keys();
+    }
+
+    @Override
+    public ParticleRecordType getType() {
+        return type;
     }
 
     @Override

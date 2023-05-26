@@ -9,8 +9,6 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -47,7 +45,10 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     private ICamera camera;
     private boolean stereoHalfWidth;
 
-    public ParticleSetPointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public ParticleSetPointRenderer(SceneRenderer sceneRenderer,
+                                    RenderGroup rg,
+                                    float[] alphas,
+                                    ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
         cmap = new Colormap();
@@ -75,7 +76,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         attributes.add(new VertexAttribute(OwnUsage.TextureIndex, 1, "a_textureIndex"));
     }
 
-    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void preRenderObjects(ExtShaderProgram shaderProgram,
+                                    ICamera camera) {
         stereoHalfWidth = Settings.settings.program.modeStereo.isStereoHalfWidth();
         this.camera = camera;
 
@@ -88,7 +90,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     }
 
     @Override
-    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
+    protected void renderObject(ExtShaderProgram shaderProgram,
+                                IRenderable renderable) {
         final Render render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
         var body = Mapper.body.get(render.entity);
@@ -97,7 +100,6 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         var desc = Mapper.datasetDescription.get(render.entity);
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
-
 
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
@@ -142,11 +144,13 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                                 g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                 b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                             }
-                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1),
+                                                                                             MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
                         }
 
                         // SIZE, CMAP_VALUE
-                        tempVerts[curr.vertexIdx + additionalOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
+                        tempVerts[curr.vertexIdx + additionalOffset] =
+                                (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
 
                         // TEXTURE INDEX
                         float textureIndex = -1.0f;
@@ -183,8 +187,11 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                 shaderProgram.setUniformf("u_falloff", set.profileDecay);
-                shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.1)) * sizeFactor * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
-                shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()), (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
+                shaderProgram.setUniformf("u_sizeFactor",
+                                          (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.1)) * sizeFactor * meanDist / (
+                                                  camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()),
+                                          (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
 
                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
@@ -192,7 +199,10 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         }
     }
 
-    private void interpolateColor(float[] c0, float[] c1, float[] result, double factor) {
+    private void interpolateColor(float[] c0,
+                                  float[] c1,
+                                  float[] result,
+                                  double factor) {
         float f = (float) factor;
         result[0] = (1 - f) * c0[0] + f * c1[0];
         result[1] = (1 - f) * c0[1] + f * c1[1];
@@ -200,7 +210,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         result[3] = (1 - f) * c0[3] + f * c1[3];
     }
 
-    protected void setInGpu(IRenderable renderable, boolean state) {
+    protected void setInGpu(IRenderable renderable,
+                            boolean state) {
         if (inGpu != null) {
             if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, renderable);
@@ -214,7 +225,9 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (event == Event.GPU_DISPOSE_PARTICLE_GROUP) {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);

@@ -8,6 +8,7 @@
 package gaiasky.scene.record;
 
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
@@ -114,12 +115,12 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public float appmag() {
+    public float appMag() {
         return 0;
     }
 
     @Override
-    public float absmag() {
+    public float absMag() {
         return 0;
     }
 
@@ -129,7 +130,7 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public boolean hasCol() {
+    public boolean hasColor() {
         return data.length >= 7;
     }
 
@@ -204,6 +205,11 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
+    public boolean hasSize() {
+        return false;
+    }
+
+    @Override
     public OctreeNode octant() {
         return null;
     }
@@ -219,6 +225,11 @@ public class PointParticleRecord implements IParticleRecord {
         aux.y = data[1];
         aux.z = data[2];
         return aux;
+    }
+
+    @Override
+    public boolean hasProperMotion() {
+        return false;
     }
 
     @Override
@@ -269,6 +280,11 @@ public class PointParticleRecord implements IParticleRecord {
     @Override
     public Keys<UCD> extraKeys() {
         return null;
+    }
+
+    @Override
+    public ParticleRecordType getType() {
+        return ParticleRecordType.FAKE;
     }
 
     @Override

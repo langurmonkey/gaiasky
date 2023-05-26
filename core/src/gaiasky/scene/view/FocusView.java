@@ -664,7 +664,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public float getAppmag() {
         if (starSet != null) {
-            return starSet.focus.appmag();
+            return starSet.focus.appMag();
         } else if (particleSet != null) {
             return 0;
         } else if (mag != null) {
@@ -677,7 +677,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public float getAbsmag() {
         if (starSet != null && starSet.focus != null) {
-            return starSet.focus.absmag();
+            return starSet.focus.absMag();
         } else if (particleSet != null) {
             return 0;
         } else if (mag != null) {
@@ -752,20 +752,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public void makeFocus() {
-        if (particleSet != null) {
-            particleSet.makeFocus();
-        } else if (starSet != null) {
-            starSet.makeFocus();
+        if (isSet()) {
+            getSet().makeFocus();
         }
     }
 
     @Override
     public IFocus getFocus(String name) {
         if (name != null) {
-            if (particleSet != null) {
-                particleSet.setFocusIndex(name);
-            } else if (starSet != null) {
-                starSet.setFocusIndex(name);
+            if (isSet()) {
+                getSet().setFocusIndex(name);
             }
         }
         return this;
@@ -798,16 +794,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public void setForceLabel(Boolean forceLabel,
                               String name) {
-        if (starSet != null) {
-            starSet.setForceLabel(forceLabel, name);
+        if (isSet()) {
+            getSet().setForceLabel(forceLabel, name);
         } else if (Mapper.label.has(entity)) {
             Mapper.label.get(entity).setForceLabel(forceLabel);
         }
     }
 
     public boolean isForceLabel(String name) {
-        if (starSet != null) {
-            return starSet.isForceLabel(name);
+        if (isSet()) {
+            return getSet().isForceLabel(name);
         } else {
             return isForceLabel();
         }
@@ -832,8 +828,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public void setLabelColor(float[] color,
                               String name) {
-        if (starSet != null) {
-            starSet.setLabelColor(color, name);
+        if (isSet()) {
+            getSet().setLabelColor(color, name);
         } else {
             this.setLabelColor(color);
         }
@@ -899,9 +895,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public double getMuAlpha() {
-        if (starSet != null) {
-            if (starSet.focus != null)
-                return starSet.focus.mualpha();
+        if (isSet()) {
+            var set = getSet();
+            if (set.focus != null && set.focus.hasProperMotion())
+                return set.focus.mualpha();
             else
                 return 0;
         } else if (Mapper.pm.has(entity)) {
@@ -916,9 +913,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public double getMuDelta() {
-        if (starSet != null) {
-            if (starSet.focus != null)
-                return starSet.focus.mudelta();
+        if (isSet()) {
+            var set = getSet();
+            if (set.focus != null && set.focus.hasProperMotion())
+                return set.focus.mudelta();
             else
                 return 0;
         } else if (Mapper.pm.has(entity)) {
@@ -933,9 +931,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public double getRadialVelocity() {
-        if (starSet != null) {
-            if (starSet.focus != null)
-                return starSet.focus.radvel();
+        if (isSet()) {
+            var set = getSet();
+            if (set.focus != null && set.focus.hasProperMotion())
+                return set.focus.radvel();
             else
                 return 0;
         } else if (Mapper.pm.has(entity)) {
@@ -1031,14 +1030,14 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * @param state Whether to highlight.
      * @param cmi   Color map index.
      * @param cma   Color map attribute.
-     * @param cmmin Min mapping value.
-     * @param cmmax Max mapping value.
+     * @param cmMin Min mapping value.
+     * @param cmMax Max mapping value.
      */
     public void highlight(boolean state,
                           int cmi,
                           IAttribute cma,
-                          double cmmin,
-                          double cmmax,
+                          double cmMin,
+                          double cmMax,
                           boolean allVisible) {
         initHighlight();
         markForUpdate();
@@ -1049,8 +1048,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             hl.hlallvisible = allVisible;
             hl.hlcmi = cmi;
             hl.hlcma = cma;
-            hl.hlcmmin = cmmin;
-            hl.hlcmmax = cmmax;
+            hl.hlcmmin = cmMin;
+            hl.hlcmmax = cmMax;
         }
 
         // In octrees, highlight all objects.
@@ -1060,7 +1059,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 initAuxView();
                 for (Entity e : l) {
                     auxView.setEntity(e);
-                    auxView.highlight(state, cmi, cma, cmmin, cmmax, allVisible);
+                    auxView.highlight(state, cmi, cma, cmMin, cmMax, allVisible);
                 }
             }
         }

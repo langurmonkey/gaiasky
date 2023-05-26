@@ -32,8 +32,8 @@ public class BinaryVersion0 extends BinaryIOBase {
         out.writeDouble(sb.radvel());
 
         // 4 floats
-        out.writeFloat(sb.appmag());
-        out.writeFloat(sb.absmag());
+        out.writeFloat(sb.appMag());
+        out.writeFloat(sb.absMag());
         out.writeFloat(sb.col());
         out.writeFloat(sb.size());
 

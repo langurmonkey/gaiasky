@@ -35,17 +35,25 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     // Renderables that are already in the GPU
     protected Set<IRenderable> inGpu;
 
-    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer,
+                                        RenderGroup rg,
+                                        float[] alphas,
+                                        ExtShaderProgram[] programs) {
         this(sceneRenderer, rg, alphas, programs, -1);
     }
 
-    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
+    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer,
+                                        RenderGroup rg,
+                                        float[] alphas,
+                                        ExtShaderProgram[] programs,
+                                        int tempVertsSize) {
         super(sceneRenderer, rg, alphas, programs);
         initShaderProgram();
         initVertices();
         meshIdx = 0;
-        if (tempVertsSize > 0)
+        if (tempVertsSize > 0) {
             tempVerts = new float[tempVertsSize];
+        }
         inGpu = new HashSet<>();
         offsets = new HashMap<>();
         counts = new HashMap<>();
@@ -106,7 +114,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         return inGpu != null && inGpu.contains(renderable);
     }
 
-    protected void setInGpu(IRenderable renderable, boolean state) {
+    protected void setInGpu(IRenderable renderable,
+                            boolean state) {
         if (inGpu != null) {
             if (state) {
                 inGpu.add(renderable);
@@ -116,7 +125,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         }
     }
 
-    protected void setOffset(IRenderable renderable, int offset) {
+    protected void setOffset(IRenderable renderable,
+                             int offset) {
         if (offsets != null) {
             if (offset >= 0) {
                 offsets.put(renderable, offset);
@@ -133,7 +143,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         return -1;
     }
 
-    protected void setCount(IRenderable renderable, int count) {
+    protected void setCount(IRenderable renderable,
+                            int count) {
         if (counts != null) {
             counts.put(renderable, count);
         }
@@ -188,11 +199,17 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         curr.vertices[curr.vertexIdx + curr.colorOffset] = color.toFloatBits();
     }
 
-    public void color(float r, float g, float b, float a) {
+    public void color(float r,
+                      float g,
+                      float b,
+                      float a) {
         curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(r, g, b, a);
     }
 
-    public void color(double r, double g, double b, double a) {
+    public void color(double r,
+                      double g,
+                      double b,
+                      double a) {
         curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) r, (float) g, (float) b, (float) a);
     }
 
@@ -200,7 +217,9 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         curr.vertices[curr.vertexIdx + curr.colorOffset] = colorBits;
     }
 
-    public void vertex(float x, float y, float z) {
+    public void vertex(float x,
+                       float y,
+                       float z) {
         curr.vertices[curr.vertexIdx] = x;
         curr.vertices[curr.vertexIdx + 1] = y;
         curr.vertices[curr.vertexIdx + 2] = z;

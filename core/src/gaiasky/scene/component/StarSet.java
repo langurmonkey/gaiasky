@@ -12,72 +12,21 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.util.Nature;
 import gaiasky.util.Settings;
-import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
 public class StarSet extends ParticleSet {
-    public final Vector3d D32 = new Vector3d();
-    public final Vector3d D33 = new Vector3d();
-    /**
-     * Epoch for positions/proper motions in julian days.
-     **/
-    public double epochJd;
     /**
      * Epoch for the times in the light curves in julian days.
      */
     public double variabilityEpochJd;
-    /**
-     * Current computed epoch time.
-     **/
-    public double currDeltaYears = 0;
     public double modelDist;
     /** Does this contain variable stars? **/
     public boolean variableStars = false;
-    /** Stars for which forceLabel is enabled. **/
-    public Set<Integer> forceLabelStars;
-    /** Stars with special label colors. **/
-    public Map<Integer, float[]> labelColors;
-
-    /** Returns the focus position, if any, for the given date in the out vector. **/
-    public Vector3b getAbsolutePosition(Instant date, Vector3b out) {
-        double deltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), epochJd) * Nature.MS_TO_Y;
-        IParticleRecord focus = pointData.get(focusIndex);
-        Vector3d aux = this.fetchPosition(focus, cPosD, D31, deltaYears);
-        return out.set(aux).add(GaiaSky.instance.getICamera().getPos());
-    }
-
-    /**
-     * Returns the absolute position of the particle with the given name.
-     *
-     * @param name The name.
-     * @param out  The out vector.
-     *
-     * @return The absolute position in the out vector.
-     */
-    public Vector3b getAbsolutePosition(String name, Vector3b out) {
-        Vector3d vec = getAbsolutePosition(name, D31);
-        out.set(vec);
-        return out;
-    }
-
-    public Vector3d getAbsolutePosition(String name, Vector3d aux) {
-        name = name.toLowerCase().trim();
-        if (index.containsKey(name)) {
-            int idx = index.get(name);
-            IParticleRecord sb = pointData.get(idx);
-            fetchPosition(sb, null, aux, currDeltaYears);
-            return aux;
-        } else {
-            return null;
-        }
-    }
 
     /**
      * Updates the parameters of the focus, if the focus is active in this group
@@ -92,24 +41,6 @@ public class StarSet extends ParticleSet {
         this.focusSize = getFocusSize();
         this.focusSolidAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
         this.focusSolidAngleApparent = this.focusSolidAngle * Settings.settings.scene.star.brightness;
-    }
-
-    /**
-     * Sets the epoch to use for the stars in this set.
-     *
-     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE).
-     */
-    public void setEpoch(Double epochJd) {
-        setEpochJd(epochJd);
-    }
-
-    /**
-     * Sets the epoch to use for the stars in this set.
-     *
-     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE).
-     */
-    public void setEpochJd(Double epochJd) {
-        this.epochJd = epochJd;
     }
 
     /**
@@ -130,22 +61,6 @@ public class StarSet extends ParticleSet {
         this.variabilityEpochJd = epochJd;
     }
 
-    @Override
-    public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d out, double deltaYears) {
-        Vector3d pm = D32.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
-        Vector3d dest = D33.set(pb.x(), pb.y(), pb.z());
-        if (campos != null && !campos.hasNaN())
-            dest.sub(campos).add(pm);
-        else
-            dest.add(pm);
-
-        return out.set(dest);
-    }
-
-    @Override
-    public double getDeltaYears() {
-        return currDeltaYears;
-    }
 
     public int getHip() {
         if (focus != null && focus.hip() > 0)
@@ -160,21 +75,15 @@ public class StarSet extends ParticleSet {
             return -1;
     }
 
-    public long getCandidateId() {
-        return pointData.get(candidateFocusIndex).id();
-    }
-
-    public String getCandidateName() {
-        return pointData.get(candidateFocusIndex).names()[0];
-    }
-
     public double getCandidateSolidAngleApparent() {
         return getSolidAngleApparent(candidateFocusIndex);
     }
 
     /**
      * Returns the apparent solid angle of the star with the given index.
+     *
      * @param index The index in the star list.
+     *
      * @return The apparent solid angle.
      */
     public double getSolidAngleApparent(int index) {
@@ -215,39 +124,6 @@ public class StarSet extends ParticleSet {
             GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, render));
         } else {
             GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, render));
-        }
-    }
-
-    public void setForceLabel(Boolean forceLabel, String name) {
-        name = name.toLowerCase().trim();
-        if (index.containsKey(name)) {
-            int idx = index.get(name);
-            if (forceLabelStars.contains(idx)) {
-                if (!forceLabel) {
-                    // Remove from forceLabelStars
-                    forceLabelStars.remove(idx);
-                }
-            } else if (forceLabel) {
-                // Add to forceLabelStars
-                forceLabelStars.add(idx);
-            }
-        }
-    }
-
-    public boolean isForceLabel(String name) {
-        name = name.toLowerCase().trim();
-        if (index.containsKey(name)) {
-            int idx = index.get(name);
-            return forceLabelStars.contains(idx);
-        }
-        return false;
-    }
-
-    public void setLabelColor(float[] color, String name) {
-        name = name.toLowerCase().trim();
-        if (index.containsKey(name)) {
-            int idx = index.get(name);
-            labelColors.put(idx, color);
         }
     }
 }

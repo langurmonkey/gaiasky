@@ -76,9 +76,13 @@ public class Quantity {
             KM(1000d),
             /** Astronomical units **/
             AU(149597870700d),
-            /** Parsecs **/
+            /** Light year **/
+            LY(9460730472580800d),
+            /** Parsec **/
             PC(3.08567758e16),
-            /** Megaparsecs **/
+            /** Kiloparsec **/
+            KPC(3.08567758e19),
+            /** Megaparsec **/
             MPC(3.08567758e22);
 
             final double m;

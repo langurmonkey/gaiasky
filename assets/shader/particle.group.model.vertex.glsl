@@ -1,6 +1,5 @@
 #version 330 core
 
-#include shader/lib_geometry.glsl
 #ifdef extendedParticlesFlag
 #include shader/lib_doublefloat.glsl
 #endif // extendedParticlesFlag
@@ -87,14 +86,11 @@ void main() {
 
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
-    float quadSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
+    // Position.
+    vec4 vert_pos = vec4(a_position.xyz * a_size, a_position.w);
+    vert_pos.xyz += pos;
+    vec4 gpos = u_projView * vert_pos;
 
-    // Use billboard snippet
-    vec4 s_vert_pos = a_position;
-    vec3 s_obj_pos = pos;
-    mat4 s_proj_view = u_projView;
-    float s_size = quadSize;
-    #include shader/snip_billboard.glsl
 
     gl_Position = gpos * u_vrScale;
 

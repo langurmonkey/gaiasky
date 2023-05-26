@@ -13,7 +13,7 @@ import gaiasky.util.i18n.I18n;
 public class AttributeAppmag extends AttributeAbstract implements IAttribute {
     @Override
     public double get(IParticleRecord bean) {
-        return bean.appmag();
+        return bean.appMag();
     }
 
     public String getUnit() {

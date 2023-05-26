@@ -328,7 +328,7 @@ public class LabelEntityRenderSystem {
             for (int i = 0; i < n; i++) {
                 IParticleRecord pb = pointData.get(active[i]);
                 if (pb.names() != null) {
-                    Vector3d camPos = fetchPosition(pb, view.particleSet.cPosD, D31, 0);
+                    Vector3d camPos = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, D31, view.particleSet.currDeltaYears);
                     float distToCamera = (float) camPos.len();
                     float viewAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
 
@@ -345,29 +345,6 @@ public class LabelEntityRenderSystem {
                 }
             }
         }
-    }
-
-    /**
-     * Fetches the real position of the particle. It will apply the necessary
-     * integrations (i.e. proper motion).
-     *
-     * @param pb          The particle bean
-     * @param campos      The position of the camera. If null, the camera position is
-     *                    not subtracted so that the coordinates are given in the global
-     *                    reference system instead of the camera reference system.
-     * @param destination The destination factor
-     * @param deltaYears  The delta years
-     *
-     * @return The vector for chaining
-     */
-    private Vector3d fetchPosition(IParticleRecord pb,
-                                   Vector3d campos,
-                                   Vector3d destination,
-                                   double deltaYears) {
-        if (campos != null)
-            return destination.set(pb.x(), pb.y(), pb.z()).sub(campos);
-        else
-            return destination.set(pb.x(), pb.y(), pb.z());
     }
 
     public void renderStarSet(LabelView view,
@@ -402,7 +379,7 @@ public class LabelEntityRenderSystem {
                 int idx = active[i];
                 renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
             }
-            for (Integer i : set.forceLabelStars) {
+            for (Integer i : set.forceLabel) {
                 renderStarLabel(view, set, i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
             }
         }
@@ -421,7 +398,7 @@ public class LabelEntityRenderSystem {
                                  FontRenderSystem sys,
                                  RenderingContext rc,
                                  ICamera camera) {
-        boolean forceLabel = set.forceLabelStars.contains(idx);
+        boolean forceLabel = set.forceLabel.contains(idx);
         IParticleRecord star = set.pointData.get(idx);
         starPosition = set.fetchPosition(star, set.cPosD, starPosition, set.currDeltaYears);
 

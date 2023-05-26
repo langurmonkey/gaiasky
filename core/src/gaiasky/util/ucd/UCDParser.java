@@ -37,7 +37,7 @@ public class UCDParser {
     public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
     public static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
     public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
-    public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi" };
+    public static String[] sizecolnames = new String[] { "radius", "rcluster", "radi", "diameter", "size", "linear_diameter" };
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
     public static String[] varimagscolnames = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
     public static String[] varitimescolnames = new String[] { "g_transit_time", "time_list", "time_series" };
@@ -62,6 +62,8 @@ public class UCDParser {
     public boolean hascol = false;
     public Array<UCD> COL;
     // PHYSICAL PARAMS
+    public boolean hassize = false;
+    public Array<UCD> SIZE;
     public boolean hasteff = false;
     public Array<UCD> TEFF;
     // VARIABILITY
@@ -84,6 +86,7 @@ public class UCDParser {
         PMRA = new Array<>();
         PMDEC = new Array<>();
         RADVEL = new Array<>();
+        SIZE = new Array<>();
         TEFF = new Array<>();
         VARI_TIMES = new Array<>();
         VARI_MAGS = new Array<>();
@@ -151,8 +154,12 @@ public class UCDParser {
         return TextUtils.contains(radvelcolnames, colname, true);
     }
 
+    public static boolean isSize(String colname) {
+        return isRadius(colname);
+    }
+
     public static boolean isRadius(String colname) {
-        return TextUtils.contains(radiuscolnames, colname, true);
+        return TextUtils.contains(sizecolnames, colname, true);
     }
 
     public static boolean isNstars(String colname) {
@@ -367,9 +374,22 @@ public class UCDParser {
         }
         this.hascol = !this.COL.isEmpty();
 
-        // PHYSICAL QUANTITIES
-        // T_eff
+        // SIZE
         Set<UCD> phys = ucdmap.get(UCDType.PHYS);
+        if (phys != null) {
+            for (UCD candidate : phys) {
+                if (candidate.ucd[0].length >= 2 && candidate.ucd[0][1].equals("size")) {
+                    this.SIZE.add(candidate);
+                    break;
+                }
+            }
+        }
+        if (this.SIZE == null || this.SIZE.isEmpty()) {
+            this.SIZE = getByColNames(sizecolnames);
+        }
+        this.hassize = !this.SIZE.isEmpty();
+
+        // EFFECTIVE TEMPERATURE
         if (phys != null) {
             for (UCD candidate : phys) {
                 if (candidate.ucd[0].length >= 3 && candidate.ucd[0][1].equals("temperature") && candidate.ucd[0][2].equals("effective")) {
@@ -422,14 +442,19 @@ public class UCDParser {
     }
 
     public boolean has(UCD ucd) {
-        return has(ucd, POS1) || has(ucd, POS2) || has(ucd, POS3) || has(ucd, PMRA) || has(ucd, PMDEC) || has(ucd, RADVEL) || has(ucd, ID) || has(ucd, COL) || has(ucd, TEFF) || has(ucd, NAME) || has(ucd, MAG);
+        return has(ucd, POS1) || has(ucd, POS2) || has(ucd, POS3) || has(ucd, PMRA) || has(ucd, PMDEC) || has(ucd, RADVEL) || has(ucd, ID) || has(ucd, COL) || has(ucd,
+                                                                                                                                                                   TEFF)
+                || has(ucd, NAME) || has(ucd, MAG);
     }
 
-    public boolean has(UCD ucd, Array<UCD> a) {
+    public boolean has(UCD ucd,
+                       Array<UCD> a) {
         return a.contains(ucd, true);
     }
 
-    public PositionType getPositionType(UCD pos1, UCD pos2, UCD pos3) {
+    public PositionType getPositionType(UCD pos1,
+                                        UCD pos2,
+                                        UCD pos3) {
         if (pos1.ucd == null || pos2.ucd == null) {
             return PositionType.valueOf("EQ_SPH_" + (pos3 == null ? "PLX" : (isDist(pos3.colname) ? "DIST" : "PLX")));
         }
@@ -469,11 +494,14 @@ public class UCDParser {
         return getByColNames(colnames, null);
     }
 
-    private Array<UCD> getByColNames(String[] colnames, String defaultunit) {
+    private Array<UCD> getByColNames(String[] colnames,
+                                     String defaultunit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
     }
 
-    private Array<UCD> getByColNames(UCDType[] types, String[] colnames, String defaultunit) {
+    private Array<UCD> getByColNames(UCDType[] types,
+                                     String[] colnames,
+                                     String defaultunit) {
         Array<UCD> candidates = new Array<>();
         for (UCDType type : types) {
             // Get all unknown and missing
@@ -501,7 +529,9 @@ public class UCDParser {
      * @param colnames  Array of column names to check
      * @param list      The list to add
      */
-    private void add(UCD candidate, String[] colnames, Array<UCD> list) {
+    private void add(UCD candidate,
+                     String[] colnames,
+                     Array<UCD> list) {
         if (candidate.colname != null && TextUtils.contains(colnames, candidate.colname)) {
             list.insert(0, candidate);
         } else {
@@ -529,7 +559,8 @@ public class UCDParser {
         return "";
     }
 
-    private void setDefaultUnit(UCD candidate, String unit) {
+    private void setDefaultUnit(UCD candidate,
+                                String unit) {
         // Default unit
         if (candidate.unit == null) {
             candidate.unit = unit;

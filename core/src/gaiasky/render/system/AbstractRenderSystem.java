@@ -27,10 +27,10 @@ import gaiasky.util.math.Vector3d;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class AbstractRenderSystem implements IRenderSystem {
+public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<IRenderSystem> {
 
     protected final SceneRenderer sceneRenderer;
-    private final RenderGroup group;
+    private final RenderGroup renderGroup;
     private final Settings settings;
     public RenderingContext rc;
     protected ExtShaderProgram[] programs;
@@ -49,7 +49,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         super();
         this.sceneRenderer = sceneRenderer;
         this.settings = Settings.settings;
-        this.group = rg;
+        this.renderGroup = rg;
         this.alphas = alphas;
         this.programs = programs;
         this.auxf = new Vector3();
@@ -60,7 +60,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     @Override
     public RenderGroup getRenderGroup() {
-        return group;
+        return renderGroup;
     }
 
     @Override
@@ -211,8 +211,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      * Adds the camera up vector (only in non-cubemap mode) to compute
      * the billboard rotation. In regular mode, we use the camera up vector to
      * have screen-aligned billboards. In cubemap mode(s), we use a global up direction.
+     *
      * @param shaderProgram The program.
-     * @param camera The camera.
+     * @param camera        The camera.
      */
     protected void addCameraUpCubemapMode(ExtShaderProgram shaderProgram,
                                           ICamera camera) {
@@ -264,6 +265,11 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     public void resetFlags() {
         vrScaleFlag = false;
         depthBufferFlag = false;
+    }
+
+    @Override
+    public int compareTo(IRenderSystem o) {
+        return Integer.compare(this.renderGroup.priority, o.getRenderGroup().priority);
     }
 
     public interface RenderSystemRunnable {

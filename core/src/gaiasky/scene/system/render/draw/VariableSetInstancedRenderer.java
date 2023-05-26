@@ -50,7 +50,10 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, starPosOffset;
     private StarSetQuadComponent triComponent;
 
-    public VariableSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public VariableSetInstancedRenderer(SceneRenderer sceneRenderer,
+                                        RenderGroup rg,
+                                        float[] alphas,
+                                        ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
         cmap = new Colormap();
@@ -58,7 +61,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         aux1 = new Vector3();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD,
+                                        Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     @Override
@@ -99,7 +103,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         pmOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
         starPosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
         nVariOffset = curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
-        variMagsOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
+        variMagsOffset =
+                curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
         variTimesOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
     }
 
@@ -109,7 +114,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         this.triComponent.initShaderProgram(getShaderProgram());
     }
 
-    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void preRenderObjects(ExtShaderProgram shaderProgram,
+                                    ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         addCameraUpCubemapMode(shaderProgram, camera);
@@ -125,7 +131,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         }
     }
 
-    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
+    protected void renderObject(ExtShaderProgram shaderProgram,
+                                IRenderable renderable) {
         final Render render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
         var set = Mapper.starSet.get(render.entity);
@@ -134,107 +141,106 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-        synchronized (render) {
-            if (!set.disposed) {
-                boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
-                int n = set.data().size();
-                if (!inGpu(render)) {
-                    int offset = addMeshData(6, n);
-                    setOffset(render, offset);
-                    curr = meshes.get(offset);
-                    ensureInstanceAttribsSize(n * curr.instanceSize);
-                    int numStarsAdded = 0;
+        if (!set.disposed) {
+            boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+            int n = set.data().size();
+            if (!inGpu(render)) {
+                int offset = addMeshData(numModelVertices, n);
+                setOffset(render, offset);
+                curr = meshes.get(offset);
+                ensureInstanceAttribsSize(n * curr.instanceSize);
+                int numStarsAdded = 0;
 
-                    for (int i = 0; i < n; i++) {
-                        if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                            VariableRecord particle = (VariableRecord) set.get(i);
-                            if (!Double.isFinite(particle.size())) {
-                                logger.debug("Star " + particle.id() + " has a non-finite size");
-                                continue;
-                            }
-
-                            // COLOR
-                            if (hlCmap) {
-                                // Color map
-                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                            } else {
-                                // Plain
-                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
-                            }
-
-                            // VARIABLE STARS (magnitudes and times)
-                            tempInstanceAttribs[curr.instanceIdx + nVariOffset] = particle.nVari;
-                            for (int k = 0; k < particle.nVari; k++) {
-                                tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
-                                tempInstanceAttribs[curr.instanceIdx + variTimesOffset + k] = (float) particle.variTime(k);
-                            }
-
-                            // PROPER MOTION [u/yr]
-                            tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
-                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 1] = (float) particle.pmy();
-                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 2] = (float) particle.pmz();
-
-                            // STAR POSITION [u]
-                            tempInstanceAttribs[curr.instanceIdx + starPosOffset] = (float) particle.x();
-                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 1] = (float) particle.y();
-                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 2] = (float) particle.z();
-
-                            curr.instanceIdx += curr.instanceSize;
-                            curr.numVertices++;
-                            numStarsAdded++;
+                for (int i = 0; i < n; i++) {
+                    if (utils.filter(i, set, desc) && set.isVisible(i)) {
+                        VariableRecord particle = (VariableRecord) set.get(i);
+                        if (!Double.isFinite(particle.size())) {
+                            logger.debug("Star " + particle.id() + " has a non-finite size");
+                            continue;
                         }
-                    }
-                    // Global (divisor=0) vertices (position, uv)
-                    curr.mesh.setVertices(tempVerts, 0, 24);
-                    // Per instance (divisor=1) vertices
-                    int count = numStarsAdded * curr.instanceSize;
-                    setCount(render, numStarsAdded);
-                    curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
-                    setInGpu(render, true);
+                        // COLOR
+                        if (hlCmap) {
+                            // Color map
+                            double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                            tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                        } else {
+                            // Plain
+                            tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
+                        }
+
+                        // VARIABLE STARS (magnitudes and times)
+                        tempInstanceAttribs[curr.instanceIdx + nVariOffset] = particle.nVari;
+                        for (int k = 0; k < particle.nVari; k++) {
+                            tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
+                            tempInstanceAttribs[curr.instanceIdx + variTimesOffset + k] = (float) particle.variTime(k);
+                        }
+
+                        // PROPER MOTION [u/yr]
+                        tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
+                        tempInstanceAttribs[curr.instanceIdx + pmOffset + 1] = (float) particle.pmy();
+                        tempInstanceAttribs[curr.instanceIdx + pmOffset + 2] = (float) particle.pmz();
+
+                        // STAR POSITION [u]
+                        tempInstanceAttribs[curr.instanceIdx + starPosOffset] = (float) particle.x();
+                        tempInstanceAttribs[curr.instanceIdx + starPosOffset + 1] = (float) particle.y();
+                        tempInstanceAttribs[curr.instanceIdx + starPosOffset + 2] = (float) particle.z();
+
+                        curr.instanceIdx += curr.instanceSize;
+                        curr.numVertices++;
+                        numStarsAdded++;
+                    }
+                }
+                // Global (divisor=0) vertices (position, uv)
+                curr.mesh.setVertices(tempVerts, 0, numModelVertices * modelVertexSize);
+                // Per instance (divisor=1) vertices
+                int count = numStarsAdded * curr.instanceSize;
+                setCount(render, numStarsAdded);
+                curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
+
+                setInGpu(render, true);
+            }
+
+            /*
+             * RENDER
+             */
+            curr = meshes.get(getOffset(render));
+            if (curr != null) {
+                if (triComponent.starTex != null) {
+                    triComponent.starTex.bind(0);
+                    shaderProgram.setUniformi("u_starTex", 0);
                 }
 
-                /*
-                 * RENDER
-                 */
-                curr = meshes.get(getOffset(render));
-                if (curr != null) {
-                    if (triComponent.starTex != null) {
-                        triComponent.starTex.bind(0);
-                        shaderProgram.setUniformi("u_starTex", 0);
-                    }
+                triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
+                triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
+                shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
-                    triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
-                    shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
+                // Fixed size
+                shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
 
-                    // Fixed size
-                    shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
+                // Days since epoch
+                // Emulate double with floats, for compatibility
+                double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
+                float curRt2 = (float) (curRt - (double) ((float) curRt));
+                shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
-                    // Days since epoch
-                    // Emulate double with floats, for compatibility
-                    double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
-                    float curRt2 = (float) (curRt - (double) ((float) curRt));
-                    shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
+                curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
+                shaderProgram.setUniformf("u_s", (float) curRt);
 
-                    curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
-                    shaderProgram.setUniformf("u_s", (float) curRt);
+                // Opacity limits
+                triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
-                    // Opacity limits
-                    triComponent.setOpacityLimitsUniform(shaderProgram, hl);
-
-                    try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, getCount(render));
-                    } catch (IllegalArgumentException e) {
-                        logger.error(e, "Render exception");
-                    }
+                try {
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, numModelVertices, getCount(render));
+                } catch (IllegalArgumentException e) {
+                    logger.error(e, "Render exception");
                 }
             }
         }
     }
 
-    protected void setInGpu(IRenderable renderable, boolean state) {
+    protected void setInGpu(IRenderable renderable,
+                            boolean state) {
         if (inGpu != null) {
             if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, renderable);
@@ -248,7 +254,9 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
         case STAR_BASE_LEVEL_CMD -> {
             triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);

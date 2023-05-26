@@ -3,10 +3,10 @@
 #include shader/lib_geometry.glsl
 
 // UNIFORMS
-uniform float u_alpha;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
+uniform float u_alpha;
 uniform float u_sizeFactor;
 uniform int u_cubemap;
 uniform vec2 u_sizeLimits;
@@ -26,11 +26,11 @@ out vec4 v_col;
 out float v_textureIndex;
 
 #ifdef relativisticEffects
-    #include shader/lib_relativity.glsl
+#include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+ #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
 #ifdef velocityBufferFlag
@@ -45,7 +45,7 @@ void main() {
     float dist = length(pos * 1e-14) * 1e14;
 
     float cubemapSizeFactor = 1.0;
-    if(u_cubemap == 1) {
+    if (u_cubemap == 1) {
         // Cosine of angle between star position and camera direction
         // Correct point primitive size error due to perspective projection
         float cosphi = pow(dot(u_camDir, pos) / dist, 2.0);

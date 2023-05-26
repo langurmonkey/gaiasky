@@ -46,7 +46,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
     private final Vector3[] additional;
     private final Vector3d[] camPositions;
     private final long baseTime;
-    private int sizeOffset, tOffset;
+
 
     public ParticleEffectsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super(sceneRenderer, rg, alphas, programs);
@@ -76,6 +76,8 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
             }
         }
     }
+
+    private int sizeOffset, tOffset;
 
     private float getT() {
         return (float) ((System.currentTimeMillis() - baseTime) / 1000d);

@@ -15,7 +15,7 @@ import gaiasky.scene.camera.ICamera;
 
 import java.util.List;
 
-public interface IRenderSystem extends Disposable {
+public interface IRenderSystem extends Disposable, Comparable<IRenderSystem> {
 
     RenderGroup getRenderGroup();
 

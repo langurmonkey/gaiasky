@@ -21,6 +21,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.scene.record.VariableRecord;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
@@ -129,6 +130,15 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.focusPosition = new Vector3d();
         set.focusPositionSph = new Vector2d();
 
+        // Default epochs, if not set
+        if (set.epochJd <= 0) {
+            set.epochJd = AstroUtils.JD_J2015_5;
+        }
+
+        // Maps.
+        set.forceLabel = new HashSet<>();
+        set.labelColors = new HashMap<>();
+
         // Textures.
         AssetManager manager = AssetBean.manager();
         if (set.textureFiles != null) {
@@ -177,10 +187,16 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             try {
                 Class<?> clazz = Class.forName(set.provider);
                 IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor().newInstance();
-                provider.setProviderParams(set.providerParams);
+                if (set.providerParams != null) {
+                    provider.setProviderParams(set.providerParams);
+                } else {
+                    var params = new HashMap<String, Object>();
+                    params.put("type", "PARTICLES");
+                    provider.setProviderParams(params);
+                }
                 provider.setTransformMatrix(transform.matrix);
-
                 set.setData(provider.loadData(set.datafile, set.factor));
+                set.isExtended = !set.data().isEmpty() && set.data().get(0).getType() == ParticleRecordType.PARTICLE_EXT;
             } catch (Exception e) {
                 Logger.getLogger(this.getClass()).error(e);
                 set.pointData = null;
@@ -214,6 +230,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                                   StarSet set,
                                   RefSysTransform transform) {
         set.isStars = true;
+        set.isExtended = false;
         boolean initializeData = set.pointData == null;
 
         if (initializeData && set.provider != null) {
@@ -237,18 +254,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         computeMeanPosition(entity, set);
         setLabelPosition(entity);
 
-        // Default epochs, if not set
-        if (set.epochJd <= 0) {
-            set.epochJd = AstroUtils.JD_J2015_5;
-        }
-
+        // Default variability epoch, if not set
         if (set.variabilityEpochJd <= 0) {
             set.variabilityEpochJd = AstroUtils.JD_J2010;
         }
-
-        // Maps.
-        set.forceLabelStars = new HashSet<>();
-        set.labelColors = new HashMap<>();
 
         // Labels.
         var label = Mapper.label.get(entity);

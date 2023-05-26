@@ -49,6 +49,10 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
 
     private void updateParticleSet(ICamera camera,
                                    ParticleSet particleSet) {
+        particleSet.cPosD.set(camera.getPos());
+        // Delta years
+        particleSet.currDeltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), particleSet.epochJd) * Nature.MS_TO_Y;
+
         if (particleSet.pointData != null) {
             particleSet.cPosD.set(camera.getPos());
 
@@ -69,10 +73,6 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                                DatasetDescription datasetDesc) {
         // Fade node visibility
         if (starSet.active.length > 0) {
-            starSet.cPosD.set(camera.getPos());
-            // Delta years
-            starSet.currDeltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starSet.epochJd) * Nature.MS_TO_Y;
-
             updateParticleSet(camera, starSet);
 
             // Update close stars

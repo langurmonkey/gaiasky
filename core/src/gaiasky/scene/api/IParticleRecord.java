@@ -7,6 +7,7 @@
 
 package gaiasky.scene.api;
 
+import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
@@ -24,9 +25,13 @@ public interface IParticleRecord {
 
     double z();
 
-    void setPos(double x, double y, double z);
+    void setPos(double x,
+                double y,
+                double z);
 
     Vector3d pos(Vector3d aux);
+
+    boolean hasProperMotion();
 
     double pmx();
 
@@ -34,7 +39,9 @@ public interface IParticleRecord {
 
     double pmz();
 
-    void setVelocityVector(double vx, double vy, double vz);
+    void setVelocityVector(double vx,
+                           double vy,
+                           double vz);
 
     String[] names();
 
@@ -42,7 +49,8 @@ public interface IParticleRecord {
 
     boolean hasName(String candidate);
 
-    boolean hasName(String candidate, boolean matchCase);
+    boolean hasName(String candidate,
+                    boolean matchCase);
 
     void setNames(String... names);
 
@@ -52,19 +60,22 @@ public interface IParticleRecord {
 
     void addNames(String... names);
 
-    float appmag();
+    float appMag();
 
-    float absmag();
+    float absMag();
 
-    void setMag(float appmag, float absmag);
+    void setMag(float appmag,
+                float absmag);
 
-    boolean hasCol();
+    boolean hasColor();
 
     float col();
 
     void setCol(float col);
 
     double[] rgb();
+
+    boolean hasSize();
 
     float size();
 
@@ -86,7 +97,9 @@ public interface IParticleRecord {
 
     float radvel();
 
-    void setProperMotion(float mualpha, float mudelta, float radvel);
+    void setProperMotion(float mualpha,
+                         float mudelta,
+                         float radvel);
 
     OctreeNode octant();
 
@@ -159,4 +172,11 @@ public interface IParticleRecord {
     double getExtra(UCD ucd);
 
     Keys<UCD> extraKeys();
+
+    /**
+     * Returns the particle record type.
+     *
+     * @return The type.
+     */
+    ParticleRecordType getType();
 }

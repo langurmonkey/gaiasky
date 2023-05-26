@@ -124,7 +124,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             int n = set.data().size();
             if (!inGpu(render)) {
-                int offset = addMeshData(6, n);
+                int offset = addMeshData(numModelVertices, n);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
                 ensureInstanceAttribsSize(n * curr.instanceSize);
@@ -140,11 +140,11 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
                         // COLOR
                         if (hlCmap) {
-                            // Color map
+                            // Color map.
                             double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
                             tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                         } else {
-                            // Plain
+                            // Plain color.
                             tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
                         }
 
@@ -167,7 +167,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     }
                 }
                 // Global (divisor=0) vertices (position, uv)
-                curr.mesh.setVertices(tempVerts, 0, 24);
+                curr.mesh.setVertices(tempVerts, 0, numModelVertices * modelVertexSize);
                 // Per instance (divisor=1) vertices
                 int count = numStarsAdded * curr.instanceSize;
                 setCount(render, numStarsAdded);
@@ -203,7 +203,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
                 try {
-                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, getCount(render));
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, numModelVertices, getCount(render));
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }

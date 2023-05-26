@@ -14,6 +14,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.TextureArrayData;
 import com.badlogic.gdx.utils.Array;
@@ -49,7 +50,9 @@ public class TextureArrayLoader extends AsynchronousAssetLoader<TextureArray, Te
                                  FileHandle file,
                                  TextureArrayParameter parameter) {
         if (data != null) {
-            return new TextureArray(data);
+            var ta = new TextureArray(data);
+            ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            return ta;
         }
         return null;
     }
