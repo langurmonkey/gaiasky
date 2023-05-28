@@ -53,6 +53,10 @@ out float v_textureIndex;
 #include shader/lib_velbuffer.vert.glsl
 #endif
 
+#ifndef PI
+#define PI 3.141592653589793238462643383
+#endif // PI
+
 void main() {
     vec3 pos = (a_particlePos - u_camPos) / u_vrScale;
 
@@ -75,6 +79,10 @@ void main() {
     // Distance to point - watch out, if position contains large values, this produces overflow!
     // Downscale before computing length()
     float dist = length(pos * 1e-14) * 1e14;
+    // Small-angle approximation, in degrees.
+    float solidAngleDeg = (a_size / dist) * 180.0 / PI;
+    // When angle goes from 3 to 0.1 degrees, fade factor goes from 1 to 0.07.
+    float fadeFactor = smoothstep(0.1, 3.0, solidAngleDeg) * 0.93 + 0.07;
 
     #ifdef relativisticEffects
     pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
@@ -84,13 +92,12 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    v_col = vec4(a_color.rgb, a_color.a * u_alpha);
+    v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
     // Position.
     vec4 vert_pos = vec4(a_position.xyz * a_size, a_position.w);
     vert_pos.xyz += pos;
     vec4 gpos = u_projView * vert_pos;
-
 
     gl_Position = gpos * u_vrScale;
 
