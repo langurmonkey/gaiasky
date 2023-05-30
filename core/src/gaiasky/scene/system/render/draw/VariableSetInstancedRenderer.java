@@ -134,12 +134,13 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-        var model = getModel(set.modelType, set.modelPrimitive);
-        if (model != null && !set.disposed) {
+        if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+            var model = getModel(set.modelType, set.modelPrimitive, getOffset(render));
             int n = set.data().size();
             if (!inGpu(render)) {
                 int offset = addMeshData(model, model.numModelVertices, n, set.modelType, set.modelPrimitive);
+                setModel(offset, model);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
                 model.ensureInstanceAttribsSize(n * curr.instanceSize);

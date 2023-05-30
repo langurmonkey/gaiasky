@@ -31,9 +31,9 @@ import java.util.Map;
 public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem implements IObserver {
 
     /**
-     * Instanced model map.
+     * Instanced model list, one per particle group.
      */
-    protected Map<String, InstancedModel> models = new HashMap<>();
+    protected InstancedModel[] models = new InstancedModel[50];
 
     /**
      * Holds temporary instanced model data.
@@ -46,17 +46,14 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         public int[] indices;
         public float[] instanceAttributes;
 
-        public InstancedModel(int numModelVertices,
-                              int modelVertexSize,
-                              int numIndices) {
+        public InstancedModel(int numModelVertices, int modelVertexSize, int numIndices) {
             this.numModelVertices = numModelVertices;
             this.modelVertexSize = modelVertexSize;
             this.numIndices = numIndices;
             initializeLists();
         }
 
-        public InstancedModel(int numModelVertices,
-                              int modelVertexSize) {
+        public InstancedModel(int numModelVertices, int modelVertexSize) {
             this.numModelVertices = numModelVertices;
             this.modelVertexSize = modelVertexSize;
             initializeLists();
@@ -79,10 +76,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         }
     }
 
-    public InstancedRenderSystem(SceneRenderer sceneRenderer,
-                                 RenderGroup rg,
-                                 float[] alphas,
-                                 ExtShaderProgram[] shaders) {
+    public InstancedRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         initVerticesDelayed();
     }
@@ -100,196 +94,203 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         return primitive >= GL30.GL_LINES && primitive <= GL30.GL_LINE_STRIP;
     }
 
-    protected InstancedModel getModel(String modelType,
-                                      int primitive) {
-        String key = modelType + primitive;
+    protected void setModel(int offset, InstancedModel model){
+        if(offset >= 0 && offset < models.length) {
+            models[offset] = model;
+        }
+    }
+
+    protected InstancedModel getModel(String modelType, int primitive, int offset) {
+        if (offset >= 0 && models[offset] != null) {
+            return models[offset];
+        }
+
         boolean wireframe = isWireframe(primitive);
         int primitivePlus = wireframe ? 0 : 2;
-        if (!models.containsKey(key)) {
-            // Create model.
-            InstancedModel model = null;
-            if (modelType.equalsIgnoreCase("sphere")) {
-                // UV-sphere.
-                final float width = 1f;
-                final float height = 1f;
-                final float depth = 1f;
-                final int divisionsU = 30;
-                final int divisionsV = 15;
-                final float angleUFrom = 0f;
-                final float angleUTo = 360f;
-                final float angleVFrom = 0f;
-                final float angleVTo = 180f;
-                final float hw = width * 0.5f;
-                final float hh = height * 0.5f;
-                final float hd = depth * 0.5f;
-                final float auo = MathUtils.degreesToRadians * angleUFrom;
-                final float stepU = (MathUtils.degreesToRadians * (angleUTo - angleUFrom)) / divisionsU;
-                final float avo = MathUtils.degreesToRadians * angleVFrom;
-                final float stepV = (MathUtils.degreesToRadians * (angleVTo - angleVFrom)) / divisionsV;
-                final float us = 1f / divisionsU;
-                final float vs = 1f / divisionsV;
-                float angleU;
-                float angleV;
-                model = new InstancedModel(divisionsU * divisionsV * 4, 3);
+        // Create model.
+        InstancedModel model = null;
+        if (modelType.equalsIgnoreCase("sphere")) {
+            // UV-sphere.
+            final float width = 1f;
+            final float height = 1f;
+            final float depth = 1f;
+            final int divisionsU = 30;
+            final int divisionsV = 15;
+            final float angleUFrom = 0f;
+            final float angleUTo = 360f;
+            final float angleVFrom = 0f;
+            final float angleVTo = 180f;
+            final float hw = width * 0.5f;
+            final float hh = height * 0.5f;
+            final float hd = depth * 0.5f;
+            final float auo = MathUtils.degreesToRadians * angleUFrom;
+            final float stepU = (MathUtils.degreesToRadians * (angleUTo - angleUFrom)) / divisionsU;
+            final float avo = MathUtils.degreesToRadians * angleVFrom;
+            final float stepV = (MathUtils.degreesToRadians * (angleVTo - angleVFrom)) / divisionsV;
+            final float us = 1f / divisionsU;
+            final float vs = 1f / divisionsV;
+            float angleU;
+            float angleV;
+            model = new InstancedModel(divisionsU * divisionsV * 4, 3);
 
-                int i = 0;
-                // Horizontal.
-                for (int iv = 0; iv < divisionsV; iv++) {
+            int i = 0;
+            // Horizontal.
+            for (int iv = 0; iv < divisionsV; iv++) {
+                angleV = avo + stepV * iv;
+                float t = MathUtils.sin(angleV);
+                float h = MathUtils.cos(angleV) * hh;
+                for (int iu = 0; iu < divisionsU; iu++) {
+                    // ORIGINAL
+                    angleU = auo + stepU * iu;
+                    // Position.
+                    model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
+                    model.vertices[i++] = h;
+                    model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
+
+                    // RIGHT
+                    angleU = auo + stepU * (iu + 1);
+                    // Position.
+                    model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
+                    model.vertices[i++] = h;
+                    model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
+                }
+            }
+
+            // Vertical.
+            for (int iv = 0; iv < divisionsV; iv++) {
+                for (int iu = 0; iu < divisionsU; iu++) {
+                    // ORIGINAL
                     angleV = avo + stepV * iv;
                     float t = MathUtils.sin(angleV);
                     float h = MathUtils.cos(angleV) * hh;
-                    for (int iu = 0; iu < divisionsU; iu++) {
-                        // ORIGINAL
-                        angleU = auo + stepU * iu;
-                        // Position.
-                        model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
-                        model.vertices[i++] = h;
-                        model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
+                    angleU = auo + stepU * iu;
+                    // Position.
+                    model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
+                    model.vertices[i++] = h;
+                    model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
 
-                        // RIGHT
-                        angleU = auo + stepU * (iu + 1);
-                        // Position.
-                        model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
-                        model.vertices[i++] = h;
-                        model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
-                    }
+                    // RIGHT
+                    angleV = avo + stepV * (iv + 1);
+                    t = MathUtils.sin(angleV);
+                    h = MathUtils.cos(angleV) * hh;
+                    angleU = auo + stepU * (iu);
+                    // Position.
+                    model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
+                    model.vertices[i++] = h;
+                    model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
                 }
+            }
 
-                // Vertical.
-                for (int iv = 0; iv < divisionsV; iv++) {
-                    for (int iu = 0; iu < divisionsU; iu++) {
-                        // ORIGINAL
-                        angleV = avo + stepV * iv;
-                        float t = MathUtils.sin(angleV);
-                        float h = MathUtils.cos(angleV) * hh;
-                        angleU = auo + stepU * iu;
-                        // Position.
-                        model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
-                        model.vertices[i++] = h;
-                        model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
+        } else if (modelType.equalsIgnoreCase("icosphere")) {
+            if (wireframe) {
+                // ICO-sphere.
+                var ico = new IcoSphereCreator();
+                ico.create(1, 3);
+                int nFaces = ico.faces.size();
+                var v = ico.vertices;
 
-                        // RIGHT
-                        angleV = avo + stepV * (iv + 1);
-                        t = MathUtils.sin(angleV);
-                        h = MathUtils.cos(angleV) * hh;
-                        angleU = auo + stepU * (iu);
-                        // Position.
-                        model.vertices[i++] = MathUtils.cos(angleU) * hw * t;
-                        model.vertices[i++] = h;
-                        model.vertices[i++] = MathUtils.sin(angleU) * hd * t;
-                    }
-                }
+                model = new InstancedModel(nFaces * 6, 3);
 
-            } else if (modelType.equalsIgnoreCase("icosphere")) {
-                if (wireframe) {
-                    // ICO-sphere.
-                    var ico = new IcoSphereCreator();
-                    ico.create(1, 3);
-                    int nFaces = ico.faces.size();
-                    var v = ico.vertices;
-
-                    model = new InstancedModel(nFaces * 6, 3);
-
-                    int i = 0;
-                    for (IFace face : ico.faces) {
-                        // Get vertices.
-                        var v1 = v.get(face.v()[0] - 1);
-                        var v2 = v.get(face.v()[1] - 1);
-                        var v3 = v.get(face.v()[2] - 1);
-
-                        // V1-V2
-                        model.vertices[i++] = v1.x;
-                        model.vertices[i++] = v1.y;
-                        model.vertices[i++] = v1.z;
-                        model.vertices[i++] = v2.x;
-                        model.vertices[i++] = v2.y;
-                        model.vertices[i++] = v2.z;
-
-                        // V2-V3
-                        model.vertices[i++] = v2.x;
-                        model.vertices[i++] = v2.y;
-                        model.vertices[i++] = v2.z;
-                        model.vertices[i++] = v3.x;
-                        model.vertices[i++] = v3.y;
-                        model.vertices[i++] = v3.z;
-
-                        // V3-V1
-                        model.vertices[i++] = v3.x;
-                        model.vertices[i++] = v3.y;
-                        model.vertices[i++] = v3.z;
-                        model.vertices[i++] = v1.x;
-                        model.vertices[i++] = v1.y;
-                        model.vertices[i++] = v1.z;
-                    }
-                } else {
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("recursion", 3);
-                    var modelPair = ModelCache.cache.getModel("icosphere", params, Bits.indexes(Usage.Position, Usage.TextureCoordinates), primitive);
-                    var intModel = modelPair.getFirst();
-                    var mesh = intModel.meshes.get(0);
-
-                    model = new InstancedModel(mesh.getNumVertices(), mesh.getVertexSize(), mesh.getNumIndices());
-                    mesh.getVertices(model.vertices);
-                    mesh.getIndices(model.indices);
-                }
-            } else if (modelType.equalsIgnoreCase("quad")) {
-                // Regular quad.
-                // Construct custom billboard with two triangles.
-
-                model = new InstancedModel(6, 2 + primitivePlus);
                 int i = 0;
-                // 0 (0)
-                model.vertices[i++] = 1; // pos
-                model.vertices[i++] = 1;
-                if (!wireframe) {
-                    model.vertices[i++] = 1; // uv
-                    model.vertices[i++] = 1;
-                }
-                // 1 (1)
-                model.vertices[i++] = 1; // pos
-                model.vertices[i++] = -1;
-                if (!wireframe) {
-                    model.vertices[i++] = 1; // uv
-                    model.vertices[i++] = 0;
-                }
-                // 2 (2)
-                model.vertices[i++] = -1; // pos
-                model.vertices[i++] = -1;
-                if (!wireframe) {
-                    model.vertices[i++] = 0; // uv
-                    model.vertices[i++] = 0;
-                }
-                // 3 (2)
-                model.vertices[i++] = -1; // pos
-                model.vertices[i++] = -1;
-                if (!wireframe) {
-                    model.vertices[i++] = 0; // uv
-                    model.vertices[i++] = 0;
-                }
-                // 4 (3)
-                model.vertices[i++] = -1; // pos
-                model.vertices[i++] = 1;
-                if (!wireframe) {
-                    model.vertices[i++] = 0; // uv
-                    model.vertices[i++] = 1;
-                }
-                // 5 (0)
-                model.vertices[i++] = 1; // pos
-                model.vertices[i++] = 1;
-                if (!wireframe) {
-                    model.vertices[i++] = 1; // uv
-                    model.vertices[i] = 1;
-                }
+                for (IFace face : ico.faces) {
+                    // Get vertices.
+                    var v1 = v.get(face.v()[0] - 1);
+                    var v2 = v.get(face.v()[1] - 1);
+                    var v3 = v.get(face.v()[2] - 1);
 
+                    // V1-V2
+                    model.vertices[i++] = v1.x;
+                    model.vertices[i++] = v1.y;
+                    model.vertices[i++] = v1.z;
+                    model.vertices[i++] = v2.x;
+                    model.vertices[i++] = v2.y;
+                    model.vertices[i++] = v2.z;
+
+                    // V2-V3
+                    model.vertices[i++] = v2.x;
+                    model.vertices[i++] = v2.y;
+                    model.vertices[i++] = v2.z;
+                    model.vertices[i++] = v3.x;
+                    model.vertices[i++] = v3.y;
+                    model.vertices[i++] = v3.z;
+
+                    // V3-V1
+                    model.vertices[i++] = v3.x;
+                    model.vertices[i++] = v3.y;
+                    model.vertices[i++] = v3.z;
+                    model.vertices[i++] = v1.x;
+                    model.vertices[i++] = v1.y;
+                    model.vertices[i++] = v1.z;
+                }
             } else {
-                // TODO Load custom model?
+                Map<String, Object> params = new HashMap<>();
+                params.put("recursion", 3);
+                var modelPair = ModelCache.cache.getModel("icosphere", params, Bits.indexes(Usage.Position, Usage.TextureCoordinates), primitive);
+                var intModel = modelPair.getFirst();
+                var mesh = intModel.meshes.get(0);
+
+                model = new InstancedModel(mesh.getNumVertices(), mesh.getVertexSize(), mesh.getNumIndices());
+                mesh.getVertices(model.vertices);
+                mesh.getIndices(model.indices);
+            }
+        } else if (modelType.equalsIgnoreCase("quad")) {
+            // Regular quad.
+            // Construct custom billboard with two triangles.
+
+            model = new InstancedModel(6, 2 + primitivePlus);
+            int i = 0;
+            // 0 (0)
+            model.vertices[i++] = 1; // pos
+            model.vertices[i++] = 1;
+            if (!wireframe) {
+                model.vertices[i++] = 1; // uv
+                model.vertices[i++] = 1;
+            }
+            // 1 (1)
+            model.vertices[i++] = 1; // pos
+            model.vertices[i++] = -1;
+            if (!wireframe) {
+                model.vertices[i++] = 1; // uv
+                model.vertices[i++] = 0;
+            }
+            // 2 (2)
+            model.vertices[i++] = -1; // pos
+            model.vertices[i++] = -1;
+            if (!wireframe) {
+                model.vertices[i++] = 0; // uv
+                model.vertices[i++] = 0;
+            }
+            // 3 (2)
+            model.vertices[i++] = -1; // pos
+            model.vertices[i++] = -1;
+            if (!wireframe) {
+                model.vertices[i++] = 0; // uv
+                model.vertices[i++] = 0;
+            }
+            // 4 (3)
+            model.vertices[i++] = -1; // pos
+            model.vertices[i++] = 1;
+            if (!wireframe) {
+                model.vertices[i++] = 0; // uv
+                model.vertices[i++] = 1;
+            }
+            // 5 (0)
+            model.vertices[i++] = 1; // pos
+            model.vertices[i++] = 1;
+            if (!wireframe) {
+                model.vertices[i++] = 1; // uv
+                model.vertices[i] = 1;
             }
 
-            if (model != null) {
-                models.put(key, model);
-            }
+        } else {
+            // TODO Load custom model?
         }
-        return models.get(key);
+        if (model != null) {
+            setModel(offset, model);
+            return model;
+        }
+
+        return null;
     }
 
     /**
@@ -300,9 +301,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param posArraySize Size of the position array (2 or 3).
      * @param primitive    The rendering primitive.
      */
-    protected void addAttributesDivisor0(Array<VertexAttribute> attributes,
-                                         int posArraySize,
-                                         int primitive) {
+    protected void addAttributesDivisor0(Array<VertexAttribute> attributes, int posArraySize, int primitive) {
         // Vertex position and texture coordinates are global
         attributes.add(new VertexAttribute(Usage.Position, posArraySize, ExtShaderProgram.POSITION_ATTRIBUTE));
         if (!isWireframe(primitive)) {
@@ -317,8 +316,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param attributes The list of attributes with divisor=1
      * @param primitive  The rendering primitive.
      */
-    protected abstract void addAttributesDivisor1(Array<VertexAttribute> attributes,
-                                                  int primitive);
+    protected abstract void addAttributesDivisor1(Array<VertexAttribute> attributes, int primitive);
 
     /**
      * Builds the vertex attributes with divisor=0 array and returns it.
@@ -326,11 +324,9 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      *
      * @param posArraySize Size of the position array (2 or 3).
      * @param primitive    The rendering primitive.
-     *
      * @return The vertex attributes array
      */
-    protected VertexAttribute[] buildAttributesDivisor0(int posArraySize,
-                                                        int primitive) {
+    protected VertexAttribute[] buildAttributesDivisor0(int posArraySize, int primitive) {
         Array<VertexAttribute> attributes = new Array<>();
         addAttributesDivisor0(attributes, posArraySize, primitive);
 
@@ -345,7 +341,6 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * The content of divisor-1 attributes is updated for each instance.
      *
      * @param primitive The rendering primitive.
-     *
      * @return The vertex attributes array.
      */
     protected VertexAttribute[] buildAttributesDivisor1(int primitive) {
@@ -365,8 +360,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param curr  The current mesh data.
      * @param model The instanced model.
      */
-    protected abstract void offsets0(MeshData curr,
-                                     InstancedModel model);
+    protected abstract void offsets0(MeshData curr, InstancedModel model);
 
     /**
      * Computes the offset for each vertex attribute in the instanced array. The offsets will be
@@ -375,8 +369,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param curr  The current mesh data.
      * @param model The instanced model.
      */
-    protected abstract void offsets1(MeshData curr,
-                                     InstancedModel model);
+    protected abstract void offsets1(MeshData curr, InstancedModel model);
 
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index.
@@ -386,14 +379,9 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param maxVerts1 The max number of vertices the divisor 1 mesh data can hold.
      * @param modelType The model type string.
      * @param primitive The rendering primitive.
-     *
      * @return The index of the new mesh data.
      */
-    protected int addMeshData(InstancedModel model,
-                              int maxVerts0,
-                              int maxVerts1,
-                              String modelType,
-                              int primitive) {
+    protected int addMeshData(InstancedModel model, int maxVerts0, int maxVerts1, String modelType, int primitive) {
         int mdi = createMeshData();
         curr = meshes.get(mdi);
 
@@ -410,25 +398,20 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         return mdi;
     }
 
-    protected void preRenderObjects(ExtShaderProgram shaderProgram,
-                                    ICamera camera) {
+    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         // Empty, override if needed
     }
 
-    protected void renderObject(ExtShaderProgram shaderProgram,
-                                IRenderable renderable) {
+    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
         // Empty, override if needed
     }
 
-    protected void postRenderObjects(ExtShaderProgram shaderProgram,
-                                     ICamera camera) {
+    protected void postRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         // Empty, override if needed
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables,
-                           ICamera camera,
-                           double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size() > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
 

@@ -68,17 +68,12 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                         ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
-        extended = rg == RenderGroup.PARTICLE_GROUP_EXT_BILLBOARD || rg == RenderGroup.PARTICLE_GROUP_EXT_WIREFRAME;
+        extended = rg.toString().contains("PARTICLE_GROUP_EXT");
 
         rand = new Random(123);
         aux1 = new Vector3();
         cmap = new Colormap();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_PARTICLE_GROUP);
-    }
-
-    @Override
-    protected void initShaderProgram() {
-        // Empty
     }
 
     @Override
@@ -130,12 +125,13 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-        var model = getModel(set.modelType, set.modelPrimitive);
-        if (model != null && !set.disposed) {
+        if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             int n = set.pointData.size();
+            var model = getModel(set.modelType, set.modelPrimitive, getOffset(render));
             if (!inGpu(render)) {
                 int offset = addMeshData(model, model.numModelVertices, n, set.modelType, set.modelPrimitive);
+                setModel(offset, model);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
                 model.ensureInstanceAttribsSize(n * curr.instanceSize);
