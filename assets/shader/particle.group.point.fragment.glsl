@@ -24,7 +24,7 @@ layout (location = 0) out vec4 fragColor;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
-#endif
+#endif // velocityBufferFlag
 
 vec4 programmatic(float dist) {
     float profile =  1.0 - pow(abs(sin(PI * dist / 2.0)), u_falloff);
@@ -58,5 +58,5 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBuffer(fragColor.a);
-    #endif
+    #endif // velocityBufferFlag
 }

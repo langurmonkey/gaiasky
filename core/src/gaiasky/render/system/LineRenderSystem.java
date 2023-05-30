@@ -37,7 +37,7 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
     private ExtShaderProgram shaderProgram;
 
     public LineRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(sceneRenderer, rg, alphas, shaders, -1);
+        super(sceneRenderer, rg, alphas, shaders);
         aux2 = new Vector3();
     }
 

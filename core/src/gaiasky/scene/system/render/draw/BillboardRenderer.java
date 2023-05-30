@@ -91,8 +91,6 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
         int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
         mesh.setIndices(indices);
 
-        auxf = new Vector3();
-
         if (starTextureListener) {
             EventManager.instance.subscribe(this, Event.BILLBOARD_TEXTURE_IDX_CMD);
         }

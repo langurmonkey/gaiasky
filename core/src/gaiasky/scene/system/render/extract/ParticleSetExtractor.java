@@ -65,7 +65,11 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
         var set = Mapper.particleSet.get(render.entity);
         if (set.renderParticles) {
             if (set.isExtended) {
-                addToRender(render, set.modelType.rg);
+                if (set.isWireframe()) {
+                    addToRender(render, RenderGroup.PARTICLE_GROUP_EXT_WIREFRAME);
+                } else {
+                    addToRender(render, RenderGroup.PARTICLE_GROUP_EXT_BILLBOARD);
+                }
             } else {
                 addToRender(render, RenderGroup.PARTICLE_GROUP);
             }

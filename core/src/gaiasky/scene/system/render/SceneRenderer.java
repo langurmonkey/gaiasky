@@ -30,7 +30,6 @@ import gaiasky.render.process.*;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.IRenderSystem;
-import gaiasky.render.system.InstancedRenderSystem.ModelType;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.CameraManager.CameraMode;
@@ -322,17 +321,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
             system.addPostRunnables(regularBlendR, depthWritesR);
         }
-        case PARTICLE_GROUP_EXT -> {
-            // PARTICLE GROUP (EXTENDED, QUAD)
-            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT, alphas, renderAssets.particleGroupExtShaders);
+        case PARTICLE_GROUP_EXT_BILLBOARD -> {
+            // PARTICLE GROUP (EXTENDED, billboards)
+            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_BILLBOARD, alphas, renderAssets.particleGroupExtBillboardShaders);
             system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
             system.addPostRunnables(regularBlendR, depthWritesR);
         }
-        case PARTICLE_GROUP_EXT_SPHERE -> {
-            // PARTICLE GROUP (EXTENDED, SPHERE)
-            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_SPHERE, alphas,
-                                                      renderAssets.particleGroupExtModelShaders,
-                                                      ModelType.ICOSPHERE);
+        case PARTICLE_GROUP_EXT_WIREFRAME -> {
+            // PARTICLE GROUP (EXTENDED, wireframes)
+            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_WIREFRAME, alphas, renderAssets.particleGroupExtWireframeShaders);
             system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
             system.addPostRunnables(regularBlendR, depthWritesR);
         }

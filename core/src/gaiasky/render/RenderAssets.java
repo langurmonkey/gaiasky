@@ -53,7 +53,8 @@ public class RenderAssets {
             billboardGroupShaders,
             particleEffectShaders,
             particleGroupShaders,
-            particleGroupExtShaders,
+            particleGroupExtBillboardShaders,
+            particleGroupExtWireframeShaders,
             particleGroupExtModelShaders,
             starGroupShaders,
             variableGroupShaders,
@@ -88,8 +89,8 @@ public class RenderAssets {
     private AssetDescriptor<ExtShaderProgram>[]
             starGroupDesc,
             particleGroupDesc,
-            particleGroupExtDesc,
-            particleGroupExtModelDesc,
+            particleGroupExtBillboardDesc,
+            particleGroupExtWireframeDesc,
             variableGroupDesc,
             particleEffectDesc,
             orbitElemDesc,
@@ -154,23 +155,23 @@ public class RenderAssets {
                                         TextUtils.concatAll("particle.effect", names), defines);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
         // Initialize point cloud shaders - depends on point cloud mode
-        final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
-        final String pointTriSuffixParticles = !Settings.settings.runtime.openXr && Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
+        final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
+        final String pointTriSuffixParticles = !Settings.settings.runtime.openXr && Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
         particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffixParticles + ".vertex.glsl",
                                        "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesColMap),
                                        definesColMap);
-        particleGroupExtDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl",
-                                          TextUtils.concatAll("particle.group.ext", namesColMap),
-                                          definesColMap, "#define extendedParticlesFlag");
-        particleGroupExtModelDesc = loadShader(manager, "shader/particle.group.model.vertex.glsl", "shader/particle.group.model.fragment.glsl",
-                                          TextUtils.concatAll("particle.group.ext.model", namesColMap),
-                                          definesColMap, "#define extendedParticlesFlag");
+        particleGroupExtBillboardDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl",
+                                                   TextUtils.concatAll("particle.group.ext", namesColMap),
+                                                   definesColMap, "#define extendedParticlesFlag");
+        particleGroupExtWireframeDesc = loadShader(manager, "shader/particle.group.wireframe.vertex.glsl", "shader/particle.group.wireframe.fragment.glsl",
+                                                   TextUtils.concatAll("particle.group.ext.wireframe", namesColMap),
+                                                   definesColMap, "#define extendedParticlesFlag");
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
                                    TextUtils.concatAll("star.group", namesColMap), definesColMap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
                                        TextUtils.concatAll("variable.group", namesColMap), definesColMap);
         // Regular stars
-        starPointDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.point", names), defines);
+        starPointDesc = loadShader(manager, "shader/star.group.point.vertex.glsl", "shader/star.group.point.fragment.glsl", TextUtils.concatAll("star.point", names), defines);
 
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
@@ -290,14 +291,14 @@ public class RenderAssets {
         particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, TextUtils.concatAll("particle.group", names));
 
         /*
-         * PARTICLE GROUP EXT (TRI) - default and relativistic
+         * PARTICLE GROUP EXT BILLBOARDS - default and relativistic
          */
-        particleGroupExtShaders = fetchShaderProgram(manager, particleGroupExtDesc, TextUtils.concatAll("particle.group.ext", names));
+        particleGroupExtBillboardShaders = fetchShaderProgram(manager, particleGroupExtBillboardDesc, TextUtils.concatAll("particle.group.ext", names));
 
         /*
-         * PARTICLE GROUP EXT MODEL - default and relativistic
+         * PARTICLE GROUP EXT WIREFRAMES - default and relativistic
          */
-        particleGroupExtModelShaders = fetchShaderProgram(manager, particleGroupExtModelDesc, TextUtils.concatAll("particle.group.ext.model", names));
+        particleGroupExtWireframeShaders = fetchShaderProgram(manager, particleGroupExtWireframeDesc, TextUtils.concatAll("particle.group.ext.wireframe", names));
 
         /*
          * STAR GROUP (TRI) - default and relativistic

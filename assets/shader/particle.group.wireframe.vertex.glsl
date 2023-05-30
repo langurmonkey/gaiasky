@@ -51,7 +51,7 @@ out float v_textureIndex;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 #ifndef PI
 #define PI 3.141592653589793238462643383
@@ -81,8 +81,8 @@ void main() {
     float dist = length(pos * 1e-14) * 1e14;
     // Small-angle approximation, in degrees.
     float solidAngleDeg = (a_size / dist) * 180.0 / PI;
-    // When angle goes from 3 to 0.1 degrees, fade factor goes from 1 to 0.07.
-    float fadeFactor = smoothstep(0.1, 3.0, solidAngleDeg) * 0.93 + 0.07;
+    // When angle goes from 3 to 0.1 degrees, fade factor goes from 1 to 0.15.
+    float fadeFactor = smoothstep(0.1, 3.0, solidAngleDeg) * 0.85 + 0.15;
 
     #ifdef relativisticEffects
     pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
@@ -106,5 +106,5 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, a_particlePos, s_size, a_position, s_quat, s_quat_conj);
-    #endif
+    #endif // velocityBufferFlag
 }

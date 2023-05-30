@@ -35,7 +35,7 @@ out float v_textureIndex;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
@@ -71,5 +71,5 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position.xyz, dist, vec2(1e10, 1e12), 1.0);
-    #endif
+    #endif // velocityBufferFlag
 }

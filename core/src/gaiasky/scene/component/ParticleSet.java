@@ -9,11 +9,11 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.TextureArray;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.system.InstancedRenderSystem.ModelType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
@@ -72,9 +72,13 @@ public class ParticleSet implements Component, IDisposable {
 
     /**
      * Default model type to use for the particles of this set.
-     * Only affects extended particle groups.
+     * Typically, this should be set to quad, but allows for other model types.
      **/
-    public ModelType modelType = ModelType.QUAD;
+    public String modelType = "quad";
+    /**
+     * Render primitive. Triangles by default.
+     */
+    public int modelPrimitive = GL30.GL_TRIANGLES;
 
     /**
      * Profile decay of the particles in the shader, when using quads.
@@ -423,9 +427,17 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setModelType(String modelType) {
-        try {
-            this.modelType = ModelType.valueOf(modelType.toUpperCase());
-        } catch (Exception ignored) {}
+        this.modelType = modelType;
+    }
+
+    public void setModelPrimitive(String modelPrimitive) {
+        this.modelPrimitive = switch(modelPrimitive) {
+            case "GL_TRIANGLE_STRIP", "gl_triangle_strip" -> GL30.GL_TRIANGLE_STRIP;
+            case "GL_LINES", "gl_lines" -> GL30.GL_LINES;
+            case "GL_LINE_LOOP", "gl_line_loop" -> GL30.GL_LINE_LOOP;
+            case "GL_LINE_STRIP", "gl_line_strip" -> GL30.GL_LINE_STRIP;
+            default -> GL30.GL_TRIANGLES;
+        };
     }
 
     // FOCUS_MODE size
@@ -745,6 +757,10 @@ public class ParticleSet implements Component, IDisposable {
     // FOCUS_MODE apparent view angle
     public double getSolidAngleApparent() {
         return focusSolidAngleApparent;
+    }
+
+    public boolean isWireframe() {
+        return modelPrimitive >= GL30.GL_LINES && modelPrimitive <= GL30.GL_LINE_STRIP;
     }
 
     public void setForceLabel(Boolean forceLabel,

@@ -40,7 +40,7 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     private final Vector3d D31 = new Vector3d();
 
     public PointPrimitiveRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(sceneRenderer, rg, alphas, shaders, -1);
+        super(sceneRenderer, rg, alphas, shaders);
         this.pointView = new PointView();
         this.glType = GL20.GL_POINTS;
     }

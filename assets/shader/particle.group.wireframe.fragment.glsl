@@ -19,7 +19,7 @@ layout (location = 0) out vec4 fragColor;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
-#endif
+#endif // velocityBufferFlag
 
 void main() {
     fragColor = v_col * v_col.a;
@@ -31,5 +31,5 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBuffer(fragColor.a);
-    #endif
+    #endif // velocityBufferFlag
 }

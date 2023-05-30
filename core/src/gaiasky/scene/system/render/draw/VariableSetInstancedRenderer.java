@@ -47,7 +47,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     private final Vector3 aux1;
     private final Colormap cmap;
     private final ParticleUtils utils;
-    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, starPosOffset;
     private StarSetQuadComponent triComponent;
 
     public VariableSetInstancedRenderer(SceneRenderer sceneRenderer,
@@ -66,14 +65,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     }
 
     @Override
-    protected void addAttributesDivisor0(Array<VertexAttribute> attributes) {
-        // Vertex position and texture coordinates are global
-        attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
-    }
-
-    @Override
-    protected void addAttributesDivisor1(Array<VertexAttribute> attributes) {
+    protected void addAttributesDivisor1(Array<VertexAttribute> attributes,
+                                         int primitive) {
         // Color, object position, proper motion and time series are per instance
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
@@ -93,19 +86,19 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     }
 
     @Override
-    protected void offsets0(MeshData curr) {
+    protected void offsets0(MeshData curr, InstancedModel model) {
         // Not needed
     }
 
     @Override
-    protected void offsets1(MeshData curr) {
+    protected void offsets1(MeshData curr, InstancedModel model) {
         curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
-        pmOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
-        starPosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
-        nVariOffset = curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
-        variMagsOffset =
+        model.properMotionOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
+        model.particlePosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
+        model.nVariOffset = curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
+        model.variMagsOffset =
                 curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
-        variTimesOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
+        model.variTimesOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
     }
 
     @Override
@@ -141,14 +134,15 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-        if (!set.disposed) {
+        var model = getModel(set.modelType, set.modelPrimitive);
+        if (model != null && !set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             int n = set.data().size();
             if (!inGpu(render)) {
-                int offset = addMeshData(numModelVertices, n);
+                int offset = addMeshData(model, model.numModelVertices, n, set.modelType, set.modelPrimitive);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
-                ensureInstanceAttribsSize(n * curr.instanceSize);
+                model.ensureInstanceAttribsSize(n * curr.instanceSize);
                 int numStarsAdded = 0;
 
                 for (int i = 0; i < n; i++) {
@@ -163,28 +157,28 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                         if (hlCmap) {
                             // Color map
                             double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                            tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                         } else {
                             // Plain
-                            tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
                         }
 
                         // VARIABLE STARS (magnitudes and times)
-                        tempInstanceAttribs[curr.instanceIdx + nVariOffset] = particle.nVari;
+                        model.instanceAttributes[curr.instanceIdx + model.nVariOffset] = particle.nVari;
                         for (int k = 0; k < particle.nVari; k++) {
-                            tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
-                            tempInstanceAttribs[curr.instanceIdx + variTimesOffset + k] = (float) particle.variTime(k);
+                            model.instanceAttributes[curr.instanceIdx + model.variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
+                            model.instanceAttributes[curr.instanceIdx + model.variTimesOffset + k] = (float) particle.variTime(k);
                         }
 
                         // PROPER MOTION [u/yr]
-                        tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
-                        tempInstanceAttribs[curr.instanceIdx + pmOffset + 1] = (float) particle.pmy();
-                        tempInstanceAttribs[curr.instanceIdx + pmOffset + 2] = (float) particle.pmz();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = (float) particle.pmx();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = (float) particle.pmy();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = (float) particle.pmz();
 
                         // STAR POSITION [u]
-                        tempInstanceAttribs[curr.instanceIdx + starPosOffset] = (float) particle.x();
-                        tempInstanceAttribs[curr.instanceIdx + starPosOffset + 1] = (float) particle.y();
-                        tempInstanceAttribs[curr.instanceIdx + starPosOffset + 2] = (float) particle.z();
+                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset] = (float) particle.x();
+                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 1] = (float) particle.y();
+                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 2] = (float) particle.z();
 
                         curr.instanceIdx += curr.instanceSize;
                         curr.numVertices++;
@@ -192,13 +186,14 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                     }
                 }
                 // Global (divisor=0) vertices (position, uv)
-                curr.mesh.setVertices(tempVerts, 0, numModelVertices * modelVertexSize);
+                curr.mesh.setVertices(model.vertices, 0, model.numModelVertices * model.modelVertexSize);
                 // Per instance (divisor=1) vertices
                 int count = numStarsAdded * curr.instanceSize;
                 setCount(render, numStarsAdded);
-                curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
+                curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, count);
 
                 setInGpu(render, true);
+
             }
 
             /*
@@ -231,11 +226,13 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
                 try {
-                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, numModelVertices, getCount(render));
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numModelVertices, getCount(render));
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }
             }
+        } else {
+            throw new RuntimeException("No suitable model found for type '" + set.modelType + "' and primitive '" + set.modelPrimitive + "'");
         }
     }
 

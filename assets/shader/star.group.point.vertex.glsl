@@ -108,7 +108,7 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
-    #endif
+    #endif // velocityBufferFlag
 
     if (dist < l0){
         // The pixels of this star will be discarded in the fragment shader

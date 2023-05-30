@@ -26,9 +26,6 @@ uniform vec3 u_camUp;
 out vec4 v_color;
 out vec2 v_texCoords;
 
-#define distfac 6.24e-8 / 60000.0
-#define distfacinv 60000.0 / 3.23e-8
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -50,17 +47,11 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    // Scale
-    float size = u_size;
-    if(u_distance > distfacinv){
-        size *= u_distance * distfac;
-    }
-
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
-    float s_size = size;
+    float s_size = u_size;
     #include shader/snip_billboard.glsl
 
     gl_Position = gpos;

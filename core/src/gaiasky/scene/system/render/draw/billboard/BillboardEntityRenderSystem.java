@@ -57,11 +57,17 @@ public class BillboardEntityRenderSystem implements IObserver {
         solidAngleThresholdBottomOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor;
     }
 
-    public float getRenderSizeBillboardGalaxy(ICamera camera, Body body, ModelScaffolding scaffolding) {
+    public float getRenderSizeBillboardGalaxy(ICamera camera,
+                                              Body body,
+                                              ModelScaffolding scaffolding) {
         return body.size * Settings.settings.scene.star.brightness * scaffolding.billboardSizeFactor;
     }
 
-    public void renderBillboardGalaxy(BillboardView view, float alpha, ExtShaderProgram shader, IntMesh mesh, ICamera camera) {
+    public void renderBillboardGalaxy(BillboardView view,
+                                      float alpha,
+                                      ExtShaderProgram shader,
+                                      IntMesh mesh,
+                                      ICamera camera) {
         var entity = view.getEntity();
         var base = view.base;
         var body = view.body;
@@ -87,7 +93,17 @@ public class BillboardEntityRenderSystem implements IObserver {
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
 
-    private void renderCloseUpStar(StarSet set, Highlight highlight, DatasetDescription desc, int idx, float fovFactor, Vector3d cPosD, ICamera camera, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, float alpha) {
+    private void renderCloseUpStar(StarSet set,
+                                   Highlight highlight,
+                                   DatasetDescription desc,
+                                   int idx,
+                                   float fovFactor,
+                                   Vector3d cPosD,
+                                   ICamera camera,
+                                   ExtShaderProgram shader,
+                                   IntMesh mesh,
+                                   double thPointTimesFovFactor,
+                                   float alpha) {
         if (utils.filter(idx, set, desc) && set.isVisible(idx)) {
             IParticleRecord star = set.pointData.get(idx);
             double varScl = utils.getVariableSizeScaling(set, idx);
@@ -119,7 +135,10 @@ public class BillboardEntityRenderSystem implements IObserver {
         }
     }
 
-    public double getRenderSizeStarSet(double size, double radius, double distToCamera, double viewAngle) {
+    public double getRenderSizeStarSet(double size,
+                                       double radius,
+                                       double distToCamera,
+                                       double viewAngle) {
         double computedSize = size;
         if (viewAngle > solidAngleThresholdBottomOverFovFactor) {
             double dist;
@@ -135,7 +154,11 @@ public class BillboardEntityRenderSystem implements IObserver {
         return computedSize;
     }
 
-    public void renderBillboardStarSet(BillboardView view, float alpha, ExtShaderProgram shader, IntMesh mesh, ICamera camera) {
+    public void renderBillboardStarSet(BillboardView view,
+                                       float alpha,
+                                       ExtShaderProgram shader,
+                                       IntMesh mesh,
+                                       ICamera camera) {
         var entity = view.getEntity();
         var base = view.base;
         var set = Mapper.starSet.get(entity);
@@ -169,7 +192,12 @@ public class BillboardEntityRenderSystem implements IObserver {
         }
     }
 
-    public float getRenderSizeCelestial(ICamera camera, Entity entity, Body body, SolidAngle sa, ModelScaffolding scaffolding, ParticleExtra extra) {
+    public float getRenderSizeCelestial(ICamera camera,
+                                        Entity entity,
+                                        Body body,
+                                        SolidAngle sa,
+                                        ModelScaffolding scaffolding,
+                                        ParticleExtra extra) {
         if (extra != null) {
             // Stars, particles
             boolean star = Mapper.hip.has(entity);
@@ -201,7 +229,11 @@ public class BillboardEntityRenderSystem implements IObserver {
         }
     }
 
-    public void renderBillboardCelestial(BillboardView view, float alpha, ExtShaderProgram shader, IntMesh mesh, ICamera camera) {
+    public void renderBillboardCelestial(BillboardView view,
+                                         float alpha,
+                                         ExtShaderProgram shader,
+                                         IntMesh mesh,
+                                         ICamera camera) {
         var entity = view.getEntity();
         var base = view.base;
         var body = view.body;
@@ -253,7 +285,11 @@ public class BillboardEntityRenderSystem implements IObserver {
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
 
-    public void renderBillboardCluster(BillboardView view, float alpha, ExtShaderProgram shader, IntMesh mesh, ICamera camera) {
+    public void renderBillboardCluster(BillboardView view,
+                                       float alpha,
+                                       ExtShaderProgram shader,
+                                       IntMesh mesh,
+                                       ICamera camera) {
         var entity = view.getEntity();
         var base = view.base;
         var body = view.body;
@@ -279,7 +315,9 @@ public class BillboardEntityRenderSystem implements IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         if (event == Event.FOV_CHANGE_NOTIFICATION) {
             fovFactor = (Float) data[1];
             solidAngleThresholdTopOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP / fovFactor;

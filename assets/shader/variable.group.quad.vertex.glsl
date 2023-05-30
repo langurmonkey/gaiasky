@@ -66,7 +66,7 @@ out vec2 v_uv;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 float idx(vec4[N_VECS] v, int i) {
     int a = int(i / 4);
@@ -164,7 +164,7 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, a_starPos, s_size, a_position, s_quat, s_quat_conj);
-    #endif
+    #endif // velocityBufferFlag
 
     if (dist < l0) {
         // The pixels of this star will be discarded in the fragment shader

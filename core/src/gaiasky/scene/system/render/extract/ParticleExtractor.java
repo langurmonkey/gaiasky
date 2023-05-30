@@ -43,7 +43,6 @@ public class ParticleExtractor extends AbstractExtractSystem {
             var renderType = Mapper.renderType.get(entity);
             var hip = Mapper.hip.get(entity);
 
-            addToRender(render, RenderGroup.POINT_STAR);
 
             if (hip == null) {
                 addToRenderParticle(camera, entity, body, render, renderType);
@@ -68,6 +67,8 @@ public class ParticleExtractor extends AbstractExtractSystem {
     }
 
     private void addToRenderStar(ICamera camera, Entity entity, Body body, Render render, RenderType renderType) {
+        addToRender(render, RenderGroup.POINT_STAR);
+
         if (camera.getCurrent() instanceof FovCamera) {
             // Render as point, do nothing
             addToRender(render, RenderGroup.BILLBOARD_STAR);

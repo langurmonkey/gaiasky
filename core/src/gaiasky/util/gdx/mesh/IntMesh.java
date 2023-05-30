@@ -77,7 +77,10 @@ public class IntMesh implements Disposable {
      * @param attributes  the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
      *                    normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
      */
-    public IntMesh(boolean isStatic, int maxVertices, int maxIndices, VertexAttribute[] attributes) {
+    public IntMesh(boolean isStatic,
+                   int maxVertices,
+                   int maxIndices,
+                   VertexAttribute[] attributes) {
         this(isStatic, maxVertices, maxIndices, new VertexAttributes(attributes));
     }
 
@@ -91,7 +94,11 @@ public class IntMesh implements Disposable {
      *                            normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
      * @param attributesInstanced vertex attributes for instanced mode. These have a divisor of 1
      */
-    public IntMesh(boolean isStatic, int maxGlobal, int maxInstanced, VertexAttribute[] attributes, VertexAttribute[] attributesInstanced) {
+    public IntMesh(boolean isStatic,
+                   int maxGlobal,
+                   int maxInstanced,
+                   VertexAttribute[] attributes,
+                   VertexAttribute[] attributesInstanced) {
         this.isInstanced = maxInstanced > 0;
         this.vertices = makeVertexBuffer(isStatic, maxGlobal, new VertexAttributes(attributes), maxInstanced, new VertexAttributes(attributesInstanced));
         this.indices = null;
@@ -109,7 +116,10 @@ public class IntMesh implements Disposable {
      * @param attributes  the {@link VertexAttributes}. Each vertex attribute defines one property of a vertex such as position,
      *                    normal or texture coordinate
      */
-    public IntMesh(boolean isStatic, int maxVertices, int maxIndices, VertexAttributes attributes) {
+    public IntMesh(boolean isStatic,
+                   int maxVertices,
+                   int maxIndices,
+                   VertexAttributes attributes) {
         this.vertices = makeVertexBuffer(isStatic, maxVertices, attributes);
         this.indices = new IntIndexBufferObject(isStatic, maxIndices);
         this.isVertexArray = false;
@@ -130,7 +140,11 @@ public class IntMesh implements Disposable {
      *
      * @author Jaroslaw Wisniewski <j.wisniewski@appsisle.com>
      **/
-    public IntMesh(boolean staticVertices, boolean staticIndices, int maxVertices, int maxIndices, VertexAttributes attributes) {
+    public IntMesh(boolean staticVertices,
+                   boolean staticIndices,
+                   int maxVertices,
+                   int maxIndices,
+                   VertexAttributes attributes) {
         this.vertices = makeVertexBuffer(staticVertices, maxVertices, attributes);
         this.indices = new IntIndexBufferObject(staticIndices, maxIndices);
         this.isVertexArray = false;
@@ -149,7 +163,11 @@ public class IntMesh implements Disposable {
      * @param attributes  the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
      *                    normal or texture coordinate
      */
-    public IntMesh(VertexDataType type, boolean isStatic, int maxVertices, int maxIndices, VertexAttribute[] attributes) {
+    public IntMesh(VertexDataType type,
+                   boolean isStatic,
+                   int maxVertices,
+                   int maxIndices,
+                   VertexAttribute[] attributes) {
         this(type, isStatic, maxVertices, maxIndices, new VertexAttributes(attributes));
     }
 
@@ -162,7 +180,11 @@ public class IntMesh implements Disposable {
      * @param maxIndices  the maximum number of indices this mesh can hold
      * @param attributes  the {@link VertexAttributes}.
      */
-    public IntMesh(VertexDataType type, boolean isStatic, int maxVertices, int maxIndices, VertexAttributes attributes) {
+    public IntMesh(VertexDataType type,
+                   boolean isStatic,
+                   int maxVertices,
+                   int maxIndices,
+                   VertexAttributes attributes) {
         switch (type) {
         case VertexBufferObject -> {
             vertices = new VertexBufferObject(isStatic, maxVertices, attributes);
@@ -193,7 +215,8 @@ public class IntMesh implements Disposable {
         addManagedMesh(Gdx.app, this);
     }
 
-    private static void addManagedMesh(Application app, IntMesh mesh) {
+    private static void addManagedMesh(Application app,
+                                       IntMesh mesh) {
         Array<IntMesh> managedResources = meshes.get(app);
         if (managedResources == null)
             managedResources = new Array<>();
@@ -245,7 +268,13 @@ public class IntMesh implements Disposable {
      * @param start      the vertex to start with
      * @param count      the amount of vertices to transform
      */
-    public static void transform(final Matrix4 matrix, final float[] vertices, int vertexSize, int offset, int dimensions, int start, int count) {
+    public static void transform(final Matrix4 matrix,
+                                 final float[] vertices,
+                                 int vertexSize,
+                                 int offset,
+                                 int dimensions,
+                                 int start,
+                                 int count) {
         if (offset < 0 || dimensions < 1 || (offset + dimensions) > vertexSize)
             throw new IndexOutOfBoundsException();
         if (start < 0 || count < 1 || ((start + count) * vertexSize) > vertices.length)
@@ -292,7 +321,12 @@ public class IntMesh implements Disposable {
      * @param start      the vertex to start with
      * @param count      the amount of vertices to transform
      */
-    public static void transformUV(final Matrix3 matrix, final float[] vertices, int vertexSize, int offset, int start, int count) {
+    public static void transformUV(final Matrix3 matrix,
+                                   final float[] vertices,
+                                   int vertexSize,
+                                   int offset,
+                                   int start,
+                                   int count) {
         if (start < 0 || count < 1 || ((start + count) * vertexSize) > vertices.length)
             throw new IndexOutOfBoundsException("start = " + start + ", count = " + count + ", vertexSize = " + vertexSize + ", length = " + vertices.length);
 
@@ -307,7 +341,9 @@ public class IntMesh implements Disposable {
         }
     }
 
-    private IntVertexData makeVertexBuffer(boolean isStatic, int maxVertices, VertexAttributes vertexAttributes) {
+    private IntVertexData makeVertexBuffer(boolean isStatic,
+                                           int maxVertices,
+                                           VertexAttributes vertexAttributes) {
         if (Gdx.gl30 != null) {
             return new VertexBufferObjectWithVAO(isStatic, maxVertices, vertexAttributes);
         } else {
@@ -315,7 +351,11 @@ public class IntMesh implements Disposable {
         }
     }
 
-    private IntVertexData makeVertexBuffer(boolean isStatic, int verticesGlobal, VertexAttributes attributesGlobal, int verticesInstance, VertexAttributes attributesInstance) {
+    private IntVertexData makeVertexBuffer(boolean isStatic,
+                                           int verticesGlobal,
+                                           VertexAttributes attributesGlobal,
+                                           int verticesInstance,
+                                           VertexAttributes attributesInstance) {
         if (Gdx.gl30 != null) {
             return new VertexBufferObjectInstanced(isStatic, verticesGlobal, attributesGlobal, verticesInstance, attributesInstance);
         } else {
@@ -345,7 +385,9 @@ public class IntMesh implements Disposable {
      *
      * @return the mesh for invocation chaining.
      */
-    public IntMesh setVertices(float[] vertices, int offset, int count) {
+    public IntMesh setVertices(float[] vertices,
+                               int offset,
+                               int count) {
         this.vertices.setVertices(vertices, offset, count);
 
         return this;
@@ -357,7 +399,8 @@ public class IntMesh implements Disposable {
      * @param targetOffset the offset in number of floats of the mesh part.
      * @param source       the vertex data to update the mesh part with
      */
-    public IntMesh updateVertices(int targetOffset, float[] source) {
+    public IntMesh updateVertices(int targetOffset,
+                                  float[] source) {
         return updateVertices(targetOffset, source, 0, source.length);
     }
 
@@ -369,7 +412,10 @@ public class IntMesh implements Disposable {
      * @param sourceOffset the offset in number of floats within the source array
      * @param count        the number of floats to update
      */
-    public IntMesh updateVertices(int targetOffset, float[] source, int sourceOffset, int count) {
+    public IntMesh updateVertices(int targetOffset,
+                                  float[] source,
+                                  int sourceOffset,
+                                  int count) {
         this.vertices.updateVertices(targetOffset, source, sourceOffset, count);
         return this;
     }
@@ -390,7 +436,8 @@ public class IntMesh implements Disposable {
      * @param srcOffset the offset (in number of floats) of the vertices in the mesh to copy
      * @param vertices  the array to copy the vertices to
      */
-    public float[] getVertices(int srcOffset, float[] vertices) {
+    public float[] getVertices(int srcOffset,
+                               float[] vertices) {
         return getVertices(srcOffset, -1, vertices);
     }
 
@@ -401,7 +448,9 @@ public class IntMesh implements Disposable {
      * @param count     the amount of floats to copy
      * @param vertices  the array to copy the vertices to
      */
-    public float[] getVertices(int srcOffset, int count, float[] vertices) {
+    public float[] getVertices(int srcOffset,
+                               int count,
+                               float[] vertices) {
         return getVertices(srcOffset, count, vertices, 0);
     }
 
@@ -414,7 +463,10 @@ public class IntMesh implements Disposable {
      * @param vertices   the array to copy the vertices to
      * @param destOffset the offset (in floats) in the vertices array to start copying
      */
-    public float[] getVertices(int srcOffset, int count, float[] vertices, int destOffset) {
+    public float[] getVertices(int srcOffset,
+                               int count,
+                               float[] vertices,
+                               int destOffset) {
         // TODO: Perhaps this method should be vertexSize aware??
         final int max = getNumVertices() * getVertexSize() / 4;
         if (count == -1) {
@@ -449,11 +501,15 @@ public class IntMesh implements Disposable {
     /**
      * Sets the per-instance attributes of this Mesh. The attributes are assumed to be given in float format.
      *
-     * @param instance the vertices.
+     * @param instance The vertices.
+     * @param offset   The offset.
+     * @param count    The number of floats to use.
      *
      * @return the mesh for invocation chaining.
      */
-    public IntMesh setInstanceAttribs(float[] instance, int offset, int count) {
+    public IntMesh setInstanceAttribs(float[] instance,
+                                      int offset,
+                                      int count) {
         ((VertexBufferObjectInstanced) this.vertices).setInstance(instance, offset, count);
 
         return this;
@@ -481,7 +537,9 @@ public class IntMesh implements Disposable {
      *
      * @return the mesh for invocation chaining.
      */
-    public IntMesh setIndices(int[] indices, int offset, int count) {
+    public IntMesh setIndices(int[] indices,
+                              int offset,
+                              int count) {
         this.indices.setIndices(indices, offset, count);
 
         return this;
@@ -503,7 +561,8 @@ public class IntMesh implements Disposable {
      * @param indices    the array to copy the indices to
      * @param destOffset the offset in the indices array to start copying
      */
-    public void getIndices(int[] indices, int destOffset) {
+    public void getIndices(int[] indices,
+                           int destOffset) {
         getIndices(0, indices, destOffset);
     }
 
@@ -515,7 +574,9 @@ public class IntMesh implements Disposable {
      * @param indices    the array to copy the indices to
      * @param destOffset the offset in the indices array to start copying
      */
-    public void getIndices(int srcOffset, int[] indices, int destOffset) {
+    public void getIndices(int srcOffset,
+                           int[] indices,
+                           int destOffset) {
         getIndices(srcOffset, -1, indices, destOffset);
     }
 
@@ -528,7 +589,10 @@ public class IntMesh implements Disposable {
      * @param indices    the array to copy the indices to
      * @param destOffset the offset in the indices array to start copying
      */
-    public void getIndices(int srcOffset, int count, int[] indices, int destOffset) {
+    public void getIndices(int srcOffset,
+                           int count,
+                           int[] indices,
+                           int destOffset) {
         int max = getNumIndices();
         if (count < 0)
             count = max - srcOffset;
@@ -596,7 +660,8 @@ public class IntMesh implements Disposable {
      * @param shader    the shader (does not bind the shader)
      * @param locations array containing the attribute locations.
      */
-    public void bind(final ExtShaderProgram shader, final int[] locations) {
+    public void bind(final ExtShaderProgram shader,
+                     final int[] locations) {
         vertices.bind(shader, locations);
         if (indices != null && indices.getNumIndices() > 0)
             indices.bind();
@@ -619,7 +684,8 @@ public class IntMesh implements Disposable {
      * @param shader    the shader (does not unbind the shader)
      * @param locations array containing the attribute locations.
      */
-    public void unbind(final ExtShaderProgram shader, final int[] locations) {
+    public void unbind(final ExtShaderProgram shader,
+                       final int[] locations) {
         vertices.unbind(shader, locations);
         if (indices != null && indices.getNumIndices() > 0)
             indices.unbind();
@@ -646,7 +712,8 @@ public class IntMesh implements Disposable {
      *
      * @param primitiveType the primitive type
      */
-    public void render(ExtShaderProgram shader, int primitiveType) {
+    public void render(ExtShaderProgram shader,
+                       int primitiveType) {
         render(shader, primitiveType, 0, indices.getNumMaxIndices() > 0 ? getNumIndices() : getNumVertices(), autoBind);
     }
 
@@ -675,7 +742,10 @@ public class IntMesh implements Disposable {
      * @param offset        the offset into the vertex or index buffer
      * @param count         number of vertices or indices to use
      */
-    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count) {
+    public void render(ExtShaderProgram shader,
+                       int primitiveType,
+                       int offset,
+                       int count) {
         render(shader, primitiveType, offset, count, autoBind);
     }
 
@@ -692,7 +762,11 @@ public class IntMesh implements Disposable {
      * @param count         number of vertices or indices to use
      * @param instanceCount number of instances
      */
-    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count, int instanceCount) {
+    public void render(ExtShaderProgram shader,
+                       int primitiveType,
+                       int offset,
+                       int count,
+                       int instanceCount) {
         render(shader, primitiveType, offset, count, instanceCount, autoBind);
     }
 
@@ -722,7 +796,11 @@ public class IntMesh implements Disposable {
      * @param count         number of vertices or indices to use
      * @param autoBind      overrides the autoBind member of this Mesh
      */
-    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count, boolean autoBind) {
+    public void render(ExtShaderProgram shader,
+                       int primitiveType,
+                       int offset,
+                       int count,
+                       boolean autoBind) {
         if (count == 0)
             return;
 
@@ -745,7 +823,8 @@ public class IntMesh implements Disposable {
         } else {
             if (indices.getNumIndices() > 0) {
                 if (count + offset > indices.getNumMaxIndices()) {
-                    throw new GdxRuntimeException("Mesh attempting to access memory outside of the index buffer (count: " + count + ", offset: " + offset + ", max: " + indices.getNumMaxIndices() + ")");
+                    throw new GdxRuntimeException("Mesh attempting to access memory outside of the index buffer (count: " + count + ", offset: " + offset + ", max: "
+                                                          + indices.getNumMaxIndices() + ")");
                 }
 
                 Gdx.gl20.glDrawElements(primitiveType, count, GL20.GL_UNSIGNED_INT, offset * 4);
@@ -772,7 +851,12 @@ public class IntMesh implements Disposable {
      * @param instanceCount number of instances
      * @param autoBind      overrides the autoBind member of this Mesh
      */
-    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count, int instanceCount, boolean autoBind) {
+    public void render(ExtShaderProgram shader,
+                       int primitiveType,
+                       int offset,
+                       int count,
+                       int instanceCount,
+                       boolean autoBind) {
         if (count == 0)
             return;
 
@@ -897,7 +981,9 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox calculateBoundingBox(final BoundingBox out, int offset, int count) {
+    public BoundingBox calculateBoundingBox(final BoundingBox out,
+                                            int offset,
+                                            int count) {
         return extendBoundingBox(out.inf(), offset, count);
     }
 
@@ -910,7 +996,10 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox calculateBoundingBox(final BoundingBox out, int offset, int count, final Matrix4 transform) {
+    public BoundingBox calculateBoundingBox(final BoundingBox out,
+                                            int offset,
+                                            int count,
+                                            final Matrix4 transform) {
         return extendBoundingBox(out.inf(), offset, count, transform);
     }
 
@@ -923,7 +1012,9 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out, int offset, int count) {
+    public BoundingBox extendBoundingBox(final BoundingBox out,
+                                         int offset,
+                                         int count) {
         return extendBoundingBox(out, offset, count, null);
     }
 
@@ -936,7 +1027,10 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out, int offset, int count, final Matrix4 transform) {
+    public BoundingBox extendBoundingBox(final BoundingBox out,
+                                         int offset,
+                                         int count,
+                                         final Matrix4 transform) {
         final int numIndices = getNumIndices();
         final int numVertices = getNumVertices();
         final int max = numIndices == 0 ? numVertices : numIndices;
@@ -1023,7 +1117,12 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadiusSquared(final float centerX, final float centerY, final float centerZ, int offset, int count, final Matrix4 transform) {
+    public float calculateRadiusSquared(final float centerX,
+                                        final float centerY,
+                                        final float centerZ,
+                                        int offset,
+                                        int count,
+                                        final Matrix4 transform) {
         int numIndices = getNumIndices();
         if (offset < 0 || count < 1 || offset + count > numIndices)
             throw new GdxRuntimeException("Not enough indices");
@@ -1086,7 +1185,12 @@ public class IntMesh implements Disposable {
      *
      * @return the radius of the bounding sphere.
      */
-    public float calculateRadius(final float centerX, final float centerY, final float centerZ, int offset, int count, final Matrix4 transform) {
+    public float calculateRadius(final float centerX,
+                                 final float centerY,
+                                 final float centerZ,
+                                 int offset,
+                                 int count,
+                                 final Matrix4 transform) {
         return (float) Math.sqrt(calculateRadiusSquared(centerX, centerY, centerZ, offset, count, transform));
     }
 
@@ -1099,7 +1203,10 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final Vector3 center, int offset, int count, final Matrix4 transform) {
+    public float calculateRadius(final Vector3 center,
+                                 int offset,
+                                 int count,
+                                 final Matrix4 transform) {
         return calculateRadius(center.x, center.y, center.z, offset, count, transform);
     }
 
@@ -1114,7 +1221,11 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final float centerX, final float centerY, final float centerZ, int offset, int count) {
+    public float calculateRadius(final float centerX,
+                                 final float centerY,
+                                 final float centerZ,
+                                 int offset,
+                                 int count) {
         return calculateRadius(centerX, centerY, centerZ, offset, count, null);
     }
 
@@ -1127,7 +1238,9 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final Vector3 center, int offset, int count) {
+    public float calculateRadius(final Vector3 center,
+                                 int offset,
+                                 int count) {
         return calculateRadius(center.x, center.y, center.z, offset, count, null);
     }
 
@@ -1140,7 +1253,9 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final float centerX, final float centerY, final float centerZ) {
+    public float calculateRadius(final float centerX,
+                                 final float centerY,
+                                 final float centerZ) {
         return calculateRadius(centerX, centerY, centerZ, 0, getNumIndices(), null);
     }
 
@@ -1168,7 +1283,9 @@ public class IntMesh implements Disposable {
      * @param scaleY scale on y
      * @param scaleZ scale on z
      */
-    public void scale(float scaleX, float scaleY, float scaleZ) {
+    public void scale(float scaleX,
+                      float scaleY,
+                      float scaleZ) {
         final VertexAttribute posAttr = getVertexAttribute(Usage.Position);
         final int offset = posAttr.offset / 4;
         final int numComponents = posAttr.numComponents;
@@ -1217,7 +1334,9 @@ public class IntMesh implements Disposable {
     }
 
     // TODO: Protected for now, because transforming a portion works but still copies all vertices
-    public void transform(final Matrix4 matrix, final int start, final int count) {
+    public void transform(final Matrix4 matrix,
+                          final int start,
+                          final int count) {
         final VertexAttribute posAttr = getVertexAttribute(Usage.Position);
         final int posOffset = posAttr.offset / 4;
         final int stride = getVertexSize() / 4;
@@ -1243,7 +1362,9 @@ public class IntMesh implements Disposable {
     }
 
     // TODO: Protected for now, because transforming a portion works but still copies all vertices
-    protected void transformUV(final Matrix3 matrix, final int start, final int count) {
+    protected void transformUV(final Matrix3 matrix,
+                               final int start,
+                               final int count) {
         final VertexAttribute posAttr = getVertexAttribute(Usage.TextureCoordinates);
         final int offset = posAttr.offset / 4;
         final int vertexSize = getVertexSize() / 4;
@@ -1266,7 +1387,9 @@ public class IntMesh implements Disposable {
      *
      * @return the copy of this mesh
      */
-    public IntMesh copy(boolean isStatic, boolean removeDuplicates, final int[] usage) {
+    public IntMesh copy(boolean isStatic,
+                        boolean removeDuplicates,
+                        final int[] usage) {
         // TODO move this to a copy constructor?
         // TODO duplicate the buffers without double copying the data if possible.
         // TODO perhaps move this code to JNI if it turns out being too slow.

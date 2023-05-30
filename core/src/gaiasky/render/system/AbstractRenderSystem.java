@@ -29,18 +29,20 @@ import java.util.List;
 
 public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<IRenderSystem> {
 
-    protected final SceneRenderer sceneRenderer;
     private final RenderGroup renderGroup;
     private final Settings settings;
+    protected final SceneRenderer sceneRenderer;
+    protected final ExtShaderProgram[] programs;
+    protected final float[] alphas;
+
     public RenderingContext rc;
-    protected ExtShaderProgram[] programs;
-    protected float[] alphas;
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;
-    protected Vector3 auxf;
-    protected Vector3d auxd;
     protected Array<RenderSystemRunnable> preRunnables, postRunnables;
     private boolean vrScaleFlag = false, depthBufferFlag = false;
+
+    protected final Vector3 auxf = new Vector3();
+    protected final Vector3d auxd = new Vector3d();
 
     protected AbstractRenderSystem(SceneRenderer sceneRenderer,
                                    RenderGroup rg,
@@ -52,8 +54,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         this.renderGroup = rg;
         this.alphas = alphas;
         this.programs = programs;
-        this.auxf = new Vector3();
-        this.auxd = new Vector3d();
         this.preRunnables = new Array<>(false, 1);
         this.postRunnables = new Array<>(false, 1);
     }
@@ -228,6 +228,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     protected ExtShaderProgram getShaderProgram() {
+        return getShaderProgram(programs);
+    }
+
+    protected ExtShaderProgram getShaderProgram(ExtShaderProgram[] programs) {
         boolean gw = settings.runtime.gravitationalWaves;
         boolean ra = settings.runtime.relativisticAberration;
         boolean vb = settings.postprocess.motionBlur.active;
