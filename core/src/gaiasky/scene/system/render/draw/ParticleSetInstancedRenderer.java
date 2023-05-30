@@ -47,7 +47,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
     /** Whether to use the extended particle set mode or not. **/
     private final boolean extended;
-    private final Vector3 aux1;
+    private final Vector3 aux1 = new Vector3();
     private final Random rand;
     private final Colormap cmap;
     private final ParticleUtils utils;
@@ -71,7 +71,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         extended = rg.toString().contains("PARTICLE_GROUP_EXT");
 
         rand = new Random(123);
-        aux1 = new Vector3();
         cmap = new Colormap();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_PARTICLE_GROUP);
     }
@@ -222,7 +221,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         numParticlesAdded++;
                     }
                 }
-                // Global (divisor=0) vertices (position, uv?) plus indices
+                // Global (divisor=0) vertices (position, uv?) plus optional indices
                 curr.mesh.setVertices(model.vertices, 0, model.numModelVertices * model.modelVertexSize);
                 if (model.numIndices > 0) {
                     curr.mesh.setIndices(model.indices, 0, model.numIndices);
@@ -308,6 +307,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);
+            models[offset] = null;
             if (inGpu != null)
                 inGpu.remove(renderable);
         }

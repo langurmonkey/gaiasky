@@ -504,15 +504,11 @@ public class IntMesh implements Disposable {
      * @param instance The vertices.
      * @param offset   The offset.
      * @param count    The number of floats to use.
-     *
-     * @return the mesh for invocation chaining.
      */
-    public IntMesh setInstanceAttribs(float[] instance,
+    public void setInstanceAttribs(float[] instance,
                                       int offset,
                                       int count) {
         ((VertexBufferObjectInstanced) this.vertices).setInstance(instance, offset, count);
-
-        return this;
     }
 
     /**
