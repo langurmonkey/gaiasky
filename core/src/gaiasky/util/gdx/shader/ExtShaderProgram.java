@@ -29,6 +29,8 @@ public class ExtShaderProgram implements Disposable {
     public static final String POSITION_ATTRIBUTE = "a_position";
     /** Default name for color attributes. **/
     public static final String COLOR_ATTRIBUTE = "a_color";
+    /** Default name for normal attribute. **/
+    public static final String NORMAL_ATTRIBUTE = "a_normal";
     /** Default name for texture coordinates attributes, append texture unit number. **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     final static IntBuffer intbuf = BufferUtils.newIntBuffer(1);

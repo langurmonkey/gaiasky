@@ -30,7 +30,7 @@ uniform float u_fixedAngularSize;
 // INPUT
 // Regular attributes
 layout (location=0) in vec4 a_position;
-layout (location=1) in vec2 a_texCoord;
+layout (location=1) in vec2 a_texCoord0;
 // Instanced attributes
 layout (location=2) in vec3 a_starPos;
 layout (location=3) in vec3 a_pm;
@@ -160,7 +160,7 @@ void main() {
 
     gl_Position = gpos;
 
-    v_uv = a_texCoord;
+    v_uv = a_texCoord0;
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, a_starPos, s_size, a_position, s_quat, s_quat_conj);

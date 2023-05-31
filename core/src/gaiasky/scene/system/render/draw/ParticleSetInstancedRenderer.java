@@ -7,7 +7,9 @@
 
 package gaiasky.scene.system.render.draw;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
@@ -127,9 +129,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             int n = set.pointData.size();
-            var model = getModel(set.modelType, set.modelPrimitive, getOffset(render));
+            var model = getModel(set, getOffset(render));
             if (!inGpu(render)) {
-                int offset = addMeshData(model, model.numModelVertices, n, set.modelType, set.modelPrimitive);
+                int offset = addMeshData(model, model.numVertices, n, model.numIndices, set.modelFile, set.modelType, set.modelPrimitive);
                 setModel(offset, model);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
@@ -192,7 +194,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
                         // TEXTURE INDEX
                         float textureIndex = -1.0f;
-                        if (set.textureArray != null) {
+                        if (set.textureArray != null && !set.isWireframe()) {
                             int nTextures = set.textureArray.getDepth();
                             textureIndex = (float) rand.nextInt(nTextures);
                         }
@@ -222,7 +224,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                     }
                 }
                 // Global (divisor=0) vertices (position, uv?) plus optional indices
-                curr.mesh.setVertices(model.vertices, 0, model.numModelVertices * model.modelVertexSize);
+                curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
                 if (model.numIndices > 0) {
                     curr.mesh.setIndices(model.indices, 0, model.numIndices);
                 }
@@ -230,6 +232,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 int count = numParticlesAdded * curr.instanceSize;
                 setCount(render, numParticlesAdded);
                 curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, count);
+                model.instanceAttributes = null;
 
                 setInGpu(render, true);
             }
@@ -268,7 +271,10 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 }
 
                 try {
-                    curr.mesh.render(shaderProgram, set.modelPrimitive, 0, curr.mesh.getNumVertices(), getCount(render));
+                    Gdx.gl30.glEnable(GL30.GL_CULL_FACE);
+                    Gdx.gl30.glCullFace(GL30.GL_BACK);
+                    int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
+                    curr.mesh.render(shaderProgram, set.modelPrimitive, 0, count, getCount(render));
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }

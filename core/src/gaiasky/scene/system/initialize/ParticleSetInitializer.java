@@ -36,6 +36,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
+import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -110,6 +111,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             // Particles.
             if (particleSet.numLabels > 0) {
                 initSortingData(entity, particleSet, null);
+            }
+
+            // Model.
+            if (particleSet.modelFile != null && manager.isLoaded(Settings.settings.data.dataFile(particleSet.modelFile))) {
+                // Model comes from file (probably .obj or .g3db)
+                particleSet.model = manager.get(Settings.settings.data.dataFile(particleSet.modelFile), IntModel.class);
             }
         }
 
@@ -216,6 +223,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         label.renderConsumer = LabelEntityRenderSystem::renderParticleSet;
         label.renderFunction = LabelView::renderTextBase;
         set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.particleGroups.numLabels;
+
+        // Model.
+        if (set.modelFile != null && !set.modelFile.isBlank()) {
+            AssetBean.addAsset(Settings.settings.data.dataFile(set.modelFile), IntModel.class);
+        }
     }
 
     /**

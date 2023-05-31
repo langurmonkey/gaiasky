@@ -26,6 +26,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2d;
@@ -71,10 +72,24 @@ public class ParticleSet implements Component, IDisposable {
     public Map<String, Object> providerParams;
 
     /**
+     * Model file to use (obj, g3db, g3dj, gltf, glb). If present, modelType and modelParams are ignored.
+     * The model should have only positions (vector-3), normals (vector-3) and texture coordinates (vector-2) as vertex attributes.
+     * Only the first mesh of the model is used. Textures, lighting and material are ignored.
+     */
+    public String modelFile;
+    /**
+     * The loaded model pointed by modelFile.
+     */
+    public IntModel model;
+    /**
      * Default model type to use for the particles of this set.
      * Typically, this should be set to quad, but allows for other model types.
      **/
     public String modelType = "quad";
+    /**
+     * Parameters for the model, in case 'modelType' is used.
+     */
+    public Map<String, Object> modelParams;
     /**
      * Render primitive. Triangles by default.
      */
@@ -383,6 +398,8 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setParticleSizeLimits(double[] sizeLimits) {
+        sizeLimits[0] = MathUtilsDouble.clamp(sizeLimits[0], 0, 90);
+        sizeLimits[1] = MathUtilsDouble.clamp(sizeLimits[1], 0, 90);
         if (sizeLimits[0] > sizeLimits[1])
             sizeLimits[0] = sizeLimits[1];
         this.particleSizeLimits = sizeLimits;
@@ -428,6 +445,10 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setModelType(String modelType) {
         this.modelType = modelType;
+    }
+
+    public void setModelParams(Map<String, Object> params) {
+        this.modelParams = params;
     }
 
     public void setModelPrimitive(String modelPrimitive) {
@@ -761,6 +782,10 @@ public class ParticleSet implements Component, IDisposable {
 
     public boolean isWireframe() {
         return modelPrimitive >= GL30.GL_LINES && modelPrimitive <= GL30.GL_LINE_STRIP;
+    }
+
+    public boolean isBillboard() {
+        return model == null && modelType.equalsIgnoreCase("quad");
     }
 
     public void setForceLabel(Boolean forceLabel,

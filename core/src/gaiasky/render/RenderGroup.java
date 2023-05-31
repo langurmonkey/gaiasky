@@ -65,7 +65,7 @@ public enum RenderGroup {
     /**
      * Particle group (extended, wireframes)
      **/
-    PARTICLE_GROUP_EXT_WIREFRAME(1110),
+    PARTICLE_GROUP_EXT_MODEL(1110),
     /**
      * Star group
      **/

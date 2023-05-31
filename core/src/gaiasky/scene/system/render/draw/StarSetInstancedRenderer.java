@@ -121,10 +121,10 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
-            var model = getModel(set.modelType, set.modelPrimitive, getOffset(render));
+            var model = getModel(set, getOffset(render));
             int n = set.data().size();
             if (!inGpu(render)) {
-                int offset = addMeshData(model, model.numModelVertices, n, set.modelType, set.modelPrimitive);
+                int offset = addMeshData(model, model.numVertices, n, 0, set.modelFile, set.modelType, set.modelPrimitive);
                 setModel(offset, model);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
@@ -168,7 +168,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     }
                 }
                 // Global (divisor=0) vertices (position, uv)
-                curr.mesh.setVertices(model.vertices, 0, model.numModelVertices * model.modelVertexSize);
+                curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
                 // Per instance (divisor=1) vertices
                 int count = numStarsAdded * curr.instanceSize;
                 setCount(render, numStarsAdded);
@@ -204,7 +204,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
                 try {
-                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numModelVertices, getCount(render));
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numVertices, getCount(render));
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }

@@ -50,7 +50,7 @@ public class ModelCache {
                 var recursion = ((Long) params.get("recursion")).intValue();
                 var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                 var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
-                model = mb.createIcoSphere(diameter / 2, recursion, flip, false, primitiveType, mat, attributes);
+                model = mb.createIcoSphere(diameter / 2.0f, recursion, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
             }
             case "octahedronsphere" -> {

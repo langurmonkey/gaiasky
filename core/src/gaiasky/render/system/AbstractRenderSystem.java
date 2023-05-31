@@ -38,7 +38,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     public RenderingContext rc;
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;
-    protected Array<RenderSystemRunnable> preRunnables, postRunnables;
+    protected Array<RenderSystemRunnable> preRunners, postRunners;
     private boolean vrScaleFlag = false, depthBufferFlag = false;
 
     protected final Vector3 auxf = new Vector3();
@@ -54,8 +54,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         this.renderGroup = rg;
         this.alphas = alphas;
         this.programs = programs;
-        this.preRunnables = new Array<>(false, 1);
-        this.postRunnables = new Array<>(false, 1);
+        this.preRunners = new Array<>(false, 1);
+        this.postRunners = new Array<>(false, 1);
     }
 
     @Override
@@ -70,9 +70,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
                        RenderingContext rc) {
         if (renderables != null && renderables.size() != 0) {
             this.rc = rc;
-            run(preRunnables, renderables, camera);
+            run(preRunners, renderables, camera);
             renderStud(renderables, camera, t);
-            run(postRunnables, renderables, camera);
+            run(postRunners, renderables, camera);
         }
     }
 
@@ -81,11 +81,11 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
                                     double t);
 
     public void addPreRunnables(RenderSystemRunnable... r) {
-        preRunnables.addAll(r);
+        preRunners.addAll(r);
     }
 
     public void addPostRunnables(RenderSystemRunnable... r) {
-        postRunnables.addAll(r);
+        postRunners.addAll(r);
     }
 
     protected void run(Array<RenderSystemRunnable> runnables,
@@ -260,10 +260,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     public void dispose() {
-        preRunnables.clear();
-        preRunnables = null;
-        postRunnables.clear();
-        postRunnables = null;
+        preRunners.clear();
+        preRunners = null;
+        postRunners.clear();
+        postRunners = null;
     }
 
     public void resetFlags() {

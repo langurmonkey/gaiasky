@@ -327,9 +327,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
             system.addPostRunnables(regularBlendR, depthWritesR);
         }
-        case PARTICLE_GROUP_EXT_WIREFRAME -> {
-            // PARTICLE GROUP (EXTENDED, wireframes)
-            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_WIREFRAME, alphas, renderAssets.particleGroupExtWireframeShaders);
+        case PARTICLE_GROUP_EXT_MODEL -> {
+            // PARTICLE GROUP (EXTENDED, models)
+            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_MODEL, alphas, renderAssets.particleGroupExtModelShaders);
             system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
             system.addPostRunnables(regularBlendR, depthWritesR);
         }

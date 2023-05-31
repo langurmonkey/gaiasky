@@ -54,7 +54,6 @@ public class RenderAssets {
             particleEffectShaders,
             particleGroupShaders,
             particleGroupExtBillboardShaders,
-            particleGroupExtWireframeShaders,
             particleGroupExtModelShaders,
             starGroupShaders,
             variableGroupShaders,
@@ -90,7 +89,7 @@ public class RenderAssets {
             starGroupDesc,
             particleGroupDesc,
             particleGroupExtBillboardDesc,
-            particleGroupExtWireframeDesc,
+            particleGroupExtModelDesc,
             variableGroupDesc,
             particleEffectDesc,
             orbitElemDesc,
@@ -163,9 +162,9 @@ public class RenderAssets {
         particleGroupExtBillboardDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl",
                                                    TextUtils.concatAll("particle.group.ext", namesColMap),
                                                    definesColMap, "#define extendedParticlesFlag");
-        particleGroupExtWireframeDesc = loadShader(manager, "shader/particle.group.wireframe.vertex.glsl", "shader/particle.group.wireframe.fragment.glsl",
-                                                   TextUtils.concatAll("particle.group.ext.wireframe", namesColMap),
-                                                   definesColMap, "#define extendedParticlesFlag");
+        particleGroupExtModelDesc = loadShader(manager, "shader/particle.group.model.vertex.glsl", "shader/particle.group.model.fragment.glsl",
+                                               TextUtils.concatAll("particle.group.ext.model", namesColMap),
+                                               definesColMap, "#define extendedParticlesFlag");
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
                                    TextUtils.concatAll("star.group", namesColMap), definesColMap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
@@ -296,9 +295,9 @@ public class RenderAssets {
         particleGroupExtBillboardShaders = fetchShaderProgram(manager, particleGroupExtBillboardDesc, TextUtils.concatAll("particle.group.ext", names));
 
         /*
-         * PARTICLE GROUP EXT WIREFRAMES - default and relativistic
+         * PARTICLE GROUP EXT MODELS - default and relativistic
          */
-        particleGroupExtWireframeShaders = fetchShaderProgram(manager, particleGroupExtWireframeDesc, TextUtils.concatAll("particle.group.ext.wireframe", names));
+        particleGroupExtModelShaders = fetchShaderProgram(manager, particleGroupExtModelDesc, TextUtils.concatAll("particle.group.ext.model", names));
 
         /*
          * STAR GROUP (TRI) - default and relativistic

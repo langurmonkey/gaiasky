@@ -20,7 +20,7 @@ uniform vec2 u_t;
 // INPUT
 // Regular attributes
 layout (location=0) in vec4 a_position;
-layout (location=1) in vec2 a_texCoord;
+layout (location=1) in vec2 a_texCoord0;
 // Instanced attributes
 layout (location=2) in vec3 a_particlePos;
 #ifdef extendedParticlesFlag
@@ -94,14 +94,16 @@ void main() {
 
     v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
+    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
+
     // Position.
-    vec4 vert_pos = vec4(a_position.xyz * a_size, a_position.w);
+    vec4 vert_pos = vec4(a_position.xyz * particleSize, a_position.w);
     vert_pos.xyz += pos;
     vec4 gpos = u_projView * vert_pos;
 
     gl_Position = gpos * u_vrScale;
 
-    v_uv = a_texCoord;
+    v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;
 
     #ifdef velocityBufferFlag

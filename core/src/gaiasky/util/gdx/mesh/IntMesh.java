@@ -88,20 +88,49 @@ public class IntMesh implements Disposable {
      * Creates a new Mesh with the given attributes.
      *
      * @param isStatic            whether this mesh is static or not. Allows for internal optimizations.
-     * @param maxGlobal           the maximum number of global vertices this mesh can hold
-     * @param maxInstanced        the maximum number of instance vertices this mesh can hold
+     * @param maxVertices         the maximum number of vertices this mesh can hold
+     * @param maxInstances        the maximum number of instances this mesh can hold
      * @param attributes          the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
      *                            normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
      * @param attributesInstanced vertex attributes for instanced mode. These have a divisor of 1
      */
     public IntMesh(boolean isStatic,
-                   int maxGlobal,
-                   int maxInstanced,
+                   int maxVertices,
+                   int maxInstances,
                    VertexAttribute[] attributes,
                    VertexAttribute[] attributesInstanced) {
-        this.isInstanced = maxInstanced > 0;
-        this.vertices = makeVertexBuffer(isStatic, maxGlobal, new VertexAttributes(attributes), maxInstanced, new VertexAttributes(attributesInstanced));
+        this.isInstanced = maxInstances > 0;
+        this.vertices = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributes), maxInstances, new VertexAttributes(attributesInstanced));
         this.indices = null;
+        this.isVertexArray = false;
+
+        addManagedMesh(Gdx.app, this);
+    }
+
+    /**
+     * Creates a new Mesh with the given attributes.
+     *
+     * @param isStatic            whether this mesh is static or not. Allows for internal optimizations.
+     * @param maxVertices         the maximum number of vertices this mesh can hold
+     * @param maxInstances        the maximum number of instances this mesh can hold
+     * @param maxIndices          the maximum number of indices this mesh can hold
+     * @param attributes          the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
+     *                            normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
+     * @param attributesInstanced vertex attributes for instanced mode. These have a divisor of 1
+     */
+    public IntMesh(boolean isStatic,
+                   int maxVertices,
+                   int maxInstances,
+                   int maxIndices,
+                   VertexAttribute[] attributes,
+                   VertexAttribute[] attributesInstanced) {
+        this.isInstanced = maxInstances > 0;
+        this.vertices = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributes), maxInstances, new VertexAttributes(attributesInstanced));
+        if (maxIndices > 0) {
+            this.indices = new IntIndexBufferObject(isStatic, maxIndices);
+        } else {
+            this.indices = null;
+        }
         this.isVertexArray = false;
 
         addManagedMesh(Gdx.app, this);
@@ -506,8 +535,8 @@ public class IntMesh implements Disposable {
      * @param count    The number of floats to use.
      */
     public void setInstanceAttribs(float[] instance,
-                                      int offset,
-                                      int count) {
+                                   int offset,
+                                   int count) {
         ((VertexBufferObjectInstanced) this.vertices).setInstance(instance, offset, count);
     }
 
@@ -604,22 +633,22 @@ public class IntMesh implements Disposable {
 
     /** @return the number of defined indices */
     public int getNumIndices() {
-        return indices.getNumIndices();
+        return indices != null ? indices.getNumIndices() : 0;
     }
 
     /** @return the number of defined vertices */
     public int getNumVertices() {
-        return vertices.getNumVertices();
+        return vertices != null ? vertices.getNumVertices() : 0;
     }
 
     /** @return the maximum number of vertices this mesh can hold */
     public int getMaxVertices() {
-        return vertices.getNumMaxVertices();
+        return vertices != null ? vertices.getNumMaxVertices() : 0;
     }
 
     /** @return the maximum number of indices this mesh can hold */
     public int getMaxIndices() {
-        return indices.getNumMaxIndices();
+        return indices != null ? indices.getNumMaxIndices() : 0;
     }
 
     /** @return the size of a single vertex in bytes */
@@ -859,7 +888,15 @@ public class IntMesh implements Disposable {
         if (autoBind)
             bind(shader);
 
-        Gdx.gl30.glDrawArraysInstanced(primitiveType, offset, count, instanceCount);
+        if (indices != null && indices.getNumIndices() > 0) {
+            if (count + offset > indices.getNumMaxIndices()) {
+                throw new GdxRuntimeException("Mesh attempting to access memory outside of the index buffer (count: " + count + ", offset: " + offset + ", max: "
+                                                      + indices.getNumMaxIndices() + ")");
+            }
+            Gdx.gl30.glDrawElementsInstanced(primitiveType, count, GL20.GL_UNSIGNED_INT, offset * 4, instanceCount);
+        } else {
+            Gdx.gl30.glDrawArraysInstanced(primitiveType, offset, count, instanceCount);
+        }
 
         if (autoBind)
             unbind(shader);

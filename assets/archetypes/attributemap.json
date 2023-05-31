@@ -182,7 +182,7 @@
         "aliases": [ "orbittrail", "trail" ]
       },
       "trailMap": {
-        "description": "Modify the tail mapping value in case ``orbitTrail`` is set to ``true``. This mapping parameter defines the location in the orbit (int [0,1]) where we map the opacity value of 0. The default value is 0. Set it to 0.5 to have a trail from the object to half the orbit. This enables having shorter trails, while improving the performance due to less lines being rendered.",
+        "description": "Modify the tail mapping value in case ``orbitTrail`` is set to ``true``. This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity value of 0. The default value is 0. Set it to 0.5 to have a trail from the object to half the orbit. This enables having shorter trails, while improving the performance due to less lines being rendered.",
         "units": "Double"
       },
       "newMethod": {
@@ -488,7 +488,7 @@
         "aliases": [ "colornoise" ]
       },
       "particleSizeLimits": {
-        "description": "Minimum and maximum solid angle limits of the particles, as :math:`(tan(\\alpha_{min}), tan(\\alpha_{max}))`.",
+        "description": "Minimum and maximum solid angle limits of the particles in degrees. They are used as :math:`(dist * tan(\\alpha_{min}), dist * tan(\\alpha_{max}))`. The minimum and maximum values must be in [0,90].",
         "units": "Double[2]",
         "aliases": [ "particlesizelimits" ]
       },
@@ -521,12 +521,20 @@
         "description": "List of texture files to render the particles of this group. If more than one texture is provided, each particle is assigned a texture randomly. This can also point to one or more directories, in which case all the image files within are used. All images must have the same dimensions. If this is provided, ``profileDecay`` is ignored.",
         "units": "String[]"
       },
-      "modelType": {
-        "description": "The model type to use for this particle set. One of (quad|sphere|icosphere). Defaults to 'quad'. This only takes effect in extended particle groups. To enable extended particle groups, you need to set 'type' to 'PARTICLES_EXT' in the 'providerParams' map.",
+      "modelFile": {
+        "description": "Model file to use (``obj``, ``obj.gz`` ``g3db``, ``g3dj``, ``gltf``, ``glb``). If present, the ``modelType`` and ``modelParams`` attributes are ignored. The model should have only positions (vector-3), normals (vector-3), and texture coordinates (vector-2) as vertex attributes. Only the first mesh of the model is used. Textures, lighting and material are ignored. This is only used in extended particle groups.",
         "units": "String"
       },
+      "modelType": {
+        "description": "The model type to use for this particle set. One of (quad|sphere|icosphere). 'quad' renders particles as billboards, 'sphere' uses UV spheres, and 'icosphere' uses icosahedron-based spheres.  Defaults to 'quad'. This is only used in extended particle groups. To enable extended particle groups, you need to set 'type' to 'PARTICLES_EXT' in the 'providerParams' map.",
+        "units": "String"
+      },
+      "modelParams": {
+        "description": "Model parameters in a map. Usually, the 'diameter', 'width', 'height', 'recursion' or 'quality' go here. For more info, see the  ``gaiasky.util.ModeCache`` class. This is only used in extended particle groups.",
+        "units": "Map<String,Object>"
+      },
       "modelPrimitive": {
-        "description": "The GL primitive to use. One of (GL_TRIANGLES|GL_TRIANGLE_STRIP|GL_TRIANGLE_FAN|GL_LINES|GL_LINE_STRIP|GL_LINE_LOOP). Defaults to 'GL_TRIANGLES'. The 'GL_LINE*' primitives enable wireframe rendering, which is currently only supported by sphere and icosphere model types.",
+        "description": "The GL primitive to use. One of (GL_TRIANGLES|GL_TRIANGLE_STRIP|GL_TRIANGLE_FAN|GL_LINES|GL_LINE_STRIP|GL_LINE_LOOP). Defaults to 'GL_TRIANGLES'. The 'GL_LINE*' primitives enable wireframe rendering, which is currently only supported by sphere and icosphere model types. This is only used in extended particle groups.",
         "units": "String"
       }
     },

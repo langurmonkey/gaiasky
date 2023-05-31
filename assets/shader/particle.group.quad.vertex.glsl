@@ -21,7 +21,7 @@ uniform vec2 u_t;
 // INPUT
 // Regular attributes
 layout (location=0) in vec4 a_position;
-layout (location=1) in vec2 a_texCoord;
+layout (location=1) in vec2 a_texCoord0;
 // Instanced attributes
 layout (location=2) in vec3 a_particlePos;
 #ifdef extendedParticlesFlag
@@ -87,18 +87,18 @@ void main() {
 
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
-    float quadSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
+    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
-    float s_size = quadSize;
+    float s_size = particleSize;
     #include shader/snip_billboard.glsl
 
     gl_Position = gpos * u_vrScale;
 
-    v_uv = a_texCoord;
+    v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;
 
     #ifdef velocityBufferFlag
