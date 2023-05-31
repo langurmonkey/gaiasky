@@ -359,7 +359,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             final double absMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
                             double size = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
 
-                            // RADIUS/SIZE
+                            // SIZE (DIAMETER, not RADIUS!)
                             if (!ucdParser.SIZE.isEmpty() && !isStars) {
                                 Pair<UCD, Double> sizePair = getDoubleUcd(ucdParser.SIZE, row);
                                 UCD sizeUcd = sizePair.getFirst();
@@ -376,6 +376,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 } else {
                                     // We hope size is already in parsecs.
                                     size = sizePair.getSecond().floatValue();
+                                }
+                                if (TextUtils.containsOrMatches(UCDParser.radiuscolnames, sizeUcd.colname, true)) {
+                                    // Radius, need to multiply by 2 to get diameter.
+                                    size *= 2;
                                 }
                             }
 
@@ -395,9 +399,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             // VARIABILITY
                             float[] variMags = null;
-                            double[] variTimes = null;
-                            double pf = 0;
-                            int nVari = 0;
+                            double[] variTimes;
+                            double pf;
+                            int nVari;
 
                             if (ucdParser.hasvari) {
                                 Pair<UCD, Double> period = getDoubleUcd(ucdParser.VARI_PERIOD, row);
@@ -570,25 +574,23 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS
                                     || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {
-                                double[] dataD = new double[ParticleRecordType.STAR.doubleArraySize];
-                                float[] dataF = new float[ParticleRecordType.STAR.floatArraySize];
+                                var type = ParticleRecordType.STAR;
 
-                                dataD[ParticleRecord.I_X] = p.realPosition.x;
-                                dataD[ParticleRecord.I_Y] = p.realPosition.y;
-                                dataD[ParticleRecord.I_Z] = p.realPosition.z;
-
-                                dataF[ParticleRecord.I_FPMX] = (float) pm.x;
-                                dataF[ParticleRecord.I_FPMY] = (float) pm.y;
-                                dataF[ParticleRecord.I_FPMZ] = (float) pm.z;
-                                dataF[ParticleRecord.I_FMUALPHA] = (float) muAlphaStar;
-                                dataF[ParticleRecord.I_FMUDELTA] = (float) muDelta;
-                                dataF[ParticleRecord.I_FRADVEL] = (float) radVel;
-                                dataF[ParticleRecord.I_FAPPMAG] = (float) appMag;
-                                dataF[ParticleRecord.I_FABSMAG] = (float) absMag;
-                                dataF[ParticleRecord.I_FCOL] = colorPacked;
-                                dataF[ParticleRecord.I_FSIZE] = (float) size;
-                                dataF[ParticleRecord.I_FHIP] = hip;
-
+                                IParticleRecord pr;
+                                if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
+                                    pr = new VariableRecord();
+                                } else {
+                                    pr = new ParticleRecord(type);
+                                }
+                                pr.setId(id);
+                                pr.setNames(names);
+                                pr.setPos(p.realPosition.x, p.realPosition.y, p.realPosition.z);
+                                pr.setVelocityVector(pm.x, pm.y, pm.z);
+                                pr.setProperMotion((float) muAlphaStar, (float) muDelta, (float) radVel);
+                                pr.setMag((float) appMag, (float) absMag);
+                                pr.setCol(colorPacked);
+                                pr.setSize((float) size);
+                                pr.setHip(hip);
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
                                 if (ucdParser.TEFF.isEmpty()) {
@@ -599,53 +601,41 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(ucdParser.TEFF.first(), tEff);
                                 }
-                                final IParticleRecord sb;
-                                if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
-                                    sb = new VariableRecord(dataD, dataF, nVari, pf, variMags, variTimes, id, names, extraAttributes);
-                                } else {
-                                    sb = new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names, extraAttributes);
-                                }
+                                pr.setExtraAttributes(extraAttributes);
 
-                                list.add(sb);
+                                list.add(pr);
 
                                 int appMagClamp = (int) MathUtilsDouble.clamp(appMag, 0, 21);
                                 countsPerMag[appMagClamp] += 1;
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
-                                double[] dataD = new double[ParticleRecordType.PARTICLE.doubleArraySize];
+                                var type = ParticleRecordType.PARTICLE;
 
-                                dataD[ParticleRecord.I_X] = p.realPosition.x;
-                                dataD[ParticleRecord.I_Y] = p.realPosition.y;
-                                dataD[ParticleRecord.I_Z] = p.realPosition.z;
-
+                                IParticleRecord pr = new ParticleRecord(type);
+                                pr.setId(id);
+                                pr.setNames(names);
+                                pr.setPos(p.realPosition.x, p.realPosition.y, p.realPosition.z);
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
+                                pr.setExtraAttributes(extraAttributes);
 
-                                IParticleRecord pb = new ParticleRecord(ParticleRecordType.PARTICLE, dataD, null, null, names, extraAttributes);
-                                list.add(pb);
+                                list.add(pr);
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES_EXT) {
-                                double[] dataD = new double[ParticleRecordType.PARTICLE_EXT.doubleArraySize];
-                                float[] dataF = new float[ParticleRecordType.PARTICLE_EXT.floatArraySize];
+                                var type = ParticleRecordType.PARTICLE_EXT;
 
-                                dataD[ParticleRecord.I_X] = p.realPosition.x;
-                                dataD[ParticleRecord.I_Y] = p.realPosition.y;
-                                dataD[ParticleRecord.I_Z] = p.realPosition.z;
-
-                                dataF[ParticleRecord.I_FPMX] = (float) pm.x;
-                                dataF[ParticleRecord.I_FPMY] = (float) pm.y;
-                                dataF[ParticleRecord.I_FPMZ] = (float) pm.z;
-                                dataF[ParticleRecord.I_FMUALPHA] = (float) muAlphaStar;
-                                dataF[ParticleRecord.I_FMUDELTA] = (float) muDelta;
-                                dataF[ParticleRecord.I_FRADVEL] = (float) radVel;
-                                dataF[ParticleRecord.I_FAPPMAG] = (float) appMag;
-                                dataF[ParticleRecord.I_FABSMAG] = (float) absMag;
-                                dataF[ParticleRecord.I_FCOL] = colorPacked;
-                                dataF[ParticleRecord.I_FSIZE] = (float) size;
-
+                                IParticleRecord pr = new ParticleRecord(type);
+                                pr.setId(id);
+                                pr.setNames(names);
+                                pr.setPos(p.realPosition.x, p.realPosition.y, p.realPosition.z);
+                                pr.setVelocityVector(pm.x, pm.y, pm.z);
+                                pr.setProperMotion((float) muAlphaStar, (float) muDelta, (float) radVel);
+                                pr.setMag((float) appMag, (float) absMag);
+                                pr.setCol(colorPacked);
+                                pr.setSize((float) size);
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
+                                pr.setExtraAttributes(extraAttributes);
 
-                                IParticleRecord pb = new ParticleRecord(ParticleRecordType.PARTICLE_EXT, dataD, dataF, id, names, extraAttributes);
-                                list.add(pb);
+                                list.add(pr);
                             }
 
                         } catch (Exception e) {

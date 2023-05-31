@@ -50,7 +50,9 @@ public class TextUtils {
         return surround(in, "[", "]");
     }
 
-    public static String surround(String in, String pre, String post) {
+    public static String surround(String in,
+                                  String pre,
+                                  String post) {
         return pre + in + post;
     }
 
@@ -63,7 +65,8 @@ public class TextUtils {
      *
      * @return The string, broken into lines.
      */
-    public static String breakCharacters(CharSequence in, int breakChars) {
+    public static String breakCharacters(CharSequence in,
+                                         int breakChars) {
         return breakCharacters(in.toString(), breakChars);
     }
 
@@ -76,7 +79,8 @@ public class TextUtils {
      *
      * @return The string, broken into lines.
      */
-    public static String breakCharacters(String in, int breakChars) {
+    public static String breakCharacters(String in,
+                                         int breakChars) {
         return breakCharacters(in, breakChars, false);
     }
 
@@ -90,7 +94,9 @@ public class TextUtils {
      *
      * @return The string, broken into lines.
      */
-    public static String breakCharacters(String in, int breakChars, boolean forceBreak) {
+    public static String breakCharacters(String in,
+                                         int breakChars,
+                                         boolean forceBreak) {
         // Warp text if breakChars <= 0
         if (breakChars > 0) {
             java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
@@ -116,11 +122,13 @@ public class TextUtils {
         return str.chars().filter(ch -> ch == '\n' || ch == '\r').count();
     }
 
-    public static String breakSpaces(CharSequence in, int breakSpaces) {
+    public static String breakSpaces(CharSequence in,
+                                     int breakSpaces) {
         return breakSpaces(in.toString(), breakSpaces);
     }
 
-    public static String breakSpaces(String in, int breakSpaces) {
+    public static String breakSpaces(String in,
+                                     int breakSpaces) {
         // Warp text if breakSpaces <= 0
         if (breakSpaces > 0) {
             java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
@@ -140,7 +148,8 @@ public class TextUtils {
         return in;
     }
 
-    public static void capLabelWidth(Label l, float targetWidth) {
+    public static void capLabelWidth(Label l,
+                                     float targetWidth) {
         while (l.getWidth() > targetWidth) {
             StringBuilder currText = l.getText();
             currText.deleteCharAt(currText.length);
@@ -150,7 +159,9 @@ public class TextUtils {
         l.setText(l.getText() + "...");
     }
 
-    public static CharSequence limitWidth(CharSequence text, float width, float letterWidth) {
+    public static CharSequence limitWidth(CharSequence text,
+                                          float width,
+                                          float letterWidth) {
         int lettersPerLine = (int) (width / letterWidth);
         StringBuilder out = new StringBuilder();
         int currentLine = 0;
@@ -170,11 +181,14 @@ public class TextUtils {
         return out;
     }
 
-    public static String capString(String in, int targetLength) {
+    public static String capString(String in,
+                                   int targetLength) {
         return capString(in, targetLength, false);
     }
 
-    public static String capString(String in, int targetLength, boolean fromStart) {
+    public static String capString(String in,
+                                   int targetLength,
+                                   boolean fromStart) {
         if (in.length() <= targetLength) {
             return in;
         } else {
@@ -236,7 +250,8 @@ public class TextUtils {
      *
      * @return The concatenation
      */
-    public static String concatenate(String split, String... strs) {
+    public static String concatenate(String split,
+                                     String... strs) {
         if (strs == null || strs.length == 0)
             return null;
         java.lang.StringBuilder out = new java.lang.StringBuilder();
@@ -258,7 +273,8 @@ public class TextUtils {
      *
      * @return The concatenation
      */
-    public static String concatenate(final String split, final Array<String> strings) {
+    public static String concatenate(final String split,
+                                     final Array<String> strings) {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strings) {
             if (str != null && !str.isEmpty()) {
@@ -278,7 +294,8 @@ public class TextUtils {
      *
      * @return The concatenation
      */
-    public static String concatenate(final String split, final java.util.List<String> strings) {
+    public static String concatenate(final String split,
+                                     final java.util.List<String> strings) {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strings) {
             if (str != null && !str.isEmpty()) {
@@ -298,7 +315,10 @@ public class TextUtils {
         return buff.toString();
     }
 
-    public static String arrayToStr(String[] arr, String pre, String post, String sep) {
+    public static String arrayToStr(String[] arr,
+                                    String pre,
+                                    String post,
+                                    String sep) {
         java.lang.StringBuilder buff = new java.lang.StringBuilder(pre);
         for (int i = 0; i < arr.length; i++) {
             buff.append(arr[i]);
@@ -313,7 +333,10 @@ public class TextUtils {
         return setToStr(set, "[", "]", ", ");
     }
 
-    public static String setToStr(Set<String> set, String pre, String post, String sep) {
+    public static String setToStr(Set<String> set,
+                                  String pre,
+                                  String post,
+                                  String sep) {
         java.lang.StringBuilder buff = new java.lang.StringBuilder(pre);
         if (set != null) {
             int n = set.size();
@@ -356,7 +379,8 @@ public class TextUtils {
      *
      * @return The result
      */
-    public static String[] concatAll(String base, String[] suffixes) {
+    public static String[] concatAll(String base,
+                                     String[] suffixes) {
         String[] result = new String[suffixes.length];
         for (int i = 0; i < suffixes.length; i++) {
             result[i] = base + suffixes[i];
@@ -364,7 +388,9 @@ public class TextUtils {
         return result;
     }
 
-    public static String[] concatAll(String base, String[] suffixes, String suffixAdditional) {
+    public static String[] concatAll(String base,
+                                     String[] suffixes,
+                                     String suffixAdditional) {
         String[] suffixesNew = new String[suffixes.length + 1];
         for (int i = 0; i < suffixes.length; i++)
             suffixesNew[i] = suffixes[1];
@@ -372,11 +398,14 @@ public class TextUtils {
         return concatAll(base, suffixesNew);
     }
 
-    public static boolean contains(String[] list, String key) {
+    public static boolean contains(String[] list,
+                                   String key) {
         return contains(list, key, false);
     }
 
-    public static boolean contains(String[] list, String key, boolean ignoreCase) {
+    public static boolean contains(String[] list,
+                                   String key,
+                                   boolean ignoreCase) {
         AtomicBoolean contained = new AtomicBoolean(false);
         Arrays.stream(list).forEach(candidate -> {
             if (ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)) {
@@ -386,21 +415,25 @@ public class TextUtils {
         return contained.get();
     }
 
-    public static String ensureStartsWith(String base, String start) {
+    public static String ensureStartsWith(String base,
+                                          String start) {
         if (!base.startsWith(start))
             return start + base;
         else
             return base;
     }
 
-    public static boolean contains(String name, List<String> list) {
+    public static boolean contains(String name,
+                                   List<String> list) {
         for (String candidate : list)
             if (candidate != null && !candidate.isEmpty() && name.contains(candidate))
                 return true;
         return false;
     }
 
-    public static boolean containsOrMatches(String[] list, String key, boolean ignoreCase) {
+    public static boolean containsOrMatches(String[] list,
+                                            String key,
+                                            boolean ignoreCase) {
         AtomicBoolean contained = new AtomicBoolean(false);
         Arrays.stream(list).forEach(candidate -> {
             if (ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)) {
@@ -409,6 +442,22 @@ public class TextUtils {
                 contained.set(true);
             }
         });
+        return contained.get();
+    }
+
+    public static boolean containsOrMatches(String[][] list,
+                                            String key,
+                                            boolean ignoreCase) {
+        AtomicBoolean contained = new AtomicBoolean(false);
+        for (String[] l : list) {
+            Arrays.stream(l).forEach(candidate -> {
+                if (ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)) {
+                    contained.set(true);
+                } else if (key.matches(candidate)) {
+                    contained.set(true);
+                }
+            });
+        }
         return contained.get();
     }
 
@@ -763,7 +812,9 @@ public class TextUtils {
      * @return The padded string, or the original string if its length was greater than
      * the given target length.
      */
-    public static String padString(String str, int length, char padChar) {
+    public static String padString(String str,
+                                   int length,
+                                   char padChar) {
         if (str.length() >= length) {
             return str;
         } else {

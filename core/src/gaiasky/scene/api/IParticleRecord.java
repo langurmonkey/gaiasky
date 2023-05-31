@@ -8,6 +8,7 @@
 package gaiasky.scene.api;
 
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
+import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
@@ -95,6 +96,7 @@ public interface IParticleRecord {
 
     float mudelta();
 
+
     float radvel();
 
     void setProperMotion(float mualpha,
@@ -160,6 +162,8 @@ public interface IParticleRecord {
      * @return The galactic latitude, in degrees
      */
     double b();
+
+    void setExtraAttributes(ObjectDoubleMap<UCD> extra);
 
     boolean hasExtra();
 

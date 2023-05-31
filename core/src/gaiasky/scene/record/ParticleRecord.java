@@ -97,6 +97,14 @@ public class ParticleRecord implements IParticleRecord {
     // Octant, if in octree.
     public OctreeNode octant;
 
+    public ParticleRecord(ParticleRecordType type) {
+        this.type = type;
+        this.dataD = new double[type.doubleArraySize];
+        if (type.floatArraySize > 0) {
+            this.dataF = new float[type.floatArraySize];
+        }
+    }
+
     public ParticleRecord(ParticleRecordType type,
                           double[] dataD) {
         this.type = type;
@@ -504,6 +512,11 @@ public class ParticleRecord implements IParticleRecord {
         Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.y;
+    }
+
+    @Override
+    public void setExtraAttributes(ObjectDoubleMap<UCD> extra) {
+        this.extra = extra;
     }
 
     @Override

@@ -9,6 +9,7 @@ package gaiasky.scene.record;
 
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
+import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
@@ -270,6 +271,11 @@ public class PointParticleRecord implements IParticleRecord {
     @Override
     public double b() {
         return 0;
+    }
+
+    @Override
+    public void setExtraAttributes(ObjectDoubleMap<UCD> extra) {
+
     }
 
     @Override

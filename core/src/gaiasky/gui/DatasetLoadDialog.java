@@ -444,12 +444,12 @@ public class DatasetLoadDialog extends GenericDialog {
         } else if (clusters.isChecked()) {
             datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
             datasetOptions.ct = componentType.getSelected().ct;
-            datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
+            datasetOptions.profileDecay = profileDecay != null ? profileDecay.getDoubleValue(5.0) : 5.0;
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
-            datasetOptions.particleColorNoise = colorNoise.getValue();
-            datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0);
+            datasetOptions.particleColorNoise = colorNoise != null ? colorNoise.getValue() : 0.0;
+            datasetOptions.particleSize = particleSize != null ? particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0) : 1.0;
             datasetOptions.particleSizeLimits = new double[] { 0.0d, 90.0d };
-            datasetOptions.numLabels = Settings.settings.scene.particleGroups.numLabels;
+            datasetOptions.numLabels = 50;
             datasetOptions.modelType = "icosphere";
             datasetOptions.modelPrimitive = "GL_LINES";
         } else if (variables.isChecked()) {

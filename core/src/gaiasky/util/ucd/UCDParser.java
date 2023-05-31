@@ -14,16 +14,13 @@ import gaiasky.util.units.Position.PositionType;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked
     // first with equals() and then with matches()
     public static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
-    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "proper", "proper_name", "common_name", "designation" };
+    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "names", "proper", "proper_name", "common_name", "designation" };
     public static String[] racolnames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
     public static String[] xcolnames = new String[] { "x", "X" };
     public static String[] decolnames = new String[] { "dec", "de", "declination", "delta", "dej2000" };
@@ -37,7 +34,8 @@ public class UCDParser {
     public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
     public static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
     public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
-    public static String[] sizecolnames = new String[] { "radius", "rcluster", "radi", "diameter", "size", "linear_diameter" };
+    public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi", "core_radius", "tidal_radius", "total_radius" };
+    public static String[] sizecolnames = new String[] { "diameter", "size", "linear_diameter" };
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
     public static String[] varimagscolnames = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
     public static String[] varitimescolnames = new String[] { "g_transit_time", "time_list", "time_series" };
@@ -159,7 +157,7 @@ public class UCDParser {
     }
 
     public static boolean isRadius(String colname) {
-        return TextUtils.contains(sizecolnames, colname, true);
+        return TextUtils.contains(radiuscolnames, colname, true);
     }
 
     public static boolean isNstars(String colname) {
@@ -229,8 +227,8 @@ public class UCDParser {
                 // Filter using best reference system (posrefsys)
                 if (!derived && (meaning.equals(posrefsys) || meaning.equals("parallax") || meaning.equals("distance"))) {
                     switch (meaning) {
-                    case "eq":
-                        switch (coord) {
+                    case "eq" -> {
+                        switch (Objects.requireNonNull(coord)) {
                         case "ra" -> {
                             setDefaultUnit(candidate, "deg");
                             add(candidate, racolnames, this.POS1);
@@ -240,10 +238,9 @@ public class UCDParser {
                             add(candidate, decolnames, this.POS2);
                         }
                         }
-                        break;
-                    case "ecliptic":
-                    case "galactic":
-                        switch (coord) {
+                    }
+                    case "ecliptic", "galactic" -> {
+                        switch (Objects.requireNonNull(coord)) {
                         case "lon" -> {
                             setDefaultUnit(candidate, "deg");
                             this.POS1.add(candidate);
@@ -253,23 +250,23 @@ public class UCDParser {
                             this.POS2.add(candidate);
                         }
                         }
-                        break;
-                    case "cartesian":
+                    }
+                    case "cartesian" -> {
                         setDefaultUnit(candidate, "pc");
-                        switch (coord) {
+                        switch (Objects.requireNonNull(coord)) {
                         case "x" -> this.POS1.add(candidate);
                         case "y" -> this.POS2.add(candidate);
                         case "z" -> this.POS3.add(candidate);
                         }
-                        break;
-                    case "parallax":
+                    }
+                    case "parallax" -> {
                         setDefaultUnit(candidate, "mas");
                         add(candidate, pllxcolnames, this.POS3);
-                        break;
-                    case "distance":
+                    }
+                    case "distance" -> {
                         setDefaultUnit(candidate, "pc");
                         add(candidate, distcolnames, this.POS3);
-                        break;
+                    }
                     }
                 }
             }
@@ -382,7 +379,7 @@ public class UCDParser {
             }
         }
         if (this.SIZE == null || this.SIZE.isEmpty()) {
-            this.SIZE = getByColNames(sizecolnames);
+            this.SIZE = getByColNames(radiuscolnames, sizecolnames);
         }
         this.hassize = !this.SIZE.isEmpty();
 
@@ -487,7 +484,7 @@ public class UCDParser {
         return getByColNames(new String[] { columName }).first();
     }
 
-    private Array<UCD> getByColNames(String[] colnames) {
+    private Array<UCD> getByColNames(String[]... colnames) {
         return getByColNames(colnames, null);
     }
 
@@ -495,9 +492,34 @@ public class UCDParser {
                                      String defaultunit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
     }
+    private Array<UCD> getByColNames(String[][] colnames,
+                                     String defaultunit) {
+        return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
+    }
 
     private Array<UCD> getByColNames(UCDType[] types,
                                      String[] colnames,
+                                     String defaultunit) {
+        Array<UCD> candidates = new Array<>();
+        for (UCDType type : types) {
+            // Get all unknown and missing
+            if (ucdmap.containsKey(type)) {
+                Set<UCD> set = ucdmap.get(type);
+                // Check column names
+                for (UCD candidate : set) {
+                    if (TextUtils.containsOrMatches(colnames, candidate.colname, true)) {
+                        if (defaultunit != null && (candidate.unit == null || candidate.unit.isEmpty()))
+                            candidate.unit = defaultunit;
+                        candidates.add(candidate);
+                    }
+                }
+            }
+        }
+        return candidates;
+
+    }
+    private Array<UCD> getByColNames(UCDType[] types,
+                                     String[][] colnames,
                                      String defaultunit) {
         Array<UCD> candidates = new Array<>();
         for (UCDType type : types) {
