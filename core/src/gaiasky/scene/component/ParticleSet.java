@@ -421,6 +421,14 @@ public class ParticleSet implements Component, IDisposable {
         this.renderParticles = renderParticles;
     }
 
+    public void setRenderSetLabel(Boolean renderSetLabel) {
+        this.renderSetLabel = renderSetLabel;
+    }
+
+    public void setExtended(Boolean extended) {
+        this.isExtended = extended;
+    }
+
     public void setNumLabels(Long numLabels) {
         this.numLabels = Math.toIntExact(numLabels);
     }

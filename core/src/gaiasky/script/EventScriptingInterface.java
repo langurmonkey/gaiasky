@@ -4061,6 +4061,32 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             sleepFrames(1);
                         }
                     }
+                } else if (datasetOptions.type == DatasetLoadType.PARTICLES_EXT) {
+                    // PARTICLE GROUP EXTENDED
+                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
+                    if (data != null && !data.isEmpty()) {
+                        AtomicReference<Entity> particleGroup = new AtomicReference<>();
+                        postRunnable(() -> {
+                            datasetOptions.initializeCatalogInfo = false;
+                            particleGroup.set(EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, datasetOptions, false));
+
+                            // Catalog info
+                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
+                            // Add to scene.
+                            EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
+                            // Add to catalog manager -> setUp
+                            scene.setUpEntity(particleGroup.get());
+
+                            String typeStr = I18n.msg("gui.dsload.objects.name");
+                            logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
+                                                 dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
+                        });
+                        // Sync waiting until the node is in the scene graph
+                        while (sync && (particleGroup.get() == null || Mapper.graph.get(particleGroup.get()).parent != null)) {
+                            sleepFrames(1);
+                        }
+                    }
                 } else if (datasetOptions.type == DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
                     var archetype = scene.archetypes().get("gaiasky.scenegraph.GenericCatalog");

@@ -18,6 +18,9 @@ public class DatasetOptions {
     public double particleColorNoise;
     public double particleSize;
     public double[] particleSizeLimits;
+    public String modelType = "quad";
+    public String modelPrimitive = "GL_TRIANGLES";
+    public String[] textures;
     public ComponentType ct;
     // Stars
     public double magnitudeScale;
@@ -27,9 +30,15 @@ public class DatasetOptions {
     public double[] labelColor;
     public double[] fadeIn;
     public double[] fadeOut;
+    public int numLabels;
+    public boolean renderSetLabel = false;
     public boolean initializeCatalogInfo = true;
 
-    public static DatasetOptions getStarDatasetOptions(String datasetName, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut) {
+    public static DatasetOptions getStarDatasetOptions(String datasetName,
+                                                       double magnitudeScale,
+                                                       double[] labelColor,
+                                                       double[] fadeIn,
+                                                       double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
         datasetOptions.type = DatasetLoadType.STARS;
         datasetOptions.catalogName = datasetName;
@@ -40,7 +49,16 @@ public class DatasetOptions {
         return datasetOptions;
     }
 
-    public static DatasetOptions getParticleDatasetOptions(String datasetName, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] particleSizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut) {
+    public static DatasetOptions getParticleDatasetOptions(String datasetName,
+                                                           double profileDecay,
+                                                           double[] particleColor,
+                                                           double colorNoise,
+                                                           double[] labelColor,
+                                                           double particleSize,
+                                                           double[] particleSizeLimits,
+                                                           ComponentType ct,
+                                                           double[] fadeIn,
+                                                           double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
         datasetOptions.type = DatasetLoadType.PARTICLES;
         datasetOptions.catalogName = datasetName;
@@ -56,19 +74,32 @@ public class DatasetOptions {
         return datasetOptions;
     }
 
-    public static DatasetOptions getStarClusterDatasetOptions(String datasetName, double[] particleColor, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut) {
+    public static DatasetOptions getStarClusterDatasetOptions(String datasetName,
+                                                              double[] particleColor,
+                                                              double[] labelColor,
+                                                              ComponentType ct,
+                                                              double[] fadeIn,
+                                                              double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
-        datasetOptions.type = DatasetLoadType.CLUSTERS;
+        datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
         datasetOptions.catalogName = datasetName;
         datasetOptions.particleColor = particleColor;
         datasetOptions.labelColor = labelColor;
         datasetOptions.ct = ct;
+        datasetOptions.particleSizeLimits = new double[] { 0.0, 90.0 };
         datasetOptions.fadeIn = fadeIn;
         datasetOptions.fadeOut = fadeOut;
+        datasetOptions.modelType = "icosphere";
+        datasetOptions.modelPrimitive = "GL_LINES";
         return datasetOptions;
     }
 
-    public static DatasetOptions getVariableStarDatasetOptions(String datasetName, double magnitudeScale, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut) {
+    public static DatasetOptions getVariableStarDatasetOptions(String datasetName,
+                                                               double magnitudeScale,
+                                                               double[] labelColor,
+                                                               ComponentType ct,
+                                                               double[] fadeIn,
+                                                               double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
         datasetOptions.type = DatasetLoadType.VARIABLES;
         datasetOptions.catalogName = datasetName;

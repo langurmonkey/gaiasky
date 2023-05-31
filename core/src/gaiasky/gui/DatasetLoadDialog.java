@@ -439,12 +439,19 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
-            datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? .2e-3 : 1.0);
-            datasetOptions.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * datasetOptions.particleSize) };
+            datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0);
+            datasetOptions.particleSizeLimits = new double[] { 0.004d, 0.5d };
         } else if (clusters.isChecked()) {
-            datasetOptions.type = DatasetLoadType.CLUSTERS;
+            datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
             datasetOptions.ct = componentType.getSelected().ct;
+            datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
+            datasetOptions.particleColorNoise = colorNoise.getValue();
+            datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0);
+            datasetOptions.particleSizeLimits = new double[] { 0.0d, 90.0d };
+            datasetOptions.numLabels = Settings.settings.scene.particleGroups.numLabels;
+            datasetOptions.modelType = "icosphere";
+            datasetOptions.modelPrimitive = "GL_LINES";
         } else if (variables.isChecked()) {
             datasetOptions.type = DatasetLoadType.VARIABLES;
             datasetOptions.magnitudeScale = magnitudeScale.getDoubleValue(0);

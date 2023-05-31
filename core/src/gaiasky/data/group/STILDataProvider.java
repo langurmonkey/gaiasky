@@ -248,6 +248,15 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 UCDParser ucdParser = new UCDParser();
                 ucdParser.parse(table);
 
+                // Automatically switch to extended particles if proper motions, colors or sizes are found in the data file.
+                if (datasetOptions != null) {
+                    if ((ucdParser.haspm || ucdParser.hassize || ucdParser.hascol) && (datasetOptions.type == null || datasetOptions.type == DatasetLoadType.PARTICLES)) {
+                        // Switch to extended.
+                        datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
+                    }
+                }
+                boolean isStars = isAnyType(DatasetLoadType.VARIABLES, DatasetLoadType.STARS);
+
                 int resampledLightCurves = 0;
                 int noPeriods = 0;
 
@@ -343,7 +352,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 appMag = 15;
                             }
                             // Scale magnitude if needed.
-                            double magScl = isAnyType(DatasetLoadType.STARS, DatasetLoadType.VARIABLES) ? datasetOptions.magnitudeScale : 0f;
+                            double magScl = isStars ? datasetOptions.magnitudeScale : 0f;
                             appMag = appMag - magScl;
 
                             // Absolute magnitude to pseudo-size.
@@ -351,7 +360,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double size = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
 
                             // RADIUS/SIZE
-                            if (!ucdParser.SIZE.isEmpty() && !isOfType(DatasetLoadType.STARS)) {
+                            if (!ucdParser.SIZE.isEmpty() && !isStars) {
                                 Pair<UCD, Double> sizePair = getDoubleUcd(ucdParser.SIZE, row);
                                 UCD sizeUcd = sizePair.getFirst();
                                 if (sizeUcd != null && sizeUcd.unit != null) {
@@ -381,7 +390,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 }
                             } else {
                                 // Default color index for stars, NaN for others.
-                                colorIndex = isAnyType(DatasetLoadType.STARS, DatasetLoadType.VARIABLES) ? 0.656f : Float.NaN;
+                                colorIndex = isStars ? 0.656f : Float.NaN;
                             }
 
                             // VARIABILITY

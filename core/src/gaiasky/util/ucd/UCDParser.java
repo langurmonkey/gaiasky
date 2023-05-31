@@ -307,12 +307,8 @@ public class UCDParser {
                         String coord = candidate.ucd[1][2];
                         if (refsys.equals("eq")) {
                             switch (coord) {
-                            case "ra":
-                                this.PMRA.add(candidate);
-                                break;
-                            case "dec":
-                                this.PMDEC.add(candidate);
-                                break;
+                            case "ra" -> this.PMRA.add(candidate);
+                            case "dec" -> this.PMDEC.add(candidate);
                             }
                         }
 
@@ -330,6 +326,7 @@ public class UCDParser {
                 this.RADVEL = getByColNames(radvelcolnames, "km/s");
             }
         }
+        this.haspm = !this.PMRA.isEmpty() && !this.PMDEC.isEmpty();
 
         // RADIAL VELOCITY
         Set<UCD> spect = ucdmap.get(UCDType.SPECT);

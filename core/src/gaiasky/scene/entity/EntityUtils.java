@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -37,7 +38,8 @@ public class EntityUtils {
      *
      * @return The vector with the position.
      */
-    public static Vector3b getAbsolutePosition(final Entity entity, Vector3b out) {
+    public static Vector3b getAbsolutePosition(final Entity entity,
+                                               Vector3b out) {
         if (entity != null) {
             if (Mapper.body.has(entity)) {
                 var body = Mapper.body.get(entity);
@@ -65,7 +67,9 @@ public class EntityUtils {
      *
      * @return The vector with the position.
      */
-    public static Vector3b getAbsolutePosition(Entity entity, String name, Vector3b out) {
+    public static Vector3b getAbsolutePosition(Entity entity,
+                                               String name,
+                                               Vector3b out) {
         if (Mapper.particleSet.has(entity)) {
             return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
         } else if (Mapper.starSet.has(entity)) {
@@ -124,22 +128,34 @@ public class EntityUtils {
      * @param celestial The celestial component.
      * @param plus      The addition.
      */
-    public static void setColor2Data(final Body body, final Celestial celestial, final float plus) {
+    public static void setColor2Data(final Body body,
+                                     final Celestial celestial,
+                                     final float plus) {
         celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
     }
 
-    public static Entity getParticleSet(Scene scene, String name, String file, List<IParticleRecord> data, DatasetOptions datasetOptions, boolean addToCatalogManager) {
+    public static Entity getParticleSet(Scene scene,
+                                        String name,
+                                        String file,
+                                        List<IParticleRecord> data,
+                                        DatasetOptions datasetOptions,
+                                        boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
         double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
         double[] particleColor = datasetOptions == null || datasetOptions.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.particleColor;
         double colorNoise = datasetOptions == null ? 0 : datasetOptions.particleColorNoise;
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
         double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
-        double[] particleSizeLimits = datasetOptions == null ? new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) } : datasetOptions.particleSizeLimits;
+        double[] particleSizeLimits =
+                datasetOptions == null || datasetOptions.particleSizeLimits == null ? new double[] { 0.1, 6.0 } : datasetOptions.particleSizeLimits;
         double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
+        String modelType = datasetOptions == null ? "quad" : datasetOptions.modelType;
+        String modelPrimitive = datasetOptions == null ? "GL_TRIANGLES" : datasetOptions.modelPrimitive;
         String ct = datasetOptions == null || datasetOptions.ct == null ? ComponentType.Galaxies.toString() : datasetOptions.ct.toString();
+        boolean renderSetLabel = datasetOptions == null || datasetOptions.renderSetLabel;
+        int numLabels = datasetOptions == null ? -1 : datasetOptions.numLabels;
 
-        var archetype = scene.archetypes().get("gaiasky.scenegraph.ParticleGroup");
+        var archetype = scene.archetypes().get("ParticleGroup");
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);
@@ -160,11 +176,16 @@ public class EntityUtils {
         fade.setFadeOut(fadeOut);
 
         var set = Mapper.particleSet.get(entity);
+        set.setExtended(datasetOptions != null && datasetOptions.type == DatasetLoadType.PARTICLES_EXT);
         set.setData(data);
         set.setDatafile(file);
         set.setProfileDecay(profileDecay);
         set.setColorNoise(colorNoise);
-        set.setParticlesizelimits(particleSizeLimits);
+        set.setParticleSizeLimits(particleSizeLimits);
+        set.setModelType(modelType);
+        set.setModelPrimitive(modelPrimitive);
+        set.setRenderSetLabel(renderSetLabel);
+        set.setNumLabels((long) numLabels);
 
         scene.initializeEntity(entity);
         if (addToCatalogManager) {
@@ -174,12 +195,18 @@ public class EntityUtils {
         return entity;
     }
 
-    public static Entity getStarSet(Scene scene, String name, String file, List<IParticleRecord> data, DatasetOptions datasetOptions, boolean addToCatalogManager) {
+    public static Entity getStarSet(Scene scene,
+                                    String name,
+                                    String file,
+                                    List<IParticleRecord> data,
+                                    DatasetOptions datasetOptions,
+                                    boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
         double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
+        boolean renderSetLabel = datasetOptions == null || datasetOptions.renderSetLabel;
 
-        var archetype = scene.archetypes().get("gaiasky.scenegraph.StarGroup");
+        var archetype = scene.archetypes().get("StarGroup");
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);
@@ -205,6 +232,7 @@ public class EntityUtils {
         var set = Mapper.starSet.get(entity);
         set.setData(data);
         set.setDatafile(file);
+        set.setRenderSetLabel(renderSetLabel);
 
         scene.initializeEntity(entity);
         if (addToCatalogManager) {
@@ -247,6 +275,7 @@ public class EntityUtils {
 
     /**
      * Gets the first dataset ancestor of this entity.
+     *
      * @param entity The entity.
      *
      * @return The catalog info.
