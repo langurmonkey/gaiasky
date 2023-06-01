@@ -1027,14 +1027,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     /**
      * Highlight using a colormap.
      *
-     * @param state Whether to highlight.
-     * @param cmi   Color map index.
-     * @param cma   Color map attribute.
-     * @param cmMin Min mapping value.
-     * @param cmMax Max mapping value.
+     * @param state   Whether to highlight.
+     * @param cmi     Color map index.
+     * @param cmAlpha Color map alpha value.
+     * @param cma     Color map attribute.
+     * @param cmMin   Min mapping value.
+     * @param cmMax   Max mapping value.
      */
     public void highlight(boolean state,
                           int cmi,
+                          float cmAlpha,
                           IAttribute cma,
                           double cmMin,
                           double cmMax,
@@ -1047,6 +1049,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             hl.hlplain = false;
             hl.hlallvisible = allVisible;
             hl.hlcmi = cmi;
+            hl.hlcmAlpha = cmAlpha;
             hl.hlcma = cma;
             hl.hlcmmin = cmMin;
             hl.hlcmmax = cmMax;
@@ -1059,7 +1062,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 initAuxView();
                 for (Entity e : l) {
                     auxView.setEntity(e);
-                    auxView.highlight(state, cmi, cma, cmMin, cmMax, allVisible);
+                    auxView.highlight(state, cmi, cmAlpha, cma, cmMin, cmMax, allVisible);
                 }
             }
         }

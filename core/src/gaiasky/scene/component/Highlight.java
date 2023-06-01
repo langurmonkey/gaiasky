@@ -23,6 +23,8 @@ public class Highlight implements Component {
     public boolean hlallvisible = true;
     // Highlight colormap index
     public int hlcmi;
+    // Color map alpha value.
+    public float hlcmAlpha = 1f;
     // Highlight colormap attribute
     public IAttribute hlcma;
     // Highlight colormap min
@@ -42,6 +44,10 @@ public class Highlight implements Component {
 
     public int getHlcmi() {
         return hlcmi;
+    }
+
+    public float getHlcmAlpha() {
+        return hlcmAlpha;
     }
 
     public IAttribute getHlcma() {

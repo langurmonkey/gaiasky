@@ -40,6 +40,7 @@ public class CatalogInfo {
     public float hlSizeFactor;
     public boolean hlAllVisible;
     public int hlCmapIndex = 0;
+    public float hlCmapAlpha = 1f;
     public IAttribute hlCmapAttribute;
     public double hlCmapMin = 0, hlCmapMax = 0;
 
@@ -184,7 +185,7 @@ public class CatalogInfo {
                 if (plainColor) {
                     view.highlight(hl, hlColor, hlAllVisible);
                 } else {
-                    view.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
+                    view.highlight(hl, hlCmapIndex, hlCmapAlpha, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
                 }
             }
 

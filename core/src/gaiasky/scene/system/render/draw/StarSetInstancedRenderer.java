@@ -143,7 +143,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                         if (hlCmap) {
                             // Color map.
                             double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
                         } else {
                             // Plain color.
                             model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);

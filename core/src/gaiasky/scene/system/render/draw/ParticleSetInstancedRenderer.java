@@ -159,7 +159,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                 // Color map.
                                 double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
                                 model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2],
-                                                                                                                  1.0f);
+                                                                                                                  hl.getHlcmAlpha());
                             } else {
                                 // Plain highlight color.
                                 model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);

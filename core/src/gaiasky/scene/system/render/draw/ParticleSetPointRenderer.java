@@ -126,7 +126,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                             if (hlCmap) {
                                 // Color map
                                 double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(pb), hl.getHlcmmin(), hl.getHlcmmax());
-                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
                             } else {
                                 // Plain
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
