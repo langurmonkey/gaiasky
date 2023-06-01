@@ -47,11 +47,12 @@ public class LineEntityRenderSystem {
      * The line view object, used to send into the
      * {@link LinePrimitiveRenderer}.
      **/
-    private LineView lineView;
-    private Vector3d D31 = new Vector3d();
-    private Vector3d D32 = new Vector3d();
-    private Vector3d D33 = new Vector3d();
-    private Vector3d D34 = new Vector3d();
+    private final LineView lineView;
+    private final Vector3b B31 = new Vector3b();
+    private final Vector3d D31 = new Vector3d();
+    private final Vector3d D32 = new Vector3d();
+    private final Vector3d D33 = new Vector3d();
+    private final Vector3d D34 = new Vector3d();
 
     public LineEntityRenderSystem() {
         this.lineView = new LineView();
@@ -426,11 +427,11 @@ public class LineEntityRenderSystem {
             IParticleRecord star = set.pointData.get(set.active[i]);
             float radius = (float) (set.getSize(set.active[i]) * Constants.STAR_SIZE_FACTOR);
             // Position
-            Vector3d lPos = set.fetchPosition(star, set.cPosD, D31, set.currDeltaYears);
+            Vector3b lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
             // Proper motion
             Vector3d pm = D32.set(star.pmx(), star.pmy(), star.pmz()).scl(set.currDeltaYears);
             // Rest of attributes
-            float distToCamera = (float) lPos.len();
+            float distToCamera = (float) lPos.lenDouble();
             float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
             if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
                 Vector3d p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());

@@ -51,12 +51,22 @@ public class CatalogInfo {
 
     // Reference to the entity
     public Entity entity;
-    public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, Entity entity) {
+
+    public CatalogInfo(String name,
+                       String description,
+                       String source,
+                       CatalogInfoSource type,
+                       float hlSizeFactor,
+                       Entity entity) {
         this(name, description, source, type, hlSizeFactor);
         setEntity(entity);
     }
 
-    public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor) {
+    public CatalogInfo(String name,
+                       String description,
+                       String source,
+                       CatalogInfoSource type,
+                       float hlSizeFactor) {
         super();
         this.name = name;
         this.description = description;
@@ -106,7 +116,10 @@ public class CatalogInfo {
         return true;
     }
 
-    public void setColor(float r, float g, float b, float a) {
+    public void setColor(float r,
+                         float g,
+                         float b,
+                         float a) {
         this.hlColor[0] = r;
         this.hlColor[1] = g;
         this.hlColor[2] = b;
@@ -123,7 +136,10 @@ public class CatalogInfo {
         setColor(hlColor[0], hlColor[1], hlColor[2], hlColor[3]);
     }
 
-    public void setHlColormap(int cmapIndex, IAttribute cmapAttribute, double cmapMin, double cmapMax) {
+    public void setHlColormap(int cmapIndex,
+                              IAttribute cmapAttribute,
+                              double cmapMin,
+                              double cmapMax) {
         this.plainColor = false;
         this.hlCmapIndex = cmapIndex;
         this.hlCmapAttribute = cmapAttribute;
@@ -179,10 +195,11 @@ public class CatalogInfo {
      * @return True if this is a highlightable catalog, false otherwise.
      */
     public boolean isHighlightable() {
-        if (this.entity != null) {
-            return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity) || Mapper.orbitElementsSet.has(entity);
-        }
-        return false;
+        return this.entity != null && isBaseDataset(entity);
+    }
+
+    private boolean isBaseDataset(Entity entity) {
+        return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity) || Mapper.orbitElementsSet.has(entity);
     }
 
     /**

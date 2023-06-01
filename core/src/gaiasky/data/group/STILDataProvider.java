@@ -61,7 +61,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     // Store the last index for a given attribute.
     private final Map<String, Integer> lastIndexMap;
     private StarTableFactory factory;
-    private long starId = 10000000;
+    private long objectId = 1;
     // Dataset options, may be null
     private DatasetOptions datasetOptions;
 
@@ -357,7 +357,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             // Absolute magnitude to pseudo-size.
                             final double absMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
-                            double size = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
+                            double sizePc = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
 
                             // SIZE (DIAMETER, not RADIUS!)
                             if (!ucdParser.SIZE.isEmpty() && !isStars) {
@@ -368,18 +368,18 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                         // Solid angle in radians.
                                         double sa = new Angle(sizePair.getSecond(), sizePair.getFirst().unit).get(AngleUnit.RAD);
                                         // Size in parsecs = tan(sa) * distPc
-                                        size = Math.tan(sa) * p.realPosition.len();
+                                        sizePc = Math.tan(sa) * p.realPosition.len();
                                     } else if (Length.isLength(sizeUcd.unit)) {
                                         // Size in parsecs, directly.
-                                        size = new Length(sizePair.getSecond(), sizePair.getFirst().unit).get(LengthUnit.PC);
+                                        sizePc = new Length(sizePair.getSecond(), sizePair.getFirst().unit).get(LengthUnit.PC);
                                     }
                                 } else {
                                     // We hope size is already in parsecs.
-                                    size = sizePair.getSecond().floatValue();
+                                    sizePc = sizePair.getSecond().floatValue();
                                 }
                                 if (TextUtils.containsOrMatches(UCDParser.radiuscolnames, sizeUcd.colname, true)) {
                                     // Radius, need to multiply by 2 to get diameter.
-                                    size *= 2;
+                                    sizePc *= 2.0;
                                 }
                             }
 
@@ -508,30 +508,41 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 colorPacked = Float.NaN;
                             }
 
-                            // IDENTIFIER AND NAME
-                            String[] names;
-                            long id = -1L;
+                            // IDENTIFIER
+                            long id;
+                            boolean idIsNotNumber = false;
                             int hip = -1;
-                            if (ucdParser.NAME.isEmpty()) {
-                                // Empty name
-                                if (!ucdParser.ID.isEmpty()) {
-                                    // We have ID
-                                    Pair<UCD, String> namePair = getStringUcd(ucdParser.ID, row);
-                                    assert namePair != null;
-                                    names = new String[] { namePair.getSecond() };
-                                    if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                        hip = Integer.parseInt(namePair.getSecond());
-                                        id = hip;
-                                    } else {
-                                        id = ++starId;
+                            if (!ucdParser.ID.isEmpty()) {
+                                // We have ID
+                                Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
+                                assert idPair != null;
+                                try {
+                                    id = Parser.parseLongException(idPair.getSecond());
+                                    if (datasetOptions.type == DatasetLoadType.STARS && idPair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                        hip = (int) id;
                                     }
+                                } catch (NumberFormatException e) {
+                                    // ID is not an integer.
+                                    id = ++objectId;
+                                    idIsNotNumber = true;
+                                }
+                            } else {
+                                // Empty ID
+                                id = ++objectId;
+                            }
+
+                            // NAME(S)
+                            String[] names;
+                            if (ucdParser.NAME.isEmpty()) {
+                                // Name from ID.
+                                if (idIsNotNumber) {
+                                    Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
+                                    names = new String[] { idPair.getSecond() };
                                 } else {
-                                    // Empty ID
-                                    id = ++starId;
                                     names = new String[] { Long.toString(id) };
                                 }
                             } else {
-                                // We have a name
+                                // We have a name.
                                 Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdParser.NAME, row);
                                 Array<String> namesArray = new Array<>(false, namePairs.length);
                                 for (Pair<UCD, String> pair : namePairs) {
@@ -547,22 +558,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 for (String n : namesArray) {
                                     names[k++] = n;
                                 }
+                                // Default to ID.
                                 if (names.length == 0) {
                                     names = new String[] { Long.toString(id) };
-                                }
-
-                                // Take care of HIP stars
-                                if (!ucdParser.ID.isEmpty()) {
-                                    Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
-                                    assert idPair != null;
-                                    if (idPair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                        hip = Integer.parseInt(idPair.getSecond());
-                                        id = hip;
-                                    } else {
-                                        id = ++starId;
-                                    }
-                                } else {
-                                    id = ++starId;
                                 }
                             }
 
@@ -589,7 +587,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 pr.setProperMotion((float) muAlphaStar, (float) muDelta, (float) radVel);
                                 pr.setMag((float) appMag, (float) absMag);
                                 pr.setCol(colorPacked);
-                                pr.setSize((float) size);
+                                pr.setSize((float) sizePc);
                                 pr.setHip(hip);
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
@@ -630,7 +628,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 pr.setProperMotion((float) muAlphaStar, (float) muDelta, (float) radVel);
                                 pr.setMag((float) appMag, (float) absMag);
                                 pr.setCol(colorPacked);
-                                pr.setSize((float) size);
+                                pr.setSize((float) (sizePc * Constants.PC_TO_U));
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
                                 pr.setExtraAttributes(extraAttributes);

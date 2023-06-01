@@ -191,9 +191,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
                         // SIZE
                         if (extended && particle.hasSize()) {
-                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (float) (particle.size() * Constants.PC_TO_U * sizeFactor);
+                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = particle.size();
                         } else {
-                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5.0)) * sizeFactor;
+                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5.0));
                         }
 
                         // TEXTURE INDEX
@@ -279,6 +279,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                     Gdx.gl30.glCullFace(GL30.GL_BACK);
                     int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
                     curr.mesh.render(shaderProgram, set.modelPrimitive, 0, count, getCount(render));
+                    Gdx.gl30.glDisable(GL30.GL_CULL_FACE);
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }

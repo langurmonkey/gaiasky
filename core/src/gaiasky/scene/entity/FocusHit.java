@@ -266,19 +266,16 @@ public class FocusHit {
             for (int i = 0; i < n; i++) {
                 if (filter.filter(i)) {
                     IParticleRecord pb = pointData.get(i);
-                    Vector3 pos = F31;
-                    Vector3d posd = set.fetchPosition(pb, set.cPosD, D31, set.getDeltaYears());
-                    pos.set(posd.valuesf());
+                    Vector3 posFloat = F31;
+                    Vector3d pos = set.fetchPositionDouble(pb, camera.getPos(), D31, set.getDeltaYears());
+                    posFloat.set(pos.valuesf());
 
-                    if (camera.direction.dot(posd) > 0) {
+                    if (camera.direction.dot(pos) > 0) {
                         // The particle is in front of us
                         // Diminish the size of the star
                         // when we are close by
-                        double dist = posd.len();
+                        double dist = pos.len();
                         double angle = set.getRadius(i) / dist / camera.getFovFactor();
-                        if (set.isExtended) {
-                            angle *= 0.8e8;
-                        }
 
                         PerspectiveCamera perspectiveCamera;
                         if (Settings.settings.program.modeStereo.active) {
@@ -294,14 +291,14 @@ public class FocusHit {
 
                         angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / perspectiveCamera.fieldOfView);
                         double pixelSize = Math.max(pixelDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
-                        perspectiveCamera.project(pos);
-                        pos.y = perspectiveCamera.viewportHeight - pos.y;
+                        perspectiveCamera.project(posFloat);
+                        posFloat.y = perspectiveCamera.viewportHeight - posFloat.y;
                         if (Settings.settings.program.modeStereo.active) {
-                            pos.x /= 2;
+                            posFloat.x /= 2;
                         }
 
                         // Check click distance
-                        if (pos.dst(screenX % perspectiveCamera.viewportWidth, screenY, pos.z) <= pixelSize) {
+                        if (posFloat.dst(screenX % perspectiveCamera.viewportWidth, screenY, posFloat.z) <= pixelSize) {
                             //Hit
                             temporalHits.add(new Pair<>(i, angle));
                         }
@@ -347,7 +344,7 @@ public class FocusHit {
             for (int i = 0; i < n; i++) {
                 if (filter.filter(i)) {
                     IParticleRecord pb = pointData.get(i);
-                    Vector3d posd = set.fetchPosition(pb, set.cPosD, D31, set.getDeltaYears());
+                    Vector3d posd = set.fetchPositionDouble(pb, set.cPosD, D31, set.getDeltaYears());
                     beamDir.set(p1).sub(p0);
                     if (camera.direction.dot(posd) > 0) {
                         // The star is in front of us

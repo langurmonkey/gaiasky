@@ -29,13 +29,15 @@ public class StarSet extends ParticleSet {
     public boolean variableStars = false;
 
     /**
-     * Updates the parameters of the focus, if the focus is active in this group
+     * Updates the parameters of the focus, if the focus is active in this group.
+     * This version is special for star sets, and uses the double-precision version of fetchPosition()
+     * for speed.
      *
      * @param camera The current camera
      */
     public void updateFocus(ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
-        Vector3d aux = this.fetchPosition(focus, cPosD, D31, currDeltaYears);
+        Vector3d aux = this.fetchPositionDouble(focus, cPosD, D31, currDeltaYears);
         this.focusPosition.set(aux).add(camera.getPos());
         this.focusDistToCamera = aux.len();
         this.focusSize = getFocusSize();

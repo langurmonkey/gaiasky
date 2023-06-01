@@ -42,6 +42,10 @@ public class ParticleSet implements Component, IDisposable {
     public static long idSeq = 0;
 
     // Auxiliary vectors.
+    protected final Vector3b B31 = new Vector3b();
+    protected final Vector3b B32 = new Vector3b();
+    protected final Vector3b B33 = new Vector3b();
+    protected final Vector3b B34 = new Vector3b();
     protected final Vector3d D31 = new Vector3d();
     protected final Vector3d D32 = new Vector3d();
     protected final Vector3d D33 = new Vector3d();
@@ -173,7 +177,7 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Position of the current focus.
      */
-    public Vector3d focusPosition;
+    public Vector3b focusPosition;
     /**
      * Position in equatorial coordinates of the current focus in radians.
      */
@@ -211,7 +215,7 @@ public class ParticleSet implements Component, IDisposable {
     public ParticleSetUpdaterTask updaterTask;
 
     // Last sort position.
-    public Vector3d lastSortCameraPos, cPosD;
+    public Vector3b lastSortCameraPos, cPosD;
     // Comparator.
     private Comparator<Integer> comp;
 
@@ -491,7 +495,7 @@ public class ParticleSet implements Component, IDisposable {
      * @return The size
      */
     public double getFocusSize() {
-        return isStars ? focus.size() : 1e5 * Constants.KM_TO_U;
+        return isStars || isExtended ? focus.size() : 1e5 * Constants.KM_TO_U;
     }
 
     public void setFocusIndex(String name) {
@@ -512,7 +516,7 @@ public class ParticleSet implements Component, IDisposable {
 
     // Radius in stars is different!
     public double getRadius(int i) {
-        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) : getRadius();
+        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) / 2.0 : getRadius();
     }
 
     /**
@@ -521,11 +525,13 @@ public class ParticleSet implements Component, IDisposable {
      * @param camera The current camera
      */
     public void updateFocus(ICamera camera) {
-        Vector3d aux = D31.set(focusPosition);
-        focusDistToCamera = aux.sub(camera.getPos()).len();
-        focusSize = getFocusSize();
-        focusSolidAngle = (float) ((getRadius() / focusDistToCamera) / camera.getFovFactor());
-        focusSolidAngleApparent = focusSolidAngle * Settings.settings.scene.star.brightness;
+        IParticleRecord focus = pointData.get(focusIndex);
+        Vector3b aux = this.fetchPosition(focus, cPosD, B31, currDeltaYears);
+        this.focusPosition.set(aux).add(camera.getPos());
+        this.focusDistToCamera = aux.lenDouble();
+        this.focusSize = getFocusSize();
+        this.focusSolidAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
+        this.focusSolidAngleApparent = this.focusSolidAngle;
     }
 
     public void updateFocusDataPos() {
@@ -533,10 +539,9 @@ public class ParticleSet implements Component, IDisposable {
             focus = null;
         } else {
             focus = pointData.get(focusIndex);
-            focusPosition.set(focus.x(), focus.y(), focus.z());
+            updateFocus(GaiaSky.instance.getICamera());
             Vector3d posSph = Coordinates.cartesianToSpherical(focusPosition, D31);
             focusPositionSph.set((float) (MathUtilsDouble.radDeg * posSph.x), (float) (MathUtilsDouble.radDeg * posSph.y));
-            updateFocus(GaiaSky.instance.getICamera());
         }
     }
 
@@ -600,7 +605,7 @@ public class ParticleSet implements Component, IDisposable {
         double deltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), epochJd) * Nature.MS_TO_Y;
         IParticleRecord focus = pointData.get(focusIndex);
         if (focus.hasProperMotion()) {
-            Vector3d aux = this.fetchPosition(focus, cPosD, D31, deltaYears);
+            Vector3b aux = this.fetchPosition(focus, cPosD, B31, deltaYears);
             return out.set(aux).add(GaiaSky.instance.getICamera().getPos());
         } else {
             return getAbsolutePosition(out);
@@ -622,21 +627,6 @@ public class ParticleSet implements Component, IDisposable {
      */
     public Vector3b getAbsolutePosition(String name,
                                         Vector3b out) {
-        Vector3d vec = getAbsolutePosition(name, D31);
-        out.set(vec);
-        return out;
-    }
-
-    /**
-     * Returns the absolute position of the particle with the given name.
-     *
-     * @param name The name.
-     * @param out  The out vector.
-     *
-     * @return The absolute position in the out vector.
-     */
-    public Vector3d getAbsolutePosition(String name,
-                                        Vector3d out) {
         name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
@@ -649,11 +639,31 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     /**
+     * Returns the absolute position of the particle with the given name.
+     *
+     * @param name The name.
+     * @param out  The out vector.
+     *
+     * @return The absolute position in the out vector.
+     */
+    public Vector3d getAbsolutePosition(String name,
+                                        Vector3d out) {
+        var result = getAbsolutePosition(name, B34);
+        if(result != null) {
+            out.set(result);
+            return out;
+        } else {
+            return null;
+        }
+
+    }
+
+    /**
      * Fetches the real position of the particle. It will apply the necessary
-     * integrations (i.e. proper motion).
+     * integrations (i.e. proper motion). Double-precision version.
      *
      * @param pb         The particle bean
-     * @param campos     The position of the camera. If null, the camera position is
+     * @param camPos     The position of the camera. If null, the camera position is
      *                   not subtracted so that the coordinates are given in the global
      *                   reference system instead of the camera reference system.
      * @param out        The output vector
@@ -661,8 +671,8 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return The vector for chaining
      */
-    public Vector3d fetchPosition(IParticleRecord pb,
-                                  Vector3d campos,
+    public Vector3d fetchPositionDouble(IParticleRecord pb,
+                                  Vector3b camPos,
                                   Vector3d out,
                                   double deltaYears) {
         Vector3d pm = D32.set(0, 0, 0);
@@ -670,8 +680,38 @@ public class ParticleSet implements Component, IDisposable {
             pm.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
         }
         Vector3d destination = out.set(pb.x(), pb.y(), pb.z());
-        if (campos != null && !campos.hasNaN())
-            destination.sub(campos).add(pm);
+        if (camPos != null && !camPos.hasNaN())
+            destination.sub(camPos).add(pm);
+        else
+            destination.add(pm);
+
+        return destination;
+    }
+
+    /**
+     * Fetches the real position of the particle. It will apply the necessary
+     * integrations (i.e. proper motion). Arbitrary-precision version.
+     *
+     * @param pb         The particle bean
+     * @param camPos     The position of the camera. If null, the camera position is
+     *                   not subtracted so that the coordinates are given in the global
+     *                   reference system instead of the camera reference system.
+     * @param out        The output vector
+     * @param deltaYears The delta years
+     *
+     * @return The vector for chaining
+     */
+    public Vector3b fetchPosition(IParticleRecord pb,
+                                  Vector3b camPos,
+                                  Vector3b out,
+                                  double deltaYears) {
+        Vector3b pm = B32.set(0, 0, 0);
+        if (pb.hasProperMotion()) {
+            pm.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
+        }
+        Vector3b destination = out.set(pb.x(), pb.y(), pb.z());
+        if (camPos != null && !camPos.hasNaN())
+            destination.sub(camPos).add(pm);
         else
             destination.add(pm);
 

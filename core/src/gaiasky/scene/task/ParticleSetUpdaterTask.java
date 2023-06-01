@@ -95,7 +95,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             if (!particleSet.updating.get()
                     && base.opacity > 0
                     && (t > UPDATE_INTERVAL_MS_2
-                    || (particleSet.lastSortCameraPos.dst2(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_MS)
+                    || (particleSet.lastSortCameraPos.dst2d(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_MS)
                     || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_MS))) {
                 particleSet.updating.set(GaiaSky.instance.getExecutorService().execute(this));
             }

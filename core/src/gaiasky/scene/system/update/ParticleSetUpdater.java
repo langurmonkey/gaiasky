@@ -49,7 +49,6 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
 
     private void updateParticleSet(ICamera camera,
                                    ParticleSet particleSet) {
-        particleSet.cPosD.set(camera.getPos());
         // Delta years
         particleSet.currDeltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), particleSet.epochJd) * Nature.MS_TO_Y;
 

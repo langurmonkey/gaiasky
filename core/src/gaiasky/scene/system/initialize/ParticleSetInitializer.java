@@ -131,10 +131,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (set.factor == null)
             set.factor = 1d;
         set.lastSortTime = -1;
-        set.cPosD = new Vector3d();
-        set.lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        set.cPosD = new Vector3b();
+        set.lastSortCameraPos = new Vector3b(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         set.proximity = new Proximity(Constants.N_DIR_LIGHTS);
-        set.focusPosition = new Vector3d();
+        set.focusPosition = new Vector3b();
         set.focusPositionSph = new Vector2d();
 
         // Default epochs, if not set
