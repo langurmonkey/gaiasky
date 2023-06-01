@@ -258,7 +258,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             Table container = new Table(skin);
             Container<Table> cont = new Container<>(container);
 
-            // Radio buttons
+            // Radio buttons.
             plainColor = new OwnCheckBox(I18n.msg("gui.colorpicker.plaincolor"), skin, "radio", pad10);
             plainColor.addListener(event -> {
                 if (event instanceof ChangeEvent) {

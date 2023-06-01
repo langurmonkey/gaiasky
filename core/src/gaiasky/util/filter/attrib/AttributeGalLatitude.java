@@ -21,6 +21,6 @@ public class AttributeGalLatitude extends AttributeAbstract implements IAttribut
     }
 
     public String toString() {
-        return I18n.msg("gui.attrib.gallon");
+        return I18n.msg("gui.attrib.gallat");
     }
 }
