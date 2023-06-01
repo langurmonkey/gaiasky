@@ -574,11 +574,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         EventManager.instance.subscribe(this, Event.LOAD_DATA_CMD);
 
+        inputMultiplexer = new InputMultiplexer();
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
         welcomeGui = new WelcomeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, skipWelcome, vrStatus);
         welcomeGui.initialize(assetManager, globalResources.getSpriteBatch());
-        inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(welcomeGui.getGuiStage());
-        Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (settings.runtime.openXr) {
             welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new XrInputListener() {

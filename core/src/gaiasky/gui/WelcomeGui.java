@@ -10,7 +10,6 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
@@ -85,7 +84,11 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final boolean skipWelcome, final XrLoadStatus vrStatus) {
+    public WelcomeGui(final Skin skin,
+                      final Graphics graphics,
+                      final Float unitsPerPixel,
+                      final boolean skipWelcome,
+                      final XrLoadStatus vrStatus) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.lock = new Object();
@@ -95,11 +98,16 @@ public class WelcomeGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+    public void initialize(AssetManager assetManager,
+                           SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         this.stage = new Stage(vp, sb);
+        var inputMultiplexer = GaiaSky.instance.inputMultiplexer;
+        if (inputMultiplexer != null) {
+            inputMultiplexer.addProcessor(this.stage);
+        }
         this.kbdListener = new WelcomeGuiKbdListener(stage);
 
         popupInterface = new PopupNotificationsInterface(skin);
@@ -147,30 +155,31 @@ public class WelcomeGui extends AbstractGui {
             }
 
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
-            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null, (digest) -> GaiaSky.postRunnable(() -> {
-                // Data descriptor ok. Skip welcome screen only if flag and base data present
-                if (skipWelcome && baseDataPresent()) {
-                    startLoading();
-                } else {
-                    buildWelcomeUI();
-                }
-            }), () -> {
-                // Fail?
-                downloadError = true;
-                if (Settings.settings.program.offlineMode) {
-                    logger.error(I18n.msg("gui.welcome.error.offlinemode"));
-                } else {
-                    logger.error(I18n.msg("gui.welcome.error.nointernet"));
-                }
-                if (baseDataPresent()) {
-                    // Go on all in
-                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, stage, this::buildWelcomeUI));
-                } else {
-                    // Error and exit
-                    logger.error(I18n.msg("gui.welcome.error.nobasedata"));
-                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, stage));
-                }
-            }, null);
+            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null,
+                                        (digest) -> GaiaSky.postRunnable(() -> {
+                                            // Data descriptor ok. Skip welcome screen only if flag and base data present
+                                            if (skipWelcome && baseDataPresent()) {
+                                                startLoading();
+                                            } else {
+                                                buildWelcomeUI();
+                                            }
+                                        }), () -> {
+                        // Fail?
+                        downloadError = true;
+                        if (Settings.settings.program.offlineMode) {
+                            logger.error(I18n.msg("gui.welcome.error.offlinemode"));
+                        } else {
+                            logger.error(I18n.msg("gui.welcome.error.nointernet"));
+                        }
+                        if (baseDataPresent()) {
+                            // Go on all in
+                            GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, stage, this::buildWelcomeUI));
+                        } else {
+                            // Error and exit
+                            logger.error(I18n.msg("gui.welcome.error.nobasedata"));
+                            GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, stage));
+                        }
+                    }, null);
 
             /* CAPTURE SCROLL FOCUS */
             stage.addListener(event -> {
@@ -357,13 +366,16 @@ public class WelcomeGui extends AbstractGui {
         exitButton.setSize(bw * 0.5f, bh * 0.6f);
         exitButton.addListener(new OwnTextTooltip(I18n.msg("context.quit"), skin, 10));
         exitButton.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
+            public void clicked(InputEvent event,
+                                float x,
+                                float y) {
                 GaiaSky.postRunnable(Gdx.app::exit);
             }
         });
         exitButton.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 GaiaSky.postRunnable(Gdx.app::exit);
             }
         });
@@ -474,7 +486,8 @@ public class WelcomeGui extends AbstractGui {
                         protected void build() {
                             content.clear();
                             content.pad(pad34, pad28 * 2f, pad34, pad28 * 2f);
-                            content.add(new OwnLabel(I18n.msg("gui.basedata.default", baseData.name, I18n.msg("gui.welcome.dsmanager")), skin, "huge")).left().colspan(3).padBottom(pad34 * 2f).row();
+                            content.add(new OwnLabel(I18n.msg("gui.basedata.default", baseData.name, I18n.msg("gui.welcome.dsmanager")), skin, "huge")).left().colspan(
+                                    3).padBottom(pad34 * 2f).row();
                             content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad34);
                             content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad34);
                             content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad34);
@@ -718,7 +731,9 @@ public class WelcomeGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
         case UI_RELOAD_CMD -> {
             GaiaSky.postRunnable(() -> {
@@ -743,8 +758,9 @@ public class WelcomeGui extends AbstractGui {
 
     private void addOwnListeners() {
         if (kbdListener != null) {
-            var multiplexer = (InputMultiplexer) Gdx.input.getInputProcessor();
-            multiplexer.addProcessor(0, kbdListener);
+            var multiplexer = GaiaSky.instance.inputMultiplexer;
+            if (multiplexer != null)
+                multiplexer.addProcessor(0, kbdListener);
             kbdListener.activate();
         }
 
@@ -756,7 +772,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void removeOwnListeners() {
         if (kbdListener != null) {
-            var multiplexer = (InputMultiplexer) Gdx.input.getInputProcessor();
+            var multiplexer = GaiaSky.instance.inputMultiplexer;
             if (multiplexer != null)
                 multiplexer.removeProcessor(kbdListener);
             kbdListener.deactivate();
@@ -893,7 +909,8 @@ public class WelcomeGui extends AbstractGui {
         }
 
         @Override
-        public boolean buttonDown(Controller controller, int buttonCode) {
+        public boolean buttonDown(Controller controller,
+                                  int buttonCode) {
             long now = TimeUtils.millis();
             if (buttonCode == mappings.getButtonStart()) {
                 startLoading();
@@ -913,13 +930,16 @@ public class WelcomeGui extends AbstractGui {
         }
 
         @Override
-        public boolean buttonUp(Controller controller, int buttonCode) {
+        public boolean buttonUp(Controller controller,
+                                int buttonCode) {
             lastControllerUsed = controller;
             return true;
         }
 
         @Override
-        public boolean axisMoved(Controller controller, int axisCode, float value) {
+        public boolean axisMoved(Controller controller,
+                                 int axisCode,
+                                 float value) {
             long now = TimeUtils.millis();
             if (now - lastAxisEvtTime > AXIS_EVT_DELAY) {
                 // Event-based
