@@ -32,12 +32,12 @@ public class ColorUtils {
     public static Color gRedC = getCol(gRed);
     public static float[] gYellow = new float[] { 244f / 255f, 160f / 255f, 0f / 255f, 1f };
     public static Color gYellowC = getCol(gYellow);
-    public static float[] gWhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
+    public static float[] gWhite = new float[] { 1.0f, 1.0f, 1.0f, 1f };
     public static Color gWhiteC = getCol(gWhite);
-    public static float[] gPink = new float[] { 255f / 255f, 102f / 255f, 255f / 255f, 1f };
+    public static float[] gPink = new float[] { 1.0f, 102f / 255f, 1.0f, 1f };
     public static Color gPinkC = getCol(gPink);
     // Amazon orange
-    public static float[] aOrange = new float[] { 255f / 255f, 153f / 255f, 0f / 255f, 1f };
+    public static float[] aOrange = new float[] { 1.0f, 153f / 255f, 0f / 255f, 1f };
     public static Color aOrangeC = getCol(aOrange);
     // Taco Bell purple
     public static float[] tPurple = new float[] { 12f / 255f, 32f / 255f, 130f / 255f, 1f };
@@ -113,15 +113,19 @@ public class ColorUtils {
     }
 
     public static float[] hexToRgba(String hex) {
-        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f, Integer.valueOf(hex.substring(7, 9), 16) / 255f };
+        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f,
+                Integer.valueOf(hex.substring(5, 7), 16) / 255f, Integer.valueOf(hex.substring(7, 9), 16) / 255f };
     }
 
     public static float[] hexToRgb(String hex) {
-        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f };
+        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f,
+                Integer.valueOf(hex.substring(5, 7), 16) / 255f };
 
     }
 
-    public static float normalize(float value, float min, float max) {
+    public static float normalize(float value,
+                                  float min,
+                                  float max) {
         if (value > max)
             return max;
         if (value < min)
@@ -135,7 +139,8 @@ public class ColorUtils {
      *
      * @param value
      */
-    public static void grayscale(float value, float[] rgba) {
+    public static void grayscale(float value,
+                                 float[] rgba) {
         rgba[0] = value;
         rgba[1] = value;
         rgba[2] = value;
@@ -149,7 +154,8 @@ public class ColorUtils {
      * @param value The value
      * @param rgba  The color
      */
-    public static void colormap_blue_white_red(float value, float[] rgba) {
+    public static void colormap_blue_white_red(float value,
+                                               float[] rgba) {
         // Make it in [-1:1]
         float a = value * 2f - 1f;
         if (a <= 0) {
@@ -167,7 +173,8 @@ public class ColorUtils {
      *
      * @param value
      */
-    public static void colormap_short_rainbow(float value, float[] rgba) {
+    public static void colormap_short_rainbow(float value,
+                                              float[] rgba) {
         /* plot short rainbow RGB */
         float a = (1 - value) / 0.25f; //invert and group
         final int X = (int) Math.floor(a); //this is the integer part
@@ -210,7 +217,8 @@ public class ColorUtils {
      *
      * @param value The value in [0..1]
      */
-    public static void colormap_long_rainbow(float value, float[] rgba) {
+    public static void colormap_long_rainbow(float value,
+                                             float[] rgba) {
         if (rgba == null)
             return;
         /* plot long rainbow RGB */
@@ -260,13 +268,15 @@ public class ColorUtils {
      *
      * @param value The value to convert
      */
-    public static void colormap_yellow_to_red(float value, float[] rgba) {
+    public static void colormap_yellow_to_red(float value,
+                                              float[] rgba) {
         rgba[0] = 1;
         rgba[1] = value;
         rgba[2] = 0;
     }
 
-    public static void colormap_blue_to_magenta(float value, float[] rgba) {
+    public static void colormap_blue_to_magenta(float value,
+                                                float[] rgba) {
         rgba[0] = value;
         rgba[1] = 0;
         rgba[2] = 1;
@@ -457,7 +467,8 @@ public class ColorUtils {
      *
      * @return The new RGB array
      */
-    public static float[] brighten(float[] rgb, float luminosity) {
+    public static float[] brighten(float[] rgb,
+                                   float luminosity) {
         float[] hsl = rgbToHsl(rgb);
         hsl[2] = luminosity;
         return hslToRgb(hsl);
@@ -530,7 +541,9 @@ public class ColorUtils {
         return new float[] { r, g, b };
     }
 
-    private static float hue2rgb(float p, float q, float t) {
+    private static float hue2rgb(float p,
+                                 float q,
+                                 float t) {
         if (t < 0)
             t += 1;
         if (t > 1)
@@ -544,7 +557,9 @@ public class ColorUtils {
         return p;
     }
 
-    public static int HSBtoRGB(float hue, float saturation, float brightness) {
+    public static int HSBtoRGB(float hue,
+                               float saturation,
+                               float brightness) {
         int r = 0, g = 0, b = 0;
         if (saturation == 0) {
             r = g = b = (int) (brightness * 255.0f + 0.5f);
