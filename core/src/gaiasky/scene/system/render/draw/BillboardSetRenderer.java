@@ -229,7 +229,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     col[0] = MathUtilsDouble.clamp(col[0], 0f, 1f);
                     col[1] = MathUtilsDouble.clamp(col[1], 0f, 1f);
                     col[2] = MathUtilsDouble.clamp(col[2], 0f, 1f);
-                    ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
+                    ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cg.generateAlpha());
 
                     // UV coordinates
                     ad.vertices[ad.vertexIdx + uvOffset] = vertUV[vert].getFirst();
@@ -376,7 +376,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
             addCameraUpCubemapMode(shaderProgram, camera);
-            shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha);
+            shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha * 1.5f);
             shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
             double pointScaleFactor = 1.8e7;
 
@@ -441,6 +441,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
     private interface ColorGenerator {
         float[] generateColor();
+        float generateAlpha();
     }
 
     private static class StarColorGenerator implements ColorGenerator {
@@ -454,13 +455,23 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                 return new float[] { 0.95f, 0.8f - r, 0.6f - r };
             }
         }
+
+        @Override
+        public float generateAlpha() {
+            return 1;
+        }
     }
 
     private static class DustColorGenerator implements ColorGenerator {
         @Override
         public float[] generateColor() {
-            float r = (float) Math.abs(StdRandom.uniform() * 0.19);
+            float r = (float) Math.abs(StdRandom.uniform() * 0.2 + 0.07);
             return new float[] { r, r, r };
+        }
+
+        @Override
+        public float generateAlpha() {
+            return 0.6f;
         }
     }
 

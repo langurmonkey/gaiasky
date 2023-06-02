@@ -17,7 +17,7 @@ import gaiasky.util.ucd.UCD;
 
 public class PointParticleRecord implements IParticleRecord {
 
-    private double[] data;
+    private final double[] data;
 
     public PointParticleRecord(double[] data) {
         this.data = data;

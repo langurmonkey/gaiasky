@@ -15,6 +15,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,12 +30,14 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
 
     private Matrix4d transform;
+    private final Vector3d aux = new Vector3d();
 
     public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public List<IParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file,
+                                          double factor) {
         InputStream is = Settings.settings.data.dataFileHandle(file).read();
 
         if (file.endsWith(".gz")) {
@@ -54,7 +57,8 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public List<IParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is,
+                                          double factor) {
         List<IParticleRecord> pointData = new ArrayList<>();
         try (is) {
             int tokensLength;
@@ -70,6 +74,13 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                         for (int j = 0; j < tokensLength; j++) {
                             // We use regular parser because of scientific notation
                             point[j] = Double.parseDouble(tokens[j]) * factor;
+                        }
+                        if (transform != null) {
+                            aux.set(point);
+                            aux.mul(transform);
+                            point[0] = aux.x;
+                            point[1] = aux.y;
+                            point[2] = aux.z;
                         }
                         pointData.add(new PointParticleRecord(point));
                     } catch (NumberFormatException e) {
@@ -107,7 +118,8 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public List<IParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file,
+                                                double factor) {
         return null;
     }
 }
