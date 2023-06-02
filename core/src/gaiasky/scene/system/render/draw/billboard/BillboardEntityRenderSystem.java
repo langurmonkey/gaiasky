@@ -25,6 +25,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -121,6 +122,8 @@ public class BillboardEntityRenderSystem implements IObserver {
             Color.abgr8888ToColor(c, utils.getColor(idx, set, highlight));
             if (solidAngle >= thPointTimesFovFactor) {
                 double fuzzySize = getRenderSizeStarSet(size, radius, distToCamera, solidAngle);
+                // Ease into billboard.
+                alpha *= MathUtilsDouble.lint(solidAngle, thPointTimesFovFactor, thPointTimesFovFactor * 2f, 0, 1);
 
                 Vector3 pos = starPos.put(F31);
                 shader.setUniformf("u_pos", pos);
@@ -141,11 +144,11 @@ public class BillboardEntityRenderSystem implements IObserver {
     public double getRenderSizeStarSet(double size,
                                        double radius,
                                        double distToCamera,
-                                       double viewAngle) {
+                                       double solidAngle) {
         double computedSize = size;
-        if (viewAngle > solidAngleThresholdBottomOverFovFactor) {
+        if (solidAngle > solidAngleThresholdBottomOverFovFactor) {
             double dist;
-            if (viewAngle > solidAngleThresholdTopOverFovFactor) {
+            if (solidAngle > solidAngleThresholdTopOverFovFactor) {
                 dist = radius / Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP;
             } else {
                 dist = distToCamera / fovFactor;

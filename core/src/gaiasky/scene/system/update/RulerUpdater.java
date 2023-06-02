@@ -51,6 +51,7 @@ public class RulerUpdater extends AbstractUpdateSystem {
             ruler.m.set(ruler.p1).sub(ruler.p0).scl(0.5).add(ruler.p0);
             body.pos.set(ruler.m).sub(parentGraph.translation);
             graph.translation.set(parentGraph.translation).add(body.pos);
+            body.distToCamera = graph.translation.lenDouble();
             // Distance in internal units
             double dst = ruler.p0.dst(ruler.p1);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst, Settings.settings.program.ui.distanceUnits);

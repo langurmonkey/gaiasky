@@ -29,6 +29,7 @@ import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -197,20 +198,19 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             } else {
                 out.set(ruler.m);
             }
-            double len = out.len();
-            out.clamp(0, len - getRadius()).scl(0.9f);
-            if (Mapper.shape.has(entity)) {
-                out.x += getRadius() * 0.5;
-            }
+            double distToCamera = out.len();
+            out.clamp(0, distToCamera - getRadius()).scl(0.9f);
 
-            Vector3d aux = D32;
-            aux.set(cam.getUp());
-            aux.crs(out).nor();
+            // Offset label a bit to the bottom-right of the position.
+            Vector3d offset = D32;
+            offset.set(cam.getUp());
+            offset.crs(out).nor();
 
-            float dist = -0.015f * cam.getFovFactor() * (float) out.len();
-            aux.add(cam.getUp()).nor().scl(dist);
+            float displacement = (float) MathUtilsDouble.lint(body.solidAngleApparent, Math.toRadians(2), Math.toRadians(40), 1, 20);
+            float dist = -0.015f * displacement * cam.getFovFactor() * (float) out.len();
+            offset.add(cam.getUp()).nor().scl(dist);
 
-            out.add(aux);
+            out.add(offset);
         }
 
         GlobalResources.applyRelativisticAberration(out, cam);
