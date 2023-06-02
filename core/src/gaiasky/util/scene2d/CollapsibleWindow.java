@@ -38,25 +38,34 @@ public class CollapsibleWindow extends OwnWindow {
     /** Whether the user can collapse the window by clicking on the menu bar. **/
     private boolean collapsible = true;
 
-    public CollapsibleWindow(String title, Skin skin) {
+    public CollapsibleWindow(String title,
+                             Skin skin) {
         this(title, skin, 2000);
     }
 
-    public CollapsibleWindow(String title, Skin skin, String styleName) {
+    public CollapsibleWindow(String title,
+                             Skin skin,
+                             String styleName) {
         this(title, skin, styleName, 2000);
     }
 
-    public CollapsibleWindow(String title, Skin skin, float collapseSpeed) {
+    public CollapsibleWindow(String title,
+                             Skin skin,
+                             float collapseSpeed) {
         super(title, skin);
         initWindow(skin, collapseSpeed);
     }
 
-    public CollapsibleWindow(String title, Skin skin, String styleName, float collapseSpeed) {
+    public CollapsibleWindow(String title,
+                             Skin skin,
+                             String styleName,
+                             float collapseSpeed) {
         super(title, skin, styleName);
         initWindow(skin, collapseSpeed);
     }
 
-    private void initWindow(final Skin skin, final float collapseSpeed) {
+    private void initWindow(final Skin skin,
+                            final float collapseSpeed) {
         this.me = this;
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
@@ -67,14 +76,22 @@ public class CollapsibleWindow extends OwnWindow {
             private float startx, starty;
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event,
+                                     float x,
+                                     float y,
+                                     int pointer,
+                                     int button) {
                 startx = x + getX();
                 starty = y + getY();
                 return super.touchDown(event, x, y, pointer, button);
             }
 
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event,
+                                float x,
+                                float y,
+                                int pointer,
+                                int button) {
                 float endx = x + getX();
                 float endy = y + getY();
                 vec2.set(endx - startx, endy - starty);
@@ -130,21 +147,26 @@ public class CollapsibleWindow extends OwnWindow {
         }
     }
 
-    protected void drawBackground(Batch batch, float parentAlpha, float x, float y) {
+    protected void drawBackground(Batch batch,
+                                  float parentAlpha,
+                                  float x,
+                                  float y) {
         float width = getWidth(), height = getHeight();
         float padTop = getPadTop();
 
         super.drawBackground(batch, parentAlpha, x, y);
 
-        Drawable icon = collapsed ? skin.getDrawable(expandIcon) : skin.getDrawable(collapseIcon);
-        float iw = icon.getMinWidth();
-        float ih = icon.getMinHeight();
+        if (collapsible) {
+            Drawable icon = collapsed ? skin.getDrawable(expandIcon) : skin.getDrawable(collapseIcon);
+            float iw = icon.getMinWidth();
+            float ih = icon.getMinHeight();
 
-        x += width - iw - getPadRight();
-        y += height - getPadTop() / 2f;
-        y -= (padTop - ih) / 2f;
+            x += width - iw - getPadRight();
+            y += height - getPadTop() / 2f;
+            y -= (padTop - ih) / 2f;
 
-        icon.draw(batch, x, y, iw, ih);
+            icon.draw(batch, x, y, iw, ih);
+        }
 
     }
 
@@ -253,7 +275,8 @@ public class CollapsibleWindow extends OwnWindow {
         super.pack();
     }
 
-    public void setResizable(boolean w, boolean h) {
+    public void setResizable(boolean w,
+                             boolean h) {
         setResizable(w || h);
         if (w) {
             maxWidth = -1f;
