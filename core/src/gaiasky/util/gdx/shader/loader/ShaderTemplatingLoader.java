@@ -20,6 +20,9 @@ public class ShaderTemplatingLoader {
     }
 
     public static String load(FileHandle fh) {
+        if (fh == null) {
+            return null;
+        }
         String in = fh.readString();
         return resolveIncludes(in);
     }

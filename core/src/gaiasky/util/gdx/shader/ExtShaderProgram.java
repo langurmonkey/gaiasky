@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.*;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
+import org.lwjgl.opengl.GL32;
 
 import java.lang.StringBuilder;
 import java.nio.*;
@@ -44,6 +45,11 @@ public class ExtShaderProgram implements Disposable {
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependVertexCode = "";
+    /**
+     * Code that is always added to the geometry shader code, typically used to inject a #version line. Note that this is added
+     * as-is, you should include a newline (`\n`) if needed.
+     */
+    public static String prependGeometryCode = "";
     /**
      * Code that is always added to every fragment shader code, typically used to inject a #version line. Note that this is added
      * as-is, you should include a newline (`\n`) if needed.
@@ -79,24 +85,54 @@ public class ExtShaderProgram implements Disposable {
     private int program;
     /** Vertex shader handle. **/
     private int vertexShaderHandle;
+    /** Geometry shader handle. **/
+    private int geometryShaderHandle;
     /** Fragment shader handle. **/
     private int fragmentShaderHandle;
     /** Vertex shader source. **/
     private String vertexShaderSource;
+    /** Geometry shader source. **/
+    private String geometryShaderSource;
     /** Fragment shader source. **/
     private String fragmentShaderSource;
-    private String vertexShaderFile, fragmentShaderFile;
+    private String vertexShaderFile, geometryShaderFile, fragmentShaderFile;
     /** Whether this shader was invalidated. **/
     private boolean invalidated;
 
     public ExtShaderProgram() {
     }
 
-    public ExtShaderProgram(String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode) {
+    public ExtShaderProgram(String vertexFile,
+                            String fragmentFile,
+                            String vertexShaderCode,
+                            String fragmentShaderCode) {
         this(null, vertexFile, fragmentFile, vertexShaderCode, fragmentShaderCode, false);
     }
 
-    public ExtShaderProgram(String name, String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode) {
+    public ExtShaderProgram(String vertexFile,
+                            String geometryFile,
+                            String fragmentFile,
+                            String vertexShaderCode,
+                            String geometryShaderCode,
+                            String fragmentShaderCode) {
+        this(null, vertexFile, geometryFile, fragmentFile, vertexShaderCode, geometryShaderCode, fragmentShaderCode, false);
+    }
+
+    public ExtShaderProgram(String name,
+                            String vertexFile,
+                            String geometryFile,
+                            String fragmentFile,
+                            String vertexShaderCode,
+                            String geometryShaderCode,
+                            String fragmentShaderCode) {
+        this(name, vertexFile, geometryFile, fragmentFile, vertexShaderCode, geometryShaderCode, fragmentShaderCode, false);
+    }
+
+    public ExtShaderProgram(String name,
+                            String vertexFile,
+                            String fragmentFile,
+                            String vertexShaderCode,
+                            String fragmentShaderCode) {
         this(name, vertexFile, fragmentFile, vertexShaderCode, fragmentShaderCode, false);
     }
 
@@ -110,7 +146,35 @@ public class ExtShaderProgram implements Disposable {
      * @param fragmentShaderCode The fragment shader code.
      * @param lazyLoading        Whether to use lazy loading, only preparing the data without actually compiling the shaders.
      */
-    public ExtShaderProgram(String name, String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode, boolean lazyLoading) {
+    public ExtShaderProgram(String name,
+                            String vertexFile,
+                            String fragmentFile,
+                            String vertexShaderCode,
+                            String fragmentShaderCode,
+                            boolean lazyLoading) {
+        this(name, vertexFile, null, fragmentFile, vertexShaderCode, null, fragmentShaderCode, lazyLoading);
+    }
+
+    /**
+     * Constructs a new ShaderProgram and immediately compiles it.
+     *
+     * @param name               The shader name, if any.
+     * @param vertexFile         The vertex shader file.
+     * @param geometryFile       The geometry shader file.
+     * @param fragmentFile       The fragment shader file.
+     * @param vertexShaderCode   The vertex shader code.
+     * @param geometryShaderCode The geometry shader code.
+     * @param fragmentShaderCode The fragment shader code.
+     * @param lazyLoading        Whether to use lazy loading, only preparing the data without actually compiling the shaders.
+     */
+    public ExtShaderProgram(String name,
+                            String vertexFile,
+                            String geometryFile,
+                            String fragmentFile,
+                            String vertexShaderCode,
+                            String geometryShaderCode,
+                            String fragmentShaderCode,
+                            boolean lazyLoading) {
         if (vertexShaderCode == null)
             throw new IllegalArgumentException("vertex shader must not be null");
         if (fragmentShaderCode == null)
@@ -118,14 +182,18 @@ public class ExtShaderProgram implements Disposable {
 
         if (prependVertexCode != null && prependVertexCode.length() > 0)
             vertexShaderCode = prependVertexCode + vertexShaderCode;
+        if (geometryShaderCode != null && prependGeometryCode != null && prependGeometryCode.length() > 0)
+            geometryShaderCode = prependGeometryCode + geometryShaderCode;
         if (prependFragmentCode != null && prependFragmentCode.length() > 0)
             fragmentShaderCode = prependFragmentCode + fragmentShaderCode;
 
         this.isLazy = lazyLoading;
         this.name = name;
         this.vertexShaderSource = vertexShaderCode;
+        this.geometryShaderSource = geometryShaderCode;
         this.fragmentShaderSource = fragmentShaderCode;
         this.vertexShaderFile = vertexFile;
+        this.geometryShaderFile = geometryFile;
         this.fragmentShaderFile = fragmentFile;
 
         if (!lazyLoading) {
@@ -139,11 +207,13 @@ public class ExtShaderProgram implements Disposable {
      * @param vertexShader   The vertex shader code.
      * @param fragmentShader The fragment shader code.
      */
-    public ExtShaderProgram(String vertexShader, String fragmentShader) {
+    public ExtShaderProgram(String vertexShader,
+                            String fragmentShader) {
         this(null, null, vertexShader, fragmentShader);
     }
 
-    public ExtShaderProgram(FileHandle vertexShader, FileHandle fragmentShader) {
+    public ExtShaderProgram(FileHandle vertexShader,
+                            FileHandle fragmentShader) {
         this(vertexShader.readString(), fragmentShader.readString());
     }
 
@@ -204,10 +274,18 @@ public class ExtShaderProgram implements Disposable {
             }
 
             if (vertexShaderFile != null || fragmentShaderFile != null) {
-                logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
+                if (geometryShaderFile != null) {
+                    logger.debug(I18n.msg("notif.shader.load.geom", vertexShaderFile, geometryShaderFile, fragmentShaderFile));
+                } else {
+                    logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
+                }
             }
 
-            compileShaders(vertexShaderSource, fragmentShaderSource);
+            if (geometryShaderSource != null) {
+                compileShaders(vertexShaderSource, geometryShaderSource, fragmentShaderSource);
+            } else {
+                compileShaders(vertexShaderSource, fragmentShaderSource);
+            }
             if (isCompiled()) {
                 fetchAttributes();
                 fetchUniforms();
@@ -216,6 +294,9 @@ public class ExtShaderProgram implements Disposable {
                 logger.error(I18n.msg("notif.shader.compile.fail"));
                 if (vertexShaderFile != null) {
                     logger.error(I18n.msg("notif.shader.vertex", vertexShaderFile));
+                }
+                if (geometryShaderFile != null) {
+                    logger.error(I18n.msg("notif.shader.geometry", geometryShaderFile));
                 }
                 if (fragmentShaderFile != null) {
                     logger.error(I18n.msg("notif.shader.fragment", fragmentShaderFile));
@@ -230,9 +311,39 @@ public class ExtShaderProgram implements Disposable {
      * Loads and compiles the shaders, creates a new program and links the shaders.
      *
      * @param vertexShader   The vertex shader code.
+     * @param geometryShader The geometry shader code.
      * @param fragmentShader The fragment shader code.
      */
-    private void compileShaders(String vertexShader, String fragmentShader) {
+    private void compileShaders(String vertexShader,
+                                String geometryShader,
+                                String fragmentShader) {
+        vertexShaderHandle = loadShader(GL20.GL_VERTEX_SHADER, vertexShader);
+        geometryShaderHandle = loadShader(GL32.GL_GEOMETRY_SHADER, geometryShader);
+        fragmentShaderHandle = loadShader(GL20.GL_FRAGMENT_SHADER, fragmentShader);
+        logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
+
+        if (vertexShaderHandle == -1 || geometryShaderHandle == -1 || fragmentShaderHandle == -1) {
+            isCompiled = false;
+            return;
+        }
+
+        program = linkProgram(createProgram());
+        if (program == -1) {
+            isCompiled = false;
+            return;
+        }
+
+        isCompiled = true;
+    }
+
+    /**
+     * Loads and compiles the shaders, creates a new program and links the shaders.
+     *
+     * @param vertexShader   The vertex shader code.
+     * @param fragmentShader The fragment shader code.
+     */
+    private void compileShaders(String vertexShader,
+                                String fragmentShader) {
         vertexShaderHandle = loadShader(GL20.GL_VERTEX_SHADER, vertexShader);
         fragmentShaderHandle = loadShader(GL20.GL_FRAGMENT_SHADER, fragmentShader);
         logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
@@ -251,7 +362,8 @@ public class ExtShaderProgram implements Disposable {
         isCompiled = true;
     }
 
-    private int loadShader(int type, String source) {
+    private int loadShader(int type,
+                           String source) {
         GL20 gl = Gdx.gl20;
         IntBuffer intbuf = BufferUtils.newIntBuffer(1);
 
@@ -286,9 +398,11 @@ public class ExtShaderProgram implements Disposable {
             return -1;
 
         gl.glAttachShader(program, vertexShaderHandle);
+        gl.glAttachShader(program, geometryShaderHandle);
         gl.glAttachShader(program, fragmentShaderHandle);
         gl.glLinkProgram(program);
         gl.glDetachShader(program, vertexShaderHandle);
+        gl.glDetachShader(program, geometryShaderHandle);
         gl.glDetachShader(program, fragmentShaderHandle);
 
         ByteBuffer tmp = ByteBuffer.allocateDirect(4);
@@ -342,7 +456,8 @@ public class ExtShaderProgram implements Disposable {
         return fetchUniformLocation(name, pedantic);
     }
 
-    public int fetchUniformLocation(String name, boolean pedantic) {
+    public int fetchUniformLocation(String name,
+                                    boolean pedantic) {
         GL20 gl = Gdx.gl20;
         // -2 == not yet cached
         // -1 == cached but not found
@@ -362,14 +477,16 @@ public class ExtShaderProgram implements Disposable {
      * @param name  the name of the uniform
      * @param value the value
      */
-    public void setUniformi(String name, int value) {
+    public void setUniformi(String name,
+                            int value) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform1i(location, value);
     }
 
-    public void setUniformi(int location, int value) {
+    public void setUniformi(int location,
+                            int value) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform1i(location, value);
@@ -382,14 +499,18 @@ public class ExtShaderProgram implements Disposable {
      * @param value1 the first value
      * @param value2 the second value
      */
-    public void setUniformi(String name, int value1, int value2) {
+    public void setUniformi(String name,
+                            int value1,
+                            int value2) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform2i(location, value1, value2);
     }
 
-    public void setUniformi(int location, int value1, int value2) {
+    public void setUniformi(int location,
+                            int value1,
+                            int value2) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform2i(location, value1, value2);
@@ -403,14 +524,20 @@ public class ExtShaderProgram implements Disposable {
      * @param value2 the second value
      * @param value3 the third value
      */
-    public void setUniformi(String name, int value1, int value2, int value3) {
+    public void setUniformi(String name,
+                            int value1,
+                            int value2,
+                            int value3) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform3i(location, value1, value2, value3);
     }
 
-    public void setUniformi(int location, int value1, int value2, int value3) {
+    public void setUniformi(int location,
+                            int value1,
+                            int value2,
+                            int value3) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform3i(location, value1, value2, value3);
@@ -425,14 +552,22 @@ public class ExtShaderProgram implements Disposable {
      * @param value3 the third value
      * @param value4 the fourth value
      */
-    public void setUniformi(String name, int value1, int value2, int value3, int value4) {
+    public void setUniformi(String name,
+                            int value1,
+                            int value2,
+                            int value3,
+                            int value4) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform4i(location, value1, value2, value3, value4);
     }
 
-    public void setUniformi(int location, int value1, int value2, int value3, int value4) {
+    public void setUniformi(int location,
+                            int value1,
+                            int value2,
+                            int value3,
+                            int value4) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform4i(location, value1, value2, value3, value4);
@@ -444,14 +579,16 @@ public class ExtShaderProgram implements Disposable {
      * @param name  the name of the uniform
      * @param value the value
      */
-    public void setUniformf(String name, float value) {
+    public void setUniformf(String name,
+                            float value) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform1f(location, value);
     }
 
-    public void setUniformf(int location, float value) {
+    public void setUniformf(int location,
+                            float value) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform1f(location, value);
@@ -464,14 +601,18 @@ public class ExtShaderProgram implements Disposable {
      * @param value1 the first value
      * @param value2 the second value
      */
-    public void setUniformf(String name, float value1, float value2) {
+    public void setUniformf(String name,
+                            float value1,
+                            float value2) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform2f(location, value1, value2);
     }
 
-    public void setUniformf(int location, float value1, float value2) {
+    public void setUniformf(int location,
+                            float value1,
+                            float value2) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform2f(location, value1, value2);
@@ -485,14 +626,20 @@ public class ExtShaderProgram implements Disposable {
      * @param value2 the second value
      * @param value3 the third value
      */
-    public void setUniformf(String name, float value1, float value2, float value3) {
+    public void setUniformf(String name,
+                            float value1,
+                            float value2,
+                            float value3) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform3f(location, value1, value2, value3);
     }
 
-    public void setUniformf(int location, float value1, float value2, float value3) {
+    public void setUniformf(int location,
+                            float value1,
+                            float value2,
+                            float value3) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform3f(location, value1, value2, value3);
@@ -507,66 +654,98 @@ public class ExtShaderProgram implements Disposable {
      * @param value3 the third value
      * @param value4 the fourth value
      */
-    public void setUniformf(String name, float value1, float value2, float value3, float value4) {
+    public void setUniformf(String name,
+                            float value1,
+                            float value2,
+                            float value3,
+                            float value4) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform4f(location, value1, value2, value3, value4);
     }
 
-    public void setUniformf(int location, float value1, float value2, float value3, float value4) {
+    public void setUniformf(int location,
+                            float value1,
+                            float value2,
+                            float value3,
+                            float value4) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform4f(location, value1, value2, value3, value4);
     }
 
-    public void setUniform1fv(String name, float[] values, int offset, int length) {
+    public void setUniform1fv(String name,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform1fv(location, length, values, offset);
     }
 
-    public void setUniform1fv(int location, float[] values, int offset, int length) {
+    public void setUniform1fv(int location,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform1fv(location, length, values, offset);
     }
 
-    public void setUniform2fv(String name, float[] values, int offset, int length) {
+    public void setUniform2fv(String name,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform2fv(location, length / 2, values, offset);
     }
 
-    public void setUniform2fv(int location, float[] values, int offset, int length) {
+    public void setUniform2fv(int location,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform2fv(location, length / 2, values, offset);
     }
 
-    public void setUniform3fv(String name, float[] values, int offset, int length) {
+    public void setUniform3fv(String name,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform3fv(location, length / 3, values, offset);
     }
 
-    public void setUniform3fv(int location, float[] values, int offset, int length) {
+    public void setUniform3fv(int location,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform3fv(location, length / 3, values, offset);
     }
 
-    public void setUniform4fv(String name, float[] values, int offset, int length) {
+    public void setUniform4fv(String name,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchUniformLocation(name);
         gl.glUniform4fv(location, length / 4, values, offset);
     }
 
-    public void setUniform4fv(int location, float[] values, int offset, int length) {
+    public void setUniform4fv(int location,
+                              float[] values,
+                              int offset,
+                              int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniform4fv(location, length / 4, values, offset);
@@ -578,7 +757,8 @@ public class ExtShaderProgram implements Disposable {
      * @param name   the name of the uniform
      * @param matrix the matrix
      */
-    public void setUniformMatrix(String name, Matrix4 matrix) {
+    public void setUniformMatrix(String name,
+                                 Matrix4 matrix) {
         setUniformMatrix(name, matrix, false);
     }
 
@@ -589,15 +769,20 @@ public class ExtShaderProgram implements Disposable {
      * @param matrix    the matrix
      * @param transpose whether the matrix should be transposed
      */
-    public void setUniformMatrix(String name, Matrix4 matrix, boolean transpose) {
+    public void setUniformMatrix(String name,
+                                 Matrix4 matrix,
+                                 boolean transpose) {
         setUniformMatrix(fetchUniformLocation(name), matrix, transpose);
     }
 
-    public void setUniformMatrix(int location, Matrix4 matrix) {
+    public void setUniformMatrix(int location,
+                                 Matrix4 matrix) {
         setUniformMatrix(location, matrix, false);
     }
 
-    public void setUniformMatrix(int location, Matrix4 matrix, boolean transpose) {
+    public void setUniformMatrix(int location,
+                                 Matrix4 matrix,
+                                 boolean transpose) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniformMatrix4fv(location, 1, transpose, matrix.val, 0);
@@ -609,7 +794,8 @@ public class ExtShaderProgram implements Disposable {
      * @param name   the name of the uniform
      * @param matrix the matrix
      */
-    public void setUniformMatrix(String name, Matrix3 matrix) {
+    public void setUniformMatrix(String name,
+                                 Matrix3 matrix) {
         setUniformMatrix(name, matrix, false);
     }
 
@@ -620,15 +806,20 @@ public class ExtShaderProgram implements Disposable {
      * @param matrix    the matrix
      * @param transpose whether the uniform matrix should be transposed
      */
-    public void setUniformMatrix(String name, Matrix3 matrix, boolean transpose) {
+    public void setUniformMatrix(String name,
+                                 Matrix3 matrix,
+                                 boolean transpose) {
         setUniformMatrix(fetchUniformLocation(name), matrix, transpose);
     }
 
-    public void setUniformMatrix(int location, Matrix3 matrix) {
+    public void setUniformMatrix(int location,
+                                 Matrix3 matrix) {
         setUniformMatrix(location, matrix, false);
     }
 
-    public void setUniformMatrix(int location, Matrix3 matrix, boolean transpose) {
+    public void setUniformMatrix(int location,
+                                 Matrix3 matrix,
+                                 boolean transpose) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniformMatrix3fv(location, 1, transpose, matrix.val, 0);
@@ -641,7 +832,10 @@ public class ExtShaderProgram implements Disposable {
      * @param buffer    buffer containing the matrix data
      * @param transpose whether the uniform matrix should be transposed
      */
-    public void setUniformMatrix3fv(String name, FloatBuffer buffer, int count, boolean transpose) {
+    public void setUniformMatrix3fv(String name,
+                                    FloatBuffer buffer,
+                                    int count,
+                                    boolean transpose) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         buffer.position(0);
@@ -656,7 +850,10 @@ public class ExtShaderProgram implements Disposable {
      * @param buffer    buffer containing the matrix data
      * @param transpose whether the uniform matrix should be transposed
      */
-    public void setUniformMatrix4fv(String name, FloatBuffer buffer, int count, boolean transpose) {
+    public void setUniformMatrix4fv(String name,
+                                    FloatBuffer buffer,
+                                    int count,
+                                    boolean transpose) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         buffer.position(0);
@@ -664,13 +861,19 @@ public class ExtShaderProgram implements Disposable {
         gl.glUniformMatrix4fv(location, count, transpose, buffer);
     }
 
-    public void setUniformMatrix4fv(int location, float[] values, int offset, int length) {
+    public void setUniformMatrix4fv(int location,
+                                    float[] values,
+                                    int offset,
+                                    int length) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glUniformMatrix4fv(location, length / 16, false, values, offset);
     }
 
-    public void setUniformMatrix4fv(String name, float[] values, int offset, int length) {
+    public void setUniformMatrix4fv(String name,
+                                    float[] values,
+                                    int offset,
+                                    int length) {
         setUniformMatrix4fv(fetchUniformLocation(name), values, offset, length);
     }
 
@@ -680,11 +883,13 @@ public class ExtShaderProgram implements Disposable {
      * @param name   the name of the uniform
      * @param values x and y as the first and second values respectively
      */
-    public void setUniformf(String name, Vector2 values) {
+    public void setUniformf(String name,
+                            Vector2 values) {
         setUniformf(name, values.x, values.y);
     }
 
-    public void setUniformf(int location, Vector2 values) {
+    public void setUniformf(int location,
+                            Vector2 values) {
         setUniformf(location, values.x, values.y);
     }
 
@@ -694,11 +899,13 @@ public class ExtShaderProgram implements Disposable {
      * @param name   the name of the uniform
      * @param values x, y and z as the first, second and third values respectively
      */
-    public void setUniformf(String name, Vector3 values) {
+    public void setUniformf(String name,
+                            Vector3 values) {
         setUniformf(name, values.x, values.y, values.z);
     }
 
-    public void setUniformf(int location, Vector3 values) {
+    public void setUniformf(int location,
+                            Vector3 values) {
         setUniformf(location, values.x, values.y, values.z);
     }
 
@@ -708,11 +915,13 @@ public class ExtShaderProgram implements Disposable {
      * @param name   the name of the uniform
      * @param values r, g, b and a as the first through fourth values respectively
      */
-    public void setUniformf(String name, Color values) {
+    public void setUniformf(String name,
+                            Color values) {
         setUniformf(name, values.r, values.g, values.b, values.a);
     }
 
-    public void setUniformf(int location, Color values) {
+    public void setUniformf(int location,
+                            Color values) {
         setUniformf(location, values.r, values.g, values.b, values.a);
     }
 
@@ -727,7 +936,12 @@ public class ExtShaderProgram implements Disposable {
      * @param stride    the stride in bytes between successive attributes
      * @param buffer    the buffer containing the vertex attributes.
      */
-    public void setVertexAttribute(String name, int size, int type, boolean normalize, int stride, Buffer buffer) {
+    public void setVertexAttribute(String name,
+                                   int size,
+                                   int type,
+                                   boolean normalize,
+                                   int stride,
+                                   Buffer buffer) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchAttributeLocation(name);
@@ -736,7 +950,12 @@ public class ExtShaderProgram implements Disposable {
         gl.glVertexAttribPointer(location, size, type, normalize, stride, buffer);
     }
 
-    public void setVertexAttribute(int location, int size, int type, boolean normalize, int stride, Buffer buffer) {
+    public void setVertexAttribute(int location,
+                                   int size,
+                                   int type,
+                                   boolean normalize,
+                                   int stride,
+                                   Buffer buffer) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glVertexAttribPointer(location, size, type, normalize, stride, buffer);
@@ -753,7 +972,12 @@ public class ExtShaderProgram implements Disposable {
      * @param stride    the stride in bytes between successive attributes
      * @param offset    byte offset into the vertex buffer object bound to GL20.GL_ARRAY_BUFFER.
      */
-    public void setVertexAttribute(String name, int size, int type, boolean normalize, int stride, int offset) {
+    public void setVertexAttribute(String name,
+                                   int size,
+                                   int type,
+                                   boolean normalize,
+                                   int stride,
+                                   int offset) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         int location = fetchAttributeLocation(name);
@@ -762,7 +986,12 @@ public class ExtShaderProgram implements Disposable {
         gl.glVertexAttribPointer(location, size, type, normalize, stride, offset);
     }
 
-    public void setVertexAttribute(int location, int size, int type, boolean normalize, int stride, int offset) {
+    public void setVertexAttribute(int location,
+                                   int size,
+                                   int type,
+                                   boolean normalize,
+                                   int stride,
+                                   int offset) {
         GL20 gl = Gdx.gl20;
         checkManaged();
         gl.glVertexAttribPointer(location, size, type, normalize, stride, offset);
@@ -845,7 +1074,8 @@ public class ExtShaderProgram implements Disposable {
         }
     }
 
-    private void addManagedShader(Application app, ExtShaderProgram shaderProgram) {
+    private void addManagedShader(Application app,
+                                  ExtShaderProgram shaderProgram) {
         Array<ExtShaderProgram> managedResources = shaders.get(app);
         if (managedResources == null)
             managedResources = new Array<ExtShaderProgram>();
@@ -862,7 +1092,11 @@ public class ExtShaderProgram implements Disposable {
      * @param value3 the third value
      * @param value4 the fourth value
      */
-    public void setAttributef(String name, float value1, float value2, float value3, float value4) {
+    public void setAttributef(String name,
+                              float value1,
+                              float value2,
+                              float value3,
+                              float value4) {
         GL20 gl = Gdx.gl20;
         int location = fetchAttributeLocation(name);
         gl.glVertexAttrib4f(location, value1, value2, value3, value4);

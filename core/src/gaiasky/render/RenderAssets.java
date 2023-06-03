@@ -42,66 +42,11 @@ public class RenderAssets {
     private static final Log logger = Logger.getLogger(RenderAssets.class);
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
-    public ExtShaderProgram[]
-            starBillboardShaders,
-            galShaders,
-            spriteShaders,
-            pointShaders,
-            lineShaders,
-            lineQuadShaders,
-            lineGpuShaders,
-            billboardGroupShaders,
-            particleEffectShaders,
-            particleGroupShaders,
-            particleGroupExtBillboardShaders,
-            particleGroupExtModelShaders,
-            starGroupShaders,
-            variableGroupShaders,
-            starPointShaders,
-            orbitElemShaders;
-    public IntModelBatch
-            mbVertexLighting,
-            mbVertexLightingAdditive,
-            mbVertexDiffuse,
-            mbVertexLightingStarSurface,
-            mbVertexLightingBeam,
-            mbVertexLightingThruster,
-            mbVertexLightingGrid,
-            mbVertexLightingRecGrid,
-            mbPixelLighting,
-            mbPixelLightingDust,
-            mbPixelLightingDepth,
-            mbPixelLightingOpaque,
-            mbPixelLightingSvtDetection,
-            mbPixelLightingTessellation,
-            mbPixelLightingOpaqueTessellation,
-            mbPixelLightingSvtDetectionTessellation,
-            mbPixelLightingDepthTessellation,
-            mbSkybox,
-            mbAtmosphere,
-            mbCloud;
-    public BitmapFont
-            font2d,
-            font3d,
-            fontTitles;
+    public ExtShaderProgram[] starBillboardShaders, galShaders, spriteShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
+    public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbVertexLightingBeam, mbVertexLightingThruster, mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation, mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
+    public BitmapFont font2d, font3d, fontTitles;
     public ExtSpriteBatch spriteBatch, fontBatch;
-    private AssetDescriptor<ExtShaderProgram>[]
-            starGroupDesc,
-            particleGroupDesc,
-            particleGroupExtBillboardDesc,
-            particleGroupExtModelDesc,
-            variableGroupDesc,
-            particleEffectDesc,
-            orbitElemDesc,
-            pointDesc,
-            lineDesc,
-            lineQuadDesc,
-            lineGpuDesc,
-            billboardGroupDesc,
-            starPointDesc,
-            galDesc,
-            spriteDesc,
-            starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
@@ -160,17 +105,16 @@ public class RenderAssets {
                                        "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesColMap),
                                        definesColMap);
         particleGroupExtBillboardDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl",
-                                                   TextUtils.concatAll("particle.group.ext", namesColMap),
-                                                   definesColMap, "#define extendedParticlesFlag");
+                                                   TextUtils.concatAll("particle.group.ext", namesColMap), definesColMap, "#define extendedParticlesFlag");
         particleGroupExtModelDesc = loadShader(manager, "shader/particle.group.model.vertex.glsl", "shader/particle.group.model.fragment.glsl",
-                                               TextUtils.concatAll("particle.group.ext.model", namesColMap),
-                                               definesColMap, "#define extendedParticlesFlag");
+                                               TextUtils.concatAll("particle.group.ext.model", namesColMap), definesColMap, "#define extendedParticlesFlag");
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
                                    TextUtils.concatAll("star.group", namesColMap), definesColMap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
                                        TextUtils.concatAll("variable.group", namesColMap), definesColMap);
         // Regular stars
-        starPointDesc = loadShader(manager, "shader/star.group.point.vertex.glsl", "shader/star.group.point.fragment.glsl", TextUtils.concatAll("star.point", names), defines);
+        starPointDesc = loadShader(manager, "shader/star.group.point.vertex.glsl", "shader/star.group.point.fragment.glsl", TextUtils.concatAll("star.point", names),
+                                   defines);
 
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
@@ -402,6 +346,27 @@ public class RenderAssets {
                                                            String fragmentShader,
                                                            String[] names,
                                                            String[] prepend) {
+        return loadShader(manager, vertexShader, null, fragmentShader, names, prepend);
+    }
+
+    /**
+     * Prepares a shader program for asynchronous loading.
+     *
+     * @param manager        The asset manager.
+     * @param vertexShader   The vertex shader file.
+     * @param geometryShader The geometry shader file.
+     * @param fragmentShader The fragment shader file.
+     * @param names          The shader names or identifiers.
+     * @param prepend        The pre-processor defines for each shader name.
+     *
+     * @return The asset descriptor for the shader program.
+     */
+    private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
+                                                           String vertexShader,
+                                                           String geometryShader,
+                                                           String fragmentShader,
+                                                           String[] names,
+                                                           String[] prepend) {
         return loadShader(manager, vertexShader, fragmentShader, names, prepend, null);
     }
 
@@ -423,6 +388,28 @@ public class RenderAssets {
                                                            String[] names,
                                                            String[] prepend,
                                                            String fixedPrepend) {
+        return loadShader(manager, vertexShader, null, fragmentShader, names, prepend, fixedPrepend);
+    }
+
+    /**
+     * Prepares a shader program for asynchronous loading.
+     *
+     * @param manager        The asset manager.
+     * @param vertexShader   The vertex shader file.
+     * @param fragmentShader The fragment shader file.
+     * @param names          The shader names or identifiers.
+     * @param prepend        The pre-processor defines for each shader name.
+     * @param fixedPrepend   The fixed defines that must appear in all shaders, if any.
+     *
+     * @return The asset descriptor for the shader program.
+     */
+    private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
+                                                           String vertexShader,
+                                                           String geometryShader,
+                                                           String fragmentShader,
+                                                           String[] names,
+                                                           String[] prepend,
+                                                           String fixedPrepend) {
         AssetDescriptor<ExtShaderProgram>[] result = new AssetDescriptor[prepend.length];
 
         int i = 0;
@@ -432,6 +419,7 @@ public class RenderAssets {
             spp.prependVertexCode = fixedPrepend != null ? fixedPrepend + "\n" + prep : prep;
             spp.prependFragmentCode = spp.prependVertexCode;
             spp.vertexFile = vertexShader;
+            spp.geometryFile = geometryShader;
             spp.fragmentFile = fragmentShader;
             manager.load(names[i], ExtShaderProgram.class, spp);
             AssetDescriptor<ExtShaderProgram> desc = new AssetDescriptor<>(names[i], ExtShaderProgram.class, spp);
