@@ -37,7 +37,6 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     protected static final int MAX_DPOOL_SIZE = 10000;
     final static double baseWidthAngle = Math.toRadians(.13);
     final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
-    private final LineArraySorter sorter;
     private final Pool<double[]> doublePool;
     private final Vector3d aux = new Vector3d();
     Vector3d line, camdir0, camdir1, camdir15, point, vec;
@@ -49,7 +48,6 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
         super(sceneRenderer, rg, alphas, shaders);
         doublePool = new DoubleArrayPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 12);
         provisionalLines = new Array<>();
-        sorter = new LineArraySorter(11);
         line = new Vector3d();
         camdir0 = new Vector3d();
         camdir1 = new Vector3d();
