@@ -53,7 +53,7 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
         initVertices(meshIdx++);
     }
 
-    private void initVertices(int index) {
+    protected void initVertices(int index) {
         if (index >= meshes.size) {
             meshes.setSize(index + 1);
         }
@@ -65,8 +65,8 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
 
             curr.capacity = 10000;
 
-            VertexAttribute[] attribs = buildVertexAttributes();
-            curr.mesh = new IntMesh(false, curr.capacity, 0, attribs);
+            VertexAttribute[] attributes = buildVertexAttributes();
+            curr.mesh = new IntMesh(false, curr.capacity, 0, attributes);
 
             curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
             curr.vertices = new float[curr.capacity * curr.vertexSize];
@@ -89,7 +89,6 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-
         shaderProgram = getShaderProgram();
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);

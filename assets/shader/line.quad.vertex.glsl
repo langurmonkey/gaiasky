@@ -2,14 +2,13 @@
 
 in vec4 a_position;
 in vec4 a_color;
-in vec2 a_uv;
 
-uniform mat4 u_projView;
 uniform vec2 u_viewport;
 uniform float u_vrScale;
 
-out vec4 v_col;
-out vec2 v_uv;
+out VS_OUT {
+    vec4 color;
+} vs_out;
 
 #include shader/lib_geometry.glsl
 
@@ -36,12 +35,10 @@ void main() {
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    v_col = a_color;
-    v_uv = a_uv;
+    vs_out.color = a_color;
 
-    // Position
-    vec4 gpos = u_projView * pos;
-    gl_Position = gpos;
+    // Position (view-projection multiplication in geometry shader).
+    gl_Position = pos;
 
     #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);

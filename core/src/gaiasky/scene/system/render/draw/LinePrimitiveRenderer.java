@@ -9,10 +9,7 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IRenderable;
@@ -25,11 +22,9 @@ import gaiasky.scene.view.LineView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class LinePrimitiveRenderer extends LineRenderSystem {
@@ -40,58 +35,12 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
 
     protected LineView view;
 
-    private ExtShaderProgram shaderProgram;
+    protected ExtShaderProgram shaderProgram;
 
     public LinePrimitiveRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         view = new LineView();
         aux2 = new Vector3();
-    }
-
-    @Override
-    protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
-        Gdx.gl.glHint(GL30.GL_LINE_SMOOTH_HINT, GL30.GL_NICEST);
-    }
-
-    @Override
-    protected void initVertices() {
-        meshes = new Array<>();
-        initVertices(meshIdx++);
-    }
-
-    private void initVertices(int index) {
-        if (index >= meshes.size) {
-            meshes.setSize(index + 1);
-        }
-        if (meshes.get(index) == null) {
-            if (index > 0)
-                logger.info("Capacity too small, creating new meshdata: " + curr.capacity);
-            curr = new MeshData();
-            meshes.set(index, curr);
-
-            curr.capacity = 10000;
-
-            VertexAttribute[] attributes = buildVertexAttributes();
-            curr.mesh = new IntMesh(false, curr.capacity, 0, attributes);
-
-            curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
-            curr.vertices = new float[curr.capacity * curr.vertexSize];
-            curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        } else {
-            curr = meshes.get(index);
-        }
-    }
-
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attributes = new Array<>();
-        attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-
-        VertexAttribute[] array = new VertexAttribute[attributes.size];
-        for (int i = 0; i < attributes.size; i++)
-            array[i] = attributes.get(i);
-        return array;
     }
 
     @Override
@@ -128,15 +77,7 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
         curr = meshes.get(0);
     }
 
-    private float getLineWidth(Render r) {
-        if (Mapper.verts.has(r.entity)) {
-            return Mapper.verts.get(r.entity).primitiveSize;
-        } else {
-            return 1;
-        }
-    }
-
-    private int getGLPrimitive(Render r) {
+    protected int getGLPrimitive(Render r) {
         if (Mapper.verts.has(r.entity)) {
             return Mapper.verts.get(r.entity).glPrimitive;
         } else {
@@ -202,25 +143,6 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
         vertex((float) x0, (float) y0, (float) z0);
         color(r1, g1, b1, a1);
         vertex((float) x1, (float) y1, (float) z1);
-    }
-
-    protected static class LineArraySorter implements Comparator<double[]> {
-        private final int idx;
-
-        public LineArraySorter(int idx) {
-            this.idx = idx;
-        }
-
-        @Override
-        public int compare(double[] o1, double[] o2) {
-            double f = o1[idx] - o2[idx];
-            if (f == 0)
-                return 0;
-            else if (f < 0)
-                return 1;
-            else
-                return -1;
-        }
     }
 
 }

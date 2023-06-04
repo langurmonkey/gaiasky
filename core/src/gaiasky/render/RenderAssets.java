@@ -92,7 +92,7 @@ public class RenderAssets {
                                         TextUtils.concatAll("billboard.group", names), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", TextUtils.concatAll("point.cpu", names), defines);
         lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
-        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", TextUtils.concatAll("line.quad", names), defines);
+        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.geometry.glsl", "shader/line.quad.fragment.glsl", TextUtils.concatAll("line.quad", names), defines);
         lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("line.gpu", names), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl",
@@ -367,7 +367,7 @@ public class RenderAssets {
                                                            String fragmentShader,
                                                            String[] names,
                                                            String[] prepend) {
-        return loadShader(manager, vertexShader, fragmentShader, names, prepend, null);
+        return loadShader(manager, vertexShader, geometryShader, fragmentShader, names, prepend, null);
     }
 
     /**
