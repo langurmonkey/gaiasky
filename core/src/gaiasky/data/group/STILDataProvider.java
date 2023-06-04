@@ -228,9 +228,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                           Runnable postCallback) {
         try {
             if (factory != null) {
-                // RNG
-                final Random r = new Random(123L);
-
                 // Add extra builders
                 List<TableBuilder> builders = factory.getDefaultBuilders();
                 builders.add(new CsvTableBuilder());
@@ -255,7 +252,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
                     }
                 }
-                boolean isStars = isAnyType(DatasetLoadType.VARIABLES, DatasetLoadType.STARS);
+                boolean isStars = datasetOptions == null || isAnyType(DatasetLoadType.VARIABLES, DatasetLoadType.STARS);
 
                 int resampledLightCurves = 0;
                 int noPeriods = 0;
@@ -352,7 +349,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 appMag = 15;
                             }
                             // Scale magnitude if needed.
-                            double magScl = isStars ? datasetOptions.magnitudeScale : 0f;
+                            double magScl = isStars && datasetOptions != null ? datasetOptions.magnitudeScale : 0f;
                             appMag = appMag - magScl;
 
                             // Absolute magnitude to pseudo-size.
@@ -518,7 +515,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 assert idPair != null;
                                 try {
                                     id = Parser.parseLongException(idPair.getSecond());
-                                    if (datasetOptions.type == DatasetLoadType.STARS && idPair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                    if (isStars && idPair.getFirst().colname.equalsIgnoreCase("hip")) {
                                         hip = (int) id;
                                     }
                                 } catch (NumberFormatException e) {
