@@ -838,12 +838,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     private AbstractRenderSystem getLineRenderSystem() {
         AbstractRenderSystem sys;
-        if (Settings.settings.scene.renderer.isNormalLineRenderer()) {
-            // Normal
+        // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
+        if (Settings.settings.scene.renderer.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+            // Normal line renderer.
             sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         } else {
-            // Quad
+            // Polyline quad-strip renderer.
             sys = new LineQuadstripRenderer(this, LINE, alphas, renderAssets.lineQuadShaders);
             sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
