@@ -23,10 +23,12 @@ in vec4 a_color;
 in vec4 a_orbitelems01;
 in vec4 a_orbitelems02;
 in float a_size;
+in float a_textureIndex;
 
 // OUTPUT
 out vec4 v_col;
 out vec2 v_uv;
+out float v_textureIndex;
 
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
@@ -137,6 +139,7 @@ void main() {
     gl_Position = gpos;
 
     v_uv = a_texCoord;
+    v_textureIndex = a_textureIndex;
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);

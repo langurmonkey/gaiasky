@@ -51,7 +51,8 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     private int elems01Offset;
     private int elems02Offset;
     private int sizeOffset;
-    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.075)), Math.tan(Math.toRadians(0.9)) };
+    private int textureIndexOffset;
+    private final double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.075)), Math.tan(Math.toRadians(0.9)) };
 
     public ElementsSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -73,6 +74,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems1, 4, "a_orbitelems01"));
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems2, 4, "a_orbitelems02"));
         attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
+        attributes.add(new VertexAttribute(OwnUsage.TextureIndex, 1, "a_textureIndex"));
     }
 
     @Override
@@ -83,6 +85,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
         elems01Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1).offset / 4 : 0;
         elems02Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
+        textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getVertexAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
     }
 
     @Override
@@ -142,6 +145,9 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
 
                             // SIZE
                             tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
+
+                            // TEXTURE INDEX
+                            tempVerts[curr.vertexIdx + textureIndexOffset] = -1f;
 
                             curr.vertexIdx += curr.vertexSize;
                             curr.numVertices++;

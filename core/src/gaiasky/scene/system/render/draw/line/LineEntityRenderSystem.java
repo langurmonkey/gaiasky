@@ -350,8 +350,9 @@ public class LineEntityRenderSystem {
                     if (p0Alpha > 0.0 || p1Alpha > 0.0) {
                         if (orbitTrail && n == nPoints - 2) {
                             renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], p1Alpha * cc[3] * baseOpacity, cc[0], cc[1], cc[2], p0Alpha * cc[3] * baseOpacity);
+                        } else {
+                            renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], p0Alpha * cc[3] * baseOpacity, cc[0], cc[1], cc[2], p1Alpha * cc[3] * baseOpacity);
                         }
-                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], p0Alpha * cc[3] * baseOpacity, cc[0], cc[1], cc[2], p1Alpha * cc[3] * baseOpacity);
                     }
 
                     topAlpha -= dAlpha;

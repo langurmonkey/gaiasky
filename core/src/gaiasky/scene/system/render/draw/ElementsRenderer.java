@@ -49,6 +49,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     private int elems01Offset;
     private int elems02Offset;
     private int sizeOffset;
+    private int textureIndexOffset;
     private boolean forceAdd = false;
     private final double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
 
@@ -72,6 +73,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems1, 4, "a_orbitelems01"));
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems2, 4, "a_orbitelems02"));
         attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
+        attributes.add(new VertexAttribute(OwnUsage.TextureIndex, 1, "a_textureIndex"));
     }
 
     @Override
@@ -82,6 +84,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
         elems01Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1).offset / 4 : 0;
         elems02Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
+        textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getVertexAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
     }
 
     @Override
@@ -134,6 +137,9 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
 
                             // SIZE
                             tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize;
+
+                            // TEXTURE INDEX
+                            tempVerts[curr.vertexIdx + textureIndexOffset] = -1f;
 
                             curr.vertexIdx += curr.vertexSize;
                             curr.numVertices++;
