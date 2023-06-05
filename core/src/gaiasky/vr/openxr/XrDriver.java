@@ -730,8 +730,10 @@ public class XrDriver implements Disposable {
 
         if (swapChains != null)
             for (SwapChain swapchain : swapChains) {
-                xrDestroySwapchain(swapchain.handle);
-                swapchain.images.free();
+                if (swapchain != null) {
+                    xrDestroySwapchain(swapchain.handle);
+                    swapchain.images.free();
+                }
             }
 
         if (xrAppSpace != null)
