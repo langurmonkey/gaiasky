@@ -24,7 +24,7 @@ data:
   realGaiaAttitude: false
 
 #
-# Performance configuration
+# Performance configuration.
 #
 performance:
   # Is multithreading enabled?
@@ -35,7 +35,7 @@ performance:
   numberThreads: 0
 
 #
-# Graphics configuration
+# Graphics configuration.
 #
 graphics:
   # Graphics quality setting in [LOW|NORMAL|HIGH|ULTRA]
@@ -68,7 +68,7 @@ graphics:
   useSRGB: false
 
 #
-# Scene configuration
+# Scene configuration.
 #
 scene:
   # Name of the home object
@@ -252,7 +252,7 @@ scene:
     # Show crosshair on closest object.
     closest: true
     # Show crosshair on home object.
-    home: false
+    home: true
   # Initialization configuration.
   initialization:
     # Lazy initialization of textures.
@@ -292,7 +292,7 @@ scene:
     Others: true
 
 #
-# Program configuration
+# Program configuration.
 #
 program:
   # The default time zone to use. One of [UTC|SYSTEM_DEFAULT].
@@ -424,10 +424,10 @@ program:
   url:
     # URL to check for new versions.
     versionCheck: https://codeberg.org/api/v1/repos/gaiasky/gaiasky/tags
-    # Data repository location
+    # Data repository location.
     dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
-    # Data descriptor file location
-    # This can also point to a local repository description file (use file://)
+    # Data descriptor file location.
+    # This can also point to a local repository description file (use file://).
     dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030301.json.gz
 
 #
@@ -529,7 +529,7 @@ postprocess:
   # Screen space reflections
   ssr:
     active: false
-  # Lens flare effect settings.
+  # Lens flare effect settings
   lensFlare:
     active: true
     # Type of lens flare effect (essentially, the shader to use).
