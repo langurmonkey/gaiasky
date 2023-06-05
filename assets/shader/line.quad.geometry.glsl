@@ -17,6 +17,7 @@ layout(triangle_strip, max_vertices = 6) out;
 
 out vec4 v_col;
 out vec2 v_uv;
+out float v_w;
 
 // Computes the closest distance of the segment p0-p1 to the point p.
 double dist_point_segment(dvec3 p1, dvec3 p2, dvec3 p) {
@@ -65,14 +66,20 @@ void main() {
     // Distance from each point.
     double d1 = length(v1.xyz);
     double d2 = length(v2.xyz);
+    // Trick! We set all points in the line at the same distance
+    // to avoid UV distortion. Then, we pass to the fragment
+    // shader the original position of v2 to use for the depth
+    // computation.
+    dvec4 v2bak = dvec4(v2);
+    v2 = v2 * (d1 / d2);
+    d2 = d1;
+
+    // Vector from v1 to v2.
+    dvec3 v12 = v2.xyz - v1.xyz;
 
     // Compute width of each end.
     double w1 = u_lineWidthTan * d1;
     double w2 = u_lineWidthTan * d2;
-
-    // Vector from v1 to v2.
-    dvec3 v12 = v2.xyz - v1.xyz;
-    bool split = abs(d1 - d2) > length(v12) * 0.5;
 
     // Vector orthogonal to each end, with the right widths.
     dvec3 c1 = normalize(cross(v1.xyz, v12)) * w1;
@@ -85,10 +92,12 @@ void main() {
     v_col = vec4(col1);
 
     gl_Position = u_projView * vec4(v1.xyz + c1, v1.w);
+    v_w = gl_Position.w;
     v_uv = vec2(0.0, 0.0);
     EmitVertex();
 
     gl_Position = u_projView * vec4(v1.xyz - c1, v1.w);
+    v_w = gl_Position.w;
     v_uv = vec2(0.0, 1.0);
     EmitVertex();
 
@@ -114,10 +123,12 @@ void main() {
             v_col = vec4(mix(col1, col2, 0.5));
 
             gl_Position = u_projView * vec4(vm.xyz + cm, w_val);
+            v_w = gl_Position.w;
             v_uv = vec2(0.5, 0.0);
             EmitVertex();
 
             gl_Position = u_projView * vec4(vm.xyz - cm, w_val);
+            v_w = gl_Position.w;
             v_uv = vec2(0.5, 1.0);
             EmitVertex();
         }
@@ -125,6 +136,7 @@ void main() {
 
     // ## Second vertex.
     v_col = vec4(col2);
+    v_w = (u_projView * vec4(v2bak)).w;
 
     gl_Position = u_projView * vec4(v2.xyz + c2, v2.w);
     v_uv = vec2(1.0, 0.0);

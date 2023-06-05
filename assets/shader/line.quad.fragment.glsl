@@ -7,6 +7,8 @@ uniform float u_k;
 
 in vec4 v_col;
 in vec2 v_uv;
+// Used for depth computation.
+in float v_w;
 
 layout (location = 0) out vec4 fragColor;
 
@@ -30,7 +32,8 @@ void main() {
 
     fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha ;
 
-    gl_FragDepth = getDepthValue(u_zfar, u_k);
+    // Recover depth value using input w.
+    gl_FragDepth = logarithmicDepth(v_w, u_zfar, u_k);
 
     #ifdef ssrFlag
     ssrBuffers();
