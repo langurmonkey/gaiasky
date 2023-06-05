@@ -327,7 +327,7 @@ public class ExtShaderProgram implements Disposable {
             return;
         }
 
-        program = linkProgram(createProgram());
+        program = linkProgram(createProgram(), true);
         if (program == -1) {
             isCompiled = false;
             return;
@@ -392,18 +392,27 @@ public class ExtShaderProgram implements Disposable {
         return program != 0 ? program : -1;
     }
 
-    private int linkProgram(int program) {
+    private int linkProgram(int program,
+                            boolean geometry) {
         GL20 gl = Gdx.gl20;
         if (program == -1)
             return -1;
 
-        gl.glAttachShader(program, vertexShaderHandle);
-        gl.glAttachShader(program, geometryShaderHandle);
-        gl.glAttachShader(program, fragmentShaderHandle);
-        gl.glLinkProgram(program);
-        gl.glDetachShader(program, vertexShaderHandle);
-        gl.glDetachShader(program, geometryShaderHandle);
-        gl.glDetachShader(program, fragmentShaderHandle);
+        if (geometry) {
+            gl.glAttachShader(program, vertexShaderHandle);
+            gl.glAttachShader(program, geometryShaderHandle);
+            gl.glAttachShader(program, fragmentShaderHandle);
+            gl.glLinkProgram(program);
+            gl.glDetachShader(program, vertexShaderHandle);
+            gl.glDetachShader(program, geometryShaderHandle);
+            gl.glDetachShader(program, fragmentShaderHandle);
+        } else {
+            gl.glAttachShader(program, vertexShaderHandle);
+            gl.glAttachShader(program, fragmentShaderHandle);
+            gl.glLinkProgram(program);
+            gl.glDetachShader(program, vertexShaderHandle);
+            gl.glDetachShader(program, fragmentShaderHandle);
+        }
 
         ByteBuffer tmp = ByteBuffer.allocateDirect(4);
         tmp.order(ByteOrder.nativeOrder());
@@ -417,6 +426,10 @@ public class ExtShaderProgram implements Disposable {
         }
 
         return program;
+    }
+
+    private int linkProgram(int program) {
+        return linkProgram(program, false);
     }
 
     /**
