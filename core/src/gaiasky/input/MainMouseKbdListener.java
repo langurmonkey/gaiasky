@@ -381,6 +381,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     @Override
     public boolean pollKeys() {
         boolean result = false;
+        float horizontalScale = Settings.settings.scene.camera.cinematic ? 0.01f : 1f;
         if (isKeyPressed(Keys.UP)) {
             camera.addForwardForce(1.0f);
             result = true;
@@ -391,17 +392,17 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         }
         if (isKeyPressed(Keys.RIGHT)) {
             if (camera.getMode().isFocus()) {
-                camera.addHorizontal(-0.01f, true);
+                camera.addHorizontal(-1.0f * horizontalScale, true);
             } else {
-                camera.addYaw(0.1f, true);
+                camera.addYaw(horizontalScale, true);
             }
             result = true;
         }
         if (isKeyPressed(Keys.LEFT)) {
             if (camera.getMode().isFocus()) {
-                camera.addHorizontal(0.01f, true);
+                camera.addHorizontal(horizontalScale, true);
             } else {
-                camera.addYaw(-0.1f, true);
+                camera.addYaw(-1.0f * horizontalScale, true);
             }
             result = true;
         }
