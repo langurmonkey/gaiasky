@@ -27,8 +27,8 @@ public class TrajectoryUtils {
 
     /** The trajectory refresher daemon. **/
     public static OrbitRefresher orbitRefresher;
-    private Vector3b B31, B32;
-    private Vector3d D31, D32, D33;
+    private final Vector3b B31, B32;
+    private final Vector3d D31, D32, D33;
 
     public TrajectoryUtils() {
         B31 = new Vector3b();

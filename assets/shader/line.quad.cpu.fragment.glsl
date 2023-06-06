@@ -30,7 +30,7 @@ void main() {
     float alpha = pow(core, 1.8);
     float cplus = pow(core, 10.0);
 
-    fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha ;
+    fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha;
 
     // Recover depth value using input w.
     gl_FragDepth = logarithmicDepth(v_w, u_zfar, u_k);

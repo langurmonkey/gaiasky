@@ -215,10 +215,9 @@ scene:
     # TRIANGLES is the default mode. Triangles are sent to the GPU in VBOs with VAOs, using instancing. Faster on newer hardware and geometrically correct.
     # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes.
     pointCloud: TRIANGLES
-    # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP].
+    # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]. POLYLINE_QUADSTRIP uses geometry shaders to render nicer lines,
+    # while GL_LINES just uses the line renderer provided by the driver.
     line: POLYLINE_QUADSTRIP
-    # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO].
-    orbit: LINE_MODE_SETTING
     # Ambient light value.
     ambient: 0.0
     # Shadow settings.

@@ -30,7 +30,6 @@ import gaiasky.render.process.*;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.IRenderSystem;
-import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
@@ -48,6 +47,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
@@ -278,18 +278,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
         case LINE -> {
             // LINES CPU
-            system = getLineRenderSystem();
+            system = getLineCPURenderSystem();
         }
         case LINE_GPU -> {
             // LINES GPU
-            system = new PrimitiveVertexRenderSystem<>(this, LINE_GPU, alphas, renderAssets.lineGpuShaders, true);
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+            system = getLineGPURenderSystem();
         }
         case POINT -> // POINTS CPU
                 system = new PointPrimitiveRenderSystem(this, POINT, alphas, renderAssets.pointShaders);
         case POINT_GPU -> {
             // POINTS GPU
-            system = new PrimitiveVertexRenderSystem<>(this, POINT_GPU, alphas, renderAssets.lineGpuShaders, false);
+            system = new PrimitiveVertexRenderSystem<>(this, POINT_GPU, alphas, renderAssets.primitiveGpuShaders, false);
             system.addPreRunnables(regularBlendR, depthTestR);
         }
         case MODEL_PIX_DUST -> // MODELS DUST AND MESH
@@ -395,7 +394,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPixelLighting);
         case LINE_LATE -> {
             // LINE LATE (TRANSPARENCIES)
-            system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineShaders);
+            system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineCpuShaders);
             system.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         }
         case PARTICLE_EFFECTS -> {
@@ -670,7 +669,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 }
             }
         }
-        case LINE_RENDERER_UPDATE -> GaiaSky.postRunnable(this::updateLineRenderSystem);
+        case LINE_RENDERER_UPDATE -> GaiaSky.postRunnable(this::updateLineRenderSystems);
         case STEREOSCOPIC_CMD -> {
             boolean stereo = (Boolean) data[0];
             if (stereo)
@@ -819,33 +818,50 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    public void updateLineRenderSystem() {
-        LineRenderSystem current = null;
-        var systems = renderSystems.values();
-        for (IRenderSystem system : systems) {
-            if (system instanceof LineRenderSystem) {
-                current = (LineRenderSystem) system;
-            }
-        }
-        if (current != null && ((current instanceof LineQuadstripRenderer && Settings.settings.scene.renderer.isNormalLineRenderer()) || (
-                !(current instanceof LineQuadstripRenderer) && !Settings.settings.scene.renderer.isNormalLineRenderer()))) {
-            renderSystems.remove(current.getRenderGroup());
-            AbstractRenderSystem lineSys = getLineRenderSystem();
+    public void updateLineRenderSystems() {
+        // CPU lines.
+        var currentCPU = renderSystems.get(RenderGroup.LINE);
+        if (currentCPU != null) {
+            renderSystems.remove(currentCPU.getRenderGroup());
+            AbstractRenderSystem lineSys = getLineCPURenderSystem();
             renderSystems.put(lineSys.getRenderGroup(), lineSys);
-            current.dispose();
+            currentCPU.dispose();
+        }
+
+        // GPU lines.
+        var currentGPU = renderSystems.get(RenderGroup.LINE_GPU);
+        if (currentGPU != null) {
+            renderSystems.remove(currentGPU.getRenderGroup());
+            AbstractRenderSystem lineSys = getLineGPURenderSystem();
+            renderSystems.put(lineSys.getRenderGroup(), lineSys);
+            currentGPU.dispose();
         }
     }
 
-    private AbstractRenderSystem getLineRenderSystem() {
+    private AbstractRenderSystem getLineGPURenderSystem() {
+        AbstractRenderSystem sys;
+        // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
+        ExtShaderProgram[] lineGpuShaders;
+        if (Settings.settings.scene.renderer.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+            lineGpuShaders = renderAssets.primitiveGpuShaders;
+        } else {
+            lineGpuShaders = renderAssets.lineQuadGpuShaders;
+        }
+        sys = new PrimitiveVertexRenderSystem<>(this, LINE_GPU, alphas, lineGpuShaders, true);
+        sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        return sys;
+    }
+
+    private AbstractRenderSystem getLineCPURenderSystem() {
         AbstractRenderSystem sys;
         // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
         if (Settings.settings.scene.renderer.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
             // Normal line renderer.
-            sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineShaders);
+            sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineCpuShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         } else {
             // Polyline quad-strip renderer.
-            sys = new LineQuadstripRenderer(this, LINE, alphas, renderAssets.lineQuadShaders);
+            sys = new LineQuadstripRenderer(this, LINE, alphas, renderAssets.lineQuadCpuShaders);
             sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
         return sys;

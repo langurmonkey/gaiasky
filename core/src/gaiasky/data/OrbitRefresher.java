@@ -79,6 +79,8 @@ public class OrbitRefresher implements IObserver {
         private final OrbitSamplerDataProvider provider;
         private final Array<OrbitDataLoaderParameters> toLoad;
 
+        private final TrajectoryUtils utils = new TrajectoryUtils();
+
         public OrbitUpdaterThread(final OrbitRefresher orbitRefresher) {
             super();
             this.toLoad = new Array<>();
@@ -106,7 +108,6 @@ public class OrbitRefresher implements IObserver {
                                     // Post new data to object
                                     GaiaSky.postRunnable(() -> {
                                         // Update orbit object
-                                        var utils = new TrajectoryUtils();
                                         var vertsView = new VertsView(entity);
 
                                         var body = Mapper.body.get(entity);

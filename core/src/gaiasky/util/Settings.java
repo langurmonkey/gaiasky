@@ -1085,7 +1085,7 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings implements IObserver {
             public PointCloudMode pointCloud = PointCloudMode.POINTS;
-            public LineMode line;
+            public LineMode line = LineMode.POLYLINE_QUADSTRIP;
             public double ambient;
             public ShadowSettings shadow;
             public ElevationSettings elevation;

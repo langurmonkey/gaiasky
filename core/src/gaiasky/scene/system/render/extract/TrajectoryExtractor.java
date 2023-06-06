@@ -51,6 +51,8 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
             var label = Mapper.label.get(entity);
 
             if (!trajectory.onlyBody) {
+                var verts = Mapper.verts.get(entity);
+
                 // If there is overflow, return.
                 if (trajectory.body != null && EntityUtils.isCoordinatesTimeOverflow(trajectory.body))
                     return;
@@ -65,11 +67,9 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                         trajectory.alpha = body.color[3];
                     }
 
-                    RenderGroup rg = Settings.settings.scene.renderer.isQuadLineRenderer() ? RenderGroup.LINE : RenderGroup.LINE_GPU;
-
                     if (trajectory.body == null) {
                         // There is no body, always render.
-                        addToRender(render, rg);
+                        addToRender(render, verts.renderGroup);
                         added = true;
                     } else {
                         var bodyBody = Mapper.body.get(trajectory.body);
@@ -78,13 +78,12 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                         if (bodyBody.distToCamera > trajectory.distDown) {
                             if (bodyBody.distToCamera < trajectory.distUp)
                                 trajectory.alpha *= MathUtilsDouble.lint(bodyBody.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
-                            addToRender(render, rg);
+                            addToRender(render, verts.renderGroup);
                             added = true;
                         }
                     }
                 }
 
-                var verts = Mapper.verts.get(entity);
                 if (verts.pointCloudData == null || added) {
                     utils.refreshOrbit(trajectory, verts, false);
                 }

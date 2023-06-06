@@ -87,7 +87,7 @@ public class TrajectoryInitializer extends AbstractInitSystem {
 
         if (trajectory.body != null) {
             var bodyBase = Mapper.base.get(trajectory.body);
-            trajectory.params = new OrbitDataLoaderParameters(bodyBase.names[0], null, trajectory.oc.period, 500);
+            trajectory.params = new OrbitDataLoaderParameters(bodyBase.names[0], null, trajectory.oc.period, 600);
             trajectory.params.entity = entity;
         }
 

@@ -69,10 +69,6 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
             }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -80,14 +76,15 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameters parameter) {
+    public void load(String file,
+                     OrbitDataLoaderParameters parameter) {
         // Sample using VSOP
         // If num samples is not defined, we use 300 samples per year of period
 
         // Prevent overlapping by rescaling the period
         double period = parameter.orbitalPeriod * 0.999d;
         int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300.0 * period / 365.0);
-        numSamples = Math.max(100, Math.min(2000, numSamples));
+        numSamples = Math.max(200, Math.min(2000, numSamples));
         data = new PointCloudData();
         String bodyDesc = parameter.name;
         double last = 0, accum = 0;
@@ -157,7 +154,9 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameters parameter, boolean newMethod) {
+    public void load(String file,
+                     OrbitDataLoaderParameters parameter,
+                     boolean newMethod) {
         load(file, parameter);
     }
 

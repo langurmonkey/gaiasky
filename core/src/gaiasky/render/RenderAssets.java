@@ -42,11 +42,11 @@ public class RenderAssets {
     private static final Log logger = Logger.getLogger(RenderAssets.class);
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
-    public ExtShaderProgram[] starBillboardShaders, galShaders, spriteShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
+    public ExtShaderProgram[] starBillboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders, primitiveGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
     public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbVertexLightingBeam, mbVertexLightingThruster, mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation, mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
     public BitmapFont font2d, font3d, fontTitles;
     public ExtSpriteBatch spriteBatch, fontBatch;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
@@ -91,9 +91,10 @@ public class RenderAssets {
         billboardGroupDesc = loadShader(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl",
                                         TextUtils.concatAll("billboard.group", names), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", TextUtils.concatAll("point.cpu", names), defines);
-        lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
-        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.geometry.glsl", "shader/line.quad.fragment.glsl", TextUtils.concatAll("line.quad", names), defines);
-        lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("line.gpu", names), defines);
+        lineCpuDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
+        lineQuadCpuDesc = loadShader(manager, "shader/line.quad.cpu.vertex.glsl", "shader/line.quad.cpu.geometry.glsl", "shader/line.quad.cpu.fragment.glsl", TextUtils.concatAll("line.quad.cpu", names), defines);
+        lineQuadGpuDesc = loadShader(manager, "shader/line.quad.gpu.vertex.glsl", "shader/line.quad.gpu.geometry.glsl", "shader/line.quad.gpu.fragment.glsl", TextUtils.concatAll("line.quad.gpu", names), defines);
+        primitiveGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("primitive.gpu", names), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl",
                                         TextUtils.concatAll("particle.effect", names), defines);
@@ -206,17 +207,22 @@ public class RenderAssets {
         /*
          * LINE CPU
          */
-        lineShaders = fetchShaderProgram(manager, lineDesc, TextUtils.concatAll("line.cpu", names));
+        lineCpuShaders = fetchShaderProgram(manager, lineCpuDesc, TextUtils.concatAll("line.cpu", names));
 
         /*
-         * LINE QUAD
+         * LINE QUAD CPU
          */
-        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, TextUtils.concatAll("line.quad", names));
+        lineQuadCpuShaders = fetchShaderProgram(manager, lineQuadCpuDesc, TextUtils.concatAll("line.quad.cpu", names));
 
         /*
-         * LINE GPU
+         * LINE QUAD GPU
          */
-        lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, TextUtils.concatAll("line.gpu", names));
+        lineQuadGpuShaders = fetchShaderProgram(manager, lineQuadGpuDesc, TextUtils.concatAll("line.quad.gpu", names));
+
+        /*
+         * PRIMITIVE GPU
+         */
+        primitiveGpuShaders = fetchShaderProgram(manager, primitiveGpuDesc, TextUtils.concatAll("primitive.gpu", names));
 
         /*
          * BILLBOARD GROUP
