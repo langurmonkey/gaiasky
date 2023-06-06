@@ -633,7 +633,7 @@ public class OctreeNode implements ILineRenderable {
      * @return True if this octree node contains the camera's focus object.
      */
     private boolean hasFocusObject(ICamera camera) {
-        return objects.stream().anyMatch((o) -> camera.isFocus(((OctreeObjectView) o).getEntity()));
+        return objects != null && objects.stream().anyMatch((o) -> camera.isFocus(((OctreeObjectView) o).getEntity()));
     }
 
     private void addObjectsTo(List<IOctreeObject> roulette) {
