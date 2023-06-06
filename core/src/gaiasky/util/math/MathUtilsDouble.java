@@ -8,6 +8,7 @@
 package gaiasky.util.math;
 
 import com.badlogic.gdx.math.RandomXS128;
+import net.jafama.FastMath;
 
 import java.util.Random;
 
@@ -354,6 +355,29 @@ public final class MathUtilsDouble {
             for (int i = 0; i < 360; i += 90)
                 table[(int) (i * degToIndex) & SIN_MASK] = Math.sin(i * degreesToRadians);
         }
+    }
+
+    /**
+     * Normalize an angle in a 2&pi; wide interval around a center value.
+     * <p>This method has three main uses:</p>
+     * <ul>
+     *   <li>normalize an angle between 0 and 2&pi;:<br/>
+     *       {@code a = MathUtils.normalizeAngle(a, FastMath.PI);}</li>
+     *   <li>normalize an angle between -&pi; and +&pi;<br/>
+     *       {@code a = MathUtils.normalizeAngle(a, 0.0);}</li>
+     *   <li>compute the angle between two defining angular positions:<br>
+     *       {@code angle = MathUtils.normalizeAngle(end, start) - start;}</li>
+     * </ul>
+     * <p>Note that due to numerical accuracy and since &pi; cannot be represented
+     * exactly, the result interval is <em>closed</em>, it cannot be half-closed
+     * as would be more satisfactory in a purely mathematical view.</p>
+     * @param a angle to normalize
+     * @param center center of the desired 2&pi; interval for the result
+     * @return a-2k&pi; with integer k and center-&pi; &lt;= a-2k&pi; &lt;= center+&pi;
+     * @since 1.2
+     */
+    public static double normalizeAngle(double a, double center) {
+        return a - PI2 * FastMath.floor((a + FastMath.PI - center) / PI2);
     }
 }
 

@@ -54,7 +54,10 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     private int textureIndexOffset;
     private final double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.075)), Math.tan(Math.toRadians(0.9)) };
 
-    public ElementsSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public ElementsSetRenderer(SceneRenderer sceneRenderer,
+                               RenderGroup rg,
+                               float[] alphas,
+                               ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         aux1 = new Vector3();
         aux = new Matrix4();
@@ -89,7 +92,9 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables,
+                           ICamera camera,
+                           double t) {
         for (IRenderable renderable : renderables) {
             Render render = (Render) renderable;
             var graph = Mapper.graph.get(render.entity);
@@ -199,8 +204,10 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 if (Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
                     refSysTransform.putIn(aux).inv();
                     refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
-                } else {
+                } else if (refSysTransform != null) {
                     refSysTransform.putIn(refSysTransformF).inv();
+                } else {
+                    refSysTransformF.idt();
                 }
                 shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
 
@@ -223,7 +230,9 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
             if (source instanceof Render) {
                 var render = (Render) source;

@@ -1,0 +1,83 @@
+#/usr/bin/env python
+
+import json, io, re, math
+
+# Max number of asteroids to process
+N_MAX = 180000
+# Ref epoch in jd: Jan 1 2010
+REF_EPOCH = 2455197.5
+# Unit conversion
+AU_TO_KM = 149598000
+Y_TO_D = 365.25 
+# Standard gravitational parameter of the Sun
+GM_SUN = 1.32712440019e20
+
+class SSO(object):
+    def __init__(self, name, color, epoch, meananomaly, semimajoraxis, eccentricity, argofpericenter, ascendingnode, period, inclination):
+        self.name = name
+        self.color = color
+        self.pointColor = [1.0, 1.0, 1.0, 0.2]
+        self.parent = "fpr-asteroids-hook"
+        self.archetype = "Orbit"
+        self.provider = "gaiasky.data.orbit.OrbitalParametersProvider"
+        self.ct = [ "Asteroids", "Orbits" ]
+        self.orbit = {}
+        self.orbit["epoch"] = epoch
+        self.orbit["meananomaly"] = meananomaly
+        self.orbit["semimajoraxis"] = semimajoraxis
+        self.orbit["eccentricity"] = eccentricity
+        self.orbit["argofpericenter"] = argofpericenter
+        self.orbit["ascendingnode"] = ascendingnode
+        self.orbit["period"] = period
+        self.orbit["inclination"] = inclination
+        self.onlybody = True
+        self.newmethod = True
+        
+
+def to_json(line, idx):
+    values = line.split(',')
+    # Designation
+    name = values[1]
+    color = [0.4, 0.4, 1.0, 0.5]
+    # Epoch in julain days since Jan 1 2010
+    jdjan12010 = values[2]
+    epoch = float(jdjan12010) + REF_EPOCH
+    # Mean anomaly [deg]
+    meananomaly = float(values[13])
+    # Semimajor axis [Km]
+    a_au = float(values[15])
+    semimajoraxis = a_au * AU_TO_KM
+    # Eccentricity
+    eccentricity = float(values[10])
+    # Argument of pericenter [deg]
+    argofpericenter = float(values[14])
+    # Ascending node [deg]
+    ascendingnode = float(values[12])
+    # Period in days
+    period = pow(a_au, 1.5) * Y_TO_D
+    # Inclination [deg]
+    inclination = float(values[11])
+
+    bean = SSO(name, color, epoch, meananomaly, semimajoraxis, eccentricity, argofpericenter, ascendingnode, period, inclination)
+    
+    jsonstr = json.dumps(bean.__dict__)
+    
+    return jsonstr
+    
+
+with open('/media/tsagrista/Daten/Gaia/data/sso/FPR/FPR-SSO-result.elements.csv', 'r') as fr:
+    lines = fr.readlines()
+    with open('/tmp/sso-fpr.json', 'w') as fw:
+        fw.write("{\"objects\" : [\n")
+        fw.write("{ \"name\" : \"fpr-asteroids-hook\", \"position\" : [0.0, 0.0, 0.0], \"ct\" : [\"Asteroids\"], \"fadeout\" : [1e-5, 2e-4], \"parent\" : \"Universe\", \"archetype\" : \"OrbitalElementsGroup\" },\n")
+
+        N = min(N_MAX, len(lines))
+        for idx, line in enumerate(lines[1:N]):
+            if line.strip():
+                jsonstring = to_json(line, idx)
+                fw.write(jsonstring)
+                if idx < N - 2:
+                    fw.write(",")
+                fw.write("\n")
+
+        fw.write("]}")
