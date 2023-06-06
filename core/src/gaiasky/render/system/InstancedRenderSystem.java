@@ -35,7 +35,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     /**
      * Instanced model list, one per particle group.
      */
-    protected InstancedModel[] models = new InstancedModel[50];
+    protected Array<InstancedModel> models = new Array<>(50);
 
     /**
      * Holds temporary instanced model data.
@@ -113,8 +113,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
 
     protected void setModel(int offset,
                             InstancedModel model) {
-        if (offset >= 0 && offset < models.length) {
-            models[offset] = model;
+        if (offset >= 0) {
+            models.insert(offset, model);
         }
     }
 
@@ -128,8 +128,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                                       Map<String, Object> modelParams,
                                       int primitive,
                                       int offset) {
-        if (offset >= 0 && models[offset] != null) {
-            return models[offset];
+        if (offset >= 0 && models.size > offset && models.get(offset) != null) {
+            return models.get(offset);
         }
 
         boolean wireframe = isWireframe(primitive);
@@ -455,7 +455,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         int mdi = createMeshData();
         curr = meshes.get(mdi);
 
-        VertexAttribute[] attributes0 = buildAttributesDivisor0(modelFile == null && modelType.equalsIgnoreCase("quad") ? 2 : 3, modelFile != null, !isWireframe(primitive));
+        VertexAttribute[] attributes0 = buildAttributesDivisor0(modelFile == null && modelType.equalsIgnoreCase("quad") ? 2 : 3, modelFile != null,
+                                                                !isWireframe(primitive));
         VertexAttribute[] attributes1 = buildAttributesDivisor1(primitive);
         curr.mesh = new IntMesh(true, maxVerts, maxInstances, maxIndices, attributes0, attributes1);
 

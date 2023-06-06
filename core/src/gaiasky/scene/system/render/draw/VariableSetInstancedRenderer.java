@@ -276,7 +276,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);
-            models[offset] = null;
+            models.set(offset, null);
             inGpu.remove(renderable);
         }
         case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));

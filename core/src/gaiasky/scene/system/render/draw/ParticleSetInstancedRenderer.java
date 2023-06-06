@@ -319,7 +319,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             int offset = getOffset(renderable);
             if (offset >= 0) {
                 clearMeshData(offset);
-                models[offset] = null;
+                models.set(offset, null);
             }
             if (inGpu != null)
                 inGpu.remove(renderable);
