@@ -391,17 +391,17 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         }
         if (isKeyPressed(Keys.RIGHT)) {
             if (camera.getMode().isFocus()) {
-                camera.addHorizontal(-1.0f, true);
+                camera.addHorizontal(-0.01f, true);
             } else {
-                camera.addYaw(1.0f, true);
+                camera.addYaw(0.1f, true);
             }
             result = true;
         }
         if (isKeyPressed(Keys.LEFT)) {
             if (camera.getMode().isFocus()) {
-                camera.addHorizontal(1.0f, true);
+                camera.addHorizontal(0.01f, true);
             } else {
-                camera.addYaw(-1.0f, true);
+                camera.addYaw(-0.1f, true);
             }
             result = true;
         }
