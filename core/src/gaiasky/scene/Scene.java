@@ -410,11 +410,22 @@ public class Scene {
      *
      * @param entity The entity to update.
      */
-    public void updateEntity(Entity entity, float deltaTime) {
+    public void updateEntity(Entity entity,
+                             float deltaTime) {
         if (updaters != null) {
-            for (EntityUpdater system : updaters) {
-                if (system.getFamily().matches(entity)) {
-                    system.updateEntity(entity, deltaTime);
+            if (Mapper.tagOctreeObject.has(entity) && Mapper.starSet.has(entity)) {
+                // Star sets with a TagOctreeObject are ignored by the regular particle set updater!
+                for (EntityUpdater system : updaters) {
+                    if (system instanceof ParticleSetUpdater) {
+                        system.updateEntity(entity, deltaTime);
+                    }
+                }
+            } else {
+                // Regular search.
+                for (EntityUpdater system : updaters) {
+                    if (system.getFamily().matches(entity)) {
+                        system.updateEntity(entity, deltaTime);
+                    }
                 }
             }
         }
@@ -447,7 +458,10 @@ public class Scene {
      * @param parentTranslation The parent translation.
      * @param opacity           The opacity value.
      */
-    public void updateEntityGraph(Entity entity, ITimeFrameProvider time, Vector3b parentTranslation, float opacity) {
+    public void updateEntityGraph(Entity entity,
+                                  ITimeFrameProvider time,
+                                  Vector3b parentTranslation,
+                                  float opacity) {
         var updater = findUpdater(GraphUpdater.class);
         if (updater != null) {
             updater.update(entity, time, parentTranslation, opacity);
@@ -475,7 +489,10 @@ public class Scene {
      *
      * @return The new system instance.
      */
-    private <T extends AbstractExtractSystem> T newExtractor(Class<T> extractorClass, Family family, int priority, ISceneRenderer sceneRenderer) {
+    private <T extends AbstractExtractSystem> T newExtractor(Class<T> extractorClass,
+                                                             Family family,
+                                                             int priority,
+                                                             ISceneRenderer sceneRenderer) {
         try {
             Constructor<T> c = extractorClass.getDeclaredConstructor(Family.class, int.class);
             T system = c.newInstance(family, priority);
@@ -495,7 +512,8 @@ public class Scene {
         engine.update((float) time.getDt());
     }
 
-    public void insert(Entity entity, boolean addToIndex) {
+    public void insert(Entity entity,
+                       boolean addToIndex) {
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
         var parent = getEntity(graph.parentName);
@@ -527,7 +545,8 @@ public class Scene {
      * @param entity          The entity.
      * @param removeFromIndex Whether to remove it from the index too.
      */
-    public void remove(Entity entity, boolean removeFromIndex) {
+    public void remove(Entity entity,
+                       boolean removeFromIndex) {
         remove(entity, true, removeFromIndex);
     }
 
@@ -539,7 +558,9 @@ public class Scene {
      *                        The top-level entity should set this to true.
      * @param removeFromIndex Whether to remove it from the index too.
      */
-    private void remove(Entity entity, boolean topLevelElement, boolean removeFromIndex) {
+    private void remove(Entity entity,
+                        boolean topLevelElement,
+                        boolean removeFromIndex) {
 
         if (entity != null && Mapper.graph.has(entity)) {
             var graph = Mapper.graph.get(entity);
@@ -633,7 +654,10 @@ public class Scene {
      * @param maxResults The maximum number of results.
      * @param abort      To enable abortion mid-computation.
      */
-    public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
+    public void matchingFocusableNodes(String name,
+                                       SortedSet<String> results,
+                                       int maxResults,
+                                       AtomicBoolean abort) {
         index.matchingFocusableNodes(name, results, maxResults, abort);
     }
 
@@ -667,7 +691,8 @@ public class Scene {
         return engine.getEntitiesFor(family);
     }
 
-    public Array<Entity> findEntitiesByComponentType(gaiasky.render.ComponentTypes.ComponentType componentType, Array<Entity> list) {
+    public Array<Entity> findEntitiesByComponentType(gaiasky.render.ComponentTypes.ComponentType componentType,
+                                                     Array<Entity> list) {
         engine.getEntities().forEach((entity) -> {
             var base = Mapper.base.get(entity);
             if (base.ct != null && base.ct.isEnabled(componentType))
@@ -687,7 +712,8 @@ public class Scene {
      * @return The out double array if the object exists, has a position and out has 3 or more
      * slots. Null otherwise.
      */
-    public double[] getObjectPosition(String name, double[] out) {
+    public double[] getObjectPosition(String name,
+                                      double[] out) {
         if (out.length >= 3 && name != null) {
             name = name.toLowerCase().trim();
             if (index.containsEntity(name)) {

@@ -81,5 +81,6 @@ public class Mapper {
     public static final ComponentMapper<TagBillboardGalaxy> tagBillboardGalaxy = ComponentMapper.getFor(TagBillboardGalaxy.class);
     public static final ComponentMapper<TagNoClosest> tagNoClosest = ComponentMapper.getFor(TagNoClosest.class);
     public static final ComponentMapper<TagVRUI> tagVRUI = ComponentMapper.getFor(TagVRUI.class);
+    public static final ComponentMapper<TagOctreeObject> tagOctreeObject = ComponentMapper.getFor(TagOctreeObject.class);
 
 }
