@@ -430,8 +430,8 @@ public class Settings {
     }
 
     public enum LineMode {
-        GL_LINES,
         POLYLINE_QUADSTRIP,
+        GL_LINES
     }
 
     public enum DefaultTimeZone {
