@@ -312,7 +312,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         case BILLBOARD_GROUP -> // BILLBOARD GROUP
                 system = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
         case PARTICLE_GROUP -> {
-            final PointCloudMode pointCloudModeParticles = isVR() ? PointCloudMode.POINTS : Settings.settings.scene.renderer.pointCloud;
+            final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
             system = switch (pointCloudModeParticles) {
                 case TRIANGLES -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
                 case POINTS -> new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
