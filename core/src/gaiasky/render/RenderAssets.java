@@ -423,6 +423,7 @@ public class RenderAssets {
             ShaderProgramParameter spp = new ShaderProgramParameter();
             spp.name = names[i];
             spp.prependVertexCode = fixedPrepend != null ? fixedPrepend + "\n" + prep : prep;
+            spp.prependGeometryCode = spp.prependVertexCode;
             spp.prependFragmentCode = spp.prependVertexCode;
             spp.vertexFile = vertexShader;
             spp.geometryFile = geometryShader;

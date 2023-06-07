@@ -378,7 +378,7 @@ public class ExtShaderProgram implements Disposable {
         int compiled = intbuf.get(0);
         if (compiled == 0) {
             String infoLog = gl.glGetShaderInfoLog(shader);
-            log += type == GL20.GL_VERTEX_SHADER ? "Vertex shader\n" : "Fragment shader:\n";
+            log += type == GL20.GL_VERTEX_SHADER ? "Vertex shader\n" : type == GL20.GL_FRAGMENT_SHADER ? "Fragment shader:\n" : "Geometry shader:\n";
             log += infoLog;
             return -1;
         }

@@ -72,3 +72,7 @@ void velocityBufferCam(vec4 gpos, vec4 pos, float dCamPosFactor){
 void velocityBufferCam(vec4 gpos, vec4 pos){
     velocityBufferCam(gpos, pos, 1.0);
 }
+
+void velocityBufferCam(vec4 gpos, vec3 pos){
+    velocityBufferCam(gpos, vec4(pos, 1.0), 1.0);
+}

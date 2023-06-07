@@ -110,7 +110,7 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
         if (parameter != null) {
             if (parameter.prependVertexCode != null)
                 vertexCode = getShaderCode(parameter.prependVertexCode, vertexCode);
-            if (parameter.prependGeometryCode != null)
+            if (parameter.prependGeometryCode != null && geometryCode != null)
                 geometryCode = getShaderCode(parameter.prependGeometryCode, geometryCode);
             if (parameter.prependFragmentCode != null)
                 fragmentCode = getShaderCode(parameter.prependFragmentCode, fragmentCode);

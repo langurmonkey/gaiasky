@@ -4,7 +4,6 @@ in vec4 a_position;
 in vec4 a_color;
 
 uniform vec2 u_viewport;
-uniform float u_vrScale;
 
 out VS_OUT {
     vec4 color;

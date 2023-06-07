@@ -2,6 +2,7 @@
 
 uniform mat4 u_projView;
 uniform float u_lineWidthTan;
+uniform float u_vrScale;
 
 in VS_OUT {
     vec4 color;
@@ -15,6 +16,7 @@ out vec2 v_uv;
 out float v_w;
 
 #ifdef velocityBufferFlag
+#include shader/lib_geometry.glsl
 #include shader/lib_velbuffer.vert.glsl
 #endif
 
@@ -58,6 +60,7 @@ void main() {
     velocityBufferCam(gl_Position, vec3(v1.xyz + c1));
     #endif
     EmitVertex();
+    // =================
 
     gl_Position = u_projView * vec4(v1.xyz - c1, v1.w);
     v_w = gl_Position.w;
@@ -66,6 +69,7 @@ void main() {
     velocityBufferCam(gl_Position, vec3(v1.xyz - c1));
     #endif
     EmitVertex();
+    // =================
 
     // ## Second vertex.
     v_col = vec4(col2);
@@ -77,6 +81,7 @@ void main() {
     velocityBufferCam(gl_Position, vec3(v2bak.xyz + c2));
     #endif
     EmitVertex();
+    // =================
 
     gl_Position = u_projView * vec4(v2.xyz - c2, v2.w);
     v_uv = vec2(1.0, 1.0);
@@ -84,6 +89,7 @@ void main() {
     velocityBufferCam(gl_Position, vec3(v2bak.xyz - c2));
     #endif
     EmitVertex();
+    // =================
 
     EndPrimitive();
 }

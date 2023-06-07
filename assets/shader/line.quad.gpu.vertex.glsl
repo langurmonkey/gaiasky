@@ -8,7 +8,6 @@ uniform mat4 u_worldTransform;
 uniform mat4 u_projView;
 uniform vec3 u_parentPos;
 uniform float u_pointSize;
-uniform float u_vrScale;
 uniform vec2 u_viewport;
 
 out VS_OUT {
