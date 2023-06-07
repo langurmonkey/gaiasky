@@ -1,5 +1,6 @@
 #version 330 core
 
+#include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
 // UNIFORMS

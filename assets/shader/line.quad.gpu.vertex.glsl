@@ -26,10 +26,6 @@ out VS_OUT {
 #include shader/lib_gravwaves.glsl
 #endif// gravitationalWaves
 
-#ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
-#endif
-
 void main() {
     vec4 pos = a_position;
 
@@ -50,8 +46,4 @@ void main() {
 
     // Position (view-projection multiplication in geometry shader).
     gl_Position = pos;
-
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gpos, pos);
-    #endif
 }

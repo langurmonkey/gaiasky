@@ -1,5 +1,6 @@
 #version 330 core
 
+#include shader/lib_geometry.glsl
 #ifdef extendedParticlesFlag
 #include shader/lib_doublefloat.glsl
 #endif // extendedParticlesFlag
@@ -107,6 +108,6 @@ void main() {
     v_textureIndex = a_textureIndex;
 
     #ifdef velocityBufferFlag
-    velocityBufferBillboard(gpos, a_particlePos, s_size, a_position, s_quat, s_quat_conj);
+    velocityBufferCam(gpos, vert_pos);
     #endif // velocityBufferFlag
 }

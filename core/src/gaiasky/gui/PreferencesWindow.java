@@ -895,14 +895,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(ssrTooltip).left().padBottom(pad10).row();
 
             // MOTION BLUR
-            OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
-            motionBlur = new OwnCheckBox("", skin);
-            motionBlur.setName("motion blur");
-            motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur.active);
-            motionBlur.setDisabled(safeMode || vr);
+            //OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
+            //motionBlur = new OwnCheckBox("", skin);
+            //motionBlur.setName("motion blur");
+            //motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur.active);
+            //motionBlur.setDisabled(safeMode || vr);
 
-            experimental.add(motionBlurLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(motionBlur).left().padRight(pad18).padBottom(pad10);
+            //experimental.add(motionBlurLabel).left().padRight(pad34).padBottom(pad10);
+            //experimental.add(motionBlur).left().padRight(pad18).padBottom(pad10);
 
             // LABELS
             labels.addAll(dynamicResolutionLabel);
