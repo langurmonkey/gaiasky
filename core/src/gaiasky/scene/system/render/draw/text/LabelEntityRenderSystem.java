@@ -329,11 +329,12 @@ public class LabelEntityRenderSystem {
             for (int i = 0; i < n; i++) {
                 IParticleRecord pb = pointData.get(active[i]);
                 if (pb.names() != null) {
-                    Vector3b camPos = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
-                    float distToCamera = (float) camPos.lenDouble();
+                    Vector3b particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
+                    float distToCamera = (float) particlePosition.lenDouble();
                     float solidAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
 
-                    textPosition(camera, camPos.put(D31), distToCamera, solidAngle, 0);
+                    Vector3d labelPosition = particlePosition.put(D32);
+                    textPosition(camera, labelPosition, distToCamera, solidAngle * 1e-6, 0);
 
                     shader.setUniformf("u_viewAngle", solidAngle);
                     shader.setUniformf("u_viewAnglePow", 1f);
@@ -341,7 +342,7 @@ public class LabelEntityRenderSystem {
                     float textSize = (float) FastMath.tanh(solidAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, pb.names()[0], camPos.put(D31), distToCamera,
+                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, pb.names()[0], labelPosition, distToCamera,
                                   view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
                 }
             }
@@ -584,7 +585,7 @@ public class LabelEntityRenderSystem {
      * Text position for star sets.
      *
      * @param cam          The camera.
-     * @param out          The output vector to put the result.
+     * @param out          Contains the object position, and is also the output vector to put the result.
      * @param distToCamera The distance to the object.
      * @param solidAngle   Solid angle of the object.
      * @param rad          The radius.
@@ -602,7 +603,7 @@ public class LabelEntityRenderSystem {
         offset.crs(out).nor();
 
         float displacement = (float) MathUtilsDouble.lint(solidAngle, Math.toRadians(2), Math.toRadians(40), 1, 20);
-        float offsetDistance = -0.02f *displacement* cam.getFovFactor() * (float) out.len();
+        float offsetDistance = -0.02f * displacement * cam.getFovFactor() * (float) out.len();
         offset.add(cam.getUp()).nor().scl(offsetDistance);
 
         out.add(offset);
@@ -719,7 +720,8 @@ public class LabelEntityRenderSystem {
             // Enable or disable blending
             ((I3DTextRenderable) view).textDepthBuffer();
 
-            DecalUtils.drawFont3D(font, batch, labelText, (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z, size, rot, camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
+            DecalUtils.drawFont3D(font, batch, labelText, (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z, size, rot, camera, !rc.isCubemap(),
+                                  minSizeDegrees, maxSizeDegrees);
         }
     }
 }
