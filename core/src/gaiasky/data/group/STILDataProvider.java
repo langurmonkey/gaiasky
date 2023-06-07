@@ -396,10 +396,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             // VARIABILITY
                             float[] variMags = null;
-                            double[] variTimes;
-                            double pf;
-                            int nVari;
-
+                            double[] variTimes = null;
+                            double pf = 0.0;
+                            int nVari = 0;
                             if (ucdParser.hasvari) {
                                 Pair<UCD, Double> period = getDoubleUcd(ucdParser.VARI_PERIOD, row);
                                 if (!ucdParser.hasperiod || period == null || !Double.isFinite(period.getSecond())) {
@@ -574,6 +573,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 IParticleRecord pr;
                                 if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
                                     pr = new VariableRecord();
+                                    var vr = (VariableRecord) pr;
+                                    vr.setNVari(nVari);
+                                    vr.setPeriod(pf);
+                                    vr.setVariMags(variMags);
+                                    vr.setVariTimes(variTimes);
                                 } else {
                                     pr = new ParticleRecord(type);
                                 }

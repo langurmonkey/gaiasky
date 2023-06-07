@@ -40,14 +40,30 @@ public class VariableRecord extends ParticleRecord {
         this.period = period;
     }
 
+    public void setNVari(int nVari) {
+        this.nVari = nVari;
+    }
+
+    public void setVariMags(float[] variMags) {
+        this.variMags = variMags;
+    }
+
     public float variMag(int i) {
         assert i < nVari : "Size out of bounds";
         return variMags[i];
     }
 
+    public void setVariTimes(double[] variTimes) {
+        this.variTimes = variTimes;
+    }
+
     public double variTime(int i) {
         assert i < nVari : "Size out of bounds";
         return variTimes[i];
+    }
+
+    public void setPeriod(double period) {
+        this.period = period;
     }
 
 }
