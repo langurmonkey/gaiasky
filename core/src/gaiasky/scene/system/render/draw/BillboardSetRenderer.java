@@ -370,8 +370,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
             // Global uniforms.
             if (ta != null) {
-                ta.bind(2400);
-                shaderProgram.setUniformi("u_textures", 2400);
+                ta.bind(0);
             }
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));

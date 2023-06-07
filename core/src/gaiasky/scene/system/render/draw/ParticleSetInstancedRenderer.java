@@ -249,8 +249,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             if (curr != null) {
                 // Only quads are textured.
                 if (set.textureArray != null && !set.isWireframe()) {
-                    set.textureArray.bind(2201 + offset);
-                    shaderProgram.setUniformi("u_textures", 2201 + offset);
+                    set.textureArray.bind(0);
                 }
 
                 if (extended) {

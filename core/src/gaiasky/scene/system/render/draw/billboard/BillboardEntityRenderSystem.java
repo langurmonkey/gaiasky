@@ -308,7 +308,6 @@ public class BillboardEntityRenderSystem implements IObserver {
         // Bind texture
         if (cluster.clusterTex != null) {
             cluster.clusterTex.bind(0);
-            shader.setUniformi("u_texture0", 0);
         }
 
         float fa = (1 - cluster.fadeAlpha) * 0.6f;

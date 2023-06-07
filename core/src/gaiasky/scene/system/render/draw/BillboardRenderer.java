@@ -154,7 +154,6 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
             if (billboardTexture != null) {
                 billboardTexture.bind(0);
-                shaderProgram.setUniformi("u_texture0", 0);
             }
 
             // Global uniforms

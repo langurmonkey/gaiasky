@@ -204,7 +204,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
             if (curr != null) {
                 if (triComponent.starTex != null) {
                     triComponent.starTex.bind(0);
-                    shaderProgram.setUniformi("u_starTex", 0);
                 }
 
                 triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];

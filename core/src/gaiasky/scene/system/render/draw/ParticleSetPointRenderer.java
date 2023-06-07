@@ -180,8 +180,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
             curr = meshes.get(getOffset(render));
             if (curr != null) {
                 if (set.textureArray != null) {
-                    set.textureArray.bind(2200);
-                    shaderProgram.setUniformi("u_textures", 2200);
+                    set.textureArray.bind(0);
                 }
                 float meanDist = (float) (set.getMeanDistance());
 
