@@ -8,6 +8,7 @@
 package gaiasky.desktop.util;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.elements.OsculatingElements;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
@@ -34,7 +35,7 @@ public class StateVector2Elements {
                     var object = new SSO();
                     object.numberMp = Parser.parseIntException(sc.next());
                     object.name = sc.next();
-                    object.oscEpoch = Parser.parseDoubleException(sc.next());
+                    object.oscEpoch = Parser.parseDoubleException(sc.next()) + AstroUtils.JD_J2010;
 
                     double x = Parser.parseDoubleException(sc.next());
                     double y = Parser.parseDoubleException(sc.next());
