@@ -1223,9 +1223,6 @@ public class DatasetManagerWindow extends GenericDialog {
             question.buildSuper();
             question.show(stage);
         } else {
-            if (this.acceptRunnable != null) {
-                this.acceptRunnable.run();
-            }
             myself.hide(); // Close.
         }
         // Do not close dialog, we close it.

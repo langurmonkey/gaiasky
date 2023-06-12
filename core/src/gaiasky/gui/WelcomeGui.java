@@ -23,7 +23,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -686,12 +685,13 @@ public class WelcomeGui extends AbstractGui {
             datasetManager.setAcceptRunnable(() -> {
                 if (datasetManager != null) {
                     // Run with slight delay to wait for hide animation.
-                    datasetManager.addAction(
-                            Actions.delay(0.4f, Actions.run(() -> {
-                                Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-                                savePreferences();
-                                reloadView();
-                            })));
+                    Timer.schedule(new Task() {
+                        @Override
+                        public void run() {
+                            reloadView();
+                        }
+                    }, 0.5f);
+
                 }
             });
         } else {
@@ -712,6 +712,7 @@ public class WelcomeGui extends AbstractGui {
             preferencesWindow.remove();
             preferencesWindow = null;
         }
+        EventManager.instance.removeAllSubscriptions(this);
     }
 
     @Override
