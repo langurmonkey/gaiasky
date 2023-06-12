@@ -35,7 +35,7 @@ public class StateVector2Elements {
                     var object = new SSO();
                     object.numberMp = Parser.parseIntException(sc.next());
                     object.name = sc.next();
-                    object.oscEpoch = Parser.parseDoubleException(sc.next()) + AstroUtils.JD_J2010;
+                    object.oscEpoch = Parser.parseDoubleException(sc.next());
 
                     double x = Parser.parseDoubleException(sc.next());
                     double y = Parser.parseDoubleException(sc.next());
