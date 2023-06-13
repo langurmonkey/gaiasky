@@ -1,0 +1,29 @@
+{ "objects" : [
+  {
+    "name" : "Test Object",
+    "color" : [1.0, 0.65, 0.4, 1.0],
+    "sizeKm" : 7000000.0,
+    "componentType" : "Others",
+
+    "parent" : "Universe", 
+    "archetype" : "ShapeObject",
+    "renderGroup" : "MODEL_PIX",
+    "focusable" : true,
+
+    "model"			: {
+      "args" : [true],
+      "staticLight": false,
+      "blendMode": "alpha",
+      "type" : "sphere",
+      "primitiveType": "triangles",
+      "params" : {
+        "quality" : 20,
+        "diameter" : 1.0,
+        "flip" : false
+      }
+      //,"material" : {
+      //  "base" : "$data/tex/base/vesta*.jpg"
+      //}
+    }
+  },
+]}
