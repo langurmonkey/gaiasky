@@ -117,6 +117,9 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             if (!Mapper.verts.has(render.entity)) {
                 logger.error("Can't render entities without a " + Verts.class.getSimpleName() + " component.");
             }
+            var trajectory = Mapper.trajectory.get(render.entity);
+            var coordEnabled = trajectory != null && trajectory.orbitTrail;
+
             // We use a VertsView object.
             vertsView.setEntity(render.entity);
             T renderable = (T) vertsView;
@@ -152,7 +155,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                 curr.vertices = tempVerts;
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < nPoints; point_i++) {
-                    coord(!hasTime ? 1f : (float) ((double) (data.getDate(point_i).getEpochSecond() - t0) / (double) t01));
+                    coord(!hasTime ? (coordEnabled ? (float) point_i / (float) nPoints : 1f) : (float) ((double) (data.getDate(point_i).getEpochSecond() - t0) / (double) t01));
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) data.getX(point_i), (float) data.getY(point_i), (float) data.getZ(point_i));
                 }
@@ -177,7 +180,6 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
              * RENDER
              */
 
-            var trajectory = Mapper.trajectory.get(render.entity);
             var base = Mapper.base.get(render.entity);
 
             // Regular.
@@ -191,7 +193,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable) * base.opacity * 0.6f);
-            shaderProgram.setUniformf("u_coordEnabled", (trajectory == null || trajectory.orbitTrail) && vertsView.getPointCloud().hasTime() ? 1f : -1f);
+            shaderProgram.setUniformf("u_coordEnabled", coordEnabled ? 1f : -1f);
             if (trajectory != null && trajectory.body != null) {
                 var bodyGraph = Mapper.graph.get(trajectory.body);
                 shaderProgram.setUniformf("u_bodyPos", bodyGraph.translation.x.floatValue(), bodyGraph.translation.y.floatValue(), bodyGraph.translation.z.floatValue());

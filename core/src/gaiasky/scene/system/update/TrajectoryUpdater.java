@@ -29,19 +29,22 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
     private final TrajectoryUtils utils;
     private final ITimeFrameProvider time;
 
-    public TrajectoryUpdater(Family family, int priority) {
+    public TrajectoryUpdater(Family family,
+                             int priority) {
         super(family, priority);
         this.time = GaiaSky.instance.time;
         this.utils = new TrajectoryUtils();
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity,
+                                 float deltaTime) {
         updateEntity(entity, deltaTime);
     }
 
     @Override
-    public void updateEntity(Entity entity, float deltaTime) {
+    public void updateEntity(Entity entity,
+                             float deltaTime) {
         var graph = Mapper.graph.get(entity);
         var transform = Mapper.transform.get(entity);
         var trajectory = Mapper.trajectory.get(entity);
@@ -52,14 +55,19 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         }
 
         // Compute position percentage in the trajectory.
-        if (verts.pointCloudData != null && verts.pointCloudData.hasTime()) {
-            long now = time.getTime().toEpochMilli();
-            long t0 = verts.pointCloudData.time.get(0).toEpochMilli();
-            long t1 = verts.pointCloudData.time.get(verts.pointCloudData.getNumPoints() - 1).toEpochMilli();
+        if (verts.pointCloudData != null) {
+            if (verts.pointCloudData.hasTime()) {
+                long now = time.getTime().toEpochMilli();
+                long t0 = verts.pointCloudData.time.get(0).toEpochMilli();
+                long t1 = verts.pointCloudData.time.get(verts.pointCloudData.getNumPoints() - 1).toEpochMilli();
 
-            long t1t0 = t1 - t0;
-            long nowt0 = now - t0;
-            trajectory.coord = ((double) nowt0 / (double) t1t0) % 1d;
+                long t1t0 = t1 - t0;
+                long nowt0 = now - t0;
+                trajectory.coord = ((double) nowt0 / (double) t1t0) % 1d;
+            } else {
+                // No time, we set the coordinate at the end of the line.
+                trajectory.coord = 1;
+            }
         }
 
         if (!trajectory.onlyBody) {
@@ -73,7 +81,9 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         }
     }
 
-    protected void updateLocalTransformHeliotropic(Instant date, GraphNode graph, Trajectory trajectory) {
+    protected void updateLocalTransformHeliotropic(Instant date,
+                                                   GraphNode graph,
+                                                   Trajectory trajectory) {
         Matrix4d localTransformD = trajectory.localTransformD;
 
         double sunLongitude = AstroUtils.getSunLongitude(date);
@@ -84,7 +94,9 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         localTransformD.putIn(graph.localTransform);
     }
 
-    protected void updateLocalTransformRegular(GraphNode graph, Trajectory trajectory, RefSysTransform transform) {
+    protected void updateLocalTransformRegular(GraphNode graph,
+                                               Trajectory trajectory,
+                                               RefSysTransform transform) {
         var localTransformD = trajectory.localTransformD;
         var transformFunction = transform.matrix;
 

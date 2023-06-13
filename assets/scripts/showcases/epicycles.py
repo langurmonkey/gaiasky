@@ -80,7 +80,7 @@ gs.setCameraPosition([650591440.987582, -1443344531.151316, -219531339.581399])
 earthp = gs.getObjectPosition("Earth")
 marsp = gs.getObjectPosition("Mars")
 
-gs.addTrajectoryLine("line-em", [], [ 1., .2, .2, .8 ], 0.6 )
+gs.addTrajectoryLine("line-em", [], [ 1., .2, .2, .8 ], 0.0 )
 line = gs.getLineObject("line-em", 10.0)
 
 gs.sleep(0.5)

@@ -29,17 +29,27 @@ layout (location = 0) out vec4 fragColor;
 void main() {
     float trail;
     if (u_coordEnabled > 0.0) {
-        trail = v_coord - u_coordPos;
-        if (trail < 0.0) {
-            trail += 1.0;
-        }
-        if (u_period <= 0.0 && v_coord > u_coordPos) {
+        if (u_period > 0.0) {
+            trail = v_coord - u_coordPos;
+            if (trail < 0.0) {
+                trail += 1.0;
+            }
+        } else if (v_coord > u_coordPos) {
+            // Weird case?
             trail = 0.0;
+        } else {
+            // Non-timed lines.
+            trail = v_coord;
+        }
+        if (u_trailMap >= 1.0) {
+            // We map to zero, always.
+            trail = 0.0;
+        } else {
+            trail = (trail - u_trailMap) / (1.0 - u_trailMap);
         }
     } else {
         trail = 1.0;
     }
-    trail = (1.0 / (1.0 - u_trailMap)) * (trail - u_trailMap);
 
     if (u_alpha<= 0.0 || trail <= 0.0) {
         discard;

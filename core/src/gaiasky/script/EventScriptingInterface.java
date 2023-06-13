@@ -3202,13 +3202,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void addTrajectoryLine(String name,
                                   double[] points,
                                   double[] color) {
-        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "gaiasky.scenegraph.Orbit");
+        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
     public void addTrajectoryLine(String name,
                                   List<?> points,
                                   List<?> color) {
-        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "gaiasky.scenegraph.Orbit");
+        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
     @Override
@@ -3216,7 +3216,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                   double[] points,
                                   double[] color,
                                   double trailMap) {
-        var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trailMap, "gaiasky.scenegraph.Orbit");
+        var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trailMap, "Orbit");
     }
 
     public void addTrajectoryLine(String name,
@@ -3272,7 +3272,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             double lineWidth,
                             int primitive,
                             boolean arrowCaps) {
-        addLineObject(name, points, color, lineWidth, primitive, arrowCaps, 0f, "gaiasky.scenegraph.Polyline");
+        addLineObject(name, points, color, lineWidth, primitive, arrowCaps, -1f, "Polyline");
     }
 
     public Entity addLineObject(String name,
@@ -3325,8 +3325,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             var trajectory = Mapper.trajectory.get(entity);
             if (trajectory != null) {
-                trajectory.orbitTrail = trailMap >= 0 && trailMap <= 1;
-                trajectory.setTrailMap(trailMap);
+                if (trailMap < 0) {
+                    // Trail disabled.
+                    trajectory.orbitTrail = false;
+                    trajectory.setTrailMap(trailMap);
+                } else {
+                    trailMap = MathUtilsDouble.clamp(trailMap, 0.0, 1.0);
+                    trajectory.orbitTrail = true;
+                    trajectory.setTrailMap(trailMap);
+                }
             }
 
             var graph = Mapper.graph.get(entity);
