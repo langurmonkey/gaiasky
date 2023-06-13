@@ -44,9 +44,10 @@ public class GraphNode implements Component, ICopy {
     public Array<Entity> children;
 
     /**
-     * Cumulative translation object. In contrast with the position, which contains
+     * Cumulative translation object. In contrast to the position in body.pos, which contains
      * the position relative to the parent, this contains the absolute position in the
-     * internal reference system.
+     * floating camera reference system. Add the camera position to this to get the
+     * absolute position in the internal reference system.
      */
     public Vector3b translation;
 

@@ -30,8 +30,7 @@ import java.util.List;
 public class EntityUtils {
 
     /**
-     * Returns the absolute position of this entity in the native coordinates
-     * (equatorial system) and internal units.
+     * Returns the absolute position of this entity in the internal reference system and internal units.
      *
      * @param entity The entity.
      * @param out    Auxiliary vector to put the result in.
@@ -41,17 +40,15 @@ public class EntityUtils {
     public static Vector3b getAbsolutePosition(final Entity entity,
                                                Vector3b out) {
         if (entity != null) {
-            if (Mapper.body.has(entity)) {
-                var body = Mapper.body.get(entity);
-                out.set(body.pos);
+            var body = Mapper.body.get(entity);
+            out.set(body.pos);
 
-                var e = entity;
-                var graph = Mapper.graph.get(e);
-                while (graph.parent != null) {
-                    e = graph.parent;
-                    graph = Mapper.graph.get(e);
-                    out.add(Mapper.body.get(e).pos);
-                }
+            var e = entity;
+            var graph = Mapper.graph.get(e);
+            while (graph.parent != null) {
+                e = graph.parent;
+                graph = Mapper.graph.get(e);
+                out.add(Mapper.body.get(e).pos);
             }
         }
         return out;
