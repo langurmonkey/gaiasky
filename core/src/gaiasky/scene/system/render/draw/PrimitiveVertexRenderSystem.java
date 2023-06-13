@@ -133,15 +133,21 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
 
                 // Initialize or fetch mesh data. We reuse if we can.
                 if (getOffset(render) < 0) {
-                    setOffset(render, addMeshData(nPoints));
+                    setOffset(render, addMeshData(nPoints + 1));
                 } else {
                     curr = meshes.get(getOffset(render));
                     // Check we still have capacity, otherwise, reinitialize.
-                    if (curr.numVertices != data.getNumPoints()) {
+                    if (curr.numVertices < nPoints + 1) {
+                        // Resize.
                         curr.clear();
                         curr.mesh.dispose();
                         meshes.set(getOffset(render), null);
-                        setOffset(render, addMeshData(nPoints));
+                        setOffset(render, addMeshData(nPoints + 1));
+                    } else {
+                        // Reset.
+                        curr.vertexIdx = 0;
+                        curr.indexIdx = 0;
+                        curr.numVertices = 0;
                     }
                 }
                 // Coord maps time.
@@ -151,13 +157,15 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                 long t01 = t1 - t0;
 
                 // Ensure vertices capacity.
-                ensureTempVertsSize((nPoints + 2) * curr.vertexSize);
+                ensureTempVertsSize((nPoints + 1) * curr.vertexSize);
                 curr.vertices = tempVerts;
+                int numAddedVertices = 0;
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < nPoints; point_i++) {
                     coord(!hasTime ? (coordEnabled ? (float) point_i / (float) nPoints : 1f) : (float) ((double) (data.getDate(point_i).getEpochSecond() - t0) / (double) t01));
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) data.getX(point_i), (float) data.getY(point_i), (float) data.getZ(point_i));
+                    numAddedVertices++;
                 }
 
                 // Close loop.
@@ -165,10 +173,11 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                     coord(1f);
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) data.getX(0), (float) data.getY(0), (float) data.getZ(0));
+                    numAddedVertices++;
                 }
 
-                int count = nPoints * curr.vertexSize;
-                setCount(render, count);
+                int count = numAddedVertices * curr.vertexSize;
+                setCount(render, numAddedVertices);
                 curr.mesh.setVertices(curr.vertices, 0, count);
                 curr.vertices = null;
 
@@ -214,7 +223,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
 
             // Rel, grav, z-buffer.
             addEffectsUniforms(shaderProgram, camera);
-            curr.mesh.render(shaderProgram, renderable.getGlPrimitive());
+            curr.mesh.render(shaderProgram, renderable.getGlPrimitive(), 0, getCount(render));
 
         });
         shaderProgram.end();
