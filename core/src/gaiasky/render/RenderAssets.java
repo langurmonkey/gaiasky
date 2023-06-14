@@ -59,6 +59,7 @@ public class RenderAssets {
      */
     public void initialize(AssetManager manager) {
 
+        var safeMode = Settings.settings.program.safeMode;
         ShaderLoader.Pedantic = false;
         ExtShaderProgram.pedantic = false;
 
@@ -92,8 +93,13 @@ public class RenderAssets {
                                         TextUtils.concatAll("billboard.group", names), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", TextUtils.concatAll("point.cpu", names), defines);
         lineCpuDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
-        lineQuadCpuDesc = loadShader(manager, "shader/line.quad.cpu.vertex.glsl", "shader/line.quad.cpu.geometry.glsl", "shader/line.quad.cpu.fragment.glsl", TextUtils.concatAll("line.quad.cpu", names), defines);
-        lineQuadGpuDesc = loadShader(manager, "shader/line.quad.gpu.vertex.glsl", "shader/line.quad.gpu.geometry.glsl", "shader/line.quad.gpu.fragment.glsl", TextUtils.concatAll("line.quad.gpu", names), defines);
+        if (!safeMode) {
+            // In safe mode we use OpenGL 3.3. Our geometry shaders use '#version 400 core', since they make use of double-precision.
+            lineQuadCpuDesc = loadShader(manager, "shader/line.quad.cpu.vertex.glsl", "shader/line.quad.cpu.geometry.glsl", "shader/line.quad.cpu.fragment.glsl",
+                                         TextUtils.concatAll("line.quad.cpu", names), defines);
+            lineQuadGpuDesc = loadShader(manager, "shader/line.quad.gpu.vertex.glsl", "shader/line.quad.gpu.geometry.glsl", "shader/line.quad.gpu.fragment.glsl",
+                                         TextUtils.concatAll("line.quad.gpu", names), defines);
+        }
         primitiveGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("primitive.gpu", names), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl",
@@ -209,15 +215,17 @@ public class RenderAssets {
          */
         lineCpuShaders = fetchShaderProgram(manager, lineCpuDesc, TextUtils.concatAll("line.cpu", names));
 
-        /*
-         * LINE QUAD CPU
-         */
-        lineQuadCpuShaders = fetchShaderProgram(manager, lineQuadCpuDesc, TextUtils.concatAll("line.quad.cpu", names));
+        if (!Settings.settings.program.safeMode) {
+            /*
+             * LINE QUAD CPU
+             */
+            lineQuadCpuShaders = fetchShaderProgram(manager, lineQuadCpuDesc, TextUtils.concatAll("line.quad.cpu", names));
 
-        /*
-         * LINE QUAD GPU
-         */
-        lineQuadGpuShaders = fetchShaderProgram(manager, lineQuadGpuDesc, TextUtils.concatAll("line.quad.gpu", names));
+            /*
+             * LINE QUAD GPU
+             */
+            lineQuadGpuShaders = fetchShaderProgram(manager, lineQuadGpuDesc, TextUtils.concatAll("line.quad.gpu", names));
+        }
 
         /*
          * PRIMITIVE GPU

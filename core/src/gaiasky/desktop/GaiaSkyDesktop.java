@@ -57,7 +57,7 @@ public class GaiaSkyDesktop implements IObserver {
     private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
     private static final String XR_OPENGL = DEFAULT_OPENGL_MAJOR + "." + XR_OPENGL_MINOR;
     private static final int MIN_OPENGL_MAJOR = 3;
-    private static final int MIN_OPENGL_MINOR = 2;
+    private static final int MIN_OPENGL_MINOR = 3;
     private static final String MIN_OPENGL = MIN_OPENGL_MAJOR + "." + MIN_OPENGL_MINOR;
     private static final int MIN_GLSL_MAJOR = 3;
     private static final int MIN_GLSL_MINOR = 3;

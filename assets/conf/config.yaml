@@ -297,7 +297,8 @@ program:
   # The default time zone to use. One of [UTC|SYSTEM_DEFAULT].
   timeZone: UTC
   # Enable safe mode, which disables advanced graphics features.
-  # For instance, it disables float buffers and creates no velocity buffer (no motion blur).
+  # In this mode, OpenGL 3.3 is used.
+  # Safe mode disables float buffers, tessellation and quality line mode.
   safeMode: false
   # Print debug information to the terminal.
   debugInfo: false

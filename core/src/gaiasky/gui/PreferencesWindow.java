@@ -397,6 +397,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lineRenderer.setItems(lineRenderers);
         lineRenderer.setWidth(selectWidth);
         lineRenderer.setSelected(lineRenderers[settings.scene.renderer.line.ordinal()]);
+        // Disable in safe mode
+        lrLabel.setDisabled(safeMode);
+        lineRenderer.setDisabled(safeMode);
 
         // BLOOM
         OwnLabel bloomLabel = new OwnLabel(I18n.msg("gui.bloom"), skin, "default");
@@ -539,6 +542,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        // Disable in safe mode.
+        elevationTypeLabel.setDisabled(safeMode);
+        elevationSb.setDisabled(safeMode);
 
         // TESSELLATION QUALITY
         tessQualityLabel = new OwnLabel(I18n.msg("gui.elevation.tessellation.quality"), skin);

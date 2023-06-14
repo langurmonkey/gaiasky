@@ -93,7 +93,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
         curr = meshes.get(mdi);
 
         VertexAttribute[] attributes = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, nVertices, 0, attributes);
+        curr.mesh = new IntMesh(true, nVertices, 0, attributes);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -133,7 +133,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
 
                 // Initialize or fetch mesh data. We reuse if we can.
                 if (getOffset(render) < 0) {
-                    setOffset(render, addMeshData(nPoints + 1));
+                    setOffset(render, addMeshData(nPoints + 10));
                 } else {
                     curr = meshes.get(getOffset(render));
                     // Check we still have capacity, otherwise, reinitialize.
@@ -142,7 +142,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                         curr.clear();
                         curr.mesh.dispose();
                         meshes.set(getOffset(render), null);
-                        setOffset(render, addMeshData(nPoints + 1));
+                        setOffset(render, addMeshData(nPoints + 10));
                     } else {
                         // Reset.
                         curr.vertexIdx = 0;
