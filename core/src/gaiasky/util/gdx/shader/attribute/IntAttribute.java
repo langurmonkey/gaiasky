@@ -10,6 +10,8 @@ package gaiasky.util.gdx.shader.attribute;
 public class IntAttribute extends Attribute {
     public static final String CullFaceAlias = "cullface";
     public static final int CullFace = register(CullFaceAlias);
+    public static final String EclipseOutlinesAlias = "eclipseOutlines";
+    public static final int EclipseOutlines = register(EclipseOutlinesAlias);
     public int value;
 
     public IntAttribute(int index) {

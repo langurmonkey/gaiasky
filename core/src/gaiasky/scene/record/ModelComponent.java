@@ -7,6 +7,7 @@
 
 package gaiasky.scene.record;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
@@ -24,6 +26,8 @@ import gaiasky.event.IObserver;
 import gaiasky.event.Observer;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.render.BlendMode;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
@@ -45,11 +49,14 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     private static final ColorAttribute globalAmbient;
 
     static {
-        globalAmbient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
+        globalAmbient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient,
+                                           (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
         // Ambient light watcher.
         var observer = new Observer() {
             @Override
-            public void notify(Event event, Object source, Object... data) {
+            public void notify(Event event,
+                               Object source,
+                               Object... data) {
                 if (event == Event.AMBIENT_LIGHT_CMD) {
                     ModelComponent.setGlobalAmbientLight((float) data[0]);
                 }
@@ -89,6 +96,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     private AssetManager manager;
     private float[] cc;
     private int primitiveType = GL20.GL_TRIANGLES;
+    private final Vector3 aux = new Vector3();
 
     public ModelComponent() {
         this(true);
@@ -189,11 +197,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc) {
+    public void doneLoading(AssetManager manager,
+                            Matrix4 localTransform,
+                            float[] cc) {
         doneLoading(manager, localTransform, cc, false);
     }
 
-    public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc, boolean mesh) {
+    public void doneLoading(AssetManager manager,
+                            Matrix4 localTransform,
+                            float[] cc,
+                            boolean mesh) {
         this.manager = manager;
         this.cc = cc;
         IntModel model;
@@ -220,7 +233,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             addColorToMat();
         }
         // Subscribe to new graphics quality setting event
-        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED, Event.SSR_CMD);
+        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED, Event.SSR_CMD, Event.ECLIPSES_CMD);
 
         this.modelInitialised = this.modelInitialised || !Settings.settings.scene.initialization.lazyMesh;
         this.modelLoading = false;
@@ -288,7 +301,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void update(boolean relativistic, Matrix4 localTransform, float alpha, int blendSrc, int blendDst, boolean blendEnabled) {
+    public void update(boolean relativistic,
+                       Matrix4 localTransform,
+                       float alpha,
+                       int blendSrc,
+                       int blendDst,
+                       boolean blendEnabled) {
         touch(localTransform);
         if (instance != null) {
             ICamera cam = GaiaSky.instance.getICamera();
@@ -303,11 +321,17 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst, boolean blendEnabled) {
+    public void update(Matrix4 localTransform,
+                       float alpha,
+                       int blendSrc,
+                       int blendDst,
+                       boolean blendEnabled) {
         update(true, localTransform, alpha, blendSrc, blendDst, blendEnabled);
     }
 
-    public void update(boolean relativistic, Matrix4 localTransform, float alpha) {
+    public void update(boolean relativistic,
+                       Matrix4 localTransform,
+                       float alpha) {
         switch (blendMode) {
         case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
         case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
@@ -316,11 +340,13 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void update(Matrix4 localTransform, float alpha) {
+    public void update(Matrix4 localTransform,
+                       float alpha) {
         update(true, localTransform, alpha);
     }
 
-    public void update(float alpha, boolean relativistic) {
+    public void update(float alpha,
+                       boolean relativistic) {
         update(relativistic, null, alpha);
     }
 
@@ -415,7 +441,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void setTransparency(float alpha, int blendSrc, int blendDest, boolean blendEnabled) {
+    public void setTransparency(float alpha,
+                                int blendSrc,
+                                int blendDest,
+                                boolean blendEnabled) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
@@ -489,7 +518,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         setDepthTest(GL20.GL_NONE, false);
     }
 
-    public void setDepthTest(int func, boolean mask) {
+    public void setDepthTest(int func,
+                             boolean mask) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
@@ -526,21 +556,49 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void setFloatExtAttribute(int attrib, float value) {
+    public void setFloatExtAttribute(int attrib,
+                                     float value) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
-                if (!mat.has(attrib)) {
-                    mat.set(new FloatAttribute(attrib, value));
-                } else {
-                    ((FloatAttribute) Objects.requireNonNull(mat.get(attrib))).value = value;
-                }
+                setFloatAttribute(mat, attrib, value);
             }
         }
     }
 
-    public void setColorAttribute(int attrib, float[] rgba) {
+    public void setIntAttribute(Material mat,
+                                int attribute,
+                                int value) {
+        if (!mat.has(attribute)) {
+            mat.set(new IntAttribute(attribute, value));
+        } else {
+            ((IntAttribute) Objects.requireNonNull(mat.get(attribute))).value = value;
+        }
+    }
+
+    public void setFloatAttribute(Material mat,
+                                  int attribute,
+                                  float value) {
+        if (!mat.has(attribute)) {
+            mat.set(new FloatAttribute(attribute, value));
+        } else {
+            ((FloatAttribute) Objects.requireNonNull(mat.get(attribute))).value = value;
+        }
+    }
+
+    public void setVector3Attribute(Material mat,
+                                    int attribute,
+                                    Vector3 value) {
+        if (!mat.has(attribute)) {
+            mat.set(new Vector3Attribute(attribute, value));
+        } else {
+            ((Vector3Attribute) Objects.requireNonNull(mat.get(attribute))).value.set(value);
+        }
+    }
+
+    public void setColorAttribute(int attrib,
+                                  float[] rgba) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
@@ -648,7 +706,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void updateVelocityBufferUniforms(Material mat, ICamera camera) {
+    public void updateVelocityBufferUniforms(Material mat,
+                                             ICamera camera) {
         if (Settings.settings.postprocess.motionBlur.active) {
             vbc.updateVelocityBufferMaterial(mat, camera);
         } else if (vbc.hasVelocityBuffer(mat)) {
@@ -656,21 +715,92 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
+    public void updateEclipsingBodyUnforms(Entity entity) {
+        if (!Settings.settings.scene.renderer.eclipses.active) {
+            return;
+        }
+        var graph = Mapper.graph.get(entity);
+        if (graph == null) {
+            return;
+        }
+        Entity eclipsingBody = null;
+        // Look down at moons.
+        if (graph.children != null && !graph.children.isEmpty()) {
+            for (var child : graph.children) {
+                var base = Mapper.base.get(child);
+                if (base.hasCt(ComponentType.Moons)) {
+                    eclipsingBody = child;
+                    break;
+                }
+            }
+        }
+
+        // Look up at planets.
+        if (eclipsingBody == null) {
+            var base = Mapper.base.get(entity);
+            if (base.hasCt(ComponentType.Moons) && graph.parent != null) {
+                var parentBase = Mapper.base.get(graph.parent);
+                if (parentBase.hasCt(ComponentType.Planets)) {
+                    // Found!
+                    eclipsingBody = graph.parent;
+                }
+
+            }
+        }
+
+        // Add.
+        if (eclipsingBody != null) {
+            for (Material mat : instance.materials) {
+                updateEclipsingBodyUniforms(mat, eclipsingBody);
+            }
+        }
+    }
+
+    private void updateEclipsingBodyUniforms(Material mat,
+                                             Entity eclipsingBody) {
+        var body = Mapper.body.get(eclipsingBody);
+        var graph = Mapper.graph.get(eclipsingBody);
+
+        setVector3Attribute(mat, Vector3Attribute.EclipsingBodyPos, graph.translation.put(aux));
+        setFloatAttribute(mat, FloatAttribute.EclipsingBodyRadius, (float) (body.size * 0.5));
+        if (Settings.settings.scene.renderer.eclipses.outlines) {
+            setIntAttribute(mat, IntAttribute.EclipseOutlines, 1);
+        } else {
+            mat.remove(IntAttribute.EclipseOutlines);
+        }
+    }
+
+    private void removeEclipsingBodyUniforms() {
+        if (instance == null) {
+            return;
+        }
+        for (Material mat : instance.materials) {
+            mat.remove(Vector3Attribute.EclipsingBodyPos);
+            mat.remove(FloatAttribute.EclipsingBodyRadius);
+            mat.remove(IntAttribute.EclipseOutlines);
+        }
+
+    }
+
     public void updateRelativisticEffects(ICamera camera) {
         updateRelativisticEffects(camera, -1);
     }
 
-    public void updateRelativisticEffects(ICamera camera, float vc) {
+    public void updateRelativisticEffects(ICamera camera,
+                                          float vc) {
         for (Material mat : instance.materials) {
             updateRelativisticEffects(mat, camera, vc);
         }
     }
 
-    public void updateRelativisticEffects(Material mat, ICamera camera) {
+    public void updateRelativisticEffects(Material mat,
+                                          ICamera camera) {
         updateRelativisticEffects(mat, camera, -1);
     }
 
-    public void updateRelativisticEffects(Material mat, ICamera camera, float vc) {
+    public void updateRelativisticEffects(Material mat,
+                                          ICamera camera,
+                                          float vc) {
         if (Settings.settings.runtime.relativisticAberration) {
             rec.updateRelativisticEffectsMaterial(mat, camera, vc);
         } else if (rec.hasRelativisticEffects(mat)) {
@@ -706,7 +836,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (event == Event.GRAPHICS_QUALITY_UPDATED) {
             GaiaSky.postRunnable(() -> {
                 if (mtc != null && mtc.texInitialised) {
@@ -727,6 +859,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                     // Add cubemap
                     addReflectionCubemapAttribute(instance.materials);
                 }
+            }
+        } else if (event == Event.ECLIPSES_CMD) {
+            boolean active = (Boolean) data[0];
+            if (!active) {
+                removeEclipsingBodyUniforms();
             }
         }
     }
@@ -809,7 +946,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * @param seed The seed to use.
      * @param size The size of the base body in internal units.
      */
-    public void randomizeAll(long seed, double size) {
+    public void randomizeAll(long seed,
+                             double size) {
         // Type
         setType("sphere");
         // Parameters

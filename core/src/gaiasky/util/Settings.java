@@ -1088,6 +1088,7 @@ public class Settings {
             public LineMode line = LineMode.POLYLINE_QUADSTRIP;
             public double ambient;
             public ShadowSettings shadow;
+            public EclipseSettings eclipses;
             public ElevationSettings elevation;
             public VirtualTextureSettings virtualTextures;
             @JsonIgnore public double orbitSolidAngleThreshold = Math.toRadians(1.5);
@@ -1138,6 +1139,12 @@ public class Settings {
                 public boolean active;
                 public int resolution;
                 public int number;
+            }
+
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            public static class EclipseSettings {
+                public boolean active;
+                public boolean outlines;
             }
 
             @JsonIgnoreProperties(ignoreUnknown = true)

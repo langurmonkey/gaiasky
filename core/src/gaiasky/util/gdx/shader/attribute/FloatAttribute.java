@@ -53,6 +53,9 @@ public class FloatAttribute extends Attribute {
     public static final String SvtDetectionFactorAlias = "svtDetectionFactor";
     public static final int SvtDetectionFactor = register(SvtDetectionFactorAlias);
 
+    public static final String EclipsingBodyRadiusAlias = "eclipsingBodyRadius";
+    public static final int EclipsingBodyRadius = register(EclipsingBodyRadiusAlias);
+
     public float value;
 
     public FloatAttribute(int index) {

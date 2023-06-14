@@ -67,7 +67,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY,
             highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
-            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
+            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr, eclipses, eclipseOutlines;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
@@ -619,6 +619,37 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to content
         contentGraphicsTable.add(titleShadows).left().padBottom(pad18).row();
         contentGraphicsTable.add(shadows).left().padBottom(pad34).row();
+
+        // ECLIPSES
+        Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
+        Table eclipsesTable = new Table();
+        // Enable eclipses
+        OwnLabel eclipsesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.enable"), skin);
+        eclipses = new OwnCheckBox("", skin);
+        eclipses.setChecked(settings.scene.renderer.eclipses.active);
+        eclipses.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                // Enable or disable resolution
+                enableComponents(eclipses.isChecked(), eclipseOutlines);
+                return true;
+            }
+            return false;
+        });
+        // Eclipse outlines
+        OwnLabel eclipsesOutlinesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.outlines"), skin);
+        eclipseOutlines = new OwnCheckBox("", skin);
+        eclipseOutlines.setChecked(settings.scene.renderer.eclipses.outlines);
+
+        labels.add(eclipsesLabel, eclipsesOutlinesLabel);
+
+        eclipsesTable.add(eclipsesLabel).left().padRight(pad34).padBottom(pad10);
+        eclipsesTable.add(eclipses).left().padRight(pad18).padBottom(pad10).row();
+        eclipsesTable.add(eclipsesOutlinesLabel).left().padRight(pad34).padBottom(pad10);
+        eclipsesTable.add(eclipseOutlines).left().padRight(pad18).padBottom(pad10);
+
+        // Add to content
+        contentGraphicsTable.add(titleEclipses).left().padBottom(pad18).row();
+        contentGraphicsTable.add(eclipsesTable).left().padBottom(pad34).row();
 
         // IMAGE LEVELS
         Label titleDisplay = new OwnLabel(I18n.msg("gui.graphics.imglevels"), skin, "header");
@@ -2408,6 +2439,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         int newShadowNumber = nShadows.getSelected().value;
         final boolean reloadShadows =
                 shadowsCb.isChecked() && (settings.scene.renderer.shadow.resolution != newShadowResolution || settings.scene.renderer.shadow.number != newShadowNumber);
+
+        // Eclipses
+        boolean eclipsesActiveBefore = settings.scene.renderer.eclipses.active;
+        settings.scene.renderer.eclipses.active = eclipses.isChecked();
+        settings.scene.renderer.eclipses.outlines = eclipseOutlines.isChecked();
+        if (eclipsesActiveBefore && !eclipses.isChecked()) {
+            // We just deactivated eclipses!
+            EventManager.publish(Event.ECLIPSES_CMD, this, eclipses.isChecked());
+        }
 
         // Fade time
         settings.scene.fadeMs = MathUtils.clamp(fadeTimeField.getLongValue(settings.scene.fadeMs), Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);

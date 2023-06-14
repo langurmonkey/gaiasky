@@ -29,6 +29,8 @@ public class Vector3Attribute extends Attribute {
     public static final int DCamPos = register(DCamPosAlias);
     public static final String VrOffsetAlias = "vrOffset";
     public static final int VrOffset = register(VrOffsetAlias);
+    public static final String EclipsingBodyPosAlias = "eclipsingBodyPos";
+    public static final int EclipsingBodyPos = register(EclipsingBodyPosAlias);
     public Vector3 value;
 
     public Vector3Attribute(int index) {

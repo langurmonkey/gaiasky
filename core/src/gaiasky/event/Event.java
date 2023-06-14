@@ -825,6 +825,10 @@ public enum Event {
      * Event to update the shadow map metadata.
      */
     REBUILD_SHADOW_MAP_DATA_CMD,
+    /**
+     * Eclipses have been toggled. Contains a boolean with the new state.
+      */
+    ECLIPSES_CMD,
 
     /**
      * Forces recalculation of main controls window size.

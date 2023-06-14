@@ -228,6 +228,12 @@ scene:
       resolution: 1024
       # Maximum number of shadows.
       number: 4
+    # Eclipses settings.
+    eclipses:
+      # Enable eclipse representation.
+      active: true
+      # Add outlines for umbra (red) and penumbra (green).
+      outlines: false
     # Elevation representation settings.
     elevation:
       # Elevation type [TESSELLATION|PARALLAX_MAPPING|NONE].

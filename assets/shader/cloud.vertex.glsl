@@ -255,6 +255,7 @@ uniform DirectionalLight u_dirLights[numDirectionalLights];
 out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
+out vec3 v_fragPosWorld;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
@@ -279,7 +280,8 @@ void main() {
     #ifdef gravitationalWaves
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
-    
+
+    v_fragPosWorld = pos.xyz;
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 

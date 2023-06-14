@@ -61,9 +61,36 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
 }
 #endif// diffuseCubemapFlag && diffuseTextureFlag
 
+#ifdef eclipsingBodyFlag
+uniform float u_eclipsingBodyRadius;
+uniform vec3 u_eclipsingBodyPos;
+
+#include shader/lib_math.glsl
+#endif // eclipsingBodyFlag
+
+
+//////////////////////////////////////////////////////
+////// DIRECTIONAL LIGHTS
+//////////////////////////////////////////////////////
+#ifdef lightingFlag
+#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+#define directionalLightsFlag
+#endif // numDirectionalLights
+#endif //lightingFlag
+
+#ifdef directionalLightsFlag
+struct DirectionalLight
+{
+    vec3 color;
+    vec3 direction;
+};
+uniform DirectionalLight u_dirLights[numDirectionalLights];
+#endif
+
 in vec3 v_lightDir;
 in vec3 v_lightCol;
 in vec3 v_viewDir;
+in vec3 v_fragPosWorld;
 
 layout (location = 0) out vec4 fragColor;
 
@@ -88,7 +115,20 @@ void main() {
     vec3 L = normalize(v_lightDir);
     float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
 
-    vec3 cloudColor = clamp(v_lightCol * cloud.rgb, 0.0, 1.0);
+    float shdw = 1.0;
+    // Eclipses
+    #ifdef eclipsingBodyFlag
+    vec3 f = v_fragPosWorld;
+    vec3 m = u_eclipsingBodyPos;
+    vec3 l = -u_dirLights[0].direction;
+    vec3 fl = f + l;
+    float dist = dist_segment_point(f, fl, m);
+    if (dist < u_eclipsingBodyRadius) {
+        shdw *= dist / u_eclipsingBodyRadius;
+    }
+    #endif // eclipsingBodyFlag
+
+    vec3 cloudColor = clamp(v_lightCol * cloud.rgb, 0.0, 1.0) * shdw;
     float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0) * 1.3;
     fragColor = vec4(cloudColor, cloud.a) * opacity;
 

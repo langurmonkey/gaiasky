@@ -117,6 +117,19 @@ uniform sampler2D u_svtIndirectionMetallicTexture;
 uniform float u_shininess;
 #endif
 
+#ifdef eclipsingBodyFlag
+uniform int u_eclipseOutlines;
+uniform float u_eclipsingBodyRadius;
+uniform vec3 u_eclipsingBodyPos;
+
+#include shader/lib_math.glsl
+
+#define UMBRA0 0.04
+#define UMBRA1 0.035
+#define PENUMBRA0 1.7
+#define PENUMBRA1 1.69
+#endif // eclipsingBodyFlag
+
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
 //////////////////////////////////////////////////////
@@ -284,6 +297,7 @@ struct DirectionalLight {
     vec3 color;
     vec3 direction;
 };
+uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif // directionalLightsFlag
 
 // INPUT
@@ -404,6 +418,38 @@ void main() {
     float shdw = 1.0;
     #endif
 
+    // Eclipses
+    #ifdef eclipsingBodyFlag
+    float outline = -1.0;
+    vec4 outlineColor;
+    vec3 f = o_data.fragPosWorld;
+    vec3 m = u_eclipsingBodyPos;
+    vec3 l = -u_dirLights[0].direction;
+    vec3 fl = f + l;
+    float dist = dist_segment_point(f, fl, m);
+    bool orientation = dot(normalVector.xyz, m - f) > -0.05;
+    if (orientation) {
+        if (dist < u_eclipsingBodyRadius * 1.5) {
+            float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
+            shdw *= eclfac;
+            if (dist < u_eclipsingBodyRadius * UMBRA0) {
+                shdw = 0.0;
+            }
+        }
+        #ifdef eclipseOutlines
+        if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
+            // Penumbra.
+            outline = 1.0;
+            outlineColor = vec4(0.0, 1.0, 0.0, 1.0);
+        } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
+            // Umbra.
+            outline = 1.0;
+            outlineColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+        #endif// eclipseOutlines
+    }
+    #endif // eclipsingBodyFlag
+
     // Reflection
     vec3 reflectionColor = vec3(0.0);
     // Reflection mask
@@ -482,6 +528,13 @@ void main() {
         fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor;
         fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
     #endif // atmosphereGround
+
+    #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)
+    if (outline > 0.0) {
+        fragColor = outlineColor;
+    }
+    #endif // eclipsingBodyFlag && eclipseOutlines
+
 
     if (fragColor.a <= 0.0) {
         discard;

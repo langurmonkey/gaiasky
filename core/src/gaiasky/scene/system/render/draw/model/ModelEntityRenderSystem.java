@@ -520,6 +520,7 @@ public class ModelEntityRenderSystem {
             if (shadow) {
                 prepareShadowEnvironment(entity, model, scaffolding);
             }
+            model.model.updateEclipsingBodyUnforms(entity);
             model.model.update(alpha * base.opacity, relativistic);
             batch.render(model.model.instance, model.model.env);
         }
@@ -568,6 +569,7 @@ public class ModelEntityRenderSystem {
         cloud.cloud.mc.updateRelativisticEffects(cam);
         cloud.cloud.mc.updateVelocityBufferUniforms(cam);
         cloud.cloud.mc.setTransparency(alpha * base.opacity);
+        cloud.cloud.mc.updateEclipsingBodyUnforms(entity);
         batch.render(cloud.cloud.mc.instance, model.model.env);
     }
 

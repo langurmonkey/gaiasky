@@ -139,7 +139,20 @@ uniform float u_shininess;
 
 #if defined(heightTextureFlag) || defined(heightCubemapFlag) || defined(svtIndirectionHeightTextureFlag)
 #define heightFlag
-#endif //heightTextureFlag
+#endif// heightTextureFlag
+
+#ifdef eclipsingBodyFlag
+uniform int u_eclipseOutlines;
+uniform float u_eclipsingBodyRadius;
+uniform vec3 u_eclipsingBodyPos;
+
+#include shader/lib_math.glsl
+
+#define UMBRA0 0.04
+#define UMBRA1 0.035
+#define PENUMBRA0 1.7
+#define PENUMBRA1 1.69
+#endif// eclipsingBodyFlag
 
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
@@ -151,7 +164,7 @@ uniform float u_shadowPCFOffset;
 
 float getShadowness(vec2 uv, vec2 offset, float compare){
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
-    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset), bitShifts)); //+(1.0/255.0));
+    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset), bitShifts));//+(1.0/255.0));
 }
 
 
@@ -174,8 +187,8 @@ float getShadow(vec3 shadowMapUv) {
     // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
     vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
     float result = 0.0;
-    for(int x=-2; x<=2; x++) {
-        for(int y=-2; y<=2; y++) {
+    for (int x=-2; x<=2; x++) {
+        for (int y=-2; y<=2; y++) {
             vec2 offset = vec2(float(x), float(y)) / size;
             result += textureShadowLerp(size, shadowMapUv.xy + offset, shadowMapUv.z);
         }
@@ -185,7 +198,7 @@ float getShadow(vec3 shadowMapUv) {
     // Simple lookup
     //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
 }
-#endif // shadowMapFlag
+#endif// shadowMapFlag
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 
@@ -194,7 +207,7 @@ float getShadow(vec3 shadowMapUv) {
 //////////////////////////////////////////////////////
 #ifdef cubemapFlag
 #include shader/lib_cubemap.glsl
-#endif // cubemapFlag
+#endif// cubemapFlag
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 
@@ -203,163 +216,164 @@ float getShadow(vec3 shadowMapUv) {
 //////////////////////////////////////////////////////
 #ifdef svtFlag
 #include shader/lib_svt.glsl
-#endif // svtFlag
+#endif// svtFlag
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-    #define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord) * u_diffuseColor
+#define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord) * u_diffuseColor
 #elif defined(diffuseTextureFlag)
-    #define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord)
+#define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord)
 #elif defined(diffuseColorFlag)
-    #define fetchColorDiffuseTD(texCoord, defaultValue) u_diffuseColor
+#define fetchColorDiffuseTD(texCoord, defaultValue) u_diffuseColor
 #else
-    #define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
-#endif // diffuse
+#define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
+#endif// diffuse
 
 #if defined(svtIndirectionDiffuseTextureFlag)
-    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord))
+#define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord))
 #elif defined(diffuseCubemapFlag)
-    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
+#define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)
-    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(texCoord, defaultValue)
+#define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(texCoord, defaultValue)
 #else
-    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor
-#endif // diffuse
+#define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor
+#endif// diffuse
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
+#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
 #elif defined(emissiveColorFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
-#endif // emissive
+#define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
+#endif// emissive
 
 #if defined(svtIndirectionEmissiveTextureFlag)
-    #define fetchColorEmissive(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionEmissiveTexture, texCoord))
+#define fetchColorEmissive(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionEmissiveTexture, texCoord))
 #elif defined(emissiveCubemapFlag)
-    #define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
+#define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
 #elif defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-    #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
+#define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
 #else
-    #define fetchColorEmissive(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
-#endif // emissive
+#define fetchColorEmissive(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
+#endif// emissive
 
 // COLOR SPECULAR
 #if defined(svtIndirectionSpecularTextureFlag)
-    #define fetchColorSpecular(texCoord, defaultValue) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionSpecularTexture, texCoord))
+#define fetchColorSpecular(texCoord, defaultValue) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionSpecularTexture, texCoord))
 #elif defined(specularCubemapFlag)
-    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularCubemap, UVtoXYZ(texCoord))
+#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularCubemap, UVtoXYZ(texCoord))
 #elif defined(specularTextureFlag) && defined(specularColorFlag)
-    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
+#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
 #elif defined(specularTextureFlag)
-    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
+#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
 #elif defined(specularColorFlag)
-    #define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
+#define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
 #else
-    #define fetchColorSpecular(texCoord, defaultValue) defaultValue
-#endif // specular
+#define fetchColorSpecular(texCoord, defaultValue) defaultValue
+#endif// specular
 
 // COLOR NORMAL
 #if defined(svtIndirectionNormalTextureFlag)
-    #define fetchColorNormal(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionNormalTexture, texCoord))
+#define fetchColorNormal(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionNormalTexture, texCoord))
 #elif defined(normalCubemapFlag)
-    #define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
+#define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
 #elif defined(normalTextureFlag)
-    #define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
-#endif // normal
+#define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
+#endif// normal
 
 // COLOR METALLIC
 #if defined(svtIndirectionMetallicTextureFlag)
-    #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
+#define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
 #elif defined(metallicCubemapFlag)
-    #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
+#define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
 #elif defined(metallicTextureFlag)
-    #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
+#define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
 #elif defined(occlusionMetallicRoughnessTextureFlag) && defined(metallicColorFlag)
-    #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b) * u_metallicColor.rgb
+#define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b) * u_metallicColor.rgb
 #elif defined(occlusionMetallicRoughnessTextureFlag)
-    #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b)
+#define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b)
 #elif defined(metallicColorFlag)
-    #define fetchColorMetallic(texCoord) u_metallicColor
-#endif // metallic
+#define fetchColorMetallic(texCoord) u_metallicColor
+#endif// metallic
 
 // COLOR ROUGHNESS
 #if defined(svtIndirectionRoughnessTextureFlag)
-    #define fetchColorRoughness(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionRoughnessTexture, texCoord)).rgb
+#define fetchColorRoughness(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionRoughnessTexture, texCoord)).rgb
 #elif defined(roughnessCubemapFlag)
-    #define fetchColorRoughness(texCoord) texture(u_roughnessCubemap, UVtoXYZ(texCoord)).rgb
+#define fetchColorRoughness(texCoord) texture(u_roughnessCubemap, UVtoXYZ(texCoord)).rgb
 #elif defined(roughnessTextureFlag)
-    #define fetchColorRoughness(texCoord) texture(u_roughnessTexture, texCoord).rgb
+#define fetchColorRoughness(texCoord) texture(u_roughnessTexture, texCoord).rgb
 #elif defined(occlusionMetallicRoughnessTextureFlag) && defined(roughnessColorFlag)
-    #define fetchColorRoughness(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).g) * u_roughnessColor.rgb
+#define fetchColorRoughness(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).g) * u_roughnessColor.rgb
 #elif defined(occlusionMetallicRoughnessTextureFlag)
-    #define fetchColorRoughness(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).g)
+#define fetchColorRoughness(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).g)
 #elif defined(roughnessColorFlag)
-    #define fetchColorRoughness(texCoord) u_roughnessColor.rgb;
-#endif // roughness
+#define fetchColorRoughness(texCoord) u_roughnessColor.rgb;
+#endif// roughness
 
 // COLOR AMBIENT OCCLUSION
 #if defined(occlusionMetallicRoughnessTextureFlag)
-    #define fetchColorAmbientOcclusion(texCoord) texture(u_occlusionMetallicRoughnessTexture, texCoord).r
+#define fetchColorAmbientOcclusion(texCoord) texture(u_occlusionMetallicRoughnessTexture, texCoord).r
 #elif defined(AOTextureFlag)
-    #define fetchColorAmbientOcclusion(texCoord) texture(u_aoTexture, texCoord).r
+#define fetchColorAmbientOcclusion(texCoord) texture(u_aoTexture, texCoord).r
 #else
-    #define fetchColorAmbientOcclusion(texCoord) 1.0
-#endif // ambient occlusion
+#define fetchColorAmbientOcclusion(texCoord) 1.0
+#endif// ambient occlusion
 
 // HEIGHT
 #if defined(svtIndirectionHeightTextureFlag)
-    #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
+#define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
 #elif defined(heightCubemapFlag)
-    #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
+#define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
 #elif defined(heightTextureFlag)
-    #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
-#endif // height
+#define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
+#endif// height
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
-#endif // numDirectionalLights
+#endif// numDirectionalLights
 
 #ifdef directionalLightsFlag
 struct DirectionalLight {
     vec3 color;
     vec3 direction;
 };
-#endif // directionalLightsFlag
+uniform DirectionalLight u_dirLights[numDirectionalLights];
+#endif// directionalLightsFlag
 
 // INPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-    #ifdef directionalLightsFlag
+#ifdef directionalLightsFlag
     DirectionalLight directionalLights[numDirectionalLights];
-    #endif // directionalLightsFlag
+#endif// directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
     vec4 color;
-    #ifdef shadowMapFlag
+#ifdef shadowMapFlag
     vec3 shadowMapUv;
-    #endif // shadowMapFlag
+#endif// shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef metallicFlag
+#ifdef metallicFlag
     vec3 reflect;
-    #endif // metallicFlag
+#endif// metallicFlag
 };
 in VertexData v_data;
 
 #ifdef atmosphereGround
 in vec4 v_atmosphereColor;
 in float v_fadeFactor;
-#endif // atmosphereGround
+#endif// atmosphereGround
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag
 #include shader/lib_ssr.frag.glsl
-#endif // ssrFlag
+#endif// ssrFlag
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -391,7 +405,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
     vec2  currentTexCoords     = texCoords;
     float currentDepthMapValue = fetchHeight(currentTexCoords).r;
 
-    while(currentLayerDepth < currentDepthMapValue){
+    while (currentLayerDepth < currentDepthMapValue){
         // shift texture coordinates along direction of P
         currentTexCoords -= deltaTexCoords;
         // get depthmap value at current texture coordinates
@@ -413,36 +427,36 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 
     return finalTexCoords;
 }
-#endif // heightFlag
+#endif// heightFlag
 
 #include shader/lib_logdepthbuff.glsl
 
 // http://www.thetenthplanet.de/archives/1180
 mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
     // get edge vectors of the pixel triangle
-    vec3 dp1 = dFdx( p );
-    vec3 dp2 = dFdy( p );
-    vec2 duv1 = dFdx( uv );
-    vec2 duv2 = dFdy( uv );
+    vec3 dp1 = dFdx(p);
+    vec3 dp2 = dFdy(p);
+    vec2 duv1 = dFdx(uv);
+    vec2 duv2 = dFdy(uv);
 
     // solve the linear system
-    vec3 dp2perp = cross( dp2, N );
-    vec3 dp1perp = cross( N, dp1 );
+    vec3 dp2perp = cross(dp2, N);
+    vec3 dp1perp = cross(N, dp1);
     vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
     vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;
 
     // construct a scale-invariant frame
-    float invmax = inversesqrt( max( dot(T,T), dot(B,B) ) );
-    return mat3( T * invmax, B * invmax, N );
+    float invmax = inversesqrt(max(dot(T, T), dot(B, B)));
+    return mat3(T * invmax, B * invmax, N);
 }
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
-#endif // velocityBufferFlag
+#endif// velocityBufferFlag
 
 #ifdef ssrFlag
 #include shader/lib_pack.glsl
-#endif // ssrFlag
+#endif// ssrFlag
 
 // MAIN
 void main() {
@@ -451,28 +465,28 @@ void main() {
     vec3 viewDir;
     // TBN and viewDir do not depend on light
     #ifdef heightFlag
-        // Compute tangent space
-        pullNormal();
-        mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-        viewDir = normalize(v_data.viewDir * TBN);
-        // Parallax occlusion mapping
-        texCoords = parallaxMapping(texCoords, viewDir);
-    #else // heightFlag
-        viewDir = v_data.viewDir;
-    #endif // heightFlag
+    // Compute tangent space
+    pullNormal();
+    mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
+    viewDir = normalize(v_data.viewDir * TBN);
+    // Parallax occlusion mapping
+    texCoords = parallaxMapping(texCoords, viewDir);
+    #else// heightFlag
+    viewDir = v_data.viewDir;
+    #endif// heightFlag
 
     #ifdef directionalLightsFlag
     vec3 lightDir[numDirectionalLights], lightCol[numDirectionalLights];
-    for(int i = 0; i < numDirectionalLights; i++) {
+    for (int i = 0; i < numDirectionalLights; i++) {
         #ifdef heightFlag
         lightDir[i] = normalize(v_data.directionalLights[i].direction * TBN);
         lightCol[i] = v_data.directionalLights[i].color;
-        #else // heightFlag
+        #else// heightFlag
         lightDir[i] = v_data.directionalLights[i].direction;
         lightCol[i] = v_data.directionalLights[i].color;
-        #endif // heightFlag
+        #endif// heightFlag
     }
-    #endif // directionalLightsFlag
+    #endif// directionalLightsFlag
 
     vec4 diffuse = fetchColorDiffuse(v_data.color, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
     vec4 emissive = fetchColorEmissive(texCoords);
@@ -499,63 +513,95 @@ void main() {
 
     vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
     #if defined(normalTextureFlag) || defined(normalCubemapFlag)
-        // Normal in tangent space
-        vec3 N = normalize(vec3(fetchColorNormal(texCoords) * 2.0 - 1.0));
-		#ifdef metallicFlag
-            // Perturb the normal to get reflect direction
-            pullNormal();
-            #ifndef heightFlag
-            mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-            #endif // heighFlag
-            normalVector.xyz = TBN * N;
-            vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
-		#endif // metallicFlag
+    // Normal in tangent space
+    vec3 N = normalize(vec3(fetchColorNormal(texCoords) * 2.0 - 1.0));
+    #ifdef metallicFlag
+    // Perturb the normal to get reflect direction
+    pullNormal();
+    #ifndef heightFlag
+    mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
+    #endif// heighFlag
+    normalVector.xyz = TBN * N;
+    vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
+    #endif// metallicFlag
     #else
-	    // Normal in tangent space
-	    vec3 N = vec3(0.0, 0.0, 1.0);
-        normalVector.xyz = v_data.normal;
-		#ifdef metallicFlag
-			vec3 reflectDir = normalize(v_data.reflect);
-        #endif // metallicFlag
-    #endif // normalTextureFlag
+    // Normal in tangent space
+    vec3 N = vec3(0.0, 0.0, 1.0);
+    normalVector.xyz = v_data.normal;
+    #ifdef metallicFlag
+    vec3 reflectDir = normalize(v_data.reflect);
+    #endif// metallicFlag
+    #endif// normalTextureFlag
 
     // Shadow
     #ifdef shadowMapFlag
     float shdw = clamp(getShadow(v_data.shadowMapUv), 0.0, 1.0);
     #else
     float shdw = 1.0;
-    #endif
+    #endif// shadowMapFlag
+
+    // Eclipses
+    #ifdef eclipsingBodyFlag
+    float outline = -1.0;
+    vec4 outlineColor;
+    vec3 f = v_data.fragPosWorld;
+    vec3 m = u_eclipsingBodyPos;
+    vec3 l = -u_dirLights[0].direction;
+    vec3 fl = f + l;
+    float dist = dist_segment_point(f, fl, m);
+    bool orientation = dot(normalVector.xyz, m - f) > -0.05;
+    if (orientation) {
+        if (dist < u_eclipsingBodyRadius * 1.5) {
+            float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
+            shdw *= eclfac;
+            if (dist < u_eclipsingBodyRadius * UMBRA0) {
+                shdw = 0.0;
+            }
+        }
+        #ifdef eclipseOutlines
+        if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
+            // Penumbra.
+            outline = 1.0;
+            outlineColor = vec4(0.0, 1.0, 0.0, 1.0);
+        } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
+            // Umbra.
+            outline = 1.0;
+            outlineColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+        #endif// eclipseOutlines
+    }
+    #endif// eclipsingBodyFlag
 
     // Reflection
     vec3 reflectionColor = vec3(0.0);
     // Reflection mask
     #ifdef ssrFlag
-        reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
-    #endif // ssrFlag
+    reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
+    #endif// ssrFlag
 
     #ifdef metallicFlag
-        float roughness = 0.0;
-        #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
-            vec3 roughness3 = fetchColorRoughness(texCoords);
-            roughness = roughness3.r;
-        #elif defined(shininessFlag)
-            roughness = 1.0 - u_shininess;
-        #endif // roughness, shininessFlag
+    float roughness = 0.0;
+    #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
+    vec3 roughness3 = fetchColorRoughness(texCoords);
+    roughness = roughness3.r;
+    #elif defined(shininessFlag)
+    roughness = 1.0 - u_shininess;
+    #endif// roughness, shininessFlag
 
-        #ifdef reflectionCubemapFlag
-            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
-        #endif // reflectionCubemapFlag
+    #ifdef reflectionCubemapFlag
+    reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
+    #endif// reflectionCubemapFlag
 
-        vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
-        reflectionColor = reflectionColor * metallicColor;
-        #ifdef ssrFlag
-            vec3 rmc = diffuse.rgb * metallicColor;
-            reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
-            reflectionColor *= 0.0;
-        #else
-            reflectionColor += reflectionColor * diffuse.rgb;
-        #endif // ssrFlag
-    #endif // metallicFlag
+    vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
+    reflectionColor = reflectionColor * metallicColor;
+    #ifdef ssrFlag
+    vec3 rmc = diffuse.rgb * metallicColor;
+    reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
+    reflectionColor *= 0.0;
+    #else
+    reflectionColor += reflectionColor * diffuse.rgb;
+    #endif// ssrFlag
+    #endif// metallicFlag
 
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);
@@ -597,7 +643,7 @@ void main() {
     }
     #else
     diffuseColor = saturate(diffuse.rgb * ambient);
-    #endif // directionalLightsFlag
+    #endif// directionalLightsFlag
 
     // Final color equation
     fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_data.opacity);
@@ -605,21 +651,27 @@ void main() {
 
     #ifdef atmosphereGround
     #define exposure 4.0
-        fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
-    #endif // atmosphereGround
+    fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
+    #endif// atmosphereGround
+
+    #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)
+    if (outline > 0.0) {
+        fragColor = outlineColor;
+    }
+    #endif// eclipsingBodyFlag && eclipseOutlines
 
     if (fragColor.a <= 0.0) {
         discard;
     }
 
     #ifdef ssrFlag
-        normalBuffer = vec4(normalVector.xyz, 1.0);
-    #endif // ssrFlag
+    normalBuffer = vec4(normalVector.xyz, 1.0);
+    #endif// ssrFlag
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
     #ifdef velocityBufferFlag
     velocityBuffer();
-    #endif // velocityBufferFlag
+    #endif// velocityBufferFlag
 }

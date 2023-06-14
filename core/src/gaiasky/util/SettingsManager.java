@@ -18,6 +18,7 @@ import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.SceneSettings.ParticleSettings;
+import gaiasky.util.Settings.SceneSettings.RendererSettings.EclipseSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.VirtualTextureSettings;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsDouble;
@@ -213,6 +214,13 @@ public class SettingsManager {
         // Default distance units
         if (settings.program.ui.distanceUnits == null) {
             settings.program.ui.distanceUnits = DistanceUnits.PC;
+        }
+
+        // Eclipses
+        if (settings.scene.renderer.eclipses == null) {
+            settings.scene.renderer.eclipses = new EclipseSettings();
+            settings.scene.renderer.eclipses.active = true;
+            settings.scene.renderer.eclipses.outlines = false;
         }
 
         // Back buffer resolution
