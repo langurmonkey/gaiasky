@@ -25,7 +25,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     // Holds all instances
     protected static final List<AbstractOrbitCoordinates> instances = new ArrayList<>();
 
-    protected String orbitname;
+    protected String orbitName;
     protected Vector3d center;
     protected Entity entity;
     protected double scaling = 1d;
@@ -58,11 +58,11 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     @Override
     public void doneLoading(Object... params) {
         if (params.length == 0) {
-            logger.error(new RuntimeException("No parameters found, can't initialize coordinates from orbit: " + orbitname));
+            logger.error(new RuntimeException("No parameters found, can't initialize coordinates from orbit: " + orbitName));
         } else {
-            if (orbitname != null && !orbitname.isEmpty()) {
+            if (orbitName != null && !orbitName.isEmpty()) {
                 if (params[0] instanceof Scene) {
-                    entity = ((Scene) params[0]).index().getEntity(orbitname);
+                    entity = ((Scene) params[0]).index().getEntity(orbitName);
                 }
                 if (params[1] instanceof Entity) {
                     var trajectory = Mapper.trajectory.get(entity);
@@ -74,11 +74,11 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     }
 
     public String getOrbitName() {
-        return orbitname;
+        return orbitName;
     }
 
     public void setOrbitName(String orbitName) {
-        this.orbitname = orbitName;
+        this.orbitName = orbitName;
     }
 
     public void setOrbitname(String orbitName) {
@@ -91,7 +91,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
 
     @Override
     public String toString() {
-        return "{" + "name='" + orbitname + '\'' + ", orbit=" + entity + ", scaling=" + scaling + '}';
+        return "{" + "name='" + orbitName + '\'' + ", orbit=" + entity + ", scaling=" + scaling + '}';
     }
 
     public void setCentre(double[] center) {

@@ -7,6 +7,7 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -16,11 +17,10 @@ import java.time.Instant;
 
 public class MoonAACoordinates extends AbstractOrbitCoordinates {
 
-    private Vector3d aux;
+    private final Vector3d aux = new Vector3d();
 
     public MoonAACoordinates() {
         super();
-        aux = new Vector3d();
     }
 
     @Override
