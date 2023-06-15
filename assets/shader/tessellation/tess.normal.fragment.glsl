@@ -427,8 +427,8 @@ void main() {
     vec3 l = -u_dirLights[0].direction;
     vec3 fl = f + l;
     float dist = dist_segment_point(f, fl, m);
-    bool orientation = dot(normalVector.xyz, m - f) > -0.05;
-    if (orientation) {
+    float dot_NM = dot(normalVector.xyz, m - f);
+    if (dot_NM > -0.05) {
         if (dist < u_eclipsingBodyRadius * 1.5) {
             float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
             shdw *= eclfac;
@@ -437,14 +437,16 @@ void main() {
             }
         }
         #ifdef eclipseOutlines
-        if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
-            // Penumbra.
-            outline = 1.0;
-            outlineColor = vec4(0.0, 1.0, 0.0, 1.0);
-        } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
-            // Umbra.
-            outline = 1.0;
-            outlineColor = vec4(1.0, 0.0, 0.0, 1.0);
+        if(dot_NM > 0.0) {
+            if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
+                // Penumbra.
+                outline = 1.0;
+                outlineColor = vec4(0.0, 1.0, 0.0, 1.0);
+            } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
+                // Umbra.
+                outline = 1.0;
+                outlineColor = vec4(1.0, 0.0, 0.0, 1.0);
+            }
         }
         #endif// eclipseOutlines
     }
