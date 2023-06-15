@@ -1,7 +1,7 @@
-##
-## Script that showcases a flight to the Hyades, proper motions and
-## a zoom out of the galaxy
-##
+# Script that showcases a flight to the Hyades, proper motions and
+# a zoom out of the galaxy.
+#
+# Created by Stefan Jordan
 
 from py4j.clientserver import ClientServer, JavaParameters
 

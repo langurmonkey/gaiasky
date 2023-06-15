@@ -1,5 +1,6 @@
-# This script showcases lines and parked runnables
-
+# This script showcases the epicycles resulting from the relative 
+# motions between the Earth and Mars.
+#
 # Created by Toni Sagrista
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters

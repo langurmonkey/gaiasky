@@ -1,7 +1,7 @@
 # In this script, we demonstrate how to implement body coordinates from a 
 # Python script and how to submit the implementation to Gaia Sky.
-
-# Created by Toni Sagrista
+#
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 from py4j.java_collections import ListConverter

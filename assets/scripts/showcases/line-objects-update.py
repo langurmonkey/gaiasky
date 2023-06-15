@@ -1,4 +1,4 @@
-# This script showcases lines and parked runnables
+# This script showcases lines and parked runnables.
 #
 # The script creates a line object between the positions of the Earth and the Moon. Then,
 # it parks a runnable which updates the line every frame with the new positions of the
@@ -6,8 +6,8 @@
 # Every few seconds, we add a new line (in green) with the current state, so that we can
 # track the past states of the line.
 # Finally, time is started to showcase the line movement.
-
-# Created by Toni Sagrista
+#
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time

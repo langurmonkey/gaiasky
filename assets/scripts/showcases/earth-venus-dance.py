@@ -1,9 +1,10 @@
-# This script showcases lines and parked runnables
+# This script showcases lines and parked runnables by adding lines
+# between Earth and Venus at constant timings.
 #
 # The script creates a polyline and updates it with a new segment
 # between the current positions of Earth and Venus every 0.2 seconds.
 #
-# Created by Toni Sagrista
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time

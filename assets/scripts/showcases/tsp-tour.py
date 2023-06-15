@@ -1,12 +1,12 @@
-# This script showcases the creation and animation of a random path between stars
+# This script showcases the creation and animation of a random path between stars.
 #
 # This script animates a TSP path visiting all stars of a given .tsp
 # file containing the id and the equatorial cartesian position
 # (see http://www.math.uwaterloo.ca/tsp/stardata/). 
-# The script does not load the stars and needs the *.tsp file to work, which
+# The script does not load the stars and needs the *.tsp file to work. These files
 # are not provided in this repository.
 #
-# Created by Toni Sagrista
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time

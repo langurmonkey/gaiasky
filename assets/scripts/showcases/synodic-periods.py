@@ -1,5 +1,6 @@
 # This script demonstrates relative orbital motions with respect to the Earth-Sun system. 
-# Created by Svetlin Tassev
+#
+# Created by Svetlin Tassev.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time

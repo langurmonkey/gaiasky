@@ -1,5 +1,6 @@
-# Scales up the Earth and Gaia and shows their movement around the Sun
-# Created by Toni Sagrista
+# Scales up the Earth and Gaia and shows their movement around the Sun.
+#
+# Created by Toni Sagrista.
 
 import time
 from py4j.clientserver import ClientServer, JavaParameters

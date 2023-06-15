@@ -1,4 +1,8 @@
-# Tour through the asteroids
+# Tour through the asteroids. At least one of the asteroids (DR2, DR3, etc.) 
+# datasets needs to be loaded beforehand.
+#
+# Created by Toni Sagrista.
+
 from py4j.clientserver import ClientServer, JavaParameters
 
 gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))

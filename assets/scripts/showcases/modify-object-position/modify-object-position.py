@@ -1,7 +1,7 @@
 # In this script, we add a shape object loaded via an external JSON catalog,
 # and then proceed to modify its position in a runnable to follow the Earth.
-
-# Created by Toni Sagrista
+#
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import os

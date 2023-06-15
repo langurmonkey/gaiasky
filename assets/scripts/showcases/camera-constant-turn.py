@@ -1,6 +1,6 @@
-# This Gaia Sky script showcases a constant camera turn
-
-# Created by Toni Sagrista
+# This Gaia Sky script showcases a constant camera turn using a parked runnable.
+#
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time

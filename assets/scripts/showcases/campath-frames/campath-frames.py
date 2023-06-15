@@ -1,6 +1,7 @@
-# This script showcases the combination of camera paths with scripting by counting frames
-
-# Created by Toni Sagrista
+# This script showcases the combination of camera paths with 
+# scripting by counting frames.
+#
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time, os, sys

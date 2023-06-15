@@ -1,5 +1,12 @@
-# This script demonstrates relative orbital motions of an object on a horseshoe orbit near Jupiter with respect to the Jupiter-Sun system. The orbit is integrated using the Kick-Drift-Kick method. It is traced in several different frames of reference: one tied with Jupiter's orbit; and in the another, in which the object orbit is traced onto the plane of the orbit of the object itself.  In this version of the script, the camera faces along the velocity vector of the object.
-# Created by Svetlin Tassev
+# This script demonstrates relative orbital motions of an object on a 
+# horseshoe orbit near Jupiter with respect to the Jupiter-Sun system. 
+# The orbit is integrated using the Kick-Drift-Kick method. It is traced
+# in several different frames of reference: one tied with Jupiter's orbit;
+# and in the another, in which the object orbit is traced onto the plane
+# of the orbit of the object itself.  In this version of the script, 
+# the camera faces along the velocity vector of the object.
+#
+# Created by Svetlin Tassev.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time

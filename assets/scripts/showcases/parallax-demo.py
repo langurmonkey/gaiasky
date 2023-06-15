@@ -1,4 +1,5 @@
-# Script to demonstrate how parallaxes work.
+# This script demonstrates how parallaxes work.
+#
 # Created by Stefan Jordan.
 
 import os, time

@@ -1,9 +1,12 @@
-# This script demonstrates the libration of the Moon as viewed from just above the Earth's surface. 
-# Created by Svetlin Tassev
+# This script demonstrates the libration of the Moon as viewed from just 
+# above the Earth's surface. 
+# Created by Svetlin Tassev.
 
 # Note:
-# In order for the script to run well, wait for it to finish setting up the camera mode to free.
-# Also, you may want to hide the gaia star data, as that slows down gaiasky quite a bit and makes the simulation choppy.
+# In order for the script to run well, wait for it to finish setting 
+# up the camera mode to free.
+# Also, you may want to hide the gaia star data, as that slows down 
+# gaiasky quite a bit and makes the simulation choppy.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time

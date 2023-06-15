@@ -1,6 +1,6 @@
-# This script adds lines all over the sky following a galactic grid
+# This script adds lines all over the sky following a galactic grid.
 #
-# Created by Toni Sagrista
+# Created by Toni Sagrista.
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time
