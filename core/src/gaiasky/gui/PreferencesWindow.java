@@ -804,7 +804,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentGraphicsTable.add(titleDisplay).left().padBottom(pad18).row();
         contentGraphicsTable.add(imageLevels).left().padBottom(pad34).row();
 
-        if (!settings.runtime.openXr) {
+        if (!vr) {
             // VIRTUAL TEXTURES
             Label titleSVT = new OwnLabel(I18n.msg("gui.svt"), skin, "header");
             Table svtTable = new Table();

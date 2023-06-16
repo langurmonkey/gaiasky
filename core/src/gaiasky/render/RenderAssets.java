@@ -107,7 +107,7 @@ public class RenderAssets {
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
         // Initialize point cloud shaders - depends on point cloud mode
         final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
-        final String pointTriSuffixParticles = !Settings.settings.runtime.openXr && Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
+        final String pointTriSuffixParticles = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
         particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffixParticles + ".vertex.glsl",
                                        "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesColMap),
                                        definesColMap);

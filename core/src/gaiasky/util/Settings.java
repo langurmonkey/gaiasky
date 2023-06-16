@@ -314,9 +314,10 @@ public class Settings {
         HIGH("gui.gquality.high", "-high", 4096, 2048),
         ULTRA("gui.gquality.ultra", "-ultra", 8192, 4096);
 
-        public String key;
-        public String suffix;
-        public int texWidthTarget, texHeightTarget;
+        public final String key;
+        public final String suffix;
+        public final int texWidthTarget;
+        public final int texHeightTarget;
 
         GraphicsQuality(String key, String suffix, int texWidthTarget, int texHeightTarget) {
             this.key = key;
@@ -382,7 +383,7 @@ public class Settings {
         NFAA(-2),
         SSAA(1);
 
-        int aaCode;
+        final int aaCode;
 
         AntialiasSettings(int aacode) {
             this.aaCode = aacode;

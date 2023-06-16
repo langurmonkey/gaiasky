@@ -49,8 +49,8 @@ flat out int v_layer;
 #endif // velocityBufferFlag
 
 void main() {
-    vec3 pos = a_particlePos - u_camPos;
-    float dist = length(pos);
+    vec3 pos = (a_particlePos - u_camPos) / u_vrScale;
+    float dist = length(pos * 1e-8) * 1e8;
 
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
@@ -68,7 +68,7 @@ void main() {
     v_layer = int(a_additional.z);
     v_uv = a_texCoord;
 
-    float quadSize = min(a_additional.x * u_sizeFactor * u_vrScale, u_maxPointSize * dist);
+    float quadSize = min(a_additional.x * u_sizeFactor, u_maxPointSize * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
@@ -77,7 +77,7 @@ void main() {
     float s_size = quadSize;
     #include shader/snip_billboard.glsl
 
-    gl_Position = gpos;
+    gl_Position = gpos * u_vrScale;
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
