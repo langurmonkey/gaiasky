@@ -25,8 +25,8 @@ gs.setObjectSizeScaling("Earth", 3000.0)
 
 gs.setStarBrightness(0.0)
 gs.setStarMinOpacity(0.0)
-gs.setStarSize(0.0)
-gs.setAmbientLight(0.45)
+gs.setStarSize(10)
+gs.setAmbientLight(0.8)
 
 gs.setCameraFocus("Earth")
 gs.setCameraOrientationLock(True)
@@ -38,6 +38,7 @@ gs.setVisibility("element.milkyway", False)
 gs.setVisibility("element.moons", False)
 gs.setVisibility("element.nebulae", False)
 gs.setVisibility("element.others", False)
+gs.setVisibility("element.orbits", False)
 
 gs.setObjectVisibility("Mercury", False)
 gs.setObjectVisibility("Venus", False)
@@ -71,5 +72,37 @@ gs.setSimulationPace(16384)
 gs.sleep(2)
 gs.startSimulationTime()
 
-gs.sleep(2)
+gs.sleep(30)
+
+
+
+gs.setObjectSizeScaling("Sun", 1.0)
+gs.setObjectSizeScaling("Earth", 1.0)
+
+gs.setVisibility("element.equatorial", False)
+gs.setVisibility("element.asteroids", False)
+gs.setVisibility("element.milkyway", True)
+gs.setVisibility("element.moons", True)
+gs.setVisibility("element.nebulae", False)
+gs.setVisibility("element.others", False)
+
+gs.setObjectVisibility("Mercury", True)
+gs.setObjectVisibility("Venus", True)
+gs.setObjectVisibility("Mars", True)
+gs.setObjectVisibility("Jupiter", True)
+gs.setObjectVisibility("Saturn",  True)
+gs.setObjectVisibility("Uranus",  True)
+gs.setObjectVisibility("Neptune", True)
+gs.setObjectVisibility("Pluto",   True)
+gs.setStarBrightness(25.0)
+gs.setStarMinOpacity(0.0)
+gs.setStarSize(12)
+gs.setAmbientLight(0.)
+
+gs.setFov(60)
+
+gs.stopSimulationTime()
+gs.setOrthosphereViewMode(False)
+gs.forceUpdateScene();
+
 gateway.shutdown()

@@ -59,6 +59,12 @@ gs.sleep(1.)
 #gs.setCameraFocus("Earth")
 #gs.landAtObjectLocation("Earth",lon,lat)
 #gs.setCameraCenterFocus(False)
+gs.setFov(60)
+
+gs.stopSimulationTime()
+gs.setOrthosphereViewMode(False)
+gs.forceUpdateScene();
+
 
 gs.sleep(2)
 gateway.shutdown()

@@ -1,19 +1,9 @@
-# This script demonstrates relative orbital motion of the Moon with respect to the Earth-Sun system. 
+# This script demonstrates the motions of Near Earth Asteroid relative to the Earth-Moon system.
 # Created by Svetlin Tassev
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time
 import numpy as np
-
-
-def current_time_ms():
-    return int(round(time.time() * 1000))
-
-au_to_km = 149597900.0
-u_to_km = 1000000.0
-
-def to_internal(xyz):
-    return [xyz[0] * u_to_km, xyz[1] * u_to_km, xyz[2] * u_to_km]
 
 class CameraUpdaterRunnable():
 
@@ -127,23 +117,23 @@ class CameraUpdaterRunnable():
             Am=np.array([Ap[0],Ap[1],Ap[2]])
             campos+= Am
             campos*=1.e6 #convert to camera position units
+            if not(np.isnan(campos.dot(campos))):
+                gs.setCameraPosition(campos, True)
             
-            gs.setCameraPosition(campos, True)
-            
-            #set cam dir
-            gs.setCameraDirection(self.dir_tied[0]*r1+self.dir_tied[1]*r2+self.dir_tied[2]*r3, True)
-            
-            #set cam up
-            rdir = gs.getCameraDirection()
-            rdir = np.array([rdir[0],rdir[1],rdir[2]])
-            rdir/=np.sqrt(rdir.dot(rdir))#normalize camera direction vector
-            ra=(r1+r2+r3)
-            ra/=np.sqrt(ra.dot(ra))
-            u1=np.cross(ra,rdir)
-            u1 /= np.sqrt(u1.dot(u1))
-            u2 = np.cross(u1,rdir)
-            u2 /= np.sqrt(u2.dot(u2))
-            gs.setCameraUp(self.u_tied[0]*u1+self.u_tied[1]*u2, True)
+                #set cam dir
+                gs.setCameraDirection(self.dir_tied[0]*r1+self.dir_tied[1]*r2+self.dir_tied[2]*r3, True)
+                
+                #set cam up
+                rdir = gs.getCameraDirection()
+                rdir = np.array([rdir[0],rdir[1],rdir[2]])
+                rdir/=np.sqrt(rdir.dot(rdir))#normalize camera direction vector
+                ra=(r1+r2+r3)
+                ra/=np.sqrt(ra.dot(ra))
+                u1=np.cross(ra,rdir)
+                u1 /= np.sqrt(u1.dot(u1))
+                u2 = np.cross(u1,rdir)
+                u2 /= np.sqrt(u2.dot(u2))
+                gs.setCameraUp(self.u_tied[0]*u1+self.u_tied[1]*u2, True)
             
     def toString():
         return "camera-update-runnable"
@@ -157,50 +147,60 @@ gs = gateway.entry_point
 
 gs.cameraStop()
 
+
 gs.stopSimulationTime()
+gs.setSimulationPace(1.2e6)
+
+
 gs.setVisibility("element.orbits", True)
 gs.setVisibility("element.others", True)
+gs.setVisibility("element.asteroids", True)
 
-gs.setCameraOrientationLock(False)
-gs.setCameraLock(True)
-
-gs.setFov(45)
+#gs.setCameraOrientationLock(False)
+#gs.setCameraLock(True)
+gs.hideDataset("Asteroids DR3")
+gs.hideDataset("Trojan asteroids (Gaia DR3, coloured)")
+gs.hideDataset("Gaia DR3 large")
+gs.setFov(90)
 #gs.setCameraFocus("Earth")
 #gs.sleep(0.5)
 gs.setCameraFree()
+#gs.setSimulationTime(2022,10, 2, 0, 0, 0, 0)
+gs.setSimulationTime(2022,9, 30, 8, 30, 0, 0)
+gs.sleep(4)
+p=np.array(gs.getObjectPosition("Earth"))
+gs.sleep(4)
 gs.setSimulationTime(2022,9, 30, 0, 0, 0, 0)
-gs.setSimulationPace(1.5e6)
+gs.sleep(1)
+p0=np.array(gs.getObjectPosition("Earth"))
+v=np.cross(p0,p)
+v/=np.sqrt(v.dot(v))
+p*=(150.+3./10.)/150.
+p+=v*np.sqrt(p.dot(p))*3./150./10.
 
+gs.setCameraPosition(p*1.e6,True)
 
-gs.setObjectSizeScaling("Sun", 15.0)
-gs.setObjectSizeScaling("Earth", 1500.0)
-gs.setObjectSizeScaling("Moon", 1500.0)
-gs.setOrbitCoordinatesScaling("MoonAACoordinates", 100.0)
+dp=p0-p
+dp/=np.sqrt(dp.dot(dp))
+p/=-np.sqrt(p.dot(p))
+gs.setCameraDirection(dp*2.+p,True)
+gs.setCameraUp(v,True)
 
-gs.setStarBrightness(0.0)
-gs.setStarMinOpacity(0.0)
-gs.setStarSize(0.0)
-gs.setAmbientLight(0.0)
+s=10.
 
-gs.setVisibility("element.asteroids", False)
-gs.setVisibility("element.milkyway", False)
-#gs.setVisibility("element.moons", False)
-gs.setVisibility("element.nebulae", False)
-gs.setVisibility("element.others", False)
-
-gs.setObjectVisibility("Mercury", False)
-gs.setObjectVisibility("Venus", False)
-gs.setObjectVisibility("Mars", False)
-gs.setObjectVisibility("Jupiter", False)
-gs.setObjectVisibility("Saturn", False)
-gs.setObjectVisibility("Uranus", False)
-gs.setObjectVisibility("Neptune", False)
-gs.setObjectVisibility("Pluto", False)
-
-#gs.setObjectVisibility("Earth", True)
-#gs.setCameraPosition(pos)
-coordxyz = gs.equatorialToInternalCartesian(0.01, 0.01, 4.0 * au_to_km)
-gs.setCameraPosition(to_internal(coordxyz))
+gs.setObjectSizeScaling("Mercury", s)
+gs.setObjectSizeScaling("Venus", s)
+gs.setObjectSizeScaling("Mars", s)
+gs.setObjectSizeScaling("Earth", s)
+gs.setObjectSizeScaling("Jupiter", s/4.)
+gs.setObjectSizeScaling("Saturn",s/4.)
+gs.setObjectSizeScaling("Uranus", s/4.)
+gs.setObjectSizeScaling("Neptune", s/4.)
+gs.setObjectSizeScaling("Pluto", s)
+gs.setObjectSizeScaling("Moon", s)
+#gs.setOrbitCoordinatesScaling("EarthVSOP87", 1.0/100000)
+gs.setObjectSizeScaling("Sun", 1.0)
+gs.setOrbitCoordinatesScaling("MoonAACoordinates", 1.0)
 
 gs.refreshAllOrbits();
 gs.refreshObjectOrbit("Moon");
@@ -213,15 +213,12 @@ gs.sleep(1.0)
 cameraUpdater = CameraUpdaterRunnable()
 gs.parkCameraRunnable("camera-updater", cameraUpdater)
 
-
-#gs.startSimulationTime()
-
-#gs.sleep(10)
-#gs.setVisibility("element.orbits", False)
-gs.sleep(60)
-
+gs.sleep(2)
+gs.startSimulationTime()
+gs.sleep(30)
 gs.stopSimulationTime()
 
+gs.setVisibility("element.asteroids", False)
 
 gs.setObjectSizeScaling("Mercury", 1.0)
 gs.setObjectSizeScaling("Venus", 1.0)
@@ -243,13 +240,12 @@ gs.forceUpdateScene();
 
 # clean up and finish
 gs.cameraStop()
-gs.sleep(0.5)
-gs.unparkRunnable("camera-updater")
-
 # Finish flushing
+
+gs.sleep(1.0)
+gs.unparkRunnable("camera-updater")
+gs.sleep(1.0)
 gs.sleepFrames(4)
-
-
 
 gs.maximizeInterfaceWindow()
 gs.enableInput()

@@ -87,12 +87,24 @@ gs.sleep(3)
 
 gs.refreshAllOrbits();
 gs.forceUpdateScene();
-
+gs.setFov(100)
 # Orbits and labels off
 gs.setVisibility("element.orbits", False)
 gs.setVisibility("element.labels", False)
 
+
+gs.setSimulationPace(6e6)
+gs.sleep(2)
+gs.startSimulationTime()
+gs.sleep(30)
+gs.stopSimulationTime()
+
+
+gs.setOrbitCoordinatesScaling("EarthVSOP87", 1.0)
 # Restore
+
+gs.refreshAllOrbits();
+gs.forceUpdateScene();
 gs.maximizeInterfaceWindow()
 
 gateway.shutdown()
