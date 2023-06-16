@@ -49,7 +49,7 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
 
     /**
      * Returns a vector with the ephemeris
-     * at the given <code>{@link SdtTcb}</code>. The position is given in internal units.
+     * at the given date. The position is given in internal units.
      *
      * @param date The date as a Java {@link Instant}.
      * @param out  The vector to return the result.
