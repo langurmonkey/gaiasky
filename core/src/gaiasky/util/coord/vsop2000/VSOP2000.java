@@ -8,11 +8,13 @@
 package gaiasky.util.coord.vsop2000;
 
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.vsop2000.VSOP2000Reader.VSOP2000Coordinate;
 import gaiasky.util.math.Vector3b;
+import net.jafama.FastMath;
 
 import java.nio.file.Path;
 import java.time.Instant;
@@ -24,7 +26,8 @@ import java.time.Instant;
 public class VSOP2000 extends AbstractOrbitCoordinates {
 
     /**
-     * Mean longitudes and motions of contributing bodies.
+     * Mean motions [][0] and mean J2000 longitudes [][1] of contributing bodies, in radians.
+     * Thes are also frequencies and phases respectively.
      */
     private final double[][] meanMotionsLongitudes = {
             { 26.0879031405997, 4.40260863422 }, // MERCURY
@@ -46,6 +49,11 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
             { 13.6194950400000, 2.03486053350 } // PALLAS
     };
 
+    private double lastT = Double.NaN;
+    /**
+     * Array used to store theta(t) for each body.
+     */
+    private final double[] theta = new double[16];
     /**
      * Location of the data file for this VSOP2000 instance.
      */
@@ -95,7 +103,7 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
      * body, in internal units (see {@link Constants#U_TO_M}).
      *
      * @param date The date as a Java {@link Instant}.
-     * @param out  The vector to put the result.
+     * @param out  The vector to return the result.
      */
     public void position(Instant date,
                          Vector3b out) {
@@ -104,26 +112,33 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
             return;
         }
 
+        // Maximum number of terms to use. Depends on high accuracy setting.
+        final int maxTerms = Settings.settings.data.highAccuracy ? 2000 : 500;
+
         double t = time(AstroUtils.getJulianDateCache(date));
 
         VSOP2000Coordinate[] d = data;
 
-        double[] theta = new double[16];
-        for (int j = 0; j < 16; j++) {
-            theta[j] = meanMotionsLongitudes[j][0] * t + meanMotionsLongitudes[j][1];
+        // Maybe we can skip this if we have done it already.
+        if (lastT != t) {
+            for (int j = 0; j < 16; j++) {
+                theta[j] = meanMotionsLongitudes[j][0] * t + meanMotionsLongitudes[j][1];
+            }
+            lastT = t;
         }
 
         double[] coordinates = new double[3];
         // X, Y, Z
         for (int coord = 0; coord < 3; coord++) {
-            double val = 0;
-
             // Bodies.
             double sum_k = 0;
             for (int k = 0; k < 16; k++) {
                 VSOP2000Coordinate c = d[coord];
-                int n_k = c.numTerms[k];
                 // Number of terms.
+                int n_k = Math.min(c.numTerms[k], maxTerms);
+                if (n_k == 0) {
+                    break;
+                }
                 double sum_i = 0;
                 for (int i = 0; i < n_k; i++) {
                     double phi_ki = 0;
@@ -131,15 +146,15 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
                         phi_ki += c.terms[k][i][j] * theta[j];
                     }
 
-                    var s_ki = c.terms[k][i][17];
-                    var c_ki = c.terms[k][i][18];
+                    // s_ki = c.terms[k][i][17];
+                    // c_ki = c.terms[k][i][18];
 
                     // Sum over i.
-                    sum_i += s_ki * Math.sin(phi_ki) + c_ki * Math.cos(phi_ki);
+                    sum_i += c.terms[k][i][17] * FastMath.sin(phi_ki) + c.terms[k][i][18] * FastMath.cos(phi_ki);
                 }
 
                 // Sum over k.
-                sum_k += Math.pow(t, k) * sum_i;
+                sum_k += FastMath.pow(t, k) * sum_i;
             }
             coordinates[coord] = sum_k * Constants.AU_TO_U;
         }

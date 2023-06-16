@@ -15,6 +15,8 @@ import java.util.Scanner;
 
 /**
  * Reads VSOP2000 data files.
+ * The FTP with the VSOP2000 data is at
+ * <a href="ftp://syrte.obspm.fr/francou/vsop2000/">ftp://syrte.obspm.fr/francou/vsop2000/</a>.
  */
 public class VSOP2000Reader {
 
@@ -64,7 +66,7 @@ public class VSOP2000Reader {
 
             // Read records.
             for (int r = 0; r < 16; r++) {
-                if(coord.numTerms[r] <= 0) {
+                if (coord.numTerms[r] <= 0) {
                     continue;
                 }
                 // Skip k=r header.
@@ -102,19 +104,40 @@ public class VSOP2000Reader {
         return result;
     }
 
+    /**
+     * VSOP2000 data for a single coordinate for a given body.
+     */
     public static class VSOP2000Coordinate {
-        // Body index.
+        /**
+         * Body index.
+         */
         int idx;
-        // Body name.
+        /**
+         * Body name.
+         */
         String body;
-        // Coordinate name (X, Y or Z).
+        /**
+         * Coordinate name (X, Y or Z).
+         */
         String coordinate;
-        // Number of terms per coordinate.
+        /**
+         * Number of terms per coordinate.
+         */
         int[] numTerms = new int[16];
-        // Matrix containing the terms.
-        // [0] - term records, up to 16.
-        // [1] - number of records in the term.
-        // [2] - each single record. 17*bkij, ski, cki -> 17 + 1 + 1 = 19.
+        /**
+         * Matrix containing the terms.
+         * <ul>
+         * <li>
+         * dim 0 - k records, up to 16. Each of this corresponds to a T**k.
+         * </li>
+         * <li>
+         * dim 1 - i, number of terms in the record k contributing to the coordinate.
+         * </li>
+         * <li>
+         * dim 2 - each single record. 17*bkij, ski, cki -> 17 + 1 + 1 = 19.
+         * </li>
+         * </ul>
+         */
         double[][][] terms = new double[16][][];
     }
 
