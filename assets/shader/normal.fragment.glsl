@@ -142,6 +142,7 @@ uniform float u_shininess;
 #endif// heightTextureFlag
 
 #ifdef eclipsingBodyFlag
+uniform float u_vrScale;
 uniform int u_eclipseOutlines;
 uniform float u_eclipsingBodyRadius;
 uniform vec3 u_eclipsingBodyPos;
@@ -546,11 +547,11 @@ void main() {
     vec4 outlineColor;
     vec3 f = v_data.fragPosWorld;
     vec3 m = u_eclipsingBodyPos;
-    vec3 l = -u_dirLights[0].direction;
+    vec3 l = -u_dirLights[0].direction * u_vrScale;
     vec3 fl = f + l;
     float dist = dist_segment_point(f, fl, m);
-    float dot_NM = dot(normalVector.xyz, m - f);
-    if (dot_NM > -0.05) {
+    float dot_NM = dot(normalize(normalVector.xyz), normalize(m - f));
+    if (dot_NM > -0.15) {
         if (dist < u_eclipsingBodyRadius * 1.5) {
             float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
             shdw *= eclfac;
