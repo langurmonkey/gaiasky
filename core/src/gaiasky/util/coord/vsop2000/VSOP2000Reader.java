@@ -102,7 +102,7 @@ public class VSOP2000Reader {
         return result;
     }
 
-    public class VSOP2000Coordinate {
+    public static class VSOP2000Coordinate {
         // Body index.
         int idx;
         // Body name.
