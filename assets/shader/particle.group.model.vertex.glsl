@@ -81,7 +81,7 @@ void main() {
     // Downscale before computing length()
     float dist = length(pos * 1e-14) * 1e14;
     // Small-angle approximation, in degrees.
-    float solidAngleDeg = (a_size / dist) * 180.0 / PI;
+    float solidAngleDeg = (a_size / (dist * u_vrScale)) * 180.0 / PI;
     // When angle goes from 3 to 0.1 degrees, fade factor goes from 1 to 0.15.
     float fadeFactor = smoothstep(0.1, 3.0, solidAngleDeg) * 0.85 + 0.15;
 
