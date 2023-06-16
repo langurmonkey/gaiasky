@@ -46,7 +46,7 @@ r=np.cross(np.cross(dir,r),dir)
 gs.setCameraUp(r,True)
 #gs.setPanoramaMode(True)
 gs.setOrthosphereViewMode(True)
-gs.sleep(1.)
+gs.sleep(10.)
 #gs.setCubemapMode(True,"ortho2")
 #dir=r
 #gs.setCameraDirection(dir,True) # Look East
@@ -62,7 +62,7 @@ gs.sleep(1.)
 gs.setFov(60)
 
 gs.stopSimulationTime()
-gs.setOrthosphereViewMode(False)
+#gs.setOrthosphereViewMode(False)
 gs.forceUpdateScene();
 
 
