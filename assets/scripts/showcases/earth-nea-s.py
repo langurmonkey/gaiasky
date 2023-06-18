@@ -233,7 +233,7 @@ gs.setObjectSizeScaling("Moon", 1.0)
 #gs.setOrbitCoordinatesScaling("EarthVSOP87", 1.0/100000)
 gs.setObjectSizeScaling("Sun", 1.0)
 gs.setOrbitCoordinatesScaling("MoonAACoordinates", 1.0)
-
+gs.showDataset("Gaia DR3 large")
 gs.refreshAllOrbits();
 gs.refreshObjectOrbit("Moon");
 gs.forceUpdateScene();
