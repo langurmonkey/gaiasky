@@ -715,7 +715,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void updateEclipsingBodyUnforms(Entity entity) {
+    public void updateEclipsingBodyUniforms(Entity entity) {
         if (!Settings.settings.scene.renderer.eclipses.active) {
             return;
         }

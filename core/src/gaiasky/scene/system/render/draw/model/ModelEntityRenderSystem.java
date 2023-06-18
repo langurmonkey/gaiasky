@@ -9,7 +9,6 @@ package gaiasky.scene.system.render.draw.model;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
@@ -520,7 +519,7 @@ public class ModelEntityRenderSystem {
             if (shadow) {
                 prepareShadowEnvironment(entity, model, scaffolding);
             }
-            model.model.updateEclipsingBodyUnforms(entity);
+            model.model.updateEclipsingBodyUniforms(entity);
             model.model.update(alpha * base.opacity, relativistic);
             batch.render(model.model.instance, model.model.env);
         }
@@ -548,6 +547,7 @@ public class ModelEntityRenderSystem {
             ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, graph, rotation, scaffolding,
                                                  rc.vrOffset);
             ac.mc.updateRelativisticEffects(cam);
+            ac.mc.updateEclipsingBodyUniforms(entity);
             batch.render(ac.mc.instance, model.model.env);
         }
     }
@@ -569,7 +569,7 @@ public class ModelEntityRenderSystem {
         cloud.cloud.mc.updateRelativisticEffects(cam);
         cloud.cloud.mc.updateVelocityBufferUniforms(cam);
         cloud.cloud.mc.setTransparency(alpha * base.opacity);
-        cloud.cloud.mc.updateEclipsingBodyUnforms(entity);
+        cloud.cloud.mc.updateEclipsingBodyUniforms(entity);
         batch.render(cloud.cloud.mc.instance, model.model.env);
     }
 

@@ -18,6 +18,9 @@ in vec3 v_frontSecondaryColor;
 in float v_heightNormalized;
 // Fade factor between hieght-driven opacity and luminosity-driven opacity
 in float v_fadeFactor;
+#ifdef eclipsingBodyFlag
+in float v_eclipseFactor;
+#endif // eclipsingBodyFlag
 
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 velMap;
@@ -43,6 +46,9 @@ void main(void) {
     float lma = luma(fragColor.rbg);
     float scl = smoothstep(0.05, 0.2, lma);
     fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl;
+    #ifdef eclipsingBodyFlag
+    fragColor *= v_eclipseFactor;
+    #endif // eclipsingBodyFlag
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
