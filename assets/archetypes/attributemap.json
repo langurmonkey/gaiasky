@@ -637,10 +637,10 @@
         "aliases": [ "additiveblending" ]
       }
     },
-    "Shape": {
-      "description": "Defines attributes related to shape objects.",
+    "Focus": {
+      "description": "Defines attributes related to objects that can be focussed.",
       "focusable": {
-        "description": "Defines whether the shape object is focusable or not.",
+        "description": "Defines whether the object is focusable or not. By default, this is on.",
         "units": "Boolean"
       }
     },

@@ -727,7 +727,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                                        int pixelDist,
                                        NaturalCamera camera,
                                        Array<Entity> hits) {
-        if (focus != null && focus.hitCoordinatesConsumer != null) {
+        if (focus != null && focus.focusable && focus.hitCoordinatesConsumer != null) {
             focus.hitCoordinatesConsumer.apply(focusHit, this, screenX, screenY, w, h, pixelDist, camera, hits);
         }
     }
@@ -745,7 +745,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                                 Vector3d p1,
                                 NaturalCamera camera,
                                 Array<Entity> hits) {
-        if (focus != null && focus.hitRayConsumer != null) {
+        if (focus != null && focus.focusable && focus.hitRayConsumer != null) {
             focus.hitRayConsumer.apply(focusHit, this, p0, p1, camera, hits);
         }
     }

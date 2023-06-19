@@ -15,10 +15,4 @@ public class Shape implements Component {
     public FocusView track;
     public String trackName;
 
-    public boolean focusable = false;
-
-    public void setFocusable(Boolean focusable) {
-        this.focusable = focusable;
-    }
-
 }

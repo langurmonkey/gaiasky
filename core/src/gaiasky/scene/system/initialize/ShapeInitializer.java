@@ -53,6 +53,7 @@ public class ShapeInitializer extends AbstractInitSystem {
         var label = Mapper.label.get(entity);
         var shape = Mapper.shape.get(entity);
         var transform = Mapper.transform.get(entity);
+        var focus = Mapper.focus.get(entity);
 
         // Transform.
         if (transform.matrix != null) {
@@ -71,15 +72,11 @@ public class ShapeInitializer extends AbstractInitSystem {
         // Line.
         line.lineWidth = 1.5f;
 
-        // Focusable.
-        if (shape.focusable) {
-            // Create focus component.
-            var focus = new Focus();
-            // Focus consumer.
+        // Focus.
+        if (focus.focusable) {
             focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateModel;
             focus.hitRayConsumer = FocusHit::addHitRayModel;
             focus.activeFunction = FocusActive::isFocusActiveTrue;
-            entity.add(focus);
         }
 
         // Solid angle.

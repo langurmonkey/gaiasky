@@ -21,6 +21,9 @@ import gaiasky.util.math.Vector3d;
 
 public class Focus implements Component {
 
+    /** Whether this entity is focusable or not. **/
+    public boolean focusable = true;
+
     /** Consumer that returns whether the focus is active or not. **/
     public Function3<FocusActive, Entity, Base, Boolean> activeFunction;
 
@@ -29,4 +32,8 @@ public class Focus implements Component {
 
     /** Consumer that computes whether the focus is hit by the given screen coordinates. **/
     public Consumer9<FocusHit, FocusView, Integer, Integer, Integer, Integer, Integer, NaturalCamera, Array<Entity>> hitCoordinatesConsumer;
+
+    public void setFocusable(Boolean focusable) {
+        this.focusable = focusable;
+    }
 }

@@ -419,6 +419,7 @@
             "parent": "SceneGraphNode",
             "components": [
                 "Model",
+                "Focus",
                 "RenderType",
                 "Coordinates",
                 "SolidAngle",
