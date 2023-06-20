@@ -7,10 +7,20 @@
 
 package gaiasky.data.api;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.scene.component.Trajectory;
 
 public interface IOrbitDataProvider {
+
+    /**
+     * Initializes the provider with the given entity and trajectory component.
+     *
+     * @param entity     The entity.
+     * @param trajectory The trajectory component.
+     */
+    void initialize(Entity entity, Trajectory trajectory);
 
     /**
      * Loads the orbit data into the OrbitData object in the internal

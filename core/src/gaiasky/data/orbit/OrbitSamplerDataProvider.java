@@ -7,6 +7,7 @@
 
 package gaiasky.data.orbit;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
@@ -17,6 +18,7 @@ import gaiasky.gui.ConsoleLogger;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Trajectory;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
@@ -27,11 +29,18 @@ import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3b;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 
+/**
+ * Samples orbits using the classical algorithms (VSOP87, Moon AA, Pluto) and converts them to point cloud
+ * data objects. Used to update the orbit objects of planets when they get outdated.
+ *
+ * @deprecated We use {@link OrbitBodyDataProvider} instead, which uses the actual coordinates provider of the
+ * attached body.
+ */
+@Deprecated
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private static final String writeDataPath = "/tmp/";
     private static boolean writeData = false;
@@ -59,8 +68,8 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             OrbitSamplerDataProvider me = new OrbitSamplerDataProvider();
 
             Date now = new Date();
-            String[] bodies = new String[] { "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Moon", "Pluto" };
-            double[] periods = new double[] { 87.9691, 224.701, 365.256363004, 686.971, 4332.59, 10759.22, 30799.095, 60190.03, 27.321682, 90560.0 };
+            String[] bodies = new String[]{"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Moon", "Pluto"};
+            double[] periods = new double[]{87.9691, 224.701, 365.256363004, 686.971, 4332.59, 10759.22, 30799.095, 60190.03, 27.321682, 90560.0};
             for (int i = 0; i < bodies.length; i++) {
                 String b = bodies[i];
                 double period = periods[i];
@@ -76,9 +85,14 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     }
 
     @Override
+    public void initialize(Entity entity, Trajectory trajectory) {
+
+    }
+
+    @Override
     public void load(String file,
                      OrbitDataLoaderParameters parameter) {
-        // Sample using VSOP
+        // Sample using VSOP87
         // If num samples is not defined, we use 300 samples per year of period
 
         // Prevent overlapping by rescaling the period
@@ -110,15 +124,15 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
         // Load orbit data
         for (int i = 0; i <= numSamples; i++) {
-            AstroUtils.getEclipticCoordinates(bodyDesc, d, ecl, true);
-            double eclx = ecl.x.doubleValue();
+            AstroUtils.getEclipticCoordinates(bodyDesc, d, ecl, Settings.settings.data.highAccuracy);
+            double eclX = ecl.x.doubleValue();
 
             if (last == 0) {
-                last = Math.toDegrees(eclx);
+                last = Math.toDegrees(eclX);
             }
 
-            accum += Math.toDegrees(eclx) - last;
-            last = Math.toDegrees(eclx);
+            accum += Math.toDegrees(eclX) - last;
+            last = Math.toDegrees(eclX);
 
             if (accum > 360) {
                 break;

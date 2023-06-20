@@ -7,6 +7,7 @@
 
 package gaiasky.data.orbit;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.api.IOrbitDataProvider;
@@ -14,10 +15,16 @@ import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.component.Trajectory;
 import gaiasky.util.Settings;
 
 public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvider {
-    PointCloudData data;
+    private PointCloudData data;
+
+    @Override
+    public void initialize(Entity entity, Trajectory trajectory) {
+
+    }
 
     @Override
     public void load(String file, OrbitDataLoaderParameters parameter) {

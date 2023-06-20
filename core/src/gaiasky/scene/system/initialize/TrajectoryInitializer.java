@@ -45,11 +45,11 @@ public class TrajectoryInitializer extends AbstractInitSystem {
                 try {
                     trajectory.providerClass = (Class<? extends IOrbitDataProvider>) ClassReflection.forName(trajectory.provider);
                     // Orbit data
-                    IOrbitDataProvider provider;
                     try {
-                        provider = ClassReflection.newInstance(trajectory.providerClass);
-                        provider.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, trajectory.numSamples), trajectory.newMethod);
-                        verts.pointCloudData = provider.getData();
+                        trajectory.providerInstance = ClassReflection.newInstance(trajectory.providerClass);
+                        trajectory.providerInstance.initialize(entity, trajectory);
+                        trajectory.providerInstance.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, trajectory.numSamples), trajectory.newMethod);
+                        verts.pointCloudData = trajectory.providerInstance.getData();
                     } catch (Exception e) {
                         logger.error(e);
                     }

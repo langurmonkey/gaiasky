@@ -10,6 +10,7 @@ package gaiasky.scene.entity;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
 import gaiasky.data.OrbitRefresher;
+import gaiasky.data.orbit.OrbitBodyDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
@@ -55,7 +56,7 @@ public class TrajectoryUtils {
         }
         updateSize(body, trajectory, verts);
         trajectory.mustRefresh = trajectory.providerClass != null
-                && trajectory.providerClass.equals(OrbitFileDataProvider.class)
+                && (trajectory.providerClass.equals(OrbitBodyDataProvider.class) || trajectory.providerClass.equals(OrbitFileDataProvider.class))
                 && trajectory.body != null
                 // body instanceof Planet
                 && Mapper.atmosphere.has(trajectory.body)

@@ -7,11 +7,13 @@
 
 package gaiasky.data.orbit;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.data.api.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -26,6 +28,12 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
     public OrbitalParametersProvider() {
         super();
+    }
+
+
+    @Override
+    public void initialize(Entity entity, Trajectory trajectory) {
+
     }
 
     @Override

@@ -30,6 +30,7 @@ public class Trajectory implements Component {
     public String provider;
     public Double multiplier = 1.0d;
     public Class<? extends IOrbitDataProvider> providerClass;
+    public IOrbitDataProvider providerInstance;
     public OrbitComponent oc;
     // Only adds the body, not the orbit
     public boolean onlyBody = false;

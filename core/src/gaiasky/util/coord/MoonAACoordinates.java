@@ -35,6 +35,7 @@ public class MoonAACoordinates extends AbstractOrbitCoordinates {
 
     @Override
     public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
+        getEclipticSphericalCoordinates(date, out);
         Coordinates.sphericalToCartesian(out, out);
         return out;
     }

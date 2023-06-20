@@ -53,11 +53,12 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
      *
      * @param date The date as a Java {@link Instant}.
      * @param out  The vector to return the result.
+     * @return The out vector if we could retrieve the position, or null if the time is out of range for the current data file.
      */
-    public void position(Instant date, final Vector3b out) {
+    public Vector3b position(Instant date, final Vector3b out) {
         if (!initialize()) {
             // Something is wrong.
-            return;
+            return null;
         }
 
         double jd = AstroUtils.getJulianDateCache(date) - AstroUtils.JD_J2010;
@@ -69,7 +70,7 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
         final ChebyshevCoefficients.Coefficients positionCoefficients = this.data.coefficients[positionTypeIndex];
 
         // Evaluate the Chebyshev polynomials to compute the ephemeris
-        evaluateChebyshev(nanosecondsTcb, positionHeader, positionCoefficients, out);
+        return evaluateChebyshev(nanosecondsTcb, positionHeader, positionCoefficients, out);
     }
 
     /**
@@ -84,10 +85,11 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
      * @param coefficients   the
      *                       <code>{@link ChebyshevCoefficients.Coefficients}</code>
      * @param out            The vector to put the result.
+     * @return The out vector if we could retrieve the position, or null if the time is out of range for the current data file.
      */
-    private void evaluateChebyshev(final long nanosecondsTcb, final ChebyshevCoefficients.Header header,
-                                   final ChebyshevCoefficients.Coefficients coefficients,
-                                   final Vector3b out) {
+    private Vector3b evaluateChebyshev(final long nanosecondsTcb, final ChebyshevCoefficients.Header header,
+                                       final ChebyshevCoefficients.Coefficients coefficients,
+                                       final Vector3b out) {
 
         // The index of the granule
         int iGranule;
@@ -132,8 +134,12 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
             t = (nanosecondsTcb - nanosecondsTcbLow) / (double) granuleLength;
         }
 
-        // Compute ephemeris
+        // Out of range.
+        if (iGranule > coefficients.data.length || iGranule < 0) {
+            return null;
+        }
 
+        // Compute ephemeris
         final double[] coefficientsX = coefficients.data[iGranule][0];
         final double[] coefficientsY = coefficients.data[iGranule][1];
         final double[] coefficientsZ = coefficients.data[iGranule][2];
@@ -171,6 +177,7 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
         }
 
         out.set(y, z, x).scl(Constants.M_TO_U);
+        return out;
     }
 
     /**

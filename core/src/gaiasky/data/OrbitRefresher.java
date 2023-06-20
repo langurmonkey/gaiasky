@@ -10,7 +10,7 @@ package gaiasky.data;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.data.orbit.OrbitSamplerDataProvider;
+import gaiasky.data.api.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
@@ -34,7 +34,6 @@ public class OrbitRefresher implements IObserver {
     private static final int LOAD_QUEUE_MAX_SIZE = 15;
     private final Queue<OrbitDataLoaderParameters> toLoadQueue;
     private final OrbitUpdaterThread daemon;
-    private final boolean loadingPaused = false;
 
     public OrbitRefresher(String threadName) {
         super();
@@ -55,6 +54,7 @@ public class OrbitRefresher implements IObserver {
     }
 
     public void queue(OrbitDataLoaderParameters params) {
+        boolean loadingPaused = false;
         if (!loadingPaused && toLoadQueue.size() < LOAD_QUEUE_MAX_SIZE - 1) {
             toLoadQueue.remove(params);
             toLoadQueue.add(params);
@@ -76,7 +76,6 @@ public class OrbitRefresher implements IObserver {
      * The orbit refresher thread.
      */
     protected static class OrbitUpdaterThread extends ServiceThread {
-        private final OrbitSamplerDataProvider provider;
         private final Array<OrbitDataLoaderParameters> toLoad;
 
         private final TrajectoryUtils utils = new TrajectoryUtils();
@@ -84,7 +83,6 @@ public class OrbitRefresher implements IObserver {
         public OrbitUpdaterThread(final OrbitRefresher orbitRefresher) {
             super();
             this.toLoad = new Array<>();
-            this.provider = new OrbitSamplerDataProvider();
             this.task = () -> {
                 /* ----------- PROCESS REQUESTS ----------- */
                 while (!orbitRefresher.toLoadQueue.isEmpty()) {
@@ -102,6 +100,14 @@ public class OrbitRefresher implements IObserver {
                             for (OrbitDataLoaderParameters params : toLoad) {
                                 if (params.entity != null) {
                                     Entity entity = params.entity;
+                                    var trajectory = Mapper.trajectory.get(entity);
+                                    if (trajectory == null) {
+                                        continue;
+                                    }
+                                    IOrbitDataProvider provider = trajectory.providerInstance;
+                                    if (provider == null) {
+                                        continue;
+                                    }
                                     // Generate data
                                     provider.load(null, params);
                                     final PointCloudData pcd = provider.getData();
@@ -112,7 +118,6 @@ public class OrbitRefresher implements IObserver {
 
                                         var body = Mapper.body.get(entity);
                                         var verts = Mapper.verts.get(entity);
-                                        var trajectory = Mapper.trajectory.get(entity);
                                         verts.pointCloudData = pcd;
                                         utils.initOrbitMetadata(body, trajectory, verts);
                                         vertsView.markForUpdate();
