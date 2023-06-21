@@ -13,20 +13,34 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public class RotationComponent implements IUpdatable<RotationComponent> {
-    /** Angular velocity [deg/hour] around the rotation axis. **/
+    /**
+     * Angular velocity [deg/hour] around the rotation axis.
+     **/
     public double angularVelocity;
-    /** Current angle with respect to the rotationAxis in degrees. **/
+    /**
+     * Current angle with respect to the rotationAxis in degrees.
+     **/
     public double angle;
 
-    /** The rotation period in hours. **/
+    /**
+     * The rotation period in hours.
+     **/
     public double period;
-    /** Angle between equatorial plane and orbital plane in degrees. **/
+    /**
+     * Angle between equatorial plane and orbital plane in degrees.
+     **/
     public double axialTilt;
-    /** Angle between orbital plane and the ecliptic in degrees. **/
+    /**
+     * Angle between orbital plane and the ecliptic in degrees.
+     **/
     public double inclination;
-    /** The ascending node in degrees, should not be used, as it obviously causes the body to wobble. **/
+    /**
+     * The ascending node in degrees, should not be used, as it obviously causes the body to wobble.
+     **/
     public double ascendingNode;
-    /** The meridian (hour) angle at the epoch J2000.0, in degrees **/
+    /**
+     * The meridian (hour) angle at the epoch J2000.0, in degrees
+     **/
     public double meridianAngle;
 
     public RotationComponent() {
@@ -55,8 +69,12 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
      *
      * @param f Angle in deg.
      */
-    public void setAxialtilt(Double f) {
+    public void setAxialTilt(Double f) {
         this.axialTilt = f;
+    }
+
+    public void setAxialtilt(Double f) {
+        setAxialTilt(f);
     }
 
     public void setAngle(Double angle) {
@@ -88,8 +106,12 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
      *
      * @param an Angle in deg.
      */
-    public void setAscendingnode(Double an) {
+    public void setAscendingNode(Double an) {
         this.ascendingNode = an;
+    }
+
+    public void setAscendingnode(Double an) {
+        setAscendingNode(an);
     }
 
     /**
@@ -97,8 +119,12 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
      *
      * @param ma Angle in deg.
      */
-    public void setMeridianangle(Double ma) {
+    public void setMeridianAngle(Double ma) {
         this.meridianAngle = ma;
+    }
+
+    public void setMeridianangle(Double ma) {
+        setMeridianAngle(ma);
     }
 
     @Override
