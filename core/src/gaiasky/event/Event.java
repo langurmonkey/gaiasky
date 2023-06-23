@@ -85,6 +85,8 @@ public enum Event {
      **/
     ANTIALIASING_CMD,
 
+    /** Shows window to give a name to the new position bookmark. **/
+    SHOW_ADD_POSITION_BOOKMARK,
     /** Add bookmark. Contains the path and a boolean indicating if it is a folder. **/
     BOOKMARKS_ADD,
     /** Remove bookmark. Contains the path to remove. **/

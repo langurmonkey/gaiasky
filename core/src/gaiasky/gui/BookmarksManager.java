@@ -13,9 +13,13 @@ import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
+import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,6 +29,7 @@ public class BookmarksManager implements IObserver {
     private Path bookmarksFile;
     private List<BookmarkNode> bookmarks;
     private Map<Path, BookmarkNode> nodes;
+
     public BookmarksManager() {
         initDefault();
         EventManager.instance.subscribe(this, Event.BOOKMARKS_ADD, Event.BOOKMARKS_REMOVE, Event.BOOKMARKS_REMOVE_ALL, Event.BOOKMARKS_MOVE, Event.BOOKMARKS_MOVE_UP, Event.BOOKMARKS_MOVE_DOWN);
@@ -156,7 +161,6 @@ public class BookmarksManager implements IObserver {
      * Adds a bookmark with the given path.
      *
      * @param path The path to add.
-     *
      * @return True if added.
      */
     public synchronized boolean addBookmark(String path, boolean folder) {
@@ -167,12 +171,19 @@ public class BookmarksManager implements IObserver {
         return added;
     }
 
+    /**
+     * Inserts a new bookmark from a line in the bookmarks.txt file.
+     *
+     * @param path   The line text.
+     * @param folder Whether it is a folder or not.
+     * @return Whether the bookmark was inserted.
+     */
     private synchronized boolean insertBookmark(String path, boolean folder) {
         Path p = Path.of(path);
         if (!nodes.containsKey(p)) {
-            BookmarkNode bnode = new BookmarkNode(p, folder);
-            nodes.put(p, bnode);
-            BookmarkNode curr = bnode;
+            BookmarkNode node = new BookmarkNode(p, folder);
+            nodes.put(p, node);
+            BookmarkNode curr = node;
             while (true) {
                 if (curr.path.getParent() != null) {
                     if (!nodes.containsKey(curr.path.getParent())) {
@@ -199,7 +210,6 @@ public class BookmarksManager implements IObserver {
      * Removes a bookmark by its path.
      *
      * @param path The path to remove
-     *
      * @return True if removed.
      */
     public synchronized boolean removeBookmark(String path) {
@@ -222,7 +232,6 @@ public class BookmarksManager implements IObserver {
      * Remove all bookmarks with the given name.
      *
      * @param name The name to remove.
-     *
      * @return Number of removed bookmarks.
      */
     public synchronized int removeBookmarksByName(String name) {
@@ -267,87 +276,189 @@ public class BookmarksManager implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case BOOKMARKS_ADD:
-            String name = (String) data[0];
-            boolean folder = (boolean) data[1];
-            if (addBookmark(name, folder))
-                logger.info("Bookmark added: " + name);
-            break;
-        case BOOKMARKS_REMOVE:
-            name = (String) data[0];
-            if (removeBookmark(name))
-                logger.info("Bookmark removed: " + name);
-            break;
-        case BOOKMARKS_REMOVE_ALL:
-            name = (String) data[0];
-            int removed = removeBookmarksByName(name);
-            logger.info(removed + " bookmarks with name " + name + " removed");
-            break;
-        case BOOKMARKS_MOVE:
-            BookmarkNode src = (BookmarkNode) data[0];
-            BookmarkNode dest = (BookmarkNode) data[1];
-            if (dest == null) {
-                // Move to root
-                removeBookmark(src.path.toString());
-                addBookmark(src.name, false);
-            } else {
-                // Move to dest folder
-                if (dest.folder) {
-                    removeBookmark(src.path.toString());
-                    addBookmark(dest.path.resolve(src.name).toString(), false);
+            case BOOKMARKS_ADD -> {
+                Object d0 = data[0];
+                if (d0 instanceof String) {
+                    // Simple object bookmark.
+                    String name = (String) d0;
+                    boolean folder = (boolean) data[1];
+                    if (addBookmark(name, folder)) {
+                        logger.info("Bookmark added: " + name);
+                    } else {
+                        logger.error("Failed to add bookmark: " + name);
+                    }
                 } else {
-                    logger.error("Destination is not a folder: " + dest);
+                    // Position bookmark.
+                    Vector3b pos = (Vector3b) d0;
+                    Vector3d dir = (Vector3d) data[1];
+                    Vector3d up = (Vector3d) data[2];
+                    Instant t = (Instant) data[3];
+                    String name = (String) data[4];
+                    boolean folder = (boolean) data[5];
+                    String text = "{" + str(pos) + "|" + str(dir) + "|" + str(up) + "|" + t.toString() + "|" + name + "}";
+                    if (addBookmark(text, folder)) {
+                        logger.info("Bookmark added: " + text);
+                    } else {
+                        logger.error("Failed to add bookmark: " + text);
+                    }
                 }
             }
-            break;
-        case BOOKMARKS_MOVE_UP:
-            BookmarkNode bookmark = (BookmarkNode) data[0];
-            List<BookmarkNode> list;
-            if (bookmark.parent != null) {
-                list = bookmark.parent.children;
-            } else {
-                list = bookmarks;
+            case BOOKMARKS_REMOVE -> {
+                String name = (String) data[0];
+                if (removeBookmark(name))
+                    logger.info("Bookmark removed: " + name);
             }
-            int idx = list.indexOf(bookmark);
-            if (idx > 0) {
-                list.remove(idx);
-                list.add(idx - 1, bookmark);
+            case BOOKMARKS_REMOVE_ALL -> {
+                String name = (String) data[0];
+                int removed = removeBookmarksByName(name);
+                logger.info(removed + " bookmarks with name " + name + " removed");
             }
-            break;
-        case BOOKMARKS_MOVE_DOWN:
-            bookmark = (BookmarkNode) data[0];
-            if (bookmark.parent != null) {
-                list = bookmark.parent.children;
-            } else {
-                list = bookmarks;
+            case BOOKMARKS_MOVE -> {
+                BookmarkNode src = (BookmarkNode) data[0];
+                BookmarkNode dest = (BookmarkNode) data[1];
+                if (dest == null) {
+                    // Move to root
+                    removeBookmark(src.path.toString());
+                    addBookmark(src.text, false);
+                } else {
+                    // Move to dest folder
+                    if (dest.folder) {
+                        removeBookmark(src.path.toString());
+                        addBookmark(dest.path.resolve(src.text).toString(), false);
+                    } else {
+                        logger.error("Destination is not a folder: " + dest);
+                    }
+                }
             }
-            idx = list.indexOf(bookmark);
-            if (idx < list.size() - 1) {
-                list.remove(idx);
-                list.add(idx + 1, bookmark);
+            case BOOKMARKS_MOVE_UP -> {
+                BookmarkNode bookmark = (BookmarkNode) data[0];
+                List<BookmarkNode> list;
+                if (bookmark.parent != null) {
+                    list = bookmark.parent.children;
+                } else {
+                    list = bookmarks;
+                }
+                int idx0 = list.indexOf(bookmark);
+                if (idx0 > 0) {
+                    list.remove(idx0);
+                    list.add(idx0 - 1, bookmark);
+                }
             }
-            break;
-        default:
-            break;
+            case BOOKMARKS_MOVE_DOWN -> {
+                BookmarkNode bookmark = (BookmarkNode) data[0];
+                List<BookmarkNode> list;
+                if (bookmark.parent != null) {
+                    list = bookmark.parent.children;
+                } else {
+                    list = bookmarks;
+                }
+                int idx1 = list.indexOf(bookmark);
+                if (idx1 < list.size() - 1) {
+                    list.remove(idx1);
+                    list.add(idx1 + 1, bookmark);
+                }
+            }
+            default -> {
+            }
         }
     }
 
+    private String str(Vector3b v) {
+        return "[" + v.x.toString() + "," + v.y.toString() + "," + v.z.toString() + "]";
+    }
+
+    private String str(Vector3d v) {
+        return "[" + v.x + "," + v.y + "," + v.z + "]";
+    }
+
     public static class BookmarkNode {
-        // The name of this node
+
+        private static final String VEC3_REGEX = "\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\\]";
+        /**
+         * Regular expression that defines the format of positional bookmarks, which is:
+         * <code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name}</code>
+         */
+        public static final String POS_BOOKMARK_REGEX = "\\{" + VEC3_REGEX +
+                                                        "\\|" + VEC3_REGEX +
+                                                        "\\|" + VEC3_REGEX +
+                                                        "\\|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z\\|[^\\|,\\\\]+\\}";
+
+        /**
+         * <p>The text of the bookmark in the bookmarks.txt file.
+         * This coincides with the name for regular bookmarks. For
+         * positional bookmarks, this has the format:</p>
+         * <code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name}</code>
+         */
+        public String text;
+        /**
+         * The name of this node
+         */
         public String name;
-        // The full path
+        /**
+         * Camera position, for positional bookmarks.
+         */
+        public Vector3d position;
+        /**
+         * Camera direction, for positional bookmarks.
+         */
+        public Vector3d direction;
+        /**
+         * Camera up vector, for positional bookmarks.
+         */
+        public Vector3d up;
+        /**
+         * Time, positional bookmarks.
+         */
+        public Instant time;
+        /**
+         * The full path.
+         */
         public Path path;
-        // The parent of this node, null if root
+        /**
+         * The parent of this node, null if root.
+         */
         public BookmarkNode parent;
-        // Children, if any
+        /**
+         * Children, if any.
+         */
         public List<BookmarkNode> children;
-        // Is it a folder?
+        /**
+         * Is it a folder?
+         */
         public boolean folder;
 
         public BookmarkNode(Path path, boolean folder) {
             this.path = path;
-            this.name = this.path.getFileName().toString();
+            this.text = this.path.getFileName().toString().strip();
             this.folder = folder;
+            initializeText();
+        }
+
+        public void initializeText() {
+            if (this.text != null) {
+                if (this.text.matches(POS_BOOKMARK_REGEX)) {
+                    // Position bookmark.
+                    var tokens = this.text.substring(1, this.text.length() - 1).split("\\|");
+                    var pos = tokens[0];
+                    var dir = tokens[1];
+                    var up = tokens[2];
+                    var instant = tokens[3];
+                    this.name = tokens[4];
+
+                    this.position = vectorFromString(pos);
+                    this.direction = vectorFromString(dir);
+                    this.up = vectorFromString(up);
+                    this.time = Instant.parse(instant);
+                } else {
+                    // Regular bookmark.
+                    this.name = this.text;
+                }
+            }
+        }
+
+        private Vector3d vectorFromString(String vectorString) {
+            var tokens = vectorString.substring(1, vectorString.length() - 1).split(",");
+            return new Vector3d(Parser.parseDouble(tokens[0]), Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]));
         }
 
         public void insert(BookmarkNode node) {

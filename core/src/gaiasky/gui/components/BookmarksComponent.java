@@ -136,29 +136,45 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                     Actor actor = ce.getTarget();
                     TreeNode selected = (TreeNode) ((Tree) actor).getSelectedNode();
                     if (selected != null && !selected.hasChildren()) {
-                        String name = selected.getValue();
-                        if (scene.index().containsEntity(name)) {
-                            Entity node = scene.getEntity(name);
-                            if (Mapper.focus.has(node)) {
-                                view.setEntity(node);
-                                view.getFocus(name);
-                                IFocus focus = view;
-                                boolean timeOverflow = focus.isCoordinatesTimeOverflow();
-                                boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                                if (!timeOverflow && ctOn) {
-                                    GaiaSky.postRunnable(() -> {
-                                        EventManager.publish(Event.CAMERA_MODE_CMD, bookmarksTree, CameraMode.FOCUS_MODE, true);
-                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, bookmarksTree, focus, true);
-                                    });
-                                    info(null, null);
-                                } else if (timeOverflow) {
-                                    info(I18n.msg("gui.objects.search.timerange.1", name), I18n.msg("gui.objects.search.timerange.2"));
-                                } else {
-                                    info(I18n.msg("gui.objects.search.invisible.1", name), I18n.msg("gui.objects.search.invisible.2", focus.getCt().toString()));
+                        if (selected.node.position == null) {
+                            // Object bookmark.
+                            String name = selected.node.name;
+                            if (scene.index().containsEntity(name)) {
+                                Entity node = scene.getEntity(name);
+                                if (Mapper.focus.has(node)) {
+                                    view.setEntity(node);
+                                    view.getFocus(name);
+                                    IFocus focus = view;
+                                    boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                                    boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                                    if (!timeOverflow && ctOn) {
+                                        GaiaSky.postRunnable(() -> {
+                                            EventManager.publish(Event.CAMERA_MODE_CMD, bookmarksTree, CameraMode.FOCUS_MODE, true);
+                                            EventManager.publish(Event.FOCUS_CHANGE_CMD, bookmarksTree, focus, true);
+                                        });
+                                        info(null, null);
+                                    } else if (timeOverflow) {
+                                        info(I18n.msg("gui.objects.search.timerange.1", name), I18n.msg("gui.objects.search.timerange.2"));
+                                    } else {
+                                        info(I18n.msg("gui.objects.search.invisible.1", name), I18n.msg("gui.objects.search.invisible.2", focus.getCt().toString()));
+                                    }
                                 }
+                            } else {
+                                info(null, null);
                             }
                         } else {
-                            info(null, null);
+                            // Position bookmark.
+                            GaiaSky.postRunnable(() -> {
+                                var p = selected.node.position;
+                                var d = selected.node.direction;
+                                var u = selected.node.up;
+                                EventManager.publish(Event.CAMERA_MODE_CMD, bookmarksTree, CameraMode.FREE_MODE, true);
+                                EventManager.publish(Event.CAMERA_POS_CMD, bookmarksTree, (Object) new double[]{p.x, p.y, p.z});
+                                EventManager.publish(Event.CAMERA_DIR_CMD, bookmarksTree, (Object) new double[]{d.x, d.y, d.z});
+                                EventManager.publish(Event.CAMERA_UP_CMD, bookmarksTree, (Object) new double[]{u.x, u.y, u.z});
+                                EventManager.publish(Event.TIME_CHANGE_CMD, bookmarksTree, selected.node.time);
+                            });
+
                         }
                     }
                     return true;
@@ -296,7 +312,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksScrollPane.setFadeScrollBars(false);
         bookmarksScrollPane.setScrollingDisabled(true, false);
 
-        bookmarksScrollPane.setHeight(160f);
+        bookmarksScrollPane.setHeight(260f);
         bookmarksScrollPane.setWidth(contentWidth);
 
         /*
@@ -423,28 +439,35 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case FOCUS_CHANGED -> {
-            // Update focus selection in focus list
-            FocusView focus = null;
-            if (data[0] instanceof String) {
-                view.setEntity(scene.getEntity((String) data[0]));
-                focus = view;
-            } else if (data[0] instanceof FocusView) {
-                focus = (FocusView) data[0];
+            case FOCUS_CHANGED -> {
+                // Update focus selection in focus list
+                FocusView focus = null;
+                if (data[0] instanceof String) {
+                    view.setEntity(scene.getEntity((String) data[0]));
+                    focus = view;
+                } else if (data[0] instanceof FocusView) {
+                    focus = (FocusView) data[0];
+                }
+                // Select only if data[1] is true
+                if (focus != null) {
+                    selectBookmark(focus.getName(), false);
+                }
             }
-            // Select only if data[1] is true
-            if (focus != null) {
-                selectBookmark(focus.getName(), false);
+            case BOOKMARKS_ADD -> {
+                var d0 = data[0];
+                if (d0 instanceof String) {
+                    String name = (String) d0;
+                    reloadBookmarksTree();
+                    selectBookmark(name, false);
+                } else {
+                    String name = (String) data[4];
+                    reloadBookmarksTree();
+                    selectBookmark(name, false);
+                }
             }
-        }
-        case BOOKMARKS_ADD -> {
-            String name = (String) data[0];
-            reloadBookmarksTree();
-            selectBookmark(name, false);
-        }
-        case BOOKMARKS_REMOVE, BOOKMARKS_REMOVE_ALL -> reloadBookmarksTree();
-        default -> {
-        }
+            case BOOKMARKS_REMOVE, BOOKMARKS_REMOVE_ALL -> reloadBookmarksTree();
+            default -> {
+            }
         }
 
     }

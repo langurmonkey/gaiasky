@@ -381,6 +381,28 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addItem(dsVisibility);
         }
 
+        // Bookmarks
+        addSeparator();
+        if (candidate != null && candidate.isValid()) {
+            MenuItem bookmarkObject = new MenuItem(I18n.msg("context.bookmark.object", candidateNameShort), skin, skin.getDrawable("iconic-star"));
+            bookmarkObject.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.BOOKMARKS_ADD, this, candidateName, false);
+                }
+                return false;
+            });
+            addItem(bookmarkObject);
+        }
+        MenuItem bookmarkPosition = new MenuItem(I18n.msg("context.bookmark.pos"), skin, skin.getDrawable("iconic-star"));
+        bookmarkPosition.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_ADD_POSITION_BOOKMARK, this);
+            }
+            return false;
+        });
+        addItem(bookmarkPosition);
+
+
         //MenuItem VRUI = new MenuItem("VR UI", skin, "default");
         //VRUI.addListener(event -> {
         //    if (event instanceof ChangeEvent) {
@@ -416,6 +438,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 addItem(gravWaveStop);
             }
         }
+
 
         if (nItems > 0) {
             addSeparator();

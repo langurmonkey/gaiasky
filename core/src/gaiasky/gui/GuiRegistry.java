@@ -46,7 +46,9 @@ import java.util.ArrayList;
 
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
-    /** Scene reference. **/
+    /**
+     * Scene reference.
+     **/
     protected final Scene scene;
     /**
      * Registered GUI array.
@@ -78,6 +80,7 @@ public class GuiRegistry implements IObserver {
     private AboutWindow aboutWindow;
     private SearchDialog searchDialog;
     private DateDialog dateDialog;
+    private BookmarkNameDialog bookmarkNameDialog;
     /**
      * Keyframes window.
      **/
@@ -86,7 +89,9 @@ public class GuiRegistry implements IObserver {
      * Individual visibility.
      */
     private IndividualVisibilityWindow indVisWindow;
-    /** Task to remove the information pop-up. **/
+    /**
+     * Task to remove the information pop-up.
+     **/
     private Task removePopup;
     /**
      * Last open location.
@@ -113,11 +118,12 @@ public class GuiRegistry implements IObserver {
         this.view = new FocusView();
         // Windows which are visible from any GUI.
         EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION,
-                                        Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION,
-                                        Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO,
-                                        Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION,
-                                        Event.SHOW_RESTART_ACTION,
-                                        Event.CLOSE_ALL_GUI_WINDOWS_CMD, Event.SHOW_DATE_TIME_EDIT_ACTION);
+                Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION,
+                Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO,
+                Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION,
+                Event.SHOW_RESTART_ACTION,
+                Event.CLOSE_ALL_GUI_WINDOWS_CMD, Event.SHOW_DATE_TIME_EDIT_ACTION,
+                Event.SHOW_ADD_POSITION_BOOKMARK);
     }
 
     public InputMultiplexer getInputMultiplexer() {
@@ -212,7 +218,6 @@ public class GuiRegistry implements IObserver {
      * Unregisters a GUI.
      *
      * @param gui The GUI to unregister.
-     *
      * @return True if the GUI was unregistered.
      */
     public boolean unregisterGui(IGui gui) {
@@ -320,408 +325,415 @@ public class GuiRegistry implements IObserver {
             Stage stage = current.getGuiStage();
             // Treats windows that can appear in any GUI.
             switch (event) {
-            case SHOW_SEARCH_ACTION -> {
-                if (searchDialog == null) {
-                    searchDialog = new SearchDialog(skin, stage, scene, true);
-                } else {
-                    searchDialog.clearText();
-                }
-                if (!searchDialog.isVisible() | !searchDialog.hasParent())
-                    searchDialog.show(stage);
-            }
-            case SHOW_QUIT_ACTION -> {
-                if (!removeModeChangePopup() && !removeGamepadGui()) {
-                    if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
-                        // Release mouse if captured.
-                        GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+                case SHOW_SEARCH_ACTION -> {
+                    if (searchDialog == null) {
+                        searchDialog = new SearchDialog(skin, stage, scene, true);
                     } else {
-                        Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
-                        if (Settings.settings.program.exitConfirmation) {
-                            QuitWindow quit = new QuitWindow(stage, skin);
-                            if (data.length > 0) {
-                                quit.setAcceptRunnable(quitRunnable);
-                            }
-                            quit.show(stage);
+                        searchDialog.clearText();
+                    }
+                    if (!searchDialog.isVisible() | !searchDialog.hasParent())
+                        searchDialog.show(stage);
+                }
+                case SHOW_QUIT_ACTION -> {
+                    if (!removeModeChangePopup() && !removeGamepadGui()) {
+                        if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
+                            // Release mouse if captured.
+                            GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
                         } else {
-                            if (quitRunnable != null)
-                                quitRunnable.run();
-                            GaiaSky.postRunnable(() -> Gdx.app.exit());
+                            Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
+                            if (Settings.settings.program.exitConfirmation) {
+                                QuitWindow quit = new QuitWindow(stage, skin);
+                                if (data.length > 0) {
+                                    quit.setAcceptRunnable(quitRunnable);
+                                }
+                                quit.show(stage);
+                            } else {
+                                if (quitRunnable != null)
+                                    quitRunnable.run();
+                                GaiaSky.postRunnable(() -> Gdx.app.exit());
+                            }
                         }
                     }
                 }
-            }
-            case CAMERA_MODE_CMD -> removeModeChangePopup();
-            case SHOW_ABOUT_ACTION -> {
-                if (aboutWindow == null) {
-                    aboutWindow = new AboutWindow(stage, skin);
-                }
-                if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
-                    aboutWindow.show(stage);
-                }
-            }
-            case SHOW_PREFERENCES_ACTION -> {
-                Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
-                if (prefs.isEmpty()) {
-                    if (preferencesWindow == null) {
-                        preferencesWindow = new PreferencesWindow(stage, skin, GaiaSky.instance.getGlobalResources());
+                case CAMERA_MODE_CMD -> removeModeChangePopup();
+                case SHOW_ABOUT_ACTION -> {
+                    if (aboutWindow == null) {
+                        aboutWindow = new AboutWindow(stage, skin);
                     }
-                    if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
-                        preferencesWindow.show(stage);
+                    if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
+                        aboutWindow.show(stage);
                     }
-                } else {
-                    // Close current windows.
-                    for (Actor pref : prefs) {
-                        if (pref instanceof PreferencesWindow) {
-                            ((PreferencesWindow) pref).cancel();
-                            ((PreferencesWindow) pref).hide();
+                }
+                case SHOW_PREFERENCES_ACTION -> {
+                    Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
+                    if (prefs.isEmpty()) {
+                        if (preferencesWindow == null) {
+                            preferencesWindow = new PreferencesWindow(stage, skin, GaiaSky.instance.getGlobalResources());
+                        }
+                        if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
+                            preferencesWindow.show(stage);
+                        }
+                    } else {
+                        // Close current windows.
+                        for (Actor pref : prefs) {
+                            if (pref instanceof PreferencesWindow) {
+                                ((PreferencesWindow) pref).cancel();
+                                ((PreferencesWindow) pref).hide();
+                            }
                         }
                     }
                 }
-            }
-            case SHOW_PER_OBJECT_VISIBILITY_ACTION -> {
-                if (indVisWindow == null) {
-                    indVisWindow = new IndividualVisibilityWindow(scene, stage, skin);
-                }
-                if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
-                    indVisWindow.show(stage);
-            }
-            case SHOW_SLAVE_CONFIG_ACTION -> {
-                if (MasterManager.hasSlaves()) {
-                    if (slaveConfigWindow == null) {
-                        slaveConfigWindow = new SlaveConfigWindow(stage, skin);
+                case SHOW_PER_OBJECT_VISIBILITY_ACTION -> {
+                    if (indVisWindow == null) {
+                        indVisWindow = new IndividualVisibilityWindow(scene, stage, skin);
                     }
-                    if (!slaveConfigWindow.isVisible() || !slaveConfigWindow.hasParent()) {
-                        slaveConfigWindow.show(stage);
-                    }
+                    if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
+                        indVisWindow.show(stage);
                 }
-            }
-            case SHOW_LOAD_CATALOG_ACTION -> {
-                if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null
-                        && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
-                    try {
-                        lastOpenLocation = Paths.get(Settings.settings.program.fileChooser.lastLocation);
-                    } catch (Exception e) {
-                        lastOpenLocation = null;
+                case SHOW_SLAVE_CONFIG_ACTION -> {
+                    if (MasterManager.hasSlaves()) {
+                        if (slaveConfigWindow == null) {
+                            slaveConfigWindow = new SlaveConfigWindow(stage, skin);
+                        }
+                        if (!slaveConfigWindow.isVisible() || !slaveConfigWindow.hasParent()) {
+                            slaveConfigWindow.show(stage);
+                        }
                     }
                 }
-                if (lastOpenLocation == null) {
-                    lastOpenLocation = SysUtils.getUserHome();
-                } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
-                    lastOpenLocation = SysUtils.getHomeDir();
-                }
-                FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
-                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
-                fc.setAcceptText(I18n.msg("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv")
-                        || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
-                fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
-                fc.setResultListener((success, result) -> {
-                    if (success) {
-                        if (Files.exists(result) && Files.exists(result)) {
-                            // Load selected file.
-                            try {
-                                String fileName = result.getFileName().toString();
-                                if (fileName.endsWith(".json")) {
-                                    // Load internal JSON catalog file.
-                                    GaiaSky.instance.getExecutorService().execute(() -> {
-                                        var loaded = GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
-                                        if (!loaded) {
-                                            logger.warn("The dataset could not be loaded: " + result.toAbsolutePath().toString());
-                                        }
-                                    });
-                                } else {
-                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, stage);
-                                    Runnable doLoad = () -> {
+                case SHOW_LOAD_CATALOG_ACTION -> {
+                    if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null
+                            && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
+                        try {
+                            lastOpenLocation = Paths.get(Settings.settings.program.fileChooser.lastLocation);
+                        } catch (Exception e) {
+                            lastOpenLocation = null;
+                        }
+                    }
+                    if (lastOpenLocation == null) {
+                        lastOpenLocation = SysUtils.getUserHome();
+                    } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
+                        lastOpenLocation = SysUtils.getHomeDir();
+                    }
+                    FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                    fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
+                    fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
+                    fc.setAcceptText(I18n.msg("gui.loadcatalog"));
+                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv")
+                            || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
+                    fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
+                    fc.setResultListener((success, result) -> {
+                        if (success) {
+                            if (Files.exists(result) && Files.exists(result)) {
+                                // Load selected file.
+                                try {
+                                    String fileName = result.getFileName().toString();
+                                    if (fileName.endsWith(".json")) {
+                                        // Load internal JSON catalog file.
                                         GaiaSky.instance.getExecutorService().execute(() -> {
-                                            DatasetOptions datasetOptions = dld.generateDatasetOptions();
-                                            // Load dataset.
-                                            GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI,
-                                                                                     datasetOptions, true);
-                                            // Select first.
-                                            CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
-                                            if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
-                                                view.setEntity(ci.entity);
-                                                if (view.isSet()) {
-                                                    var set = view.getSet();
-                                                    if (set.data() != null && !set.data().isEmpty() && EntityUtils.isVisibilityOn(ci.entity)) {
-                                                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getRandomParticleName());
-                                                    }
-                                                } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
-                                                        view.getGraph().children.get(0))) {
-                                                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
-                                                }
-                                                // Open UI datasets.
-                                                GaiaSky.instance.scripting().maximizeInterfaceWindow();
-                                                GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
-                                            } else {
-                                                logger.info("No data loaded (did the load crash?)");
+                                            var loaded = GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
+                                            if (!loaded) {
+                                                logger.warn("The dataset could not be loaded: " + result.toAbsolutePath().toString());
                                             }
                                         });
-                                    };
-                                    dld.setAcceptRunnable(doLoad);
-                                    dld.show(stage);
+                                    } else {
+                                        final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, stage);
+                                        Runnable doLoad = () -> {
+                                            GaiaSky.instance.getExecutorService().execute(() -> {
+                                                DatasetOptions datasetOptions = dld.generateDatasetOptions();
+                                                // Load dataset.
+                                                GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI,
+                                                        datasetOptions, true);
+                                                // Select first.
+                                                CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
+                                                if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
+                                                    view.setEntity(ci.entity);
+                                                    if (view.isSet()) {
+                                                        var set = view.getSet();
+                                                        if (set.data() != null && !set.data().isEmpty() && EntityUtils.isVisibilityOn(ci.entity)) {
+                                                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                                                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getRandomParticleName());
+                                                        }
+                                                    } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
+                                                            view.getGraph().children.get(0))) {
+                                                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
+                                                    }
+                                                    // Open UI datasets.
+                                                    GaiaSky.instance.scripting().maximizeInterfaceWindow();
+                                                    GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
+                                                } else {
+                                                    logger.info("No data loaded (did the load crash?)");
+                                                }
+                                            });
+                                        };
+                                        dld.setAcceptRunnable(doLoad);
+                                        dld.show(stage);
+                                    }
+
+                                    lastOpenLocation = result.getParent();
+                                    Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
+                                    return true;
+                                } catch (Exception e) {
+                                    logger.error(I18n.msg("notif.error", result.getFileName()), e);
+                                    return false;
                                 }
 
-                                lastOpenLocation = result.getParent();
-                                Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
-                                return true;
-                            } catch (Exception e) {
-                                logger.error(I18n.msg("notif.error", result.getFileName()), e);
+                            } else {
+                                logger.error("Selection must be a file: " + result.toAbsolutePath());
                                 return false;
                             }
-
                         } else {
-                            logger.error("Selection must be a file: " + result.toAbsolutePath());
-                            return false;
-                        }
-                    } else {
-                        // Still, update last location.
-                        if (!Files.isDirectory(result)) {
-                            lastOpenLocation = result.getParent();
-                        } else {
-                            lastOpenLocation = result;
-                        }
-                        Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
-                    }
-                    return false;
-                });
-                fc.show(stage);
-            }
-            case SHOW_KEYFRAMES_WINDOW_ACTION -> {
-                if (keyframesWindow == null) {
-                    keyframesWindow = new KeyframesWindow(scene, stage, skin);
-                }
-                if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                    keyframesWindow.show(stage, 0, 0);
-                if (!GaiaSky.instance.isOn(ComponentType.Others)) {
-                    // Notify that the user needs to enable 'others'.
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.keyframe.ct"), 10f);
-                }
-            }
-            case SHOW_TEXTURE_WINDOW_ACTION -> {
-                var title = (String) data[0];
-                var scale = 1f;
-                if (data.length > 2) {
-                    scale = (Float) data[2];
-                }
-                var flipX = false;
-                var flipY = false;
-                if (data.length > 3) {
-                    flipX = (Boolean) data[3];
-                }
-                if (data.length > 4) {
-                    flipY = (Boolean) data[4];
-                }
-                TextureWindow textureWindow;
-                if (data[1] instanceof FrameBuffer) {
-                    var frameBuffer = (FrameBuffer) data[1];
-                    textureWindow = new TextureWindow(title, skin, stage, frameBuffer, scale);
-                } else {
-                    var texture = (Texture) data[1];
-                    textureWindow = new TextureWindow(title, skin, stage, texture, scale);
-                }
-                textureWindow.setFlip(flipX, flipY);
-                textureWindow.show(stage, 0, 50);
-            }
-            case SHOW_DATE_TIME_EDIT_ACTION -> {
-                if (dateDialog == null) {
-                    dateDialog = new DateDialog(stage, skin);
-                }
-                dateDialog.updateTime(GaiaSky.instance.time.getTime(), Settings.settings.program.timeZone.getTimeZone());
-                dateDialog.show(stage);
-            }
-            case UI_THEME_RELOAD_INFO -> {
-                if (keyframesWindow != null) {
-                    keyframesWindow.dispose();
-                    keyframesWindow = null;
-                }
-                this.skin = (Skin) data[0];
-            }
-            case MODE_POPUP_CMD -> {
-                if (Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
-                    ModePopupInfo mpi = (ModePopupInfo) data[0];
-                    String name = (String) data[1];
-
-                    if (mpi != null) {
-                        // Add
-                        Float seconds = (Float) data[2];
-                        float pad10 = 16f;
-                        float pad5 = 8f;
-                        float pad3 = 4.8f;
-                        if (modeChangeInfoPopup != null) {
-                            modeChangeInfoPopup.remove();
-                        }
-                        modeChangeInfoPopup = new Table(skin);
-                        modeChangeInfoPopup.setName("mct-" + name);
-                        modeChangeInfoPopup.setBackground("table-bg");
-                        modeChangeInfoPopup.pad(pad10);
-
-                        // Fill up table
-                        OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
-                        modeChangeInfoPopup.add(ttl).left().padBottom(pad10).row();
-
-                        OwnLabel dsc = new OwnLabel(mpi.header, skin);
-                        modeChangeInfoPopup.add(dsc).left().padBottom(pad5 * 3f).row();
-
-                        Table keysTable = new Table(skin);
-                        for (Pair<String[], String> m : mpi.mappings) {
-                            HorizontalGroup keysGroup = new HorizontalGroup();
-                            keysGroup.space(pad3);
-                            String[] keys = m.getFirst();
-                            String action = m.getSecond();
-                            if (keys != null && keys.length > 0 && action != null && !action.isEmpty()) {
-                                for (int i = 0; i < keys.length; i++) {
-                                    TextButton key = new TextButton(keys[i], skin, "key");
-                                    key.pad(0, pad3, 0, pad3);
-                                    key.pad(pad5);
-                                    keysGroup.addActor(key);
-                                    if (i < keys.length - 1) {
-                                        keysGroup.addActor(new OwnLabel("+", skin));
-                                    }
-                                }
-                                keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
-                                keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
-                            }
-                        }
-                        modeChangeInfoPopup.add(keysTable).center().row();
-                        if (mpi.warn != null && !mpi.warn.isEmpty()) {
-                            modeChangeInfoPopup.add(new OwnLabel(mpi.warn, skin, "mono-pink")).left().padTop(pad10).padBottom(pad5).row();
-                        }
-                        OwnTextButton closeButton = new OwnTextButton(I18n.msg("gui.ok") + " [esc]", skin);
-                        closeButton.pad(pad3, pad10, pad3, pad10);
-                        closeButton.addListener(event1 -> {
-                            if (event1 instanceof ChangeEvent) {
-                                removeModeChangePopup();
-                                return true;
-                            }
-                            return false;
-                        });
-                        modeChangeInfoPopup.add(closeButton).right().padTop(pad10 * 2f);
-
-                        modeChangeInfoPopup.pack();
-
-                        // Add table to UI.
-                        Container<Table> mct = new Container<>(modeChangeInfoPopup);
-                        mct.setFillParent(true);
-                        mct.top();
-                        mct.pad(pad10 * 2, 0, 0, 0);
-                        stage.addActor(mct);
-
-                        // Cancel and schedule task.
-                        cancelRemovePopupTask();
-                        removePopup = new Task() {
-                            @Override
-                            public void run() {
-                                if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent()) {
-                                    modeChangeInfoPopup.remove();
-                                }
-                            }
-                        };
-                        Timer.schedule(removePopup, seconds);
-
-                    } else {
-                        // Remove
-                        if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent() && modeChangeInfoPopup.getName().equals("mct-" + name)) {
-                            modeChangeInfoPopup.remove();
-                            modeChangeInfoPopup = null;
-                        }
-                    }
-                }
-            }
-            case DISPLAY_GUI_CMD -> {
-                boolean displayGui = (Boolean) data[0];
-                if (!displayGui) {
-                    // Remove processor.
-                    inputMultiplexer.removeProcessor(current.getGuiStage());
-                } else {
-                    // Add processor.
-                    inputMultiplexer.addProcessor(0, current.getGuiStage());
-                }
-            }
-            case SHOW_RESTART_ACTION -> {
-                String text;
-                if (data.length > 0) {
-                    text = (String) data[0];
-                } else {
-                    text = I18n.msg("gui.restart.default");
-                }
-                GenericDialog restart = new GenericDialog(I18n.msg("gui.restart.title"), skin, stage) {
-
-                    @Override
-                    protected void build() {
-                        content.clear();
-                        content.add(new OwnLabel(text, skin)).left().padBottom(pad18 * 2f).row();
-                    }
-
-                    @Override
-                    protected boolean accept() {
-                        // Shut down.
-                        GaiaSky.postRunnable(() -> {
-                            Gdx.app.exit();
-                            // Attempt restart.
-                            Path workingDir = Path.of(System.getProperty("user.dir"));
-                            Path[] scripts;
-                            if (SysUtils.isWindows()) {
-                                scripts = new Path[] { workingDir.resolve("gaiasky.exe"), workingDir.resolve("gaiasky.bat"), workingDir.resolve("gradlew.bat") };
+                            // Still, update last location.
+                            if (!Files.isDirectory(result)) {
+                                lastOpenLocation = result.getParent();
                             } else {
-                                scripts = new Path[] { workingDir.resolve("gaiasky"), workingDir.resolve("gradlew") };
+                                lastOpenLocation = result;
                             }
-                            for (Path file : scripts) {
-                                if (Files.exists(file) && Files.isRegularFile(file) && Files.isExecutable(file)) {
-                                    try {
-                                        if (file.getFileName().toString().contains("gaiasky")) {
-                                            // Just use the script.
-                                            final ArrayList<String> command = new ArrayList<>();
-                                            command.add(file.toString());
-                                            final ProcessBuilder builder = new ProcessBuilder(command);
-                                            builder.start();
-                                        } else if (file.getFileName().toString().contains("gradlew")) {
-                                            // Gradle script.
-                                            final ArrayList<String> command = new ArrayList<>();
-                                            command.add(file.toString());
-                                            command.add("core:run");
-                                            final ProcessBuilder builder = new ProcessBuilder(command);
-                                            builder.start();
-                                        }
-                                        break;
-                                    } catch (IOException e) {
-                                        logger.error(e, "Error running Gaia Sky");
-                                    }
-                                }
-                            }
-                        });
-                        return true;
+                            Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
+                        }
+                        return false;
+                    });
+                    fc.show(stage);
+                }
+                case SHOW_KEYFRAMES_WINDOW_ACTION -> {
+                    if (keyframesWindow == null) {
+                        keyframesWindow = new KeyframesWindow(scene, stage, skin);
                     }
-
-                    @Override
-                    protected void cancel() {
-                        // Nothing.
-                    }
-
-                    @Override
-                    public void dispose() {
-                        // Nothing.
-                    }
-                };
-                restart.setAcceptText(I18n.msg("gui.yes"));
-                restart.setCancelText(I18n.msg("gui.no"));
-                restart.buildSuper();
-                restart.show(stage);
-            }
-            case CLOSE_ALL_GUI_WINDOWS_CMD -> {
-                var actors = stage.getActors();
-                for (var actor : actors) {
-                    if (actor instanceof GenericDialog) {
-                        closeWindow((GenericDialog) actor);
+                    if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                        keyframesWindow.show(stage, 0, 0);
+                    if (!GaiaSky.instance.isOn(ComponentType.Others)) {
+                        // Notify that the user needs to enable 'others'.
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.keyframe.ct"), 10f);
                     }
                 }
-            }
-            case UI_RELOAD_CMD -> reloadUI((GlobalResources) data[0]);
-            default -> {
-            }
+                case SHOW_TEXTURE_WINDOW_ACTION -> {
+                    var title = (String) data[0];
+                    var scale = 1f;
+                    if (data.length > 2) {
+                        scale = (Float) data[2];
+                    }
+                    var flipX = false;
+                    var flipY = false;
+                    if (data.length > 3) {
+                        flipX = (Boolean) data[3];
+                    }
+                    if (data.length > 4) {
+                        flipY = (Boolean) data[4];
+                    }
+                    TextureWindow textureWindow;
+                    if (data[1] instanceof FrameBuffer) {
+                        var frameBuffer = (FrameBuffer) data[1];
+                        textureWindow = new TextureWindow(title, skin, stage, frameBuffer, scale);
+                    } else {
+                        var texture = (Texture) data[1];
+                        textureWindow = new TextureWindow(title, skin, stage, texture, scale);
+                    }
+                    textureWindow.setFlip(flipX, flipY);
+                    textureWindow.show(stage, 0, 50);
+                }
+                case SHOW_DATE_TIME_EDIT_ACTION -> {
+                    if (dateDialog == null) {
+                        dateDialog = new DateDialog(stage, skin);
+                    }
+                    dateDialog.updateTime(GaiaSky.instance.time.getTime(), Settings.settings.program.timeZone.getTimeZone());
+                    dateDialog.show(stage);
+                }
+                case SHOW_ADD_POSITION_BOOKMARK -> {
+                    if (bookmarkNameDialog == null) {
+                        bookmarkNameDialog = new BookmarkNameDialog(stage, skin);
+                    }
+                    bookmarkNameDialog.resetName();
+                    bookmarkNameDialog.show(stage);
+                }
+                case UI_THEME_RELOAD_INFO -> {
+                    if (keyframesWindow != null) {
+                        keyframesWindow.dispose();
+                        keyframesWindow = null;
+                    }
+                    this.skin = (Skin) data[0];
+                }
+                case MODE_POPUP_CMD -> {
+                    if (Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
+                        ModePopupInfo mpi = (ModePopupInfo) data[0];
+                        String name = (String) data[1];
+
+                        if (mpi != null) {
+                            // Add
+                            Float seconds = (Float) data[2];
+                            float pad10 = 16f;
+                            float pad5 = 8f;
+                            float pad3 = 4.8f;
+                            if (modeChangeInfoPopup != null) {
+                                modeChangeInfoPopup.remove();
+                            }
+                            modeChangeInfoPopup = new Table(skin);
+                            modeChangeInfoPopup.setName("mct-" + name);
+                            modeChangeInfoPopup.setBackground("table-bg");
+                            modeChangeInfoPopup.pad(pad10);
+
+                            // Fill up table
+                            OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
+                            modeChangeInfoPopup.add(ttl).left().padBottom(pad10).row();
+
+                            OwnLabel dsc = new OwnLabel(mpi.header, skin);
+                            modeChangeInfoPopup.add(dsc).left().padBottom(pad5 * 3f).row();
+
+                            Table keysTable = new Table(skin);
+                            for (Pair<String[], String> m : mpi.mappings) {
+                                HorizontalGroup keysGroup = new HorizontalGroup();
+                                keysGroup.space(pad3);
+                                String[] keys = m.getFirst();
+                                String action = m.getSecond();
+                                if (keys != null && keys.length > 0 && action != null && !action.isEmpty()) {
+                                    for (int i = 0; i < keys.length; i++) {
+                                        TextButton key = new TextButton(keys[i], skin, "key");
+                                        key.pad(0, pad3, 0, pad3);
+                                        key.pad(pad5);
+                                        keysGroup.addActor(key);
+                                        if (i < keys.length - 1) {
+                                            keysGroup.addActor(new OwnLabel("+", skin));
+                                        }
+                                    }
+                                    keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
+                                    keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
+                                }
+                            }
+                            modeChangeInfoPopup.add(keysTable).center().row();
+                            if (mpi.warn != null && !mpi.warn.isEmpty()) {
+                                modeChangeInfoPopup.add(new OwnLabel(mpi.warn, skin, "mono-pink")).left().padTop(pad10).padBottom(pad5).row();
+                            }
+                            OwnTextButton closeButton = new OwnTextButton(I18n.msg("gui.ok") + " [esc]", skin);
+                            closeButton.pad(pad3, pad10, pad3, pad10);
+                            closeButton.addListener(event1 -> {
+                                if (event1 instanceof ChangeEvent) {
+                                    removeModeChangePopup();
+                                    return true;
+                                }
+                                return false;
+                            });
+                            modeChangeInfoPopup.add(closeButton).right().padTop(pad10 * 2f);
+
+                            modeChangeInfoPopup.pack();
+
+                            // Add table to UI.
+                            Container<Table> mct = new Container<>(modeChangeInfoPopup);
+                            mct.setFillParent(true);
+                            mct.top();
+                            mct.pad(pad10 * 2, 0, 0, 0);
+                            stage.addActor(mct);
+
+                            // Cancel and schedule task.
+                            cancelRemovePopupTask();
+                            removePopup = new Task() {
+                                @Override
+                                public void run() {
+                                    if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent()) {
+                                        modeChangeInfoPopup.remove();
+                                    }
+                                }
+                            };
+                            Timer.schedule(removePopup, seconds);
+
+                        } else {
+                            // Remove
+                            if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent() && modeChangeInfoPopup.getName().equals("mct-" + name)) {
+                                modeChangeInfoPopup.remove();
+                                modeChangeInfoPopup = null;
+                            }
+                        }
+                    }
+                }
+                case DISPLAY_GUI_CMD -> {
+                    boolean displayGui = (Boolean) data[0];
+                    if (!displayGui) {
+                        // Remove processor.
+                        inputMultiplexer.removeProcessor(current.getGuiStage());
+                    } else {
+                        // Add processor.
+                        inputMultiplexer.addProcessor(0, current.getGuiStage());
+                    }
+                }
+                case SHOW_RESTART_ACTION -> {
+                    String text;
+                    if (data.length > 0) {
+                        text = (String) data[0];
+                    } else {
+                        text = I18n.msg("gui.restart.default");
+                    }
+                    GenericDialog restart = new GenericDialog(I18n.msg("gui.restart.title"), skin, stage) {
+
+                        @Override
+                        protected void build() {
+                            content.clear();
+                            content.add(new OwnLabel(text, skin)).left().padBottom(pad18 * 2f).row();
+                        }
+
+                        @Override
+                        protected boolean accept() {
+                            // Shut down.
+                            GaiaSky.postRunnable(() -> {
+                                Gdx.app.exit();
+                                // Attempt restart.
+                                Path workingDir = Path.of(System.getProperty("user.dir"));
+                                Path[] scripts;
+                                if (SysUtils.isWindows()) {
+                                    scripts = new Path[]{workingDir.resolve("gaiasky.exe"), workingDir.resolve("gaiasky.bat"), workingDir.resolve("gradlew.bat")};
+                                } else {
+                                    scripts = new Path[]{workingDir.resolve("gaiasky"), workingDir.resolve("gradlew")};
+                                }
+                                for (Path file : scripts) {
+                                    if (Files.exists(file) && Files.isRegularFile(file) && Files.isExecutable(file)) {
+                                        try {
+                                            if (file.getFileName().toString().contains("gaiasky")) {
+                                                // Just use the script.
+                                                final ArrayList<String> command = new ArrayList<>();
+                                                command.add(file.toString());
+                                                final ProcessBuilder builder = new ProcessBuilder(command);
+                                                builder.start();
+                                            } else if (file.getFileName().toString().contains("gradlew")) {
+                                                // Gradle script.
+                                                final ArrayList<String> command = new ArrayList<>();
+                                                command.add(file.toString());
+                                                command.add("core:run");
+                                                final ProcessBuilder builder = new ProcessBuilder(command);
+                                                builder.start();
+                                            }
+                                            break;
+                                        } catch (IOException e) {
+                                            logger.error(e, "Error running Gaia Sky");
+                                        }
+                                    }
+                                }
+                            });
+                            return true;
+                        }
+
+                        @Override
+                        protected void cancel() {
+                            // Nothing.
+                        }
+
+                        @Override
+                        public void dispose() {
+                            // Nothing.
+                        }
+                    };
+                    restart.setAcceptText(I18n.msg("gui.yes"));
+                    restart.setCancelText(I18n.msg("gui.no"));
+                    restart.buildSuper();
+                    restart.show(stage);
+                }
+                case CLOSE_ALL_GUI_WINDOWS_CMD -> {
+                    var actors = stage.getActors();
+                    for (var actor : actors) {
+                        if (actor instanceof GenericDialog) {
+                            closeWindow((GenericDialog) actor);
+                        }
+                    }
+                }
+                case UI_RELOAD_CMD -> reloadUI((GlobalResources) data[0]);
+                default -> {
+                }
             }
         }
 
