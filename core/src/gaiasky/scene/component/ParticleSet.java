@@ -605,8 +605,8 @@ public class ParticleSet implements Component, IDisposable {
         double deltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), epochJd) * Nature.MS_TO_Y;
         IParticleRecord focus = pointData.get(focusIndex);
         if (focus.hasProperMotion()) {
-            Vector3b aux = this.fetchPosition(focus, cPosD, B31, deltaYears);
-            return out.set(aux).add(GaiaSky.instance.getICamera().getPos());
+            Vector3b aux = this.fetchPosition(focus, null, B31, deltaYears);
+            return out.set(aux);
         } else {
             return getAbsolutePosition(out);
         }

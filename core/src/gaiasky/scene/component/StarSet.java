@@ -38,7 +38,7 @@ public class StarSet extends ParticleSet {
     public void updateFocus(ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
         Vector3d aux = this.fetchPositionDouble(focus, cPosD, D31, currDeltaYears);
-        this.focusPosition.set(aux).add(camera.getPos());
+        this.focusPosition.set(aux).add(cPosD);
         this.focusDistToCamera = aux.len();
         this.focusSize = getFocusSize();
         this.focusSolidAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());

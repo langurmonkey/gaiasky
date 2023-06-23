@@ -1410,7 +1410,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                     pos.add(dx, dy, dz);
                     posinv.set(pos).scl(-1d);
-                    direction.set(aux1b).sub(pos).nor();
+                    direction.set(-dx, -dy, -dz).nor();
                     up.set(direction.x, direction.z, -direction.y).nor();
                     rotate(up, 0.01);
                     updatePerspectiveCamera();
