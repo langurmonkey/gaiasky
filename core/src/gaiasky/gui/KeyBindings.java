@@ -37,7 +37,7 @@ public class KeyBindings {
     public static final int CTRL_L = Keys.CONTROL_LEFT;
     public static final int SHIFT_L = Keys.SHIFT_LEFT;
     public static final int ALT_L = Keys.ALT_LEFT;
-    public static final int[] SPECIAL = new int[] { CTRL_L, SHIFT_L, ALT_L };
+    public static final int[] SPECIAL = new int[]{CTRL_L, SHIFT_L, ALT_L};
     private static final Log logger = Logger.getLogger(KeyBindings.class);
     public static KeyBindings instance;
     private final Map<String, ProgramAction> actions;
@@ -100,7 +100,6 @@ public class KeyBindings {
      * Finds an action given its name
      *
      * @param name The name
-     *
      * @return The action if it exists
      */
     public ProgramAction findAction(String name) {
@@ -116,7 +115,6 @@ public class KeyBindings {
      * Gets the keys that trigger the action identified by the given name
      *
      * @param actionId The action ID
-     *
      * @return The keys
      */
     public TreeSet<Integer> getKeys(String actionId) {
@@ -281,10 +279,16 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.clusters", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.clusters")));
 
         // Divide time warp
-        addAction(new ProgramAction("action.dividetime", () -> EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this)));
+        addAction(new ProgramAction("action.dividetime", () -> {
+            /* This is now implemented in {@link gaiasky.input.MainMouseKbdListener#update() **/
+            // EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this);
+        }));
 
         // Double time warp
-        addAction(new ProgramAction("action.doubletime", () -> EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this)));
+        addAction(new ProgramAction("action.doubletime", () -> {
+            /* This is now implemented in {@link gaiasky.input.MainMouseKbdListener#update() **/
+            // EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this);
+        }));
 
         // Toggle time
         addAction(new ProgramAction("action.pauseresume", () -> {
@@ -554,7 +558,6 @@ public class KeyBindings {
      * Reads the first line of a file.
      *
      * @param file The path pointing to the file to read.
-     *
      * @return The first line as a string.
      */
     private Optional<String> readFirstLine(Path file) {
@@ -596,10 +599,14 @@ public class KeyBindings {
     public static class ProgramAction implements Runnable, Comparable<ProgramAction> {
         final String actionId;
         final String actionName;
-        /** Action to run. **/
+        /**
+         * Action to run.
+         **/
         private final Runnable action;
 
-        /** Condition that must be met. **/
+        /**
+         * Condition that must be met.
+         **/
         private final BooleanRunnable[] conditions;
 
         ProgramAction(String actionId, Runnable action, BooleanRunnable... conditions) {

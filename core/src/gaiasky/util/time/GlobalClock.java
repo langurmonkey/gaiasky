@@ -21,20 +21,30 @@ import java.time.Instant;
 public class GlobalClock implements IObserver, ITimeFrameProvider {
     private static final Log logger = Logger.getLogger(GlobalClock.class);
 
-    /** The current time of the clock **/
+    /**
+     * The current time of the clock
+     **/
     public Instant time;
     /**
      * The fixed frame rate when not in real time. Set negative to use real time
      **/
     public float fps = -1;
     long lastTime;
-    /** Target time to stop the clock, if any **/
+    /**
+     * Target time to stop the clock, if any
+     **/
     private Instant targetTime;
-    /** The simulation time difference in hours **/
+    /**
+     * The simulation time difference in hours
+     **/
     private double hDiff;
-    /** The frame time difference in seconds **/
+    /**
+     * The frame time difference in seconds
+     **/
     private double dt;
-    /** Represents the time wrap multiplier. Scales the real time **/
+    /**
+     * Represents the time wrap multiplier. Scales the real time
+     **/
     private double timeWarp = 1;
     // Seconds since last event POST
     private float lastUpdate = 1;
@@ -140,68 +150,81 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TARGET_TIME_CMD:
-            if (data.length > 0) {
-                targetTime = (Instant) data[0];
-            } else {
-                targetTime = null;
+            case TARGET_TIME_CMD -> {
+                if (data.length > 0) {
+                    targetTime = (Instant) data[0];
+                } else {
+                    targetTime = null;
+                }
             }
-            break;
-        case TIME_WARP_CMD:
-            // Update pace
-            setTimeWarp((Double) data[0]);
-            break;
-        case TIME_WARP_INCREASE_CMD:
-            double tw;
-            if (timeWarp == 0) {
-                tw = 0.125;
-            } else if (timeWarp == -0.125) {
-                tw = 0;
-            } else if (timeWarp < 0) {
-                tw = timeWarp / 2.0;
-            } else {
-                tw = timeWarp * 2.0;
+            case TIME_WARP_CMD -> setTimeWarp((Double) data[0]);
+            case TIME_WARP_INCREASE_CMD -> {
+                double tw;
+                if (timeWarp == 0) {
+                    tw = 0.125;
+                } else if (timeWarp == -0.125) {
+                    tw = 0;
+                } else if (timeWarp < 0) {
+                    tw = nearestPowerOf2(timeWarp, -1.0);
+                } else {
+                    tw = nearestPowerOf2(timeWarp, 1.0);
+                }
+                setTimeWarp(tw);
             }
-            setTimeWarp(tw);
-            break;
-        case TIME_WARP_DECREASE_CMD:
-            if (timeWarp == 0.125) {
-                tw = 0;
-            } else if (timeWarp == 0) {
-                tw = -0.125;
-            } else if (timeWarp < 0) {
-                tw = timeWarp * 2.0;
-            } else {
-                tw = timeWarp / 2.0;
+            case TIME_WARP_DECREASE_CMD -> {
+                double tw;
+                if (timeWarp == 0.125) {
+                    tw = 0;
+                } else if (timeWarp == 0) {
+                    tw = -0.125;
+                } else if (timeWarp < 0) {
+                    tw = nearestPowerOf2(timeWarp, 1.0);
+                } else {
+                    tw = nearestPowerOf2(timeWarp, -1.0);
+                }
+                setTimeWarp(tw);
             }
-            setTimeWarp(tw);
-            break;
-        case TIME_CHANGE_CMD:
-            // Update time
-            Instant newinstant = ((Instant) data[0]);
-            long newt = newinstant.toEpochMilli();
-            boolean updt = false;
-            Settings settings = Settings.settings;
-            if (newt > settings.runtime.maxTimeMs) {
-                newt = settings.runtime.maxTimeMs;
-                logger.info("Time overflow, set to maximum (" + (settings.runtime.maxTimeMs * Nature.MS_TO_Y) + " years)");
-                updt = true;
+            case TIME_CHANGE_CMD -> {
+                // Update time
+                Instant newinstant = ((Instant) data[0]);
+                long newt = newinstant.toEpochMilli();
+                boolean updt = false;
+                Settings settings = Settings.settings;
+                if (newt > settings.runtime.maxTimeMs) {
+                    newt = settings.runtime.maxTimeMs;
+                    logger.info("Time overflow, set to maximum (" + (settings.runtime.maxTimeMs * Nature.MS_TO_Y) + " years)");
+                    updt = true;
+                }
+                if (newt < settings.runtime.minTimeMs) {
+                    newt = settings.runtime.minTimeMs;
+                    logger.info("Time overflow, set to minimum (" + (settings.runtime.minTimeMs * Nature.MS_TO_Y) + " years)");
+                    updt = true;
+                }
+                if (updt) {
+                    this.time = Instant.ofEpochMilli(newt);
+                } else {
+                    this.time = newinstant;
+                }
             }
-            if (newt < settings.runtime.minTimeMs) {
-                newt = settings.runtime.minTimeMs;
-                logger.info("Time overflow, set to minimum (" + (settings.runtime.minTimeMs * Nature.MS_TO_Y) + " years)");
-                updt = true;
+            default -> {
             }
-            if (updt) {
-                this.time = Instant.ofEpochMilli(newt);
-            } else {
-                this.time = newinstant;
-            }
-            break;
-        default:
-            break;
         }
 
+    }
+
+    /**
+     * Finds the nearest power of two to n, in the given direction.
+     * @param n The number.
+     * @param dir Direction. Either 1.0 or -1.0.
+     * @return The nearest power of two to n.
+     */
+    public double nearestPowerOf2(double n, double dir) {
+        long a = (int) (Math.log(n) / Math.log(2.0));
+
+        if (Math.pow(2.0, a) == n)
+            return n;
+
+        return (long) Math.pow(2.0, a + dir);
     }
 
     public void setTimeWarp(double tw) {

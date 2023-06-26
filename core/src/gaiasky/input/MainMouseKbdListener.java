@@ -34,21 +34,35 @@ import java.util.Objects;
 
 public class MainMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
 
-    /** Maximum double click time, in ms **/
+    /**
+     * Maximum double click time, in ms
+     **/
     private static final long doubleClickTime = 400;
     public final GaiaGestureListener gestureListener;
-    /** FOCUS_MODE comparator **/
+    /**
+     * FOCUS_MODE comparator
+     **/
     private final Comparator<Entity> comp;
-    /** Max pixel distance to be considered a click **/
+    /**
+     * Max pixel distance to be considered a click
+     **/
     private final float MOVE_PX_DIST;
-    /** Max distance from the click to the actual selected star **/
+    /**
+     * Max distance from the click to the actual selected star
+     **/
     private final int MIN_PIX_DIST;
     private final Vector2 gesture = new Vector2();
-    /** Smoothing factor applied in the non-cinematic mode **/
+    /**
+     * Smoothing factor applied in the non-cinematic mode
+     **/
     private final double noAccelSmoothing;
-    /** Scaling factor applied in the non-cinematic mode **/
+    /**
+     * Scaling factor applied in the non-cinematic mode
+     **/
     private final double noAccelFactor;
-    /** Drag vectors **/
+    /**
+     * Drag vectors
+     **/
     private final Vector2 currentDrag;
     private final Vector2 lastDrag;
     private final NaturalCamera camera;
@@ -58,37 +72,61 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
      * focus.
      */
     public int leftMouseButton = Buttons.LEFT;
-    /** The button for panning the camera along the up/right plane */
+    /**
+     * The button for panning the camera along the up/right plane
+     */
     public int rightMouseButton = Buttons.RIGHT;
-    /** The button for moving the camera along the direction axis */
+    /**
+     * The button for moving the camera along the direction axis
+     */
     public int middleMouseButton = Buttons.MIDDLE;
     /**
      * Whether scrolling requires the activeKey to be pressed (false) or always
      * allow scrolling (true).
      */
     public boolean alwaysScroll = true;
-    /** The weight for each scrolled amount. */
+    /**
+     * The weight for each scrolled amount.
+     */
     public float scrollFactor = -0.1f;
-    /** Current movement multiplier state. **/
+    /**
+     * Current movement multiplier state.
+     **/
     private boolean movementMultiplierState = false;
-    /** The key for rolling the camera **/
+    /**
+     * The key for rolling the camera
+     **/
     public int rollKey = Keys.SHIFT_LEFT;
-    /** The current (first) button being pressed. */
+    /**
+     * The current (first) button being pressed.
+     */
     protected int button = -1;
     private float startX, startY;
-    /** dx(mouse pointer) since last time **/
+    /**
+     * dx(mouse pointer) since last time
+     **/
     private double dragDx;
-    /** dy(mouse pointer) since last time **/
+    /**
+     * dy(mouse pointer) since last time
+     **/
     private double dragDy;
-    /** Save time of last click, in ms */
+    /**
+     * Save time of last click, in ms
+     */
     private long lastClickTime = -1;
-    /** We're dragging or selecting a keyframe **/
+    /**
+     * We're dragging or selecting a keyframe
+     **/
     private boolean keyframeBeingDragged = false;
     private int touched;
     private boolean multiTouch;
-    /** Reference to the scene. **/
+    /**
+     * Reference to the scene.
+     **/
     private Scene scene;
-    /** Keyframes path entity. **/
+    /**
+     * Keyframes path entity.
+     **/
     private Entity kpo;
     private KeyframesView kfView;
 
@@ -406,9 +444,11 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             }
             result = true;
         }
+
+        // Camera speed-up button.
         var bindings = KeyBindings.instance;
-        var keys = bindings.getKeys("action.camera.speedup");
-        if (allPressed(keys)) {
+        var speedUpKeys = bindings.getKeys("action.camera.speedup");
+        if (allPressed(speedUpKeys)) {
             if (!movementMultiplierState) {
                 // Activate.
                 movementMultiplierState = true;
@@ -422,21 +462,47 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
             }
         }
+
+        // Keys to speed up and slow down time.
+        var speedTimeKeys = bindings.getKeys("action.doubletime");
+        var slowTimeKeys = bindings.getKeys("action.dividetime");
+        if (allPressed(speedTimeKeys)) {
+            var t = GaiaSky.instance.time.getWarpFactor();
+            // Speed up.
+            if (t == 0) {
+                t = 0.1;
+            } else if(t > -0.1 && t < 0) {
+                t = 0;
+            }
+            double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+            EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + Math.abs(t * inc) : t + t * inc);
+        } else if (allPressed(slowTimeKeys)) {
+            var t = GaiaSky.instance.time.getWarpFactor();
+            // Slow down.
+            if (t == 0) {
+                t = -0.1;
+            } else if (t < 0.1 && t > 0) {
+                t = 0;
+            }
+            double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+            EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - Math.abs(t * inc) : t - t * inc);
+        }
+
         return result;
     }
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-        case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-        case TOUCH_DRAGGED -> this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
-        case SCROLLED -> this.scrolled(0f, (float) data[0]);
-        case KEY_DOWN -> this.keyDown((int) data[0]);
-        case KEY_UP -> this.keyUp((int) data[0]);
-        case SCENE_LOADED -> this.scene = (Scene) data[0];
-        default -> {
-        }
+            case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+            case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+            case TOUCH_DRAGGED -> this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
+            case SCROLLED -> this.scrolled(0f, (float) data[0]);
+            case KEY_DOWN -> this.keyDown((int) data[0]);
+            case KEY_UP -> this.keyUp((int) data[0]);
+            case SCENE_LOADED -> this.scene = (Scene) data[0];
+            default -> {
+            }
         }
     }
 
