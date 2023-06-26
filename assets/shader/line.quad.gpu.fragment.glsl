@@ -34,12 +34,12 @@ void main() {
             if (trail < 0.0) {
                 trail += 1.0;
             }
-        } else if (v_coord > u_coordPos) {
-            // Weird case?
-            trail = 0.0;
+        } else if (v_coord <= u_coordPos) {
+            // Non-timed lines, before the object.
+            trail = v_coord / u_coordPos;
         } else {
-            // Non-timed lines.
-            trail = v_coord;
+            // We are past the object in non-periodic orbits.
+            trail = 0.0;
         }
         if (u_trailMap >= 1.0) {
             // We map to zero, always.

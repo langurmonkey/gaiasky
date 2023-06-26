@@ -38,12 +38,13 @@ public class ModelUpdater extends AbstractUpdateSystem {
     private final Vector3d D32;
     private final Matrix4d MD4;
     private final Quaternion QF;
-    private QuaternionDouble QD;
+    private final QuaternionDouble QD;
 
     public ModelUpdater(Family family, int priority) {
         super(family, priority);
         this.camera = GaiaSky.instance.cameraManager;
         this.D32 = new Vector3d();
+        this.QD = new QuaternionDouble();
         this.QF = new Quaternion();
         this.MD4 = new Matrix4d();
     }
@@ -138,7 +139,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
                 graph.translation.setToTranslation(localTransform).scl(size * sizeFactor);
                 if (attitude.attitude != null) {
-                    QD = attitude.attitude.getQuaternion();
+                    QD.set(attitude.attitude.getQuaternion());
                     QF.set((float) QD.x, (float) QD.y, (float) QD.z, (float) QD.w);
                 } else {
                     QD.setFromAxis(0, 1, 0, AstroUtils.getSunLongitude(GaiaSky.instance.time.getTime()));

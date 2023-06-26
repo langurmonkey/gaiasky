@@ -32,7 +32,7 @@ public class SceneGraphBuilderSystem extends AbstractInitSystem {
             if (parent != null) {
                 addChild(parent, entity, true);
             } else {
-                throw new RuntimeException(I18n.msg("error.parent.notfound", Mapper.base.get(entity).getName(), graph.parentName));
+                logger.error(I18n.msg("error.parent.notfound", Mapper.base.get(entity).getName(), graph.parentName));
             }
         }
 
