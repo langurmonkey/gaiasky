@@ -193,8 +193,9 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
 
             // Regular.
             if (isLine()) {
-                float lw = vertsView.getPrimitiveSize();
-                shaderProgram.setUniformf("u_lineWidthTan", (float) (lw * 0.8f * baseWidthAngleTan * Settings.settings.scene.lineWidth * camera.getFovFactor()));
+                float lw = vertsView.getPrimitiveSize() * Settings.settings.scene.lineWidth * camera.getFovFactor();
+                shaderProgram.setUniformf("u_lineWidthTan", (float) (lw * 0.8f * baseWidthAngleTan));
+                Gdx.gl.glLineWidth(lw * 1.5f);
             } else {
                 shaderProgram.setUniformf("u_pointSize", renderable.getPrimitiveSize());
             }
@@ -210,6 +211,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                 shaderProgram.setUniformf("u_bodyPos", Float.NaN, Float.NaN, Float.NaN);
             }
             shaderProgram.setUniformf("u_trailMap", trajectory != null ? trajectory.trailMap : 0.0f);
+            shaderProgram.setUniformf("u_trailMinOpacity", trajectory != null ? trajectory.trailMinOpacity : 0.0f);
             shaderProgram.setUniformf("u_coordPos", trajectory != null ? (float) trajectory.coord : 1f);
             shaderProgram.setUniformf("u_period", trajectory != null && trajectory.oc != null ? (float) trajectory.oc.period : 0f);
             Entity parent = renderable.getParentEntity();

@@ -17,10 +17,7 @@ import gaiasky.util.math.Vector3b;
 
 public class KeyframeUtils {
 
-    private Scene scene;
-
     public KeyframeUtils(Scene scene) {
-        this.scene = scene;
     }
 
     public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean arrowCaps) {
@@ -35,7 +32,6 @@ public class KeyframeUtils {
 
         var verts = Mapper.verts.get(entity);
         verts.renderGroup = rg;
-        verts.closedLoop = closedLoop;
         verts.primitiveSize = primitiveSize;
 
         var graph = Mapper.graph.get(entity);

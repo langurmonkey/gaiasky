@@ -7,6 +7,7 @@ uniform float u_zfar;
 uniform float u_k;
 uniform float u_coordEnabled;
 uniform float u_trailMap;
+uniform float u_trailMinOpacity;
 uniform float u_coordPos;
 uniform float u_period;
 
@@ -34,9 +35,10 @@ void main() {
             if (trail < 0.0) {
                 trail += 1.0;
             }
+            trail = min(trail + u_trailMinOpacity, 1.0);
         } else if (v_coord <= u_coordPos) {
-            // Non-timed lines, before the object.
-            trail = v_coord / u_coordPos;
+            // Non-periodic lines, before the object.
+            trail = min(v_coord / u_coordPos + u_trailMinOpacity, 1.0);
         } else {
             // We are past the object in non-periodic orbits.
             trail = 0.0;
@@ -48,6 +50,7 @@ void main() {
             trail = (trail - u_trailMap) / (1.0 - u_trailMap);
         }
     } else {
+        // We assume a periodic orbit.
         trail = 1.0;
     }
 

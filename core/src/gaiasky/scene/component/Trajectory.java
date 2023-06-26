@@ -52,11 +52,16 @@ public class Trajectory implements Component {
      * Whether the orbit must be refreshed when out of bounds
      */
     public boolean mustRefresh;
+
+    /** Whether to close the trajectory (connect end point to start point) or not **/
+    public boolean closedLoop = true;
+
     /**
      * Whether to show the orbit as a trail or not.
      * A trail fades the orbit line as it gets further away from the object.
      */
     public boolean orbitTrail = true;
+
     /**
      * The bottom mapping position for the trail. The orbit trail assigns
      * an opacity value to each point of the orbit, where 1 is the location of
@@ -66,6 +71,14 @@ public class Trajectory implements Component {
      * Set to 1 to have no orbit at all.
      */
     public float trailMap = 0.0f;
+
+    /**
+     * Minimum opacity value of the trail. Set this > 0 to raise the global opacity level
+     * of the orbit. Effectively, the opacity of the orbit will be mapped from this value
+     * to 1.
+     */
+    public float trailMinOpacity = 0.0f;
+
     public OrbitDataLoaderParameters params;
     /**
      * Point color
@@ -131,6 +144,10 @@ public class Trajectory implements Component {
         setPointColor(color);
     }
 
+    public void setClosedLoop(Boolean closedLoop) {
+
+    }
+
     public void setOrbitProvider(String provider) {
         this.provider = provider.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
     }
@@ -161,6 +178,10 @@ public class Trajectory implements Component {
 
     public void setTrailMap(Double trailMap) {
         this.trailMap = MathUtils.clamp(trailMap.floatValue(), 0f, 1.0f);
+    }
+
+    public void setTrailMinOpacity(Double trailMin) {
+        this.trailMinOpacity = MathUtils.clamp(trailMin.floatValue(), 0f, 1.0f);
     }
 
     public void setOrbittrail(Boolean trail) {

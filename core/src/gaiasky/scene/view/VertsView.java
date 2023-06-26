@@ -26,11 +26,17 @@ import gaiasky.util.math.Vector3d;
 public class VertsView extends BaseView implements IGPUVertsRenderable {
 
     private final TrajectoryUtils utils;
-    /** The verts component . **/
+    /**
+     * The verts component .
+     **/
     private Verts verts;
-    /** The graph component. **/
+    /**
+     * The graph component.
+     **/
     private GraphNode graph;
-    /** The trajectory component (if any). **/
+    /**
+     * The trajectory component (if any).
+     **/
     private Trajectory trajectory;
 
     public VertsView() {
@@ -100,11 +106,14 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
 
     @Override
     public boolean isClosedLoop() {
-        return verts.closedLoop;
+        return trajectory != null ? trajectory.closedLoop : verts.closedLoop;
     }
 
     @Override
     public void setClosedLoop(boolean closedLoop) {
+        if (trajectory != null) {
+            trajectory.closedLoop = closedLoop;
+        }
         verts.closedLoop = closedLoop;
     }
 
@@ -211,6 +220,6 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
      * Clears the data from this object, both in RAM and VRAM
      */
     public void clear() {
-        setPoints(new double[] {});
+        setPoints(new double[]{});
     }
 }

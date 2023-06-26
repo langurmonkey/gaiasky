@@ -176,6 +176,10 @@
         "units": "Double",
         "aliases": [ "pointsize" ]
       },
+      "closedLoop": {
+        "description": "Define whether the loop must be closed or not (i.e. join the end point with the start point). Defaults to true, which is the value for periodic orbits.",
+        "units": "Boolean"
+      },
       "orbitTrail": {
         "description": "Whether to fade the orbit as it gets further away from the head (or object), in the opposite direction of travel. By default, the head is mapped to an opacity of 1, and the tail is mapped to an opacity of 0.",
         "units": "Boolean",
@@ -183,6 +187,10 @@
       },
       "trailMap": {
         "description": "Modify the tail mapping value in case ``orbitTrail`` is set to ``true``. This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity value of 0. The default value is 0. Set it to 0.5 to have a trail from the object to half the orbit. This enables having shorter trails, while improving the performance due to less lines being rendered.",
+        "units": "Double"
+      },
+      "trailMinOpacity": {
+        "description": "Minimum opacity level of the whole orbit in trail mode. Only active if ``orbitTrail`` is set to ``true``. This parameter defines the minimum opacity of the orbit (in [0,1]). This enables having trails where the faint end maps to an opacity larger than zero, thus getting to see the whole orbit at all times.",
         "units": "Double"
       },
       "newMethod": {
