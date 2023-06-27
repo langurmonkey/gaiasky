@@ -259,6 +259,7 @@ public class CollapsiblePane extends Table {
         window.align(Align.center);
 
         OwnScrollPane contentScroll = new OwnScrollPane(content, skin, "minimalist-nobg");
+        contentScroll.setName("collapsible pane scroll");
         contentScroll.setSize(content.getWidth(), content.getHeight() * 1.1f);
 
         window.add(contentScroll).pad(8f).row();

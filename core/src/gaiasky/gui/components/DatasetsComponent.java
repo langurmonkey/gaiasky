@@ -248,6 +248,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         // Info
         ScrollPane scroll = new OwnScrollPane(c, skin, "minimalist-nobg");
+        scroll.setName("datasets component scroll");
         scroll.setScrollingDisabled(false, true);
         scroll.setForceScroll(false, false);
         scroll.setFadeScrollBars(false);

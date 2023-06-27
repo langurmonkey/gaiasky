@@ -312,7 +312,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksScrollPane.setFadeScrollBars(false);
         bookmarksScrollPane.setScrollingDisabled(true, false);
 
-        bookmarksScrollPane.setHeight(260f);
+        bookmarksScrollPane.setHeight(350f);
         bookmarksScrollPane.setWidth(contentWidth);
 
         /*
@@ -482,9 +482,11 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
 
         public TreeNode(BookmarkNode node, Skin skin) {
             super(new OwnLabel(node.name, skin));
+            this.getActor().setName(node.name);
             this.node = node;
             setValue(node.name);
         }
+
     }
 
 }

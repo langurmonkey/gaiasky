@@ -12,7 +12,12 @@ import gaiasky.scene.view.FocusView;
 
 public class Shape implements Component {
 
+    /** The actual object to track. **/
     public FocusView track;
+    /** The name of the object whose position this shape object will track. **/
     public String trackName;
 
+    public void setTrack(String track) {
+        this.trackName = track;
+    }
 }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
+import gaiasky.util.GuiUtils;
 
 public class OwnScrollPane extends ScrollPane {
     private float ownWidth = 0f, ownHeight = 0f;
@@ -48,20 +49,18 @@ public class OwnScrollPane extends ScrollPane {
             }
         }
 
-        // FOCUS_MODE listener
+        // Focus listener.
         setFocusModeListener();
     }
 
     private void setFocusModeListener() {
-        // FOCUS_MODE listener
+        // Focus listener.
         addListener((e) -> {
             if (e instanceof InputEvent) {
                 InputEvent ie = (InputEvent) e;
                 e.setBubbles(bubbles);
                 if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
                     return this.getStage().setScrollFocus(this);
-                } else if (ie.getType() == InputEvent.Type.exit && this.getStage() != null) {
-                    return this.getStage().setScrollFocus(null);
                 }
             }
             return false;

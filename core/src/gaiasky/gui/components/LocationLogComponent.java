@@ -47,7 +47,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
          * ADD TO CONTENT
          */
         ScrollPane scrollPane = new OwnScrollPane(locations, skin, "minimalist-nobg");
-        scrollPane.setName("bookmarks scroll");
+        scrollPane.setName("location log scroll");
 
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);

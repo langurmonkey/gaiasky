@@ -373,7 +373,7 @@ public class BookmarksManager implements IObserver {
 
     public static class BookmarkNode {
 
-        private static final String VEC3_REGEX = "\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\\]";
+        private static final String VEC3_REGEX = "\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?]";
         /**
          * Regular expression that defines the format of positional bookmarks, which is:
          * <code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name}</code>
@@ -381,7 +381,7 @@ public class BookmarksManager implements IObserver {
         public static final String POS_BOOKMARK_REGEX = "\\{" + VEC3_REGEX +
                                                         "\\|" + VEC3_REGEX +
                                                         "\\|" + VEC3_REGEX +
-                                                        "\\|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z\\|[^\\|,\\\\]+\\}";
+                                                        "\\|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z\\|[^|,\\\\]+}";
 
         /**
          * <p>The text of the bookmark in the bookmarks.txt file.

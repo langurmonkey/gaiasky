@@ -145,6 +145,16 @@
         "units": "Double"
       }
     },
+    "Shape": {
+      "description": "Defines attributes related to shape objects",
+      "track": {
+        "description": "Shape objects can use the position of other objects as their own. This is useful when, for example, we want to add a wireframe sphere around an object. This attribute contains the name of the object whose position we are to track.",
+        "units": "String",
+        "aliases": [
+          "trackName"
+        ]
+      }
+    },
     "Trajectory": {
       "description": "Defines attributes related to orbits and trajectory objects. See :ref:`orbits` for more information.",
       "orbitProvider": {

@@ -10,6 +10,7 @@ package gaiasky.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -18,10 +19,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.gui.GenericDialog;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.Link;
-import gaiasky.util.scene2d.OwnImageButton;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 
 public class GuiUtils {
 
@@ -78,7 +76,7 @@ public class GuiUtils {
     }
 
     public static void addNoConnectionExit(Skin skin, Stage stage) {
-        GenericDialog exitw = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.download.noconnection.title")), skin, stage) {
+        GenericDialog exitDialog = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.download.noconnection.title")), skin, stage) {
 
             @Override
             protected void build() {
@@ -112,14 +110,14 @@ public class GuiUtils {
             }
 
         };
-        exitw.setAcceptText(I18n.msg("gui.exit"));
-        exitw.setCancelText(null);
-        exitw.buildSuper();
-        exitw.show(stage);
+        exitDialog.setAcceptText(I18n.msg("gui.exit"));
+        exitDialog.setCancelText(null);
+        exitDialog.buildSuper();
+        exitDialog.show(stage);
     }
 
     public static void addNoVRConnectionExit(Skin skin, Stage stage) {
-        GenericDialog exitw = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.vr.noconnection.title")), skin, stage) {
+        GenericDialog exitDialog = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.vr.noconnection.title")), skin, stage) {
 
             @Override
             protected void build() {
@@ -147,14 +145,14 @@ public class GuiUtils {
             }
 
         };
-        exitw.setAcceptText(I18n.msg("gui.exit"));
-        exitw.setCancelText(null);
-        exitw.buildSuper();
-        exitw.show(stage);
+        exitDialog.setAcceptText(I18n.msg("gui.exit"));
+        exitDialog.setCancelText(null);
+        exitDialog.buildSuper();
+        exitDialog.show(stage);
     }
 
     public static void addNoVRDataExit(Skin skin, Stage stage) {
-        GenericDialog exitw = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.vr.nodata.title")), skin, stage) {
+        GenericDialog exitDialog = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.vr.nodata.title")), skin, stage) {
 
             @Override
             protected void build() {
@@ -182,10 +180,10 @@ public class GuiUtils {
             }
 
         };
-        exitw.setAcceptText(I18n.msg("gui.exit"));
-        exitw.setCancelText(null);
-        exitw.buildSuper();
-        exitw.show(stage);
+        exitDialog.setAcceptText(I18n.msg("gui.exit"));
+        exitDialog.setCancelText(null);
+        exitDialog.buildSuper();
+        exitDialog.show(stage);
     }
 
     public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, Skin skin) {
@@ -244,7 +242,6 @@ public class GuiUtils {
      * traversing it recursively, if it exists.
      *
      * @param actor The container actor.
-     *
      * @return The first scroll pane found, or null if none is found.
      */
     public static ScrollPane getScrollPaneIn(Actor actor) {
@@ -268,7 +265,6 @@ public class GuiUtils {
      * the actor is visible by moving the scroll position if required.
      *
      * @param actor The actor.
-     *
      * @return True if the scroll needed to be moved.
      */
     public static boolean ensureScrollVisible(Actor actor) {
@@ -290,6 +286,32 @@ public class GuiUtils {
         return false;
     }
 
+    /**
+     * Recursively get all scroll panes in the given group.
+     *
+     * @param group The group to test.
+     * @param list  The output list where to put the scroll panes.
+     * @return The list.
+     */
+    public static Array<OwnScrollPane> getScrollPanes(Group group, Array<OwnScrollPane> list) {
+        for (var actor : group.getChildren()) {
+            if (actor instanceof OwnScrollPane) {
+                list.add((OwnScrollPane) actor);
+                getScrollPanes((WidgetGroup) actor, list);
+            } else if (actor instanceof WidgetGroup) {
+                getScrollPanes((WidgetGroup) actor, list);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get all input widgets recursively.
+     *
+     * @param actors The list of actors.
+     * @param list   The output list.
+     * @return The output list with all the input widgets.
+     */
     public static Array<Actor> getInputWidgets(Array<? extends Actor> actors, Array<Actor> list) {
         for (var actor : actors) {
             getInputWidgets(actor, list);
@@ -303,7 +325,6 @@ public class GuiUtils {
      *
      * @param actor The actor.
      * @param list  The list with all the input widgets in the actor.
-     *
      * @return The input list.
      */
     public static Array<Actor> getInputWidgets(Actor actor, Array<Actor> list) {
@@ -328,7 +349,6 @@ public class GuiUtils {
      * Check if the given actor is an input widget.
      *
      * @param actor The actor.
-     *
      * @return True if the actor is an input widget.
      */
     public static boolean isInputWidget(Actor actor) {
@@ -342,7 +362,6 @@ public class GuiUtils {
      * Check if the given actor is a tooltip widget.
      *
      * @param actor The actor.
-     *
      * @return True if the actor is a tooltip widget.
      */
     public static boolean isTooltipWidget(Actor actor) {
@@ -353,7 +372,6 @@ public class GuiUtils {
      * Check if the actor is not disabled.
      *
      * @param actor The actor.
-     *
      * @return True if the actor is not disabled.
      */
     public static boolean isNotDisabled(Actor actor) {
@@ -364,7 +382,6 @@ public class GuiUtils {
      * Check if the actor currently has a change listener attached.
      *
      * @param actor The actor.
-     *
      * @return True if the actor has a change listener.
      */
     public static boolean hasChangeListener(Actor actor) {
@@ -375,5 +392,21 @@ public class GuiUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns true if the given object is a descendant of the given group.
+     *
+     * @param object The object.
+     * @param parent The group.
+     * @return True if the object is in the group.
+     */
+    public static boolean isDescendentOf(Actor object, WidgetGroup parent) {
+        var p = object.getParent();
+        while (p != null && p != parent) {
+            p = p.getParent();
+        }
+
+        return p != null;
     }
 }
