@@ -22,7 +22,6 @@ allprojects {
         jafamaVersion = "2.3.+"
         compressVersion = "1.23.0"
         commonsioVersion = "2.+"
-        commonsmathVersion = "3.+"
         py4jVersion = "0.10.9.+"
         oshiVersion = "6.4.+"
         stilVersion = "4.1.+"
