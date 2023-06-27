@@ -160,6 +160,11 @@ public class GaiaSkyDesktop implements IObserver {
                 Settings.settings.program.safeModeFlag = true;
             }
 
+            // Force deactivation of safe graphics mode.
+            if (cliArgs.noSafeMode) {
+                Settings.settings.program.safeMode = false;
+            }
+
             // Reinitialize with user-defined locale.
             I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
 
@@ -689,5 +694,8 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = {"--safemode"}, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12)
         private boolean safeMode = false;
+
+        @Parameter(names = {"--nosafemode"}, description = "Force deactivation of safe graphics mode. Warning: this bypasses internal checks and may break things! Useful to get rid of safe graphics mode in the settings.", order = 13)
+        private boolean noSafeMode = false;
     }
 }

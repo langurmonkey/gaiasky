@@ -70,7 +70,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
     protected void initShaderProgram() {
         if (isLine()) {
             Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
-            Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
+            Gdx.gl.glHint(GL30.GL_LINE_SMOOTH_HINT, GL30.GL_NICEST);
         } else if (isPoint()) {
             Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
         }

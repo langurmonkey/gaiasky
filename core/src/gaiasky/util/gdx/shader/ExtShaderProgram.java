@@ -21,24 +21,37 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL32;
+import org.lwjgl.opengl.GL33;
 
 import java.lang.StringBuilder;
 import java.nio.*;
 
 public class ExtShaderProgram implements Disposable {
-    /** Default name for position attributes. **/
+    /**
+     * Default name for position attributes.
+     **/
     public static final String POSITION_ATTRIBUTE = "a_position";
-    /** Default name for color attributes. **/
+    /**
+     * Default name for color attributes.
+     **/
     public static final String COLOR_ATTRIBUTE = "a_color";
-    /** Default name for normal attribute. **/
+    /**
+     * Default name for normal attribute.
+     **/
     public static final String NORMAL_ATTRIBUTE = "a_normal";
-    /** Default name for texture coordinates attributes, append texture unit number. **/
+    /**
+     * Default name for texture coordinates attributes, append texture unit number.
+     **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     final static IntBuffer intbuf = BufferUtils.newIntBuffer(1);
     private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
-    /** The list of currently available shaders. **/
+    /**
+     * The list of currently available shaders.
+     **/
     private final static ObjectMap<Application, Array<ExtShaderProgram>> shaders = new ObjectMap<>();
-    /** Flag indicating whether attributes & uniforms must be present at all times. **/
+    /**
+     * Flag indicating whether attributes & uniforms must be present at all times.
+     **/
     public static boolean pedantic = true;
     /**
      * Code that is always added to the vertex shader code, typically used to inject a #version line. Note that this is added
@@ -55,49 +68,101 @@ public class ExtShaderProgram implements Disposable {
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependFragmentCode = "";
-    IntBuffer params = BufferUtils.newIntBuffer(1);
-    IntBuffer type = BufferUtils.newIntBuffer(1);
-    /** The log. **/
-    private String log = "";
-    /** The shader name, if any. **/
-    private String name;
-    /** Whether this program compiled successfully. **/
-    private boolean isCompiled;
-    /** Whether lazy loading is activated for this shader. **/
-    private boolean isLazy;
-    /** Uniform lookup. **/
-    private ObjectIntMap<String> uniforms;
-    /** Uniform types. **/
-    private ObjectIntMap<String> uniformTypes;
-    /** Uniform sizes. **/
-    private ObjectIntMap<String> uniformSizes;
-    /** Uniform names. **/
-    private String[] uniformNames;
-    /** Attribute lookup. **/
-    private ObjectIntMap<String> attributes;
-    /** Attribute types. **/
-    private ObjectIntMap<String> attributeTypes;
-    /** Attribute sizes. **/
-    private ObjectIntMap<String> attributeSizes;
-    /** Attribute names. **/
-    private String[] attributeNames;
-    /** Program handle. **/
-    private int program;
-    /** Vertex shader handle. **/
-    private int vertexShaderHandle;
-    /** Geometry shader handle. **/
+
+    /**
+     * Int buffer for parameters.
+     **/
+    protected IntBuffer params = BufferUtils.newIntBuffer(1);
+    /**
+     * Int buffer for types.
+     **/
+    protected IntBuffer type = BufferUtils.newIntBuffer(1);
+    /**
+     * The log.
+     **/
+    protected String log = "";
+    /**
+     * The shader name, if any.
+     **/
+    protected String name;
+    /**
+     * Whether this program compiled successfully.
+     **/
+    protected boolean isCompiled;
+    /**
+     * Whether lazy loading is activated for this shader.
+     **/
+    protected boolean isLazy;
+    /**
+     * Whether this program has been disposed.
+     **/
+    protected boolean isDisposed;
+    /**
+     * Uniform lookup.
+     **/
+    protected ObjectIntMap<String> uniforms;
+    /**
+     * Uniform types.
+     **/
+    protected ObjectIntMap<String> uniformTypes;
+    /**
+     * Uniform sizes.
+     **/
+    protected ObjectIntMap<String> uniformSizes;
+    /**
+     * Uniform names.
+     **/
+    protected String[] uniformNames;
+    /**
+     * Attribute lookup.
+     **/
+    protected ObjectIntMap<String> attributes;
+    /**
+     * Attribute types.
+     **/
+    protected ObjectIntMap<String> attributeTypes;
+    /**
+     * Attribute sizes.
+     **/
+    protected ObjectIntMap<String> attributeSizes;
+    /**
+     * Attribute names.
+     **/
+    protected String[] attributeNames;
+    /**
+     * Program handle.
+     **/
+    protected int program;
+    /**
+     * Vertex shader handle.
+     **/
+    protected int vertexShaderHandle;
+    /**
+     * Geometry shader handle.
+     **/
     private int geometryShaderHandle;
-    /** Fragment shader handle. **/
-    private int fragmentShaderHandle;
-    /** Vertex shader source. **/
-    private String vertexShaderSource;
-    /** Geometry shader source. **/
-    private String geometryShaderSource;
-    /** Fragment shader source. **/
-    private String fragmentShaderSource;
-    private String vertexShaderFile, geometryShaderFile, fragmentShaderFile;
-    /** Whether this shader was invalidated. **/
-    private boolean invalidated;
+    /**
+     * Fragment shader handle.
+     **/
+    protected int fragmentShaderHandle;
+    /**
+     * Vertex shader source.
+     **/
+    protected String vertexShaderSource;
+    /**
+     * Geometry shader source.
+     **/
+    protected String geometryShaderSource;
+    /**
+     * Fragment shader source.
+     **/
+    protected String fragmentShaderSource;
+
+    protected String vertexShaderFile, geometryShaderFile, fragmentShaderFile;
+    /**
+     * Whether this shader was invalidated.
+     **/
+    protected boolean invalidated;
 
     public ExtShaderProgram() {
     }
@@ -251,12 +316,14 @@ public class ExtShaderProgram implements Disposable {
         return builder.toString();
     }
 
-    /** @return the number of managed shader programs currently loaded */
+    /**
+     * @return the number of managed shader programs currently loaded
+     */
     public static int getNumManagedShaderPrograms() {
         return shaders.get(Gdx.app).size;
     }
 
-    private void initializeLocalAssets() {
+    protected void initializeLocalAssets() {
         uniforms = new ObjectIntMap<>();
         uniformTypes = new ObjectIntMap<>();
         uniformSizes = new ObjectIntMap<>();
@@ -364,21 +431,20 @@ public class ExtShaderProgram implements Disposable {
 
     private int loadShader(int type,
                            String source) {
-        GL20 gl = Gdx.gl20;
-        IntBuffer intbuf = BufferUtils.newIntBuffer(1);
+        IntBuffer intBuffer = BufferUtils.newIntBuffer(1);
 
-        int shader = gl.glCreateShader(type);
+        int shader = GL33.glCreateShader(type);
         if (shader == 0)
             return -1;
 
-        gl.glShaderSource(shader, source);
-        gl.glCompileShader(shader);
-        gl.glGetShaderiv(shader, GL20.GL_COMPILE_STATUS, intbuf);
+        GL33.glShaderSource(shader, source);
+        GL33.glCompileShader(shader);
+        GL33.glGetShaderiv(shader, GL20.GL_COMPILE_STATUS, intBuffer);
 
-        int compiled = intbuf.get(0);
+        int compiled = intBuffer.get(0);
         if (compiled == 0) {
-            String infoLog = gl.glGetShaderInfoLog(shader);
-            log += type == GL20.GL_VERTEX_SHADER ? "Vertex shader\n" : type == GL20.GL_FRAGMENT_SHADER ? "Fragment shader:\n" : "Geometry shader:\n";
+            String infoLog = GL33.glGetShaderInfoLog(shader);
+            log += type == GL33.GL_VERTEX_SHADER ? "Vertex shader\n" : type == GL33.GL_FRAGMENT_SHADER ? "Fragment shader:\n" : "Geometry shader:\n";
             log += infoLog;
             return -1;
         }
@@ -387,41 +453,39 @@ public class ExtShaderProgram implements Disposable {
     }
 
     protected int createProgram() {
-        GL20 gl = Gdx.gl20;
-        int program = gl.glCreateProgram();
+        int program = GL33.glCreateProgram();
         return program != 0 ? program : -1;
     }
 
     private int linkProgram(int program,
                             boolean geometry) {
-        GL20 gl = Gdx.gl20;
         if (program == -1)
             return -1;
 
         if (geometry) {
-            gl.glAttachShader(program, vertexShaderHandle);
-            gl.glAttachShader(program, geometryShaderHandle);
-            gl.glAttachShader(program, fragmentShaderHandle);
-            gl.glLinkProgram(program);
-            gl.glDetachShader(program, vertexShaderHandle);
-            gl.glDetachShader(program, geometryShaderHandle);
-            gl.glDetachShader(program, fragmentShaderHandle);
+            GL33.glAttachShader(program, vertexShaderHandle);
+            GL33.glAttachShader(program, geometryShaderHandle);
+            GL33.glAttachShader(program, fragmentShaderHandle);
+            GL33.glLinkProgram(program);
+            GL33.glDetachShader(program, vertexShaderHandle);
+            GL33.glDetachShader(program, geometryShaderHandle);
+            GL33.glDetachShader(program, fragmentShaderHandle);
         } else {
-            gl.glAttachShader(program, vertexShaderHandle);
-            gl.glAttachShader(program, fragmentShaderHandle);
-            gl.glLinkProgram(program);
-            gl.glDetachShader(program, vertexShaderHandle);
-            gl.glDetachShader(program, fragmentShaderHandle);
+            GL33.glAttachShader(program, vertexShaderHandle);
+            GL33.glAttachShader(program, fragmentShaderHandle);
+            GL33.glLinkProgram(program);
+            GL33.glDetachShader(program, vertexShaderHandle);
+            GL33.glDetachShader(program, fragmentShaderHandle);
         }
 
         ByteBuffer tmp = ByteBuffer.allocateDirect(4);
         tmp.order(ByteOrder.nativeOrder());
         IntBuffer intBuffer = tmp.asIntBuffer();
 
-        gl.glGetProgramiv(program, GL20.GL_LINK_STATUS, intBuffer);
+        GL33.glGetProgramiv(program, GL33.GL_LINK_STATUS, intBuffer);
         int linked = intBuffer.get(0);
         if (linked == 0) {
-            log = Gdx.gl20.glGetProgramInfoLog(program);
+            log = GL33.glGetProgramInfoLog(program);
             return -1;
         }
 
@@ -443,17 +507,21 @@ public class ExtShaderProgram implements Disposable {
         return log;
     }
 
-    /** @return whether this program compiled successfully. */
+    /**
+     * @return whether this program compiled successfully.
+     */
     public boolean isCompiled() {
         return isCompiled;
     }
 
-    /** @return whether this program has lazy loading activated. */
+    /**
+     * @return whether this program has lazy loading activated.
+     */
     public boolean isLazy() {
         return isLazy;
     }
 
-    private int fetchAttributeLocation(String name) {
+    protected int fetchAttributeLocation(String name) {
         GL20 gl = Gdx.gl20;
         // -2 == not yet cached
         // -1 == cached but not found
@@ -465,7 +533,7 @@ public class ExtShaderProgram implements Disposable {
         return location;
     }
 
-    private int fetchUniformLocation(String name) {
+    protected int fetchUniformLocation(String name) {
         return fetchUniformLocation(name, pedantic);
     }
 
@@ -1029,17 +1097,6 @@ public class ExtShaderProgram implements Disposable {
         gl.glUseProgram(0);
     }
 
-    /** Disposes all resources associated with this shader. Must be called when the shader is no longer used. */
-    public void dispose() {
-        GL20 gl = Gdx.gl20;
-        gl.glUseProgram(0);
-        gl.glDeleteShader(vertexShaderHandle);
-        gl.glDeleteShader(fragmentShaderHandle);
-        gl.glDeleteProgram(program);
-        if (shaders.get(Gdx.app) != null)
-            shaders.get(Gdx.app).removeValue(this, true);
-    }
-
     /**
      * Disables the vertex attribute with the given name
      *
@@ -1082,7 +1139,11 @@ public class ExtShaderProgram implements Disposable {
 
     private void checkManaged() {
         if (invalidated) {
-            compileShaders(vertexShaderSource, fragmentShaderSource);
+            if (geometryShaderSource != null) {
+                compileShaders(vertexShaderSource, geometryShaderSource, fragmentShaderSource);
+            } else {
+                compileShaders(vertexShaderSource, fragmentShaderSource);
+            }
             invalidated = false;
         }
     }
@@ -1091,7 +1152,7 @@ public class ExtShaderProgram implements Disposable {
                                   ExtShaderProgram shaderProgram) {
         Array<ExtShaderProgram> managedResources = shaders.get(app);
         if (managedResources == null)
-            managedResources = new Array<ExtShaderProgram>();
+            managedResources = new Array<>();
         managedResources.add(shaderProgram);
         shaders.put(app, managedResources);
     }
@@ -1115,7 +1176,7 @@ public class ExtShaderProgram implements Disposable {
         gl.glVertexAttrib4f(location, value1, value2, value3, value4);
     }
 
-    private void fetchUniforms() {
+    protected void fetchUniforms() {
         params.clear();
         Gdx.gl20.glGetProgramiv(program, GL20.GL_ACTIVE_UNIFORMS, params);
         int numUniforms = params.get(0);
@@ -1135,7 +1196,7 @@ public class ExtShaderProgram implements Disposable {
         }
     }
 
-    private void fetchAttributes() {
+    protected void fetchAttributes() {
         params.clear();
         Gdx.gl20.glGetProgramiv(program, GL20.GL_ACTIVE_ATTRIBUTES, params);
         int numAttributes = params.get(0);
@@ -1157,7 +1218,6 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
-     *
      * @return whether the attribute is available in the shader
      */
     public boolean hasAttribute(String name) {
@@ -1166,7 +1226,6 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
-     *
      * @return the type of the attribute, one of {@link GL20#GL_FLOAT}, {@link GL20#GL_FLOAT_VEC2} etc.
      */
     public int getAttributeType(String name) {
@@ -1175,7 +1234,6 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
-     *
      * @return the location of the attribute or -1.
      */
     public int getAttributeLocation(String name) {
@@ -1184,7 +1242,6 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
-     *
      * @return the size of the attribute or 0.
      */
     public int getAttributeSize(String name) {
@@ -1193,7 +1250,6 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
-     *
      * @return whether the uniform is available in the shader
      */
     public boolean hasUniform(String name) {
@@ -1202,7 +1258,6 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
-     *
      * @return the type of the uniform, one of {@link GL20#GL_FLOAT}, {@link GL20#GL_FLOAT_VEC2} etc.
      */
     public int getUniformType(String name) {
@@ -1211,7 +1266,6 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
-     *
      * @return the location of the uniform or -1.
      */
     public int getUniformLocation(String name) {
@@ -1220,30 +1274,60 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
-     *
      * @return the size of the uniform or 0.
      */
     public int getUniformSize(String name) {
         return uniformSizes.get(name, 0);
     }
 
-    /** @return the attributes */
+    /**
+     * @return the attributes
+     */
     public String[] getAttributes() {
         return attributeNames;
     }
 
-    /** @return the uniforms */
+    /**
+     * @return the uniforms
+     */
     public String[] getUniforms() {
         return uniformNames;
     }
 
-    /** @return the source of the vertex shader */
+    /**
+     * @return the source of the vertex shader
+     */
     public String getVertexShaderSource() {
         return vertexShaderSource;
     }
 
-    /** @return the source of the fragment shader */
+    /**
+     * @return the source of the fragment shader
+     */
     public String getFragmentShaderSource() {
         return fragmentShaderSource;
+    }
+
+    /**
+     * Disposes all resources associated with this shader. Must be called when the shader is no longer used.
+     */
+    public void dispose() {
+        if (isCompiled && !isDisposed) {
+            GL33.glUseProgram(0);
+            if (vertexShaderHandle != 0) {
+                GL33.glDeleteShader(vertexShaderHandle);
+            }
+            if (geometryShaderHandle != 0) {
+                GL33.glDeleteShader(geometryShaderHandle);
+            }
+            if (fragmentShaderHandle != 0) {
+                GL33.glDeleteShader(fragmentShaderHandle);
+            }
+            GL33.glDeleteProgram(program);
+            if (shaders.get(Gdx.app) != null)
+                shaders.get(Gdx.app).removeValue(this, true);
+
+            isDisposed = true;
+        }
     }
 }
