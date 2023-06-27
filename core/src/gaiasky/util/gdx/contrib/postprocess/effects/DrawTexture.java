@@ -17,13 +17,7 @@ public class DrawTexture extends PostProcessorEffect {
 
     public DrawTexture() {
         copy = new Copy();
-    }
-
-    @Override
-    public void dispose() {
-        if (copy != null) {
-            copy.dispose();
-        }
+        disposables.add(copy);
     }
 
     @Override

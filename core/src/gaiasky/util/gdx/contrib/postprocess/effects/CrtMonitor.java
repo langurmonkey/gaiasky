@@ -26,53 +26,37 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 public final class CrtMonitor extends PostProcessorEffect {
     private final CrtScreen crt;
     private final Combine combine;
-    private final boolean doblur;
     private PingPongBuffer pingPongBuffer = null;
     private FrameBuffer buffer = null;
     private Blur blur;
     private boolean blending = false;
-    private int sfactor, dfactor;
+    private int sFactor, dFactor;
 
     // the effect is designed to work on the whole screen area, no small/mid size tricks!
     public CrtMonitor(int fboWidth, int fboHeight, boolean barrelDistortion, boolean performBlur, RgbMode mode, int effectsSupport) {
-        doblur = performBlur;
 
-        if (doblur) {
+        if (performBlur) {
             pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
             blur = new Blur(fboWidth, fboHeight);
             blur.setPasses(1);
             blur.setAmount(1f);
             // blur.setType( BlurType.Gaussian3x3b ); // high defocus
             blur.setType(BlurType.Gaussian3x3); // modern machines defocus
+            disposables.addAll(pingPongBuffer, blur);
         } else {
             buffer = new FrameBuffer(PostProcessor.getFramebufferFormat(), fboWidth, fboHeight, false);
+            disposables.addAll(buffer);
         }
 
         combine = new Combine();
         crt = new CrtScreen(barrelDistortion, mode, effectsSupport);
+        disposables.addAll(combine, crt);
     }
 
-    @Override
-    public void dispose() {
-        crt.dispose();
-        combine.dispose();
-        if (doblur) {
-            blur.dispose();
-        }
-
-        if (buffer != null) {
-            buffer.dispose();
-        }
-
-        if (pingPongBuffer != null) {
-            pingPongBuffer.dispose();
-        }
-    }
-
-    public void enableBlending(int sfactor, int dfactor) {
+    public void enableBlending(int sFactor, int dFactor) {
         this.blending = true;
-        this.sfactor = sfactor;
-        this.dfactor = dfactor;
+        this.sFactor = sFactor;
+        this.dFactor = dFactor;
     }
 
     public void disableBlending() {
@@ -158,9 +142,9 @@ public final class CrtMonitor extends PostProcessorEffect {
         boolean blendingWasEnabled = PostProcessor.isStateEnabled(GL20.GL_BLEND);
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        Texture out = null;
+        Texture out;
 
-        if (doblur) {
+        if (blur != null) {
 
             pingPongBuffer.begin();
             {
@@ -185,7 +169,7 @@ public final class CrtMonitor extends PostProcessorEffect {
         }
 
         if (blending) {
-            Gdx.gl.glBlendFunc(sfactor, dfactor);
+            Gdx.gl.glBlendFunc(sFactor, dFactor);
         }
 
         restoreViewport(dest);

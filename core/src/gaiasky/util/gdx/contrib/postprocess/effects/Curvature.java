@@ -17,11 +17,7 @@ public final class Curvature extends PostProcessorEffect {
 
     public Curvature() {
         distort = new RadialDistortion();
-    }
-
-    @Override
-    public void dispose() {
-        distort.dispose();
+        disposables.add(distort);
     }
 
     public float getDistortion() {

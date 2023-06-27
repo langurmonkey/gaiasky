@@ -18,24 +18,19 @@ public final class PipelineState implements Disposable {
 
     private final ByteBuffer byteBuffer;
 
-    protected PipelineState() {
+    PipelineState() {
         byteBuffer = BufferUtils.newByteBuffer(32);
     }
 
-    public boolean isEnabled(int pname) {
-        boolean ret = false;
-
-        switch (pname) {
-        case GL20.GL_BLEND:
+    public boolean isEnabled(int propertyName) {
+        if (propertyName == GL20.GL_BLEND) {
             Gdx.gl20.glGetBooleanv(GL20.GL_BLEND, byteBuffer);
-            ret = (byteBuffer.get() == 1);
+            var ret = (byteBuffer.get() == 1);
             byteBuffer.clear();
-            break;
-        default:
-            ret = false;
+            return ret;
         }
 
-        return ret;
+        return false;
     }
 
     @Override

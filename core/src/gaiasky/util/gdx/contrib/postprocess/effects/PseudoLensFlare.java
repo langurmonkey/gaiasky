@@ -27,7 +27,8 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     private final Combine combine;
     private Settings settings;
     private boolean blending = false;
-    private int sfactor, dfactor;
+    private int sFactor, dFactor;
+
     public PseudoLensFlare(int fboWidth, int fboHeight) {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
 
@@ -37,22 +38,16 @@ public final class PseudoLensFlare extends PostProcessorEffect {
         bias = new Bias();
         combine = new Combine();
 
+        disposables.addAll(pingPongBuffer, flare, dirt, blur, bias, combine);
+
         setSettings(new Settings("default", 2, -0.9f, 1f, 1f, 0.7f, 1f, 8, 0.5f));
     }
 
-    @Override
-    public void dispose() {
-        combine.dispose();
-        bias.dispose();
-        blur.dispose();
-        pingPongBuffer.dispose();
-    }
-
-    public void setBaseIntesity(float intensity) {
+    public void setBaseIntensity(float intensity) {
         combine.setSource1Intensity(intensity);
     }
 
-    public void setFlareIntesity(float intensity) {
+    public void setFlareIntensity(float intensity) {
         combine.setSource2Intensity(intensity);
     }
 
@@ -78,8 +73,8 @@ public final class PseudoLensFlare extends PostProcessorEffect {
 
     public void enableBlending(int sfactor, int dfactor) {
         this.blending = true;
-        this.sfactor = sfactor;
-        this.dfactor = dfactor;
+        this.sFactor = sfactor;
+        this.dFactor = dfactor;
     }
 
     public void disableBlending() {
@@ -131,11 +126,11 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     }
 
     public int getBlendingSourceFactor() {
-        return sfactor;
+        return sFactor;
     }
 
     public int getBlendingDestFactor() {
-        return dfactor;
+        return dFactor;
     }
 
     public BlurType getBlurType() {
@@ -157,9 +152,9 @@ public final class PseudoLensFlare extends PostProcessorEffect {
         setBias(settings.flareBias);
 
         // setup combine filter
-        setBaseIntesity(settings.baseIntensity);
+        setBaseIntensity(settings.baseIntensity);
         setBaseSaturation(settings.baseSaturation);
-        setFlareIntesity(settings.flareIntensity);
+        setFlareIntensity(settings.flareIntensity);
         setFlareSaturation(settings.flareSaturation);
 
         // setup blur filter
@@ -214,7 +209,7 @@ public final class PseudoLensFlare extends PostProcessorEffect {
         }
 
         if (blending) {
-            Gdx.gl.glBlendFunc(sfactor, dfactor);
+            Gdx.gl.glBlendFunc(sFactor, dFactor);
         }
 
         restoreViewport(dest);

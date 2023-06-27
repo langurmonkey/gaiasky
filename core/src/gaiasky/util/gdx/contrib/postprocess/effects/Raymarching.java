@@ -16,7 +16,7 @@ import gaiasky.util.gdx.contrib.postprocess.filters.RaymarchingFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Raymarching extends PostProcessorEffect {
-    private RaymarchingFilter filter;
+    private final RaymarchingFilter filter;
 
     public Raymarching(String fragmentShader, float viewportWidth, float viewportHeight) {
         this(fragmentShader, (int) viewportWidth, (int) viewportHeight);
@@ -25,6 +25,7 @@ public final class Raymarching extends PostProcessorEffect {
     public Raymarching(String fragmentShader, int viewportWidth, int viewportHeight) {
         super();
         filter = new RaymarchingFilter(fragmentShader, viewportWidth, viewportHeight);
+        disposables.add(filter);
     }
 
     public void setViewportSize(int width, int height) {
@@ -73,14 +74,6 @@ public final class Raymarching extends PostProcessorEffect {
 
     public void setAdditional(int index, float value) {
         filter.setAdditional(index, value);
-    }
-
-    @Override
-    public void dispose() {
-        if (filter != null) {
-            filter.dispose();
-            filter = null;
-        }
     }
 
     @Override

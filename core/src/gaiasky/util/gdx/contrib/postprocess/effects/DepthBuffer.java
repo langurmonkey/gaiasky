@@ -13,19 +13,12 @@ import gaiasky.util.gdx.contrib.postprocess.filters.DepthBufferFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class DepthBuffer extends PostProcessorEffect {
-    private DepthBufferFilter filter;
+    private final DepthBufferFilter filter;
 
     /** Creates the effect */
     public DepthBuffer() {
         filter = new DepthBufferFilter();
-    }
-
-    @Override
-    public void dispose() {
-        if (filter != null) {
-            filter.dispose();
-            filter = null;
-        }
+        disposables.add(filter);
     }
 
     @Override

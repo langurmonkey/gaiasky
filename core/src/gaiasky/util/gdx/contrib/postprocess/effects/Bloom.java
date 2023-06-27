@@ -27,23 +27,17 @@ public final class Bloom extends PostProcessorEffect {
     private final Combine combine;
     private Settings settings;
     private boolean blending = false;
-    private int sfactor, dfactor;
+    private int sFactor, dFactor;
+
     public Bloom(int fboWidth, int fboHeight) {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false, false, false, false, false);
 
         blur = new Blur(fboWidth, fboHeight);
         threshold = new Threshold();
         combine = new Combine();
+        disposables.addAll(blur, threshold, combine, pingPongBuffer);
 
         setSettings(new Settings("default", 3, 0.2f, 1f, .85f, 1.1f, .85f));
-    }
-
-    @Override
-    public void dispose() {
-        combine.dispose();
-        threshold.dispose();
-        blur.dispose();
-        pingPongBuffer.dispose();
     }
 
     public void setBaseIntensity(float intensity) {
@@ -64,8 +58,8 @@ public final class Bloom extends PostProcessorEffect {
 
     public void enableBlending(int sfactor, int dfactor) {
         this.blending = true;
-        this.sfactor = sfactor;
-        this.dfactor = dfactor;
+        this.sFactor = sfactor;
+        this.dFactor = dfactor;
     }
 
     public void disableBlending() {
@@ -150,7 +144,7 @@ public final class Bloom extends PostProcessorEffect {
 
         if (blending) {
             //Gdx.gl.glBlendFuncSeparate(sfactor, dfactor, GL30.GL_ONE, GL30.GL_ONE);
-            Gdx.gl.glBlendFunc(sfactor, dfactor);
+            Gdx.gl.glBlendFunc(sFactor, dFactor);
         }
 
         restoreViewport(dest);

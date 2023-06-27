@@ -16,13 +16,16 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public class AccumulationBlur extends PostProcessorEffect {
     private final Copy copyFilter;
-    private AccumulationBlurFilter motionFilter;
-    private FrameBuffer fbo;
+    private final AccumulationBlurFilter motionFilter;
+    private final FrameBuffer fbo;
 
     public AccumulationBlur(int width, int height) {
         motionFilter = new AccumulationBlurFilter();
         motionFilter.setResolution(width, height);
         copyFilter = new Copy();
+        fbo = new FrameBuffer(Format.RGBA8888, width, height, false);
+
+        disposables.addAll(copyFilter, motionFilter, fbo);
     }
 
     public void setBlurOpacity(float blurOpacity) {
@@ -38,25 +41,12 @@ public class AccumulationBlur extends PostProcessorEffect {
     }
 
     @Override
-    public void dispose() {
-        if (motionFilter != null) {
-            motionFilter.dispose();
-            motionFilter = null;
-        }
-    }
-
-    @Override
     public void rebind() {
         motionFilter.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
-        if (fbo == null) {
-            // Init frame buffer
-            fbo = new FrameBuffer(Format.RGBA8888, src.getWidth(), src.getHeight(), false);
-        }
-
         restoreViewport(dest);
         if (dest != null) {
             motionFilter.setInput(src).setOutput(dest).render();
@@ -71,16 +61,6 @@ public class AccumulationBlur extends PostProcessorEffect {
         // Set last frame
         motionFilter.setLastFrameTexture(fbo.getColorBufferTexture());
 
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        // Dispose fbo
-        if (!enabled && fbo != null) {
-            fbo.dispose();
-            fbo = null;
-        }
     }
 
 }

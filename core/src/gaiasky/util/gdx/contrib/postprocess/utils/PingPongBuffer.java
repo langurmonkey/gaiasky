@@ -11,12 +11,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-public final class PingPongBuffer {
+public final class PingPongBuffer implements Disposable {
     public final boolean ownResources;
     // save/restore state
     private final GaiaSkyFrameBuffer ownedMain, ownedExtra;

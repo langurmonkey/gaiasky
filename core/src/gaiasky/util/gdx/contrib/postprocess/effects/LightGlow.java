@@ -17,14 +17,11 @@ public final class LightGlow extends PostProcessorEffect {
     private final GlowFilter glow;
     private Settings settings;
     private boolean blending = false;
-    private int sfactor, dfactor;
+    private int sFactor, dFactor;
+
     public LightGlow(int width, int height) {
         glow = new GlowFilter(width, height);
-    }
-
-    @Override
-    public void dispose() {
-        glow.dispose();
+        disposables.add(glow);
     }
 
     public void setBackbufferScale(float bbs) {
@@ -61,8 +58,8 @@ public final class LightGlow extends PostProcessorEffect {
 
     public void enableBlending(int sfactor, int dfactor) {
         this.blending = true;
-        this.sfactor = sfactor;
-        this.dfactor = dfactor;
+        this.sFactor = sfactor;
+        this.dFactor = dfactor;
     }
 
     public void disableBlending() {
@@ -90,11 +87,11 @@ public final class LightGlow extends PostProcessorEffect {
     }
 
     public int getBlendingSourceFactor() {
-        return sfactor;
+        return sFactor;
     }
 
     public int getBlendingDestFactor() {
-        return dfactor;
+        return dFactor;
     }
 
     public Settings getSettings() {

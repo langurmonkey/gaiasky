@@ -12,19 +12,18 @@ import gaiasky.util.gdx.contrib.postprocess.filters.FxaaFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Fxaa extends Antialiasing {
-    private FxaaFilter fxaaFilter = null;
+    private final FxaaFilter fxaaFilter;
 
-    /** Create a FXAA with the viewport size */
+    /**
+     * Create a FXAA with the viewport size
+     */
     public Fxaa(float viewportWidth, float viewportHeight, int quality) {
-        setup(viewportWidth, viewportHeight, quality);
+        this((int) viewportWidth, (int) viewportHeight, quality);
     }
 
     public Fxaa(int viewportWidth, int viewportHeight, int quality) {
-        this((float) viewportWidth, (float) viewportHeight, quality);
-    }
-
-    private void setup(float viewportWidth, float viewportHeight, int quality) {
         fxaaFilter = new FxaaFilter(viewportWidth, viewportHeight, quality);
+        disposables.add(fxaaFilter);
     }
 
     public void setViewportSize(int width, int height) {
@@ -38,14 +37,6 @@ public final class Fxaa extends Antialiasing {
      */
     public void updateQuality(int quality) {
         fxaaFilter.updateQuality(quality);
-    }
-
-    @Override
-    public void dispose() {
-        if (fxaaFilter != null) {
-            fxaaFilter.dispose();
-            fxaaFilter = null;
-        }
     }
 
     @Override

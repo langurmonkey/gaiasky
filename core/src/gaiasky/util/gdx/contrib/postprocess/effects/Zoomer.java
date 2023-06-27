@@ -15,42 +15,50 @@ import gaiasky.util.gdx.contrib.postprocess.filters.Zoom;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Zoomer extends PostProcessorEffect {
-    private boolean doRadial = false;
-    private RadialBlur radialBlur = null;
-    private Zoom zoom = null;
-    private float oneOnW, oneOnH;
+    private final boolean doRadial;
+    private final RadialBlur radialBlur;
+    private final Zoom zoom;
+    private final float oneOnW;
+    private final float oneOnH;
     private float userOriginX, userOriginY;
 
-    /** Creating a Zoomer specifying the radial blur quality will enable radial blur */
+    /**
+     * Creating a Zoomer specifying the radial blur quality will enable radial blur
+     */
     public Zoomer(int viewportWidth, int viewportHeight, RadialBlur.Quality quality) {
-        setup(viewportWidth, viewportHeight, new RadialBlur(quality));
-    }
-
-    /** Creating a Zoomer without any parameter will use plain simple zooming */
-    public Zoomer(int viewportWidth, int viewportHeight) {
-        setup(viewportWidth, viewportHeight, null);
-    }
-
-    private void setup(int viewportWidth, int viewportHeight, RadialBlur radialBlurFilter) {
-        radialBlur = radialBlurFilter;
+        radialBlur = quality != null ? new RadialBlur(quality) : null;
         if (radialBlur != null) {
             doRadial = true;
             zoom = null;
+            disposables.add(radialBlur);
         } else {
             doRadial = false;
             zoom = new Zoom();
+            disposables.add(zoom);
         }
 
         oneOnW = 1f / (float) viewportWidth;
         oneOnH = 1f / (float) viewportHeight;
+
     }
 
-    /** Specify the zoom origin, in screen coordinates. */
+    /**
+     * Creating a Zoomer without any parameter will use plain simple zooming
+     */
+    public Zoomer(int viewportWidth, int viewportHeight) {
+        this(viewportWidth, viewportHeight, null);
+    }
+
+    /**
+     * Specify the zoom origin, in screen coordinates.
+     */
     public void setOrigin(Vector2 o) {
         setOrigin(o.x, o.y);
     }
 
-    /** Specify the zoom origin, in screen coordinates. */
+    /**
+     * Specify the zoom origin, in screen coordinates.
+     */
     public void setOrigin(float x, float y) {
         userOriginX = x;
         userOriginY = y;
@@ -98,19 +106,6 @@ public final class Zoomer extends PostProcessorEffect {
 
     public float getOriginY() {
         return userOriginY;
-    }
-
-    @Override
-    public void dispose() {
-        if (radialBlur != null) {
-            radialBlur.dispose();
-            radialBlur = null;
-        }
-
-        if (zoom != null) {
-            zoom.dispose();
-            zoom = null;
-        }
     }
 
     @Override

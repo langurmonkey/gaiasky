@@ -206,18 +206,6 @@ public interface IPostProcessor extends Disposable {
         public void dispose(boolean cleanAllBuffers) {
             if (pp != null) {
                 pp.dispose(cleanAllBuffers);
-                if (effects != null) {
-                    Set<Class<? extends PostProcessorEffect>> keys = effects.keySet();
-                    for (Class<? extends PostProcessorEffect> key : keys) {
-                        Map<String, PostProcessorEffect> l = effects.get(key);
-                        if (l != null) {
-                            for (String k : l.keySet()) {
-                                if (l.get(k) != null)
-                                    l.get(k).dispose();
-                            }
-                        }
-                    }
-                }
             }
         }
 

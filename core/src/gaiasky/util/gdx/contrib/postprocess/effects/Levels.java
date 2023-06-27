@@ -27,10 +27,12 @@ public final class Levels extends PostProcessorEffect {
     private static final int LUMA_SIZE = 200;
     private final Luma luma;
     private final FrameBuffer lumaBuffer;
-    /** Is the max/avg process running? **/
+    /**
+     * Is the max/avg process running?
+     **/
     private final AtomicBoolean processRunning;
     FloatBuffer pixels = BufferUtils.createFloatBuffer(LUMA_SIZE * LUMA_SIZE * 3);
-    private LevelsFilter levels;
+    private final LevelsFilter levels;
     private float lumaMax = 0.9f, lumaAvg = 0.09f;
     private float currLumaMax = -1f, currLumaAvg = -1f;
     private long lastFrame;
@@ -58,6 +60,8 @@ public final class Levels extends PostProcessorEffect {
 
         luma.setImageSize(LUMA_SIZE, LUMA_SIZE);
         luma.setTexelSize(1f / LUMA_SIZE, 1f / LUMA_SIZE);
+
+        disposables.addAll(luma, levels, lumaBuffer);
     }
 
     public Luma getLuma() {
@@ -144,14 +148,6 @@ public final class Levels extends PostProcessorEffect {
 
     public void disableToneMapping() {
         levels.disableToneMapping();
-    }
-
-    @Override
-    public void dispose() {
-        if (levels != null) {
-            levels.dispose();
-            levels = null;
-        }
     }
 
     @Override

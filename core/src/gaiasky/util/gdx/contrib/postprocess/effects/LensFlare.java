@@ -20,10 +20,10 @@ import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public class LensFlare extends PostProcessorEffect {
-    private final PingPongBuffer pingPongBuffer;
+    private PingPongBuffer pingPongBuffer;
     private final LensFlareFilter flare;
-    private final LensDirt dirt;
-    private final Combine combine;
+    private LensDirt dirt;
+    private Combine combine;
     private final boolean useLensDirt;
 
     /**
@@ -38,14 +38,12 @@ public class LensFlare extends PostProcessorEffect {
     public LensFlare(int width, int height, float intensity, int type, boolean useLensDirt) {
         flare = new LensFlareFilter(width, height, intensity, type, useLensDirt);
 
+        disposables.add(flare);
         if (useLensDirt) {
             pingPongBuffer = PostProcessor.newPingPongBuffer(width, height, PostProcessor.getFramebufferFormat(), false);
             dirt = new LensDirt(true);
             combine = new Combine();
-        } else {
-            pingPongBuffer = null;
-            dirt = null;
-            combine = null;
+            disposables.addAll(pingPongBuffer, dirt, combine);
         }
         this.useLensDirt = useLensDirt;
     }
@@ -122,20 +120,6 @@ public class LensFlare extends PostProcessorEffect {
         } else {
             restoreViewport(dest);
             flare.setInput(src).setOutput(dest).render();
-        }
-    }
-
-    @Override
-    public void dispose() {
-        flare.dispose();
-        if (combine != null) {
-            combine.dispose();
-        }
-        if (dirt != null) {
-            dirt.dispose();
-        }
-        if (combine != null) {
-            combine.dispose();
         }
     }
 }

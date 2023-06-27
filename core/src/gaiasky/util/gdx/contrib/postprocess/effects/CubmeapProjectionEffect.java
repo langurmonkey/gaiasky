@@ -19,11 +19,7 @@ public final class CubmeapProjectionEffect extends PostProcessorEffect {
 
     public CubmeapProjectionEffect(float w, float h) {
         filter = new CubemapProjectionsFilter(w, h);
-    }
-
-    @Override
-    public void dispose() {
-        filter.dispose();
+        disposables.add(filter);
     }
 
     @Override

@@ -29,7 +29,8 @@ public final class LightScattering extends PostProcessorEffect {
     private final Combine combine;
     private Settings settings;
     private boolean blending = false;
-    private int sfactor, dfactor;
+    private int sFactor, dFactor;
+
     public LightScattering(int fboWidth, int fboHeight) {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
 
@@ -38,18 +39,14 @@ public final class LightScattering extends PostProcessorEffect {
         bias = new Bias();
         combine = new Combine();
 
+        disposables.addAll(pingPongBuffer, scattering, blur, bias, combine);
+
         setSettings(new Settings("default", 2, -0.9f, 1f, 1f, 0.7f, 1f));
     }
 
-    @Override
-    public void dispose() {
-        combine.dispose();
-        bias.dispose();
-        blur.dispose();
-        pingPongBuffer.dispose();
-    }
-
-    /** Sets the positions of the 10 lights in [0..1] in both coordinates **/
+    /**
+     * Sets the positions of the 10 lights in [0..1] in both coordinates
+     **/
     public void setLightPositions(int nLights, float[] vec) {
         scattering.setLightPositions(nLights, vec);
     }
@@ -68,8 +65,8 @@ public final class LightScattering extends PostProcessorEffect {
 
     public void enableBlending(int sfactor, int dfactor) {
         this.blending = true;
-        this.sfactor = sfactor;
-        this.dfactor = dfactor;
+        this.sFactor = sfactor;
+        this.dFactor = dfactor;
     }
 
     public void disableBlending() {
@@ -129,11 +126,11 @@ public final class LightScattering extends PostProcessorEffect {
     }
 
     public int getBlendingSourceFactor() {
-        return sfactor;
+        return sFactor;
     }
 
     public int getBlendingDestFactor() {
-        return dfactor;
+        return dFactor;
     }
 
     public BlurType getBlurType() {
@@ -209,7 +206,7 @@ public final class LightScattering extends PostProcessorEffect {
         }
 
         if (blending) {
-            Gdx.gl.glBlendFunc(sfactor, dfactor);
+            Gdx.gl.glBlendFunc(sFactor, dFactor);
         }
 
         restoreViewport(dest);

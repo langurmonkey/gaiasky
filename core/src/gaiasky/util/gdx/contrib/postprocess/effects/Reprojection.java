@@ -17,6 +17,7 @@ public final class Reprojection extends PostProcessorEffect {
 
     public Reprojection(float width, float height) {
         reprojection = new ReprojectionFilter(width, height);
+        disposables.add(reprojection);
     }
 
     public Reprojection(int width, int height) {
@@ -33,11 +34,6 @@ public final class Reprojection extends PostProcessorEffect {
 
     public void setMode(int mode) {
         this.reprojection.setMode(mode);
-    }
-
-    @Override
-    public void dispose() {
-        reprojection.dispose();
     }
 
     @Override

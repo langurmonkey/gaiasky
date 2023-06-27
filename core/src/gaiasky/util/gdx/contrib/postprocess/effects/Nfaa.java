@@ -12,15 +12,14 @@ import gaiasky.util.gdx.contrib.postprocess.filters.NfaaFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Nfaa extends Antialiasing {
-    private NfaaFilter nfaaFilter = null;
+    private final NfaaFilter nfaaFilter;
 
-    /** Create a NFAA with the viewport size */
+    /**
+     * Create a NFAA with the viewport size
+     */
     public Nfaa(float viewportWidth, float viewportHeight) {
-        setup(viewportWidth, viewportHeight);
-    }
-
-    private void setup(float viewportWidth, float viewportHeight) {
         nfaaFilter = new NfaaFilter(viewportWidth, viewportHeight);
+        disposables.add(nfaaFilter);
     }
 
     public void setViewportSize(int width, int height) {
@@ -28,14 +27,6 @@ public final class Nfaa extends Antialiasing {
     }
 
     public void updateQuality(int quality) {
-    }
-
-    @Override
-    public void dispose() {
-        if (nfaaFilter != null) {
-            nfaaFilter.dispose();
-            nfaaFilter = null;
-        }
     }
 
     @Override

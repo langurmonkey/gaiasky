@@ -18,11 +18,7 @@ public final class AnaglyphEffect extends PostProcessorEffect {
 
     public AnaglyphEffect() {
         anaglyphFilter = new AnaglyphFilter();
-    }
-
-    @Override
-    public void dispose() {
-        anaglyphFilter.dispose();
+        disposables.add(anaglyphFilter);
     }
 
     @Override

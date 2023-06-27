@@ -14,11 +14,12 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public class XBRZ extends PostProcessorEffect {
 
-    private XBRZUpscale filter;
+    private final XBRZUpscale filter;
 
     public XBRZ() {
         super();
         filter = new XBRZUpscale();
+        disposables.add(filter);
     }
 
     public void setInputSize(int w, int h) {
@@ -26,15 +27,6 @@ public class XBRZ extends PostProcessorEffect {
     }
     public void setOutputSize(int w, int h) {
         filter.setOutputSize(w, h);
-    }
-
-
-    @Override
-    public void dispose() {
-        if (filter != null) {
-            filter.dispose();
-            filter = null;
-        }
     }
 
     @Override

@@ -14,9 +14,10 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenQuad;
 
-public abstract class Filter<T> {
+public abstract class Filter<T> implements Disposable {
 
     protected static final FullscreenQuad quad = new FullscreenQuad();
     protected static final int u_texture0 = 0;

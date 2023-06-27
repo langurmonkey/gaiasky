@@ -14,11 +14,12 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenQuad3;
 
-public abstract class Filter3<T> {
+public abstract class Filter3<T> implements Disposable {
     protected static final Log logger = Logger.getLogger(Filter3.class);
     protected static final FullscreenQuad3 quad = new FullscreenQuad3();
     protected static final int u_texture0 = 0;

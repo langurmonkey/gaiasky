@@ -14,14 +14,19 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 public class SSRFilter extends Filter3<SSRFilter> {
 
-    private final Vector2 zfark;
-    private Matrix4 frustumCorners, combined, projection, invProjection, view, invView;
+    private final Vector2 zFarK;
+    private Matrix4 frustumCorners;
+    private final Matrix4 combined;
+    private final Matrix4 projection;
+    private final Matrix4 invProjection;
+    private final Matrix4 view;
+    private final Matrix4 invView;
 
     private Texture texture1, texture2, texture3;
 
     public SSRFilter() {
         super(ShaderLoader.fromFile("raymarching/screenspace", "ssr"));
-        this.zfark = new Vector2();
+        this.zFarK = new Vector2();
         this.frustumCorners = new Matrix4();
         this.projection = new Matrix4();
         this.invProjection = new Matrix4();
@@ -70,8 +75,8 @@ public class SSRFilter extends Filter3<SSRFilter> {
     }
 
     public void setZfarK(float zfar, float k) {
-        this.zfark.set(zfar, k);
-        setParam(Param.ZfarK, this.zfark);
+        this.zFarK.set(zfar, k);
+        setParam(Param.ZfarK, this.zFarK);
     }
 
     public void setTexture1(Texture tex) {
@@ -100,7 +105,7 @@ public class SSRFilter extends Filter3<SSRFilter> {
         setParams(Param.Texture1, u_texture1);
         setParams(Param.Texture2, u_texture2);
         setParams(Param.Texture3, u_texture3);
-        setParams(Param.ZfarK, zfark);
+        setParams(Param.ZfarK, zFarK);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.Combined, combined);
         setParams(Param.Projection, projection);

@@ -15,11 +15,12 @@ import gaiasky.util.gdx.contrib.postprocess.filters.SSRFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public class SSR extends PostProcessorEffect {
-    private SSRFilter filter;
+    private final SSRFilter filter;
 
     public SSR() {
         super();
         filter = new SSRFilter();
+        disposables.add(filter);
     }
 
     public void setFrustumCorners(Matrix4 frustumCorners) {
@@ -52,14 +53,6 @@ public class SSR extends PostProcessorEffect {
 
     public void setTexture3(Texture tex) {
         filter.setTexture3(tex);
-    }
-
-    @Override
-    public void dispose() {
-        if (filter != null) {
-            filter.dispose();
-            filter = null;
-        }
     }
 
     @Override

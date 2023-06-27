@@ -13,32 +13,21 @@ import gaiasky.util.gdx.contrib.postprocess.filters.GravitationalDistortionFilte
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class GravitationalDistortion extends PostProcessorEffect {
-    private GravitationalDistortionFilter gravFilter = null;
+    private final GravitationalDistortionFilter gravFilter;
 
     public GravitationalDistortion(int viewportWidth, int viewportHeight) {
-        setup(viewportWidth, viewportHeight);
-    }
-
-    private void setup(int viewportWidth, int viewportHeight) {
         gravFilter = new GravitationalDistortionFilter(viewportWidth, viewportHeight);
+        disposables.add(gravFilter);
     }
 
     /**
      * Sets the position of the mass in pixels.
      *
-     * @param x
-     * @param y
+     * @param x The mass X position.
+     * @param y The mass Y position.
      */
     public void setMassPosition(float x, float y) {
         gravFilter.setMassPosition(x, y);
-    }
-
-    @Override
-    public void dispose() {
-        if (gravFilter != null) {
-            gravFilter.dispose();
-            gravFilter = null;
-        }
     }
 
     @Override

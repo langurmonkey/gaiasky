@@ -14,57 +14,53 @@ import gaiasky.util.gdx.contrib.postprocess.filters.CameraBlur;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class CameraMotion extends PostProcessorEffect {
-    private final CameraBlur camblur;
+    private final CameraBlur cameraBlur;
     private final float width;
     private final float height;
 
     public CameraMotion(float width, float height) {
         this.width = width;
         this.height = height;
-        camblur = new CameraBlur();
-        camblur.setVelocityTexture(null);
+        cameraBlur = new CameraBlur();
+        cameraBlur.setVelocityTexture(null);
+        disposables.add(cameraBlur);
     }
 
     public CameraMotion(int width, int height) {
         this((float) width, (float) height);
     }
 
-    @Override
-    public void dispose() {
-        camblur.dispose();
-    }
-
     public void setVelocityTexture(Texture velocityTexture) {
-        camblur.setVelocityTexture(velocityTexture);
+        cameraBlur.setVelocityTexture(velocityTexture);
     }
 
     public void setBlurMaxSamples(int samples) {
-        camblur.setBlurMaxSamples(samples);
+        cameraBlur.setBlurMaxSamples(samples);
     }
 
     public void setBlurScale(float scale) {
-        camblur.setBlurScale(scale);
+        cameraBlur.setBlurScale(scale);
     }
 
     public void setVelocityScale(float scale) {
-        camblur.setVelocityScale(scale);
+        cameraBlur.setVelocityScale(scale);
     }
 
     @Override
     public void rebind() {
-        camblur.rebind();
+        cameraBlur.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         if (dest != null) {
-            camblur.setViewport(dest.getWidth(), dest.getHeight());
+            cameraBlur.setViewport(dest.getWidth(), dest.getHeight());
         } else {
-            camblur.setViewport(width, height);
+            cameraBlur.setViewport(width, height);
         }
 
         restoreViewport(dest);
-        camblur.setVelocityTexture(main.getVelocityBufferTexture());
-        camblur.setInput(src).setOutput(dest).render();
+        cameraBlur.setVelocityTexture(main.getVelocityBufferTexture());
+        cameraBlur.setInput(src).setOutput(dest).render();
     }
 }

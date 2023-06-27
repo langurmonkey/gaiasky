@@ -7,9 +7,10 @@
 
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 
-public abstract class MultipassFilter {
+public abstract class MultipassFilter implements Disposable {
     public abstract void rebind();
 
     public abstract void render(PingPongBuffer srcdest);

@@ -13,14 +13,11 @@ import gaiasky.util.gdx.contrib.postprocess.filters.UnsharpMaskFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class UnsharpMask extends PostProcessorEffect {
-    private UnsharpMaskFilter filter = null;
+    private final UnsharpMaskFilter filter;
 
     public UnsharpMask() {
-        setup();
-    }
-
-    private void setup() {
         filter = new UnsharpMaskFilter();
+        disposables.add(filter);
     }
 
     /**
@@ -30,14 +27,6 @@ public final class UnsharpMask extends PostProcessorEffect {
      */
     public void setSharpenFactor(float sf) {
         filter.setSharpenFactor(sf);
-    }
-
-    @Override
-    public void dispose() {
-        if (filter != null) {
-            filter.dispose();
-            filter = null;
-        }
     }
 
     @Override

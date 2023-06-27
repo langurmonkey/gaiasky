@@ -278,9 +278,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             pseudoLensFlare.setLensColorTexture(lensColor);
             pseudoLensFlare.setLensDirtTexture(lensDirt);
             pseudoLensFlare.setLensStarburstTexture(lensStarBurst);
-            pseudoLensFlare.setFlareIntesity(lensFlareSettings.active ? lensFlareSettings.strength * 0.15f : 0f);
+            pseudoLensFlare.setFlareIntensity(lensFlareSettings.active ? lensFlareSettings.strength * 0.15f : 0f);
             pseudoLensFlare.setFlareSaturation(lensFlareSettings.flareSaturation);
-            pseudoLensFlare.setBaseIntesity(1f);
+            pseudoLensFlare.setBaseIntensity(1f);
             pseudoLensFlare.setBias(lensFlareSettings.bias);
             pseudoLensFlare.setBlurPasses(lensFlareSettings.blurPasses);
             pseudoLensFlare.setEnabledOptions(false, true);
@@ -837,7 +837,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         PostProcessBean ppb = pps[i];
                         PseudoLensFlare lensFlare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
                         lensFlare.setEnabled(enabled);
-                        lensFlare.setFlareIntesity(intensity);
+                        lensFlare.setFlareIntensity(intensity);
                     }
                 }
             } else {

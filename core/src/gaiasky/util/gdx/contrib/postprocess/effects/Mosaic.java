@@ -17,11 +17,7 @@ public final class Mosaic extends PostProcessorEffect {
 
     public Mosaic(float w, float h) {
         filter = new MosaicFilter(w, h);
-    }
-
-    @Override
-    public void dispose() {
-        filter.dispose();
+        disposables.add(filter);
     }
 
     @Override

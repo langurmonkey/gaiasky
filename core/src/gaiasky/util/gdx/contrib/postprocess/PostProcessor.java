@@ -176,21 +176,19 @@ public final class PostProcessor implements Disposable {
             buffers.removeValue(composite, true);
         }
 
-        if (enabledEffects != null) {
-            enabledEffects.clear();
-        }
+        enabledEffects.clear();
 
         if (cleanAllBuffers) {
             pipelineState.dispose();
         }
     }
 
-    /** Whether or not the post-processor is enabled */
+    /** Whether the post-processor is enabled */
     public boolean isEnabled() {
         return enabled;
     }
 
-    /** Sets whether or not the post-processor should be enabled */
+    /** Sets whether the post-processor should be enabled */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }

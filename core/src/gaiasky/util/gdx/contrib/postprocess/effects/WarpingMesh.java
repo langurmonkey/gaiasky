@@ -16,18 +16,21 @@ import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
 
 public final class WarpingMesh extends PostProcessorEffect {
-    private WarpingMeshFilter warpFilter;
+    private final WarpingMeshFilter warpFilter;
 
     public WarpingMesh(PFMData data, float rw, float rh) {
         warpFilter = new WarpingMeshFilter(data, rw, rh);
+        disposables.add(warpFilter);
     }
 
     public WarpingMesh(PFMData data, Texture blend) {
         warpFilter = new WarpingMeshFilter(data, blend);
+        disposables.add(warpFilter);
     }
 
     public WarpingMesh(WarpMesh data, int rw, int rh) {
         warpFilter = new WarpingMeshFilter(data, rw, rh);
+        disposables.add(warpFilter);
     }
 
     public void setViewportSize(int width, int height) {
@@ -36,14 +39,6 @@ public final class WarpingMesh extends PostProcessorEffect {
 
     public void setBlendTexture(Texture tex) {
         warpFilter.setBlendTexture(tex);
-    }
-
-    @Override
-    public void dispose() {
-        if (warpFilter != null) {
-            warpFilter.dispose();
-            warpFilter = null;
-        }
     }
 
     @Override

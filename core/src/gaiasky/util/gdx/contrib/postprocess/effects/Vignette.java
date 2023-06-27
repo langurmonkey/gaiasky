@@ -24,11 +24,7 @@ public final class Vignette extends PostProcessorEffect {
         oneOnW = 1f / (float) viewportWidth;
         oneOnH = 1f / (float) viewportHeight;
         vignetting = new Vignetting(controlSaturation);
-    }
-
-    @Override
-    public void dispose() {
-        vignetting.dispose();
+        disposables.add(vignetting);
     }
 
     public boolean doesSaturationControl() {

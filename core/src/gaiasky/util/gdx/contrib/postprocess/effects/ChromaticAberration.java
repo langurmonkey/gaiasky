@@ -18,6 +18,7 @@ public class ChromaticAberration extends PostProcessorEffect {
 
     public ChromaticAberration(float amount) {
         filter = new ChromaticAberrationFilter(amount);
+        disposables.add(filter);
     }
 
     public void setAberrationAmount(float amount) {
@@ -37,10 +38,5 @@ public class ChromaticAberration extends PostProcessorEffect {
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
         filter.setInput(src).setOutput(dest).render();
-    }
-
-    @Override
-    public void dispose() {
-        filter.dispose();
     }
 }
