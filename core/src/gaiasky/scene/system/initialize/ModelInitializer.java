@@ -358,8 +358,6 @@ public class ModelInitializer extends AbstractInitSystem {
         sa.thresholdQuad = thPoint / 8.0;
         sa.thresholdLabel = (Math.toRadians(1e-7) / Settings.settings.scene.label.number);
         label.labelFactor = (float) (0.5e1 * Constants.DISTANCE_SCALE_FACTOR);
-        sa.thresholdLabel = (Math.toRadians(1e-8) / Settings.settings.scene.label.number);
-        label.labelFactor = (float) (13.0 * Constants.DISTANCE_SCALE_FACTOR);
         label.labelMax = label.labelMax * 2f;
 
         scaffolding.billboardSizeFactor = 10f;
