@@ -21,7 +21,7 @@ import java.time.Instant;
 public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     OrbitComponent orbitalParams;
     PointCloudData data;
-    Matrix4d transf;
+    Matrix4d transform;
     Vector3d aux = new Vector3d();
 
     public OrbitLintCoordinates() {
@@ -34,7 +34,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
         } else {
             super.doneLoading(params);
-            transf = new Matrix4d();
+            transform = new Matrix4d();
             if (entity != null) {
                 Trajectory trajectory = Mapper.trajectory.get(entity);
                 Verts verts = Mapper.verts.get(entity);
@@ -75,13 +75,13 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             return out;
         }
         long dateWrap = data.getWrapTimeMs(date);
-        int basei = data.getIndex(dateWrap);
+        int baseIndex = data.getIndex(dateWrap);
 
-        int nexti = (basei + 1) % data.getNumPoints();
-        double percent = (double) Math.abs(dateWrap - data.getDate(basei).toEpochMilli()) / (double) Math.abs(data.getDate(nexti).toEpochMilli() - data.getDate(basei).toEpochMilli());
+        int nextIndex = (baseIndex + 1) % data.getNumPoints();
+        double percent = (double) Math.abs(dateWrap - data.getDate(baseIndex).toEpochMilli()) / (double) Math.abs(data.getDate(nextIndex).toEpochMilli() - data.getDate(baseIndex).toEpochMilli());
 
-        data.loadPoint(out, basei);
-        data.loadPoint(aux, nexti);
+        data.loadPoint(out, baseIndex);
+        data.loadPoint(aux, nextIndex);
 
         double len = aux.sub(out).len();
         aux.nor().scl(percent * len);
@@ -91,23 +91,23 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         Matrix4d parentOrientation = getParentOrientation();
 
         if (transformFunction == null && parentOrientation != null) {
-            transf.set(parentOrientation);
+            transform.set(parentOrientation);
         } else if (transformFunction != null) {
-            transf.set(transformFunction);
+            transform.set(transformFunction);
         } else {
-            transf.idt();
+            transform.idt();
         }
         if (!isNewMethod()) {
-            transf.rotate(0, 1, 0, orbitalParams.argofpericenter);
-            transf.rotate(0, 0, 1, orbitalParams.i);
-            transf.rotate(0, 1, 0, orbitalParams.ascendingnode);
+            transform.rotate(0, 1, 0, orbitalParams.argofpericenter);
+            transform.rotate(0, 0, 1, orbitalParams.i);
+            transform.rotate(0, 1, 0, orbitalParams.ascendingnode);
         } else {
             if (entity != null && Mapper.trajectory.get(entity).model.isExtrasolar()) {
-                transf.rotate(0, 1, 0, 90);
+                transform.rotate(0, 1, 0, 90);
             }
         }
 
-        out.mul(transf).scl(scaling);
+        out.mul(transform).scl(scaling);
 
         // Move to center if needed
         if (center != null && !center.isZero())

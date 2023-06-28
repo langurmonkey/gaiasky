@@ -10,10 +10,12 @@ package gaiasky.gui;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
+import gaiasky.input.KeyRegister;
 import gaiasky.util.Settings;
 
 import java.util.HashSet;
@@ -24,12 +26,16 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
 
     private final Input input;
     public KeyBindings mappings;
-    /** Holds the pressed keys at any moment **/
+    /**
+     * Holds the pressed keys at any moment
+     **/
     public Set<Integer> pressedKeys;
+    private final KeyRegister register;
 
     public KeyboardInputController(Input input) {
         super();
         this.input = input;
+        this.register = new KeyRegister();
         pressedKeys = new HashSet<>();
         KeyBindings.initialize();
         mappings = KeyBindings.instance;
@@ -42,6 +48,7 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
 
         if (Settings.settings.runtime.inputEnabled) {
             pressedKeys.add(keycode);
+            register.registerKeyDownTime(keycode, TimeUtils.millis());
         }
         return false;
 
@@ -52,11 +59,12 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
         EventManager.publish(Event.INPUT_EVENT, this, keycode);
 
         cleanSpecial();
+        long now = System.currentTimeMillis();
 
         if (Settings.settings.runtime.inputEnabled) {
             // Use key mappings
             ProgramAction action = mappings.getMappings().get(pressedKeys);
-            if (action != null) {
+            if (action != null && (now - register.lastKeyDownTime(pressedKeys) < action.maxKeyDownTimeMs)) {
                 action.run();
             }
         } else if (keycode == Keys.ESCAPE) {

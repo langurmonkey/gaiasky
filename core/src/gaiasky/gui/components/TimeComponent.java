@@ -18,13 +18,12 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.ControlsWindow;
-import gaiasky.gui.DateDialog;
 import gaiasky.gui.KeyBindings;
-import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+import gaiasky.util.time.GlobalClock;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -35,12 +34,13 @@ import java.time.format.TextStyle;
 public class TimeComponent extends GuiComponent implements IObserver {
 
     private final ZoneId timeZone;
-    /** Date format **/
+    /**
+     * Date format
+     **/
     private final DateTimeFormatter dfDate;
     private final DateTimeFormatter dfEra;
     private final DateTimeFormatter dfTime;
-    // Warp steps per side + 0, 0.125, 0.250, 0.5
-    private final int warpSteps = Constants.WARP_STEPS + 4;
+    private final int warpSteps;
     protected OwnLabel date;
     protected OwnLabel time;
     protected ImageButton plus, minus;
@@ -56,6 +56,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
+        warpSteps = ((GlobalClock) GaiaSky.instance.time).warpSteps;
         EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
     }
 
@@ -83,7 +84,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dateEdit.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
         // Pace
-        timeWarpVector = generateTimeWarpVector(warpSteps);
+        timeWarpVector = ((GlobalClock) GaiaSky.instance.time).generateTimeWarpVector();
         warp = new OwnSliderPlus(I18n.msg("gui.warp"), -warpSteps, warpSteps, 1, skin, "big-horizontal-arrow");
         warp.setValueLabelTransform((value) -> TextUtils.getFormattedTimeWarp(timeWarpVector[value.intValue() + warpSteps]));
         warp.setValue(getWarpIndex(GaiaSky.instance.time.getWarpFactor()) - warpSteps);
@@ -169,7 +170,6 @@ public class TimeComponent extends GuiComponent implements IObserver {
      * Generate the time warp vector.
      *
      * @param steps The number of steps per side (positive and negative)
-     *
      * @return The vector
      */
     private double[] generateTimeWarpVector(int steps) {
@@ -217,28 +217,28 @@ public class TimeComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
-            // Update input time
-            Instant datetime = (Instant) data[0];
-            GaiaSky.postRunnable(() -> {
-                date.setText(dfDate.format(datetime) + " " + dfEra.format(datetime));
-                time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
-            });
-        }
-        case TIME_WARP_CHANGED_INFO, TIME_WARP_CMD -> {
-            if (source != warp) {
-                double newWarp = (double) data[0];
-                int index = getWarpIndex(newWarp);
+            case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
+                // Update input time
+                Instant datetime = (Instant) data[0];
+                GaiaSky.postRunnable(() -> {
+                    date.setText(dfDate.format(datetime) + " " + dfEra.format(datetime));
+                    time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
+                });
+            }
+            case TIME_WARP_CHANGED_INFO, TIME_WARP_CMD -> {
+                if (source != warp) {
+                    double newWarp = (double) data[0];
+                    int index = getWarpIndex(newWarp);
 
-                if (index >= 0) {
-                    warpGuard = true;
-                    warp.setValue(index - warpSteps);
-                    warpGuard = false;
+                    if (index >= 0) {
+                        warpGuard = true;
+                        warp.setValue(index - warpSteps);
+                        warpGuard = false;
+                    }
                 }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
     }
 

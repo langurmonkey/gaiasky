@@ -22,11 +22,24 @@ import gaiasky.util.Logger.Log;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractGamepadListener implements ControllerListener, IInputListener, IObserver {
-    protected static final float MIN_ZERO_POINT = 0.3f;
-    protected static final long AXIS_EVT_DELAY = 250;
-    protected static final long AXIS_POLL_DELAY = 250;
-    protected static final long BUTTON_POLL_DELAY = 400;
     private static final Log logger = Logger.getLogger(AbstractGamepadListener.class);
+
+    protected static final float MIN_ZERO_POINT = 0.3f;
+
+    /**
+     * Delay between axis events.
+     */
+    protected long axisEventDelay = 250;
+
+    /**
+     * Delay between axis poll operations.
+     */
+    protected long axisPollDelay = 250;
+    /**
+     * Delay between button poll operations.
+     */
+    protected long buttonPollDelay = 400;
+
     protected final EventManager em;
     protected final AtomicBoolean active = new AtomicBoolean(true);
     protected Controller lastControllerUsed = null;
@@ -139,14 +152,14 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         if (active.get()) {
             long now = TimeUtils.millis();
             // AXES POLL
-            if (now - lastAxisEvtTime > AXIS_POLL_DELAY) {
+            if (now - lastAxisEvtTime > axisPollDelay) {
                 if (pollAxes()) {
                     lastAxisEvtTime = now;
                 }
             }
 
             // BUTTONS POLL
-            if (now - lastButtonPollTime > BUTTON_POLL_DELAY) {
+            if (now - lastButtonPollTime > buttonPollDelay) {
                 if (pollButtons()) {
                     lastButtonPollTime = now;
                 }

@@ -7,6 +7,7 @@
 
 package gaiasky.util.time;
 
+import com.badlogic.gdx.math.MathUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -17,6 +18,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 
 import java.time.Instant;
+import java.util.Arrays;
 
 public class GlobalClock implements IObserver, ITimeFrameProvider {
     private static final Log logger = Logger.getLogger(GlobalClock.class);
@@ -49,6 +51,13 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     // Seconds since last event POST
     private float lastUpdate = 1;
 
+    // Warp steps per side + 0, 0.125, 0.250, 0.5
+    public final int warpSteps = Constants.WARP_STEPS + 4;
+    /**
+     * Possible values for the time warp to snap.
+     */
+    private final double[] timeWarpVector;
+
     /**
      * Creates a new GlobalClock
      *
@@ -63,7 +72,66 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
         time = instant;
         targetTime = null;
         lastTime = time.toEpochMilli();
+        timeWarpVector = generateTimeWarpVector(warpSteps);
+
         EventManager.instance.subscribe(this, Event.TIME_WARP_CMD, Event.TIME_WARP_DECREASE_CMD, Event.TIME_WARP_INCREASE_CMD, Event.TIME_CHANGE_CMD, Event.TARGET_TIME_CMD);
+    }
+
+    /**
+     * Generate the time warp vector with the default number of steps.
+     *
+     * @return The vector
+     */
+    public double[] generateTimeWarpVector() {
+        return generateTimeWarpVector(warpSteps);
+    }
+
+    /**
+     * Generate the time warp vector.
+     *
+     * @param steps The number of steps per side (positive and negative)
+     * @return The vector
+     */
+    public double[] generateTimeWarpVector(int steps) {
+        double[] warp = new double[steps * 2 + 1];
+        warp[steps] = 0;
+        // Positive
+        double w = 0;
+        for (int i = steps + 1; i < warp.length; i++) {
+            warp[i] = increaseWarp(w);
+            w = warp[i];
+        }
+        // Negative
+        w = 0;
+        for (int i = steps - 1; i >= 0; i--) {
+            warp[i] = decreaseWarp(w);
+            w = warp[i];
+        }
+        return warp;
+    }
+
+    private double increaseWarp(double timeWarp) {
+        if (timeWarp == 0) {
+            return 0.125;
+        } else if (timeWarp == -0.125) {
+            return 0;
+        } else if (timeWarp < 0) {
+            return timeWarp / 2.0;
+        } else {
+            return timeWarp * 2.0;
+        }
+    }
+
+    private double decreaseWarp(double timeWarp) {
+        if (timeWarp == 0.125) {
+            return 0;
+        } else if (timeWarp == 0) {
+            return -0.125;
+        } else if (timeWarp < 0) {
+            return timeWarp * 2.0;
+        } else {
+            return timeWarp / 2.0;
+        }
     }
 
     /**
@@ -159,29 +227,11 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
             }
             case TIME_WARP_CMD -> setTimeWarp((Double) data[0]);
             case TIME_WARP_INCREASE_CMD -> {
-                double tw;
-                if (timeWarp == 0) {
-                    tw = 0.125;
-                } else if (timeWarp == -0.125) {
-                    tw = 0;
-                } else if (timeWarp < 0) {
-                    tw = nearestPowerOf2(timeWarp, -1.0);
-                } else {
-                    tw = nearestPowerOf2(timeWarp, 1.0);
-                }
+                double tw = findNearestWarpSnapValue(timeWarp, 1.0);
                 setTimeWarp(tw);
             }
             case TIME_WARP_DECREASE_CMD -> {
-                double tw;
-                if (timeWarp == 0.125) {
-                    tw = 0;
-                } else if (timeWarp == 0) {
-                    tw = -0.125;
-                } else if (timeWarp < 0) {
-                    tw = nearestPowerOf2(timeWarp, 1.0);
-                } else {
-                    tw = nearestPowerOf2(timeWarp, -1.0);
-                }
+                double tw = findNearestWarpSnapValue(timeWarp, -1.0);
                 setTimeWarp(tw);
             }
             case TIME_CHANGE_CMD -> {
@@ -212,17 +262,49 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
 
     }
 
+
+    /**
+     * Finds the nearest value in the {@link GlobalClock#timeWarpVector} array in the given direction.
+     *
+     * @param value The value to use.
+     * @param dir   The direction, either 1 or -1.
+     * @return The nearest snap value in the given direction.
+     */
+    public double findNearestWarpSnapValue(double value, double dir) {
+        int idx = Arrays.binarySearch(timeWarpVector, value);
+        if (idx < 0) {
+            idx = -idx - 1;
+        }
+        idx = MathUtils.clamp(idx, 0, timeWarpVector.length - 1);
+        double v = timeWarpVector[idx];
+        if (value == v) {
+            // Our value is in the array, we must get either the left or the right values.
+            return dir > 0 ? timeWarpVector[Math.min(timeWarpVector.length - 1, idx + 1)] : timeWarpVector[Math.max(0, idx - 1)];
+        } else {
+            // Our value is not in the array! Index points to the first element in the sequence that is greater than value.
+            return dir < 0 ? timeWarpVector[Math.max(0, idx - 1)] : timeWarpVector[idx];
+        }
+    }
+
     /**
      * Finds the nearest power of two to n, in the given direction.
-     * @param n The number.
+     *
+     * @param n   The number.
      * @param dir Direction. Either 1.0 or -1.0.
      * @return The nearest power of two to n.
      */
     public double nearestPowerOf2(double n, double dir) {
+        if (n == 1) {
+            if (dir < 0) {
+                return 0.5;
+            }
+        }
+        if (n == -1) {
+            if (dir > 0) {
+                return -0.5;
+            }
+        }
         long a = (int) (Math.log(n) / Math.log(2.0));
-
-        if (Math.pow(2.0, a) == n)
-            return n;
 
         return (long) Math.pow(2.0, a + dir);
     }

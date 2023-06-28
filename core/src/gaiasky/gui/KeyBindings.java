@@ -280,15 +280,16 @@ public class KeyBindings {
 
         // Divide time warp
         addAction(new ProgramAction("action.dividetime", () -> {
-            /* This is now implemented in {@link gaiasky.input.MainMouseKbdListener#update() **/
-            // EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this);
-        }));
+            EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this);
+        }, 500L));
 
         // Double time warp
         addAction(new ProgramAction("action.doubletime", () -> {
-            /* This is now implemented in {@link gaiasky.input.MainMouseKbdListener#update() **/
-            // EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this);
-        }));
+            EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this);
+        }, 500L));
+
+        // Reset time warp to 1
+        addAction(new ProgramAction("action.time.warp.reset", () -> EventManager.publish(Event.TIME_WARP_CMD, this, 1d)));
 
         // Toggle time
         addAction(new ProgramAction("action.pauseresume", () -> {
@@ -597,6 +598,10 @@ public class KeyBindings {
      * evaluate to true for the action to be run.
      */
     public static class ProgramAction implements Runnable, Comparable<ProgramAction> {
+        /**
+         * Contains the maximum amount of time between the key down and key up events.
+         **/
+        public final long maxKeyDownTimeMs;
         final String actionId;
         final String actionName;
         /**
@@ -609,7 +614,7 @@ public class KeyBindings {
          **/
         private final BooleanRunnable[] conditions;
 
-        ProgramAction(String actionId, Runnable action, BooleanRunnable... conditions) {
+        ProgramAction(String actionId, Runnable action, long maxKeyDownTimeMs, BooleanRunnable... conditions) {
             this.actionId = actionId;
             // Set action name
             String actionName;
@@ -626,6 +631,11 @@ public class KeyBindings {
             this.actionName = actionName;
             this.action = action;
             this.conditions = conditions;
+            this.maxKeyDownTimeMs = maxKeyDownTimeMs;
+        }
+
+        ProgramAction(String actionId, Runnable action, BooleanRunnable... conditions) {
+            this(actionId, action, 10000L, conditions);
         }
 
         @Override
@@ -642,7 +652,7 @@ public class KeyBindings {
          */
         private boolean evaluateConditions() {
             boolean result = true;
-            if (conditions != null && conditions.length > 0) {
+            if (conditions != null) {
                 for (BooleanRunnable br : conditions) {
                     result = result && br.run();
                 }

@@ -52,6 +52,7 @@ action.toggle/element.clusters              = SHIFT_L V
 action.dividetime                           = COMMA
 action.doubletime                           = PERIOD
 action.pauseresume                          = SPACE
+action.time.warp.reset                      = CTRL_L PERIOD
 
 # FOV
 action.incfov                               = CTRL_L R_BRACKET

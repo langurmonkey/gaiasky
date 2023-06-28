@@ -8,7 +8,9 @@
 package gaiasky.input;
 
 import com.badlogic.gdx.controllers.Controller;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Logger;
@@ -23,6 +25,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
     public MainGamepadListener(NaturalCamera cam, String mappingsFile) {
         super(mappingsFile);
         this.cam = cam;
+        this.buttonPollDelay = 20;
     }
 
     @Override
@@ -39,10 +42,6 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
             } else if (buttonCode == mappings.getButtonB()) {
                 em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.asteroids");
-            } else if (buttonCode == mappings.getButtonDpadUp()) {
-                em.post(Event.STAR_POINT_SIZE_INCREASE_CMD, this);
-            } else if (buttonCode == mappings.getButtonDpadDown()) {
-                em.post(Event.STAR_POINT_SIZE_DECREASE_CMD, this);
             } else if (buttonCode == mappings.getButtonDpadLeft()) {
                 em.post(Event.TIME_STATE_CMD, this, false);
             } else if (buttonCode == mappings.getButtonDpadRight()) {
@@ -145,6 +144,30 @@ public class MainGamepadListener extends AbstractGamepadListener {
 
     @Override
     public boolean pollButtons() {
+        if (active.get() && lastControllerUsed != null) {
+            if (lastControllerUsed.getButton(mappings.getButtonDpadUp())) {
+                var t = GaiaSky.instance.time.getWarpFactor();
+                // Speed up.
+                if (t == 0) {
+                    t = 0.1;
+                } else if (t > -0.1 && t < 0) {
+                    t = 0;
+                }
+                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + Math.abs(t * inc) : t + t * inc);
+            } else if (lastControllerUsed.getButton(mappings.getButtonDpadDown())) {
+                var t = GaiaSky.instance.time.getWarpFactor();
+                // Slow down.
+                if (t == 0) {
+                    t = -0.1;
+                } else if (t < 0.1 && t > 0) {
+                    t = 0;
+                }
+                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - Math.abs(t * inc) : t - t * inc);
+            }
+            return true;
+        }
         return false;
     }
 }

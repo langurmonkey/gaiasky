@@ -80,7 +80,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
     public boolean axisMoved(Controller controller, int axisCode, float value) {
         long now = TimeUtils.millis();
         value = (float) applyZeroPoint(value);
-        if (now - lastAxisEvtTime > AXIS_EVT_DELAY) {
+        if (now - lastAxisEvtTime > axisEventDelay) {
             // Event-based
             if (axisCode == mappings.getAxisLstickV()) {
                 // LEFT STICK vertical - move focus vertically

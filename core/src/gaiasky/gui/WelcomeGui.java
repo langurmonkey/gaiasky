@@ -942,7 +942,7 @@ public class WelcomeGui extends AbstractGui {
                                  int axisCode,
                                  float value) {
             long now = TimeUtils.millis();
-            if (now - lastAxisEvtTime > AXIS_EVT_DELAY) {
+            if (now - lastAxisEvtTime > axisEventDelay) {
                 // Event-based
                 if (axisCode == mappings.getAxisLstickV()) {
                     value = (float) applyZeroPoint(value);

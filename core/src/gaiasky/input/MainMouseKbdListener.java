@@ -130,12 +130,16 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     private Entity kpo;
     private KeyframesView kfView;
 
+    /** Key register **/
+    private final KeyRegister register;
+
     protected MainMouseKbdListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
         super(gestureListener, camera);
         this.camera = camera;
         this.gestureListener = gestureListener;
         this.gestureListener.inputListener = this;
         this.comp = new ViewAngleComparator<>();
+        this.register = new KeyRegister();
         // 1% of width
         this.MOVE_PX_DIST = (float) Math.max(5, Gdx.graphics.getWidth() * 0.01);
         this.MIN_PIX_DIST = (int) (8f);
@@ -417,7 +421,19 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
+    public boolean keyDown(int keycode) {
+        if (isActive()) {
+            if (Settings.settings.runtime.inputEnabled) {
+                register.registerKeyDownTime(keycode, TimeUtils.millis());
+            }
+            return super.keyDown(keycode);
+        }
+        return false;
+    }
+
+    @Override
     public boolean pollKeys() {
+        long now = System.currentTimeMillis();
         boolean result = false;
         float horizontalScale = Settings.settings.scene.camera.cinematic ? 0.01f : 1f;
         if (isKeyPressed(Keys.UP)) {
@@ -464,28 +480,34 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         }
 
         // Keys to speed up and slow down time.
+        long speedMs = bindings.findAction("action.doubletime").maxKeyDownTimeMs;
+        long slowMs = bindings.findAction("action.dividetime").maxKeyDownTimeMs;
         var speedTimeKeys = bindings.getKeys("action.doubletime");
         var slowTimeKeys = bindings.getKeys("action.dividetime");
         if (allPressed(speedTimeKeys)) {
-            var t = GaiaSky.instance.time.getWarpFactor();
-            // Speed up.
-            if (t == 0) {
-                t = 0.1;
-            } else if(t > -0.1 && t < 0) {
-                t = 0;
+            if (now - register.lastKeyDownTime(speedTimeKeys) > speedMs) {
+                var t = GaiaSky.instance.time.getWarpFactor();
+                // Speed up.
+                if (t == 0) {
+                    t = 0.1;
+                } else if (t > -0.1 && t < 0) {
+                    t = 0;
+                }
+                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + Math.abs(t * inc) : t + t * inc);
             }
-            double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
-            EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + Math.abs(t * inc) : t + t * inc);
         } else if (allPressed(slowTimeKeys)) {
-            var t = GaiaSky.instance.time.getWarpFactor();
-            // Slow down.
-            if (t == 0) {
-                t = -0.1;
-            } else if (t < 0.1 && t > 0) {
-                t = 0;
+            if (now - register.lastKeyDownTime(slowTimeKeys) > slowMs) {
+                var t = GaiaSky.instance.time.getWarpFactor();
+                // Slow down.
+                if (t == 0) {
+                    t = -0.1;
+                } else if (t < 0.1 && t > 0) {
+                    t = 0;
+                }
+                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - Math.abs(t * inc) : t - t * inc);
             }
-            double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
-            EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - Math.abs(t * inc) : t - t * inc);
         }
 
         return result;
