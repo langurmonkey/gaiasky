@@ -496,38 +496,38 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             content.add(new OwnLabel(I18n.msg("gui.procedural.param.color"), skin, "header")).colspan(2).left().padBottom(pad34).row();
 
             // LUT
-            Path dataPath = Settings.settings.data.dataPath("tex/base");
-            Array<String> luts = new Array<>();
-            try {
-                java.util.List<Path> l = Files.list(dataPath).filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
+            Path dataPath = Settings.settings.data.dataPath("default-data/tex/base");
+            Array<String> lookUpTables = new Array<>();
+            try (var stream = Files.list(dataPath)){
+                java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
                 for (Path p : l) {
                     String name = p.toString();
-                    luts.add("data" + name.substring(name.indexOf("/tex/base/")));
+                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/base/")));
                 }
             } catch (Exception ignored) {
             }
-            if (luts.isEmpty()) {
-                luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
-                luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
+            if (lookUpTables.isEmpty()) {
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-smooth-lut.png");
             }
-            OwnSelectBox<String> lutsBox = new OwnSelectBox<>(skin);
-            lutsBox.setItems(luts);
-            lutsBox.setWidth(fieldWidth);
-            lutsBox.setSelected(mtc.biomeLUT);
-            lutsBox.addListener(new ChangeListener() {
+            OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
+            lookUpTablesBox.setItems(lookUpTables);
+            lookUpTablesBox.setWidth(fieldWidth);
+            lookUpTablesBox.setSelected(mtc.biomeLUT);
+            lookUpTablesBox.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    mtc.biomeLUT = lutsBox.getSelected();
-                    updateLutImage(luts);
+                    mtc.biomeLUT = lookUpTablesBox.getSelected();
+                    updateLutImage(lookUpTables);
                 }
             });
 
-            OwnLabel lutLabel = new OwnLabel(I18n.msg("gui.procedural.lut"), skin);
-            lutLabel.setWidth(textWidth);
+            OwnLabel lookUpTablesLabel = new OwnLabel(I18n.msg("gui.procedural.lut"), skin);
+            lookUpTablesLabel.setWidth(textWidth);
             OwnImageButton lutTooltip = new OwnImageButton(skin, "tooltip");
             lutTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.lut"), skin));
-            content.add(lutLabel).left().padBottom(pad18).padRight(pad18);
-            content.add(lutsBox).left().padBottom(pad18).padRight(pad10);
+            content.add(lookUpTablesLabel).left().padBottom(pad18).padRight(pad18);
+            content.add(lookUpTablesBox).left().padBottom(pad18).padRight(pad10);
             content.add(lutTooltip).left().padBottom(pad18).row();
             lutImageCell = content.add();
             lutImageCell.colspan(3).padBottom(pad18).row();
@@ -541,7 +541,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     mtc.biomeHueShift = hueShift.getMappedValue();
-                    updateLutImage(luts);
+                    updateLutImage(lookUpTables);
                 }
             });
             OwnImageButton hueShiftTooltip = new OwnImageButton(skin, "tooltip");
@@ -550,7 +550,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             content.add(hueShiftTooltip).left().padBottom(pad34).row();
 
             // Initial update
-            updateLutImage(luts);
+            updateLutImage(lookUpTables);
 
             // Noise
             addNoiseGroup(content, mtc.nc, "gui.procedural.param.elev");

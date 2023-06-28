@@ -106,7 +106,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap,
             roughnessCubemap, metallicCubemap;
     // Biome lookup texture.
-    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png";
+    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-lut.png";
     public float biomeHueShift = 0;
     /** Add also color even if texture is present **/
     public boolean colorIfTexture = false;
@@ -818,10 +818,18 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void setBiomelut(String biomeLookupTex) {
+        this.setBiomeLUT(biomeLookupTex);
+    }
+
+    public void setBiomeLUT(String biomeLookupTex) {
         this.biomeLUT = biomeLookupTex;
     }
 
     public void setBiomehueshift(Double hueShift) {
+        this.setBiomeHueShift(hueShift);
+    }
+
+    public void setBiomeHueShift(Double hueShift) {
         this.biomeHueShift = hueShift.floatValue();
     }
 
@@ -1143,20 +1151,20 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
-        var dataPath = Settings.settings.data.dataPath("tex/base");
+        var dataPath = Settings.settings.data.dataPath("default-data/tex/base");
         Array<String> lookUpTables = new Array<>();
         try (var paths = Files.list(dataPath)) {
             List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
             for (Path p : l) {
                 String name = p.toString();
-                lookUpTables.add("data" + name.substring(name.indexOf("/tex/base/")));
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/base/")));
             }
         } catch (Exception ignored) {
         }
 
         if (lookUpTables.isEmpty()) {
-            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
-            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-lut.png");
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-smooth-lut.png");
         }
         setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
         setBiomehueshift(rand.nextDouble() * 360.0);
