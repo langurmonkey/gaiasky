@@ -3334,18 +3334,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (checkString(dsName, "datasetName")) {
                 // Only local files accepted.
                 Path path = Path.of(ds.getURL().getPath());
-                String pathString = path.toAbsolutePath().toString();
-                if (!Files.exists(path)) {
-                    notifyErrorPopup(I18n.msg("error.loading.notexistent", pathString));
-                    return false;
-                }
-                if (!Files.isReadable(path)) {
-                    notifyErrorPopup(I18n.msg("error.file.read", pathString));
-                    return false;
-                }
-                if (Files.isDirectory(path)) {
-                    notifyErrorPopup(I18n.msg("error.file.isdir", pathString));
-                    return false;
+                if(ds.getURL().getProtocol().equals("file")) {
+                    String pathString = path.toString();
+                    if (!Files.exists(path)) {
+                        notifyErrorPopup(I18n.msg("error.loading.notexistent", pathString));
+                        return false;
+                    }
+                    if (!Files.isReadable(path)) {
+                        notifyErrorPopup(I18n.msg("error.file.read", pathString));
+                        return false;
+                    }
+                    if (Files.isDirectory(path)) {
+                        notifyErrorPopup(I18n.msg("error.file.isdir", pathString));
+                        return false;
+                    }
                 }
 
                 if (path.getFileName().toString().endsWith(".json")) {
