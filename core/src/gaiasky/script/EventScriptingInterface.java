@@ -81,7 +81,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-@SuppressWarnings({ "unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue" })
+@SuppressWarnings({"unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue"})
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
@@ -341,22 +341,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraPosition(double x, double y, double z) {
-        setCameraPosition(new double[] { x, y, z });
+        setCameraPosition(new double[]{x, y, z});
     }
 
     @Override
     public void setCameraPosition(double x, double y, double z, String units) {
-        setCameraPosition(new double[] { x, y, z }, units);
+        setCameraPosition(new double[]{x, y, z}, units);
     }
 
     @Override
     public void setCameraPosition(double x, double y, double z, boolean immediate) {
-        setCameraPosition(new double[] { x, y, z }, immediate);
+        setCameraPosition(new double[]{x, y, z}, immediate);
     }
 
     @Override
     public void setCameraPosition(double x, double y, double z, String units, boolean immediate) {
-        setCameraPosition(new double[] { x, y, z }, units, immediate);
+        setCameraPosition(new double[]{x, y, z}, units, immediate);
     }
 
     public void setCameraPosition(final List<?> vec, boolean immediate) {
@@ -400,7 +400,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkDistanceUnits(units, "units")) {
             var u = DistanceUnits.valueOf(units.toUpperCase());
             Vector3d campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
-            return new double[] { u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z) };
+            return new double[]{u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z)};
         }
         return null;
     }
@@ -445,7 +445,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraDirection() {
         Vector3d camdir = GaiaSky.instance.cameraManager.getDirection();
-        return new double[] { camdir.x, camdir.y, camdir.z };
+        return new double[]{camdir.x, camdir.y, camdir.z};
     }
 
     @Override
@@ -479,7 +479,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraUp() {
         Vector3d camUp = GaiaSky.instance.cameraManager.getUp();
-        return new double[] { camUp.x, camUp.y, camUp.z };
+        return new double[]{camUp.x, camUp.y, camUp.z};
     }
 
     @Override
@@ -1869,7 +1869,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 IParticleRecord sb = set.getCandidateBean();
                 if (sb != null) {
                     double[] rgb = sb.rgb();
-                    return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appMag(), rgb[0], rgb[1], rgb[2] };
+                    return new double[]{sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appMag(), rgb[0], rgb[1], rgb[2]};
                 }
             }
         }
@@ -1889,7 +1889,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             focusView.getFocus(name);
             focusView.getAbsolutePosition(name, aux3b1);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[] { u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue()) };
+            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
     }
@@ -1907,7 +1907,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             focusView.getFocus(name);
             focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[] { u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue()) };
+            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
     }
@@ -1961,7 +1961,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkNotNull(object, "object") && checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
 
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            double[] posUnits = new double[] { u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2]) };
+            double[] posUnits = new double[]{u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2])};
 
             var body = Mapper.body.get(object);
             body.pos.set(posUnits);
@@ -2096,7 +2096,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[] { id }));
+        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[]{id}));
     }
 
     @Override
@@ -2188,7 +2188,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 y += parent.getY();
                 parent = parent.getParent();
             }
-            return new float[] { x, y, actor.getWidth(), actor.getHeight() };
+            return new float[]{x, y, actor.getWidth(), actor.getHeight()};
         } else {
             return null;
         }
@@ -2241,7 +2241,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void preloadTexture(String path) {
-        preloadTextures(new String[] { path });
+        preloadTextures(new String[]{path});
     }
 
     @Override
@@ -2292,16 +2292,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Object monitor = new Object();
             IObserver watcher = (event, source, data) -> {
                 switch (event) {
-                case CAMERA_PLAY_INFO -> {
-                    Boolean status = (Boolean) data[0];
-                    if (!status) {
-                        synchronized (monitor) {
-                            monitor.notify();
+                    case CAMERA_PLAY_INFO -> {
+                        Boolean status = (Boolean) data[0];
+                        if (!status) {
+                            synchronized (monitor) {
+                                monitor.notify();
+                            }
                         }
                     }
-                }
-                default -> {
-                }
+                    default -> {
+                    }
                 }
             };
             em.subscribe(watcher, Event.CAMERA_PLAY_INFO);
@@ -2398,7 +2398,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 end = () -> unparkRunnable(name);
 
             var u = DistanceUnits.valueOf(units.toUpperCase());
-            double[] posUnits = new double[] { u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2]) };
+            double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
 
             // Create and park runnable
             CameraTransitionRunnable r = new CameraTransitionRunnable(cam, posUnits, camDir, camUp, seconds, end);
@@ -2511,7 +2511,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public double[] galacticToInternalCartesian(double l, double b, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     public double[] galacticToInternalCartesian(int l, int b, int r) {
@@ -2522,7 +2522,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public double[] eclipticToInternalCartesian(double l, double b, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     public double[] eclipticToInternalCartesian(int l, int b, int r) {
@@ -2532,7 +2532,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     public double[] equatorialToInternalCartesian(int ra, int dec, int r) {
@@ -2543,7 +2543,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Vector3b in = aux3b1.set(x, y, z);
         Vector3d out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
-        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble() };
+        return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble()};
     }
 
     public double[] internalCartesianToEquatorial(int x, int y, int z) {
@@ -2553,7 +2553,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor) {
         aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
-        return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
+        return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
     }
 
     public double[] equatorialCartesianToInternalCartesian(final List<?> eq, double kmFactor) {
@@ -2652,7 +2652,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setHDRToneMappingType(String type) {
-        if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
+        if (checkString(type, new String[]{"auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE"}, "tone mapping type"))
             postRunnable(() -> em.post(Event.TONEMAPPING_TYPE_CMD, this, Settings.ToneMapping.valueOf(type.toUpperCase())));
     }
 
@@ -3106,12 +3106,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadStarDataset(String dsName, String path, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[] { 0, 0, 0, 0 }, null, null, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[] { 0, 0, 0, 0 }, null, null, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
@@ -3139,7 +3139,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, null, null, sync);
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{1.5d, 100d}, ct, null, null, sync);
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, List<?> particleColor, double colorNoise, List<?> labelColor, double particleSize, String ct, boolean sync) {
@@ -3148,7 +3148,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) }, ct, fadeIn, fadeOut, sync);
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0))}, ct, fadeIn, fadeOut, sync);
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List<?> particleColor, double colorNoise, final List<?> labelColor, double particleSize, String ct, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
@@ -3332,11 +3332,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
-                // Only local files accepted.
-                Path path = Path.of(ds.getURL().getPath());
-                if(ds.getURL().getProtocol().equals("file")) {
-                    String pathString = path.toString();
-                    if (!Files.exists(path)) {
+                // Only local files checked.
+                Path path = null;
+                if (ds instanceof FileDataSource) {
+                    var file = ((FileDataSource)ds).getFile();
+                    path = file.toPath();
+                    String pathString = file.getAbsolutePath();
+                    if (!Files.exists(file.toPath())) {
                         notifyErrorPopup(I18n.msg("error.loading.notexistent", pathString));
                         return false;
                     }
@@ -3350,7 +3352,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 }
 
-                if (path.getFileName().toString().endsWith(".json")) {
+                if (path != null && path.getFileName().toString().endsWith(".json")) {
+                    // Only local files allowed for JSON.
                     loadJsonDataset(dsName, path.toString(), sync);
                 } else if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
                     List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
@@ -3440,7 +3443,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     var body = Mapper.body.get(entity);
                     body.setColor(datasetOptions.particleColor);
                     body.setLabelColor(datasetOptions.labelColor);
-                    body.setPosition(new double[] { 0, 0, 0 });
+                    body.setPosition(new double[]{0, 0, 0});
 
                     var fade = Mapper.fade.get(entity);
                     fade.setFadeIn(datasetOptions.fadeIn);
@@ -3643,7 +3646,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Class<?> clazz = Class.forName("gaiasky.util.filter.attrib.Attribute" + name);
             Constructor<?> ctor = clazz.getConstructor();
             return (IAttribute) ctor.newInstance();
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
             // Try extra attributes
 
             // New
@@ -3717,7 +3721,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // NEW
                 {
                     Entity trackingObject = getFocusEntity(objectName);
-                    float[] color = new float[] { r, g, b, a };
+                    float[] color = new float[]{r, g, b, a};
                     int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
                     // Create shape
                     Archetype at = scene.archetypes().get("gaiasky.scenegraph.ShapeObject");
@@ -3729,7 +3733,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     var body = Mapper.body.get(newShape);
                     body.setColor(color);
-                    body.setLabelColor(new float[] { r, g, b, a });
+                    body.setLabelColor(new float[]{r, g, b, a});
                     body.size = (float) (size * Constants.KM_TO_U);
 
                     var graph = Mapper.graph.get(newShape);
@@ -3952,20 +3956,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case INPUT_EVENT -> inputCode = (Integer) data[0];
-        case DISPOSE -> {
-            // Stop all
-            for (AtomicBoolean stop : stops) {
-                if (stop != null)
-                    stop.set(true);
+            case INPUT_EVENT -> inputCode = (Integer) data[0];
+            case DISPOSE -> {
+                // Stop all
+                for (AtomicBoolean stop : stops) {
+                    if (stop != null)
+                        stop.set(true);
+                }
             }
-        }
-        case SCENE_LOADED -> {
-            this.scene = (Scene) data[0];
-            this.focusView.setScene(this.scene);
-        }
-        default -> {
-        }
+            case SCENE_LOADED -> {
+                this.scene = (Scene) data[0];
+                this.focusView.setScene(this.scene);
+            }
+            default -> {
+            }
         }
 
     }
@@ -4174,7 +4178,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
 
         private PathDouble<Vector3d> getPathd(Vector3d p0, double[] p1) {
-            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
+            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
             return new LinearDouble<>(points);
         }
 
