@@ -46,8 +46,8 @@ public class PerimeterUpdater extends AbstractUpdateSystem {
         var parentSa = Mapper.sa.get(parent);
         var parentBody = Mapper.body.get(parent);
 
-        float angleLow = (float) parentSa.thresholdQuad * camera.getFovFactor() * 100f;
-        float angleHigh = (float) parentSa.thresholdQuad * camera.getFovFactor() * 200f;
+        float angleLow = (float) parentSa.thresholdQuad * camera.getFovFactor() * 30f;
+        float angleHigh = (float) parentSa.thresholdQuad * camera.getFovFactor() * 90f;
 
         if (GaiaSky.instance.isOn(base.ct) && parentBody.solidAngleApparent > angleLow) {
             graph.localTransform.idt();
