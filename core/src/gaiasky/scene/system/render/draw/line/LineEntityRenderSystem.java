@@ -523,7 +523,7 @@ public class LineEntityRenderSystem {
 
                 renderer.addLine(lineView, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
                 if (Settings.settings.scene.properMotion.arrowHeads) {
-                    // Add Arrow cap.
+                    // Add the arrow cap.
                     Vector3d p3 = D32.set(ppm).nor().scl(p1p2len * .86).add(p1);
                     p3.rotate(p2, 30);
                     renderer.addLine(lineView, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
