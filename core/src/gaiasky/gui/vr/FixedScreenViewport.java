@@ -10,6 +10,7 @@ package gaiasky.gui.vr;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -70,11 +71,11 @@ public class FixedScreenViewport extends Viewport {
         int bbw = Settings.settings.graphics.backBufferResolution[0];
         int bbh = Settings.settings.graphics.backBufferResolution[1];
         if (width != bbw || height != bbh) {
-            Gdx.gl.glViewport(0, 0, width * bbw / width, height * bbh / height);
+            HdpiUtils.glViewport(0, 0, width * bbw / width, height * bbh / height);
         } else {
-            Gdx.gl.glViewport(0, 0, width, height);
+            HdpiUtils.glViewport(0, 0, width, height);
         }
-        Gdx.gl.glViewport(0, 0, width, height);
+        HdpiUtils.glViewport(0, 0, width, height);
         getCamera().viewportWidth = width;
         getCamera().viewportHeight = height;
         if (centerCamera)

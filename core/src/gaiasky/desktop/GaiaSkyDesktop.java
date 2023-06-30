@@ -15,10 +15,12 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.converters.EnumConverter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -47,32 +49,51 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * Main entry point for Gaia Sky. This class takes care of initializing the settings and logging system, parsing
+ * the CLI arguments, setting up the GDX configuration and starting the application.
+ */
 public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
+    /** Minimum Java version required to run Gaia Sky. **/
     private static final String REQUIRED_JAVA_VERSION = "15";
+    /** Default major OpenGL version. **/
     private static final int DEFAULT_OPENGL_MAJOR = 4;
+    /** Default minor OpenGL version. **/
     private static final int DEFAULT_OPENGL_MINOR = 1;
+    /** Default minor OpenGL version in VR mode. **/
     private static final int XR_OPENGL_MINOR = 5;
+    /** Full default OpenGL version string (with OpenXR). **/
     private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
+    /** Full default OpenGL version string in VR mode (with OpenXR). **/
     private static final String XR_OPENGL = DEFAULT_OPENGL_MAJOR + "." + XR_OPENGL_MINOR;
+    /** Minimum required OpenGL major version for Gaia Sky to run. **/
     private static final int MIN_OPENGL_MAJOR = 3;
+    /** Minimum required OpenGL minor version for Gaia Sky to run. **/
     private static final int MIN_OPENGL_MINOR = 3;
+    /** Minimum required OpenGL version string. **/
     private static final String MIN_OPENGL = MIN_OPENGL_MAJOR + "." + MIN_OPENGL_MINOR;
+    /** Minimum GLSL major version. **/
     private static final int MIN_GLSL_MAJOR = 3;
+    /** Minimum GLSL minor version. **/
     private static final int MIN_GLSL_MINOR = 3;
+    /** Minimum GLSL version string. **/
     private static final String MIN_GLSL = MIN_GLSL_MAJOR + "." + MIN_GLSL_MINOR;
-    private static boolean REST_ENABLED = false;
+    /** Whether the REST server is enabled or not. **/
+    private static boolean REST_ENABLED;
     /**
      * Running with an unsupported Java version.
      **/
     private static boolean JAVA_VERSION_PROBLEM_FLAG = false;
+    /** CLI arguments. **/
     private static CLIArgs cliArgs;
     /**
      * UTF-8 output stream printer.
      **/
     private static PrintStream out;
-    // Force re-computing the UI scale.
+    /** Force re-computing the UI scale. **/
     private boolean reinitializeUIScale = false;
+    /** The Gaia Sky application instance. **/
     private GaiaSky gs;
 
     public GaiaSkyDesktop() {
@@ -302,7 +323,7 @@ public class GaiaSkyDesktop implements IObserver {
             if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
                 // Back up user configuration, if it exists and contains data.
                 if (Files.exists(userFolderConfFile) && userFolderConfFile.toFile().length() > 0) {
-                    Path backup = userFolderConfFile.getParent().resolve(userFolderConfFile.getFileName() + "." + LocalDateTime.now().toString().replaceAll("[^a-zA-Z0-9_\\.\\-]", "_"));
+                    Path backup = userFolderConfFile.getParent().resolve(userFolderConfFile.getFileName() + "." + LocalDateTime.now().toString().replaceAll("[^a-zA-Z0-9_.\\-]", "_"));
                     GlobalResources.copyFile(userFolderConfFile, backup, true);
                 }
                 // Overwrite user configuration with internal configuration.
@@ -403,7 +424,7 @@ public class GaiaSkyDesktop implements IObserver {
                     // Only one available, use it.
                     myMode = fittingModes.get(0);
                 } else if (fittingModes.size > 1) {
-                    // Check if bit depth and refresh rate are set.
+                    // Check if the bit depth and refresh rate are set.
                     for (DisplayMode fittingMode : fittingModes) {
                         if (myMode == null) {
                             myMode = fittingMode;
@@ -459,7 +480,7 @@ public class GaiaSkyDesktop implements IObserver {
         int minor = cliArgs.vr ? XR_OPENGL_MINOR : DEFAULT_OPENGL_MINOR;
         cfg.setOpenGLEmulation(GLEmulation.GL30, DEFAULT_OPENGL_MAJOR, minor);
         // Disable logical DPI modes (macOS, Windows).
-        cfg.setHdpiMode(HdpiMode.Pixels);
+        cfg.setHdpiMode(cliArgs.hdpiMode);
         // Headless mode.
         cfg.setInitialVisible(!cliArgs.headless);
         // OpenGL debug.
@@ -697,5 +718,10 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = {"--nosafemode"}, description = "Force deactivation of safe graphics mode. Warning: this bypasses internal checks and may break things! Useful to get rid of safe graphics mode in the settings.", order = 13)
         private boolean noSafeMode = false;
+
+        @Parameter(names = {"--hdpimode"}, description = "The HDPI mode to use. Defines how HiDPI monitors are handled. Operating systems may have a per-monitor HiDPI scale setting. The operating system " +
+                "may report window width/height and mouse coordinates in a logical coordinate system at a lower resolution than the actual " +
+                "physical resolution. This setting allows you to specify whether you want to work in logical or raw pixel units.", order = 14)
+        private HdpiMode hdpiMode = HdpiMode.Pixels;
     }
 }
