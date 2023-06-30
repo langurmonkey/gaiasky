@@ -83,7 +83,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             smResolution, maxFpsInput;
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
             celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
-            chromaticAberration, lensFlare;
+            chromaticAberration, lensFlare, velocityVectors;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
@@ -1288,9 +1288,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnImageButton lodTooltip = new OwnImageButton(skin, "tooltip");
         lodTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.lod.thresholds.info"), skin));
 
-        // LABELS
-        labels.addAll(numThreadsLabel, ddLabel, lodFadeLabel);
-
         // Add to table
         lod.add(lodFadeLabel).left().padRight(pad34).padBottom(pad10);
         lod.add(lodFadeCb).colspan(2).left().padBottom(pad10).row();
@@ -1300,7 +1297,33 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to content
         contentPerformance.add(titleLod).left().padBottom(pad18).row();
-        contentPerformance.add(lod).left();
+        contentPerformance.add(lod).left().padBottom(pad34).row();
+
+        // VELOCITY VECTORS
+        OwnLabel titleVelVectors = new OwnLabel(I18n.msg("gui.velvec"), skin, "header");
+
+        Table velVectors = new Table(skin);
+
+        // Max num of velocity vectors per star set.
+        OwnLabel velVectorsLabel = new OwnLabel(I18n.msg("gui.velvec.num"), skin);
+        velocityVectors = new OwnSliderPlus("", Constants.MIN_VELOCITY_VECTORS_STAR_GROUP, Constants.MAX_VELOCITY_VECTORS_STAR_GROUP, Constants.SLIDER_STEP, skin);
+        velocityVectors.setWidth(sliderWidth);
+        velocityVectors.setValue(settings.scene.star.group.numVelocityVector);
+
+        OwnImageButton velVectorsTooltip = new OwnImageButton(skin, "tooltip");
+        velVectorsTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.velvec.num.info"), skin));
+
+        // LABELS
+        labels.addAll(numThreadsLabel, ddLabel, lodFadeLabel, velVectorsLabel);
+
+        // Add to table
+        velVectors.add(velVectorsLabel).left().padRight(pad34).padBottom(pad10);
+        velVectors.add(velocityVectors).left().padRight(pad18).padBottom(pad10);
+        velVectors.add(velVectorsTooltip).left().padBottom(pad10);
+
+        // Add to content
+        contentPerformance.add(titleVelVectors).left().padBottom(pad18).row();
+        contentPerformance.add(velVectors).left();
 
         /*
          * ==== CONTROLS ====
@@ -2530,6 +2553,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                      Constants.MAX_LOD_TRANS_ANGLE_DEG) * (float) MathUtilsDouble.degRad;
         // Here we use a 0.4 rad between the thresholds
         settings.scene.octree.threshold[1] = settings.scene.octree.fade ? settings.scene.octree.threshold[0] + 0.4f : settings.scene.octree.threshold[0];
+        // Number of velocity vectors per star group.
+        settings.scene.star.group.numVelocityVector = (int) velocityVectors.getValue();
 
         // Data
         boolean highAccuracy = settings.data.highAccuracy;

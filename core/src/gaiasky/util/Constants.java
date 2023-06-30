@@ -119,6 +119,10 @@ public class Constants {
     public static final float MIN_LOD_TRANS_ANGLE_DEG = 0f;
     /** Maximum angle where the LOD transitions end. **/
     public static final float MAX_LOD_TRANS_ANGLE_DEG = 120f;
+    /** Minimum number of velocity vectors per star group. **/
+    public static final int MIN_VELOCITY_VECTORS_STAR_GROUP = 40;
+    /** Maximum number of velocity vectors per star group. **/
+    public static final int MAX_VELOCITY_VECTORS_STAR_GROUP = 500;
     /** Min ambient light. **/
     public static final float MIN_AMBIENT_LIGHT = 0f;
     /** Max ambient light. **/

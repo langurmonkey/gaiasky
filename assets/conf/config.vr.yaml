@@ -160,7 +160,7 @@ scene:
       # Maximum number of labels per star group. Applies unless overwritten.
       numLabel: 50
       # Maximum number of velocity vectors per star group.
-      numVelocityVector: 500
+      numVelocityVector: 300
     # Star threshold values.
     threshold:
       # Threshold radius/distance for stars. This controls the threshold to render stars as points or as quads
