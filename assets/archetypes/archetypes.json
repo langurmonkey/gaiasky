@@ -31,7 +31,7 @@
                 "Rotation",
                 "Label",
                 "SolidAngle",
-                "Focus*",
+                "Focus",
                 "Billboard*"
             ],
             "aliases": [
@@ -128,7 +128,7 @@
                 "SolidAngle",
                 "ProperMotion",
                 "Label",
-                "Focus*",
+                "Focus",
                 "Billboard*"
             ],
             "aliases": [
@@ -326,7 +326,7 @@
             "components": [
                 "ParticleSet",
                 "TagNoProcessChildren*",
-                "Focus*"
+                "Focus"
             ],
             "aliases": [
                 "gaiasky.scenegraph.ParticleGroup"
@@ -339,7 +339,7 @@
                 "Model",
                 "Label",
                 "Line*",
-                "Focus*",
+                "Focus",
                 "Billboard*"
             ],
             "aliases": [

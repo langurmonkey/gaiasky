@@ -1686,7 +1686,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (Mapper.atmosphere.has(object)) {
                 synchronized (focusView) {
                     focusView.setEntity(object);
-                    Entity loc = focusView.getChildByNameAndArchetype(locationName, scene.archetypes().get("gaiasky.scenegraph.Loc"));
+                    Entity loc = focusView.getChildByNameAndArchetype(locationName, scene.archetypes().get("Loc"));
                     if (loc != null) {
                         var locMark = Mapper.loc.get(loc);
                         landAtObjectLocation(object, locMark.location.x, locMark.location.y, stop);
@@ -1720,7 +1720,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 String nameStub = focusView.getCandidateName() + " [loc]";
 
                 if (!scene.index().containsEntity(nameStub)) {
-                    var archetype = scene.archetypes().get("gaiasky.scenegraph.Invisible");
+                    var archetype = scene.archetypes().get("Invisible");
                     Entity invisible = archetype.createEntity();
                     var base = Mapper.base.get(invisible);
                     base.setName(nameStub);
@@ -3335,7 +3335,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Only local files checked.
                 Path path = null;
                 if (ds instanceof FileDataSource) {
-                    var file = ((FileDataSource)ds).getFile();
+                    var file = ((FileDataSource) ds).getFile();
                     path = file.toPath();
                     String pathString = file.getAbsolutePath();
                     if (!Files.exists(file.toPath())) {
@@ -3433,7 +3433,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (datasetOptions.type == DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
-                    var archetype = scene.archetypes().get("gaiasky.scenegraph.GenericCatalog");
+                    var archetype = scene.archetypes().get("GenericCatalog");
                     var entity = archetype.createEntity();
 
                     var base = Mapper.base.get(entity);
@@ -3724,7 +3724,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     float[] color = new float[]{r, g, b, a};
                     int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
                     // Create shape
-                    Archetype at = scene.archetypes().get("gaiasky.scenegraph.ShapeObject");
+                    Archetype at = scene.archetypes().get("ShapeObject");
                     Entity newShape = at.createEntity();
 
                     var base = Mapper.base.get(newShape);
@@ -3738,6 +3738,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     var graph = Mapper.graph.get(newShape);
                     graph.setParent(Scene.ROOT_NAME);
+
+                    var focus = Mapper.focus.get(newShape);
+                    focus.focusable = false;
 
                     var shape = Mapper.shape.get(newShape);
                     if (trackObject) {
