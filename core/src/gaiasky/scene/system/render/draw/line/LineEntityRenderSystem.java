@@ -40,7 +40,9 @@ import java.util.List;
 
 public class LineEntityRenderSystem {
 
-    /** Auxiliary color array. **/
+    /**
+     * Auxiliary color array.
+     **/
     private final float[] rgba = new float[4];
     protected Vector3d prev = new Vector3d(), curr = new Vector3d();
     /**
@@ -413,7 +415,7 @@ public class LineEntityRenderSystem {
     }
 
     /**
-     * Renders the proper motions of a star set.
+     * Renders the velocity vectors of a star set.
      */
     public void renderStarSet(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var base = lineView.base;
@@ -423,7 +425,7 @@ public class LineEntityRenderSystem {
 
         alpha *= GaiaSky.instance.sceneRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
-        int n = (int) getMaxProperMotionLines(set);
+        int n = (int) getMaxProperMotionLines(entity, set);
         for (int i = n - 1; i >= 0; i--) {
             IParticleRecord star = set.pointData.get(set.active[i]);
             float radius = (float) (set.getSize(set.active[i]) * Constants.STAR_SIZE_FACTOR);
@@ -444,75 +446,74 @@ public class LineEntityRenderSystem {
                 float maxSpeedKms = 100;
                 float r, g, b;
                 switch (Settings.settings.scene.properMotion.colorMode) {
-                case 0:
-                default:
-                    // DIRECTION
-                    // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
-                    ppm.nor();
-                    r = (float) (ppm.x + 1d) / 2f;
-                    g = (float) (ppm.y + 1d) / 2f;
-                    b = (float) (ppm.z + 1d) / 2f;
-                    break;
-                case 1:
-                    // LENGTH
-                    ppm.set(star.pmx(), star.pmy(), star.pmz());
-                    // Units/year to Km/s
-                    ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                    double len = MathUtilsDouble.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
-                    ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
-                    r = rgba[0];
-                    g = rgba[1];
-                    b = rgba[2];
-                    break;
-                case 2:
-                    // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
-                    if (star.radvel() != 0) {
-                        r = ColorUtils.gBlue[0] + 0.2f;
-                        g = ColorUtils.gBlue[1] + 0.4f;
-                        b = ColorUtils.gBlue[2] + 0.4f;
-                    } else {
-                        r = ColorUtils.gRed[0] + 0.4f;
-                        g = ColorUtils.gRed[1] + 0.2f;
-                        b = ColorUtils.gRed[2] + 0.2f;
+                    default -> {
+                        // DIRECTION
+                        // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
+                        ppm.nor();
+                        r = (float) (ppm.x + 1d) / 2f;
+                        g = (float) (ppm.y + 1d) / 2f;
+                        b = (float) (ppm.z + 1d) / 2f;
                     }
-                    break;
-                case 3:
-                    // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
-                    float rav = star.radvel();
-                    if (rav != 0) {
-                        // rv in [0:1]
-                        float rv = ((MathUtilsDouble.clamp(rav, -maxSpeedKms, maxSpeedKms) / maxSpeedKms) + 1) / 2;
-                        ColorUtils.colormap_blue_white_red(rv, rgba);
-                        r = rgba[0];
-                        g = rgba[1];
-                        b = rgba[2];
-                    } else {
-                        r = g = b = 1;
-                    }
-                    break;
-                case 4:
-                    // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
-                    if (ppm.len2() != 0) {
+                    case 1 -> {
+                        // LENGTH
                         ppm.set(star.pmx(), star.pmy(), star.pmz());
                         // Units/year to Km/s
                         ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                        Vector3d camStar = D34.set(p1);
-                        double pr = ppm.dot(camStar.nor());
-                        double projection = ((MathUtilsDouble.clamp(pr, -(double) maxSpeedKms, maxSpeedKms) / (double) maxSpeedKms) + 1) / 2;
-                        ColorUtils.colormap_blue_white_red((float) projection, rgba);
+                        double len = MathUtilsDouble.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
+                        ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
                         r = rgba[0];
                         g = rgba[1];
                         b = rgba[2];
-                    } else {
-                        r = g = b = 1;
                     }
-                    break;
-                case 5:
-                    // SINGLE COLOR
-                    r = ColorUtils.gBlue[0] + 0.2f;
-                    g = ColorUtils.gBlue[1] + 0.4f;
-                    b = ColorUtils.gBlue[2] + 0.4f;
-                    break;
+                    case 2 -> {
+                        // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
+                        if (star.radvel() != 0) {
+                            r = ColorUtils.gBlue[0] + 0.2f;
+                            g = ColorUtils.gBlue[1] + 0.4f;
+                            b = ColorUtils.gBlue[2] + 0.4f;
+                        } else {
+                            r = ColorUtils.gRed[0] + 0.4f;
+                            g = ColorUtils.gRed[1] + 0.2f;
+                            b = ColorUtils.gRed[2] + 0.2f;
+                        }
+                    }
+                    case 3 -> {
+                        // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
+                        float rav = star.radvel();
+                        if (rav != 0) {
+                            // rv in [0:1]
+                            float rv = ((MathUtilsDouble.clamp(rav, -maxSpeedKms, maxSpeedKms) / maxSpeedKms) + 1) / 2;
+                            ColorUtils.colormap_blue_white_red(rv, rgba);
+                            r = rgba[0];
+                            g = rgba[1];
+                            b = rgba[2];
+                        } else {
+                            r = g = b = 1;
+                        }
+                    }
+                    case 4 -> {
+                        // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
+                        if (ppm.len2() != 0) {
+                            ppm.set(star.pmx(), star.pmy(), star.pmz());
+                            // Units/year to Km/s
+                            ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                            Vector3d camStar = D34.set(p1);
+                            double pr = ppm.dot(camStar.nor());
+                            double projection = ((MathUtilsDouble.clamp(pr, -(double) maxSpeedKms, maxSpeedKms) / (double) maxSpeedKms) + 1) / 2;
+                            ColorUtils.colormap_blue_white_red((float) projection, rgba);
+                            r = rgba[0];
+                            g = rgba[1];
+                            b = rgba[2];
+                        } else {
+                            r = g = b = 1;
+                        }
+                    }
+                    case 5 -> {
+                        // SINGLE COLOR
+                        r = ColorUtils.gBlue[0] + 0.2f;
+                        g = ColorUtils.gBlue[1] + 0.4f;
+                        b = ColorUtils.gBlue[2] + 0.4f;
+                    }
                 }
 
                 // Clamp
@@ -534,8 +535,9 @@ public class LineEntityRenderSystem {
         }
     }
 
-    private long getMaxProperMotionLines(StarSet set) {
-        return Math.min(set.pointData.size(), Settings.settings.scene.star.group.numVelocityVector);
+    private long getMaxProperMotionLines(Entity entity, StarSet set) {
+        // Star sets in octrees get their number tuned down, because usually there's many of them in view.
+        return Math.min(set.pointData.size(), Math.round(Settings.settings.scene.star.group.numVelocityVector / (Mapper.octant.has(entity) ? 5f : 1f)));
     }
 
     private int wrap(int idx, int n) {

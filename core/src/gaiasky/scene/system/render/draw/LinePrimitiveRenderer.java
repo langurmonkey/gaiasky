@@ -59,7 +59,7 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
 
             view.render(this, camera, getAlpha(render));
 
-            Gdx.gl.glLineWidth(view.getLineWidth() * 1.5f * Settings.settings.scene.lineWidth);
+            Gdx.gl.glLineWidth(view.getLineWidth() * 1.5f * Settings.settings.scene.lineWidth * camera.getFovFactor());
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);

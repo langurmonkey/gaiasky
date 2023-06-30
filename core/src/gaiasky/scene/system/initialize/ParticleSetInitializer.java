@@ -280,7 +280,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
         // Lines.
         var line = Mapper.line.get(entity);
-        line.lineWidth = 0.6f;
+        line.lineWidth = 1f;
         line.renderConsumer = LineEntityRenderSystem::renderStarSet;
 
         // Billboard.

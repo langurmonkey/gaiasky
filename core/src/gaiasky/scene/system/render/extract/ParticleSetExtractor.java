@@ -14,6 +14,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.StarSet;
+import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 
 public class ParticleSetExtractor extends AbstractExtractSystem {
@@ -33,15 +34,18 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
         if (mustRender(base)) {
             var render = Mapper.render.get(entity);
             if (Mapper.starSet.has(entity)) {
-                addToRenderLists(render, Mapper.starSet.get(entity));
+                addToRenderLists(render, entity, Mapper.starSet.get(entity));
             } else {
                 addToRenderLists(render);
             }
         }
     }
 
-    /** For star sets. **/
+    /**
+     * For star sets.
+     **/
     private void addToRenderLists(Render render,
+                                  Entity entity,
                                   StarSet starSet) {
         if (starSet.renderParticles) {
             if (starSet.variableStars) {
@@ -55,12 +59,21 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
             }
         }
         if (renderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
-            addToRender(render, RenderGroup.LINE);
+            if (Mapper.tagOctreeObject.has(entity)) {
+                var octant = Mapper.octant.get(entity);
+                if (octant.octant.observed && octant.octant.viewAngle > Math.toRadians(117)) {
+                    addToRender(render, RenderGroup.LINE);
+                }
+            } else {
+                addToRender(render, RenderGroup.LINE);
+            }
         }
         addToRender(render, RenderGroup.FONT_LABEL);
     }
 
-    /** For particle sets. **/
+    /**
+     * For particle sets.
+     **/
     private void addToRenderLists(Render render) {
         var set = Mapper.particleSet.get(render.entity);
         if (set.renderParticles) {
