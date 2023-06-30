@@ -43,7 +43,7 @@ public class GaiaSkyExecutorService {
         return false;
     }
 
-    public ThreadPoolExecutor pool() {
+    public ThreadPoolExecutor getPool() {
         return pool;
     }
 

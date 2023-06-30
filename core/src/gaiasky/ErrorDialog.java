@@ -24,6 +24,10 @@ import gaiasky.util.scene2d.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * Gaia Sky main error dialog implementation. This is implemented as a standalone application that
+ * displays an error to the user. Used when a very bad, unrecoverable crash happens.
+ */
 public class ErrorDialog implements ApplicationListener {
 
     private final Exception cause;

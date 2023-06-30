@@ -11,18 +11,21 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import org.lwjgl.openxr.XrCompositionLayerProjectionView;
 import org.lwjgl.openxr.XrSwapchainImageOpenGLKHR;
 
+/**
+ * This interface is to be implemented by all agents that want to render to OpenXR.
+ */
 public interface XrRenderer {
 
     /**
      * Executed for each eye every cycle.
      *
      * @param layerView      The layer view.
-     * @param swapchainImage The swapchain image.
+     * @param swapChainImage The swap-chain image.
      * @param frameBuffer    The frame buffer to draw to.
      * @param viewIndex      The view index.
      */
     void renderOpenXRView(XrCompositionLayerProjectionView layerView,
-                          XrSwapchainImageOpenGLKHR swapchainImage,
+                          XrSwapchainImageOpenGLKHR swapChainImage,
                           FrameBuffer frameBuffer,
                           int viewIndex);
 

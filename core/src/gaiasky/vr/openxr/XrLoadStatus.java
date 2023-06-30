@@ -7,6 +7,9 @@
 
 package gaiasky.vr.openxr;
 
+/**
+ * Loading status of the XR subsystem.
+ */
 public enum XrLoadStatus {
     OK,
     ERROR_NO_CONTEXT,

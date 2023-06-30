@@ -28,6 +28,9 @@ import gaiasky.event.IObserver;
 import gaiasky.util.RenderUtils;
 import gaiasky.util.scene2d.OwnLabel;
 
+/**
+ * Additional window that mirrors the main window implemented in {@link GaiaSky}.
+ */
 public class GaiaSkyView implements ApplicationListener, IObserver {
 
     private final Skin skin;

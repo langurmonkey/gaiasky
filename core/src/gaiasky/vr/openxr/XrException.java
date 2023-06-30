@@ -6,6 +6,7 @@
  */
 
 package gaiasky.vr.openxr;
+
 public class XrException extends Exception {
 
     public final int result;

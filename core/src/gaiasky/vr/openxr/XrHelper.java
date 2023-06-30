@@ -33,6 +33,9 @@ import static org.lwjgl.system.MemoryStack.stackInts;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memPutInt;
 
+/**
+ * Helper functions to use by the VR subsystem.
+ */
 public final class XrHelper {
 
     private XrHelper() {
@@ -41,7 +44,7 @@ public final class XrHelper {
     public static <T extends StructBuffer> T fill(T buffer, int offset, int value) {
         long ptr = buffer.address() + offset;
         int stride = buffer.sizeof();
-        for (int i = 0; i < buffer.limit(); i++) {
+        for (long i = 0; i < buffer.limit(); i++) {
             memPutInt(ptr + i * stride, value);
         }
         return buffer;
@@ -213,7 +216,7 @@ public final class XrHelper {
             // HTC vive controller model.
             model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
         } else {
-            // Load default model.
+            // Load the default model.
             model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/generic/generic_vr_controller.obj"));
         }
 
