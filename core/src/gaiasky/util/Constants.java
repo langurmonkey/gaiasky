@@ -144,7 +144,7 @@ public class Constants {
     public static final float MIN_LABEL_SIZE = 0.5f;
     public static final float MAX_LABEL_SIZE = 2.3f;
     public static final float MIN_LINE_WIDTH = 0.2f;
-    public static final float MAX_LINE_WIDTH = 2.5f;
+    public static final float MAX_LINE_WIDTH = 3.5f;
     public final static float MIN_ELEVATION_MULT = 0f;
     public final static float MAX_ELEVATION_MULT = 15f;
     public final static float MIN_TESS_QUALITY = 1f;
