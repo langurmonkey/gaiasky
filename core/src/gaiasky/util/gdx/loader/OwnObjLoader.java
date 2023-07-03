@@ -67,7 +67,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
         String line;
         String[] tokens;
         char firstChar;
-        OwnMtlLoader mtl = new OwnMtlLoader();
+        OwnMtlLoader materialLoader = new OwnMtlLoader();
 
         // Create a "default" Group and set it as the active group, in case
         // there are no groups or objects defined in the OBJ file.
@@ -140,7 +140,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
                     else
                         activeGroup = setActiveGroup("default");
                 } else if (tokens[0].equals("mtllib")) {
-                    mtl.load(file.parent().child(tokens[1]));
+                    materialLoader.load(file.parent().child(tokens[1]));
                 } else if (tokens[0].equals("usemtl")) {
                     if (tokens.length == 1)
                         activeGroup.materialName = "default";
@@ -239,12 +239,9 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             mesh.parts = new IntModelMeshPart[] { part };
             data.nodes.add(node);
             data.meshes.add(mesh);
-            OwnModelMaterial mm = mtl.getMaterial(group.materialName);
+            OwnModelMaterial mm = materialLoader.getMaterial(group.materialName);
             data.materials.add(mm);
         }
-
-        // for (ModelMaterial m : mtl.materials)
-        // data.materials.add(m);
 
         // An instance of OwnObjLoader can be used to load more than one OBJ.
         // Clearing the Array cache instead of instantiating new
@@ -263,8 +260,6 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
     }
 
     private Group setActiveGroup(String name) {
-        // TODO: Check if a HashMap.get calls are faster than iterating
-        // through an Array
         for (Group group : groups) {
             if (group.name.equals(name))
                 return group;
@@ -295,7 +290,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
         }
     }
 
-    private class Group {
+    private static class Group {
         final String name;
         String materialName;
         IntArray faces;

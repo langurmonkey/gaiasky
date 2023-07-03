@@ -132,8 +132,6 @@ public class OwnMtlLoader {
 
         // last material
         addCurrentMat(curMatName, difcolor, speccolor, emicolor, metcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texMetallicFilename, materials);
-
-        return;
     }
 
     private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color metcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texSpecularFilename, String texRoughnessFilename, String texMetallicFilename, Array<OwnModelMaterial> materials) {
@@ -145,7 +143,7 @@ public class OwnMtlLoader {
         if (!ColorUtils.isZero(emicolor))
             mat.emissive = new Color(emicolor);
         if (!ColorUtils.isZero(metcolor))
-            mat.reflection = new Color(metcolor);
+            mat.metallic = new Color(metcolor);
         mat.opacity = opacity;
         mat.shininess = shininess;
         if (texDiffuseFilename != null) {

@@ -288,7 +288,9 @@ public class IntModel implements Disposable {
             result.set(new ColorAttribute(ColorAttribute.Specular, mtl.specular));
         if (mtl.emissive != null)
             result.set(new ColorAttribute(ColorAttribute.Emissive, mtl.emissive));
-        if (mtl.reflection != null)
+        if (mtl.metallic != null)
+            result.set(new ColorAttribute(ColorAttribute.Metallic, mtl.metallic));
+        if (mtl.reflection != null && mtl.metallic == null)
             result.set(new ColorAttribute(ColorAttribute.Metallic, mtl.reflection));
         if (mtl.shininess > 0f)
             result.set(new FloatAttribute(FloatAttribute.Shininess, mtl.shininess));
@@ -321,30 +323,22 @@ public class IntModel implements Disposable {
                 float scaleV = tex.uvScaling == null ? 1f : tex.uvScaling.y;
 
                 switch (tex.usage) {
-                case ModelTexture.USAGE_DIFFUSE:
-                    result.set(new TextureAttribute(TextureAttribute.Diffuse, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
-                case ModelTexture.USAGE_SPECULAR:
-                    result.set(new TextureAttribute(TextureAttribute.Specular, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
-                case ModelTexture.USAGE_BUMP:
-                    result.set(new TextureAttribute(TextureAttribute.Bump, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
-                case ModelTexture.USAGE_NORMAL:
-                    result.set(new TextureAttribute(TextureAttribute.Normal, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
-                case ModelTexture.USAGE_AMBIENT:
-                    result.set(new TextureAttribute(TextureAttribute.Ambient, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
-                case ModelTexture.USAGE_EMISSIVE:
-                    result.set(new TextureAttribute(TextureAttribute.Emissive, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
-                case ModelTexture.USAGE_REFLECTION:
-                    result.set(new TextureAttribute(TextureAttribute.Metallic, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
-                case ModelTexture.USAGE_SHININESS:
-                    result.set(new TextureAttribute(TextureAttribute.Roughness, descriptor, offsetU, offsetV, scaleU, scaleV));
-                    break;
+                    case ModelTexture.USAGE_DIFFUSE ->
+                            result.set(new TextureAttribute(TextureAttribute.Diffuse, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case ModelTexture.USAGE_SPECULAR ->
+                            result.set(new TextureAttribute(TextureAttribute.Specular, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case ModelTexture.USAGE_BUMP ->
+                            result.set(new TextureAttribute(TextureAttribute.Bump, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case ModelTexture.USAGE_NORMAL ->
+                            result.set(new TextureAttribute(TextureAttribute.Normal, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case ModelTexture.USAGE_AMBIENT ->
+                            result.set(new TextureAttribute(TextureAttribute.Ambient, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case ModelTexture.USAGE_EMISSIVE ->
+                            result.set(new TextureAttribute(TextureAttribute.Emissive, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case OwnModelTexture.USAGE_METALLIC ->
+                            result.set(new TextureAttribute(TextureAttribute.Metallic, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case OwnModelTexture.USAGE_ROUGHNESS, ModelTexture.USAGE_SHININESS ->
+                            result.set(new TextureAttribute(TextureAttribute.Roughness, descriptor, offsetU, offsetV, scaleU, scaleV));
                 }
             }
         }

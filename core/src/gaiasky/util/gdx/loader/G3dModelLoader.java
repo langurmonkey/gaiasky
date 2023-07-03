@@ -181,6 +181,9 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                 final JsonValue reflection = material.get("reflection");
                 if (reflection != null)
                     jsonMaterial.reflection = parseColor(reflection);
+                final JsonValue metallic = material.get("metallic");
+                if (metallic != null)
+                    jsonMaterial.metallic = parseColor(metallic);
                 // Read shininess
                 jsonMaterial.shininess = material.getFloat("shininess", 0.0f);
                 // Read opacity
