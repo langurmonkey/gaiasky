@@ -10,10 +10,17 @@ package gaiasky.util;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TwoWayHashmap<K extends Object, V extends Object> {
+/**
+ * A map that allows forward and backward referencing.
+ * It is implemented by wrapping two hash maps and keeping them up to date.
+ *
+ * @param <K> Type of first object.
+ * @param <V> Type of second object.
+ */
+public class TwoWayMap<K, V> {
 
-    private final Map<K, V> forward = new HashMap<K, V>();
-    private final Map<V, K> backward = new HashMap<V, K>();
+    private final Map<K, V> forward = new HashMap<>();
+    private final Map<V, K> backward = new HashMap<>();
 
     public synchronized void add(K key, V value) {
         forward.put(key, value);

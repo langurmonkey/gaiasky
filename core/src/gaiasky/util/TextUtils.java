@@ -18,22 +18,26 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Utilities to manipulate strings and text.
+ */
 public class TextUtils {
 
-    /** Decimal format **/
+    /**
+     * Decimal format
+     **/
     private static final DecimalFormat nf;
-    private static final DecimalFormat nfsci;
+    private static final DecimalFormat nfSci;
 
     static {
         nf = new DecimalFormat("#########.###");
-        nfsci = new DecimalFormat("0.#E0");
+        nfSci = new DecimalFormat("0.#E0");
     }
 
     /**
      * Escape a give String to make it safe to be printed or stored.
      *
      * @param s The input String.
-     *
      * @return The output String.
      **/
     public static String escape(String s) {
@@ -62,7 +66,6 @@ public class TextUtils {
      *
      * @param in         The character sequence.
      * @param breakChars The number of characters per line.
-     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(CharSequence in,
@@ -76,7 +79,6 @@ public class TextUtils {
      *
      * @param in         The string.
      * @param breakChars The number of characters per line.
-     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(String in,
@@ -91,7 +93,6 @@ public class TextUtils {
      * @param in         The string.
      * @param breakChars The number of characters per line.
      * @param forceBreak Break the string even when there are not separator characters.
-     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(String in,
@@ -206,7 +207,6 @@ public class TextUtils {
      * -> ModelTextureBump
      *
      * @param property The property displayName
-     *
      * @return The method name
      */
     public static String propertyToMethodName(String property) {
@@ -222,7 +222,6 @@ public class TextUtils {
      * Returns the given string with the first letter capitalised
      *
      * @param line The input string
-     *
      * @return The string with its first letter capitalised
      */
     public static String capitalise(String line) {
@@ -234,7 +233,6 @@ public class TextUtils {
      * others in lower case
      *
      * @param line The input string
-     *
      * @return The string with its first letter capitalised and the others in
      * lower case
      */
@@ -247,7 +245,6 @@ public class TextUtils {
      *
      * @param split The split
      * @param strs  The strings
-     *
      * @return The concatenation
      */
     public static String concatenate(String split,
@@ -270,7 +267,6 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
-     *
      * @return The concatenation
      */
     public static String concatenate(final String split,
@@ -291,7 +287,6 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
-     *
      * @return The concatenation
      */
     public static String concatenate(final String split,
@@ -361,7 +356,7 @@ public class TextUtils {
             warp = Math.round(warp * 1000.0) / 1000.0;
         }
         if (warp > 99999 || warp < -99999) {
-            return "x" + nfsci.format(warp);
+            return "x" + nfSci.format(warp);
         } else {
             return "x" + nf.format(warp);
         }
@@ -376,7 +371,6 @@ public class TextUtils {
      *
      * @param base     The base string
      * @param suffixes All the suffixes
-     *
      * @return The result
      */
     public static String[] concatAll(String base,
@@ -462,7 +456,7 @@ public class TextUtils {
     }
 
     public static String html2text(String html) {
-        return html.replaceAll("\\<.*?\\>", "");
+        return html.replaceAll("<.*?>", "");
     }
 
     /*
@@ -522,261 +516,261 @@ public class TextUtils {
      *
      */
 
-    public final static String unescape(String oldstr) {
+    public static String unescape(String oldStr) {
 
         /*
-         * In contrast to fixing Java's broken regex charclasses,
-         * this one need be no bigger, as unescaping shrinks the string
+         * In contrast to fixing Java's broken regex char classes,
+         * this one need be no bigger, as un-escaping shrinks the string
          * here, where in the other one, it grows it.
          */
 
-        StringBuffer newstr = new StringBuffer(oldstr.length());
+        java.lang.StringBuilder newStr = new java.lang.StringBuilder(oldStr.length());
 
         boolean saw_backslash = false;
 
-        for (int i = 0; i < oldstr.length(); i++) {
-            int cp = oldstr.codePointAt(i);
-            if (oldstr.codePointAt(i) > Character.MAX_VALUE) {
-                i++; /****WE HATES UTF-16! WE HATES IT FOREVERSES!!!****/
+        for (int i = 0; i < oldStr.length(); i++) {
+            int cp = oldStr.codePointAt(i);
+            if (oldStr.codePointAt(i) > Character.MAX_VALUE) {
+                i++;
             }
 
             if (!saw_backslash) {
                 if (cp == '\\') {
                     saw_backslash = true;
                 } else {
-                    newstr.append(Character.toChars(cp));
+                    newStr.append(Character.toChars(cp));
                 }
                 continue; /* switch */
             }
 
             if (cp == '\\') {
                 saw_backslash = false;
-                newstr.append('\\');
-                newstr.append('\\');
+                newStr.append('\\');
+                newStr.append('\\');
                 continue; /* switch */
             }
 
             switch (cp) {
 
-            case 'r':
-                newstr.append('\r');
-                break; /* switch */
+                case 'r':
+                    newStr.append('\r');
+                    break; /* switch */
 
-            case 'n':
-                newstr.append('\n');
-                break; /* switch */
+                case 'n':
+                    newStr.append('\n');
+                    break; /* switch */
 
-            case 'f':
-                newstr.append('\f');
-                break; /* switch */
+                case 'f':
+                    newStr.append('\f');
+                    break; /* switch */
 
-            /* PASS a \b THROUGH!! */
-            case 'b':
-                newstr.append("\\b");
-                break; /* switch */
+                /* PASS a \b THROUGH!! */
+                case 'b':
+                    newStr.append("\\b");
+                    break; /* switch */
 
-            case 't':
-                newstr.append('\t');
-                break; /* switch */
+                case 't':
+                    newStr.append('\t');
+                    break; /* switch */
 
-            case 'a':
-                newstr.append('\007');
-                break; /* switch */
+                case 'a':
+                    newStr.append('\007');
+                    break; /* switch */
 
-            case 'e':
-                newstr.append('\033');
-                break; /* switch */
-
-            /*
-             * A "control" character is what you get when you xor its
-             * codepoint with '@'==64.  This only makes sense for ASCII,
-             * and may not yield a "control" character after all.
-             *
-             * Strange but true: "\c{" is ";", "\c}" is "=", etc.
-             */
-            case 'c': {
-                if (++i == oldstr.length()) {
-                    die("trailing \\c");
-                }
-                cp = oldstr.codePointAt(i);
-                /*
-                 * don't need to grok surrogates, as next line blows them up
-                 */
-                if (cp > 0x7f) {
-                    die("expected ASCII after \\c");
-                }
-                newstr.append(Character.toChars(cp ^ 64));
-                break; /* switch */
-            }
-
-            case '8':
-            case '9':
-                die("illegal octal digit");
-                /* NOTREACHED */
+                case 'e':
+                    newStr.append('\033');
+                    break; /* switch */
 
                 /*
-                 * may be 0 to 2 octal digits following this one
-                 * so back up one for fallthrough to next case;
-                 * unread this digit and fall through to next case.
+                 * A "control" character is what you get when you xor its
+                 * codepoint with '@'==64.  This only makes sense for ASCII,
+                 * and may not yield a "control" character after all.
+                 *
+                 * Strange but true: "\c{" is ";", "\c}" is "=", etc.
                  */
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-                --i;
-                /* FALLTHROUGH */
-
-                /*
-                 * Can have 0, 1, or 2 octal digits following a 0
-                 * this permits larger values than octal 377, up to
-                 * octal 777.
-                 */
-            case '0': {
-                if (i + 1 == oldstr.length()) {
-                    /* found \0 at end of string */
-                    newstr.append(Character.toChars(0));
+                case 'c': {
+                    if (++i == oldStr.length()) {
+                        die("trailing \\c");
+                    }
+                    cp = oldStr.codePointAt(i);
+                    /*
+                     * don't need to grok surrogates, as next line blows them up
+                     */
+                    if (cp > 0x7f) {
+                        die("expected ASCII after \\c");
+                    }
+                    newStr.append(Character.toChars(cp ^ 64));
                     break; /* switch */
                 }
-                i++;
-                int digits = 0;
-                int j;
-                for (j = 0; j <= 2; j++) {
-                    if (i + j == oldstr.length()) {
-                        break; /* for */
-                    }
-                    /* safe because will unread surrogate */
-                    int ch = oldstr.charAt(i + j);
-                    if (ch < '0' || ch > '7') {
-                        break; /* for */
-                    }
-                    digits++;
-                }
-                if (digits == 0) {
-                    --i;
-                    newstr.append('\0');
-                    break; /* switch */
-                }
-                int value = 0;
-                try {
-                    value = Integer.parseInt(oldstr.substring(i, i + digits), 8);
-                } catch (NumberFormatException nfe) {
-                    die("invalid octal value for \\0 escape");
-                }
-                newstr.append(Character.toChars(value));
-                i += digits - 1;
-                break; /* switch */
-            } /* end case '0' */
 
-            case 'x': {
-                if (i + 2 > oldstr.length()) {
-                    die("string too short for \\x escape");
-                }
-                i++;
-                boolean saw_brace = false;
-                if (oldstr.charAt(i) == '{') {
-                    /* ^^^^^^ ok to ignore surrogates here */
-                    i++;
-                    saw_brace = true;
-                }
-                int j;
-                for (j = 0; j < 8; j++) {
-
-                    if (!saw_brace && j == 2) {
-                        break;  /* for */
-                    }
+                case '8':
+                case '9':
+                    die("illegal octal digit");
+                    /* NOTREACHED */
 
                     /*
-                     * ASCII test also catches surrogates
+                     * may be 0 to 2 octal digits following this one
+                     * so back up one for fallthrough to next case;
+                     * unread this digit and fall through to next case.
                      */
-                    int ch = oldstr.charAt(i + j);
-                    if (ch > 127) {
-                        die("illegal non-ASCII hex digit in \\x escape");
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                    --i;
+                    /* FALLTHROUGH */
+
+                    /*
+                     * Can have 0, 1, or 2 octal digits following a 0
+                     * this permits larger values than octal 377, up to
+                     * octal 777.
+                     */
+                case '0': {
+                    if (i + 1 == oldStr.length()) {
+                        /* found \0 at end of string */
+                        newStr.append(Character.toChars(0));
+                        break; /* switch */
                     }
-
-                    if (saw_brace && ch == '}') {
-                        break; /* for */
+                    i++;
+                    int digits = 0;
+                    int j;
+                    for (j = 0; j <= 2; j++) {
+                        if (i + j == oldStr.length()) {
+                            break; /* for */
+                        }
+                        /* safe because will unread surrogate */
+                        int ch = oldStr.charAt(i + j);
+                        if (ch < '0' || ch > '7') {
+                            break; /* for */
+                        }
+                        digits++;
                     }
-
-                    if (!((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))) {
-                        die(String.format("illegal hex digit #%d '%c' in \\x", ch, ch));
+                    if (digits == 0) {
+                        --i;
+                        newStr.append('\0');
+                        break; /* switch */
                     }
-
-                }
-                if (j == 0) {
-                    die("empty braces in \\x{} escape");
-                }
-                int value = 0;
-                try {
-                    value = Integer.parseInt(oldstr.substring(i, i + j), 16);
-                } catch (NumberFormatException nfe) {
-                    die("invalid hex value for \\x escape");
-                }
-                newstr.append(Character.toChars(value));
-                if (saw_brace) {
-                    j++;
-                }
-                i += j - 1;
-                break; /* switch */
-            }
-
-            case 'u': {
-                if (i + 4 > oldstr.length()) {
-                    die("string too short for \\u escape");
-                }
-                i++;
-                int j;
-                for (j = 0; j < 4; j++) {
-                    /* this also handles the surrogate issue */
-                    if (oldstr.charAt(i + j) > 127) {
-                        die("illegal non-ASCII hex digit in \\u escape");
+                    int value = 0;
+                    try {
+                        value = Integer.parseInt(oldStr.substring(i, i + digits), 8);
+                    } catch (NumberFormatException nfe) {
+                        die("invalid octal value for \\0 escape");
                     }
-                }
-                int value = 0;
-                try {
-                    value = Integer.parseInt(oldstr.substring(i, i + j), 16);
-                } catch (NumberFormatException nfe) {
-                    die("invalid hex value for \\u escape");
-                }
-                newstr.append(Character.toChars(value));
-                i += j - 1;
-                break; /* switch */
-            }
+                    newStr.append(Character.toChars(value));
+                    i += digits - 1;
+                    break; /* switch */
+                } /* end case '0' */
 
-            case 'U': {
-                if (i + 8 > oldstr.length()) {
-                    die("string too short for \\U escape");
-                }
-                i++;
-                int j;
-                for (j = 0; j < 8; j++) {
-                    /* this also handles the surrogate issue */
-                    if (oldstr.charAt(i + j) > 127) {
-                        die("illegal non-ASCII hex digit in \\U escape");
+                case 'x': {
+                    if (i + 2 > oldStr.length()) {
+                        die("string too short for \\x escape");
                     }
-                }
-                int value = 0;
-                try {
-                    value = Integer.parseInt(oldstr.substring(i, i + j), 16);
-                } catch (NumberFormatException nfe) {
-                    die("invalid hex value for \\U escape");
-                }
-                newstr.append(Character.toChars(value));
-                i += j - 1;
-                break; /* switch */
-            }
+                    i++;
+                    boolean saw_brace = false;
+                    if (oldStr.charAt(i) == '{') {
+                        /* ^^^^^^ ok to ignore surrogates here */
+                        i++;
+                        saw_brace = true;
+                    }
+                    int j;
+                    for (j = 0; j < 8; j++) {
 
-            default:
-                newstr.append('\\');
-                newstr.append(Character.toChars(cp));
-                /*
-                 * say(String.format(
-                 *       "DEFAULT unrecognized escape %c passed through",
-                 *       cp));
-                 */
-                break; /* switch */
+                        if (!saw_brace && j == 2) {
+                            break;  /* for */
+                        }
+
+                        /*
+                         * ASCII test also catches surrogates
+                         */
+                        int ch = oldStr.charAt(i + j);
+                        if (ch > 127) {
+                            die("illegal non-ASCII hex digit in \\x escape");
+                        }
+
+                        if (saw_brace && ch == '}') {
+                            break; /* for */
+                        }
+
+                        if (!((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))) {
+                            die(String.format("illegal hex digit #%d '%c' in \\x", ch, ch));
+                        }
+
+                    }
+                    if (j == 0) {
+                        die("empty braces in \\x{} escape");
+                    }
+                    int value = 0;
+                    try {
+                        value = Integer.parseInt(oldStr.substring(i, i + j), 16);
+                    } catch (NumberFormatException nfe) {
+                        die("invalid hex value for \\x escape");
+                    }
+                    newStr.append(Character.toChars(value));
+                    if (saw_brace) {
+                        j++;
+                    }
+                    i += j - 1;
+                    break; /* switch */
+                }
+
+                case 'u': {
+                    if (i + 4 > oldStr.length()) {
+                        die("string too short for \\u escape");
+                    }
+                    i++;
+                    int j;
+                    for (j = 0; j < 4; j++) {
+                        /* this also handles the surrogate issue */
+                        if (oldStr.charAt(i + j) > 127) {
+                            die("illegal non-ASCII hex digit in \\u escape");
+                        }
+                    }
+                    int value = 0;
+                    try {
+                        value = Integer.parseInt(oldStr.substring(i, i + j), 16);
+                    } catch (NumberFormatException nfe) {
+                        die("invalid hex value for \\u escape");
+                    }
+                    newStr.append(Character.toChars(value));
+                    i += j - 1;
+                    break; /* switch */
+                }
+
+                case 'U': {
+                    if (i + 8 > oldStr.length()) {
+                        die("string too short for \\U escape");
+                    }
+                    i++;
+                    int j;
+                    for (j = 0; j < 8; j++) {
+                        /* this also handles the surrogate issue */
+                        if (oldStr.charAt(i + j) > 127) {
+                            die("illegal non-ASCII hex digit in \\U escape");
+                        }
+                    }
+                    int value = 0;
+                    try {
+                        value = Integer.parseInt(oldStr.substring(i, i + j), 16);
+                    } catch (NumberFormatException nfe) {
+                        die("invalid hex value for \\U escape");
+                    }
+                    newStr.append(Character.toChars(value));
+                    i += j - 1;
+                    break; /* switch */
+                }
+
+                default:
+                    newStr.append('\\');
+                    newStr.append(Character.toChars(cp));
+                    /*
+                     * say(String.format(
+                     *       "DEFAULT unrecognized escape %c passed through",
+                     *       cp));
+                     */
+                    break; /* switch */
 
             }
             saw_backslash = false;
@@ -784,10 +778,10 @@ public class TextUtils {
 
         /* weird to leave one at the end */
         if (saw_backslash) {
-            newstr.append('\\');
+            newStr.append('\\');
         }
 
-        return newstr.toString();
+        return newStr.toString();
     }
 
     private static void die(String foa) {
@@ -808,7 +802,6 @@ public class TextUtils {
      * @param str     The string to pad.
      * @param length  The target length.
      * @param padChar The padding character to use.
-     *
      * @return The padded string, or the original string if its length was greater than
      * the given target length.
      */

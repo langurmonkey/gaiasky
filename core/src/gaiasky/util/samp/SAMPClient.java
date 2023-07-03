@@ -44,7 +44,7 @@ public class SAMPClient implements IObserver {
     private static final Log logger = Logger.getLogger(SAMPClient.class);
     private final CatalogManager catalogManager;
     private HubConnector conn;
-    private TwoWayHashmap<String, Entity> idToNode;
+    private TwoWayMap<String, Entity> idToNode;
     private Map<String, String> idToUrl;
     private boolean preventProgrammaticEvents = false;
 
@@ -59,7 +59,7 @@ public class SAMPClient implements IObserver {
         java.util.logging.Logger.getLogger("org.astrogrid.samp").setLevel(Level.OFF);
 
         // Init map
-        idToNode = new TwoWayHashmap<>();
+        idToNode = new TwoWayMap<>();
         idToUrl = new HashMap<>();
 
         ClientProfile cp = DefaultClientProfile.getProfile();

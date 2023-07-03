@@ -31,6 +31,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Manages slave Gaia Sky instances that connect to master instances.
+ */
 public class SlaveManager {
     private static final Log logger = Logger.getLogger(SlaveManager.class);
 
@@ -82,8 +85,6 @@ public class SlaveManager {
                 setDefaultConf();
                 printInfo();
             }
-        } else {
-            // Not a slave
         }
     }
 
@@ -136,9 +137,8 @@ public class SlaveManager {
 
             return unzipLocation;
 
-        } else {
-            // Not using MPCDI
         }
+
         return null;
 
     }

@@ -17,6 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Some handy system utilities and constants.
+ */
 public class SysUtils {
     private static final Log logger = Logger.getLogger(SysUtils.class);
     private static final String OS;

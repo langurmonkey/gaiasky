@@ -7,6 +7,13 @@
 
 package gaiasky.util;
 
+/**
+ * A simple data structure that holds three objects.
+ *
+ * @param <A> First object type.
+ * @param <B> Second object type.
+ * @param <C> Third object type.
+ */
 public class Trio<A, B, C> {
 
     private A first;

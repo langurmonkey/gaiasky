@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 
+/**
+ * Generates tip strings.
+ */
 public class TipsGenerator {
     private static final int MAX_KEYS = 100;
 

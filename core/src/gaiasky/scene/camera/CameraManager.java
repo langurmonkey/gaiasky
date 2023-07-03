@@ -706,7 +706,7 @@ public class CameraManager implements ICamera, IObserver {
          **/
         GAIA_FOVS_MODE;
 
-        static TwoWayHashmap<String, CameraMode> equivalences;
+        static TwoWayMap<String, CameraMode> equivalences;
 
         public static CameraMode getMode(int idx) {
             if (idx >= 0 && idx < CameraMode.values().length) {

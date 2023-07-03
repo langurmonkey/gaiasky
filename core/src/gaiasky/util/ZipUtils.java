@@ -15,11 +15,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ZipUtils {
-    public static void unzip(String zipFilePath, String destDir) throws IOException {
-        File dir = new File(destDir);
-        // create output directory if it doesn't exist
-        if (!dir.exists())
-            dir.mkdirs();
+    private static final Logger.Log logger = Logger.getLogger(ZipUtils.class);
+
+    public static void unzip(String zipFilePath, String destinationDir) throws IOException {
+        File dir = new File(destinationDir);
+
+        // Create output directory if it doesn't exist.
+        if (!dir.exists() && dir.mkdirs())
+            logger.debug("Output directory created: " + dir);
+
         FileInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
@@ -28,10 +32,13 @@ public class ZipUtils {
         ZipEntry ze = zis.getNextEntry();
         while (ze != null) {
             String fileName = ze.getName();
-            File newFile = new File(destDir + File.separator + fileName);
-            System.out.println("Unzipping to " + newFile.getAbsolutePath());
-            //create directories for sub directories in zip
-            new File(newFile.getParent()).mkdirs();
+            File newFile = new File(destinationDir + File.separator + fileName);
+            logger.info("Unzipping to " + newFile.getAbsolutePath());
+
+            // Create directories for sub directories in zip.
+            if (new File(newFile.getParent()).mkdirs()) {
+                logger.debug("Directory created: " + newFile.getParent());
+            }
             FileOutputStream fos = new FileOutputStream(newFile);
             int len;
             while ((len = zis.read(buffer)) > 0) {
