@@ -61,50 +61,52 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     /**
      * Contains a map by name with
-     * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
+     * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for ray-marching post-processors.
      */
-    private final Map<String, Object[]> raymarchingDef;
-    /** Aspect ratio cache. **/
+    private final Map<String, Object[]> rayMarchingDefinitions;
+    /**
+     * Aspect ratio cache.
+     **/
     float ar;
     Entity blurObject;
     BaseView blurObjectView;
     FocusView focusView;
     boolean blurObjectAdded = false;
-    Vector3b auxb1, auxb2, prevCampos;
-    Vector3 auxf;
-    Matrix4 prevViewProj;
-    Matrix4 projection, combined, view;
-    Matrix4 frustumCorners;
-    /** The asset manager. **/
+
+    /**
+     * The asset manager.
+     **/
     private AssetManager manager;
-    /** The actual post processors. **/
+    /**
+     * The actual post processors.
+     **/
     private PostProcessBean[] pps;
-    /** Reference to the scene. **/
+    /**
+     * Reference to the scene.
+     **/
     private Scene scene;
     private String starLensTextureName, lensDirtName, lensColorName, lensStarburstName;
+
+    final Vector3b auxb1 = new Vector3b(), auxb2 = new Vector3b(), prevCampos = new Vector3b();
+    final Vector3 auxf = new Vector3();
+    final Matrix4 prevViewProj = new Matrix4();
+    final Matrix4 projection = new Matrix4(), combined = new Matrix4(), view = new Matrix4();
+    final Matrix4 frustumCorners = new Matrix4();
 
     public MainPostProcessor(Scene scene) {
         ShaderLoader.BasePath = "shader/postprocess/";
 
         this.scene = scene;
-        this.auxb1 = new Vector3b();
-        this.auxb2 = new Vector3b();
-        this.auxf = new Vector3();
-        this.prevCampos = new Vector3b();
         this.focusView = new FocusView();
-        this.prevViewProj = new Matrix4();
-        this.view = new Matrix4();
-        this.projection = new Matrix4();
-        this.combined = new Matrix4();
-        this.frustumCorners = new Matrix4();
-        this.raymarchingDef = new HashMap<>();
+
+        this.rayMarchingDefinitions = new HashMap<>();
 
         EventManager.instance.subscribe(this, Event.RAYMARCHING_CMD);
     }
 
     private void addRayMarchingDef(String name, Object[] list) {
-        if (!raymarchingDef.containsKey(name))
-            raymarchingDef.put(name, list);
+        if (!rayMarchingDefinitions.containsKey(name))
+            rayMarchingDefinitions.put(name, list);
     }
 
     public void initialize(AssetManager manager) {
@@ -146,9 +148,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     private int[] getSize(RenderType type) {
         return switch (type) {
-            case screen -> new int[] { (int) Math.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) Math.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale) };
-            case screenshot -> new int[] { Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1] };
-            case frame -> new int[] { Settings.settings.frame.resolution[0], Settings.settings.frame.resolution[1] };
+            case screen ->
+                    new int[]{(int) Math.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) Math.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale)};
+            case screenshot ->
+                    new int[]{Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]};
+            case frame -> new int[]{Settings.settings.frame.resolution[0], Settings.settings.frame.resolution[1]};
         };
     }
 
@@ -182,7 +186,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         updateGlow(ppb, gq);
 
         // RAY MARCHING SHADERS
-        raymarchingDef.forEach((key, list) -> {
+        rayMarchingDefinitions.forEach((key, list) -> {
             Raymarching rm = new Raymarching((String) list[0], width, height);
             // Fixed uniforms
             float zFar = (float) GaiaSky.instance.getCameraManager().current.getFar();
@@ -294,7 +298,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
             LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.strength, lensFlareSettings.type.ordinal(), true);
-            lensFlare.setColor(new float[] { 1f, 1f, 1f });
+            lensFlare.setColor(new float[]{1f, 1f, 1f});
             lensFlare.setLensDirtTexture(lensDirt);
             lensFlare.setLensStarburstTexture(lensStarBurst);
             lensFlare.setEnabled(lensFlareSettings.active);
@@ -408,7 +412,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             base.setCt("");
 
             var body = Mapper.body.get(entity);
-            body.setColor(new float[] { 0, 0, 0, 0 });
+            body.setColor(new float[]{0, 0, 0, 0});
             body.setSize(1.0);
 
             var label = Mapper.label.get(entity);
@@ -419,7 +423,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
             var coordinates = Mapper.coordinates.get(entity);
             StaticCoordinates sc = new StaticCoordinates();
-            sc.setPosition(new double[] { 0, 0, 0 });
+            sc.setPosition(new double[]{0, 0, 0});
             coordinates.coordinates = sc;
 
             var model = Mapper.model.get(entity);
@@ -505,15 +509,15 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         levels.setGamma(Settings.settings.postprocess.levels.gamma);
 
         switch (Settings.settings.postprocess.toneMapping.type) {
-        case AUTO -> levels.enableToneMappingAuto();
-        case EXPOSURE -> {
-            levels.enableToneMappingExposure();
-            levels.setExposure(Settings.settings.postprocess.toneMapping.exposure);
-        }
-        case ACES -> levels.enableToneMappingACES();
-        case UNCHARTED -> levels.enableToneMappingUncharted();
-        case FILMIC -> levels.enableToneMappingFilmic();
-        case NONE -> levels.disableToneMapping();
+            case AUTO -> levels.enableToneMappingAuto();
+            case EXPOSURE -> {
+                levels.enableToneMappingExposure();
+                levels.setExposure(Settings.settings.postprocess.toneMapping.exposure);
+            }
+            case ACES -> levels.enableToneMappingACES();
+            case UNCHARTED -> levels.enableToneMappingUncharted();
+            case FILMIC -> levels.enableToneMappingFilmic();
+            case NONE -> levels.disableToneMapping();
         }
 
         ppb.set(levels);
@@ -585,563 +589,565 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     @Override
     public void notify(Event event, Object source, final Object... data) {
         switch (event) {
-        case SCENE_LOADED -> {
-            this.scene = (Scene) data[0];
-            initializeOffScreenPostProcessors();
-        }
-        case RAYMARCHING_CMD -> {
-            var name = (String) data[0];
-            var status = (Boolean) data[1];
-            var entity = (Entity) data[2];
-            if (data.length > 3) {
-                // Add effect description for later initialization.
-                String shader = (String) data[3];
-                float[] additional = data[4] != null ? (float[]) data[4] : null;
-                Object[] l = new Object[] { shader, false, entity, additional };
-                addRayMarchingDef(name, l);
-                logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
-            } else {
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        PostProcessorEffect effect = ppb.get(name, Raymarching.class);
-                        if (effect != null) {
-                            effect.setEnabled(status);
-                            logger.info("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
-                        }
-                    }
-                }
+            case SCENE_LOADED -> {
+                this.scene = (Scene) data[0];
+                initializeOffScreenPostProcessors();
             }
-        }
-        case RAYMARCHING_ADDITIONAL_CMD -> {
-            var name = (String) data[0];
-            var additional = (float[]) data[1];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    // Update ray marching additional data
-                    Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
-                    if (rms != null) {
-                        PostProcessorEffect ppe = rms.get(name);
-                        if (ppe != null)
-                            ((Raymarching) ppe).setAdditional(additional);
-                    }
-                }
-            }
-        }
-        case STAR_BRIGHTNESS_CMD -> {
-            var brightness = (Float) data[0];
-            GaiaSky.postRunnable(() -> {
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightglow != null) {
-                            lightglow.setTextureScale(getGlowTextureScale(brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                            lightglow.setSpiralScale(getGlowSpiralScale(brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
-                        }
-                    }
-                }
-            });
-        }
-        case STAR_GLOW_FACTOR_CMD -> {
-            var glowFactor = (Float) data[0];
-            GaiaSky.postRunnable(() -> {
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightglow != null) {
-                            lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                        }
-                    }
-                }
-            });
-        }
-        case STAR_POINT_SIZE_CMD -> {
-            var size = (Float) data[0];
-            GaiaSky.postRunnable(() -> {
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightglow != null) {
-                            lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, size, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                            lightglow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, size, GaiaSky.instance.cameraManager.getFovFactor()));
-                        }
-                    }
-                }
-            });
-        }
-        case LIGHT_POS_2D_UPDATE -> {
-            var nLights = (Integer) data[0];
-            var lightPos = (float[]) data[1];
-            var angles = (float[]) data[2];
-            var colors = (float[]) data[3];
-            var alphas = new float[nLights];
-            var prePass = (Texture) data[4];
-            var lensFlareSettings = Settings.settings.postprocess.lensFlare;
-            var nLightsFlare = 0;
-            int i = 0;
-            for (int k = 0; k < nLights; k++) {
-                var angle = angles[k];
-                // Lens flare fade start solid angle, end 1
-                final float lensFlareAngle0 = 1e-6f;
-                // Lens flare fade end solid angle, end 2
-                final float lensFlareAngle1 = 0.5e-7f;
-                if (angle > lensFlareAngle1) {
-                    nLightsFlare++;
-                    alphas[i] = 1;
-                    if(angle < lensFlareAngle0) {
-                        alphas[i] = MathUtilsDouble.lint(angle, lensFlareAngle1, lensFlareAngle0, 0f, 1f);
-                    }
-                }
-                i++;
-            }
-            for (i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
-                    if (lightGlow != null && lightGlow.isEnabled()) {
-                        lightGlow.setLightPositions(nLights, lightPos);
-                        lightGlow.setLightSolidAngles(angles);
-                        lightGlow.setLightColors(colors);
-                        if (prePass != null)
-                            lightGlow.setPrePassTexture(prePass);
-                    }
-                    if (!lensFlareSettings.type.isPseudoLensFlare()) {
-                        LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
-                        if (lensFlare != null && lensFlare.isEnabled()) {
-                            lensFlare.setLightPositions(nLightsFlare, lightPos, alphas);
-                            if (nLights <= 0) {
-                                lensFlare.setIntensity(0);
-                            } else {
-                                lensFlare.setIntensity(lensFlareSettings.strength);
+            case RAYMARCHING_CMD -> {
+                var name = (String) data[0];
+                var status = (Boolean) data[1];
+                var entity = (Entity) data[2];
+                if (data.length > 3) {
+                    // Add effect description for later initialization.
+                    String shader = (String) data[3];
+                    float[] additional = data[4] != null ? (float[]) data[4] : null;
+                    Object[] l = new Object[]{shader, false, entity, additional};
+                    addRayMarchingDef(name, l);
+                    logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
+                } else {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            PostProcessorEffect effect = ppb.get(name, Raymarching.class);
+                            if (effect != null) {
+                                effect.setEnabled(status);
+                                logger.info("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
                             }
                         }
                     }
                 }
             }
-        }
-        case LIGHT_GLOW_CMD -> {
-            var lightGlowActive = (Boolean) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                    if (lightglow != null) {
-                        lightglow.setEnabled(lightGlowActive);
-                    }
-                }
-            }
-        }
-        case FOV_CHANGE_NOTIFICATION -> {
-            var newFov = (Float) data[0];
-            GaiaSky.postRunnable(() -> {
+            case RAYMARCHING_ADDITIONAL_CMD -> {
+                var name = (String) data[0];
+                var additional = (float[]) data[1];
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        // Light glow.
-                        LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightGlow != null) {
-                            lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                            lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
-                        }
-                        // Reprojection.
-                        Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
-                        if (reprojection != null)
-                            reprojection.setFov(newFov);
-                        // Aberration.
-                        ChromaticAberration aberration = (ChromaticAberration) ppb.get(ChromaticAberration.class);
-                        if (aberration != null && aberration.getAberrationAmount() > 0) {
-                            float amount = Settings.settings.postprocess.chromaticAberration.amount * (newFov / 40f);
-                            aberration.setAberrationAmount(amount);
-                            aberration.setEnabled(amount > 0);
+                        // Update ray marching additional data
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        if (rms != null) {
+                            PostProcessorEffect ppe = rms.get(name);
+                            if (ppe != null)
+                                ((Raymarching) ppe).setAdditional(additional);
                         }
                     }
-                }
-            });
-        }
-        case SCREENSHOT_SIZE_UPDATE -> {
-            if (pps != null && Settings.settings.screenshot.isAdvancedMode()) {
-                var newWidth = (Integer) data[0];
-                var newHeight = (Integer) data[1];
-                if (pps[RenderType.screenshot.index] != null) {
-                    if (changed(pps[RenderType.screenshot.index].pp, newWidth, newHeight)) {
-                        GaiaSky.postRunnable(() -> replace(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight));
-                    }
-                } else {
-                    pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight, manager);
                 }
             }
-        }
-        case FRAME_SIZE_UPDATE -> {
-            if (pps != null && Settings.settings.frame.isAdvancedMode()) {
-                var newWidth = (Integer) data[0];
-                var newHeight = (Integer) data[1];
-                if (pps[RenderType.frame.index] != null) {
-                    if (changed(pps[RenderType.frame.index].pp, newWidth, newHeight)) {
+            case STAR_BRIGHTNESS_CMD -> {
+                var brightness = (Float) data[0];
+                GaiaSky.postRunnable(() -> {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                            if (lightglow != null) {
+                                lightglow.setTextureScale(getGlowTextureScale(brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                                lightglow.setSpiralScale(getGlowSpiralScale(brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
+                            }
+                        }
+                    }
+                });
+            }
+            case STAR_GLOW_FACTOR_CMD -> {
+                var glowFactor = (Float) data[0];
+                GaiaSky.postRunnable(() -> {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                            if (lightglow != null) {
+                                lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                            }
+                        }
+                    }
+                });
+            }
+            case STAR_POINT_SIZE_CMD -> {
+                var size = (Float) data[0];
+                GaiaSky.postRunnable(() -> {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                            if (lightglow != null) {
+                                lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, size, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                                lightglow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, size, GaiaSky.instance.cameraManager.getFovFactor()));
+                            }
+                        }
+                    }
+                });
+            }
+            case LIGHT_POS_2D_UPDATE -> {
+                var nLights = (Integer) data[0];
+                var lightPos = (float[]) data[1];
+                var angles = (float[]) data[2];
+                var colors = (float[]) data[3];
+                var alphas = new float[nLights];
+                var prePass = (Texture) data[4];
+                var lensFlareSettings = Settings.settings.postprocess.lensFlare;
+                var nLightsFlare = 0;
+                int i = 0;
+                for (int k = 0; k < nLights; k++) {
+                    var angle = angles[k];
+                    // Lens flare fade start solid angle, end 1
+                    final float lensFlareAngle0 = 1e-6f;
+                    // Lens flare fade end solid angle, end 2
+                    final float lensFlareAngle1 = 0.5e-7f;
+                    if (angle > lensFlareAngle1) {
+                        nLightsFlare++;
+                        alphas[i] = 1;
+                        if (angle < lensFlareAngle0) {
+                            alphas[i] = MathUtilsDouble.lint(angle, lensFlareAngle1, lensFlareAngle0, 0f, 1f);
+                        }
+                    }
+                    i++;
+                }
+                for (i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightGlow != null && lightGlow.isEnabled()) {
+                            lightGlow.setLightPositions(nLights, lightPos);
+                            lightGlow.setLightSolidAngles(angles);
+                            lightGlow.setLightColors(colors);
+                            if (prePass != null)
+                                lightGlow.setPrePassTexture(prePass);
+                        }
+                        if (!lensFlareSettings.type.isPseudoLensFlare()) {
+                            LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
+                            if (lensFlare != null && lensFlare.isEnabled()) {
+                                lensFlare.setLightPositions(nLightsFlare, lightPos, alphas);
+                                if (nLights <= 0) {
+                                    lensFlare.setIntensity(0);
+                                } else {
+                                    lensFlare.setIntensity(lensFlareSettings.strength);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            case LIGHT_GLOW_CMD -> {
+                var lightGlowActive = (Boolean) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightglow != null) {
+                            lightglow.setEnabled(lightGlowActive);
+                        }
+                    }
+                }
+            }
+            case FOV_CHANGE_NOTIFICATION -> {
+                var newFov = (Float) data[0];
+                GaiaSky.postRunnable(() -> {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            // Light glow.
+                            LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
+                            if (lightGlow != null) {
+                                lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                                lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
+                            }
+                            // Reprojection.
+                            Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
+                            if (reprojection != null)
+                                reprojection.setFov(newFov);
+                            // Aberration.
+                            ChromaticAberration aberration = (ChromaticAberration) ppb.get(ChromaticAberration.class);
+                            if (aberration != null && aberration.getAberrationAmount() > 0) {
+                                float amount = Settings.settings.postprocess.chromaticAberration.amount * (newFov / 40f);
+                                aberration.setAberrationAmount(amount);
+                                aberration.setEnabled(amount > 0);
+                            }
+                        }
+                    }
+                });
+            }
+            case SCREENSHOT_SIZE_UPDATE -> {
+                if (pps != null && Settings.settings.screenshot.isAdvancedMode()) {
+                    var newWidth = (Integer) data[0];
+                    var newHeight = (Integer) data[1];
+                    if (pps[RenderType.screenshot.index] != null) {
+                        if (changed(pps[RenderType.screenshot.index].pp, newWidth, newHeight)) {
+                            GaiaSky.postRunnable(() -> replace(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight));
+                        }
+                    } else {
+                        pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight, manager);
+                    }
+                }
+            }
+            case FRAME_SIZE_UPDATE -> {
+                if (pps != null && Settings.settings.frame.isAdvancedMode()) {
+                    var newWidth = (Integer) data[0];
+                    var newHeight = (Integer) data[1];
+                    if (pps[RenderType.frame.index] != null) {
+                        if (changed(pps[RenderType.frame.index].pp, newWidth, newHeight)) {
+                            GaiaSky.postRunnable(() -> {
+                                replace(RenderType.frame, newWidth, newHeight, newWidth, newHeight);
+                            });
+                        }
+                    } else {
                         GaiaSky.postRunnable(() -> {
                             replace(RenderType.frame, newWidth, newHeight, newWidth, newHeight);
                         });
                     }
+                }
+            }
+            case BLOOM_CMD -> GaiaSky.postRunnable(() -> {
+                var intensity = (float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Bloom bloom = (Bloom) ppb.get(Bloom.class);
+                        bloom.setBloomIntesnity(intensity);
+                        bloom.setEnabled(intensity > 0);
+                    }
+                }
+            });
+            case UNSHARP_MASK_CMD -> GaiaSky.postRunnable(() -> {
+                var sharpenFactor = (float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        UnsharpMask unsharp = (UnsharpMask) ppb.get(UnsharpMask.class);
+                        unsharp.setSharpenFactor(sharpenFactor);
+                        unsharp.setEnabled(sharpenFactor > 0);
+                    }
+                }
+            });
+            case CHROMATIC_ABERRATION_CMD -> GaiaSky.postRunnable(() -> {
+                var amount = (float) data[0] * GaiaSky.instance.getCameraManager().getFovFactor();
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        ChromaticAberration aberration = (ChromaticAberration) ppb.get(ChromaticAberration.class);
+                        aberration.setAberrationAmount(amount);
+                        aberration.setEnabled(amount > 0);
+                    }
+                }
+            });
+            case LENS_FLARE_CMD -> {
+                var strength = (Float) data[0];
+                var enabled = strength > 0;
+                var lensFlareSettings = Settings.settings.postprocess.lensFlare;
+                if (lensFlareSettings.type.isPseudoLensFlare()) {
+                    // Pseudo lens flare.
+                    var intensity = enabled ? strength * 0.15f : 0;
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            PseudoLensFlare lensFlare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
+                            lensFlare.setEnabled(enabled);
+                            lensFlare.setFlareIntensity(intensity);
+                        }
+                    }
                 } else {
-                    GaiaSky.postRunnable(() -> {
-                        replace(RenderType.frame, newWidth, newHeight, newWidth, newHeight);
-                    });
-                }
-            }
-        }
-        case BLOOM_CMD -> GaiaSky.postRunnable(() -> {
-            var intensity = (float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Bloom bloom = (Bloom) ppb.get(Bloom.class);
-                    bloom.setBloomIntesnity(intensity);
-                    bloom.setEnabled(intensity > 0);
-                }
-            }
-        });
-        case UNSHARP_MASK_CMD -> GaiaSky.postRunnable(() -> {
-            var sharpenFactor = (float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    UnsharpMask unsharp = (UnsharpMask) ppb.get(UnsharpMask.class);
-                    unsharp.setSharpenFactor(sharpenFactor);
-                    unsharp.setEnabled(sharpenFactor > 0);
-                }
-            }
-        });
-        case CHROMATIC_ABERRATION_CMD -> GaiaSky.postRunnable(() -> {
-            var amount = (float) data[0] * GaiaSky.instance.getCameraManager().getFovFactor();
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    ChromaticAberration aberration = (ChromaticAberration) ppb.get(ChromaticAberration.class);
-                    aberration.setAberrationAmount(amount);
-                    aberration.setEnabled(amount > 0);
-                }
-            }
-        });
-        case LENS_FLARE_CMD -> {
-            var strength = (Float) data[0];
-            var enabled = strength > 0;
-            var lensFlareSettings = Settings.settings.postprocess.lensFlare;
-            if (lensFlareSettings.type.isPseudoLensFlare()) {
-                // Pseudo lens flare.
-                var intensity = enabled ? strength * 0.15f : 0;
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
+                    // Real lens flare.
+                    for (int i = 0; i < RenderType.values().length; i++) {
                         PostProcessBean ppb = pps[i];
-                        PseudoLensFlare lensFlare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
+                        LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
                         lensFlare.setEnabled(enabled);
-                        lensFlare.setFlareIntensity(intensity);
+                        lensFlare.setIntensity(strength);
                     }
-                }
-            } else {
-                // Real lens flare.
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    PostProcessBean ppb = pps[i];
-                    LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
-                    lensFlare.setEnabled(enabled);
-                    lensFlare.setIntensity(strength);
-                }
 
-            }
-        }
-        case CAMERA_MOTION_UPDATE -> {
-            var camera = (PerspectiveCamera) data[3];
-            var campos = (Vector3b) data[0];
-            var zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
-            float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
-            float cameraOffset = (camera.direction.x + camera.direction.y + camera.direction.z);
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    PseudoLensFlare flare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
-                    if (flare != null)
-                        flare.setStarburstOffset(cameraOffset);
-                    LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
-                    if (glow != null)
-                        glow.setOrientation(cameraOffset * 50f);
-
-                    // Update ray marching shaders
-                    Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
-                    if (rms != null)
-                        rms.forEach((key, rmEffect) -> {
-                            if (rmEffect.isEnabled()) {
-                                var rmEntity = (Entity) raymarchingDef.get(key)[2];
-                                focusView.setScene(scene);
-                                focusView.setEntity(rmEntity);
-                                focusView.getPredictedPosition(auxb2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
-                                var camPos = auxb1.set(campos).sub(auxb2).put(auxf);
-                                Raymarching raymarching = (Raymarching) rmEffect;
-                                raymarching.setTime(secs);
-                                raymarching.setPos(camPos);
-                            }
-                        });
                 }
             }
-            // Update previous projectionView matrix
-            prevViewProj = camera.combined;
-        }
-        case CAMERA_ORIENTATION_UPDATE -> {
-            var camera = (PerspectiveCamera) data[0];
-            var w = (Integer) data[1];
-            var h = (Integer) data[2];
-            CameraManager.getFrustumCornersEye(camera, frustumCorners);
-            view.set(camera.view);
-            projection.set(camera.projection);
-            combined.set(camera.combined);
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    // Update all raymarching and SSR shaders
-                    Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
-                    if (rms != null)
-                        rms.forEach((key, rmEffect) -> {
-                            if (rmEffect.isEnabled()) {
-                                Raymarching raymarching = (Raymarching) rmEffect;
-                                raymarching.setFrustumCorners(frustumCorners);
-                                raymarching.setView(view);
-                                raymarching.setCombined(combined);
-                                raymarching.setViewportSize(w, h);
-                            }
-                        });
-                    Map<String, PostProcessorEffect> ssrs = ppb.getAll(SSR.class);
-                    if (ssrs != null)
-                        ssrs.forEach((key, ssrEffect) -> {
-                            if (ssrEffect.isEnabled()) {
-                                SSR ssr = (SSR) ssrEffect;
-                                ssr.setFrustumCorners(frustumCorners);
-                                ssr.setView(view);
-                                ssr.setProjection(projection);
-                                ssr.setCombined(combined);
-                            }
-                        });
-                }
-            }
-        }
-        case REPROJECTION_CMD -> {
-            var active = (Boolean) data[0];
-            var mode = (ReprojectionMode) data[1];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
-                    if (reprojection != null) {
-                        reprojection.setEnabled(active);
-                        reprojection.setMode(mode.mode);
-                    }
-                    LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
-                    if (glow != null) {
-                        glow.setNSamples(active ? 1 : Settings.settings.postprocess.lightGlow.samples);
-                    }
-                }
-            }
-        }
-        case SSR_CMD -> {
-            var enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    SSR ssr = (SSR) ppb.get(SSR.class);
-                    if (ssr != null)
-                        ssr.setEnabled(enabled);
-                }
-            }
-        }
-        case MOTION_BLUR_CMD -> {
-            var enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
-                    if (cameraMotion != null)
-                        cameraMotion.setEnabled(enabled);
-                }
-            }
-            if (enabled && blurObjectAdded) {
-                blurObjectView.setVisible(true);
-            } else if (blurObject != null) {
-                blurObjectView.setVisible(true);
-            }
-        }
-        case CUBEMAP_CMD -> {
-            var cubemap = (Boolean) data[0];
-            var enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openXr;
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    ppb.get(CameraMotion.class).setEnabled(enabled);
-                    LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                    if (lightglow != null) {
-                        lightglow.setNSamples(enabled ? 1 : Settings.settings.postprocess.lightGlow.samples);
-                        lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                    }
-                }
-            }
-        }
-        case STEREOSCOPIC_CMD -> updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);
-        case STEREO_PROFILE_CMD -> updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
-        case ANTIALIASING_CMD -> {
-            final AntialiasSettings antiAliasingValue = (AntialiasSettings) data[0];
-            GaiaSky.postRunnable(() -> {
+            case CAMERA_MOTION_UPDATE -> {
+                var camera = (PerspectiveCamera) data[3];
+                var campos = (Vector3b) data[0];
+                var zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
+                float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
+                float cameraOffset = (camera.direction.x + camera.direction.y + camera.direction.z);
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        Antialiasing antialiasing = getAA(ppb);
-                        if (antiAliasingValue.isPostProcessAntialias()) {
-                            // clean
-                            if (antialiasing != null) {
-                                ppb.remove(antialiasing.getClass());
-                            }
-                            // update
-                            initAntiAliasing(antiAliasingValue, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
-                            // ensure motion blur and levels go after
-                            ppb.remove(Levels.class);
-                            initLevels(ppb);
-                        } else {
-                            // remove
-                            if (antialiasing != null) {
-                                ppb.remove(antialiasing.getClass());
-                            }
-                        }
+                        PseudoLensFlare flare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
+                        if (flare != null)
+                            flare.setStarburstOffset(cameraOffset);
+                        LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
+                        if (glow != null)
+                            glow.setOrientation(cameraOffset * 50f);
+
+                        // Update ray marching shaders
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        if (rms != null)
+                            rms.forEach((key, rmEffect) -> {
+                                if (rmEffect.isEnabled()) {
+                                    var rmEntity = (Entity) rayMarchingDefinitions.get(key)[2];
+                                    focusView.setScene(scene);
+                                    focusView.setEntity(rmEntity);
+                                    focusView.getPredictedPosition(auxb2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
+                                    var camPos = auxb1.set(campos).sub(auxb2).put(auxf);
+                                    Raymarching raymarching = (Raymarching) rmEffect;
+                                    raymarching.setTime(secs);
+                                    raymarching.setPos(camPos);
+                                }
+                            });
                     }
                 }
-            });
-        }
-        case BRIGHTNESS_CMD -> {
-            var br = (Float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Levels levels = (Levels) ppb.get(Levels.class);
-                    if (levels != null)
-                        levels.setBrightness(br);
-                }
+                // Update previous projectionView matrix
+                prevViewProj.set(camera.combined);
             }
-        }
-        case CONTRAST_CMD -> {
-            var cn = (Float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Levels levels = (Levels) ppb.get(Levels.class);
-                    if (levels != null)
-                        levels.setContrast(cn);
-                }
-            }
-        }
-        case HUE_CMD -> {
-            var hue = (Float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Levels levels = (Levels) ppb.get(Levels.class);
-                    if (levels != null)
-                        levels.setHue(hue);
-                }
-            }
-        }
-        case SATURATION_CMD -> {
-            var sat = (Float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Levels levels = (Levels) ppb.get(Levels.class);
-                    if (levels != null)
-                        levels.setSaturation(sat);
-                }
-            }
-        }
-        case GAMMA_CMD -> {
-            var gamma = (Float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Levels levels = (Levels) ppb.get(Levels.class);
-                    if (levels != null)
-                        levels.setGamma(gamma);
-                }
-            }
-        }
-        case TONEMAPPING_TYPE_CMD -> {
-            ToneMapping tm;
-            if (data[0] instanceof String) {
-                tm = ToneMapping.valueOf((String) data[0]);
-            } else {
-                tm = (ToneMapping) data[0];
-            }
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Levels levels = (Levels) ppb.get(Levels.class);
-                    if (levels != null)
-                        switch (tm) {
-                        case AUTO -> levels.enableToneMappingAuto();
-                        case EXPOSURE -> levels.enableToneMappingExposure();
-                        case ACES -> levels.enableToneMappingACES();
-                        case UNCHARTED -> levels.enableToneMappingUncharted();
-                        case FILMIC -> levels.enableToneMappingFilmic();
-                        case NONE -> levels.disableToneMapping();
-                        }
-                }
-            }
-        }
-        case EXPOSURE_CMD -> {
-            var exposure = (Float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    Levels levels = (Levels) ppb.get(Levels.class);
-                    if (levels != null)
-                        levels.setExposure(exposure);
-                }
-            }
-        }
-        case FPS_INFO -> {
-            var fps = (Float) data[0];
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
-                    if (cameraMotionBlur != null)
-                        cameraMotionBlur.setVelocityScale(fps / 60f);
-                }
-            }
-        }
-        case GRAPHICS_QUALITY_UPDATED -> {
-            // Update graphics quality
-            var gq = (GraphicsQuality) data[0];
-            GaiaSky.postRunnable(() -> {
+            case CAMERA_ORIENTATION_UPDATE -> {
+                var camera = (PerspectiveCamera) data[0];
+                var w = (Integer) data[1];
+                var h = (Integer) data[2];
+                CameraManager.getFrustumCornersEye(camera, frustumCorners);
+                view.set(camera.view);
+                projection.set(camera.projection);
+                combined.set(camera.combined);
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        updateGraphicsQuality(ppb, gq);
+                        // Update all raymarching and SSR shaders
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        if (rms != null)
+                            rms.forEach((key, rmEffect) -> {
+                                if (rmEffect.isEnabled()) {
+                                    Raymarching raymarching = (Raymarching) rmEffect;
+                                    raymarching.setFrustumCorners(frustumCorners);
+                                    raymarching.setView(view);
+                                    raymarching.setCombined(combined);
+                                    raymarching.setViewportSize(w, h);
+                                }
+                            });
+                        Map<String, PostProcessorEffect> ssrs = ppb.getAll(SSR.class);
+                        if (ssrs != null)
+                            ssrs.forEach((key, ssrEffect) -> {
+                                if (ssrEffect.isEnabled()) {
+                                    SSR ssr = (SSR) ssrEffect;
+                                    ssr.setFrustumCorners(frustumCorners);
+                                    ssr.setView(view);
+                                    ssr.setProjection(projection);
+                                    ssr.setCombined(combined);
+                                }
+                            });
+                    }
+                }
+            }
+            case REPROJECTION_CMD -> {
+                var active = (Boolean) data[0];
+                var mode = (ReprojectionMode) data[1];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
+                        if (reprojection != null) {
+                            reprojection.setEnabled(active);
+                            reprojection.setMode(mode.mode);
+                        }
+                        LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
+                        if (glow != null) {
+                            glow.setNSamples(active ? 1 : Settings.settings.postprocess.lightGlow.samples);
+                        }
+                    }
+                }
+            }
+            case SSR_CMD -> {
+                var enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        SSR ssr = (SSR) ppb.get(SSR.class);
+                        if (ssr != null)
+                            ssr.setEnabled(enabled);
+                    }
+                }
+            }
+            case MOTION_BLUR_CMD -> {
+                var enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
+                        if (cameraMotion != null)
+                            cameraMotion.setEnabled(enabled);
+                    }
+                }
+                if (enabled && blurObjectAdded) {
+                    blurObjectView.setVisible(true);
+                } else if (blurObject != null) {
+                    blurObjectView.setVisible(true);
+                }
+            }
+            case CUBEMAP_CMD -> {
+                var cubemap = (Boolean) data[0];
+                var enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openXr;
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        ppb.get(CameraMotion.class).setEnabled(enabled);
+                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightglow != null) {
+                            lightglow.setNSamples(enabled ? 1 : Settings.settings.postprocess.lightGlow.samples);
+                            lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                        }
+                    }
+                }
+            }
+            case STEREOSCOPIC_CMD -> updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);
+            case STEREO_PROFILE_CMD ->
+                    updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
+            case ANTIALIASING_CMD -> {
+                final AntialiasSettings antiAliasingValue = (AntialiasSettings) data[0];
+                GaiaSky.postRunnable(() -> {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            Antialiasing antialiasing = getAA(ppb);
+                            if (antiAliasingValue.isPostProcessAntialias()) {
+                                // clean
+                                if (antialiasing != null) {
+                                    ppb.remove(antialiasing.getClass());
+                                }
+                                // update
+                                initAntiAliasing(antiAliasingValue, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
+                                // ensure motion blur and levels go after
+                                ppb.remove(Levels.class);
+                                initLevels(ppb);
+                            } else {
+                                // remove
+                                if (antialiasing != null) {
+                                    ppb.remove(antialiasing.getClass());
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            case BRIGHTNESS_CMD -> {
+                var br = (Float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setBrightness(br);
+                    }
+                }
+            }
+            case CONTRAST_CMD -> {
+                var cn = (Float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setContrast(cn);
+                    }
+                }
+            }
+            case HUE_CMD -> {
+                var hue = (Float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setHue(hue);
+                    }
+                }
+            }
+            case SATURATION_CMD -> {
+                var sat = (Float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setSaturation(sat);
+                    }
+                }
+            }
+            case GAMMA_CMD -> {
+                var gamma = (Float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setGamma(gamma);
+                    }
+                }
+            }
+            case TONEMAPPING_TYPE_CMD -> {
+                ToneMapping tm;
+                if (data[0] instanceof String) {
+                    tm = ToneMapping.valueOf((String) data[0]);
+                } else {
+                    tm = (ToneMapping) data[0];
+                }
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            switch (tm) {
+                                case AUTO -> levels.enableToneMappingAuto();
+                                case EXPOSURE -> levels.enableToneMappingExposure();
+                                case ACES -> levels.enableToneMappingACES();
+                                case UNCHARTED -> levels.enableToneMappingUncharted();
+                                case FILMIC -> levels.enableToneMappingFilmic();
+                                case NONE -> levels.disableToneMapping();
+                            }
+                    }
+                }
+            }
+            case EXPOSURE_CMD -> {
+                var exposure = (Float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setExposure(exposure);
+                    }
+                }
+            }
+            case FPS_INFO -> {
+                var fps = (Float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
+                        if (cameraMotionBlur != null)
+                            cameraMotionBlur.setVelocityScale(fps / 60f);
+                    }
+                }
+            }
+            case GRAPHICS_QUALITY_UPDATED -> {
+                // Update graphics quality
+                var gq = (GraphicsQuality) data[0];
+                GaiaSky.postRunnable(() -> {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            updateGraphicsQuality(ppb, gq);
+                        }
+                    }
+                });
+            }
+            case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> {
+                var starTex = new Texture(Settings.settings.data.dataFileHandle(Settings.settings.scene.star.getStarTexture()), true);
+                starTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        ((LightGlow) ppb.get(LightGlow.class)).setLightGlowTexture(starTex);
                     }
                 }
             });
-        }
-        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> {
-            var starTex = new Texture(Settings.settings.data.dataFileHandle(Settings.settings.scene.star.getStarTexture()), true);
-            starTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    ((LightGlow) ppb.get(LightGlow.class)).setLightGlowTexture(starTex);
-                }
+            case BACKBUFFER_SCALE_CMD ->
+                    updateUpscaleFilters(Settings.settings.postprocess.upscaleFilter, (Float) data[0]);
+            case UPSCALE_FILTER_CMD -> {
+                var upscaleFilter = (UpscaleFilter) data[0];
+                updateUpscaleFilters(upscaleFilter, (float) Settings.settings.graphics.backBufferScale);
             }
-        });
-        case BACKBUFFER_SCALE_CMD -> updateUpscaleFilters(Settings.settings.postprocess.upscaleFilter, (Float) data[0]);
-        case UPSCALE_FILTER_CMD -> {
-            var upscaleFilter = (UpscaleFilter) data[0];
-            updateUpscaleFilters(upscaleFilter, (float) Settings.settings.graphics.backBufferScale);
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
     }
 

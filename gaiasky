@@ -34,7 +34,7 @@ while getopts 'hvsiend' flag; do
 done
 
 if [ ! -f ./gradlew ]; then
-    echo "Gradle wrapper not found, please run this from the gaiasky folder"
+    echo "Gradle wrapper not found, please run this from the gaiasky directory"
     exit 1
 fi
 

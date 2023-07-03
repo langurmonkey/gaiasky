@@ -30,6 +30,10 @@ import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader.Tessellat
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParameter;
 
+/**
+ * Loads and initializes shaders, fonts, batches and other resources used for rendering, especially
+ * by {@link gaiasky.scene.system.render.SceneRenderer}.
+ */
 public class RenderAssets {
     /**
      * Shader name parts.
@@ -87,79 +91,79 @@ public class RenderAssets {
 
         // Direct shaders
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names),
-                                       defines);
+                defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", TextUtils.concatAll("sprite", names), defines);
         billboardGroupDesc = loadShader(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl",
-                                        TextUtils.concatAll("billboard.group", names), defines);
+                TextUtils.concatAll("billboard.group", names), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", TextUtils.concatAll("point.cpu", names), defines);
         lineCpuDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
         if (!safeMode) {
             // In safe mode we use OpenGL 3.3. Our geometry shaders use '#version 400 core', since they make use of double-precision.
             lineQuadCpuDesc = loadShader(manager, "shader/line.quad.cpu.vertex.glsl", "shader/line.quad.cpu.geometry.glsl", "shader/line.quad.cpu.fragment.glsl",
-                                         TextUtils.concatAll("line.quad.cpu", names), defines);
+                    TextUtils.concatAll("line.quad.cpu", names), defines);
             lineQuadGpuDesc = loadShader(manager, "shader/line.quad.gpu.vertex.glsl", "shader/line.quad.gpu.geometry.glsl", "shader/line.quad.gpu.fragment.glsl",
-                                         TextUtils.concatAll("line.quad.gpu", names), defines);
+                    TextUtils.concatAll("line.quad.gpu", names), defines);
         }
         primitiveGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("primitive.gpu", names), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl",
-                                        TextUtils.concatAll("particle.effect", names), defines);
+                TextUtils.concatAll("particle.effect", names), defines);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
         // Initialize point cloud shaders - depends on point cloud mode
         final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
         final String pointTriSuffixParticles = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
         particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffixParticles + ".vertex.glsl",
-                                       "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesColMap),
-                                       definesColMap);
+                "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl", TextUtils.concatAll("particle.group", namesColMap),
+                definesColMap);
         particleGroupExtBillboardDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl",
-                                                   TextUtils.concatAll("particle.group.ext", namesColMap), definesColMap, "#define extendedParticlesFlag");
+                TextUtils.concatAll("particle.group.ext", namesColMap), definesColMap, "#define extendedParticlesFlag");
         particleGroupExtModelDesc = loadShader(manager, "shader/particle.group.model.vertex.glsl", "shader/particle.group.model.fragment.glsl",
-                                               TextUtils.concatAll("particle.group.ext.model", namesColMap), definesColMap, "#define extendedParticlesFlag");
+                TextUtils.concatAll("particle.group.ext.model", namesColMap), definesColMap, "#define extendedParticlesFlag");
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
-                                   TextUtils.concatAll("star.group", namesColMap), definesColMap);
+                TextUtils.concatAll("star.group", namesColMap), definesColMap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl",
-                                       TextUtils.concatAll("variable.group", namesColMap), definesColMap);
+                TextUtils.concatAll("variable.group", namesColMap), definesColMap);
         // Regular stars
         starPointDesc = loadShader(manager, "shader/star.group.point.vertex.glsl", "shader/star.group.point.fragment.glsl", TextUtils.concatAll("star.point", names),
-                                   defines);
+                defines);
 
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
         manager.load("per-vertex-lighting-additive", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.additive.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.additive.fragment.glsl"));
         manager.load("per-vertex-diffuse", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.diffuse.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.diffuse.fragment.glsl"));
         manager.load("per-vertex-lighting-grid", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.grid.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.grid.fragment.glsl"));
         manager.load("per-vertex-lighting-recgrid", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.gridrec.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.gridrec.fragment.glsl"));
         manager.load("per-vertex-lighting-starsurface", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
         manager.load("per-vertex-lighting-beam", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/beam.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/beam.fragment.glsl"));
         manager.load("per-vertex-lighting-thruster", GroundShaderProvider.class,
-                     new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/thruster.fragment.glsl"));
+                new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/thruster.fragment.glsl"));
 
         manager.load("per-pixel-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/normal.fragment.glsl"));
         manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl",
-                                                             "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
+                new TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl",
+                        "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
         manager.load("per-pixel-lighting-dust", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/dust.fragment.glsl"));
         manager.load("per-pixel-lighting-depth", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/depth.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/depth.fragment.glsl"));
         manager.load("per-pixel-lighting-depth-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.depth.control.glsl",
-                                                             "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.depth.fragment.glsl"));
+                new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.depth.control.glsl",
+                        "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.depth.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
-                                                             "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
+                new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
+                        "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
         manager.load("per-pixel-lighting-svtdetection", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/svt.detection.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/svt.detection.fragment.glsl"));
         manager.load("per-pixel-lighting-svtdetection-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
-                                                             "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.svt.detection.fragment.glsl"));
+                new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
+                        "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.svt.detection.fragment.glsl"));
 
         manager.load("skybox", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/skybox.vertex.glsl", "shader/skybox.fragment.glsl"));
         manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));
@@ -183,7 +187,7 @@ public class RenderAssets {
      * @param manager The asset manager.
      */
     public void doneLoading(AssetManager manager) {
-        String[] names = GlobalResources.combinations(new String[] { " (ssr)", " (vel)", " (rel)", " (grav)" });
+        String[] names = GlobalResources.combinations(new String[]{" (ssr)", " (vel)", " (rel)", " (grav)"});
 
         /*
           STAR BILLBOARD SHADER
@@ -352,7 +356,6 @@ public class RenderAssets {
      * @param fragmentShader The fragment shader file.
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
-     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
@@ -372,7 +375,6 @@ public class RenderAssets {
      * @param fragmentShader The fragment shader file.
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
-     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
@@ -393,7 +395,6 @@ public class RenderAssets {
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
      * @param fixedPrepend   The fixed defines that must appear in all shaders, if any.
-     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
@@ -414,7 +415,6 @@ public class RenderAssets {
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
      * @param fixedPrepend   The fixed defines that must appear in all shaders, if any.
-     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
