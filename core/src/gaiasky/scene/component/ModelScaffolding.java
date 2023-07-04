@@ -40,8 +40,8 @@ public class ModelScaffolding implements Component {
     public String inverseRefPlaneTransform;
 
     /**
-     * Array with shadow camera distance, cam near and cam far as a function of
-     * the radius of the object
+     * Array with shadow camera distance, camera near and camera far as a function of
+     * the radius of the object.
      */
     public double[] shadowMapValues;
 

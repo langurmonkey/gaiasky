@@ -7,8 +7,6 @@
 
 package gaiasky.util.gdx.model;
 
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -45,33 +43,6 @@ public class IntNode {
     protected IntNode parent;
 
     public IntNode() {
-    }
-
-    public IntNode(Node other) {
-        this(other, null);
-    }
-
-    public IntNode(Node other, IntNode parent) {
-        id = other.id;
-        translation.set(other.translation);
-        rotation.set(other.rotation);
-        scale.set(other.scale);
-        localTransform.set(other.localTransform);
-        globalTransform.set(other.globalTransform);
-        inheritTransform = other.inheritTransform;
-        isAnimated = other.isAnimated;
-        // Convert children.
-        this.parent = parent;
-        for (var child : other.getChildren()) {
-            var newChild = new IntNode(child, this);
-            children.add(newChild);
-        }
-
-        // Convert parts.
-        for (var part : other.parts) {
-            parts.add(new IntNodePart(part));
-        }
-
     }
 
     /**

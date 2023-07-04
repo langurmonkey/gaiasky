@@ -579,7 +579,7 @@ public class ModelEntityRenderSystem {
     protected void prepareShadowEnvironment(Entity entity,
                                             Model model,
                                             ModelScaffolding scaffolding) {
-        if (Settings.settings.scene.renderer.shadow.active) {
+        if (Settings.settings.scene.renderer.shadow.active && scaffolding.shadowMapValues != null) {
             Environment env = model.model.env;
             var shadowMapPass = sceneRenderer.getShadowMapPass();
             if (scaffolding.shadow > 0 && shadowMapPass.smTexMap.containsKey(entity)) {

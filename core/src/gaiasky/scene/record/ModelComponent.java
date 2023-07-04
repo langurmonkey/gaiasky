@@ -35,6 +35,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.model.gltf.scene3d.model.ModelInstanceHack;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
@@ -50,7 +51,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     static {
         globalAmbient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient,
-                                           (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
+                (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
         // Ambient light watcher.
         var observer = new Observer() {
             @Override
@@ -88,10 +89,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     /**
      * Ambient light level for static light objects
      **/
-    private final float[] ambientColor = new float[] { -1f, -1f, -1f, -1f };
+    private final float[] ambientColor = new float[]{-1f, -1f, -1f, -1f};
     private boolean modelInitialised, modelLoading;
     private boolean useColor = true;
-    /** The blend mode **/
+    /**
+     * The blend mode
+     **/
     private BlendMode blendMode = BlendMode.ALPHA;
     private AssetManager manager;
     private float[] cc;
@@ -118,7 +121,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * Returns the given directional light
      *
      * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}.
-     *
      * @return The directional light with index i
      */
     public DirectionalLight directional(int i) {
@@ -216,7 +218,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             Pair<IntModel, Map<String, Material>> modelMaterial = initModelFile();
             if (modelMaterial != null) {
                 model = modelMaterial.getFirst();
-                instance = new IntModelInstance(model, localTransform);
+                if (modelFile != null && (modelFile.endsWith("gltf") || modelFile.endsWith("glb"))) {
+                    instance = new ModelInstanceHack(model, localTransform);
+                } else {
+                    instance = new IntModelInstance(model, localTransform);
+                }
             }
             this.modelInitialised = true;
         }
@@ -230,7 +236,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
         // COLOR IF NO TEXTURE
         if (mtc == null && instance != null) {
-            addColorToMat();
+            addColorToMaterial();
         }
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED, Event.SSR_CMD, Event.ECLIPSES_CMD);
@@ -250,13 +256,24 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 Material material = new Material();
                 model.materials.add(material);
                 materials.put("base", material);
-            } else {
-                if (model.materials.size > 1)
+            } else if (modelFile == null) {
+                if (model.materials.size > 1) {
                     for (int i = 0; i < model.materials.size; i++) {
-                        materials.put("base" + i, model.materials.get(i));
+                        var mat = model.materials.get(i);
+                        if (mat.id != null && !mat.id.isEmpty()) {
+                            materials.put(mat.id, mat);
+                        } else {
+                            materials.put("base" + i, model.materials.get(i));
+                        }
                     }
-                else
-                    materials.put("base", model.materials.first());
+                } else {
+                    var mat = model.materials.first();
+                    if (mat.id != null && !mat.id.isEmpty()) {
+                        materials.put(mat.id, mat);
+                    } else {
+                        materials.put("base", mat);
+                    }
+                }
             }
             // Add skybox to materials if reflection present
             if (!Settings.settings.postprocess.ssr.active) {
@@ -333,10 +350,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                        Matrix4 localTransform,
                        float alpha) {
         switch (blendMode) {
-        case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
-        case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
-        case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, true);
-        case NONE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, false);
+            case ALPHA ->
+                    update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+            case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
+            case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, true);
+            case NONE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
     }
 
@@ -386,11 +404,15 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 Pair<IntModel, Map<String, Material>> modMat = initModelFile();
                 assert modMat != null;
                 model = modMat.getFirst();
-                instance = new IntModelInstance(model, localTransform);
+                if (modelFile != null && (modelFile.endsWith("gltf") || modelFile.endsWith("glb"))) {
+                    instance = new ModelInstanceHack(model, localTransform);
+                } else {
+                    instance = new IntModelInstance(model, localTransform);
+                }
 
                 // COLOR IF NO TEXTURE
                 if (mtc == null) {
-                    addColorToMat();
+                    addColorToMaterial();
                 }
 
                 this.modelInitialised = true;
@@ -403,15 +425,14 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         this.modelInitialised = initialized;
     }
 
-    public void addColorToMat() {
+    public void addColorToMaterial() {
         if (cc != null && useColor) {
-            // Regular mesh, we use the color
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material material = instance.materials.get(i);
-                if (material.get(TextureAttribute.Ambient) == null && material.get(TextureAttribute.Diffuse) == null) {
+                // Only set color if not already there.
+                if (!material.has(ColorAttribute.Diffuse)) {
                     material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
-                    material.set(new ColorAttribute(ColorAttribute.Ambient, cc[0], cc[1], cc[2], cc[3]));
                     if (!culling) {
                         material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
                     }
@@ -490,10 +511,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      */
     public void updateDepthTest() {
         switch (blendMode) {
-        // Read-write depth test.
-        case ALPHA, COLOR, NONE -> depthTestReadWrite();
-        // Read-only depth test.
-        case ADDITIVE -> depthTestReadOnly();
+            // Read-write depth test.
+            case ALPHA, COLOR, NONE -> depthTestReadWrite();
+            // Read-only depth test.
+            case ADDITIVE -> depthTestReadOnly();
         }
     }
 
@@ -540,10 +561,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void setTransparency(float alpha) {
         switch (blendMode) {
-        case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
-        case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
-        case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, true);
-        case NONE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, false);
+            case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+            case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
+            case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, true);
+            case NONE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
     }
 

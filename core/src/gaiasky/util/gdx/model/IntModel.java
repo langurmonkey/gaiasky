@@ -9,12 +9,10 @@ package gaiasky.util.gdx.model;
 
 import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.model.Animation;
-import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.model.NodeKeyframe;
 import com.badlogic.gdx.graphics.g3d.model.data.*;
@@ -26,7 +24,6 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
-import gaiasky.util.gdx.loader.IntModelLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.data.*;
 import gaiasky.util.gdx.shader.Material;
@@ -65,33 +62,6 @@ public class IntModel implements Disposable {
      */
     public IntModel(IntModelData modelData) {
         this(modelData, new FileTextureProvider());
-    }
-
-    /**
-     * Constructs a new IntModel based on the given {@link com.badlogic.gdx.graphics.g3d.Model}.
-     *
-     * @param other The other model.
-     */
-    public IntModel(Model other) {
-        // Add Nodes.
-        if (other.nodes != null) {
-            for (var node : other.nodes) {
-                nodes.add(new IntNode(node));
-            }
-
-            for (var node : nodes) {
-                for (var part : node.parts) {
-                    if (part.meshPart != null) {
-                        meshParts.add(part.meshPart);
-                        meshes.add(part.meshPart.mesh);
-                    }
-                    if (part.material != null) {
-                        materials.add(part.material);
-                    }
-                }
-            }
-        }
-
     }
 
     /**

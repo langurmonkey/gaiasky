@@ -501,6 +501,12 @@ void main() {
     #endif
 
     float ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
+    #if defined(occlusionMetallicRoughnessTextureFlag)
+    // Sometimes ambient occlusion is not used, and it is set to 0.
+    if (ambientOcclusion == 0.0) {
+        ambientOcclusion = 1.0;
+    }
+    #endif// occlusionMetallicRoughnessTextureFlag
     diffuse.rgb *= ambientOcclusion;
     specular.rgb *= ambientOcclusion;
 
@@ -560,7 +566,7 @@ void main() {
             }
         }
         #ifdef eclipseOutlines
-        if(dot_NM > 0.0) {
+        if (dot_NM > 0.0) {
             if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
                 // Penumbra.
                 outline = 1.0;
@@ -573,7 +579,7 @@ void main() {
         }
         #endif// eclipseOutlines
     }
-    #endif // eclipsingBodyFlag
+    #endif// eclipsingBodyFlag
 
     // Reflection
     vec3 reflectionColor = vec3(0.0);

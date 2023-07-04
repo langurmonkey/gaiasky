@@ -17,9 +17,9 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.gdx.loader.GLBWrapperLoader.GLBLoaderParameters;
 import gaiasky.util.gdx.model.IntModel;
-import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
-import net.mgsx.gltf.loaders.shared.SceneAssetLoaderParameters;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import gaiasky.util.gdx.model.gltf.loaders.glb.GLBAssetLoader;
+import gaiasky.util.gdx.model.gltf.loaders.shared.SceneAssetLoaderParameters;
+import gaiasky.util.gdx.model.gltf.scene3d.scene.SceneAsset;
 
 public class GLBWrapperLoader extends AsynchronousAssetLoader<IntModel, GLBLoaderParameters> {
 
@@ -38,11 +38,7 @@ public class GLBWrapperLoader extends AsynchronousAssetLoader<IntModel, GLBLoade
     @Override
     public IntModel loadSync(AssetManager manager, String fileName, FileHandle file, GLBLoaderParameters parameter) {
         SceneAsset scene = glbAssetLoader.loadSync(manager, fileName, file, convertParameters(parameter));
-
-        // Convert to IntModel.
-        Model model = scene.scene.model;
-
-        return new IntModel(model);
+        return scene.scene.model;
     }
 
     @Override

@@ -164,7 +164,6 @@ public class LoadingGui extends AbstractGui {
     @Override
     public void update(double dt) {
         super.update(dt);
-        // Fibonacci numbers
         long currTime = System.currentTimeMillis();
         if (currTime - lastFunnyTime > funnyTextTime) {
             randomFunnyText();

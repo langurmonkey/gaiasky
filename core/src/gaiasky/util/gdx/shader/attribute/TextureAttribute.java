@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
-import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRTextureAttribute;
 
 public class TextureAttribute extends Attribute {
     public final static String DiffuseAlias = "diffuseTexture";

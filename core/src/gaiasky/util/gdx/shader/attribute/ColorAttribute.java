@@ -8,7 +8,7 @@
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRColorAttribute;
 
 public class ColorAttribute extends Attribute {
     public final static String DiffuseAlias = "diffuseColor";

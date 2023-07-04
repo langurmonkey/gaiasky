@@ -8,6 +8,7 @@
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class Matrix4Attribute extends Attribute {
@@ -15,6 +16,8 @@ public class Matrix4Attribute extends Attribute {
     public static final int ShadowMapProjViewTrans = register(ShadowMapProjViewTransAlias);
     public static final String PrevProjViewAlias = "prevProjView";
     public static final int PrevProjView = register(PrevProjViewAlias);
+    public static final String EnvRotationAlias = "envRotation";
+    public static final int EnvRotation = register(EnvRotationAlias);
     public Matrix4 value;
 
     public Matrix4Attribute(int index) {
@@ -26,8 +29,22 @@ public class Matrix4Attribute extends Attribute {
         this.value = new Matrix4(value);
     }
 
-    public void set(Matrix4 value) {
+    public static Matrix4Attribute createEnvRotation(float azymuthAngleDegree) {
+        return new Matrix4Attribute(EnvRotation).set(azymuthAngleDegree);
+    }
+
+    public static Matrix4Attribute createEnvRotation(Matrix4 matrix) {
+        return new Matrix4Attribute(EnvRotation).set(matrix);
+    }
+
+    public Matrix4Attribute set(Matrix4 value) {
         this.value.set(value);
+        return this;
+    }
+
+    public Matrix4Attribute set(float azimuthAngleDegree) {
+        this.value.setToRotation(Vector3.Y, azimuthAngleDegree);
+        return this;
     }
 
     @Override

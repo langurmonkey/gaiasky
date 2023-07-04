@@ -13,13 +13,12 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.gdx.loader.GLTFWrapperLoader.GLTFLoaderParameters;
 import gaiasky.util.gdx.model.IntModel;
-import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
-import net.mgsx.gltf.loaders.shared.SceneAssetLoaderParameters;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import gaiasky.util.gdx.model.gltf.loaders.gltf.GLTFAssetLoader;
+import gaiasky.util.gdx.model.gltf.loaders.shared.SceneAssetLoaderParameters;
+import gaiasky.util.gdx.model.gltf.scene3d.scene.SceneAsset;
 
 public class GLTFWrapperLoader extends AsynchronousAssetLoader<IntModel, GLTFLoaderParameters> {
 
@@ -38,14 +37,7 @@ public class GLTFWrapperLoader extends AsynchronousAssetLoader<IntModel, GLTFLoa
     @Override
     public IntModel loadSync(AssetManager manager, String fileName, FileHandle file, GLTFLoaderParameters parameter) {
         SceneAsset scene = gltfAssetLoader.loadSync(manager, fileName, file, convertParameters(parameter));
-
-        // Convert to IntModel.
-        if (scene != null && scene.scene != null && scene.scene.model != null) {
-            Model model = scene.scene.model;
-            return new IntModel(model);
-        } else {
-            return null;
-        }
+        return scene.scene.model;
     }
 
     @Override
