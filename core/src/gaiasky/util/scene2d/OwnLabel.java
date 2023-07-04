@@ -16,7 +16,7 @@ import gaiasky.util.TextUtils;
 
 public class OwnLabel extends Label implements Disableable {
     private final Color regularColor;
-    private float ownwidth = 0f, ownheight = 0f;
+    private float ownPrefWidth = 0f, ownPrefHeight = 0f;
     private boolean disabled = false;
 
     public OwnLabel(CharSequence text, Skin skin, float width) {
@@ -73,27 +73,27 @@ public class OwnLabel extends Label implements Disableable {
 
     @Override
     public void setWidth(float width) {
-        ownwidth = width;
+        ownPrefWidth = width;
         super.setWidth(width);
     }
 
     @Override
     public void setHeight(float height) {
-        ownheight = height;
+        ownPrefHeight = height;
         super.setHeight(height);
     }
 
     @Override
     public void setSize(float width, float height) {
-        ownwidth = width;
-        ownheight = height;
+        ownPrefWidth = width;
+        ownPrefHeight = height;
         super.setSize(width, height);
     }
 
     @Override
     public float getPrefWidth() {
-        if (ownwidth != 0) {
-            return ownwidth;
+        if (ownPrefWidth != 0) {
+            return ownPrefWidth;
         } else {
             return super.getPrefWidth();
         }
@@ -101,8 +101,8 @@ public class OwnLabel extends Label implements Disableable {
 
     @Override
     public float getPrefHeight() {
-        if (ownheight != 0) {
-            return ownheight;
+        if (ownPrefHeight != 0) {
+            return ownPrefHeight;
         } else {
             return super.getPrefHeight();
         }

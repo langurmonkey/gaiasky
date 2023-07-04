@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.StringBuilder;
+import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -117,11 +118,13 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         // Create second message if necessary
         if (multiple) {
             message2 = new OwnLabel("", skin, "hud-med");
+            message2.setName("message2");
             c2 = this.add(message2).left();
             c2.row();
         }
         // Create message
         message1 = new OwnLabel("", skin, "hud-med");
+        message1.setName("message1");
         c1 = this.add(message1).left();
 
         this.df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
@@ -145,26 +148,27 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     }
 
     private void addMessage(String msg, boolean permanent, LoggerLevel level) {
-        MessageBean messageBean = new MessageBean(msg);
+        GaiaSky.postRunnable(() -> {
+            MessageBean messageBean = new MessageBean(msg);
 
-        boolean debug = level.equals(LoggerLevel.DEBUG);
-        boolean add = !debug || debug && Gdx.app.getLogLevel() >= Application.LOG_DEBUG;
+            boolean debug = level.equals(LoggerLevel.DEBUG);
+            boolean add = !debug || Gdx.app.getLogLevel() >= Application.LOG_DEBUG;
 
-        if (add) {
-            if (multiple && !historical.isEmpty() && !historical.getLast().finished(msTimeout)) {
-                // Move current up
-                setText(message2, c2, message1.getText());
+            if (add) {
+                if (multiple && !historical.isEmpty() && !historical.getLast().finished(msTimeout)) {
+                    // Move current up
+                    setText(message2, c2, message1.getText());
+                }
+                // Set 1
+                setText(message1, c1, formatMessage(messageBean, level));
+
+                this.displaying = true;
+                this.permanent = permanent;
+
+                if (historicalLog)
+                    historical.add(messageBean);
             }
-            // Set 1
-            setText(message1, c1, formatMessage(messageBean, level));
-
-            this.displaying = true;
-            this.permanent = permanent;
-
-            if (historicalLog)
-                historical.add(messageBean);
-
-        }
+        });
 
     }
 
@@ -211,144 +215,144 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
             switch (event) {
-            case POST_NOTIFICATION:
-                LoggerLevel level = (LoggerLevel) data[0];
-                Object[] dat = (Object[]) data[1];
-                java.lang.StringBuilder message = new java.lang.StringBuilder();
-                boolean perm = false;
-                int startIndex = 0;
-                if (dat.length > 1 && !showSources) {
-                    startIndex = 1;
-                }
-                for (int i = startIndex; i < dat.length; i++) {
-                    if (i == dat.length - 1 && dat[i] instanceof Boolean) {
-                        perm = (Boolean) dat[i];
-                    } else {
-                        message.append(dat[i].toString());
-                        if (i < dat.length - 1 && !(i == dat.length - 2 && dat[dat.length - 1] instanceof Boolean)) {
-                            message.append(TAG_SEPARATOR);
-                        }
+                case POST_NOTIFICATION:
+                    LoggerLevel level = (LoggerLevel) data[0];
+                    Object[] dat = (Object[]) data[1];
+                    var message = new java.lang.StringBuilder();
+                    boolean permanent = false;
+                    int startIndex = 0;
+                    if (dat.length > 1 && !showSources) {
+                        startIndex = 1;
                     }
-                }
-                addMessage(message.toString(), perm, level);
-                break;
-            case FOCUS_CHANGED:
-                if (data[0] != null) {
-                    if (data[0] instanceof String) {
-                        addMessage(I18n.msg("notif.camerafocus", data[0]));
-                    } else {
-                        var focus = (FocusView) data[0];
-                        addMessage(I18n.msg("notif.camerafocus", focus.getName()));
-                    }
-                }
-                break;
-            case TIME_STATE_CMD:
-                Boolean bool = (Boolean) data[0];
-                if (bool == null) {
-                    addMessage(I18n.msg("notif.toggle", I18n.msg("gui.time")));
-                } else {
-                    addMessage(I18n.msg("notif.simulation." + (bool ? "resume" : "pause")));
-                }
-                break;
-            case TOGGLE_VISIBILITY_CMD:
-                if (data.length == 2)
-                    addMessage(I18n.msg("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.msg((String) data[0])));
-                else
-                    addMessage(I18n.msg("notif.visibility.toggle", I18n.msg((String) data[0])));
-                break;
-            case FOCUS_LOCK_CMD:
-            case ORIENTATION_LOCK_CMD:
-            case OCTREE_PARTICLE_FADE_CMD:
-                addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
-                break;
-            case CAMERA_MODE_CMD:
-                CameraMode cm = (CameraMode) data[0];
-                if (cm != CameraMode.FOCUS_MODE)
-                    addMessage(I18n.msg("notif.cameramode.change", data[0]));
-                break;
-            case TIME_WARP_CHANGED_INFO:
-                addMessage(I18n.msg("notif.timepace.change", data[0]));
-                break;
-            case FOV_CHANGE_NOTIFICATION:
-                // addMessage("Field of view changed to " + (float) data[0]);
-                break;
-            case JAVA_EXCEPTION:
-                Throwable t = (Throwable) data[0];
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                t.printStackTrace(pw);
-                String stackTrace = sw.toString();
-                if (data.length == 1) {
-                    if (I18n.messages != null)
-                        addMessage(I18n.msg("notif.error", stackTrace));
-                    else
-                        addMessage("Error: " + stackTrace);
-                } else {
-                    if (I18n.messages != null)
-                        addMessage(I18n.msg("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
-                    else
-                        addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
-                }
-                break;
-            case ORBIT_DATA_LOADED:
-                addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, LoggerLevel.DEBUG);
-                break;
-            case SCREENSHOT_INFO:
-                addMessage(I18n.msg("notif.screenshot", data[0]));
-                break;
-            case STEREOSCOPIC_CMD:
-                addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
-                break;
-            case DISPLAY_GUI_CMD:
-                boolean displayGui = (Boolean) data[0];
-                addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
-                break;
-            case STEREO_PROFILE_CMD:
-                addMessage(I18n.msg("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
-                break;
-            case FRAME_OUTPUT_CMD:
-                boolean activated = (Boolean) data[0];
-                if (activated) {
-                    addMessage(I18n.msg("notif.activated", I18n.msg("element.frameoutput")));
-                } else {
-                    addMessage(I18n.msg("notif.deactivated", I18n.msg("element.frameoutput")));
-                }
-                break;
-            case SCREEN_NOTIFICATION_CMD:
-                String title = (String) data[0];
-                String[] msgs = (String[]) data[1];
-
-                // Log to output
-                addMessage(title);
-                for (String msg : msgs)
-                    addMessage(msg);
-
-                break;
-            case MODE_POPUP_CMD:
-                ModePopupInfo mpi = (ModePopupInfo) data[0];
-                if (mpi != null && Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
-                    addMessage(mpi.title);
-                    addMessage(mpi.header);
-                    for (Pair<String[], String> p : mpi.mappings) {
-                        String[] keys = p.getFirst();
-                        String action = p.getSecond();
-                        if (keys != null && keys.length > 0 && action != null && !action.isEmpty()) {
-                            StringBuilder msg = new StringBuilder();
-                            msg.append("<");
-                            for (int i = 0; i < keys.length; i++) {
-                                msg.append(keys[i].toUpperCase());
-                                if (i < keys.length - 1) {
-                                    msg.append("+");
-                                }
+                    for (int i = startIndex; i < dat.length; i++) {
+                        if (i == dat.length - 1 && dat[i] instanceof Boolean) {
+                            permanent = (Boolean) dat[i];
+                        } else {
+                            message.append(dat[i].toString());
+                            if (i < dat.length - 1 && !(i == dat.length - 2 && dat[dat.length - 1] instanceof Boolean)) {
+                                message.append(TAG_SEPARATOR);
                             }
-                            msg.append("> ").append(action);
-                            addMessage(msg.toString());
                         }
                     }
-                }
-                break;
-            default:
-                break;
+                    addMessage(message.toString(), permanent, level);
+                    break;
+                case FOCUS_CHANGED:
+                    if (data[0] != null) {
+                        if (data[0] instanceof String) {
+                            addMessage(I18n.msg("notif.camerafocus", data[0]));
+                        } else {
+                            var focus = (FocusView) data[0];
+                            addMessage(I18n.msg("notif.camerafocus", focus.getName()));
+                        }
+                    }
+                    break;
+                case TIME_STATE_CMD:
+                    Boolean bool = (Boolean) data[0];
+                    if (bool == null) {
+                        addMessage(I18n.msg("notif.toggle", I18n.msg("gui.time")));
+                    } else {
+                        addMessage(I18n.msg("notif.simulation." + (bool ? "resume" : "pause")));
+                    }
+                    break;
+                case TOGGLE_VISIBILITY_CMD:
+                    if (data.length == 2)
+                        addMessage(I18n.msg("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.msg((String) data[0])));
+                    else
+                        addMessage(I18n.msg("notif.visibility.toggle", I18n.msg((String) data[0])));
+                    break;
+                case FOCUS_LOCK_CMD:
+                case ORIENTATION_LOCK_CMD:
+                case OCTREE_PARTICLE_FADE_CMD:
+                    addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
+                    break;
+                case CAMERA_MODE_CMD:
+                    CameraMode cm = (CameraMode) data[0];
+                    if (cm != CameraMode.FOCUS_MODE)
+                        addMessage(I18n.msg("notif.cameramode.change", data[0]));
+                    break;
+                case TIME_WARP_CHANGED_INFO:
+                    addMessage(I18n.msg("notif.timepace.change", data[0]));
+                    break;
+                case FOV_CHANGE_NOTIFICATION:
+                    // addMessage("Field of view changed to " + (float) data[0]);
+                    break;
+                case JAVA_EXCEPTION:
+                    Throwable t = (Throwable) data[0];
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    t.printStackTrace(pw);
+                    String stackTrace = sw.toString();
+                    if (data.length == 1) {
+                        if (I18n.messages != null)
+                            addMessage(I18n.msg("notif.error", stackTrace));
+                        else
+                            addMessage("Error: " + stackTrace);
+                    } else {
+                        if (I18n.messages != null)
+                            addMessage(I18n.msg("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
+                        else
+                            addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
+                    }
+                    break;
+                case ORBIT_DATA_LOADED:
+                    addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, LoggerLevel.DEBUG);
+                    break;
+                case SCREENSHOT_INFO:
+                    addMessage(I18n.msg("notif.screenshot", data[0]));
+                    break;
+                case STEREOSCOPIC_CMD:
+                    addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
+                    break;
+                case DISPLAY_GUI_CMD:
+                    boolean displayGui = (Boolean) data[0];
+                    addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
+                    break;
+                case STEREO_PROFILE_CMD:
+                    addMessage(I18n.msg("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
+                    break;
+                case FRAME_OUTPUT_CMD:
+                    boolean activated = (Boolean) data[0];
+                    if (activated) {
+                        addMessage(I18n.msg("notif.activated", I18n.msg("element.frameoutput")));
+                    } else {
+                        addMessage(I18n.msg("notif.deactivated", I18n.msg("element.frameoutput")));
+                    }
+                    break;
+                case SCREEN_NOTIFICATION_CMD:
+                    String title = (String) data[0];
+                    String[] msgs = (String[]) data[1];
+
+                    // Log to output
+                    addMessage(title);
+                    for (String msg : msgs)
+                        addMessage(msg);
+
+                    break;
+                case MODE_POPUP_CMD:
+                    ModePopupInfo mpi = (ModePopupInfo) data[0];
+                    if (mpi != null && Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
+                        addMessage(mpi.title);
+                        addMessage(mpi.header);
+                        for (Pair<String[], String> p : mpi.mappings) {
+                            String[] keys = p.getFirst();
+                            String action = p.getSecond();
+                            if (keys != null && keys.length > 0 && action != null && !action.isEmpty()) {
+                                StringBuilder msg = new StringBuilder();
+                                msg.append("<");
+                                for (int i = 0; i < keys.length; i++) {
+                                    msg.append(keys[i].toUpperCase());
+                                    if (i < keys.length - 1) {
+                                        msg.append("+");
+                                    }
+                                }
+                                msg.append("> ").append(action);
+                                addMessage(msg.toString());
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

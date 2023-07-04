@@ -91,7 +91,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      **/
     private final float[] ambientColor = new float[]{-1f, -1f, -1f, -1f};
     private boolean modelInitialised, modelLoading;
-    private boolean useColor = true;
+    private boolean useColor = false;
     /**
      * The blend mode
      **/
@@ -426,12 +426,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void addColorToMaterial() {
-        if (cc != null && useColor) {
+        if (cc != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material material = instance.materials.get(i);
-                // Only set color if not already there.
-                if (!material.has(ColorAttribute.Diffuse)) {
+                // Only set color if useColor is true or the material does not have it yet.
+                if (useColor || !material.has(ColorAttribute.Diffuse)) {
                     material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
                     if (!culling) {
                         material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
@@ -692,15 +692,23 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void setUsecolor(String usecolor) {
+       setUseColor(usecolor);
+    }
+
+    public void setUseColor(String useColor) {
         try {
-            this.useColor = Boolean.parseBoolean(usecolor);
+            this.useColor = Boolean.parseBoolean(useColor);
         } catch (Exception ignored) {
         }
     }
 
     public void setUsecolor(Boolean usecolor) {
+        setUseColor(usecolor);
+    }
+
+    public void setUseColor(Boolean useColor) {
         try {
-            this.useColor = usecolor;
+            this.useColor = useColor;
         } catch (Exception ignored) {
         }
     }

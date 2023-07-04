@@ -3769,6 +3769,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     model.model.setPrimitiveType(primitiveInt);
                     model.model.setParams(params);
                     model.model.setStaticLight(true);
+                    model.model.setUseColor(true);
                     model.model.setBlendMode(BlendMode.ADDITIVE);
 
                     var rt = Mapper.renderType.get(newShape);
