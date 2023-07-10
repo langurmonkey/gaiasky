@@ -7,6 +7,12 @@
 
 package gaiasky.util;
 
+/**
+ * Data type that holds two objects.
+ *
+ * @param <A> The first object type.
+ * @param <B> The second object type.
+ */
 public class Pair<A, B> {
     private A first;
     private B second;

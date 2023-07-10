@@ -7,6 +7,9 @@
 
 package gaiasky.util;
 
+/**
+ * Constants in nature.
+ */
 public class Nature {
 
     /*

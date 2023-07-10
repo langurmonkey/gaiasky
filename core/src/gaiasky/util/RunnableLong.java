@@ -7,6 +7,9 @@
 
 package gaiasky.util;
 
+/**
+ * A runnable that takes in a long integer as parameter.
+ */
 public interface RunnableLong {
 
     void run(long a);

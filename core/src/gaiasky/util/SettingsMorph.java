@@ -45,6 +45,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 
+/**
+ * Convert old settings (properties files) to new settings (YAML-based).
+ */
 public class SettingsMorph {
 
     /**

@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Manages slave Gaia Sky instances that connect to master instances.
+ * Manager for slave Gaia Sky instances that connect to master instances.
  */
 public class SlaveManager {
     private static final Log logger = Logger.getLogger(SlaveManager.class);

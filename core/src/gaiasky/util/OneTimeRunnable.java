@@ -10,6 +10,9 @@ package gaiasky.util;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 
+/**
+ * A process that is parked and runs only once before it is removed.
+ */
 public abstract class OneTimeRunnable implements Runnable {
     private final String name;
 

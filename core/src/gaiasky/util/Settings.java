@@ -48,6 +48,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
 
+/**
+ * Holds the settings of Gaia Sky. This class has a near 1-to-1 mapping to the configuration file, conf.yaml.
+ */
 public class Settings {
 
     /*

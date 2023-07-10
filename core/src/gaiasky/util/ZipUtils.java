@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Little zipping and unzipping handy functions.
+ */
 public class ZipUtils {
     private static final Logger.Log logger = Logger.getLogger(ZipUtils.class);
 

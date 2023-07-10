@@ -13,6 +13,9 @@ import gaiasky.event.EventManager;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The Gaia Sky logger.
+ */
 public class Logger {
 
     private static final Map<String, Log> logObjects;

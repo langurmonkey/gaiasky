@@ -27,6 +27,9 @@ import java.net.http.HttpResponse.BodySubscriber;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Manager for Gaia Sky master instances.
+ */
 public class MasterManager implements IObserver {
     private static final Log logger = Logger.getLogger(MasterManager.class);
 

@@ -16,6 +16,9 @@ import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.graphics.TextureView;
 
+/**
+ * Contains common functions used by render systems.
+ */
 public class RenderUtils {
 
     /**

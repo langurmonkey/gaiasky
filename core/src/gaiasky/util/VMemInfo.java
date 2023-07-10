@@ -13,6 +13,9 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.NVXGPUMemoryInfo;
 import org.lwjgl.opengl.WGLAMDGPUAssociation;
 
+/**
+ * Gathers and provides information on video memory.
+ */
 public class VMemInfo {
     private static final Log logger = Logger.getLogger(VMemInfo.class);
 

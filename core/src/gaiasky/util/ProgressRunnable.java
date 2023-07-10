@@ -7,6 +7,9 @@
 
 package gaiasky.util;
 
+/**
+ * Runnable to update the progress of an operation.
+ */
 public interface ProgressRunnable {
     /**
      * Informs of progress

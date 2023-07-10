@@ -9,6 +9,9 @@ package gaiasky.util;
 
 import java.lang.management.ManagementFactory;
 
+/**
+ * Provides information on system memory data.
+ */
 public class MemInfo {
 
     /**
@@ -43,8 +46,8 @@ public class MemInfo {
      * The total amount of RAM memory in the system, in MB.
      */
     public static double getTotalRam() {
-        com.sun.management.OperatingSystemMXBean mxbean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        return mxbean.getTotalPhysicalMemorySize() * Constants.BYTE_TO_MB;
+        com.sun.management.OperatingSystemMXBean mxBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        return mxBean.getTotalMemorySize() * Constants.BYTE_TO_MB;
     }
 
 }

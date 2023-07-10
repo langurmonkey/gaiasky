@@ -36,6 +36,9 @@ import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.Properties;
 
+/**
+ * Contains utilities to initialize and manage the Gaia Sky {@link Settings} objects.
+ */
 public class SettingsManager {
     private static final Logger.Log logger = Logger.getLogger(SettingsManager.class);
 

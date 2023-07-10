@@ -15,23 +15,22 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-@SuppressWarnings("unchecked")
 public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
     public int size;
     /**
      * Used by {@link #place(Object)} to bit shift the upper bits of a {@code long} into a usable range (&gt;= 0 and &lt;=
      * {@link #mask}). The shift can be negative, which is convenient to match the number of bits in mask: if mask is a 7-bit
      * number, a shift of -7 shifts the upper 7 bits into the lowest 7 positions. This class sets the shift &gt; 32 and &lt; 64,
-     * which if used with an int will still move the upper bits of an int to the lower bits due to Java's implicit modulus on
+     * which, if used with an int, will still move the upper bits of an int to the lower bits due to Java's implicit modulus on
      * shifts.
      * <p>
-     * {@link #mask} can also be used to mask the low bits of a number, which may be faster for some hashcodes, if
+     * {@link #mask} can also be used to mask the low bits of a number, which may be faster for some hash codes, if
      * {@link #place(Object)} is overridden.
      */
     protected int shift;
     /**
-     * A bitmask used to confine hashcodes to the size of the table. Must be all 1 bits in its low positions, ie a power of two
-     * minus 1. If {@link #place(Object)} is overriden, this can be used instead of {@link #shift} to isolate usable bits of a
+     * A bitmask used to confine hash codes to the size of the table. Must be all 1 bit in its low positions, ie a power of two
+     * minus 1. If {@link #place(Object)} is overwritten, this can be used instead of {@link #shift} to isolate usable bits of a
      * hash.
      */
     protected int mask;

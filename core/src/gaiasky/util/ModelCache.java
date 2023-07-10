@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Caches models of type {@link IntModel} by type and parameters.
+ */
 public class ModelCache {
     /** Model cache **/
     public static ModelCache cache = new ModelCache();
