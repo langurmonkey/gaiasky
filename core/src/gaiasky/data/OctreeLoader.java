@@ -46,6 +46,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Loads Gaia Sky LOD datasets backed by an octree.
+ */
 public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOctantLoader {
     /**
      * Data will be preloaded at startup down to this octree depth.

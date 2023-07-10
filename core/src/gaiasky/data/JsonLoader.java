@@ -37,6 +37,9 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.*;
 
+/**
+ * Main JSON loader. Loads Gaia Sky dataset definition files written in JSON.
+ */
 public class JsonLoader extends AbstractSceneLoader {
     private static final Logger.Log logger = Logger.getLogger(JsonLoader.class);
 
@@ -134,7 +137,7 @@ public class JsonLoader extends AbstractSceneLoader {
                 logger.info(I18n.msg("notif.nodeloader", loaded, filePath));
             } else if (root.has("updates")) {
                 // If the top element is 'updates', we update existing objects with additional attributes.
-                // Store updates and run them afterwards.
+                // Store updates and run them afterward.
                 updates.add(root);
                 updateFiles.add(file);
             }

@@ -18,7 +18,6 @@ public class RealTimeClock implements ITimeFrameProvider {
 
     private double dt;
     private long time;
-    private double dtHours;
     private double lastUpdate = 0;
 
     public RealTimeClock() {
@@ -46,7 +45,7 @@ public class RealTimeClock implements ITimeFrameProvider {
     @Override
     public void update(double dt) {
         this.dt = dt;
-        this.dtHours = dt * SEC_TO_HOUR;
+        double dtHours = dt * SEC_TO_HOUR;
         time = TimeUtils.millis();
 
         // Post event each 1/2 second

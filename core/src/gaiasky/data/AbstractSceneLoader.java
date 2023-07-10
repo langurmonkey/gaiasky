@@ -16,6 +16,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Abstract implementation of {@link ISceneLoader}, which contains some common utilities to all implementers.
+ */
 public abstract class AbstractSceneLoader implements ISceneLoader {
 
     // Contains all the files to be loaded by this loader.

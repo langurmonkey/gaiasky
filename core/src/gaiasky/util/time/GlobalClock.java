@@ -20,6 +20,10 @@ import gaiasky.util.Settings;
 import java.time.Instant;
 import java.util.Arrays;
 
+/**
+ * Implementation of a time frame provider that provides simulation times governed by a warp value, which informs
+ * the speed at which time passes.
+ */
 public class GlobalClock implements IObserver, ITimeFrameProvider {
     private static final Log logger = Logger.getLogger(GlobalClock.class);
 
@@ -47,7 +51,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     /**
      * Represents the time wrap multiplier. Scales the real time
      **/
-    private double timeWarp = 1;
+    private double timeWarp;
     // Seconds since last event POST
     private float lastUpdate = 1;
 

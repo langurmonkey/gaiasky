@@ -12,15 +12,20 @@ import com.badlogic.gdx.assets.AssetManager;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes" })
 public class AssetBean {
-    private static final Set<AssetBean> assetDescriptors;
-    private static AssetManager assetManager;
 
-    static {
-        assetDescriptors = new HashSet<>();
-    }
+    /**
+     * Asset descriptors set.
+     */
+    private static final Set<AssetBean> assetDescriptors = new HashSet<>();
+
+    /**
+     * Reference to the main asset manager.
+     */
+    private static final AtomicReference<AssetManager> assetManager = new AtomicReference<>();
 
     private final String assetName;
     private final Class assetClass;
@@ -41,7 +46,7 @@ public class AssetBean {
         if (assetManager == null) {
             assetDescriptors.add(new AssetBean(assetName, assetClass));
         } else {
-            assetManager.load(assetName, assetClass);
+            assetManager.get().load(assetName, assetClass);
         }
     }
 
@@ -49,7 +54,7 @@ public class AssetBean {
         if (assetManager == null) {
             assetDescriptors.add(new AssetBean(assetName, assetClass, params));
         } else {
-            assetManager.load(assetName, assetClass, params);
+            assetManager.get().load(assetName, assetClass, params);
         }
     }
 
@@ -58,11 +63,11 @@ public class AssetBean {
     }
 
     public static void setAssetManager(AssetManager manager) {
-        AssetBean.assetManager = manager;
+        AssetBean.assetManager.set(manager);
     }
 
     public static AssetManager manager() {
-        return assetManager;
+        return assetManager.get();
     }
 
     /**

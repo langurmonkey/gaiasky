@@ -23,6 +23,9 @@ import gaiasky.util.i18n.I18n;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
+/**
+ * GeoJSON data loader.
+ */
 public class GeoJsonLoader extends AbstractSceneLoader {
     private static final Logger.Log logger = Logger.getLogger(GeoJsonLoader.class);
 
@@ -56,7 +59,7 @@ public class GeoJsonLoader extends AbstractSceneLoader {
     }
 
     private Entity loadJsonObject(JsonValue json) {
-        String className = "gaiasky.scenegraph.Area";
+        String className = "Area";
         if (!scene.archetypes().contains(className)) {
             // Do not know what to do
             if (!loggedArchetypes.contains(className)) {
@@ -80,24 +83,24 @@ public class GeoJsonLoader extends AbstractSceneLoader {
 
             JsonValue jsonArray = json.get("geometry").get("coordinates");
 
-            JsonValue firstelem;
+            JsonValue firstElement;
             int size;
             int d;
 
             int depth = depth(jsonArray);
 
             if (depth == 4) {
-                firstelem = jsonArray.child;
+                firstElement = jsonArray.child;
                 size = jsonArray.size;
                 d = 1;
             } else {
-                firstelem = jsonArray.child;
+                firstElement = jsonArray.child;
                 size = jsonArray.size;
                 d = 2;
             }
 
             // Set to component
-            perimeter.setPerimeter(convertToDoubleArray(firstelem, size, d));
+            perimeter.setPerimeter(convertToDoubleArray(firstElement, size, d));
 
             return entity;
         }
