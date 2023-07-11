@@ -205,7 +205,7 @@
                     </property>
                     <property name="imageFile">
                       <object class="com.install4j.api.beans.ExternalFile">
-                        <string>@gs-git-folder@/assets/img/installer-img.png</string>
+                        <string>@gs-git-folder@/assets/img/installer-img.jpg</string>
                       </object>
                     </property>
                   </serializedBean>
@@ -389,7 +389,7 @@ return console.askOkCancel(message, true);
                     </property>
                     <property name="imageFile">
                       <object class="com.install4j.api.beans.ExternalFile">
-                        <string>@gs-git-folder@/assets/img/installer-img.png</string>
+                        <string>@gs-git-folder@/assets/img/installer-img.jpg</string>
                       </object>
                     </property>
                   </serializedBean>
@@ -426,7 +426,7 @@ return console.askOkCancel(message, true);
                 </property>
                 <property name="imageFile">
                   <object class="com.install4j.api.beans.ExternalFile">
-                    <string>@gs-git-folder@/assets/img/installer-img.png</string>
+                    <string>@gs-git-folder@/assets/img/installer-img.jpg</string>
                   </object>
                 </property>
               </serializedBean>
@@ -457,7 +457,7 @@ return console.askOkCancel(message, true);
                     </property>
                     <property name="imageFile">
                       <object class="com.install4j.api.beans.ExternalFile">
-                        <string>@gs-git-folder@/assets/img/installer-img.png</string>
+                        <string>@gs-git-folder@/assets/img/installer-img.jpg</string>
                       </object>
                     </property>
                   </serializedBean>
@@ -512,7 +512,7 @@ return console.askYesNo(message, true);
                     </property>
                     <property name="imageFile">
                       <object class="com.install4j.api.beans.ExternalFile">
-                        <string>@gs-git-folder@/assets/img/installer-img.png</string>
+                        <string>@gs-git-folder@/assets/img/installer-img.jpg</string>
                       </object>
                     </property>
                   </serializedBean>
