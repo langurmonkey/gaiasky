@@ -135,7 +135,9 @@ public class AboutWindow extends GenericDialog {
         gaiaSkyIcon.setOrigin(Align.center);
 
         // Add all to content
-        contentHelp.add(gaiasky).pad(pad18).padTop(pad34).padBottom(pad18 * 5f).colspan(2);
+        contentHelp.add(gaiaSkyIcon).colspan(2).padTop(pad34).align(Align.center);
+        contentHelp.row();
+        contentHelp.add(gaiasky).pad(pad18).padBottom(pad18 * 5f).colspan(2);
         contentHelp.row();
         contentHelp.add(homepageTitle).align(Align.left).padRight(pad34);
         contentHelp.add(homepageTxt).align(Align.left);
@@ -148,8 +150,6 @@ public class AboutWindow extends GenericDialog {
         contentHelp.row();
         contentHelp.add(new OwnLabel("", skin)).padBottom(pad18 * 4f);
         contentHelp.add(docsLink).align(Align.left).padBottom(pad18 * 4f);
-        contentHelp.row();
-        contentHelp.add(gaiaSkyIcon).colspan(2).align(Align.center);
         contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
