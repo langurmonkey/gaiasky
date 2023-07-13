@@ -32,7 +32,7 @@ public class Label implements Component {
     public boolean forceLabel = false;
     /** Factor to apply to the size of the label. **/
     public float labelFactor = 0;
-    /** Internal rednering factor **/
+    /** Internal rendering factor **/
     public float labelMax;
     /** Scale parameter for distance field fonts. **/
     public float textScale = -1;

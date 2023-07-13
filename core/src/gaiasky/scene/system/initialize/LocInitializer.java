@@ -33,7 +33,7 @@ public class LocInitializer extends AbstractInitSystem {
 
         graph.mustUpdateFunction = GraphUpdater::mustUpdateLoc;
 
-        label.label = false;
+        label.label = true;
         label.labelMax = 1;
         label.textScale = 1e-7f;
         label.renderConsumer = LabelEntityRenderSystem::renderLocation;

@@ -39,7 +39,6 @@ import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -66,6 +65,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var starSet = Mapper.starSet.get(entity);
         var focus = Mapper.focus.get(entity);
         var transform = Mapper.transform.get(entity);
+        var label = Mapper.label.get(entity);
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateParticleSet;
@@ -73,11 +73,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
         // Initialize particle set
         if (starSet == null) {
-            initializeCommon(base, particleSet);
-            initializeParticleSet(entity, particleSet, transform);
+            initializeCommon(base, particleSet, label);
+            initializeParticleSet(entity, particleSet, label, transform);
         } else {
-            initializeCommon(base, starSet);
-            initializeStarSet(entity, starSet, transform);
+            initializeCommon(base, starSet, label);
+            initializeStarSet(entity, starSet, label, transform);
         }
     }
 
@@ -122,8 +122,16 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
     }
 
+    /**
+     * Initializes the common parts of particles and star sets.
+     *
+     * @param base  The base component.
+     * @param set   The set.
+     * @param label The label component.
+     */
     private void initializeCommon(Base base,
-                                  ParticleSet set) {
+                                  ParticleSet set,
+                                  Label label) {
         if (base.id < 0) {
             base.id = ParticleSet.idSeq++;
         }
@@ -146,6 +154,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.forceLabel = new HashSet<>();
         set.labelColors = new HashMap<>();
 
+        // Labels.
+        label.label = true;
+        label.textScale = 0.5f;
+        label.renderFunction = LabelView::renderTextBase;
+
         // Textures.
         AssetManager manager = AssetBean.manager();
         if (set.textureFiles != null) {
@@ -157,7 +170,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 if (Files.exists(galLocationPath)) {
                     if (Files.isDirectory(galLocationPath)) {
                         // Directory.
-                        Collection<File> galaxyFiles = FileUtils.listFiles(galLocationPath.toFile(), new String[] { "png", "jpeg", "jpg" }, true);
+                        Collection<File> galaxyFiles = FileUtils.listFiles(galLocationPath.toFile(), new String[]{"png", "jpeg", "jpg"}, true);
                         if (!galaxyFiles.isEmpty()) {
                             for (File f : galaxyFiles) {
                                 actualFilePaths.add(f.getAbsolutePath());
@@ -181,10 +194,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      *
      * @param entity    The entity.
      * @param set       The particle set.
+     * @param label     The label component.
      * @param transform The transform.
      */
     private void initializeParticleSet(Entity entity,
                                        ParticleSet set,
+                                       Label label,
                                        RefSysTransform transform) {
         set.isStars = false;
         boolean initializeData = set.pointData == null;
@@ -215,13 +230,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         setLabelPosition(entity);
 
         // Labels.
-        var label = Mapper.label.get(entity);
-        label.label = true;
-        label.textScale = 0.5f;
         label.labelMax = 1;
         label.labelFactor = 1e-3f;
         label.renderConsumer = LabelEntityRenderSystem::renderParticleSet;
-        label.renderFunction = LabelView::renderTextBase;
         set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.particleGroups.numLabels;
 
         // Model.
@@ -236,10 +247,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      *
      * @param entity    The entity.
      * @param set       The star set.
+     * @param label     The label component.
      * @param transform The transform.
      */
     public void initializeStarSet(Entity entity,
                                   StarSet set,
+                                  Label label,
                                   RefSysTransform transform) {
         set.isStars = true;
         set.isExtended = false;
@@ -272,8 +285,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         }
 
         // Labels.
-        var label = Mapper.label.get(entity);
-        label.textScale = 0.5f;
         label.renderConsumer = LabelEntityRenderSystem::renderStarSet;
         label.renderFunction = LabelView::renderTextBase;
         set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.star.group.numLabel;

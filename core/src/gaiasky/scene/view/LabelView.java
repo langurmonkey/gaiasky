@@ -248,7 +248,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public boolean isLabel() {
-        return label != null ? label.label : true;
+        return label == null || label.label;
     }
 
     @Override
