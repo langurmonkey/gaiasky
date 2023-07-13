@@ -7,7 +7,9 @@
 
 package gaiasky.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -181,9 +183,9 @@ public class DecalUtils {
     }
 
     public static void drawFont2D(BitmapFont font, ExtSpriteBatch batch, RenderingContext rc, String text, float x, float y, float scale, int align) {
-        // Save
-        float scalex = font.getData().scaleX;
-        float scaley = font.getData().scaleY;
+        // Backup font scale and matrix.
+        float scaleXBak = font.getData().scaleX;
+        float scaleYBak = font.getData().scaleY;
         aux1.set(batch.getProjectionMatrix());
 
         batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h());
@@ -195,9 +197,9 @@ public class DecalUtils {
             font.draw(batch, text, x, y);
         }
 
-        // Restore
+        // Restore font scale and matrix.
         batch.setProjectionMatrix(aux1);
-        font.getData().setScale(scalex, scaley);
+        font.getData().setScale(scaleXBak, scaleYBak);
 
     }
 
