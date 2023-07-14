@@ -21,6 +21,7 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
+import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
@@ -47,7 +48,8 @@ public class CameraManager implements ICamera, IObserver {
     public FovCamera fovCamera;
     public SpacecraftCamera spacecraftCamera;
     public RelativisticCamera relativisticCamera;
-    public Entity previousClosest;
+    private final FocusView focusView;
+    public IFocus previousClosest;
     /**
      * Current velocity in km/h
      **/
@@ -66,6 +68,7 @@ public class CameraManager implements ICamera, IObserver {
         this.relativisticCamera = new RelativisticCamera(manager, this);
 
         this.cameras = new ICamera[]{naturalCamera, fovCamera, spacecraftCamera};
+        this.focusView = new FocusView();
 
         this.mode = mode;
         this.lastPos = new Vector3d();
@@ -336,10 +339,14 @@ public class CameraManager implements ICamera, IObserver {
         IFocus newClosest = getClosest();
         EventManager.publish(Event.CAMERA_CLOSEST_INFO, this, newClosest, getClosestBody(), getClosestParticle());
 
-        // This is not an error, FocusView overrides equals() and checks whether the compared object is an Entity.
         if (!newClosest.equals(previousClosest)) {
             EventManager.publish(Event.CAMERA_NEW_CLOSEST, this, newClosest);
-            previousClosest = ((FocusView) newClosest).getEntity();
+            if (newClosest instanceof FocusView) {
+                focusView.setEntity(((FocusView) newClosest).getEntity());
+                previousClosest = focusView;
+            } else if (newClosest instanceof Proximity.NearbyRecord) {
+                previousClosest = newClosest;
+            }
         }
     }
 

@@ -838,10 +838,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public boolean equals(Object other) {
         if (other instanceof FocusView) {
             return this.entity == ((FocusView) other).getEntity();
-        } else if(other instanceof Entity) {
-            return this.entity == ((Entity) other);
         }
-
         return false;
 
     }
@@ -909,6 +906,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      */
     public boolean isSet() {
         return particleSet != null || starSet != null;
+    }
+
+    public boolean isStarSet() {
+        return starSet != null;
     }
 
     public ParticleSet getSet() {
@@ -1123,6 +1124,24 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public boolean isPlanet() {
         return isValid() && base.archetype != null && base.archetype.getName().equals("Planet");
+    }
+
+    /**
+     * Returns true if this focus is a single star.
+     *
+     * @return True if this is a single star.
+     */
+    public boolean isSingleStar() {
+        return isValid() && base.archetype != null && base.archetype.getName().equals("Star");
+    }
+
+    /**
+     * Returns whether this focus is a star of any kind (set or single).
+     *
+     * @return True if the focus is a star.
+     */
+    public boolean isStar() {
+        return isValid() && (isStarSet() || isSingleStar());
     }
 
     private Array<Entity> getOctreeObjects(OctreeNode node,

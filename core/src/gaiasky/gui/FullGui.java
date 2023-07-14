@@ -359,184 +359,176 @@ public class FullGui extends AbstractGui {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case SHOW_PROCEDURAL_GEN_ACTION:
-            FocusView planet = (FocusView) data[0];
-            Actor w = findActor("procedural-window");
-            // Only one instance
-            if (w != null && w.hasParent()) {
-                if (!w.isVisible())
-                    w.setVisible(true);
-            } else {
-                ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
-                proceduralWindow.setName("procedural-window");
-                proceduralWindow.show(stage);
-            }
-            break;
-        case SHOW_LAND_AT_LOCATION_ACTION:
-            var target = (FocusView) data[0];
-            LandAtWindow landAtLocation = new LandAtWindow(target.getEntity(), stage, skin);
-            landAtLocation.show(stage);
-            break;
-        case SHOW_PLAYCAMERA_ACTION:
-            FileChooser fc = new FileChooser(I18n.msg("gui.camera.title"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
-            fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-            fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
-            fc.setAcceptText(I18n.msg("gui.camera.run"));
-            fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
-            fc.setAcceptedFiles("*.dat, *.gsc");
-            fc.setResultListener((success, result) -> {
-                if (success) {
-                    if (Files.exists(result) && Files.exists(result)) {
-                        EventManager.publish(PLAY_CAMERA_CMD, fc, result);
-                        return true;
-                    } else {
-                        logger.error("Selection must be a file: " + result.toAbsolutePath());
-                    }
+            case SHOW_PROCEDURAL_GEN_ACTION -> {
+                FocusView planet = (FocusView) data[0];
+                Actor w = findActor("procedural-window");
+                // Only one instance
+                if (w != null && w.hasParent()) {
+                    if (!w.isVisible())
+                        w.setVisible(true);
+                } else {
+                    ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
+                    proceduralWindow.setName("procedural-window");
+                    proceduralWindow.show(stage);
                 }
-                return false;
-            });
-            fc.show(stage);
-            break;
-        case SHOW_LOG_ACTION:
-            if (logWindow == null) {
-                logWindow = new LogWindow(stage, skin);
             }
-            logWindow.update();
-            if (!logWindow.isVisible() || !logWindow.hasParent())
-                logWindow.show(stage);
-            break;
-        case UPDATE_WIKI_INFO_ACTION:
-            if (wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()) {
-                // Update
+            case SHOW_LAND_AT_LOCATION_ACTION -> {
+                var target = (FocusView) data[0];
+                LandAtWindow landAtLocation = new LandAtWindow(target.getEntity(), stage, skin);
+                landAtLocation.show(stage);
+            }
+            case SHOW_PLAYCAMERA_ACTION -> {
+                FileChooser fc = new FileChooser(I18n.msg("gui.camera.title"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
+                fc.setAcceptText(I18n.msg("gui.camera.run"));
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
+                fc.setAcceptedFiles("*.dat, *.gsc");
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (Files.exists(result) && Files.exists(result)) {
+                            EventManager.publish(PLAY_CAMERA_CMD, fc, result);
+                            return true;
+                        } else {
+                            logger.error("Selection must be a file: " + result.toAbsolutePath());
+                        }
+                    }
+                    return false;
+                });
+                fc.show(stage);
+            }
+            case SHOW_LOG_ACTION -> {
+                if (logWindow == null) {
+                    logWindow = new LogWindow(stage, skin);
+                }
+                logWindow.update();
+                if (!logWindow.isVisible() || !logWindow.hasParent())
+                    logWindow.show(stage);
+            }
+            case UPDATE_WIKI_INFO_ACTION -> {
+                if (wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()) {
+                    // Update
+                    String searchName = (String) data[0];
+                    wikiInfoWindow.update(searchName);
+                }
+            }
+            case SHOW_WIKI_INFO_ACTION -> {
                 String searchName = (String) data[0];
-                wikiInfoWindow.update(searchName);
+                if (wikiInfoWindow == null) {
+                    wikiInfoWindow = new WikiInfoWindow(stage, skin);
+                }
+                if (!wikiInfoWindow.isUpdating()) {
+                    wikiInfoWindow.update(searchName);
+                    if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
+                        wikiInfoWindow.show(stage);
+                }
             }
-            break;
-        case SHOW_WIKI_INFO_ACTION:
-            String searchName = (String) data[0];
-            if (wikiInfoWindow == null) {
-                wikiInfoWindow = new WikiInfoWindow(stage, skin);
+            case UPDATE_ARCHIVE_VIEW_ACTION -> {
+                if (archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()) {
+                    // Update
+                    FocusView starFocus = (FocusView) data[0];
+                    archiveViewWindow.update(starFocus);
+                }
             }
-            if (!wikiInfoWindow.isUpdating()) {
-                wikiInfoWindow.update(searchName);
-                if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
-                    wikiInfoWindow.show(stage);
-            }
-            break;
-        case UPDATE_ARCHIVE_VIEW_ACTION:
-            if (archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()) {
-                // Update
+            case SHOW_ARCHIVE_VIEW_ACTION -> {
                 FocusView starFocus = (FocusView) data[0];
+                if (archiveViewWindow == null) {
+                    archiveViewWindow = new ArchiveViewWindow(stage, skin);
+                }
                 archiveViewWindow.update(starFocus);
+                if (!archiveViewWindow.isVisible() || !archiveViewWindow.hasParent())
+                    archiveViewWindow.show(stage);
             }
-            break;
-        case SHOW_ARCHIVE_VIEW_ACTION:
-            FocusView starFocus = (FocusView) data[0];
-            if (archiveViewWindow == null) {
-                archiveViewWindow = new ArchiveViewWindow(stage, skin);
+            case REMOVE_KEYBOARD_FOCUS -> stage.setKeyboardFocus(null);
+            case REMOVE_GUI_COMPONENT -> {
+                String name = (String) data[0];
+                String method = "remove" + TextUtils.capitalise(name);
+                try {
+                    Method m = ClassReflection.getMethod(this.getClass(), method);
+                    m.invoke(this);
+                } catch (ReflectionException e) {
+                    logger.error(e);
+                }
+                rebuildGui();
             }
-            archiveViewWindow.update(starFocus);
-            if (!archiveViewWindow.isVisible() || !archiveViewWindow.hasParent())
-                archiveViewWindow.show(stage);
-            break;
-        case REMOVE_KEYBOARD_FOCUS:
-            stage.setKeyboardFocus(null);
-            break;
-        case REMOVE_GUI_COMPONENT:
-            String name = (String) data[0];
-            String method = "remove" + TextUtils.capitalise(name);
-            try {
-                Method m = ClassReflection.getMethod(this.getClass(), method);
-                m.invoke(this);
-            } catch (ReflectionException e) {
-                logger.error(e);
+            case ADD_GUI_COMPONENT -> {
+                String name = (String) data[0];
+                String method = "add" + TextUtils.capitalise(name);
+                try {
+                    Method m = ClassReflection.getMethod(this.getClass(), method);
+                    m.invoke(this);
+                } catch (ReflectionException e) {
+                    logger.error(e);
+                }
+                rebuildGui();
             }
-            rebuildGui();
-            break;
-        case ADD_GUI_COMPONENT:
-            name = (String) data[0];
-            method = "add" + TextUtils.capitalise(name);
-            try {
-                Method m = ClassReflection.getMethod(this.getClass(), method);
-                m.invoke(this);
-            } catch (ReflectionException e) {
-                logger.error(e);
-            }
-            rebuildGui();
-            break;
-        case RA_DEC_UPDATED:
-            if (Settings.settings.program.pointer.coordinates) {
-                Stage ui = pointerYCoord.getStage();
-                float uiScale = Settings.settings.program.ui.scale;
-                Double ra = (Double) data[0];
-                Double dec = (Double) data[1];
-                Integer x = (Integer) data[4];
-                Integer y = (Integer) data[5];
+            case RA_DEC_UPDATED -> {
+                if (Settings.settings.program.pointer.coordinates) {
+                    Stage ui = pointerYCoord.getStage();
+                    float uiScale = Settings.settings.program.ui.scale;
+                    Double ra = (Double) data[0];
+                    Double dec = (Double) data[1];
+                    Integer x = (Integer) data[4];
+                    Integer y = (Integer) data[5];
 
-                pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.ra", nf.format(ra)));
-                pointerXCoord.setPosition(x / uiScale, 1.6f);
-                pointerYCoord.setText(I18n.msg("gui.focusinfo.pointer.dec", nf.format(dec)));
-                pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
+                    pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.ra", nf.format(ra)));
+                    pointerXCoord.setPosition(x / uiScale, 1.6f);
+                    pointerYCoord.setText(I18n.msg("gui.focusinfo.pointer.dec", nf.format(dec)));
+                    pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
+                }
             }
-            break;
-        case LON_LAT_UPDATED:
-            if (Settings.settings.program.pointer.coordinates) {
-                Stage ui = pointerYCoord.getStage();
-                float uiScale = Settings.settings.program.ui.scale;
-                Double lon = (Double) data[0];
-                Double lat = (Double) data[1];
-                Integer x = (Integer) data[2];
-                Integer y = (Integer) data[3];
+            case LON_LAT_UPDATED -> {
+                if (Settings.settings.program.pointer.coordinates) {
+                    Stage ui = pointerYCoord.getStage();
+                    float uiScale = Settings.settings.program.ui.scale;
+                    Double lon = (Double) data[0];
+                    Double lat = (Double) data[1];
+                    Integer x = (Integer) data[2];
+                    Integer y = (Integer) data[3];
 
-                pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.lon", nf.format(lon)));
-                pointerXCoord.setPosition(x / uiScale, 1.6f);
-                pointerYCoord.setText(I18n.msg("gui.focusinfo.pointer.lat", nf.format(lat)));
-                pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
+                    pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.lon", nf.format(lon)));
+                    pointerXCoord.setPosition(x / uiScale, 1.6f);
+                    pointerYCoord.setText(I18n.msg("gui.focusinfo.pointer.lat", nf.format(lat)));
+                    pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
+                }
             }
-            break;
-        case DISPLAY_POINTER_COORDS_CMD:
-            Boolean display = (Boolean) data[0];
-            pointerXCoord.setVisible(display);
-            pointerYCoord.setVisible(display);
-            break;
-        case POPUP_MENU_FOCUS:
-            final Entity candidate = (Entity) data[0];
-            int screenX = Gdx.input.getX();
-            int screenY = Gdx.input.getY();
-
-            FocusView focusView = null;
-            if (candidate != null) {
-                view.setEntity(candidate);
-                focusView = view;
+            case DISPLAY_POINTER_COORDS_CMD -> {
+                Boolean display = (Boolean) data[0];
+                pointerXCoord.setVisible(display);
+                pointerYCoord.setVisible(display);
             }
-
-            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, focusView, catalogManager, scene);
-
-            int h = (int) getGuiStage().getHeight();
-
-            float px = screenX / Settings.settings.program.ui.scale;
-            float py = h - screenY / Settings.settings.program.ui.scale - 32f;
-
-            popup.showMenu(stage, px, py);
-
-            break;
-        case TOGGLE_MINIMAP:
-            if (Settings.settings.program.minimap.inWindow) {
-                toggleMinimapWindow(stage);
-            } else {
-                toggleMinimapInterface(stage);
+            case POPUP_MENU_FOCUS -> {
+                final Entity candidate = (Entity) data[0];
+                int screenX = Gdx.input.getX();
+                int screenY = Gdx.input.getY();
+                FocusView focusView = null;
+                if (candidate != null) {
+                    view.setEntity(candidate);
+                    focusView = view;
+                }
+                GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, focusView, catalogManager, scene);
+                int h = (int) getGuiStage().getHeight();
+                float px = screenX / Settings.settings.program.ui.scale;
+                float py = h - screenY / Settings.settings.program.ui.scale - 32f;
+                popup.showMenu(stage, px, py);
             }
-            break;
-        case SHOW_MINIMAP_ACTION:
-            boolean show = (Boolean) data[0];
-            if (Settings.settings.program.minimap.inWindow) {
-                showMinimapWindow(stage, show);
-            } else {
-                showMinimapInterface(stage, show);
+            case TOGGLE_MINIMAP -> {
+                if (Settings.settings.program.minimap.inWindow) {
+                    toggleMinimapWindow(stage);
+                } else {
+                    toggleMinimapInterface(stage);
+                }
             }
-            break;
-        default:
-            break;
+            case SHOW_MINIMAP_ACTION -> {
+                boolean show = (Boolean) data[0];
+                if (Settings.settings.program.minimap.inWindow) {
+                    showMinimapWindow(stage, show);
+                } else {
+                    showMinimapInterface(stage, show);
+                }
+            }
+            default -> {
+            }
         }
     }
 

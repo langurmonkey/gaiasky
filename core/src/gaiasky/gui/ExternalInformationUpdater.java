@@ -24,7 +24,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
-import gaiasky.scene.api.IStarFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -65,7 +64,7 @@ public class ExternalInformationUpdater {
         this.pad = pad;
     }
 
-    public void update(final IFocus focus) {
+    public void update(final FocusView focus) {
         GaiaSky.postRunnable(() -> {
             if (focus != null) {
                 logger.debug("Looking up network resources for '" + focus.getName() + "'");
@@ -75,13 +74,13 @@ public class ExternalInformationUpdater {
                 simbadCell = table.add().left();
 
                 // Add table
-                if (focus instanceof IStarFocus) {
+                if (focus.isStar()) {
                     EventManager.publish(Event.UPDATE_ARCHIVE_VIEW_ACTION, this, focus);
                     if (gaiaButton != null)
                         gaiaButton.remove();
                     gaiaButton = new OwnTextButton(I18n.msg("gui.focusinfo.archive"), skin);
                     gaiaButton.pad(pad / 3f, pad, pad / 3f, pad);
-                    gaiaButton.addListener(new GaiaButtonListener((IStarFocus) focus));
+                    gaiaButton.addListener(new GaiaButtonListener(focus));
                     gaiaButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.gaiaarchive"), skin));
                     gaiaCell.setActor(gaiaButton).padRight(pad);
                 } else {
@@ -149,12 +148,11 @@ public class ExternalInformationUpdater {
         });
     }
 
-    private void setSimbadLink(IFocus focus, LinkListener listener) {
-        if (focus instanceof IStarFocus) {
+    private void setSimbadLink(FocusView focus, LinkListener listener) {
+        if (focus.isStar()) {
             String url = Constants.URL_SIMBAD;
-            IStarFocus st = (IStarFocus) focus;
-            if (st.getHip() > 0) {
-                listener.ok(url + "HIP+" + st.getHip());
+            if (focus.getHip() > 0) {
+                listener.ok(url + "HIP+" + focus.getHip());
             } else {
                 listener.ko(null);
             }
@@ -245,9 +243,9 @@ public class ExternalInformationUpdater {
     }
 
     private static class GaiaButtonListener implements EventListener {
-        private final IStarFocus focus;
+        private final FocusView focus;
 
-        public GaiaButtonListener(IStarFocus focus) {
+        public GaiaButtonListener(FocusView focus) {
             super();
             this.focus = focus;
         }

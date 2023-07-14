@@ -9,8 +9,8 @@ package gaiasky.event;
 
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.api.IFocus;
-import gaiasky.scene.api.IStarFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 
 import static gaiasky.util.Settings.*;
@@ -1119,7 +1119,7 @@ public enum Event {
     UPDATE_WIKI_INFO_ACTION,
     /**
      * Shows a window with the Gaia or Hipparcos archive info for the object in the data,
-     * which must be a {@link IStarFocus}.
+     * which must be a {@link FocusView}.
      */
     SHOW_ARCHIVE_VIEW_ACTION,
     /** Updates the archive view if it is open. **/

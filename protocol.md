@@ -61,3 +61,11 @@ The actions are separated into rough categories.
     - With regular dataset: line width, number, length, arrow caps.
     - With LOD dataset: performance.
 
+## Location Log
+
+- Check that closest object is correctly added to the location log as the camera moves.
+
+## Info Windows
+
+- Select star and check that the archive info window works. Check that the links (JSON data, archive) at the top work.
+- Select a star or planet and check that the Wikipedia info window works.
