@@ -39,7 +39,7 @@ public class CameraManager implements ICamera, IObserver {
     private final Vector3 vec;
     private final Vector3 v0;
     private final Vector3 v1;
-    private final Vector3 isec;
+    private final Vector3 intersection;
     private final Matrix4 localTransformInv;
     public CameraMode mode;
     public ICamera current;
@@ -47,7 +47,7 @@ public class CameraManager implements ICamera, IObserver {
     public FovCamera fovCamera;
     public SpacecraftCamera spacecraftCamera;
     public RelativisticCamera relativisticCamera;
-    public IFocus previousClosest;
+    public Entity previousClosest;
     /**
      * Current velocity in km/h
      **/
@@ -65,7 +65,7 @@ public class CameraManager implements ICamera, IObserver {
         this.spacecraftCamera = new SpacecraftCamera(this);
         this.relativisticCamera = new RelativisticCamera(manager, this);
 
-        this.cameras = new ICamera[] { naturalCamera, fovCamera, spacecraftCamera };
+        this.cameras = new ICamera[]{naturalCamera, fovCamera, spacecraftCamera};
 
         this.mode = mode;
         this.lastPos = new Vector3d();
@@ -75,7 +75,7 @@ public class CameraManager implements ICamera, IObserver {
         this.vec = new Vector3();
         this.v0 = new Vector3();
         this.v1 = new Vector3();
-        this.isec = new Vector3();
+        this.intersection = new Vector3();
         this.velocity = new Vector3d();
         this.velocityNormalized = new Vector3d();
         this.localTransformInv = new Matrix4();
@@ -148,26 +148,26 @@ public class CameraManager implements ICamera, IObserver {
         AbstractCamera aux;
         // Update
         switch (mode) {
-        case GAME_MODE:
-            EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, false);
-        case FREE_MODE:
-        case FOCUS_MODE:
-            aux = backupCam(current);
-            current = naturalCamera;
-            restoreCam(naturalCamera, aux);
-            break;
-        case SPACECRAFT_MODE:
-            aux = backupCam(current);
-            current = spacecraftCamera;
-            restoreCam(spacecraftCamera, aux);
-            break;
-        case GAIA_FOV1_MODE:
-        case GAIA_FOV2_MODE:
-        case GAIA_FOVS_MODE:
-            current = fovCamera;
-            break;
-        default:
-            break;
+            case GAME_MODE:
+                EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, false);
+            case FREE_MODE:
+            case FOCUS_MODE:
+                aux = backupCam(current);
+                current = naturalCamera;
+                restoreCam(naturalCamera, aux);
+                break;
+            case SPACECRAFT_MODE:
+                aux = backupCam(current);
+                current = spacecraftCamera;
+                restoreCam(spacecraftCamera, aux);
+                break;
+            case GAIA_FOV1_MODE:
+            case GAIA_FOV2_MODE:
+            case GAIA_FOVS_MODE:
+                current = fovCamera;
+                break;
+            default:
+                break;
         }
 
     }
@@ -336,9 +336,10 @@ public class CameraManager implements ICamera, IObserver {
         IFocus newClosest = getClosest();
         EventManager.publish(Event.CAMERA_CLOSEST_INFO, this, newClosest, getClosestBody(), getClosestParticle());
 
-        if (newClosest != previousClosest) {
+        // This is not an error, FocusView overrides equals() and checks whether the compared object is an Entity.
+        if (!newClosest.equals(previousClosest)) {
             EventManager.publish(Event.CAMERA_NEW_CLOSEST, this, newClosest);
-            previousClosest = newClosest;
+            previousClosest = ((FocusView) newClosest).getEntity();
         }
     }
 
@@ -377,7 +378,7 @@ public class CameraManager implements ICamera, IObserver {
             if (current.hasFocus() && Mapper.atmosphere.has(((FocusView) current.getFocus()).getEntity())) {
                 FocusView e = (FocusView) current.getFocus();
                 double[] lonlat = new double[2];
-                boolean ok = CameraUtils.getLonLat(e, e.getEntity(), getCurrent(), screenX, screenY, v0, v1, vec, isec, in, out, localTransformInv, lonlat);
+                boolean ok = CameraUtils.getLonLat(e, e.getEntity(), getCurrent(), screenX, screenY, v0, v1, vec, intersection, in, out, localTransformInv, lonlat);
 
                 if (ok)
                     EventManager.publish(Event.LON_LAT_UPDATED, this, lonlat[0], lonlat[1], screenX, screenY);
@@ -407,16 +408,16 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case CAMERA_MODE_CMD -> {
-            CameraMode newCameraMode = (CameraMode) data[0];
-            boolean centerFocus = true;
-            if (data.length > 1)
-                centerFocus = (Boolean) data[1];
-            updateMode(current, this.mode, newCameraMode, centerFocus, true);
-        }
-        case FOV_CHANGE_NOTIFICATION -> updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        default -> {
-        }
+            case CAMERA_MODE_CMD -> {
+                CameraMode newCameraMode = (CameraMode) data[0];
+                boolean centerFocus = true;
+                if (data.length > 1)
+                    centerFocus = (Boolean) data[1];
+                updateMode(current, this.mode, newCameraMode, centerFocus, true);
+            }
+            case FOV_CHANGE_NOTIFICATION -> updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            default -> {
+            }
         }
 
     }
@@ -623,7 +624,6 @@ public class CameraManager implements ICamera, IObserver {
      * Stores the normalized rays representing the camera frustum in world space in a 4x4 matrix.  Each row is a vector.
      *
      * @param frustumCorners The matrix to fill
-     *
      * @return The same matrix
      */
     public Matrix4 getFrustumCornersWorld(Matrix4 frustumCorners) {

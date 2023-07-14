@@ -55,13 +55,14 @@ public class LocationLogManager implements IObserver {
         this.locations.clear();
     }
 
-    /*
+    /**
      * Starts capturing locations.
      * Must be called at some point during initialization, otherwise no locations will be captured.
      */
     public void startCapturing() {
-        if (!EventManager.instance.isSubscribedTo(this, Event.CAMERA_NEW_CLOSEST))
+        if (!EventManager.instance.isSubscribedTo(this, Event.CAMERA_NEW_CLOSEST)) {
             EventManager.instance.subscribe(this, Event.CAMERA_NEW_CLOSEST);
+        }
     }
 
     /**

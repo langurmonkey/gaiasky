@@ -1,18 +1,19 @@
-# Test protocol
+# GAIA SKY TEST PROTOCOL
+
 
 This document lists a sequence of actions to be performed in order to test the readiness of Gaia Sky for release. These are typically pain-points that have either failed in the past or are too obscure to be caught during the regular usage of the program during the testing phase.
 
 The actions are separated into rough categories.
 
 
-## Configuration file
+## Configuration File
 
 - Start Gaia Sky with non-existing configuration file.
 - Start Gaia Sky with blank (empty) configuration file.
 - Start Gaia Sky with non-existing data directory (`~/.local/share/gaiasky`).
 - If there is a version bump, check that the configuration file is updated.
 
-## Basic navigation
+## Basic Navigation
 
 - Check instant go-to command works (`Ctrl`+`g`).
     - Planets.
@@ -28,7 +29,7 @@ The actions are separated into rough categories.
     - Start time, check shape tracks object.
     - Remove all shapes.
 
-## Procedural generation
+## Procedural Generation
 
 - Load Exonia dataset.
 - Navigate to Exonia C, D, E and F, and check that the procedural generation works.
@@ -54,7 +55,7 @@ The actions are separated into rough categories.
 - Highlight (select) in Topcat, check action is reciprocated in Gaia Sky.
     - Same as above, but the other way around.
 
-## Velocity vectors
+## Velocity Vectors
 
 - Velocity vectors.
     - With regular dataset: line width, number, length, arrow caps.

@@ -48,32 +48,56 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     private final Vector3b B33 = new Vector3b();
     private final Matrix4 mataux = new Matrix4();
     private final Matrix4d matauxd = new Matrix4d();
-    /** Particle component, maybe. **/
+    /**
+     * Particle component, maybe.
+     **/
     protected ParticleExtra extra;
-    /** Focus component. **/
+    /**
+     * Focus component.
+     **/
     private Focus focus;
-    /** The graph component. **/
+    /**
+     * The graph component.
+     **/
     private GraphNode graph;
-    /** The octant component. **/
+    /**
+     * The octant component.
+     **/
     private Octant octant;
-    /** The magnitude component. **/
+    /**
+     * The magnitude component.
+     **/
     private Magnitude mag;
-    /** The particle set component, if any. **/
+    /**
+     * The particle set component, if any.
+     **/
     private ParticleSet particleSet;
-    /** The star set component, if any. **/
+    /**
+     * The star set component, if any.
+     **/
     private StarSet starSet;
-    /** The highlight component, initialized lazily. **/
+    /**
+     * The highlight component, initialized lazily.
+     **/
     private Highlight hl;
-    /** Implementation of pointer collision. **/
+    /**
+     * Implementation of pointer collision.
+     **/
     private final FocusHit focusHit;
-    /** Reference to the scene. **/
+    /**
+     * Reference to the scene.
+     **/
     private Scene scene;
-    /** The focus active computer. **/
+    /**
+     * The focus active computer.
+     **/
     private FocusActive focusActive;
     private FocusView auxView;
     private ModelUpdater updater;
 
-    /** Creates a focus view with the given scene. **/
+    /**
+     * Creates a focus view with the given scene.
+     **/
     public FocusView(Scene scene) {
         super();
         this.scene = scene;
@@ -82,7 +106,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         this.updater = new ModelUpdater(null, 0);
     }
 
-    /** Creates an empty focus view. **/
+    /**
+     * Creates an empty focus view.
+     **/
     public FocusView() {
         this((Scene) null);
     }
@@ -436,7 +462,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * when time is on
      *
      * @param time The current time
-     *
      * @return True if position should be recomputed for this entity
      */
     protected boolean mustUpdatePosition(ITimeFrameProvider time) {
@@ -807,6 +832,18 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         } else {
             return isForceLabel();
         }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof FocusView) {
+            return this.entity == ((FocusView) other).getEntity();
+        } else if(other instanceof Entity) {
+            return this.entity == ((Entity) other);
+        }
+
+        return false;
+
     }
 
     @Override
