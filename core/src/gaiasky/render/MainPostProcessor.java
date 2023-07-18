@@ -87,8 +87,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private Scene scene;
     private String starLensTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    final Vector3b auxb1 = new Vector3b(), auxb2 = new Vector3b(), prevCampos = new Vector3b();
-    final Vector3 auxf = new Vector3();
+    final Vector3b v3b1 = new Vector3b(), v3b2 = new Vector3b(), prevCampos = new Vector3b();
+    final Vector3 v3f1 = new Vector3();
     final Matrix4 prevViewProj = new Matrix4();
     final Matrix4 projection = new Matrix4(), combined = new Matrix4(), view = new Matrix4();
     final Matrix4 frustumCorners = new Matrix4();
@@ -879,8 +879,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                     var rmEntity = (Entity) rayMarchingDefinitions.get(key)[2];
                                     focusView.setScene(scene);
                                     focusView.setEntity(rmEntity);
-                                    focusView.getPredictedPosition(auxb2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
-                                    var camPos = auxb1.set(campos).sub(auxb2).put(auxf);
+                                    focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
+                                    var camPos = v3b1.set(campos).sub(v3b2).put(v3f1);
                                     Raymarching raymarching = (Raymarching) rmEffect;
                                     raymarching.setTime(secs);
                                     raymarching.setPos(camPos);

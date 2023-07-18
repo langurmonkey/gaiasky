@@ -7,7 +7,6 @@
 
 package gaiasky.util;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
@@ -19,7 +18,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.gui.BookmarksManager;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.MainPostProcessor;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
@@ -41,7 +39,7 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
         assets = new GaiaSkyAssets();
 
-        if(parameter.firstStage) {
+        if (parameter.firstStage) {
             // First stage async.
 
             // Tooltip to 1s
@@ -78,21 +76,15 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
             // Post processor.
             assets.postProcessor = new MainPostProcessor(null);
             assets.postProcessor.initialize(manager);
-        } else {
-            // Second stage async.
-
         }
     }
 
     @Override
     public GaiaSkyAssets loadSync(AssetManager manager, String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
-        if(parameter.firstStage) {
+        if (parameter.firstStage) {
             // First stage sync.
             assets.svtManager.doneLoading(manager);
             assets.postProcessor.doneLoading(manager);
-        } else {
-            // Second stage sync.
-
         }
         return assets;
     }
@@ -106,11 +98,13 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
         public boolean firstStage;
         public boolean noScripting;
         public GaiaSky gaiaSky;
+
         public GaiaSkyLoaderParameters(GaiaSky gaiaSky, boolean noScripting, boolean firstStage) {
             this.gaiaSky = gaiaSky;
             this.noScripting = noScripting;
             this.firstStage = firstStage;
         }
+
         public GaiaSkyLoaderParameters(GaiaSky gaiaSky, boolean noScripting) {
             this(gaiaSky, noScripting, true);
         }

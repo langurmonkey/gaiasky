@@ -1,0 +1,29 @@
+### What do you want to address?
+(This step is required; examples are shown below)
+
+- [ ] Bug
+- [ ] Feature
+- [ ] Suggestion
+
+### Describe your matter briefly
+(This step is required)
+
+
+### What did you expect? (useful when addressing bugs)
+_(This step is optional)_
+
+
+### System information
+_(Required for bug reports)_
+
+* The version of **Gaia Sky** you are using: 
+* The operating system you are using: 
+* Special features you are using (VR, safe mode, etc.):
+
+
+### Crash/session log files
+_(Required for crashes)_
+
+_(Please attach, if applicable, the Gaia Sky crash or session logs. [Here is how to get them](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/System-log.html))_
+
+
