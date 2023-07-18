@@ -22,8 +22,8 @@ _(Required for bug reports)_
 
 
 ### Crash/session log files
-_(Required for crashes)_
+_(Attach, if applicable, the Gaia Sky crash or session log files)_
 
-_(Please attach, if applicable, the Gaia Sky crash or session logs. [Here is how to get them](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/System-log.html))_
+Here is how to get them: https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/System-log.html
 
 
