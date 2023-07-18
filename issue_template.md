@@ -16,9 +16,9 @@ _(This step is optional)_
 ### System information
 _(Required for bug reports)_
 
-* The version of **Gaia Sky** you are using: 
-* The operating system you are using: 
-* Special features you are using (VR, safe mode, etc.):
+* Gaia Sky version/revision: 
+* Operating system: 
+* Special features (VR, safe mode, etc.):
 
 
 ### Crash/session log files
