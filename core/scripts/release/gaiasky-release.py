@@ -171,7 +171,7 @@ if __name__ == '__main__':
         print(" > Create new docs tag (%s) and generate the docs: make versions publish" % arguments.tag)
         print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
         print(" > Update flatpak repo and do pull request. See here: https://codeberg.org/gaiasky/gaiasky/issues/337#issuecomment-521949")
-        print(" > Upload the windows .zip and the linux .tar.gz packages to itch.io")
+        print(" > Post to social media")
         print()
         print(">DONE<")
 
