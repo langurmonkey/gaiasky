@@ -188,8 +188,8 @@ public class BookmarksManager implements IObserver {
                 if (curr.path.getParent() != null) {
                     if (!nodes.containsKey(curr.path.getParent())) {
                         // Add
-                        BookmarkNode pnode = new BookmarkNode(curr.path.getParent(), true);
-                        nodes.put(pnode.path, pnode);
+                        BookmarkNode bookmarkNode = new BookmarkNode(curr.path.getParent(), true);
+                        nodes.put(bookmarkNode.path, bookmarkNode);
                     }
                     // Insert
                     BookmarkNode parentNode = nodes.get(curr.path.getParent());
@@ -213,7 +213,7 @@ public class BookmarksManager implements IObserver {
      * @return True if removed.
      */
     public synchronized boolean removeBookmark(String path) {
-        Path p = Path.of(path);
+        Path p = new BookmarkPath(path);
         if (nodes != null && nodes.containsKey(p)) {
             BookmarkNode n = nodes.get(p);
             if (n.parent != null) {
