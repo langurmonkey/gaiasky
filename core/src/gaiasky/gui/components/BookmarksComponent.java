@@ -51,8 +51,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     protected Tree<TreeNode, String> bookmarksTree;
     protected TextField searchBox;
     protected OwnScrollPane bookmarksScrollPane;
-    protected Table infoTable;
-    protected Cell<?> infoCell1, infoCell2;
+    protected VerticalGroup infoTable;
     protected OwnLabel infoMessage1, infoMessage2;
     private boolean events = true;
 
@@ -115,10 +114,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         });
 
         // Info message
-        infoTable = new Table(skin);
-        infoCell1 = infoTable.add();
-        infoTable.row();
-        infoCell2 = infoTable.add();
+        infoTable = new VerticalGroup();
 
         infoMessage1 = new OwnLabel("", skin, "default-blue");
         infoMessage2 = new OwnLabel("", skin, "default-blue");
@@ -312,7 +308,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksScrollPane.setFadeScrollBars(false);
         bookmarksScrollPane.setScrollingDisabled(true, false);
 
-        bookmarksScrollPane.setHeight(350f);
+        bookmarksScrollPane.setHeight(300f);
         bookmarksScrollPane.setWidth(contentWidth);
 
         /*
@@ -426,12 +422,10 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     private void info(boolean visible) {
+        infoTable.clear();
         if (visible) {
-            infoCell1.setActor(infoMessage1);
-            infoCell2.setActor(infoMessage2);
-        } else {
-            infoCell1.setActor(null);
-            infoCell2.setActor(null);
+            infoTable.addActor(infoMessage1);
+            infoTable.addActor(infoMessage2);
         }
         infoTable.pack();
     }

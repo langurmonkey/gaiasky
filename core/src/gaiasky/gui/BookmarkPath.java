@@ -7,12 +7,15 @@
 
 package gaiasky.gui;
 
+import gaiasky.util.ArrayUtils;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -21,12 +24,15 @@ import java.util.Set;
 public class BookmarkPath implements Path {
 
     private static final String separator = "/";
+
+    private final String pathString;
     private final String[] tokens;
     private final Path parent;
 
     public BookmarkPath(String path) {
         if (path != null && !path.isEmpty()) {
             tokens = path.split(separator);
+            pathString = path;
             if (tokens.length > 1) {
                 parent = new BookmarkPath(Arrays.copyOf(tokens, tokens.length - 1));
             } else {
@@ -35,6 +41,7 @@ public class BookmarkPath implements Path {
         } else {
             tokens = null;
             parent = null;
+            pathString = null;
         }
     }
 
@@ -45,6 +52,7 @@ public class BookmarkPath implements Path {
         } else {
             parent = null;
         }
+        pathString = constructString();
     }
 
     @Override
@@ -110,8 +118,16 @@ public class BookmarkPath implements Path {
 
     @Override
     public Path resolve(Path path) {
-        return null;
+        return resolve(path.toString());
     }
+
+    @Override
+    public Path resolve(String other) {
+        var otherTokens = other.split(separator);
+        var t = ArrayUtils.concatWithArrayCopy(this.tokens, otherTokens);
+        return new BookmarkPath(t);
+    }
+
 
     @Override
     public Path relativize(Path path) {
@@ -130,7 +146,7 @@ public class BookmarkPath implements Path {
 
     @Override
     public Path toRealPath(LinkOption... linkOptions) throws IOException {
-        return null;
+        return this;
     }
 
     @Override
@@ -139,12 +155,32 @@ public class BookmarkPath implements Path {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BookmarkPath paths = (BookmarkPath) o;
+        return Objects.equals(pathString, paths.pathString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pathString);
+    }
+
+    @Override
     public int compareTo(Path path) {
-        return 0;
+        if (path instanceof BookmarkPath) {
+            return this.pathString.compareTo(((BookmarkPath) path).pathString);
+        }
+        return this.pathString.compareTo(path.toString());
     }
 
     @Override
     public String toString() {
+        return pathString;
+    }
+
+    public String constructString() {
         if (tokens == null || tokens.length == 0) {
             return "";
         }

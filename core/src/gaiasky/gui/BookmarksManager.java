@@ -179,7 +179,7 @@ public class BookmarksManager implements IObserver {
      * @return Whether the bookmark was inserted.
      */
     private synchronized boolean insertBookmark(String path, boolean folder) {
-        Path p = Path.of(path);
+        Path p = new BookmarkPath(path);
         if (!nodes.containsKey(p)) {
             BookmarkNode node = new BookmarkNode(p, folder);
             nodes.put(p, node);
