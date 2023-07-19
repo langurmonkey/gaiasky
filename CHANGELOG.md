@@ -1,3 +1,11 @@
+<a name="3.5.1"></a>
+## [3.5.1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.0) (2023-07-19)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.0...3.5.1)
+
+### Bug Fixes
+- paths in Windows do not accept certain characters and are unsuitable to represent our bookmarks. Add specific `BookmarkPath` implementation that fixes this. 
+- VR flag from `--openvr` to `--openxr`. 
+
 <a name="3.5.0"></a>
 ## [3.5.0](https://codeberg.org/gaiasky/gaiasky/tree/3.5.0-rc10) (2023-07-17)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.0-rc10...3.5.0)
