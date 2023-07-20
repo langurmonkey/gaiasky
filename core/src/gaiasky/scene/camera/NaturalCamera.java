@@ -499,7 +499,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         pos.add(dx);
                     }
 
-                    // aux4b <- foucs.abspos + dx
+                    // aux4b <- focus.abspos + dx
                     this.focus.getAbsolutePosition(aux4b).add(dx);
 
                     if (!vr) {

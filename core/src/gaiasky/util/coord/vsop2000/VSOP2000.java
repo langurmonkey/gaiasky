@@ -27,7 +27,7 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
 
     /**
      * Mean motions [][0] and mean J2000 longitudes [][1] of contributing bodies, in radians.
-     * Thes are also frequencies and phases respectively.
+     * These are also frequencies and phases respectively.
      */
     private final double[][] meanMotionsLongitudes = {
             { 26.0879031405997, 4.40260863422 }, // MERCURY

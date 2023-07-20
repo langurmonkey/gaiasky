@@ -304,7 +304,7 @@ public class MenuItem extends Button {
     }
 
     /**
-     * Creates platform dependant shortcut text. Converts int keycodes to String
+     * Creates platform dependent shortcut text. Converts int keycodes to String
      * text. Eg. Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.F5 will be converted
      * to Ctrl+Shift+F5 on Windows and Linux, and to ⌘⇧F5 on Mac.
      * <p>

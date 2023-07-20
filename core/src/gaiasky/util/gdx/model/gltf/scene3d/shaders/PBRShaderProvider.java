@@ -474,7 +474,7 @@ public class PBRShaderProvider extends DefaultIntShaderProvider
 				Gdx.app.error(TAG, "too many spot lights detected: " + lightsInfo.spotLights + "/" + config.numSpotLights);
 			}
 			if(lightsInfo.miscLights > 0){
-				Gdx.app.error(TAG, "unknow type lights not supported.");
+				Gdx.app.error(TAG, "unknown type lights not supported.");
 			}
 		}
 		

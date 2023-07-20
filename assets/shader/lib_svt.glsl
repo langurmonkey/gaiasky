@@ -63,7 +63,7 @@ vec2 svtTexCoords(sampler2D indirection, vec2 texCoords, float bias) {
     // The next line prevents bilinear filtering artifacts due to unrelated tiles being side-by-side in the cache.
     // For each tile, we sample an area (tile_resolution - 2)^2, leaving a 1px border which should be filled with
     // data from the adjacent tiles. However, in high resolution tiles (512, 1024, etc.), this 1 pixel is not
-    // noticable at all if the border is not set up in the tiles.
+    // noticeable at all if the border is not set up in the tiles.
     withinPageCoord = ((withinPageCoord * (u_svtTileSize - 2.0)) / u_svtTileSize) + (1.0 / u_svtTileSize);
     return ((pageCoord + withinPageCoord) / cacheSizeInTiles);
 }

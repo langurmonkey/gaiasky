@@ -142,7 +142,7 @@ public class Logger {
     }
 
     /**
-     * Gets a logger for an arbitary string tag
+     * Gets a logger for an arbitrary string tag
      *
      * @param tag The tag
      *

@@ -12,7 +12,7 @@ gs.cameraStop()
 gs.displayPopupNotification("The script is now running. Hooray!", 10.0)
 gs.displayPopupNotification("This is another notification, slightly longer than the previous one, albeit not too much. If this has line breaks, the line break system works.", 10.0)
 gs.displayPopupNotification("This notification\ncontains manual\nbreaks")
-gs.displayPopupNotification("This one is long but it also contains\nmanual breaks. Let's see how these two play togeter, or if they work at all...")
+gs.displayPopupNotification("This one is long but it also contains\nmanual breaks. Let's see how these two play together, or if they work at all...")
 
 gs.sleep(8.0)
 

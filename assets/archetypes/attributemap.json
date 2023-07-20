@@ -644,7 +644,7 @@
       }
     },
     "Mesh": {
-      "description": "Defines attributes related to meshes and iso-density surfaces. See :ref:`mesh-objects` for more inforamtion.",
+      "description": "Defines attributes related to meshes and iso-density surfaces. See :ref:`mesh-objects` for more information.",
       "shading": {
         "description": "Shading mode for the mesh. Can be 'additive', for additive blending, 'dust', to use an opaque mesh with transparency at the edges, or 'regular', to use the regular general-purpose PBR shader.",
         "units": "String"

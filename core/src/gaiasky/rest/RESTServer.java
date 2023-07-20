@@ -183,7 +183,7 @@ public class RESTServer {
             // probably an array should never be empty
             logger.warn("splitArrayString: '{}' is parsed as empty array!", arrayString);
             throw new IllegalArgumentException();
-            // emtpy array
+            // empty array
             // return new String[0];
         }
     }

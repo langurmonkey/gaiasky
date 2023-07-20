@@ -71,7 +71,7 @@ abstract public class KHRLightsPunctual {
 			pl.color.set(GLTFTypes.mapColor(light.color, Color.WHITE));
 			// Blender exported intensity is the raw value in Watts
 			// GLTF spec. states it's in Candela which is lumens per square radian (lm/sr).
-			// adjustement is made empirically here (comparing with Blender rendering)
+			// adjustment is made empirically here (comparing with Blender rendering)
 			// TODO find if it's a GLTF Blender exporter issue and find the right conversion.
 			pl.intensity = light.intensity / 10f;
 			pl.range = light.range;

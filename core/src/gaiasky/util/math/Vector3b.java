@@ -88,12 +88,12 @@ public class Vector3b implements Serializable {
         this.set(values[0], values[1], values[2]);
     }
 
-    /** @return The euclidian length */
+    /** @return The euclidean length */
     public static double len(final double x, final double y, final double z) {
         return FastMath.sqrt(x * x + y * y + z * z);
     }
 
-    /** @return The squared euclidian length */
+    /** @return The squared euclidean length */
     public static double len2(final double x, final double y, final double z) {
         return x * x + y * y + z * z;
     }

@@ -25,7 +25,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 public class RelativisticEffectsManager implements IObserver {
 
     private static RelativisticEffectsManager instance;
-    /** Intial time for the counter **/
+    /** Initial time for the counter **/
     private final long initime;
     /** Unit vector **/
     private final Vector3 unitz;

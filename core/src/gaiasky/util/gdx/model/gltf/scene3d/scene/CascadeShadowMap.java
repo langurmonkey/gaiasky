@@ -56,7 +56,7 @@ public class CascadeShadowMap implements Disposable {
 	 * @param sceneCamera the camera used to render the scene (frustum should be up to date)
 	 * @param base the default shadow light, used for far shadows
 	 * @param minLlightDepth minimum shadow box depth, depends on the scene, big value means more objects casted but less precision.
-	 * A zero value restricts shadow box depth to the frustrum (only visible objects by the scene camera).
+	 * A zero value restricts shadow box depth to the frustum (only visible objects by the scene camera).
 	 * @param splitDivisor Describe how to split scene camera frustum. . With a value of 4, far cascade covers the
 	 * range: 1/4 to 1/1, next cascade, the range 1/16 to 1/4, and so on. The closest one covers the remaining starting
 	 * from 0. When used with 2 extra cascades (3 areas), split points are: 0.0, 1/16, 1/4, 1.0.
@@ -79,7 +79,7 @@ public class CascadeShadowMap implements Disposable {
 	 * @param sceneCamera the camera used to render the scene (frustum should be up to date)
 	 * @param base the default shadow light, used for far shadows
 	 * @param minLlightDepth minimum shadow box depth, depends on the scene, big value means more objects casted but less precision.
-	 * A zero value restricts shadow box depth to the frustrum (only visible objects by the scene camera).
+	 * A zero value restricts shadow box depth to the frustum (only visible objects by the scene camera).
 	 * @param splitRates Describe how to split scene camera frustum. The first 2 values define near and far rate for the closest cascade, 
 	 * Second and third value define near and far rate for the second cascade, and so on.
 	 * When used with 2 extra cascades (3 areas), 4 split rates are expected. Eg: [0.0, 0.1, 0.3, 1.0].

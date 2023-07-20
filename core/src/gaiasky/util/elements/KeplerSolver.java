@@ -289,7 +289,7 @@ public class KeplerSolver {
         /**
          * @param tolerance Error tolerance.
          * @param actualError Actual error.
-         * @param iterations Allowed nnumber of iterations.
+         * @param iterations Allowed number of iterations.
          * @param meanAnomaly Requested mean anomaly.
          * @param eccentricity Requested eccentricity.
          */

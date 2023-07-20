@@ -154,6 +154,6 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 	}
 	
 	public boolean equals(DirectionalShadowLight other) {
-		return (other != null) && (other == this); // No comparaison, same as identity ==
+		return (other != null) && (other == this); // No comparison, same as identity ==
 	}
 }

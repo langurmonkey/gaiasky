@@ -61,7 +61,7 @@ public class ModifiedScanningLaw {
     protected double scanRate;
     /**
      * The uniform speed of the z-axis in solar motion units (S) for the nominal
-     * scaning law [dimensionless]
+     * scanning law [dimensionless]
      */
     protected double sNom;
     /**
@@ -281,7 +281,7 @@ public class ModifiedScanningLaw {
 
     /**
      * Set the reference heliotropic angles (at refEpoch) to other values than
-     * the default values obtained with the contructor
+     * the default values obtained with the constructor
      *
      * @param refNu    value of revolving phase (nu) at refEpoch [rad]
      * @param refOmega value of spin phase (omega) at refEpoch [rad]

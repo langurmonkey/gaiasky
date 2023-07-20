@@ -83,14 +83,14 @@ public class Vector3d implements Serializable, VectorDouble<Vector3d> {
         return FastMath.sqrt(x * x + y * y + z * z);
     }
 
-    /** @return The squared euclidian length */
+    /** @return The squared euclidean length */
     public static double len2(final double x,
                               final double y,
                               final double z) {
         return x * x + y * y + z * z;
     }
 
-    /** @return The euclidian distance between the two specified vectors */
+    /** @return The euclidean distance between the two specified vectors */
     public static double dst(final double x1,
                              final double y1,
                              final double z1,
@@ -432,7 +432,7 @@ public class Vector3d implements Serializable, VectorDouble<Vector3d> {
     /**
      * @param vec The other vector
      *
-     * @return Wether this and the other vector are equal
+     * @return Whether this and the other vector are equal
      */
     public boolean idt(final Vector3d vec) {
         return x == vec.x && y == vec.y && z == vec.z;

@@ -90,7 +90,7 @@ public interface IScriptingInterface {
     void setSubheadMessage(String subhead);
 
     /**
-     * Clears the headline messge.
+     * Clears the headline message.
      */
     void clearHeadlineMessage();
 
@@ -583,7 +583,7 @@ public interface IScriptingInterface {
      *
      * @param focus      The name of the focus object.
      * @param other      The name of the other object, to the fine a line from this to
-     *                   foucs. Usually a light source.
+     *                   focus. Usually a light source.
      * @param rotation   The rotation angle, in degrees.
      * @param solidAngle The target solid angle which determines the distance, in degrees.
      */
@@ -1521,7 +1521,7 @@ public interface IScriptingInterface {
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      *
-     * @return The radius of the object in Km. If the object identifed by name
+     * @return The radius of the object in Km. If the object identified by name
      * or id (HIP, TYC, sourceId). does not exist, it returns a negative
      * value.
      */

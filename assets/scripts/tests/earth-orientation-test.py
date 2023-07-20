@@ -22,7 +22,7 @@ sid=t.sidereal_time('apparent').rad
 # -10.*np.pi/180.
 print(sid*180./np.pi) # Print sidereal time
 
-#Vector looking at zenith from lat/lon location in gaiasky coordiantes.
+#Vector looking at zenith from lat/lon location in gaiasky coordinates.
 r=np.array([np.sin(sid)*np.cos(lat*np.pi/180.),
    np.sin(lat*np.pi/180.),
    np.cos(sid)*np.cos(lat*np.pi/180.)]) 

@@ -23,7 +23,7 @@ public class Satellite {
     @ParamMetaData(description = "Value of the inertial scan rate (spin rate) of the satellite around the SRS z-axis, defined - for a given CCD TDI period (and along-scan pixel dimension) and the design-value of the telescope focal length - as the speed with which electrons move through the CCDs in TDI mode", source = "", status = "CDB", basic = false, scalar = true, unit = "arcsec s^-1")
     public static final double SCANRATE;
     /**
-     * Nominal value of the constant angle between the SRS z-axis and the direction to the nominal Sun (also refered to as solar-aspect angle, SAA, revolving angle, and satellite scan-axis tilt angle)
+     * Nominal value of the constant angle between the SRS z-axis and the direction to the nominal Sun (also referred to as solar-aspect angle, SAA, revolving angle, and satellite scan-axis tilt angle)
      * <p>
      * Source: ESA, 21 May 2013, 'Gaia mission requirements document (MRD)', GAIA-EST-RD-00553, issue 3, revision 1, Requirement SCI-010. Reference document: A.G.A. Brown, U. Bastian, L. Lindegren, et al., 6 September 2006, 'On the definition of the solar aspect angle', GAIA-CG-TN-LEI-AB-010-02<br/>
      * Status: CONF<br/>
@@ -31,7 +31,7 @@ public class Satellite {
      * Basic : true<br/>
      * Scalar: true
      */
-    @ParamMetaData(description = "Nominal value of the constant angle between the SRS z-axis and the direction to the nominal Sun (also refered to as solar-aspect angle, SAA, revolving angle, and satellite scan-axis tilt angle)", source = "ESA, 21 May 2013, 'Gaia mission requirements document (MRD)', GAIA-EST-RD-00553, issue 3, revision 1, Requirement SCI-010. Reference document: A.G.A. Brown, U. Bastian, L. Lindegren, et al., 6 September 2006, 'On the definition of the solar aspect angle', GAIA-CG-TN-LEI-AB-010-02", status = "CONF", basic = true, scalar = true, unit = "deg")
+    @ParamMetaData(description = "Nominal value of the constant angle between the SRS z-axis and the direction to the nominal Sun (also referred to as solar-aspect angle, SAA, revolving angle, and satellite scan-axis tilt angle)", source = "ESA, 21 May 2013, 'Gaia mission requirements document (MRD)', GAIA-EST-RD-00553, issue 3, revision 1, Requirement SCI-010. Reference document: A.G.A. Brown, U. Bastian, L. Lindegren, et al., 6 September 2006, 'On the definition of the solar aspect angle', GAIA-CG-TN-LEI-AB-010-02", status = "CONF", basic = true, scalar = true, unit = "deg")
     public static final double SOLARASPECTANGLE_NOMINAL;
     /**
      * Initial value \nu_0 of the revolving phase \nu at time t_0 corresponding to the scanning-law reference epoch (see parameter :Satellite:Mission_ReferenceEpoch_ScanningLaw_TCB)
@@ -97,14 +97,14 @@ public class Satellite {
     @ParamMetaData(description = "Total FoV (i.e., including dead zones between CCDs) in the across-scan direction per viewing direction (telescope)", source = "", status = "CONF", basic = false, scalar = true, unit = "deg")
     public static final double FOV_AC;
     /**
-     * Total actice FoV (i.e., excluding dead zones between CCDs) in the across-scan direction per viewing direction (telescope)
+     * Total active FoV (i.e., excluding dead zones between CCDs) in the across-scan direction per viewing direction (telescope)
      * <p>
      * Status: CONF<br/>
      * Unit: deg<br/>
      * Basic : false<br/>
      * Scalar: true
      */
-    @ParamMetaData(description = "Total actice FoV (i.e., excluding dead zones between CCDs) in the across-scan direction per viewing direction (telescope)", source = "", status = "CONF", basic = false, scalar = true, unit = "deg")
+    @ParamMetaData(description = "Total active FoV (i.e., excluding dead zones between CCDs) in the across-scan direction per viewing direction (telescope)", source = "", status = "CONF", basic = false, scalar = true, unit = "deg")
     public static final double FOV_AC_ACTIVE;
 
     static {

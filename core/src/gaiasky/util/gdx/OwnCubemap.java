@@ -136,7 +136,7 @@ public class OwnCubemap extends GLTexture {
                 } else {
                     // get the ref count of the cubemap, then set it to 0 so we
                     // can actually remove it from the assetmanager. Also set the
-                    // handle to zero, otherwise we might accidentially dispose
+                    // handle to zero, otherwise we might accidentally dispose
                     // already reloaded cubemaps.
                     final int refCount = assetManager.getReferenceCount(fileName);
                     assetManager.setReferenceCount(fileName, 0);

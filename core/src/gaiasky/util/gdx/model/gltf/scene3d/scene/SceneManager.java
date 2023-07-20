@@ -181,7 +181,7 @@ public class SceneManager implements Disposable {
 	}
 	
 	/**
-	 * Automatically set skybox rotation matching this environement rotation.
+	 * Automatically set skybox rotation matching this environment rotation.
 	 * Subclasses could override this method in order to change this behavior.
 	 */
 	protected void updateSkyboxRotation(){
@@ -277,7 +277,7 @@ public class SceneManager implements Disposable {
 	}
 
 	/**
-	 * Render shadows only to interal frame buffers.
+	 * Render shadows only to internal frame buffers.
 	 * (useful when you're using your own frame buffer to render scenes)
 	 */
 	@SuppressWarnings("deprecation")
@@ -305,7 +305,7 @@ public class SceneManager implements Disposable {
 	}
 	
 	/**
-	 * Render only depth (packed 32 bits), usefull for post processing effects.
+	 * Render only depth (packed 32 bits), useful for post processing effects.
 	 * You typically render it to a FBO with depth enabled.
 	 */
 	public void renderDepth(){

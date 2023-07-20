@@ -154,7 +154,7 @@ vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     float bright = 0.1;//+0.1/1/3.;//add brightness based on how the sun moves so that it is brightest
     //when it is lined up with the center
 
-    //multiply by the exponetial e^x ? of 1.0-length which kind of masks the brightness more so that
+    //multiply by the exponential e^x ? of 1.0-length which kind of masks the brightness more so that
     //there is a sharper roll of of the light decay from the sun.
     color *= exp(1.0 - length(uv - light_pos)) / 5.0;
     color = color * intensity * STRENGTH;

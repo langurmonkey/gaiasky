@@ -20,7 +20,7 @@ public enum TimeScale {
     TCB,
 
     /**
-     * Terrestial Time
+     * Terrestrial Time
      */
     TT,
 

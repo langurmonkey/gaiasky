@@ -34,7 +34,7 @@ public enum FOV {
     public static final FOV[] FollowingFovs = new FOV[] { FOV2, FOV4, };
 
     /**
-     * Lists of FOVs grouped by the application of AC motion in theis related observations
+     * Lists of FOVs grouped by the application of AC motion in these related observations
      */
     public static final FOV[] MotionFovs = new FOV[] { FOV1, FOV2, };
     public static final FOV[] NullMotionFovs = new FOV[] { FOV3, FOV4, };

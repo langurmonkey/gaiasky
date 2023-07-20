@@ -182,7 +182,7 @@ class CameraUpdaterRunnable():
             self.dir_tied=np.array([rdir.dot(r10), rdir.dot(r20), rdir.dot(r30)])
             
             # Cam Up
-            ra=(r10+r20+r30) # this is random: a vector that's preferrably not aligned with any ri0. Hopefully, this would ensure no division of zero happens below.
+            ra=(r10+r20+r30) # this is random: a vector that's preferably not aligned with any ri0. Hopefully, this would ensure no division of zero happens below.
             ra/=np.sqrt(ra.dot(ra))
             u1=np.cross(ra,rdir)
             u1 /= np.sqrt(u1.dot(u1)) # This may need some rework to check that we are not dividing by ~0.

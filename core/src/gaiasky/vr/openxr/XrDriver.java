@@ -381,7 +381,7 @@ public class XrDriver implements Disposable {
                 }
 
                 if (glColorFormat == 0) {
-                    throw new IllegalStateException("No compatable swapchain / framebuffer format availible");
+                    throw new IllegalStateException("No compatible swapchain / framebuffer format available");
                 }
 
                 swapChains = new SwapChain[viewCountNumber];

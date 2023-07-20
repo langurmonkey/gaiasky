@@ -371,7 +371,7 @@ public class AttitudeUtils {
                 s0 = dl * t0;
                 s1 = t0 + ((double) dl * t1);
             }
-            // b0.length and b1.lentgh must be >= ATT_SPLINE_ORDER
+            // b0.length and b1.length must be >= ATT_SPLINE_ORDER
             int j = i + 1;
             b0[j] = s0;
             b1[j] = s1;

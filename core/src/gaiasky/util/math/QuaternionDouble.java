@@ -71,7 +71,7 @@ public class QuaternionDouble implements Serializable {
         this.set(axis, angle);
     }
 
-    /** @return the euclidian length of the specified quaternion */
+    /** @return the euclidean length of the specified quaternion */
     public static double len(final double x, final double y, final double z, final double w) {
         return Math.sqrt(x * x + y * y + z * z + w * w);
     }
@@ -887,7 +887,7 @@ public class QuaternionDouble implements Serializable {
      */
     public double getAxisAngleRad(Vector3d axis) {
         if (this.w > 1)
-            this.nor(); // if w>1 acos and sqrt will produce errors, this cant happen if quaternion is normalised
+            this.nor(); // if w>1 acos and sqrt will produce errors, this can't happen if quaternion is normalised
         double angle = (2.0 * Math.acos(this.w));
         double s = Math.sqrt(1 - this.w * this.w); // assuming quaternion normalised then w is less than 1, so term always positive.
         if (s < NORMALIZATION_TOLERANCE) { // test to avoid divide by zero, s is always positive due to sqrt

@@ -369,7 +369,7 @@ public interface IFocus {
     IFocus getFocus(String name);
 
     /**
-     * Checks whether this foucs is within its valid time range, so that it can
+     * Checks whether this focus is within its valid time range, so that it can
      * be used as a focus.
      *
      * @return Whether the focus object is within its valid time range.

@@ -213,7 +213,7 @@ public class GLTFTypes {
             camera.viewportHeight = glCamera.orthographic.ymag / canvasRatio;
             return camera;
         } else {
-            throw new GLTFIllegalException("unknow camera type " + glCamera.type);
+            throw new GLTFIllegalException("unknown camera type " + glCamera.type);
         }
     }
 

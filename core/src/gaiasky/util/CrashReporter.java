@@ -275,7 +275,7 @@ public class CrashReporter {
             /* GL info */
             strArray.add("");
             strArray.add("## GL INFORMATION");
-            strArray.add("Graphcis device: " + Gdx.gl.glGetString(GL20.GL_RENDERER));
+            strArray.add("Graphics device: " + Gdx.gl.glGetString(GL20.GL_RENDERER));
             strArray.add("GL vendor: " + Gdx.gl.glGetString(GL20.GL_VENDOR));
             strArray.add("GL version: " + Gdx.gl.glGetString(GL20.GL_VERSION));
             strArray.add("GLSL version: " + Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));

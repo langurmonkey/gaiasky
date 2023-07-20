@@ -17,7 +17,7 @@ public class TimeMediator {
     protected TimeConverter converter;
 
     /**
-     * Construct a new TimeMediator with a given native and requestd time context
+     * Construct a new TimeMediator with a given native and requested time context
      *
      * @param nat native time context
      * @param req requested time context

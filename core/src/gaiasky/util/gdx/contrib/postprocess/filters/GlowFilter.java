@@ -24,7 +24,7 @@ public final class GlowFilter extends Filter<GlowFilter> {
     private float orientation = 0f;
     private float backbufferScale = 1f;
 
-    // Contians a pre pass texture which is used to compute occlusion
+    // Contains a pre pass texture which is used to compute occlusion
     private Texture prePassTexture;
     private Texture lightGlowTexture;
 

@@ -545,7 +545,7 @@ public class BitmapFont implements Disposable {
         /** The x-height, which is the distance from the top of most lowercase characters to the baseline. */
         public float xHeight = 1;
 
-        /** Additional characters besides whitespace where text is wrapped. Eg, a hypen (-). */
+        /** Additional characters besides whitespace where text is wrapped. Eg, a hyphen (-). */
         public char[] breakChars;
         public char[] xChars = { 'x', 'e', 'a', 'o', 'n', 's', 'r', 'c', 'u', 'm', 'v', 'w', 'z' };
         public char[] capChars = { 'M', 'N', 'B', 'D', 'C', 'E', 'F', 'K', 'A', 'G', 'H', 'I', 'J', 'L', 'O', 'P', 'Q', 'R', 'S',

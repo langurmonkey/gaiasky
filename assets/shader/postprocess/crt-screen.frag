@@ -22,8 +22,8 @@
  * parameterized to permit runtime configuration.
  *
  * Furthermore it has been reworked to mimic the GL_REPEAT texture
- * wrapping on the FBO due to problems arised when running on a real
- * Android device, equipped with a Tegra2 GPU (Asus TF101).
+ * wrapping on the FBO due to problems that arose when running on a
+ * real Android device, equipped with a Tegra2 GPU (Asus TF101).
  */
 #version 330 core
 

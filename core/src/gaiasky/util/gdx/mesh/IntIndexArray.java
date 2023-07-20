@@ -90,7 +90,7 @@ public class IntIndexArray implements IntIndexData {
 
     /**
      * <p>
-     * Returns the underlying IntBuffer. If you modify the buffer contents they wil be uploaded on the call to {@link #bind()}.
+     * Returns the underlying IntBuffer. If you modify the buffer contents they will be uploaded on the call to {@link #bind()}.
      * If you need immediate uploading use {@link #setIndices(int[], int, int)}.
      * </p>
      *

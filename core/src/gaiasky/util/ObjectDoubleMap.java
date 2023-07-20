@@ -109,7 +109,7 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
      * "https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/">Malte
      * Skarupke's blog post</a>).
      * <p>
-     * This method can be overriden to customizing hashing. This may be useful eg in the unlikely event that most hashcodes are
+     * This method can be overridden to customizing hashing. This may be useful eg in the unlikely event that most hashcodes are
      * Fibonacci numbers, if keys provide poor or incorrect hashcodes, or to simplify hashing if keys provide high quality
      * hashcodes and don't need Fibonacci hashing: {@code return item.hashCode() & mask;}
      */
@@ -119,7 +119,7 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
 
     /**
      * Returns the index of the key if already present, else -(index + 1) for the next empty index. This can be overridden in this
-     * pacakge to compare for equality differently than {@link Object#equals(Object)}.
+     * package to compare for equality differently than {@link Object#equals(Object)}.
      */
     int locateKey(K key) {
         if (key == null)

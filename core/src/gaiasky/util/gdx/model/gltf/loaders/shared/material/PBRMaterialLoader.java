@@ -74,7 +74,7 @@ public class PBRMaterialLoader extends MaterialLoaderBase {
             material.set(new BlendingAttribute()); // opacity is set by pbrMetallicRoughness below
             alphaBlend = true;
         } else if (glMaterial.alphaMode != null) {
-            throw new GLTFIllegalException("unknow alpha mode : " + glMaterial.alphaMode);
+            throw new GLTFIllegalException("unknown alpha mode : " + glMaterial.alphaMode);
         }
 
         if (glMaterial.pbrMetallicRoughness != null) {

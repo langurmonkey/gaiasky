@@ -271,7 +271,7 @@ public class IntersectorDouble {
      * Determine the signed distance of the given point to the plane determined by the given plane normal and point.
      *
      * @param point       The point to test.
-     * @param planeNormal The normal vector fo the plane.
+     * @param planeNormal The normal vector of the plane.
      * @param planePoint  A point in the plane.
      *
      * @return the distance between the point and the plane.
