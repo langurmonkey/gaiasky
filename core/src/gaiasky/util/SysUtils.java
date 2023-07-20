@@ -24,12 +24,13 @@ public class SysUtils {
     private static final Log logger = Logger.getLogger(SysUtils.class);
     private static final String OS;
     private static final boolean linux;
+    private static final boolean steamDeck;
     private static final boolean mac;
     private static final boolean windows;
     private static final boolean unix;
     private static final boolean solaris;
     private static final String ARCH;
-    private static final boolean aarch64;
+    private static final boolean aArch64;
     private static final String GAIASKY_DIR_NAME = "gaiasky";
     private static final String DOTGAIASKY_DIR_NAME = ".gaiasky";
     private static final String CAMERA_DIR_NAME = "camera";
@@ -52,12 +53,29 @@ public class SysUtils {
         unix = OS.contains("unix");
         solaris = OS.contains("sunos");
 
+        if (linux) {
+            // Check Steam Deck.
+            String boardVendor = null, boardName = null;
+            try {
+                var vendorPath = Paths.get("/sys/devices/virtual/dmi/id/board_vendor");
+                var namePath = Paths.get("/sys/devices/virtual/dmi/id/board_name");
+                boardVendor = Files.exists(vendorPath) && Files.isReadable(vendorPath) ? new String(Files.readAllBytes(vendorPath)) : null;
+                boardName = Files.exists(namePath) && Files.isReadable(namePath) ? new String(Files.readAllBytes(namePath)) : null;
+            } catch (IOException ignored) {
+                // Nothing.
+            }
+            steamDeck = (boardVendor != null && boardVendor.equalsIgnoreCase("Valve"))
+                    || (boardName != null && boardName.equalsIgnoreCase("Jupiter"));
+        } else {
+            steamDeck = false;
+        }
+
         ARCH = System.getProperty("os.arch");
-        aarch64 = ARCH.contains("aarch64");
+        aArch64 = ARCH.contains("aarch64");
     }
 
     /**
-     * Initialise directories.
+     * Initialize directories.
      */
     public static void mkdirs() {
         // Top level.
@@ -155,7 +173,7 @@ public class SysUtils {
     }
 
     public static boolean isM1Mac() {
-        return isMac() && aarch64;
+        return isMac() && aArch64;
     }
 
     public static boolean isUnix() {
@@ -164,6 +182,10 @@ public class SysUtils {
 
     public static boolean isSolaris() {
         return solaris;
+    }
+
+    public static boolean isSteamDeck() {
+        return steamDeck;
     }
 
     public static boolean launchedViaInstall4j() {
@@ -282,7 +304,6 @@ public class SysUtils {
      * the user-configured data folder as input.
      *
      * @param dataLocation The user-defined data location.
-     *
      * @return A path that points to the temporary directory.
      */
     public static Path getTempDir(String dataLocation) {
@@ -430,7 +451,6 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
-     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -439,6 +459,7 @@ public class SysUtils {
 
     /**
      * Returns whether we are running in an AppImage.
+     *
      * @return True if we are in an AppImage package.
      */
     public static boolean isAppImage() {

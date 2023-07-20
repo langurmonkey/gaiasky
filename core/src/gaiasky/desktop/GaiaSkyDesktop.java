@@ -15,12 +15,10 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
-import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.converters.EnumConverter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -55,45 +53,77 @@ import java.util.Map;
  */
 public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
-    /** Minimum Java version required to run Gaia Sky. **/
+    /**
+     * Minimum Java version required to run Gaia Sky.
+     **/
     private static final String REQUIRED_JAVA_VERSION = "15";
-    /** Default major OpenGL version. **/
+    /**
+     * Default major OpenGL version.
+     **/
     private static final int DEFAULT_OPENGL_MAJOR = 4;
-    /** Default minor OpenGL version. **/
+    /**
+     * Default minor OpenGL version.
+     **/
     private static final int DEFAULT_OPENGL_MINOR = 1;
-    /** Default minor OpenGL version in VR mode. **/
+    /**
+     * Default minor OpenGL version in VR mode.
+     **/
     private static final int XR_OPENGL_MINOR = 5;
-    /** Full default OpenGL version string (with OpenXR). **/
+    /**
+     * Full default OpenGL version string (with OpenXR).
+     **/
     private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
-    /** Full default OpenGL version string in VR mode (with OpenXR). **/
+    /**
+     * Full default OpenGL version string in VR mode (with OpenXR).
+     **/
     private static final String XR_OPENGL = DEFAULT_OPENGL_MAJOR + "." + XR_OPENGL_MINOR;
-    /** Minimum required OpenGL major version for Gaia Sky to run. **/
+    /**
+     * Minimum required OpenGL major version for Gaia Sky to run.
+     **/
     private static final int MIN_OPENGL_MAJOR = 3;
-    /** Minimum required OpenGL minor version for Gaia Sky to run. **/
+    /**
+     * Minimum required OpenGL minor version for Gaia Sky to run.
+     **/
     private static final int MIN_OPENGL_MINOR = 3;
-    /** Minimum required OpenGL version string. **/
+    /**
+     * Minimum required OpenGL version string.
+     **/
     private static final String MIN_OPENGL = MIN_OPENGL_MAJOR + "." + MIN_OPENGL_MINOR;
-    /** Minimum GLSL major version. **/
+    /**
+     * Minimum GLSL major version.
+     **/
     private static final int MIN_GLSL_MAJOR = 3;
-    /** Minimum GLSL minor version. **/
+    /**
+     * Minimum GLSL minor version.
+     **/
     private static final int MIN_GLSL_MINOR = 3;
-    /** Minimum GLSL version string. **/
+    /**
+     * Minimum GLSL version string.
+     **/
     private static final String MIN_GLSL = MIN_GLSL_MAJOR + "." + MIN_GLSL_MINOR;
-    /** Whether the REST server is enabled or not. **/
+    /**
+     * Whether the REST server is enabled or not.
+     **/
     private static boolean REST_ENABLED;
     /**
      * Running with an unsupported Java version.
      **/
     private static boolean JAVA_VERSION_PROBLEM_FLAG = false;
-    /** CLI arguments. **/
+    /**
+     * CLI arguments.
+     **/
     private static CLIArgs cliArgs;
     /**
      * UTF-8 output stream printer.
      **/
     private static PrintStream out;
-    /** Force re-computing the UI scale. **/
+    /**
+     * Force re-computing the UI scale.
+     **/
     private boolean reinitializeUIScale = false;
-    /** The Gaia Sky application instance. **/
+    /**
+     * The Gaia Sky application instance.
+     **/
     private GaiaSky gs;
 
     public GaiaSkyDesktop() {
@@ -399,6 +429,11 @@ public class GaiaSkyDesktop implements IObserver {
         Settings s = Settings.settings;
         cfg.setTitle(Settings.APPLICATION_NAME);
         if (!cliArgs.vr) {
+            // If we run on the Steam Deck, we default to full screen.
+            if (SysUtils.isSteamDeck()) {
+                s.graphics.fullScreen.active = true;
+            }
+
             if (s.graphics.fullScreen.active) {
                 int[] fullScreenResolution = s.graphics.fullScreen.resolution;
                 // Full screen mode.
@@ -459,7 +494,7 @@ public class GaiaSkyDesktop implements IObserver {
                     s.graphics.fullScreen.refreshRate = myMode.refreshRate;
                 }
             } else {
-                // Windowed mode.
+                // Windowed mode. Compute window size.
                 configureWindowSize(cfg);
                 cfg.setResizable(s.graphics.resizable);
             }
