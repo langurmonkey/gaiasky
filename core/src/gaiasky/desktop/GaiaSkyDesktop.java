@@ -438,6 +438,8 @@ public class GaiaSkyDesktop implements IObserver {
                 if (screenDiagonalPixels < 1600) {
                     // Set full screen.
                     s.graphics.fullScreen.active = true;
+                    s.graphics.fullScreen.resolution[0] = resolution[0];
+                    s.graphics.fullScreen.resolution[1] = resolution[1];
                     // Set UI scale to 0.9.
                     s.program.ui.scale = MathUtilsDouble.lint(0.9f, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
                 }
