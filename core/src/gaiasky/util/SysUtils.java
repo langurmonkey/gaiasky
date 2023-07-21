@@ -11,6 +11,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import gaiasky.util.Logger.Log;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -64,8 +66,14 @@ public class SysUtils {
             } catch (IOException ignored) {
                 // Nothing.
             }
+            // Check APU.
+            CentralProcessor cp = (new SystemInfo()).getHardware().getProcessor();
+            boolean deckAPU = cp.getProcessorIdentifier().getName().equalsIgnoreCase("AMD Custom APU 0405");
+
             steamDeck = (boardVendor != null && boardVendor.equalsIgnoreCase("Valve"))
-                    || (boardName != null && boardName.equalsIgnoreCase("Jupiter"));
+                    || (boardName != null && boardName.equalsIgnoreCase("Jupiter"))
+                    || deckAPU;
+
         } else {
             steamDeck = false;
         }

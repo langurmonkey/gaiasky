@@ -357,7 +357,8 @@ public class AboutWindow extends GenericDialog {
         }
 
         var glRendererTitle = new OwnLabel(I18n.msg("gui.help.graphicsdevice"), skin);
-        var glRenderer = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin);
+        var glRendererStr = Gdx.gl.glGetString(GL20.GL_RENDERER);
+        var glRenderer = new OwnLabel(TextUtils.breakSpaces(glRendererStr, 48), skin);
 
         // OpenGL info
         var glInfo = new OwnLabel(I18n.msg("gui.help.openglinfo"), skin, "header");
