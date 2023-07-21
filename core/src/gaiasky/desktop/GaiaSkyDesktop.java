@@ -337,9 +337,6 @@ public class GaiaSkyDesktop implements IObserver {
                     // Move old properties file so that they are not converted on the next run
                     Files.move(propertiesFile, SysUtils.getConfigDir().resolve(vr ? "global.vr.properties.old" : "global.properties.old"));
                     userConfExists = true;
-                } else {
-                    // Old configuration not found!
-                    out.println("Failed updating old global.properties file into new config.yaml: Old configuration file not found");
                 }
             } catch (Exception e) {
                 // Failed!
