@@ -24,19 +24,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
-import gaiasky.util.Settings;
-import gaiasky.util.SysUtils;
+import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
 import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.HardwareAbstractionLayer;
 
-import java.nio.IntBuffer;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -76,19 +70,19 @@ public class AboutWindow extends GenericDialog {
         boolean showUpdateTab = !SysUtils.launchedViaInstall4j();
 
         // Create the tab buttons
-        HorizontalGroup tabGroup = new HorizontalGroup();
+        var tabGroup = new HorizontalGroup();
         tabGroup.align(Align.left);
 
-        final Button tabHelp = new OwnTextButton(I18n.msg("gui.help.help"), skin, "toggle-big");
+        final var tabHelp = new OwnTextButton(I18n.msg("gui.help.help"), skin, "toggle-big");
         tabHelp.pad(pad10);
         tabHelp.setWidth(tabWidth);
-        final Button tabAbout = new OwnTextButton(I18n.msg("gui.help.about"), skin, "toggle-big");
+        final var tabAbout = new OwnTextButton(I18n.msg("gui.help.about"), skin, "toggle-big");
         tabAbout.pad(pad10);
         tabAbout.setWidth(tabWidth);
-        final Button tabSystem = new OwnTextButton(I18n.msg("gui.help.system"), skin, "toggle-big");
+        final var tabSystem = new OwnTextButton(I18n.msg("gui.help.system"), skin, "toggle-big");
         tabSystem.pad(pad10);
         tabSystem.setWidth(tabWidth);
-        final Button tabUpdates = showUpdateTab ? new OwnTextButton(I18n.msg("gui.newversion"), skin, "toggle-big") : null;
+        final var tabUpdates = showUpdateTab ? new OwnTextButton(I18n.msg("gui.newversion"), skin, "toggle-big") : null;
         if (showUpdateTab) {
             tabUpdates.pad(pad10);
             tabUpdates.setWidth(tabWidth);
@@ -112,26 +106,26 @@ public class AboutWindow extends GenericDialog {
         content.pad(pad18);
 
         /* CONTENT 1 - HELP */
-        final Table contentHelp = new Table(skin);
+        final var contentHelp = new Table(skin);
         contentHelp.top();
 
-        OwnLabel gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+        var gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
 
         // User manual
-        Label homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
-        Label homepageTxt = new OwnLabel(I18n.msg("gui.help.help1"), skin);
-        Link homepageLink = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
+        var homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
+        var homepageTxt = new OwnLabel(I18n.msg("gui.help.help1"), skin);
+        var homepageLink = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
 
         // Wiki
-        Label docsTitle = new OwnLabel(I18n.msg("gui.help.docs"), skin);
-        Label docsTxt = new OwnLabel(I18n.msg("gui.help.help2"), skin);
-        Link docsLink = new Link(Settings.DOCUMENTATION, linkStyle, Settings.DOCUMENTATION);
+        var docsTitle = new OwnLabel(I18n.msg("gui.help.docs"), skin);
+        var docsTxt = new OwnLabel(I18n.msg("gui.help.help2"), skin);
+        var docsLink = new Link(Settings.DOCUMENTATION, linkStyle, Settings.DOCUMENTATION);
 
         // Icon
-        FileHandle gsIcon = Gdx.files.internal(Settings.settings.runtime.openXr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
-        Texture iconTex = new Texture(gsIcon);
+        var gsIcon = Gdx.files.internal(Settings.settings.runtime.openXr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
+        var iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Image gaiaSkyIcon = new Image(iconTex);
+        var gaiaSkyIcon = new Image(iconTex);
         gaiaSkyIcon.setOrigin(Align.center);
 
         // Add all to content
@@ -153,56 +147,56 @@ public class AboutWindow extends GenericDialog {
         contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
-        final Table contentAbout = new Table(skin);
+        final var contentAbout = new Table(skin);
         contentAbout.top();
 
         // Intro
-        TextArea intro = new OwnTextArea(I18n.msg("gui.help.gscredits", Settings.settings.version.version), skin.get("regular", TextFieldStyle.class));
+        var intro = new OwnTextArea(I18n.msg("gui.help.gscredits", Settings.settings.version.version), skin.get("regular", TextFieldStyle.class));
         intro.setDisabled(true);
         intro.setPrefRows(3);
         intro.setWidth(contentWidth);
 
         // Home page
-        Label homePageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
-        Link homepage = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
+        var homePageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
+        var homepage = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
 
         // Twitter
-        Label devNewsTitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
-        Link tw = new Link(Settings.SOCIAL_MEDIA_NAME, linkStyle, Settings.SOCIAL_MEDIA_URL);
+        var devNewsTitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
+        var tw = new Link(Settings.SOCIAL_MEDIA_NAME, linkStyle, Settings.SOCIAL_MEDIA_URL);
 
         // Author
-        Label authorTitle = new OwnLabel(I18n.msg("gui.help.author"), skin);
+        var authorTitle = new OwnLabel(I18n.msg("gui.help.author"), skin);
 
-        Table author = new Table(skin);
-        Label authorName = new OwnLabel(Settings.AUTHOR_NAME, skin);
-        Link authorMail = new Link(Settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.AUTHOR_EMAIL);
-        Link authorPage = new Link("tonisagrista.com", linkStyle, "https://tonisagrista.com");
-        Link authorMasto = new Link("@jumpinglangur@mastodon.social", linkStyle, "https://mastodon.social/@jumpinglangur");
+        var author = new Table(skin);
+        var authorName = new OwnLabel(Settings.AUTHOR_NAME, skin);
+        var authorMail = new Link(Settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.AUTHOR_EMAIL);
+        var authorPage = new Link("tonisagrista.com", linkStyle, "https://tonisagrista.com");
+        var authorMasto = new Link("@jumpinglangur@mastodon.social", linkStyle, "https://mastodon.social/@jumpinglangur");
         author.add(authorName).left().row();
         author.add(authorMail).left().row();
         author.add(authorPage).left().row();
         author.add(authorMasto).left().row();
 
         // Contributor
-        Label contribTitle = new OwnLabel(I18n.msg("gui.help.contributors"), skin);
+        var contribTitle = new OwnLabel(I18n.msg("gui.help.contributors"), skin);
 
-        Table contrib = new Table(skin);
+        var contrib = new Table(skin);
         contrib.align(Align.left);
-        Label contribName = new OwnLabel("Apl. Prof. Dr. Stefan Jordan", skin);
-        Link contribMail = new Link("jordan@ari.uni-heidelberg.de", linkStyle, "mailto:jordan@ari.uni-heidelberg.de");
+        var contribName = new OwnLabel("Apl. Prof. Dr. Stefan Jordan", skin);
+        var contribMail = new Link("jordan@ari.uni-heidelberg.de", linkStyle, "mailto:jordan@ari.uni-heidelberg.de");
         contrib.add(contribName).left().row();
         contrib.add(contribMail).left().row();
 
         // License
-        HorizontalGroup licenseHorizontal = new HorizontalGroup();
+        var licenseHorizontal = new HorizontalGroup();
         licenseHorizontal.space(pad18);
 
-        VerticalGroup licenseVertical = new VerticalGroup();
-        TextArea licenseText = new OwnTextArea(I18n.msg("gui.help.license"), skin.get("regular", TextFieldStyle.class));
+        var licenseVertical = new VerticalGroup();
+        var licenseText = new OwnTextArea(I18n.msg("gui.help.license"), skin.get("regular", TextFieldStyle.class));
         licenseText.setDisabled(true);
         licenseText.setPrefRows(3);
         licenseText.setWidth(taWidth2 / 2f);
-        Link licenseLink = new Link(Settings.LICENSE_URL, linkStyle, Settings.LICENSE_URL);
+        var licenseLink = new Link(Settings.LICENSE_URL, linkStyle, Settings.LICENSE_URL);
 
         licenseVertical.addActor(licenseText);
         licenseVertical.addActor(licenseLink);
@@ -215,10 +209,10 @@ public class AboutWindow extends GenericDialog {
         Container<Actor> thanksSc = new Container<>(thanks);
         thanksSc.setBackground(skin.getDrawable("bg-clear"));
 
-        Image zah = new Image(getSpriteDrawable(Gdx.files.internal("img/zah.png")));
-        Image dlr = new Image(getSpriteDrawable(Gdx.files.internal("img/dlr.png")));
-        Image bwt = new Image(getSpriteDrawable(Gdx.files.internal("img/bwt.png")));
-        Image dpac = new Image(getSpriteDrawable(Gdx.files.internal("img/dpac.png")));
+        var zah = new Image(getSpriteDrawable(Gdx.files.internal("img/zah.png")));
+        var dlr = new Image(getSpriteDrawable(Gdx.files.internal("img/dlr.png")));
+        var bwt = new Image(getSpriteDrawable(Gdx.files.internal("img/bwt.png")));
+        var dpac = new Image(getSpriteDrawable(Gdx.files.internal("img/dpac.png")));
 
         thanks.addActor(zah);
         thanks.addActor(dlr);
@@ -249,61 +243,82 @@ public class AboutWindow extends GenericDialog {
         contentSystem.top();
 
         // Build info
-        Label buildInfo = new OwnLabel(I18n.msg("gui.help.buildinfo"), skin, "header");
+        var buildInfo = new OwnLabel(I18n.msg("gui.help.buildinfo"), skin, "header");
 
-        Label versionTitle = new OwnLabel(I18n.msg("gui.help.version", Settings.APPLICATION_NAME), skin);
-        Label version = new OwnLabel(Settings.settings.version.version, skin);
+        var versionTitle = new OwnLabel(I18n.msg("gui.help.version", Settings.APPLICATION_NAME), skin);
+        var version = new OwnLabel(Settings.settings.version.version, skin);
 
-        Label revisionTitle = new OwnLabel(I18n.msg("gui.help.buildnumber"), skin);
-        Label revision = new OwnLabel(Settings.settings.version.build, skin);
+        var revisionTitle = new OwnLabel(I18n.msg("gui.help.buildnumber"), skin);
+        var revision = new OwnLabel(Settings.settings.version.build, skin);
 
-        Label timeTitle = new OwnLabel(I18n.msg("gui.help.buildtime"), skin);
-        Label time = new OwnLabel(Settings.settings.version.buildTime.toString(), skin);
+        var timeTitle = new OwnLabel(I18n.msg("gui.help.buildtime"), skin);
+        var time = new OwnLabel(Settings.settings.version.buildTime.toString(), skin);
 
-        Label systemTitle = new OwnLabel(I18n.msg("gui.help.buildsys"), skin);
-        TextArea system = new OwnTextArea(Settings.settings.version.system, skin.get("regular", TextFieldStyle.class));
+        var systemTitle = new OwnLabel(I18n.msg("gui.help.buildsys"), skin);
+        var system = new OwnTextArea(Settings.settings.version.system, skin.get("regular", TextFieldStyle.class));
         system.setDisabled(true);
         system.setPrefRows(3);
         system.setWidth(taWidth * 2f / 3f);
 
-        Label builderTitle = new OwnLabel(I18n.msg("gui.help.builder"), skin);
-        Label builder = new OwnLabel(Settings.settings.version.builder, skin);
+        var builderTitle = new OwnLabel(I18n.msg("gui.help.builder"), skin);
+        var builder = new OwnLabel(Settings.settings.version.builder, skin);
 
         // Paths
-        Label paths = new OwnLabel(I18n.msg("gui.help.paths"), skin, "header");
+        var paths = new OwnLabel(I18n.msg("gui.help.paths"), skin, "header");
+        var pathLength = 48;
 
-        Label configTitle = new OwnLabel(I18n.msg("gui.help.paths.config"), skin);
-        Label config = new OwnLabel(SysUtils.getConfigDir().toAbsolutePath().toString(), skin);
-        Label dataTitle = new OwnLabel(I18n.msg("gui.help.paths.data"), skin);
-        Label data = new OwnLabel(SysUtils.getDataDir().toAbsolutePath().toString(), skin);
-        Label screenshotsTitle = new OwnLabel(I18n.msg("gui.help.paths.screenshots"), skin);
-        Label screenshots = new OwnLabel(SysUtils.getDefaultScreenshotsDir().toAbsolutePath().toString(), skin);
-        Label framesTitle = new OwnLabel(I18n.msg("gui.help.paths.frames"), skin);
-        Label frames = new OwnLabel(SysUtils.getDefaultFramesDir().toAbsolutePath().toString(), skin);
-        Label musicTitle = new OwnLabel(I18n.msg("gui.help.paths.music"), skin);
-        Label music = new OwnLabel(SysUtils.getDefaultMusicDir().toAbsolutePath().toString(), skin);
-        Label mappingsTitle = new OwnLabel(I18n.msg("gui.help.paths.mappings"), skin);
-        Label mappings = new OwnLabel(SysUtils.getDefaultMappingsDir().toAbsolutePath().toString(), skin);
-        Label cameraTitle = new OwnLabel(I18n.msg("gui.help.paths.camera"), skin);
-        Label camera = new OwnLabel(SysUtils.getDefaultCameraDir().toAbsolutePath().toString(), skin);
+        var configTitle = new OwnLabel(I18n.msg("gui.help.paths.config"), skin);
+        var configPath = SysUtils.getConfigDir().toAbsolutePath().toString();
+        var config = new OwnLabel(TextUtils.capString(configPath, pathLength, true), skin);
+        config.addListener(new OwnTextTooltip(configPath, skin, 15));
+
+        var dataTitle = new OwnLabel(I18n.msg("gui.help.paths.data"), skin);
+        var dataPath = SysUtils.getDataDir().toAbsolutePath().toString();
+        var data = new OwnLabel(TextUtils.capString(dataPath, pathLength, true), skin);
+        data.addListener(new OwnTextTooltip(dataPath, skin, 15));
+
+        var screenshotsTitle = new OwnLabel(I18n.msg("gui.help.paths.screenshots"), skin);
+        var screenshotsPath = SysUtils.getDefaultScreenshotsDir().toAbsolutePath().toString();
+        var screenshots = new OwnLabel(TextUtils.capString(screenshotsPath, pathLength, true), skin);
+        screenshots.addListener(new OwnTextTooltip(screenshotsPath, skin, 15));
+
+        var framesTitle = new OwnLabel(I18n.msg("gui.help.paths.frames"), skin);
+        var framesPath = SysUtils.getDefaultFramesDir().toAbsolutePath().toString();
+        var frames = new OwnLabel(TextUtils.capString(framesPath, pathLength, true), skin);
+        frames.addListener(new OwnTextTooltip(framesPath, skin, 15));
+
+        var musicTitle = new OwnLabel(I18n.msg("gui.help.paths.music"), skin);
+        var musicPath = SysUtils.getDefaultMusicDir().toAbsolutePath().toString();
+        var music = new OwnLabel(TextUtils.capString(musicPath, pathLength, true), skin);
+        music.addListener(new OwnTextTooltip(musicPath, skin, 15));
+
+        var mappingsTitle = new OwnLabel(I18n.msg("gui.help.paths.mappings"), skin);
+        var mappingsPath = SysUtils.getDefaultMappingsDir().toAbsolutePath().toString();
+        var mappings = new OwnLabel(TextUtils.capString(mappingsPath, pathLength, true), skin);
+        mappings.addListener(new OwnTextTooltip(mappingsPath, skin, 15));
+
+        var cameraTitle = new OwnLabel(I18n.msg("gui.help.paths.camera"), skin);
+        var cameraPath = SysUtils.getDefaultCameraDir().toAbsolutePath().toString();
+        var camera = new OwnLabel(TextUtils.capString(cameraPath, pathLength, true), skin);
+        camera.addListener(new OwnTextTooltip(cameraPath, skin, 15));
 
         // Java info
-        Label javaInfo = new OwnLabel(I18n.msg("gui.help.javainfo"), skin, "header");
+        var javaInfo = new OwnLabel(I18n.msg("gui.help.javainfo"), skin, "header");
 
-        Label javaVersionTitle = new OwnLabel(I18n.msg("gui.help.javaversion"), skin);
-        Label javaVersion = new OwnLabel(System.getProperty("java.version"), skin);
+        var javaVersionTitle = new OwnLabel(I18n.msg("gui.help.javaversion"), skin);
+        var javaVersion = new OwnLabel(System.getProperty("java.version"), skin);
 
-        Label javaRuntimeTitle = new OwnLabel(I18n.msg("gui.help.javaname"), skin);
-        Label javaRuntime = new OwnLabel(System.getProperty("java.runtime.name"), skin);
+        var javaRuntimeTitle = new OwnLabel(I18n.msg("gui.help.javaname"), skin);
+        var javaRuntime = new OwnLabel(System.getProperty("java.runtime.name"), skin);
 
-        Label javaVMNameTitle = new OwnLabel(I18n.msg("gui.help.javavmname"), skin);
-        Label javaVMName = new OwnLabel(System.getProperty("java.vm.name"), skin);
+        var javaVMNameTitle = new OwnLabel(I18n.msg("gui.help.javavmname"), skin);
+        var javaVMName = new OwnLabel(System.getProperty("java.vm.name"), skin);
 
-        Label javaVMVersionTitle = new OwnLabel(I18n.msg("gui.help.javavmversion"), skin);
-        Label javaVMVersion = new OwnLabel(System.getProperty("java.vm.version"), skin);
+        var javaVMVersionTitle = new OwnLabel(I18n.msg("gui.help.javavmversion"), skin);
+        var javaVMVersion = new OwnLabel(System.getProperty("java.vm.version"), skin);
 
-        Label javaVMVendorTitle = new OwnLabel(I18n.msg("gui.help.javavmvendor"), skin);
-        Label javaVMVendor = new OwnLabel(System.getProperty("java.vm.vendor"), skin);
+        var javaVMVendorTitle = new OwnLabel(I18n.msg("gui.help.javavmvendor"), skin);
+        var javaVMVendor = new OwnLabel(System.getProperty("java.vm.vendor"), skin);
 
         TextButton memInfoButton = new OwnTextButton(I18n.msg("gui.help.meminfo"), skin, "default");
         memInfoButton.setName("memoryinfo");
@@ -322,46 +337,53 @@ public class AboutWindow extends GenericDialog {
         });
 
         // System info
-        Label sysInfo = new OwnLabel(I18n.msg("gui.help.sysinfo"), skin, "header");
+        var sysInfo = new OwnLabel(I18n.msg("gui.help.sysinfo"), skin, "header");
 
-        Label sysOSTitle = new OwnLabel(I18n.msg("gui.help.os"), skin);
-        Label sysOS;
+        var sysOSTitle = new OwnLabel(I18n.msg("gui.help.os"), skin);
+        OwnLabel sysOS;
 
         try {
-            SystemInfo si = new SystemInfo();
-            sysOS = new OwnLabel(si.getOperatingSystem().toString() + "\n" + "Arch: " + System.getProperty("os.arch"), skin);
+            var si = new SystemInfo();
+            var os = si.getOperatingSystem();
+            sysOS = new OwnLabel(
+                    I18n.msg("gui.help.os.family") + ": " + os.getFamily()
+                            + "\n" + I18n.msg("gui.help.os.name") + ": " + os.getVersionInfo().getCodeName()
+                            + "\n" + I18n.msg("gui.help.os.version") + ": " + os.getVersionInfo().getVersion()
+                            + "\n" + I18n.msg("gui.help.os.build") + ": " + os.getVersionInfo().getBuildNumber()
+                            + "\n" + I18n.msg("gui.help.os.manufacturer") + ": " + os.getManufacturer()
+                            + "\n" + I18n.msg("gui.help.os.arch") + ": " + System.getProperty("os.arch"), skin);
         } catch (Error e) {
-            sysOS = new OwnLabel(System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"), skin);
+            sysOS = new OwnLabel(System.getProperty("os.name") + "\n" + System.getProperty("os.version") + "\n" + System.getProperty("os.arch"), skin);
         }
 
-        Label glRendererTitle = new OwnLabel(I18n.msg("gui.help.graphicsdevice"), skin);
-        Label glRenderer = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin);
+        var glRendererTitle = new OwnLabel(I18n.msg("gui.help.graphicsdevice"), skin);
+        var glRenderer = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin);
 
         // OpenGL info
-        Label glInfo = new OwnLabel(I18n.msg("gui.help.openglinfo"), skin, "header");
+        var glInfo = new OwnLabel(I18n.msg("gui.help.openglinfo"), skin, "header");
 
-        Label glVendorTitle = new OwnLabel(I18n.msg("gui.help.glvendor"), skin);
-        Label glVendor = new OwnLabel(Gdx.gl.glGetString(GL20.GL_VENDOR), skin);
+        var glVendorTitle = new OwnLabel(I18n.msg("gui.help.glvendor"), skin);
+        var glVendor = new OwnLabel(Gdx.gl.glGetString(GL20.GL_VENDOR), skin);
 
-        Label glVersionTitle = new OwnLabel(I18n.msg("gui.help.openglversion"), skin);
-        Label glVersion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_VERSION), skin);
+        var glVersionTitle = new OwnLabel(I18n.msg("gui.help.openglversion"), skin);
+        var glVersion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_VERSION), skin);
 
-        Label glslVersionTitle = new OwnLabel(I18n.msg("gui.help.glslversion"), skin);
-        Label glslVersion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION), skin);
+        var glslVersionTitle = new OwnLabel(I18n.msg("gui.help.glslversion"), skin);
+        var glslVersion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION), skin);
 
-        Label glExtensionsTitle = new OwnLabel(I18n.msg("gui.help.glextensions"), skin);
-        String extensions = GlobalResources.getGLExtensions();
+        var glExtensionsTitle = new OwnLabel(I18n.msg("gui.help.glextensions"), skin);
+        var extensions = GlobalResources.getGLExtensions();
 
-        IntBuffer buf = BufferUtils.newIntBuffer(16);
+        var buf = BufferUtils.newIntBuffer(16);
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
         int lines = GlobalResources.countOccurrences(extensions, '\n');
-        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "default");
+        var maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "default");
         maxTexSize.setDisabled(true);
         maxTexSize.setPrefRows(lines);
         maxTexSize.clearListeners();
 
-        OwnScrollPane glExtensionsScroll = new OwnScrollPane(maxTexSize, skin, "default-nobg");
+        var glExtensionsScroll = new OwnScrollPane(maxTexSize, skin, "default-nobg");
         glExtensionsScroll.setWidth(taWidth);
         glExtensionsScroll.setHeight(taHeight);
         glExtensionsScroll.setForceScroll(false, true);
@@ -438,22 +460,23 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(sysInfo).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
         contentSystem.row();
         try {
-            SystemInfo si = new SystemInfo();
-            HardwareAbstractionLayer hal = si.getHardware();
-            CentralProcessor cp = hal.getProcessor();
+            var si = new SystemInfo();
+            var hal = si.getHardware();
+            var cp = hal.getProcessor();
 
-            Label cpuTitle = new OwnLabel(I18n.msg("gui.help.cpu"), skin);
-            Label cpu = new OwnLabel(cp.toString(), skin);
+            var cpuTitle = new OwnLabel(I18n.msg("gui.help.cpu"), skin);
+            var cpu = new OwnLabel(cp.toString(), skin);
 
-            contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-            contentSystem.add(cpu).align(Align.left).padTop(pad10);
+            contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad18).padTop(pad10).padBottom(pad18);
+            contentSystem.add(cpu).align(Align.left).padTop(pad10).padBottom(pad18);
             contentSystem.row();
         } catch (Error e) {
             contentSystem.add(new OwnLabel(I18n.msg("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad18).padBottom(pad18).row();
         }
-        contentSystem.add(sysOSTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(sysOS).align(Align.left);
+        contentSystem.add(sysOSTitle).align(Align.topLeft).padRight(pad18).padBottom(pad18);
+        contentSystem.add(sysOS).align(Align.left).padBottom(pad18);
         contentSystem.row();
+
         contentSystem.add(glRendererTitle).align(Align.topLeft).padRight(pad18).padTop(pad18);
         contentSystem.add(glRenderer).align(Align.left).padTop(pad10);
         contentSystem.row();
@@ -484,7 +507,7 @@ public class AboutWindow extends GenericDialog {
 
         /* CONTENT 4 - UPDATES */
 
-        final Table contentUpdates = showUpdateTab ? new Table(skin) : null;
+        final var contentUpdates = showUpdateTab ? new Table(skin) : null;
         if (showUpdateTab) {
             contentUpdates.top();
 
