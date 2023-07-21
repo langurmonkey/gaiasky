@@ -852,21 +852,21 @@ public class Settings {
                 case 7 ->
                     // 1000 km/h
                         speedLimit = 0.277777778 * Constants.KM_TO_U;
-                case 8 -> speedLimit = 0.01 * Constants.C * Constants.M_TO_U;
-                case 9 -> speedLimit = 0.1 * Constants.C * Constants.M_TO_U;
-                case 10 -> speedLimit = 0.5 * Constants.C * Constants.M_TO_U;
-                case 11 -> speedLimit = 0.8 * Constants.C * Constants.M_TO_U;
-                case 12 -> speedLimit = 0.9 * Constants.C * Constants.M_TO_U;
-                case 13 -> speedLimit = 0.99 * Constants.C * Constants.M_TO_U;
-                case 14 -> speedLimit = 0.99999 * Constants.C * Constants.M_TO_U;
-                case 15 -> speedLimit = Constants.C * Constants.M_TO_U;
-                case 16 -> speedLimit = 2.0 * Constants.C * Constants.M_TO_U;
+                case 8 -> speedLimit = 0.01 * Nature.C * Constants.M_TO_U;
+                case 9 -> speedLimit = 0.1 * Nature.C * Constants.M_TO_U;
+                case 10 -> speedLimit = 0.5 * Nature.C * Constants.M_TO_U;
+                case 11 -> speedLimit = 0.8 * Nature.C * Constants.M_TO_U;
+                case 12 -> speedLimit = 0.9 * Nature.C * Constants.M_TO_U;
+                case 13 -> speedLimit = 0.99 * Nature.C * Constants.M_TO_U;
+                case 14 -> speedLimit = 0.99999 * Nature.C * Constants.M_TO_U;
+                case 15 -> speedLimit = Nature.C * Constants.M_TO_U;
+                case 16 -> speedLimit = 2.0 * Nature.C * Constants.M_TO_U;
                 case 17 ->
                     // 10 c
-                        speedLimit = 10.0 * Constants.C * Constants.M_TO_U;
+                        speedLimit = 10.0 * Nature.C * Constants.M_TO_U;
                 case 18 ->
                     // 1000 c
-                        speedLimit = 1000.0 * Constants.C * Constants.M_TO_U;
+                        speedLimit = 1000.0 * Nature.C * Constants.M_TO_U;
                 case 19 -> speedLimit = Constants.AU_TO_U;
                 case 20 -> speedLimit = 10.0 * Constants.AU_TO_U;
                 case 21 -> speedLimit = 1000.0 * Constants.AU_TO_U;

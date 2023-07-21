@@ -11,9 +11,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -473,5 +476,46 @@ public class SysUtils {
     public static boolean isAppImage() {
         String userDir = System.getProperty("user.dir");
         return isAppImagePath(userDir);
+    }
+
+    /**
+     * Gets the current display resolution.
+     *
+     * @return The display resolution in an array with [width, height], or null if the resolution could not be
+     * determined.
+     */
+    public static int[] getDisplayResolution() {
+        int w, h;
+
+        // Graphics device method.
+        try {
+            GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            GraphicsConfiguration gc = gd.getDefaultConfiguration();
+            AffineTransform transform = gc.getDefaultTransform();
+            double scaleX = transform.getScaleX();
+            double scaleY = transform.getScaleY();
+            w = (int) (gc.getBounds().getWidth() * scaleX);
+            h = (int) (gc.getBounds().getHeight() * scaleY);
+            if (w > 0 && h > 0) {
+                return new int[]{w, h};
+            }
+        } catch (HeadlessException e) {
+            logger.error(I18n.msg("error.screensize.gd"));
+            logger.debug(e);
+        }
+
+        // Toolkit method.
+        try {
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            w = (int) screenSize.getWidth();
+            h = (int) screenSize.getHeight();
+            if (w > 0 && h > 0) {
+                return new int[]{w, h};
+            }
+        } catch (Exception e) {
+            logger.error(I18n.msg("error.screensize.toolkit"));
+            logger.debug(e);
+        }
+        return null;
     }
 }

@@ -38,8 +38,6 @@ import gaiasky.util.math.MathManager;
 import gaiasky.util.math.MathUtilsDouble;
 import org.yaml.snakeyaml.Yaml;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -429,9 +427,23 @@ public class GaiaSkyDesktop implements IObserver {
         Settings s = Settings.settings;
         cfg.setTitle(Settings.APPLICATION_NAME);
         if (!cliArgs.vr) {
-            // If we run on the Steam Deck, we default to full screen.
-            if (SysUtils.isSteamDeck()) {
-                s.graphics.fullScreen.active = true;
+            // We also default to full screen in small displays (around 720p, or a bit larger).
+            // To that effect, we check the length of the diagonal:
+            // 1280x720  -> 1468.6
+            // 1280x800  -> 1509.5
+            // 1600x900  -> 1835.7
+            // 1920x1080 -> 2202.9
+            // 2560x1440 -> 2937.2
+            // 3840x2160 -> 4405.8
+            int[] resolution = SysUtils.getDisplayResolution();
+            if (resolution != null && resolution.length == 2 && resolution[0] > 0 && resolution[1] > 0) {
+                double screenDiagonalPixels = Math.sqrt(Math.pow(resolution[0], 2) + Math.pow(resolution[1], 2));
+                if (screenDiagonalPixels < 1600) {
+                    // Set full screen.
+                    s.graphics.fullScreen.active = true;
+                    // Set UI scale to 0.9.
+                    s.program.ui.scale = MathUtilsDouble.lint(0.9f, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+                }
             }
 
             if (s.graphics.fullScreen.active) {
@@ -587,45 +599,26 @@ public class GaiaSkyDesktop implements IObserver {
         int w = Settings.settings.graphics.getScreenWidth();
         int h = Settings.settings.graphics.getScreenHeight();
         if (!SysUtils.isMac()) {
-            // Graphics device method.
             if (w <= 0 || h <= 0) {
-                try {
-                    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                    GraphicsConfiguration gc = gd.getDefaultConfiguration();
-                    AffineTransform transform = gc.getDefaultTransform();
-                    double scaleX = transform.getScaleX();
-                    double scaleY = transform.getScaleY();
-                    w = (int) Math.max(1600, gc.getBounds().getWidth() * scaleX * 0.85f);
-                    h = (int) Math.max(900, gc.getBounds().getHeight() * scaleY * 0.85f);
-                    Settings.settings.graphics.resolution[0] = w;
-                    Settings.settings.graphics.resolution[1] = h;
-                } catch (HeadlessException he) {
-                    logger.error(I18n.msg("error.screensize.gd"));
-                    logger.debug(he);
-                }
-            }
-            // Toolkit method.
-            if (w <= 0 || h <= 0) {
-                try {
-                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    w = (int) Math.max(1600, (screenSize.getWidth() * 0.85f));
-                    h = (int) Math.max(900, (screenSize.getHeight() * 0.85f));
-                    Settings.settings.graphics.resolution[0] = w;
-                    Settings.settings.graphics.resolution[1] = h;
-                } catch (Exception e) {
+                int[] wh = SysUtils.getDisplayResolution();
+                // Default values.
+                w = Constants.DEFAULT_RESOLUTION_WIDTH;
+                h = Constants.DEFAULT_RESOLUTION_HEIGHT;
+                if (wh != null && wh.length == 2 && wh[0] > 0 && wh[1] > 0) {
+                    // Use retrieved resolution.
+                    w = (int) Math.max(w, wh[0] * 0.85f);
+                    h = (int) Math.max(h, wh[1] * 0.85f);
+                } else {
                     // Default.
-                    w = 1600;
-                    h = 900;
-                    Settings.settings.graphics.resolution[0] = w;
-                    Settings.settings.graphics.resolution[1] = h;
-                    logger.error(I18n.msg("error.screensize.toolkit", w, h));
-                    logger.debug(e);
+                    logger.error(I18n.msg("error.screensize.default", w, h));
                 }
+                Settings.settings.graphics.resolution[0] = w;
+                Settings.settings.graphics.resolution[1] = h;
             }
         } else {
             // macOS is retarded and only likes headless mode, using default.
-            w = 1600;
-            h = 900;
+            w = Constants.DEFAULT_RESOLUTION_WIDTH;
+            h = Constants.DEFAULT_RESOLUTION_HEIGHT;
             Settings.settings.graphics.resolution[0] = w;
             Settings.settings.graphics.resolution[1] = h;
         }

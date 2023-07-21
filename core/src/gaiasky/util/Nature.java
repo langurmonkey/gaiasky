@@ -94,4 +94,12 @@ public class Nature {
     /** Minutes to seconds **/
     public static final double MIN_TO_S = 60.0;
 
+    /*
+     * ======= SPEEDS =======
+     */
+    /**
+     * Speed of light in m/s
+     */
+    public static final double C = 299792458;
+
 }

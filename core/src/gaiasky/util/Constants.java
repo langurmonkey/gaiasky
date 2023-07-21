@@ -13,10 +13,11 @@ import org.apfloat.Apfloat;
 
 public class Constants {
 
-    /**
-     * Speed of light in m/s
-     */
-    public static final double C = 299792458;
+    /** Default resolution: width. **/
+    public static final int DEFAULT_RESOLUTION_WIDTH = 1600;
+    /** Default resolution: height. **/
+    public static final int DEFAULT_RESOLUTION_HEIGHT = 900;
+
     /**
      * Speed of light in km/h
      */
@@ -277,7 +278,7 @@ public class Constants {
     /**
      * Speed of light in internal units per second
      */
-    public static double C_US = C * M_TO_U;
+    public static double C_US = Nature.C * M_TO_U;
     /**
      * Logarithmic depth buffer constant. Controls the resolution close to the camera
      */
@@ -300,7 +301,7 @@ public class Constants {
         KPC_TO_U = PC_TO_U * 1000d;
         U_TO_KPC = U_TO_PC / 1000d;
         MPC_TO_U = KPC_TO_U * 1000d;
-        C_US = C * M_TO_U;
+        C_US = Nature.C * M_TO_U;
         Ro_TO_U = Ro_TO_KM * KM_TO_U;
         U_TO_Ro = 1d / Ro_TO_U;
         CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
