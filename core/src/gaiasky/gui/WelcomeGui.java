@@ -15,6 +15,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -49,6 +50,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.Separator;
 import gaiasky.vr.openxr.XrLoadStatus;
 
 import java.io.File;
@@ -253,13 +255,13 @@ public class WelcomeGui extends AbstractGui {
         logo.setOrigin(Align.center);
 
         // Title
-        HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(pad32 * 2f);
+        Table titleGroup = new Table(skin);
         OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
         OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
         version.setColor(skin.getColor("theme"));
-        titleGroup.addActor(gaiaSky);
-        titleGroup.addActor(version);
+
+        titleGroup.add(gaiaSky).padBottom(pad32).padRight(pad32 * 2f);
+        titleGroup.add(version).padBottom(pad32).row();
 
         String textStyle = "main-title-s";
 
