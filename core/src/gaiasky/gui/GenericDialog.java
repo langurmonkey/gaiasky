@@ -596,7 +596,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 for (var processor : inputMultiplexer.getProcessors()) {
                     if (processor instanceof AbstractMouseKbdListener) {
                         var abstractMouseKbdListener = (AbstractMouseKbdListener) processor;
-                        if (abstractMouseKbdListener.isActive()) {
+                        if (abstractMouseKbdListener.isActive() && isModal()) {
                             abstractMouseKbdListener.deactivate();
                             backupMouseKbdListeners.add(abstractMouseKbdListener);
                         }

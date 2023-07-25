@@ -35,12 +35,12 @@ public class KeyframesView extends BaseView {
     private final FocusView focus;
     /** The keyframed path component. **/
     private Keyframes kf;
-    private Scene scene;
-    private KeyframeUtils utils;
+    private final Scene scene;
+    private final KeyframeUtils utils;
 
-    private Vector3 F31 = new Vector3();
-    private Vector3d D31 = new Vector3d();
-    private Vector3d D32 = new Vector3d();
+    private final Vector3 F31 = new Vector3();
+    private final Vector3d D31 = new Vector3d();
+    private final Vector3d D32 = new Vector3d();
 
     public KeyframesView(Scene scene) {
         this.scene = scene;

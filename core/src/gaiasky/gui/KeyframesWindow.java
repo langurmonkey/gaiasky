@@ -123,8 +123,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Model object to represent the path
      **/
-    private Entity keyframesPathEntity;
-    private Keyframes keyframesComponent;
+    private final Entity keyframesPathEntity;
+    private final Keyframes keyframesComponent;
     private long lastMs = 0L;
     private Color colorBak;
 
@@ -930,7 +930,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private void clean(boolean cleanKeyframesList, boolean cleanModel) {
         // Clean camera
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
-        if (Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith("Keyframe")) {
+        if (focus != null && Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith("Keyframe")) {
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, Settings.settings.scene.homeObject);
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
         }
