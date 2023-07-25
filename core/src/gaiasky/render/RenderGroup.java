@@ -170,7 +170,7 @@ public enum RenderGroup {
     public final int priority;
 
     RenderGroup(int priority) {
-       this.priority = priority;
+        this.priority = priority;
     }
 
     /**
@@ -178,7 +178,6 @@ public enum RenderGroup {
      *
      * @param renderGroupMask The bit mask
      * @param rgs             The render groups
-     *
      * @return The bits instance
      */
     public static Bits add(Bits renderGroupMask, RenderGroup... rgs) {
@@ -193,7 +192,6 @@ public enum RenderGroup {
      *
      * @param renderGroupMask The bit mask
      * @param rgs             The render groups
-     *
      * @return The bits instance
      */
     public static Bits set(Bits renderGroupMask, RenderGroup... rgs) {
@@ -203,6 +201,14 @@ public enum RenderGroup {
 
     public boolean is(Bits renderGroupMask) {
         return renderGroupMask.get(ordinal());
+    }
+
+    public boolean isPoint() {
+        return this.equals(POINT) || this.equals(POINT_GPU);
+    }
+
+    public boolean isLine() {
+        return this.equals(LINE) || this.equals(LINE_GPU) || this.equals(LINE_LATE);
     }
 
 }

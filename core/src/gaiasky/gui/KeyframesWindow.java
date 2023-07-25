@@ -984,38 +984,34 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case KEYFRAME_ADD:
-            addKeyframe(-1);
-            break;
-        case UPDATE_CAM_RECORDER:
-            synchronized (lock) {
-                t = (ITimeFrameProvider) data[0];
-                pos = (Vector3b) data[1];
-                dir = (Vector3d) data[2];
-                up = (Vector3d) data[3];
+            case KEYFRAME_ADD -> addKeyframe(-1);
+            case UPDATE_CAM_RECORDER -> {
+                synchronized (lock) {
+                    t = (ITimeFrameProvider) data[0];
+                    pos = (Vector3b) data[1];
+                    dir = (Vector3d) data[2];
+                    up = (Vector3d) data[3];
+                }
             }
-            break;
-        case KEYFRAMES_REFRESH:
-            reinitialiseKeyframes(keyframes, null);
-            break;
-        case KEYFRAME_SELECT:
-            Keyframe kf = (Keyframe) data[0];
-            OwnLabel nl = keyframeNames.get(kf);
-            if (nl != null) {
-                colorBak = nl.getColor().cpy();
-                nl.setColor(skin.getColor("theme"));
-                scrollToKeyframe(kf);
+            case KEYFRAMES_REFRESH -> reinitialiseKeyframes(keyframes, null);
+            case KEYFRAME_SELECT -> {
+                Keyframe kf = (Keyframe) data[0];
+                OwnLabel nl = keyframeNames.get(kf);
+                if (nl != null) {
+                    colorBak = nl.getColor().cpy();
+                    nl.setColor(skin.getColor("theme"));
+                    scrollToKeyframe(kf);
+                }
             }
-            break;
-        case KEYFRAME_UNSELECT:
-            kf = (Keyframe) data[0];
-            nl = keyframeNames.get(kf);
-            if (nl != null && colorBak != null) {
-                nl.setColor(colorBak);
+            case KEYFRAME_UNSELECT -> {
+                Keyframe kf = (Keyframe) data[0];
+                OwnLabel nl = keyframeNames.get(kf);
+                if (nl != null && colorBak != null) {
+                    nl.setColor(colorBak);
+                }
             }
-            break;
-        default:
-            break;
+            default -> {
+            }
         }
     }
 

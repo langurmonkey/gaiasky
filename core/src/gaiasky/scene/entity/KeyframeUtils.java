@@ -8,6 +8,7 @@
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.GL20;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -33,6 +34,7 @@ public class KeyframeUtils {
         var verts = Mapper.verts.get(entity);
         verts.renderGroup = rg;
         verts.primitiveSize = primitiveSize;
+        verts.glPrimitive = rg.isPoint() ? GL20.GL_POINTS : GL20.GL_LINE_STRIP;
 
         var graph = Mapper.graph.get(entity);
         graph.translation = new Vector3b();

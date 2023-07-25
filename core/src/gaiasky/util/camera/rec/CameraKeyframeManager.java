@@ -29,7 +29,7 @@ public class CameraKeyframeManager implements IObserver {
     /**
      * Separator for keyframes files
      **/
-    private static final String ksep = ",";
+    private static final String keyframeSeparator = ",";
     /**
      * Separator for camera files
      **/
@@ -71,7 +71,7 @@ public class CameraKeyframeManager implements IObserver {
             br = new BufferedReader(new FileReader(file.toFile()));
             String line;
             while ((line = br.readLine()) != null) {
-                String[] tokens = line.split(ksep);
+                String[] tokens = line.split(keyframeSeparator);
                 double secs = Parser.parseDouble(tokens[0]);
                 long time = Parser.parseLong(tokens[1]);
                 Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
@@ -112,11 +112,11 @@ public class CameraKeyframeManager implements IObserver {
             os = new BufferedWriter(new FileWriter(f.toFile()));
 
             for (Keyframe kf : keyframes) {
-                os.append(Double.toString(kf.seconds)).append(ksep).append(Long.toString(kf.time)).append(ksep);
-                os.append(Double.toString(kf.pos.x)).append(ksep).append(Double.toString(kf.pos.y)).append(ksep).append(Double.toString(kf.pos.z)).append(ksep);
-                os.append(Double.toString(kf.dir.x)).append(ksep).append(Double.toString(kf.dir.y)).append(ksep).append(Double.toString(kf.dir.z)).append(ksep);
-                os.append(Double.toString(kf.up.x)).append(ksep).append(Double.toString(kf.up.y)).append(ksep).append(Double.toString(kf.up.z)).append(ksep);
-                os.append(Integer.toString(kf.seam ? 1 : 0)).append(ksep);
+                os.append(Double.toString(kf.seconds)).append(keyframeSeparator).append(Long.toString(kf.time)).append(keyframeSeparator);
+                os.append(Double.toString(kf.pos.x)).append(keyframeSeparator).append(Double.toString(kf.pos.y)).append(keyframeSeparator).append(Double.toString(kf.pos.z)).append(keyframeSeparator);
+                os.append(Double.toString(kf.dir.x)).append(keyframeSeparator).append(Double.toString(kf.dir.y)).append(keyframeSeparator).append(Double.toString(kf.dir.z)).append(keyframeSeparator);
+                os.append(Double.toString(kf.up.x)).append(keyframeSeparator).append(Double.toString(kf.up.y)).append(keyframeSeparator).append(Double.toString(kf.up.z)).append(keyframeSeparator);
+                os.append(Integer.toString(kf.seam ? 1 : 0)).append(keyframeSeparator);
                 os.append(kf.name).append("\n");
             }
 
@@ -190,7 +190,7 @@ public class CameraKeyframeManager implements IObserver {
         }
         BufferedWriter os = null;
 
-        /** Frame counter **/
+        /* Frame counter */
         long frames = 0;
         double frameRate = Settings.settings.camrecorder.targetFps;
 
@@ -214,16 +214,16 @@ public class CameraKeyframeManager implements IObserver {
 
             Vector3d aux = new Vector3d();
 
-            /** Current position in the spline. Coincides with the control points **/
+            /* Current position in the spline. Coincides with the control points */
             double splineIdx = 0d;
-            /** Step length between control points **/
+            /* Step length between control points */
             double splineStep = 1d / (directions.length - 1);
 
             PathPart currentPosSpline = posSplines[0];
             int k = 0;
-            /** Position in current position spline **/
+            /* Position in current position spline */
             double splinePosIdx = 0d;
-            /** Step length in between control positions **/
+            /* Step length in between control positions */
             double splinePosStep = 1d / (currentPosSpline.nPoints - 1);
 
             for (int i = 1; i < keyframes.size; i++) {
@@ -231,17 +231,17 @@ public class CameraKeyframeManager implements IObserver {
                 Keyframe k1 = keyframes.get(i);
 
                 long nFrames = (long) (k1.seconds * frameRate);
-                double splineSubstep = splineStep / nFrames;
-                double splinePosSubstep = splinePosStep / nFrames;
+                double splineSubStep = splineStep / nFrames;
+                double splinePosSubStep = splinePosStep / nFrames;
 
                 long dt = k1.time - k0.time;
                 long tStep = dt / nFrames;
 
                 for (long fr = 0; fr < nFrames; fr++) {
                     // Global spline index in 0..1
-                    double a = splineIdx + splineSubstep * fr;
+                    double a = splineIdx + splineSubStep * fr;
                     // Partial position spline index in 0..1
-                    double b = splinePosIdx + splinePosSubstep * fr;
+                    double b = splinePosIdx + splinePosSubStep * fr;
 
                     // TIME
                     os.append(Long.toString(k0.time + tStep * fr)).append(sep);
@@ -269,7 +269,7 @@ public class CameraKeyframeManager implements IObserver {
                 splineIdx += splineStep;
                 splinePosIdx += splinePosStep;
 
-                // If k1 is seam and not last and we're doing splines, jump to next spline
+                // If k1 is seam and not last, and we're doing splines, jump to next spline
                 if (k1.seam && i < keyframes.size - 1 && Settings.settings.camrecorder.keyframe.position == PathType.SPLINE) {
                     currentPosSpline = posSplines[++k];
                     splinePosIdx = 0;
@@ -333,18 +333,18 @@ public class CameraKeyframeManager implements IObserver {
     public void notify(final Event event, Object source, final Object... data) {
 
         switch (event) {
-        case KEYFRAMES_FILE_SAVE:
-            Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
-            String fileName = (String) data[1];
-            saveKeyframesFile(keyframes, fileName);
-            break;
-        case KEYFRAMES_EXPORT:
-            keyframes = (Array<Keyframe>) data[0];
-            fileName = (String) data[1];
-            exportKeyframesFile(keyframes, fileName);
-            break;
-        default:
-            break;
+            case KEYFRAMES_FILE_SAVE -> {
+                Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
+                String fileName = (String) data[1];
+                saveKeyframesFile(keyframes, fileName);
+            }
+            case KEYFRAMES_EXPORT -> {
+                var keyframes = (Array<Keyframe>) data[0];
+                var fileName = (String) data[1];
+                exportKeyframesFile(keyframes, fileName);
+            }
+            default -> {
+            }
         }
     }
 
@@ -353,7 +353,7 @@ public class CameraKeyframeManager implements IObserver {
         SPLINE
     }
 
-    class PathPart {
+    static class PathPart {
         PathDouble<Vector3d> path;
         int nPoints, nChunks;
         long nFrames;
