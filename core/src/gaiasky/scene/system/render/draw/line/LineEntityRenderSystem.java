@@ -104,7 +104,7 @@ public class LineEntityRenderSystem {
                 p1.sub(camera.getPos());
                 p2.sub(camera.getPos());
 
-                // Add Arrow cap
+                // Add arrow head.
                 Vector3d p3 = ppm.nor().scl(p1p2len * 0.7).add(p2);
                 p3.rotate(p1, 30);
                 renderer.addPoint(lineView, p1.x, p1.y, p1.z, cc[0], cc[1], cc[2], alpha);

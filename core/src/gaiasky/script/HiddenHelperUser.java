@@ -48,86 +48,82 @@ public class HiddenHelperUser implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case SCENE_LOADED:
-            this.scene = (Scene) data[0];
-            break;
-        case NAVIGATE_TO_OBJECT:
-            FocusView body;
-            if (data[0] instanceof String) {
-                var entity = scene.findFocus((String) data[0]);
-                view.setEntity(entity);
-                body = view;
-            } else {
-                body = ((FocusView) data[0]);
-            }
-
-            GoToObjectTask gotoTask = new GoToObjectTask(body.getEntity(), currentTasks);
-            Thread gotoT = new Thread(gotoTask);
-            gotoT.start();
-            currentTasks.add(gotoTask);
-            lastCommandTime = TimeUtils.millis();
-            break;
-        case LAND_ON_OBJECT:
-            if (data[0] instanceof String) {
-                var entity = scene.findFocus((String) data[0]);
-                view.setEntity(entity);
-                body = view;
-            } else {
-                body = ((FocusView) data[0]);
-            }
-
-            LandOnObjectTask landOnTask = new LandOnObjectTask(body.getEntity(), currentTasks);
-            Thread landonT = new Thread(landOnTask);
-            landonT.start();
-            currentTasks.add(landOnTask);
-            lastCommandTime = TimeUtils.millis();
-
-            break;
-        case LAND_AT_LOCATION_OF_OBJECT:
-            if (data[0] instanceof String) {
-                var entity = scene.findFocus((String) data[0]);
-                view.setEntity(entity);
-                body = view;
-            } else if (data[0] instanceof Entity) {
-                view.setEntity((Entity) data[0]);
-                body = view;
-            } else {
-                body = ((FocusView) data[0]);
-            }
-
-            HelperTask landAtTask;
-            if (data[1] instanceof String) {
-                String locname = (String) data[1];
-                landAtTask = new LandAtLocationTask(body.getEntity(), locname, currentTasks);
-            } else {
-                Double lon = (Double) data[1];
-                Double lat = (Double) data[2];
-                landAtTask = new LandAtLocationTask(body.getEntity(), lon, lat, currentTasks);
-            }
-            Thread landAtLoc = new Thread(landAtTask);
-            landAtLoc.start();
-            currentTasks.add(landAtTask);
-            lastCommandTime = TimeUtils.millis();
-            break;
-        case INPUT_EVENT:
-            // More than one second after the command is given to be able to
-            // stop
-            if (TimeUtils.millis() - lastCommandTime > 1000) {
-
-                // Stop all current threads
-                for (HelperTask tsk : currentTasks) {
-                    tsk.stop();
+            case SCENE_LOADED -> this.scene = (Scene) data[0];
+            case NAVIGATE_TO_OBJECT -> {
+                final FocusView body;
+                if (data[0] instanceof String) {
+                    var entity = scene.findFocus((String) data[0]);
+                    view.setEntity(entity);
+                    body = view;
+                } else {
+                    body = ((FocusView) data[0]);
                 }
-                currentTasks.clear();
+                GoToObjectTask gotoTask = new GoToObjectTask(body.getEntity(), currentTasks);
+                Thread gotoT = new Thread(gotoTask);
+                gotoT.start();
+                currentTasks.add(gotoTask);
+                lastCommandTime = TimeUtils.millis();
             }
-            break;
-        default:
-            break;
+            case LAND_ON_OBJECT -> {
+                final FocusView body;
+                if (data[0] instanceof String) {
+                    var entity = scene.findFocus((String) data[0]);
+                    view.setEntity(entity);
+                    body = view;
+                } else {
+                    body = ((FocusView) data[0]);
+                }
+                LandOnObjectTask landOnTask = new LandOnObjectTask(body.getEntity(), currentTasks);
+                Thread landonT = new Thread(landOnTask);
+                landonT.start();
+                currentTasks.add(landOnTask);
+                lastCommandTime = TimeUtils.millis();
+            }
+            case LAND_AT_LOCATION_OF_OBJECT -> {
+                final FocusView body;
+                if (data[0] instanceof String) {
+                    var entity = scene.findFocus((String) data[0]);
+                    view.setEntity(entity);
+                    body = view;
+                } else if (data[0] instanceof Entity) {
+                    view.setEntity((Entity) data[0]);
+                    body = view;
+                } else {
+                    body = ((FocusView) data[0]);
+                }
+                HelperTask landAtTask;
+                if (data[1] instanceof String) {
+                    String locName = (String) data[1];
+                    landAtTask = new LandAtLocationTask(body.getEntity(), locName, currentTasks);
+                } else {
+                    Double lon = (Double) data[1];
+                    Double lat = (Double) data[2];
+                    landAtTask = new LandAtLocationTask(body.getEntity(), lon, lat, currentTasks);
+                }
+                Thread landAtLoc = new Thread(landAtTask);
+                landAtLoc.start();
+                currentTasks.add(landAtTask);
+                lastCommandTime = TimeUtils.millis();
+            }
+            case INPUT_EVENT -> {
+                // More than one second after the command is given to be able to
+                // stop
+                if (TimeUtils.millis() - lastCommandTime > 1000) {
+
+                    // Stop all current threads
+                    for (HelperTask tsk : currentTasks) {
+                        tsk.stop();
+                    }
+                    currentTasks.clear();
+                }
+            }
+            default -> {
+            }
         }
 
     }
 
-    private abstract class HelperTask implements Runnable {
+    private abstract static class HelperTask implements Runnable {
         protected AtomicBoolean stop;
         Array<HelperTask> currentTasks;
 
@@ -141,7 +137,7 @@ public class HiddenHelperUser implements IObserver {
         }
     }
 
-    private class GoToObjectTask extends HelperTask {
+    private static class GoToObjectTask extends HelperTask {
         Entity body;
 
         GoToObjectTask(Entity entity, Array<HelperTask> currentTasks) {
@@ -157,7 +153,7 @@ public class HiddenHelperUser implements IObserver {
 
     }
 
-    private class LandOnObjectTask extends HelperTask {
+    private static class LandOnObjectTask extends HelperTask {
         Entity body;
 
         LandOnObjectTask(Entity body, Array<HelperTask> currentTasks) {
@@ -173,7 +169,7 @@ public class HiddenHelperUser implements IObserver {
 
     }
 
-    private class LandAtLocationTask extends HelperTask {
+    private static class LandAtLocationTask extends HelperTask {
         Entity body;
         String locName;
         Double lon, lat;

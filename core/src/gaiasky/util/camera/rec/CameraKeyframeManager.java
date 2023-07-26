@@ -39,6 +39,10 @@ public class CameraKeyframeManager implements IObserver {
      **/
     public static CameraKeyframeManager instance;
 
+    private final Vector3d v3d1 = new Vector3d();
+    private final Vector3d v3d2 = new Vector3d();
+    private final Vector3d v3d3 = new Vector3d();
+
     public CameraKeyframeManager() {
         super();
 
@@ -65,10 +69,8 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     public Array<Keyframe> loadKeyframesFile(Path file) throws RuntimeException {
-        Array<Keyframe> result = new Array<>();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(file.toFile()));
+        try (BufferedReader br = new BufferedReader(new FileReader(file.toFile()))) {
+            Array<Keyframe> result = new Array<>();
             String line;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(keyframeSeparator);
@@ -83,18 +85,10 @@ public class CameraKeyframeManager implements IObserver {
                 result.add(kf);
             }
 
+            return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            try {
-                if (br != null)
-                    br.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
         }
-
-        return result;
     }
 
     public void saveKeyframesFile(Array<Keyframe> keyframes, String fileName) {
@@ -106,11 +100,7 @@ public class CameraKeyframeManager implements IObserver {
                 logger.error(e);
             }
         }
-        BufferedWriter os = null;
-        try {
-            Files.createFile(f);
-            os = new BufferedWriter(new FileWriter(f.toFile()));
-
+        try (BufferedWriter os = new BufferedWriter(new FileWriter(f.toFile()))) {
             for (Keyframe kf : keyframes) {
                 os.append(Double.toString(kf.seconds)).append(keyframeSeparator).append(Long.toString(kf.time)).append(keyframeSeparator);
                 os.append(Double.toString(kf.pos.x)).append(keyframeSeparator).append(Double.toString(kf.pos.y)).append(keyframeSeparator).append(Double.toString(kf.pos.z)).append(keyframeSeparator);
@@ -123,13 +113,6 @@ public class CameraKeyframeManager implements IObserver {
         } catch (IOException e) {
             logger.error(e);
             return;
-        } finally {
-            if (os != null)
-                try {
-                    os.close();
-                } catch (Exception e) {
-                    logger.error(e);
-                }
         }
         logger.info(keyframes.size + " keyframes saved to file " + f);
 
@@ -212,8 +195,6 @@ public class CameraKeyframeManager implements IObserver {
             PathDouble<Vector3d> dirSpline = getPath(directions, Settings.settings.camrecorder.keyframe.orientation);
             PathDouble<Vector3d> upSpline = getPath(ups, Settings.settings.camrecorder.keyframe.orientation);
 
-            Vector3d aux = new Vector3d();
-
             /* Current position in the spline. Coincides with the control points */
             double splineIdx = 0d;
             /* Step length between control points */
@@ -231,11 +212,11 @@ public class CameraKeyframeManager implements IObserver {
                 Keyframe k1 = keyframes.get(i);
 
                 long nFrames = (long) (k1.seconds * frameRate);
-                double splineSubStep = splineStep / nFrames;
-                double splinePosSubStep = splinePosStep / nFrames;
+                double splineSubStep = splineStep / (nFrames - 1);
+                double splinePosSubStep = splinePosStep / (nFrames - 1);
 
                 long dt = k1.time - k0.time;
-                long tStep = dt / nFrames;
+                long tStep = dt / (nFrames - 1);
 
                 for (long fr = 0; fr < nFrames; fr++) {
                     // Global spline index in 0..1
@@ -247,18 +228,20 @@ public class CameraKeyframeManager implements IObserver {
                     os.append(Long.toString(k0.time + tStep * fr)).append(sep);
 
                     // POS
-                    currentPosSpline.path.valueAt(aux, b);
-                    os.append(Double.toString(aux.x)).append(sep).append(Double.toString(aux.y)).append(sep).append(Double.toString(aux.z)).append(sep);
+                    currentPosSpline.path.valueAt(v3d1, b);
+                    os.append(Double.toString(v3d1.x)).append(sep).append(Double.toString(v3d1.y)).append(sep).append(Double.toString(v3d1.z)).append(sep);
 
                     // DIR
-                    dirSpline.valueAt(aux, a);
-                    aux.nor();
-                    os.append(Double.toString(aux.x)).append(sep).append(Double.toString(aux.y)).append(sep).append(Double.toString(aux.z)).append(sep);
+                    dirSpline.valueAt(v3d1, a);
+                    v3d1.nor();
+                    os.append(Double.toString(v3d1.x)).append(sep).append(Double.toString(v3d1.y)).append(sep).append(Double.toString(v3d1.z)).append(sep);
 
                     // UP
-                    upSpline.valueAt(aux, a);
-                    aux.nor();
-                    os.append(Double.toString(aux.x)).append(sep).append(Double.toString(aux.y)).append(sep).append(Double.toString(aux.z));
+                    upSpline.valueAt(v3d2, a);
+                    // Ensure orthogonality with direction.
+                    Vector3d right = v3d3.set(v3d1).crs(v3d2);
+                    v3d2.set(v3d3.crs(v3d1)).nor();
+                    os.append(Double.toString(v3d2.x)).append(sep).append(Double.toString(v3d2.y)).append(sep).append(Double.toString(v3d2.z));
 
                     // New line
                     os.append("\n");

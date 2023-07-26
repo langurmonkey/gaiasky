@@ -20,8 +20,8 @@ import gaiasky.util.color.ColorUtils;
 
 public class KeyframeInitializer extends AbstractInitSystem {
 
-    private KeyframeUtils utils;
-    private Scene scene;
+    private final KeyframeUtils utils;
+    private final Scene scene;
 
     public KeyframeInitializer(Scene scene, boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
