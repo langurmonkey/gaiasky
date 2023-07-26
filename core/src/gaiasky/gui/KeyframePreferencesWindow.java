@@ -28,7 +28,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
     private final DecimalFormat nf3;
     public OwnTextField camrecFps;
-    private OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
+    private OwnSelectBox<ComboBoxBean> posMethod;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.keyframes.preferences"), skin, stage);
@@ -65,11 +65,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
         // Camera orientation
         OwnLabel orientation = new OwnLabel(I18n.msg("gui.cam.orientation"), skin);
-        orientationMethod = new OwnSelectBox<>(skin);
-        orientationMethod.setItems(interpolation);
-        orientationMethod.setSelectedIndex(Settings.settings.camrecorder.keyframe.orientation.ordinal());
-        orientationMethod.setItems(interpolation);
-        orientationMethod.setWidth(240f);
+        OwnLabel orientationMethod = new OwnLabel("Slerp", skin);
 
         // Time
         OwnLabel time = new OwnLabel(I18n.msg("gui.time"), skin);
@@ -97,7 +93,6 @@ public class KeyframePreferencesWindow extends GenericDialog {
     protected boolean accept() {
         EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camrecFps.getText()));
         Settings.settings.camrecorder.keyframe.position = CameraKeyframeManager.PathType.values()[posMethod.getSelectedIndex()];
-        Settings.settings.camrecorder.keyframe.orientation = CameraKeyframeManager.PathType.values()[orientationMethod.getSelectedIndex()];
         return true;
     }
 

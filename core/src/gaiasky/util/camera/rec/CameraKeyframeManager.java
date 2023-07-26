@@ -14,10 +14,7 @@ import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
-import gaiasky.util.math.CatmullRomSplined;
-import gaiasky.util.math.LinearDouble;
-import gaiasky.util.math.PathDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
@@ -42,6 +39,10 @@ public class CameraKeyframeManager implements IObserver {
     private final Vector3d v3d1 = new Vector3d();
     private final Vector3d v3d2 = new Vector3d();
     private final Vector3d v3d3 = new Vector3d();
+
+    private final QuaternionDouble q = new QuaternionDouble();
+    private final QuaternionDouble q0 = new QuaternionDouble();
+    private final QuaternionDouble q1 = new QuaternionDouble();
 
     public CameraKeyframeManager() {
         super();
@@ -181,24 +182,12 @@ public class CameraKeyframeManager implements IObserver {
             Files.createFile(f);
             os = new BufferedWriter(new FileWriter(f.toFile()));
 
-            Vector3d[] directions = new Vector3d[keyframes.size];
-            Vector3d[] ups = new Vector3d[keyframes.size];
-
-            // Fill in vectors
-            for (int i = 0; i < keyframes.size; i++) {
-                Keyframe k = keyframes.get(i);
-                directions[i] = k.dir;
-                ups[i] = k.up;
-            }
-
             PathPart[] posSplines = positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position);
-            PathDouble<Vector3d> dirSpline = getPath(directions, Settings.settings.camrecorder.keyframe.orientation);
-            PathDouble<Vector3d> upSpline = getPath(ups, Settings.settings.camrecorder.keyframe.orientation);
 
             /* Current position in the spline. Coincides with the control points */
             double splineIdx = 0d;
             /* Step length between control points */
-            double splineStep = 1d / (directions.length - 1);
+            double splineStep = 1d / (keyframes.size - 1);
 
             PathPart currentPosSpline = posSplines[0];
             int k = 0;
@@ -211,6 +200,9 @@ public class CameraKeyframeManager implements IObserver {
                 Keyframe k0 = keyframes.get(i - 1);
                 Keyframe k1 = keyframes.get(i);
 
+                q0.setFromCamera(k0.dir, k0.up);
+                q1.setFromCamera(k1.dir, k1.up);
+
                 long nFrames = (long) (k1.seconds * frameRate);
                 double splineSubStep = splineStep / (nFrames - 1);
                 double splinePosSubStep = splinePosStep / (nFrames - 1);
@@ -219,8 +211,8 @@ public class CameraKeyframeManager implements IObserver {
                 long tStep = dt / (nFrames - 1);
 
                 for (long fr = 0; fr < nFrames; fr++) {
-                    // Global spline index in 0..1
-                    double a = splineIdx + splineSubStep * fr;
+                    // Local index in 0..1
+                    double a = (double) fr / (double) (nFrames - 1);
                     // Partial position spline index in 0..1
                     double b = splinePosIdx + splinePosSubStep * fr;
 
@@ -231,16 +223,15 @@ public class CameraKeyframeManager implements IObserver {
                     currentPosSpline.path.valueAt(v3d1, b);
                     os.append(Double.toString(v3d1.x)).append(sep).append(Double.toString(v3d1.y)).append(sep).append(Double.toString(v3d1.z)).append(sep);
 
-                    // DIR
-                    dirSpline.valueAt(v3d1, a);
+                    // ORIENTATION
+                    q.set(q0).slerp(q1, a);
+                    // direction
+                    q.getDirection(v3d1);
                     v3d1.nor();
                     os.append(Double.toString(v3d1.x)).append(sep).append(Double.toString(v3d1.y)).append(sep).append(Double.toString(v3d1.z)).append(sep);
 
-                    // UP
-                    upSpline.valueAt(v3d2, a);
-                    // Ensure orthogonality with direction.
-                    Vector3d right = v3d3.set(v3d1).crs(v3d2);
-                    v3d2.set(v3d3.crs(v3d1)).nor();
+                    // up
+                    q.getUp(v3d2);
                     os.append(Double.toString(v3d2.x)).append(sep).append(Double.toString(v3d2.y)).append(sep).append(Double.toString(v3d2.z));
 
                     // New line
