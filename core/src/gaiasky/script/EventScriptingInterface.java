@@ -4140,12 +4140,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     class CameraTransitionRunnable implements Runnable {
         final Object lock;
-        final Vector3d D31, D32, D33;
+        final Vector3d v3d1, v3d2, v3d3;
         NaturalCamera cam;
         double seconds;
         double elapsed, start;
-        double[] targetPos, targetDir, targetUp;
-        PathDouble<Vector3d> posl, dirl, upl;
+        Vector3d targetDir, targetUp;
+        PathDouble<Vector3d> posInterpolator;
+        QuaternionDouble startOrientation, endOrientation, qd;
         Runnable end;
 
         /**
@@ -4161,9 +4162,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
          */
         public CameraTransitionRunnable(NaturalCamera cam, double[] pos, double[] dir, double[] up, double seconds, Runnable end) {
             this.cam = cam;
-            this.targetPos = pos;
-            this.targetDir = dir;
-            this.targetUp = up;
+            this.targetDir = new Vector3d(dir).nor();
+            this.targetUp = new Vector3d(up).nor();
             this.seconds = seconds;
             this.start = GaiaSky.instance.getT();
             this.elapsed = 0;
@@ -4171,17 +4171,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             this.lock = new Object();
 
             // Set up interpolation.
-            posl = getPathd(cam.getPos().tov3d(aux3d3), pos);
-            dirl = getPathd(cam.getDirection(), dir);
-            upl = getPathd(cam.getUp(), up);
+            posInterpolator = getPath(cam.getPos().tov3d(aux3d3), pos);
+            // Start and end orientations.
+            startOrientation = new QuaternionDouble();
+            startOrientation.setFromCamera(cam.direction, cam.up);
+            // End orientation.
+            endOrientation = new QuaternionDouble();
+            endOrientation.setFromCamera(targetDir, targetUp);
 
             // Aux
-            D31 = new Vector3d();
-            D32 = new Vector3d();
-            D33 = new Vector3d();
+            v3d1 = new Vector3d();
+            v3d2 = new Vector3d();
+            v3d3 = new Vector3d();
+            qd = new QuaternionDouble();
         }
 
-        private PathDouble<Vector3d> getPathd(Vector3d p0, double[] p1) {
+        private PathDouble<Vector3d> getPath(Vector3d p0, double[] p1) {
             Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
             return new LinearDouble<>(points);
         }
@@ -4194,12 +4199,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Interpolation variable
             double alpha = MathUtilsDouble.clamp(elapsed / seconds, 0.0, 0.99999999999999);
 
-            // Set camera state
-            cam.setPos(posl.valueAt(D31, alpha));
-            cam.setDirection(dirl.valueAt(D31, alpha).nor());
-            Vector3d up = upl.valueAt(D31, alpha);
-            Vector3d right = D32.set(cam.direction).crs(up);
-            cam.setUp(right.crs(cam.direction).nor());
+            // Interpolate camera position.
+            cam.setPos(posInterpolator.valueAt(v3d1, alpha));
+
+            // Interpolate camera orientation using quaternions.
+            qd.set(startOrientation).slerp(endOrientation, alpha);
+            var up = qd.getUp(v3d3);
+            cam.setUp(up);
+            var direction = qd.getDirection(v3d3);
+            cam.setDirection(v3d3);
 
             // Finish if needed
             if (elapsed >= seconds) {

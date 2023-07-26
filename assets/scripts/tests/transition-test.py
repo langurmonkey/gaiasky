@@ -11,6 +11,7 @@ gs.cameraStop()
 gs.minimizeInterfaceWindow()
 
 gs.sleep(2)
+gs.setCameraFree()
 
 # SYNC
 gs.print("Starting SYNC transition that will last 15 seconds")
@@ -24,6 +25,7 @@ gs.sleep(2)
 
 gs.setCameraFocusInstantAndGo("Earth")
 gs.sleep(2)
+gs.setCameraFree()
 
 # ASYNC
 gs.print("Starting ASYNC transition")
