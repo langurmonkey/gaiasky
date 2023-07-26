@@ -194,7 +194,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         OwnTextIconButton addKeyframe = new OwnTextIconButton(I18n.msg("gui.keyframes.add.end"), skin, "add");
         addKeyframe.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.add.end"), skin));
         addKeyframe.pad(pad10);
-        left.add(addKeyframe).left().colspan(2).padBottom(pad10).row();
+        left.add(addKeyframe).left().colspan(2).padBottom(pad34).row();
         addKeyframe.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Add at end
@@ -214,7 +214,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             addKeyframe.setDisabled(true);
         });
         secondsInput = new OwnTextField("1.0", skin, secondsValidator);
-        secondsInput.setWidth(96f);
+        secondsInput.setWidth(150f);
         OwnLabel secondsLabel = new OwnLabel(I18n.msg("gui.keyframes.secsafter") + ":", skin);
         left.add(secondsLabel).center().left().padRight(pad18).padBottom(pad18);
         left.add(secondsInput).center().left().padBottom(pad18).row();
@@ -223,7 +223,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         LengthValidator lengthValidator = new LengthValidator(0, 15);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]*$");
         nameInput = new OwnTextField("", skin, nameValidator);
-        nameInput.setWidth(96f);
+        nameInput.setWidth(150f);
         OwnLabel nameLabel = new OwnLabel(I18n.msg("gui.keyframes.name") + ":", skin);
         left.add(nameLabel).center().left().padRight(pad18).padBottom(pad18);
         left.add(nameInput).center().left().padBottom(pad18).row();
@@ -240,12 +240,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setExpand(true);
         rightScroll.setScrollingDisabled(true, false);
-        rightScroll.setHeight(160f);
-        rightScroll.setWidth(540f);
+        rightScroll.setHeight(250f);
+        rightScroll.setWidth(820f);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad18).row();
-        right.add(rightScroll).center().left();
+        right.add(rightScroll).width(820f).height(250f).center().left();
 
         right.pack();
 
@@ -429,7 +429,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /* FINAL LAYOUT */
         content.add(left).top().left().padRight(pad18 * 2f).padBottom(pad18 * 3f);
-        content.add(right).width(592f).top().left().padBottom(pad18).row();
+        content.add(right).width(830f).top().left().padBottom(pad18).row();
         notice = content.add();
         notice.padBottom(pad18 * 2f).expandY().center().colspan(2).row();
         content.add(normalizeTime).colspan(2).bottom().center().padBottom(pad18).row();
@@ -549,8 +549,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Table buildKeyframesTable() {
         Table table = new Table(skin);
         table.align(Align.top | Align.left);
+        table.setWidth(700f);
 
         addKeyframesToTable(keyframes, table);
+
+        table.pack();
 
         return table;
     }
@@ -584,7 +587,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private void addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-subheader");
-        secondsL.setWidth(96f);
+        secondsL.setWidth(126f);
         Cell<?> secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -654,7 +657,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private void addFrameName(Keyframe kf, int index, Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth(160f);
+        nameL.setWidth(360f);
         Cell<?> nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -663,7 +666,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             namesCells.put(kf, nameCell);
         }
         nameCell.clearActor();
-        nameCell.setActor(nameL).left().padRight(pad18 / 2f).padBottom(pad10);
+        nameCell.setActor(nameL).left().padRight(pad18).padBottom(pad10);
         keyframeNames.put(kf, nameL);
         nameL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.name"), skin));
         nameL.addListener((event) -> {
@@ -723,7 +726,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         long frame = (long) ((t + kf.seconds) * Settings.settings.frame.targetFps);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
-        framesL.setWidth(64f);
+        framesL.setWidth(86f);
         framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / Settings.settings.frame.targetFps)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad18).padBottom(pad10);
@@ -851,7 +854,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(rubbish, kf);
-        Cell<?> rub = table.add(rubbish).left().padBottom(pad10);
+        Cell<?> rub = table.add(rubbish).left().padRight(pad18).padBottom(pad10);
         rub.row();
         table.pack();
 
