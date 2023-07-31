@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.util.camera.rec.Camcorder;
 
 public class KeyframeExtractor extends AbstractExtractSystem {
     public KeyframeExtractor(Family family, int priority) {
@@ -29,7 +30,12 @@ public class KeyframeExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var kf = Mapper.keyframes.get(entity);
-        // Extract all children paths
+        // We do not render keyframes at all if the camcorder is playing.
+        if(Camcorder.instance.isPlaying()) {
+            return;
+        }
+
+        // Extract all children paths.
         for (Entity object : kf.objects) {
             extractVerts(object);
         }

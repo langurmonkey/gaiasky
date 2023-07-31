@@ -32,7 +32,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings.ElevationType;
-import gaiasky.util.camera.rec.CamRecorder;
+import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
 import gaiasky.util.math.MathUtilsDouble;
@@ -260,7 +260,7 @@ public class GaiaSkyDesktop implements IObserver {
             ScreenModeCmd.initialize();
 
             // Init cam recorder.
-            CamRecorder.initialize();
+            Camcorder.initialize();
 
             // Key mappings.
             KeyBindings.initialize();

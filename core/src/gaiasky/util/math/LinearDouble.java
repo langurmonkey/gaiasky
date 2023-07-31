@@ -21,12 +21,20 @@ public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     }
 
     @Override
-    public T derivativeAt(T out, double t) {
+    public T derivativeAt(T out,
+                          double t) {
         return null;
     }
 
     @Override
-    public T valueAt(T out, double t) {
+    public T valueAt(T out,
+                     double t) {
+        if (t == 0) {
+            return controlPoints[0];
+        }
+        if (t == 1) {
+            return controlPoints[controlPoints.length - 1];
+        }
         int n = controlPoints.length;
         double step = 1d / ((double) n - 1d);
         int i0 = (int) Math.floor(t / step);
