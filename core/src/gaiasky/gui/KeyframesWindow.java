@@ -843,6 +843,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         newKfs.add(k);
                 }
 
+                // Clear editing.
+                if (!editing.isEmpty() && editing.kf() == kf) {
+                    editing.unset();
+                }
+
                 // In case we removed the first
                 if (!newKfs.isEmpty())
                     newKfs.get(0).seconds = 0;
@@ -1038,7 +1043,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     /**
-     * Contains info on field currently being edited
+     * Contains info on field currently being edited.
      */
     private class Editing {
         private final Map<String, Object> map;

@@ -184,8 +184,6 @@ public class CameraKeyframeManager implements IObserver {
 
             PathPart[] posSplines = positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position);
 
-            /* Current position in the spline. Coincides with the control points */
-            double splineIdx = 0d;
             /* Step length between control points */
             double splineStep = 1d / (keyframes.size - 1);
 
@@ -240,7 +238,6 @@ public class CameraKeyframeManager implements IObserver {
                     frames++;
                 }
 
-                splineIdx += splineStep;
                 splinePosIdx += splinePosStep;
 
                 // If k1 is seam and not last, and we're doing splines, jump to next spline
