@@ -20,7 +20,8 @@ public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked
     // first with equals() and then with matches()
     public static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
-    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "names", "proper", "proper_name", "common_name", "designation" };
+    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "names", "proper", "proper_name", "common_name",
+            "designation" };
     public static String[] racolnames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
     public static String[] xcolnames = new String[] { "x", "X" };
     public static String[] decolnames = new String[] { "dec", "de", "declination", "delta", "dej2000" };
@@ -200,8 +201,8 @@ public class UCDParser {
         Set<UCD> meta = ucdmap.get(UCDType.META);
         if (meta != null)
             for (UCD candidate : meta) {
-                if (candidate.ucdstrings[0].equals("meta.id")) {
-                    if (candidate.ucdstrings.length == 1 || candidate.ucdstrings[1].equals("meta.main"))
+                if (TextUtils.contains(candidate.ucdstrings, "meta.id")) {
+                    if (candidate.ucdstrings.length > 1 && TextUtils.contains(candidate.ucdstrings, "meta.main"))
                         this.ID.add(candidate);
                 }
             }
@@ -337,14 +338,9 @@ public class UCDParser {
         Set<UCD> mag = ucdmap.get(UCDType.PHOT);
         if (mag != null)
             for (UCD candidate : mag) {
-                if (candidate.ucd[0][1].equals("mag") && candidate.ucd[0].length < 3) {
-                    if (candidate.ucd.length > 1) {
-                        if (candidate.ucdstrings[1].equals("stat.mean") || candidate.ucdstrings[1].toLowerCase().startsWith("em.opt.")) {
-                            this.MAG.add(candidate);
-                        }
-                    } else {
-                        if (this.MAG != null)
-                            this.MAG.add(candidate);
+                if (TextUtils.contains(candidate.ucdstrings, "phot.mag")) {
+                    if (candidate.ucdstrings.length == 1 || TextUtils.contains(candidate.ucdstrings, "stat.mean")|| TextUtils.startsWith(candidate.ucdstrings, "em.opt.")) {
+                        this.MAG.add(candidate);
                     }
                 }
             }
@@ -492,6 +488,7 @@ public class UCDParser {
                                      String defaultunit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
     }
+
     private Array<UCD> getByColNames(String[][] colnames,
                                      String defaultunit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
@@ -518,6 +515,7 @@ public class UCDParser {
         return candidates;
 
     }
+
     private Array<UCD> getByColNames(UCDType[] types,
                                      String[][] colnames,
                                      String defaultunit) {
