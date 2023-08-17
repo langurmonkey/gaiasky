@@ -315,6 +315,7 @@ public class SysUtils {
      * the user-configured data folder as input.
      *
      * @param dataLocation The user-defined data location.
+     *
      * @return A path that points to the temporary directory.
      */
     public static Path getTempDir(String dataLocation) {
@@ -449,7 +450,8 @@ public class SysUtils {
      * @param p    The pixmap.
      * @param name The name of the pixmap.
      */
-    public static void saveProceduralPixmap(Pixmap p, String name) {
+    public static void saveProceduralPixmap(Pixmap p,
+                                            String name) {
         if (p != null) {
             Path proceduralDir = getProceduralPixmapDir();
             Path file = proceduralDir.resolve(name + ".png");
@@ -462,6 +464,7 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
+     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -487,6 +490,11 @@ public class SysUtils {
     public static int[] getDisplayResolution() {
         int w, h;
 
+        // MacOS seems to be "special", only likes headless mode.
+        if (isMac()) {
+            return new int[] { Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT };
+        }
+
         // Graphics device method.
         try {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -497,7 +505,7 @@ public class SysUtils {
             w = (int) (gc.getBounds().getWidth() * scaleX);
             h = (int) (gc.getBounds().getHeight() * scaleY);
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             }
         } catch (HeadlessException e) {
             logger.error(I18n.msg("error.screensize.gd"));
@@ -510,7 +518,7 @@ public class SysUtils {
             w = (int) screenSize.getWidth();
             h = (int) screenSize.getHeight();
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             }
         } catch (Exception e) {
             logger.error(I18n.msg("error.screensize.toolkit"));
