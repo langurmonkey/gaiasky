@@ -34,7 +34,7 @@ import gaiasky.scene.view.VertsView;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
-import gaiasky.util.camera.rec.CameraKeyframeManager;
+import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -309,7 +309,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         if (Files.exists(result) && Files.isRegularFile(result)) {
                             // Load selected file
                             try {
-                                Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result);
+                                Array<Keyframe> kfs = KeyframesManager.instance.loadKeyframesFile(result);
                                 // Update current instance
                                 reinitialiseKeyframes(kfs, null);
                                 synchronized (view) {

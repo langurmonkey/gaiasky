@@ -31,7 +31,7 @@ import gaiasky.util.Settings.SceneSettings.RendererSettings.ElevationSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.ShadowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.GroupSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.ThresholdSettings;
-import gaiasky.util.camera.rec.CameraKeyframeManager.PathType;
+import gaiasky.util.camera.rec.KeyframesManager.PathType;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;
 

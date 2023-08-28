@@ -29,7 +29,7 @@ import gaiasky.gui.ModePopupInfo;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.camera.rec.CameraKeyframeManager;
+import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -2008,14 +2008,14 @@ public class Settings {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class KeyframeSettings {
-            public CameraKeyframeManager.PathType position;
+            public KeyframesManager.PathType position;
 
             /**
              * Since we started using quaternion spherical linear interpolation, this property is not used.
              *
              * @deprecated Not used anymore.
              */
-            public CameraKeyframeManager.PathType orientation;
+            public KeyframesManager.PathType orientation;
 
             public void setPosition(final String positionString) {
                 position = getPathType(positionString);
@@ -2025,8 +2025,8 @@ public class Settings {
                 orientation = getPathType(orientationString);
             }
 
-            private CameraKeyframeManager.PathType getPathType(String str) {
-                return CameraKeyframeManager.PathType.valueOf(str.toUpperCase());
+            private KeyframesManager.PathType getPathType(String str) {
+                return KeyframesManager.PathType.valueOf(str.toUpperCase());
             }
         }
 

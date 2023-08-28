@@ -14,7 +14,7 @@ import gaiasky.event.EventManager;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.camera.rec.CameraKeyframeManager;
+import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnLabel;
@@ -44,7 +44,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
     @Override
     protected void build() {
 
-        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.interpolation.linear"), CameraKeyframeManager.PathType.LINEAR.ordinal()), new ComboBoxBean(I18n.msg("gui.interpolation.catmull"), CameraKeyframeManager.PathType.SPLINE.ordinal()) };
+        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.interpolation.linear"), KeyframesManager.PathType.LINEAR.ordinal()), new ComboBoxBean(I18n.msg("gui.interpolation.catmull"), KeyframesManager.PathType.SPLINE.ordinal()) };
 
         OwnLabel generalTitle = new OwnLabel(I18n.msg("gui.general"), skin, "hud-header");
 
@@ -92,7 +92,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
     @Override
     protected boolean accept() {
         EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camrecFps.getText()));
-        Settings.settings.camrecorder.keyframe.position = CameraKeyframeManager.PathType.values()[posMethod.getSelectedIndex()];
+        Settings.settings.camrecorder.keyframe.position = KeyframesManager.PathType.values()[posMethod.getSelectedIndex()];
         return true;
     }
 

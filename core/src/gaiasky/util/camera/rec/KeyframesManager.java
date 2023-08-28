@@ -21,8 +21,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class CameraKeyframeManager implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(CameraKeyframeManager.class);
+public class KeyframesManager implements IObserver {
+    private static final Logger.Log logger = Logger.getLogger(KeyframesManager.class);
     /**
      * Separator for keyframes files
      **/
@@ -34,24 +34,23 @@ public class CameraKeyframeManager implements IObserver {
     /**
      * Singleton
      **/
-    public static CameraKeyframeManager instance;
+    public static KeyframesManager instance;
 
     private final Vector3d v3d1 = new Vector3d();
     private final Vector3d v3d2 = new Vector3d();
-    private final Vector3d v3d3 = new Vector3d();
 
     private final QuaternionDouble q = new QuaternionDouble();
     private final QuaternionDouble q0 = new QuaternionDouble();
     private final QuaternionDouble q1 = new QuaternionDouble();
 
-    public CameraKeyframeManager() {
+    public KeyframesManager() {
         super();
 
         EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT);
     }
 
     public static void initialize() {
-        instance = new CameraKeyframeManager();
+        instance = new KeyframesManager();
     }
 
     private PathDouble<Vector3d> getPath(Vector3d[] data, PathType pathType) {

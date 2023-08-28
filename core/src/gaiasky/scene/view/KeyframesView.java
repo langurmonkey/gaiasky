@@ -23,7 +23,7 @@ import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.entity.KeyframeUtils;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.camera.rec.CameraKeyframeManager;
+import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Vector3b;
@@ -119,7 +119,7 @@ public class KeyframesView extends BaseView {
             }
 
             // Set points to path
-            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
+            double[] pathSamples = KeyframesManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
             synchronized (verts) {
                 verts.setEntity(kf.path);
                 verts.setPoints(pathSamples);
@@ -194,7 +194,7 @@ public class KeyframesView extends BaseView {
             }
             kfPositionsSep.add(current);
 
-            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
+            double[] pathSamples = KeyframesManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
             synchronized (verts) {
                 verts.setEntity(kf.path);
                 verts.setPoints(pathSamples);
