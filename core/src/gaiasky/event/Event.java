@@ -914,7 +914,7 @@ public enum Event {
      * <ol start='0'>
      * <li>name [string]</li>
      * <li>status [boolean]</li>
-     * <li>position [vector3]</li>
+     * <li>entity [Entity]</li>
      * <li>shader [string] - optional, only at creation</li>
      * <li>additional [float4] - optional, only at creation</li>
      * </ol>
