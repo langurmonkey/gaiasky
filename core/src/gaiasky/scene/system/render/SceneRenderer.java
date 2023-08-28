@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static gaiasky.render.RenderGroup.*;
 
 /**
- * Coordinates and manages all render systems and render lists.
+ * Coordinates and manages all rendering operations in Gaia Sky.
  */
 public class SceneRenderer implements ISceneRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneRenderer.class);

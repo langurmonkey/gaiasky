@@ -24,6 +24,10 @@ import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 import gaiasky.util.validator.IntValidator;
 
+/**
+ * Extension of libgdx's text field that incorporates some QOL improvements like built-in validation
+ * or a clear button.
+ */
 public class OwnTextField extends TextField {
 
     private final Skin skin;
