@@ -596,7 +596,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             secondsCells.put(kf, secondsCell);
         }
         secondsCell.setActor(secondsL).left().padRight(pad18 / 2f).padBottom(pad10);
-        secondsL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seconds", kf.seconds, Settings.settings.frame.targetFps), skin));
+        secondsL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seconds", kf.seconds, Settings.settings.camrecorder.targetFps), skin));
         // Can't modify time of first keyframe; it's always zero
         if (index > 0)
             secondsL.addListener((event) -> {
@@ -723,11 +723,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 break;
             t += keyframes.get(i).seconds;
         }
-        long frame = (long) ((t + kf.seconds) * Settings.settings.frame.targetFps);
+        long frame = (long) ((t + kf.seconds) * Settings.settings.camrecorder.targetFps);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
         framesL.setWidth(86f);
-        framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / Settings.settings.frame.targetFps)), skin));
+        framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / Settings.settings.camrecorder.targetFps)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad18).padBottom(pad10);
 
