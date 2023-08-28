@@ -14,6 +14,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -35,33 +36,36 @@ import java.util.Objects;
 public class MainMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
 
     /**
-     * Maximum double click time, in ms
+     * Maximum double click time, in ms.
      **/
     private static final long doubleClickTime = 400;
-    public final GaiaGestureListener gestureListener;
     /**
-     * FOCUS_MODE comparator
+     * The gesture listener.
+     */
+    protected final GaiaGestureListener gestureListener;
+    /**
+     * FOCUS_MODE comparator.
      **/
     private final Comparator<Entity> comp;
     /**
-     * Max pixel distance to be considered a click
+     * Max pixel distance to be considered a click.
      **/
     private final float MOVE_PX_DIST;
     /**
-     * Max distance from the click to the actual selected star
+     * Max distance from the click to the actual selected star.
      **/
     private final int MIN_PIX_DIST;
     private final Vector2 gesture = new Vector2();
     /**
-     * Smoothing factor applied in the non-cinematic mode
+     * Smoothing factor applied in the non-cinematic mode.
      **/
     private final double noAccelSmoothing;
     /**
-     * Scaling factor applied in the non-cinematic mode
+     * Scaling factor applied in the non-cinematic mode.
      **/
     private final double noAccelFactor;
     /**
-     * Drag vectors
+     * Drag vectors.
      **/
     private final Vector2 currentDrag;
     private final Vector2 lastDrag;
@@ -73,11 +77,11 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
      */
     public int leftMouseButton = Buttons.LEFT;
     /**
-     * The button for panning the camera along the up/right plane
+     * The button for panning the camera along the up/right plane.
      */
     public int rightMouseButton = Buttons.RIGHT;
     /**
-     * The button for moving the camera along the direction axis
+     * The button for moving the camera along the direction axis.
      */
     public int middleMouseButton = Buttons.MIDDLE;
     /**
@@ -94,7 +98,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
      **/
     private boolean movementMultiplierState = false;
     /**
-     * The key for rolling the camera
+     * The key for rolling the camera.
      **/
     public int rollKey = Keys.SHIFT_LEFT;
     /**
@@ -103,19 +107,19 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     protected int button = -1;
     private float startX, startY;
     /**
-     * dx(mouse pointer) since last time
+     * dx(mouse pointer) since last time.
      **/
     private double dragDx;
     /**
-     * dy(mouse pointer) since last time
+     * dy(mouse pointer) since last time.
      **/
     private double dragDy;
     /**
-     * Save time of last click, in ms
+     * Save time of last click, in ms.
      */
     private long lastClickTime = -1;
     /**
-     * We're dragging or selecting a keyframe
+     * We're dragging or selecting a keyframe.
      **/
     private boolean keyframeBeingDragged = false;
     private int touched;
@@ -133,7 +137,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     /** Key register **/
     private final KeyRegister register;
 
-    protected MainMouseKbdListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
+    protected MainMouseKbdListener(final GaiaGestureListener gestureListener,
+                                   NaturalCamera camera) {
         super(gestureListener, camera);
         this.camera = camera;
         this.gestureListener = gestureListener;
@@ -180,14 +185,18 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         return null;
     }
 
-    private FocusView getKeyframeCollision(int screenX, int screenY) {
+    private FocusView getKeyframeCollision(int screenX,
+                                           int screenY) {
         if (getKeyframesPathObject() != null)
             return getKeyframesPathObject().select(screenX, screenY, MIN_PIX_DIST, camera);
         else
             return null;
     }
 
-    private void dragKeyframe(int screenX, int screenY, double dragDx, double dragDy) {
+    private void dragKeyframe(int screenX,
+                              int screenY,
+                              double dragDx,
+                              double dragDy) {
         if (isKeyPressed(Keys.SHIFT_LEFT) && !anyPressed(Keys.CONTROL_LEFT, Keys.ALT_LEFT)) {
             // Rotate around up (rotate dir)
             Objects.requireNonNull(getKeyframesPathObject()).rotateAroundUp(dragDx, dragDy, camera);
@@ -204,7 +213,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         Objects.requireNonNull(getKeyframesPathObject()).moveSelection(screenX, screenY, camera);
     }
 
-    private Array<Entity> getHits(int screenX, int screenY) {
+    private Array<Entity> getHits(int screenX,
+                                  int screenY) {
         Array<Entity> l = camera.getScene().findFocusableEntities();
         Array<Entity> hits = new Array<>();
 
@@ -217,7 +227,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         return hits;
     }
 
-    private Entity getBestHit(int screenX, int screenY) {
+    private Entity getBestHit(int screenX,
+                              int screenY) {
         Array<Entity> hits = getHits(screenX, screenY);
         if (hits.size != 0) {
             // Sort using distance
@@ -229,7 +240,10 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+    public boolean touchDown(int screenX,
+                             int screenY,
+                             int pointer,
+                             int button) {
         if (isActive()) {
             if (Settings.settings.runtime.inputEnabled) {
                 touched |= (1 << pointer);
@@ -262,7 +276,10 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
+    public boolean touchUp(final int screenX,
+                           final int screenY,
+                           final int pointer,
+                           final int button) {
         if (isActive()) {
             EventManager.publish(Event.INPUT_EVENT, this, button);
             if (Settings.settings.runtime.inputEnabled) {
@@ -296,7 +313,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 } else if (button == this.button && button == rightMouseButton) {
                     if (keyframeBeingDragged) {
                         keyframeBeingDragged = false;
-                    } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
+                    } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(
+                            Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                         Objects.requireNonNull(getKeyframesPathObject()).unselect();
                     } else {
@@ -329,7 +347,11 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         return false;
     }
 
-    protected boolean processDrag(int screenX, int screenY, double deltaX, double deltaY, int button) {
+    protected boolean processDrag(int screenX,
+                                  int screenY,
+                                  double deltaX,
+                                  double deltaY,
+                                  int button) {
         if (isActive()) {
             boolean accel = Settings.settings.scene.camera.cinematic;
             if (accel) {
@@ -358,7 +380,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     camera.addRotateMovement(dragDx, dragDy, false, accel);
                 }
             } else if (button == rightMouseButton) {
-                if (keyframeBeingDragged || (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT, Keys.ALT_LEFT))) {
+                if (keyframeBeingDragged || (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT,
+                                                                                                                                     Keys.ALT_LEFT))) {
                     // Drag keyframe
                     dragKeyframe(screenX, screenY, dragDx, dragDy);
                 } else {
@@ -381,12 +404,16 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         return false;
     }
 
-    private double lowPass(double smoothedValue, double newValue, double smoothing) {
+    private double lowPass(double smoothedValue,
+                           double newValue,
+                           double smoothing) {
         return smoothedValue + (newValue - smoothedValue) / smoothing;
     }
 
     @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
+    public boolean touchDragged(int screenX,
+                                int screenY,
+                                int pointer) {
         if (isActive()) {
             if (Settings.settings.runtime.inputEnabled) {
                 boolean result = super.touchDragged(screenX, screenY, pointer);
@@ -404,7 +431,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean scrolled(float amountX, float amountY) {
+    public boolean scrolled(float amountX,
+                            float amountY) {
         if (isActive()) {
             if (Settings.settings.runtime.inputEnabled) {
                 return zoom(amountY * scrollFactor);
@@ -435,30 +463,35 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     public boolean pollKeys() {
         long now = System.currentTimeMillis();
         boolean result = false;
-        float horizontalScale = Settings.settings.scene.camera.cinematic ? 0.01f : 1f;
-        if (isKeyPressed(Keys.UP)) {
-            camera.addForwardForce(1.0f);
-            result = true;
-        }
-        if (isKeyPressed(Keys.DOWN)) {
-            camera.addForwardForce(-1.0f);
-            result = true;
-        }
-        if (isKeyPressed(Keys.RIGHT)) {
-            if (camera.getMode().isFocus()) {
-                camera.addHorizontal(-1.0f * horizontalScale, true);
-            } else {
-                camera.addYaw(horizontalScale, true);
+
+        // Process cursors.
+        var keyboardFocus = GaiaSky.instance.mainGui.getGuiStage().getKeyboardFocus();
+        if (!(keyboardFocus instanceof TextField)) {
+            float horizontalScale = Settings.settings.scene.camera.cinematic ? 0.01f : 1f;
+            if (isKeyPressed(Keys.UP)) {
+                camera.addForwardForce(1.0f);
+                result = true;
             }
-            result = true;
-        }
-        if (isKeyPressed(Keys.LEFT)) {
-            if (camera.getMode().isFocus()) {
-                camera.addHorizontal(horizontalScale, true);
-            } else {
-                camera.addYaw(-1.0f * horizontalScale, true);
+            if (isKeyPressed(Keys.DOWN)) {
+                camera.addForwardForce(-1.0f);
+                result = true;
             }
-            result = true;
+            if (isKeyPressed(Keys.RIGHT)) {
+                if (camera.getMode().isFocus()) {
+                    camera.addHorizontal(-1.0f * horizontalScale, true);
+                } else {
+                    camera.addYaw(horizontalScale, true);
+                }
+                result = true;
+            }
+            if (isKeyPressed(Keys.LEFT)) {
+                if (camera.getMode().isFocus()) {
+                    camera.addHorizontal(horizontalScale, true);
+                } else {
+                    camera.addYaw(-1.0f * horizontalScale, true);
+                }
+                result = true;
+            }
         }
 
         // Camera speed-up button.
@@ -514,17 +547,19 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
-            case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-            case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-            case TOUCH_DRAGGED -> this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
-            case SCROLLED -> this.scrolled(0f, (float) data[0]);
-            case KEY_DOWN -> this.keyDown((int) data[0]);
-            case KEY_UP -> this.keyUp((int) data[0]);
-            case SCENE_LOADED -> this.scene = (Scene) data[0];
-            default -> {
-            }
+        case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+        case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+        case TOUCH_DRAGGED -> this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
+        case SCROLLED -> this.scrolled(0f, (float) data[0]);
+        case KEY_DOWN -> this.keyDown((int) data[0]);
+        case KEY_UP -> this.keyUp((int) data[0]);
+        case SCENE_LOADED -> this.scene = (Scene) data[0];
+        default -> {
+        }
         }
     }
 
@@ -533,13 +568,17 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         private float previousZoom;
 
         @Override
-        public boolean touchDown(float x, float y, int pointer, int button) {
+        public boolean touchDown(float x,
+                                 float y,
+                                 int pointer,
+                                 int button) {
             previousZoom = 0;
             return false;
         }
 
         @Override
-        public boolean zoom(float initialDistance, float distance) {
+        public boolean zoom(float initialDistance,
+                            float distance) {
             if (inputListener.isActive()) {
                 float newZoom = distance - initialDistance;
                 float amount = newZoom - previousZoom;
