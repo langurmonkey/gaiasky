@@ -30,9 +30,11 @@ public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     public T valueAt(T out,
                      double t) {
         if (t == 0) {
+            out.set(controlPoints[0]);
             return controlPoints[0];
         }
         if (t == 1) {
+            out.set(controlPoints[controlPoints.length - 1]);
             return controlPoints[controlPoints.length - 1];
         }
         int n = controlPoints.length;

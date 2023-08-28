@@ -1,8 +1,15 @@
 package gaiasky.util.camera.rec;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import gaiasky.util.DoubleArray;
+import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
+import gaiasky.util.camera.rec.KeyframesManager.PathPart;
+import gaiasky.util.camera.rec.KeyframesManager.PathType;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.QuaternionDouble;
+import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
@@ -17,7 +24,7 @@ public class CameraPath {
     /**
      * Number of steps in the current path.
      */
-    int n;
+    long n;
 
     /**
      * Contains the time as a long timestamp for each step.
@@ -31,7 +38,7 @@ public class CameraPath {
     /**
      * Current step number.
      */
-    int i;
+    long i;
 
     /**
      * Create an empty camera path.
@@ -78,6 +85,83 @@ public class CameraPath {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Create a camera path from a list of keyframes and its respective array of path parts.
+     *
+     * @param keyframes  Array of keyframes.
+     * @param posSplines Array of path parts.
+     */
+    public CameraPath(Array<Keyframe> keyframes,
+                      PathPart[] posSplines) {
+        times = new LongArray();
+        data = new DoubleArray();
+
+        final var q = new QuaternionDouble();
+        final var q0 = new QuaternionDouble();
+        final var q1 = new QuaternionDouble();
+        final var v3d1 = new Vector3d();
+        final var v3d2 = new Vector3d();
+
+        /* Frame counter */
+        double frameRate = Settings.settings.camrecorder.targetFps;
+
+        PathPart currentPosSpline = posSplines[0];
+        int k = 0;
+        /* Position in current position spline */
+        double splinePosIdx = 0d;
+        /* Step length in between control positions */
+        double splinePosStep = 1d / (currentPosSpline.nPoints - 1);
+
+        for (int i = 1; i < keyframes.size; i++) {
+            Keyframe k0 = keyframes.get(i - 1);
+            Keyframe k1 = keyframes.get(i);
+
+            q0.setFromCamera(k0.dir, k0.up);
+            q1.setFromCamera(k1.dir, k1.up);
+
+            long nFrames = (long) (k1.seconds * frameRate);
+            double splinePosSubStep = splinePosStep / (nFrames - 1);
+
+            long dt = k1.time - k0.time;
+            long tStep = dt / (nFrames - 1);
+
+            for (long fr = 0; fr < nFrames; fr++) {
+                // Local index in 0..1
+                double a = (double) fr / (double) (nFrames - 1);
+                // Partial position spline index in 0..1
+                double b = splinePosIdx + splinePosSubStep * fr;
+
+                // TIME
+                times.add(k0.time + tStep * fr);
+
+                // POS
+                currentPosSpline.path.valueAt(v3d1, b);
+                data.add(v3d1.x, v3d1.y, v3d1.z);
+
+                // ORIENTATION
+                q.set(q0).slerp(q1, a);
+                // direction
+                q.getDirection(v3d1);
+                v3d1.nor();
+                data.add(v3d1.x, v3d1.y, v3d1.z);
+
+                // up
+                q.getUp(v3d2);
+                data.add(v3d2.x, v3d2.y, v3d2.z);
+            }
+
+            splinePosIdx += splinePosStep;
+
+            // If k1 is seam and not last, and we're doing splines, jump to next spline
+            if (k1.seam && i < keyframes.size - 1 && Settings.settings.camrecorder.keyframe.position == PathType.SPLINE) {
+                currentPosSpline = posSplines[++k];
+                splinePosIdx = 0;
+                splinePosStep = 1d / (currentPosSpline.nPoints - 1);
+            }
+        }
+        n = times.size;
     }
 
     /**

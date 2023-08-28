@@ -81,10 +81,10 @@ public class Camcorder implements IObserver {
             if (playingPath != null) {
                 if (playingPath.i < playingPath.n) {
                     // Set time.
-                    EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(playingPath.times.get(playingPath.i)));
+                    EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(playingPath.times.get((int) playingPath.i)));
 
                     // Set position, direction, up.
-                    int ip = playingPath.i * 9;
+                    int ip = (int) playingPath.i * 9;
                     position.set(playingPath.data.get(ip), playingPath.data.get(ip + 1), playingPath.data.get(ip + 2));
                     direction.set(playingPath.data.get(ip + 3), playingPath.data.get(ip + 4), playingPath.data.get(ip + 5));
                     up.set(playingPath.data.get(ip + 6), playingPath.data.get(ip + 7), playingPath.data.get(ip + 8));
