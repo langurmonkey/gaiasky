@@ -14,7 +14,8 @@ import gaiasky.scene.Mapper;
 import gaiasky.util.camera.rec.Camcorder;
 
 public class KeyframeExtractor extends AbstractExtractSystem {
-    public KeyframeExtractor(Family family, int priority) {
+    public KeyframeExtractor(Family family,
+                             int priority) {
         super(family, priority);
     }
 
@@ -28,10 +29,11 @@ public class KeyframeExtractor extends AbstractExtractSystem {
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity,
+                                 float deltaTime) {
         var kf = Mapper.keyframes.get(entity);
         // We do not render keyframes at all if the camcorder is playing.
-        if(Camcorder.instance.isPlaying()) {
+        if (Camcorder.instance.isPlaying()) {
             return;
         }
 

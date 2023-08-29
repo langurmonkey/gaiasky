@@ -578,6 +578,22 @@
     "edit": {
       "imageUp": "edit-icon"
     },
+    "media-play-pause": {
+      "imageUp": "iconic-media-play",
+      "imageChecked": "iconic-media-pause"
+    },
+    "media-skip-forward": {
+      "imageUp": "iconic-media-skip-forward"
+    },
+    "media-skip-backward": {
+      "imageUp": "iconic-media-skip-backward"
+    },
+    "media-step-forward": {
+      "imageUp": "iconic-media-step-forward"
+    },
+    "media-step-backward": {
+      "imageUp": "iconic-media-step-backward"
+    },
     "playstop": {
       "imageUp": "play-icon",
       "imageChecked": "pause-icon"

@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Camcorder implements IObserver {
     private static final Log logger = Logger.getLogger(Camcorder.class);
-    private static final String sep = " ";
     /**
      * Singleton camcorder instance.
      **/
@@ -41,7 +40,6 @@ public class Camcorder implements IObserver {
     float time;
     private final AtomicReference<RecorderState> mode;
     private CameraPath recordingPath, playingPath;
-    private Path f;
     private long startMs;
 
     public Camcorder() {
@@ -166,7 +164,7 @@ public class Camcorder implements IObserver {
                     filename = df.format(new Date());
                 }
                 // Annotate by date.
-                f = SysUtils.getDefaultCameraDir().resolve(filename + ".gsc");
+                Path f = SysUtils.getDefaultCameraDir().resolve(filename + ".gsc");
                 if (Files.exists(f)) {
                     try {
                         Files.delete(f);

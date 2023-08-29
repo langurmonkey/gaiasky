@@ -28,20 +28,9 @@ public class KeyframesManager implements IObserver {
      **/
     private static final String keyframeSeparator = ",";
     /**
-     * Separator for camera files
-     **/
-    private static final String sep = " ";
-    /**
      * Singleton
      **/
     public static KeyframesManager instance;
-
-    private final Vector3d v3d1 = new Vector3d();
-    private final Vector3d v3d2 = new Vector3d();
-
-    private final QuaternionDouble q = new QuaternionDouble();
-    private final QuaternionDouble q0 = new QuaternionDouble();
-    private final QuaternionDouble q1 = new QuaternionDouble();
 
     public KeyframesManager() {
         super();
@@ -200,7 +189,7 @@ public class KeyframesManager implements IObserver {
      *
      * @return Array of path parts.
      */
-    private PathPart[] positionsToPathParts(Array<Keyframe> keyframes,
+    public PathPart[] positionsToPathParts(Array<Keyframe> keyframes,
                                             PathType pathType) {
         double frameRate = Settings.settings.camrecorder.targetFps;
         Array<Array<Vector3d>> positionsSep = new Array<>();

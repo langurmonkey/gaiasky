@@ -24,21 +24,21 @@ public class CameraPath {
     /**
      * Number of steps in the current path.
      */
-    long n;
+    public long n;
 
     /**
      * Contains the time as a long timestamp for each step.
      */
-    final LongArray times;
+    public final LongArray times;
     /**
      * Contains the position (3), direction (3) and up (3) values for each step.
      */
-    final DoubleArray data;
+    public final DoubleArray data;
 
     /**
      * Current step number.
      */
-    long i;
+    public long i;
 
     /**
      * Create an empty camera path.
