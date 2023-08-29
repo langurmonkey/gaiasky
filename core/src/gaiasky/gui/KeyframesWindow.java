@@ -536,7 +536,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 Keyframe kf = new Keyframe(name, cPos, cDir, cUp, cTime, secsAfter, false);
                 final boolean insert = index >= 0 && index != keyframes.size;
                 if (!insert) {
-                    keyframes.add(kf);
+                    synchronized (keyframes) {
+                        keyframes.add(kf);
+                    }
                     double prevT = 0;
                     for (Keyframe kfr : keyframes) {
                         if (kfr == kf)
@@ -546,13 +548,16 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
                     addKeyframeToTable(kf, prevT, keyframes.size - 1, keyframesTable, true);
                 } else {
-                    keyframes.insert(index, kf);
+                    synchronized (keyframes) {
+                        keyframes.insert(index, kf);
+                    }
                 }
                 GaiaSky.postRunnable(() -> {
-                    if (insert)
+                    if (insert) {
                         reinitialiseKeyframes(keyframes, kf);
-                    else
+                    } else {
                         checkKeyframesTable();
+                    }
                     scrollToKeyframe(kf);
                 });
 
