@@ -8,18 +8,24 @@
 package gaiasky.util.camera.rec;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
+import gaiasky.util.camera.rec.Camcorder.RecorderState;
 import gaiasky.util.math.*;
 import gaiasky.util.parse.Parser;
+import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class KeyframesManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesManager.class);
@@ -28,29 +34,85 @@ public class KeyframesManager implements IObserver {
      **/
     private static final String keyframeSeparator = ",";
     /**
-     * Separator for camera files
-     **/
-    private static final String sep = " ";
-    /**
      * Singleton
      **/
     public static KeyframesManager instance;
 
-    private final Vector3d v3d1 = new Vector3d();
-    private final Vector3d v3d2 = new Vector3d();
-
-    private final QuaternionDouble q = new QuaternionDouble();
-    private final QuaternionDouble q0 = new QuaternionDouble();
-    private final QuaternionDouble q1 = new QuaternionDouble();
+    /**
+     * Current keyframes
+     **/
+    public final Array<Keyframe> keyframes;
+    /**
+     * Reference to current camera position.
+     */
+    public Vector3b pos;
+    /**
+     * Reference to current camera orientation.
+     */
+    public Vector3d dir, up;
+    /**
+     * Reference to current time.
+     */
+    public ITimeFrameProvider t;
+    /**
+     * The current camera path, used for direct playback.
+     */
+    public CameraPath currentPath;
+    /**
+     * Play state.
+     */
+    public final AtomicReference<RecorderState> state = new AtomicReference<>(RecorderState.IDLE);
 
     public KeyframesManager() {
         super();
 
-        EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT);
+        this.keyframes = new Array<>();
+
+        EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT, Event.UPDATE_CAM_RECORDER, Event.KEYFRAME_PLAY_FRAME);
     }
 
     public static void initialize() {
         instance = new KeyframesManager();
+    }
+
+    /**
+     * Re-generates the camera path object from the current keyframes list.
+     */
+    public void regenerateCameraPath() {
+        synchronized (keyframes) {
+            currentPath = new CameraPath(keyframes, positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position));
+        }
+    }
+
+    /**
+     * Cleans the current configuration of keyframes.
+     */
+    public void clean() {
+        keyframes.clear();
+    }
+
+    /**
+     * Gets the frame number of the given keyframe using the current target frame rate setting.
+     *
+     * @param kf The keyframe.
+     *
+     * @return The frame number corresponding to exactly this keyframe if the keyframe is valid and in the keyframes list, otherwise -1.
+     * The frame number is in [1,n].
+     */
+    public long getFrameNumber(Keyframe kf) {
+        if (kf == null || keyframes.isEmpty() || !keyframes.contains(kf, true)) {
+            return -1;
+        }
+
+        // We start at the first frame.
+        double t = 1d / Settings.settings.camrecorder.targetFps;
+        for (int i = 0; ; i++) {
+            if (keyframes.get(i).equals(kf))
+                break;
+            t += keyframes.get(i).seconds;
+        }
+        t += kf.seconds;
+        return (long) (t * Settings.settings.camrecorder.targetFps);
     }
 
     private PathDouble<Vector3d> getPath(Vector3d[] data,
@@ -239,6 +301,71 @@ public class KeyframesManager implements IObserver {
         return res;
     }
 
+    /**
+     * Sets the manager in play mode.
+     */
+    public void play() {
+        state.set(RecorderState.PLAYING);
+    }
+
+    public boolean isPlaying() {
+        return state.get() == RecorderState.PLAYING;
+    }
+
+    /**
+     * Sets the manager in pause mode.
+     */
+    public void pause() {
+        state.set(RecorderState.IDLE);
+    }
+
+    public boolean isIdle() {
+        return state.get() == RecorderState.IDLE;
+    }
+
+    /**
+     * Sets the manager in stepping mode.
+     */
+    public void stepping() {
+        state.set(RecorderState.STEPPING);
+    }
+
+    public boolean isStepping() {
+        return state.get() == RecorderState.STEPPING;
+    }
+
+    /**
+     * Skips to the given frame.
+     * @param frame The frame number.
+     */
+    public void skip(long frame) {
+        if (frame < currentPath.n) {
+            // Set frame as current.
+            currentPath.i = frame;
+            // Set mode to stepping.
+            stepping();
+        }
+    }
+
+    /**
+     * Sets the current frame in the current path to the camera position, direction and up. It also sets the time.
+     */
+    private void setFrame() {
+        // Set free mode if necessary.
+        if (!GaiaSky.instance.getCameraManager().getMode().isFree()) {
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+        }
+
+        // Set time.
+        EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(currentPath.times.get((int) currentPath.i)));
+
+        // Set position, direction, up.
+        int ip = (int) currentPath.i * 9;
+        pos.set(currentPath.data.get(ip), currentPath.data.get(ip + 1), currentPath.data.get(ip + 2));
+        dir.set(currentPath.data.get(ip + 3), currentPath.data.get(ip + 4), currentPath.data.get(ip + 5));
+        up.set(currentPath.data.get(ip + 6), currentPath.data.get(ip + 7), currentPath.data.get(ip + 8));
+    }
+
     @Override
     public void notify(final Event event,
                        Object source,
@@ -254,6 +381,47 @@ public class KeyframesManager implements IObserver {
             var keyframes = (Array<Keyframe>) data[0];
             var fileName = (String) data[1];
             exportKeyframesFile(keyframes, fileName);
+        }
+        case UPDATE_CAM_RECORDER -> {
+            synchronized (this) {
+                t = (ITimeFrameProvider) data[0];
+                pos = (Vector3b) data[1];
+                dir = (Vector3d) data[2];
+                up = (Vector3d) data[3];
+            }
+            if (state.get() == RecorderState.PLAYING && currentPath != null) {
+                // In playing mode, we set the frame and then advance to the next.
+
+                // Set frame.
+                setFrame();
+
+                // Advance step.
+                currentPath.i = (currentPath.i + 1) % currentPath.n;
+
+                // Check end.
+                if (currentPath.i == 0) {
+                    pause();
+                }
+
+                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
+            } else if (state.get() == RecorderState.STEPPING && currentPath != null) {
+                // In stepping mode, we set the frame and pause.
+
+                // Set frame.
+                setFrame();
+
+                // Pause.
+                pause();
+
+                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
+            }
+        }
+        case KEYFRAME_PLAY_FRAME -> {
+            if (source != this && currentPath != null) {
+                // Actually play frame.
+                long frame = (Long) data[0];
+                skip(frame);
+            }
         }
         default -> {
         }

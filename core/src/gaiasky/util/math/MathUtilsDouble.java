@@ -58,7 +58,8 @@ public final class MathUtilsDouble {
      * Returns atan2 in radians, faster but less accurate than Math.atan2. Average error of 0.00231 radians (0.1323 degrees),
      * largest error of 0.00488 radians (0.2796 degrees).
      */
-    static public double atan2(double y, double x) {
+    static public double atan2(double y,
+                               double x) {
         if (x == 0) {
             if (y > 0)
                 return PI / 2;
@@ -83,7 +84,8 @@ public final class MathUtilsDouble {
     }
 
     /** Returns a random number between start (inclusive) and end (inclusive). */
-    static public int random(int start, int end) {
+    static public int random(int start,
+                             int end) {
         return start + random.nextInt(end - start + 1);
     }
 
@@ -93,7 +95,8 @@ public final class MathUtilsDouble {
     }
 
     /** Returns a random number between start (inclusive) and end (inclusive). */
-    static public long random(long start, long end) {
+    static public long random(long start,
+                              long end) {
         return start + (long) (random.nextDouble() * (end - start));
     }
 
@@ -108,17 +111,22 @@ public final class MathUtilsDouble {
     }
 
     /** Returns a random number between start (inclusive) and end (exclusive). */
-    static public double random(double start, double end) {
+    static public double random(double start,
+                                double end) {
         return start + random.nextDouble() * (end - start);
     }
 
-    static public int clamp(int value, int min, int max) {
+    static public int clamp(int value,
+                            int min,
+                            int max) {
         if (value < min)
             return min;
         return Math.min(value, max);
     }
 
-    static public short clamp(short value, short min, short max) {
+    static public short clamp(short value,
+                              short min,
+                              short max) {
         if (value < min)
             return min;
         if (value > max)
@@ -126,13 +134,17 @@ public final class MathUtilsDouble {
         return value;
     }
 
-    static public float clamp(float value, float min, float max) {
+    static public float clamp(float value,
+                              float min,
+                              float max) {
         if (value < min)
             return min;
         return Math.min(value, max);
     }
 
-    static public double clamp(double value, double min, double max) {
+    static public double clamp(double value,
+                               double min,
+                               double max) {
         if (value < min)
             return min;
         return Math.min(value, max);
@@ -152,7 +164,8 @@ public final class MathUtilsDouble {
      * @param tolerance represent an upper bound below which the value is considered
      *                  zero.
      */
-    static public boolean isZero(double value, double tolerance) {
+    static public boolean isZero(double value,
+                                 double tolerance) {
         return Math.abs(value) <= tolerance;
     }
 
@@ -163,7 +176,8 @@ public final class MathUtilsDouble {
      * @param a the first value.
      * @param b the second value.
      */
-    static public boolean isEqual(double a, double b) {
+    static public boolean isEqual(double a,
+                                  double b) {
         return Math.abs(a - b) <= FLOAT_ROUNDING_ERROR;
     }
 
@@ -175,7 +189,9 @@ public final class MathUtilsDouble {
      * @param tolerance represent an upper bound below which the two values are
      *                  considered equal.
      */
-    static public boolean isEqual(double a, double b, double tolerance) {
+    static public boolean isEqual(double a,
+                                  double b,
+                                  double tolerance) {
         return Math.abs(a - b) <= tolerance;
     }
 
@@ -202,7 +218,11 @@ public final class MathUtilsDouble {
      *
      * @return The interpolated value
      */
-    public static double lint(double x, double x0, double x1, double y0, double y1) {
+    public static double lint(double x,
+                              double x0,
+                              double x1,
+                              double y0,
+                              double y1) {
         double rx0 = x0;
         double rx1 = x1;
         if (x0 > x1) {
@@ -231,7 +251,11 @@ public final class MathUtilsDouble {
      *
      * @return The interpolated value
      */
-    public static float lint(float x, float x0, float x1, float y0, float y1) {
+    public static float lint(float x,
+                             float x0,
+                             float x1,
+                             float y0,
+                             float y1) {
         float rx0 = x0;
         float rx1 = x1;
         if (x0 > x1) {
@@ -260,7 +284,11 @@ public final class MathUtilsDouble {
      *
      * @return The interpolated value
      */
-    public static float lint(long x, long x0, long x1, float y0, float y1) {
+    public static float lint(long x,
+                             long x0,
+                             long x1,
+                             float y0,
+                             float y1) {
         double rx0 = x0;
         double rx1 = x1;
         if (x0 > x1) {
@@ -290,7 +318,15 @@ public final class MathUtilsDouble {
      *
      * @return The Euclidean distance between the segment (x1, x2)
      */
-    public static double distancePointSegment(double x1, double y1, double z1, double x2, double y2, double z2, double x0, double y0, double z0) {
+    public static double distancePointSegment(double x1,
+                                              double y1,
+                                              double z1,
+                                              double x2,
+                                              double y2,
+                                              double z2,
+                                              double x0,
+                                              double y0,
+                                              double z0) {
         Vector3d v = aux0.set(x1, y1, z1);
         Vector3d w = aux1.set(x2, y2, z2);
         Vector3d p = aux2.set(x0, y0, z0);
@@ -313,8 +349,16 @@ public final class MathUtilsDouble {
         return p.dst(projection);
     }
 
-
-    public static Vector3d getClosestPoint2(double x1, double y1, double z1, double x2, double y2, double z2, double x0, double y0, double z0, Vector3d result) {
+    public static Vector3d getClosestPoint2(double x1,
+                                            double y1,
+                                            double z1,
+                                            double x2,
+                                            double y2,
+                                            double z2,
+                                            double x0,
+                                            double y0,
+                                            double z0,
+                                            Vector3d result) {
         //           (P2-P1)dot(v)
         //Pr = P1 +  ------------- * v.
         //           (v)dot(v)
@@ -331,7 +375,6 @@ public final class MathUtilsDouble {
         return result;
     }
 
-
     /**
      * Rounds the double value to a number of decimal places
      *
@@ -340,7 +383,8 @@ public final class MathUtilsDouble {
      *
      * @return The rounded value
      */
-    public static double roundAvoid(double value, int places) {
+    public static double roundAvoid(double value,
+                                    int places) {
         double scale = Math.pow(10, places);
         return Math.round(value * scale) / scale;
     }
@@ -371,13 +415,45 @@ public final class MathUtilsDouble {
      * <p>Note that due to numerical accuracy and since &pi; cannot be represented
      * exactly, the result interval is <em>closed</em>, it cannot be half-closed
      * as would be more satisfactory in a purely mathematical view.</p>
-     * @param a angle to normalize
+     *
+     * @param a      angle to normalize
      * @param center center of the desired 2&pi; interval for the result
+     *
      * @return a-2k&pi; with integer k and center-&pi; &lt;= a-2k&pi; &lt;= center+&pi;
+     *
      * @since 1.2
      */
-    public static double normalizeAngle(double a, double center) {
+    public static double normalizeAngle(double a,
+                                        double center) {
         return a - PI2 * FastMath.floor((a + FastMath.PI - center) / PI2);
+    }
+
+    /**
+     * Compares two doubles, with an epsilon.
+     *
+     * @param a       first nullable element
+     * @param b       second nullable element
+     * @param epsilon absolute difference tolerance.
+     */
+    public static boolean fuzzyEquals(Double a,
+                                      Double b,
+                                      double epsilon) {
+        final double absA = Math.abs(a);
+        final double absB = Math.abs(b);
+        final double diff = Math.abs(a - b);
+
+        if (a == b) {
+            // shortcut, handles infinities
+            return true;
+        } else if (a == 0 || b == 0 || absA + absB < Double.MIN_NORMAL) {
+            // a or b is zero or both are extremely close to it
+            // relative error is less meaningful here
+            // NOT SURE HOW RELATIVE EPSILON WORKS IN THIS CASE
+            return diff < (epsilon * Double.MIN_NORMAL);
+        } else {
+            // use relative error
+            return diff / Math.min((absA + absB), Double.MAX_VALUE) < epsilon;
+        }
     }
 }
 

@@ -499,36 +499,17 @@ public class GuiRegistry implements IObserver {
                     if (keyframesWindow == null) {
                         keyframesWindow = new KeyframesWindow(scene, stage, skin);
                     }
-                    if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                    if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent()) {
+                        keyframesWindow.reset();
                         keyframesWindow.show(stage, 0, 0);
+                    }
                     if (!GaiaSky.instance.isOn(ComponentType.Others)) {
                         // Notify that the user needs to enable 'others'.
                         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.keyframe.ct"), 10f);
                     }
                 }
                 case SHOW_TEXTURE_WINDOW_ACTION -> {
-                    var title = (String) data[0];
-                    var scale = 1f;
-                    if (data.length > 2) {
-                        scale = (Float) data[2];
-                    }
-                    var flipX = false;
-                    var flipY = false;
-                    if (data.length > 3) {
-                        flipX = (Boolean) data[3];
-                    }
-                    if (data.length > 4) {
-                        flipY = (Boolean) data[4];
-                    }
-                    TextureWindow textureWindow;
-                    if (data[1] instanceof FrameBuffer) {
-                        var frameBuffer = (FrameBuffer) data[1];
-                        textureWindow = new TextureWindow(title, skin, stage, frameBuffer, scale);
-                    } else {
-                        var texture = (Texture) data[1];
-                        textureWindow = new TextureWindow(title, skin, stage, texture, scale);
-                    }
-                    textureWindow.setFlip(flipX, flipY);
+                    TextureWindow textureWindow = getTextureWindow(data, stage);
                     textureWindow.show(stage, 0, 50);
                 }
                 case SHOW_DATE_TIME_EDIT_ACTION -> {
@@ -737,6 +718,33 @@ public class GuiRegistry implements IObserver {
             }
         }
 
+    }
+
+    private TextureWindow getTextureWindow(Object[] data,
+                                           Stage stage) {
+        var title = (String) data[0];
+        var scale = 1f;
+        if (data.length > 2) {
+            scale = (Float) data[2];
+        }
+        var flipX = false;
+        var flipY = false;
+        if (data.length > 3) {
+            flipX = (Boolean) data[3];
+        }
+        if (data.length > 4) {
+            flipY = (Boolean) data[4];
+        }
+        TextureWindow textureWindow;
+        if (data[1] instanceof FrameBuffer) {
+            var frameBuffer = (FrameBuffer) data[1];
+            textureWindow = new TextureWindow(title, skin, stage, frameBuffer, scale);
+        } else {
+            var texture = (Texture) data[1];
+            textureWindow = new TextureWindow(title, skin, stage, texture, scale);
+        }
+        textureWindow.setFlip(flipX, flipY);
+        return textureWindow;
     }
 
     private void closeWindow(GenericDialog dialog) {

@@ -598,6 +598,12 @@ public enum Event {
      * The given keyframe is no longer selected.
      **/
     KEYFRAME_UNSELECT,
+    /**
+     * Orders the keyframe manager to set the current frame to the given frame number (if source is not the manager).
+     * Informs that a new step has been taken in the keyframe playing mode (if source is the manager).
+     * Contains a long integer with the frame index in the whole sequence (not the keyframe!).
+     */
+    KEYFRAME_PLAY_FRAME,
 
     KEY_DOWN,
     KEY_UP,

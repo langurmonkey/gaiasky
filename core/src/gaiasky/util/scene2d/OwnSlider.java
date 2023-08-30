@@ -8,17 +8,20 @@
 package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Null;
+import com.badlogic.gdx.utils.Pools;
 import gaiasky.util.math.MathUtilsDouble;
 
 import java.text.DecimalFormat;
 
 public class OwnSlider extends Slider {
-    private float ownwidth = 0f, ownheight = 0f;
+    private float ownWidth = 0f, ownHeight = 0f;
     private float mapMin, mapMax;
     private boolean map = false;
     private Skin skin;
@@ -29,8 +32,16 @@ public class OwnSlider extends Slider {
     private float padX = 4.8f;
     private float padY = 4.8f;
     private DecimalFormat nf;
+    private EventListener labelListener;
+    private boolean programmaticChangeEvents = true;
 
-    public OwnSlider(float min, float max, float stepSize, float mapMin, float mapMax, boolean vertical, Skin skin) {
+    public OwnSlider(float min,
+                     float max,
+                     float stepSize,
+                     float mapMin,
+                     float mapMax,
+                     boolean vertical,
+                     Skin skin) {
         super(min, max, stepSize, vertical, skin.get("default-" + (vertical ? "vertical" : "horizontal"), OwnSliderStyle.class));
         if (vertical) {
             padX = -8;
@@ -41,41 +52,68 @@ public class OwnSlider extends Slider {
         setUp(mapMin, mapMax);
     }
 
-    public OwnSlider(float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
+    public OwnSlider(float min,
+                     float max,
+                     float stepSize,
+                     float mapMin,
+                     float mapMax,
+                     Skin skin) {
         this(min, max, stepSize, mapMin, mapMax, false, skin);
     }
 
-    public OwnSlider(float min, float max, float stepSize, Skin skin) {
+    public OwnSlider(float min,
+                     float max,
+                     float stepSize,
+                     Skin skin) {
         this(min, max, stepSize, min, max, false, skin);
     }
 
-    public OwnSlider(float min, float max, float stepSize, boolean vertical, Skin skin) {
+    public OwnSlider(float min,
+                     float max,
+                     float stepSize,
+                     boolean vertical,
+                     Skin skin) {
         this(min, max, stepSize, min, max, vertical, skin);
     }
 
-    public OwnSlider(float min, float max, float stepSize, boolean vertical, Skin skin, String styleName) {
+    public OwnSlider(float min,
+                     float max,
+                     float stepSize,
+                     boolean vertical,
+                     Skin skin,
+                     String styleName) {
         super(min, max, stepSize, vertical, skin.get(styleName, OwnSliderStyle.class));
     }
 
-    public void setUp(float mapMin, float mapMax) {
+    public void setValueFormatter(DecimalFormat df) {
+        this.nf = df;
+    }
+
+    public void setUp(float mapMin,
+                      float mapMax) {
         setUp(mapMin, mapMax, new DecimalFormat("####0.0#"));
     }
 
-    public void setUp(float mapMin, float mapMax, DecimalFormat nf) {
+    public void setUp(float mapMin,
+                      float mapMax,
+                      DecimalFormat nf) {
         this.nf = nf;
         setMapValues(mapMin, mapMax);
 
         this.valueLabel = new OwnLabel(getValueString(), skin);
-        this.addListener((event) -> {
+
+        this.labelListener = (event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 this.valueLabel.setText(getValueString());
                 return true;
             }
             return false;
-        });
+        };
+        addListener(this.labelListener);
     }
 
-    public void setMapValues(float mapMin, float mapMax) {
+    public void setMapValues(float mapMin,
+                             float mapMax) {
         this.mapMin = mapMin;
         this.mapMax = mapMax;
         this.map = true;
@@ -109,6 +147,13 @@ public class OwnSlider extends Slider {
         } else {
             setValue(mappedValue);
         }
+        // Force label listener to update even when programmatic change events are off.
+        if (!programmaticChangeEvents && labelListener != null) {
+            ChangeEvent changeEvent = Pools.obtain(ChangeEvent.class);
+            labelListener.handle(changeEvent);
+            Pools.free(changeEvent);
+        }
+
     }
 
     public void setDisplayValueMapped(boolean displayValueMapped) {
@@ -129,27 +174,28 @@ public class OwnSlider extends Slider {
 
     @Override
     public void setWidth(float width) {
-        ownwidth = width;
+        ownWidth = width;
         super.setWidth(width);
     }
 
     @Override
     public void setHeight(float height) {
-        ownheight = height;
+        ownHeight = height;
         super.setHeight(height);
     }
 
     @Override
-    public void setSize(float width, float height) {
-        ownwidth = width;
-        ownheight = height;
+    public void setSize(float width,
+                        float height) {
+        ownWidth = width;
+        ownHeight = height;
         super.setSize(width, height);
     }
 
     @Override
     public float getPrefWidth() {
-        if (ownwidth != 0) {
-            return ownwidth;
+        if (ownWidth != 0) {
+            return ownWidth;
         } else {
             return super.getPrefWidth();
         }
@@ -157,15 +203,16 @@ public class OwnSlider extends Slider {
 
     @Override
     public float getPrefHeight() {
-        if (ownheight != 0) {
-            return ownheight;
+        if (ownHeight != 0) {
+            return ownHeight;
         } else {
             return super.getPrefHeight();
         }
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
+    public void draw(Batch batch,
+                     float parentAlpha) {
         super.draw(batch, parentAlpha);
         if (valueLabel != null && showValueLabel) {
             if (this.isVertical()) {
@@ -191,6 +238,12 @@ public class OwnSlider extends Slider {
             knobBefore = ((OwnSliderStyle) getStyle()).knobBeforeFocused;
         }
         return knobBefore;
+    }
+
+    @Override
+    public void setProgrammaticChangeEvents(boolean programmaticChangeEvents) {
+        this.programmaticChangeEvents = programmaticChangeEvents;
+        super.setProgrammaticChangeEvents(programmaticChangeEvents);
     }
 
     @Override
