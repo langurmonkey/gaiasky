@@ -684,13 +684,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             manager.regenerateCameraPath();
 
             // Update timeline slider.
-            timelineSlider = new OwnSlider(1f, manager.currentPath.n, 1f, skin);
+            timelineSlider = new OwnSlider(0f, manager.currentPath.n - 1, 1f, skin);
             timelineSlider.setWidth(600f);
             timelineSlider.setValuePrefix("frame ");
             timelineSlider.setValueFormatter(new DecimalFormat("######0"));
             timelineSlider.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    long frame = (long) (timelineSlider.getValue() - 1);
+                    long frame = (long) (timelineSlider.getValue());
                     EventManager.publish(Event.KEYFRAME_PLAY_FRAME, timelineSlider, frame);
                     return true;
                 }
@@ -933,7 +933,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         goTo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Step to keyframe.
-                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, goTo, frame - 1);
+                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, goTo, frame);
                 return true;
             }
             return false;
@@ -1192,7 +1192,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
                 // Set timeline.
                 timelineSlider.setProgrammaticChangeEvents(false);
-                timelineSlider.setMappedValue(manager.currentPath.i + 1);
+                timelineSlider.setMappedValue(manager.currentPath.i);
                 timelineSlider.setProgrammaticChangeEvents(true);
 
                 // Check end.

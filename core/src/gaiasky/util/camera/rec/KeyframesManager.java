@@ -97,7 +97,7 @@ public class KeyframesManager implements IObserver {
      * @param kf The keyframe.
      *
      * @return The frame number corresponding to exactly this keyframe if the keyframe is valid and in the keyframes list, otherwise -1.
-     * The frame number is in [1,n].
+     * The frame number is in [0,n-1].
      */
     public long getFrameNumber(Keyframe kf) {
         if (kf == null || keyframes.isEmpty() || !keyframes.contains(kf, true)) {
@@ -105,7 +105,7 @@ public class KeyframesManager implements IObserver {
         }
 
         // We start at the first frame.
-        double t = 1d / Settings.settings.camrecorder.targetFps;
+        double t = 0;
         for (int i = 0; ; i++) {
             if (keyframes.get(i).equals(kf))
                 break;
@@ -355,6 +355,8 @@ public class KeyframesManager implements IObserver {
         if (!GaiaSky.instance.getCameraManager().getMode().isFree()) {
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
         }
+        // Stop camera.
+        EventManager.publish(Event.CAMERA_STOP, this);
 
         // Set time.
         EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(currentPath.times.get((int) currentPath.i)));

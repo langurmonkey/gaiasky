@@ -122,15 +122,15 @@ public class CameraPath {
             q1.setFromCamera(k1.dir, k1.up);
 
             long nFrames = (long) (k1.seconds * frameRate);
-            double splinePosSubStep = splinePosStep / (nFrames - 1);
+            double splinePosSubStep = splinePosStep / nFrames;
 
             long dt = k1.time - k0.time;
-            long tStep = dt / (nFrames - 1);
+            long tStep = dt / nFrames;
 
             for (long fr = 0; fr < nFrames; fr++) {
-                // Local index in 0..1
-                double a = (double) fr / (double) (nFrames - 1);
-                // Partial position spline index in 0..1
+                // Local index for quaternion interpolation.
+                double a = (double) fr / (double) nFrames;
+                // Global spline part index in [0,1].
                 double b = splinePosIdx + splinePosSubStep * fr;
 
                 // TIME
@@ -161,6 +161,14 @@ public class CameraPath {
                 splinePosStep = 1d / (currentPosSpline.nPoints - 1);
             }
         }
+
+        // Add final point.
+        Keyframe kf = keyframes.get(keyframes.size - 1);
+        times.add(kf.time);
+        data.add(kf.pos.x, kf.pos.y, kf.pos.z);
+        data.add(kf.dir.x, kf.dir.y, kf.dir.z);
+        data.add(kf.up.x, kf.up.y, kf.up.z);
+
         n = times.size;
     }
 
