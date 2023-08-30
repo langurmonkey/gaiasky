@@ -9,6 +9,9 @@ package gaiasky.util.camera.rec;
 
 import gaiasky.util.math.Vector3d;
 
+/**
+ * Represents a single camera keyframe.
+ */
 public class Keyframe {
     public String name;
     public Vector3d pos, dir, up;
@@ -19,7 +22,13 @@ public class Keyframe {
      **/
     public boolean seam;
 
-    public Keyframe(String name, Vector3d pos, Vector3d dir, Vector3d up, long time, double secs, boolean seam) {
+    public Keyframe(String name,
+                    Vector3d pos,
+                    Vector3d dir,
+                    Vector3d up,
+                    long time,
+                    double secs,
+                    boolean seam) {
         this.name = name;
         this.pos = pos;
         this.dir = dir;

@@ -272,6 +272,8 @@ public class Camcorder implements IObserver {
         RECORDING,
         // Playing classical recording
         PLAYING,
+        // Stepping
+        STEPPING,
         // Idle
         IDLE
     }
