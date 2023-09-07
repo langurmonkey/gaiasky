@@ -267,7 +267,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         right.add(keyframesTitle).top().left().padBottom(pad18).row();
         right.add(rightScroll).width(820f).height(250f).center().left().row();
-        right.add(mediaTable).center();
+        right.add(mediaTable).center().padTop(pad10);
 
         right.pack();
 
@@ -597,7 +597,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void addMediaControlsToTable(Table table) {
-        table.setWidth(600f);
+        table.setWidth(800f);
 
         // Skip back.
         skipBack = new OwnImageButton(skin, "media-skip-backward");
@@ -690,7 +690,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
             // Update timeline slider.
             timelineSlider = new OwnSlider(0f, manager.currentPath.n - 1, 1f, skin);
-            timelineSlider.setWidth(600f);
+            timelineSlider.setWidth(800f);
             timelineSlider.setValuePrefix("frame ");
             timelineSlider.setValueFormatter(new DecimalFormat("######0"));
             timelineSlider.addListener((event) -> {
