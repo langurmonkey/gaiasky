@@ -12,7 +12,6 @@ import gaiasky.GaiaSky;
 import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.OrbitBodyDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
-import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
@@ -26,7 +25,9 @@ import java.util.Date;
 
 public class TrajectoryUtils {
 
-    /** The trajectory refresher daemon. **/
+    /**
+     * The trajectory refresher daemon.
+     **/
     public static OrbitRefresher orbitRefresher;
     private final Vector3b B31, B32;
     private final Vector3d D31, D32, D33;
@@ -39,7 +40,9 @@ public class TrajectoryUtils {
         D33 = new Vector3d();
     }
 
-    /** Initialize the trajectory refresher daemon. **/
+    /**
+     * Initialize the trajectory refresher daemon.
+     **/
     public static void initRefresher() {
         if (orbitRefresher == null) {
             orbitRefresher = new OrbitRefresher("gaiasky-worker-trajectoryupdate");
@@ -66,7 +69,7 @@ public class TrajectoryUtils {
     public void updateSize(Body body, Trajectory trajectory, Verts verts) {
         PointCloudData pointCloudData = verts.pointCloudData;
         if (pointCloudData != null) {
-            if (!trajectory.onlyBody && pointCloudData.getNumPoints() > 0) {
+            if (!trajectory.isOnlyBody() && pointCloudData.getNumPoints() > 0) {
                 pointCloudData.loadPoint(D31, 0);
                 int n = pointCloudData.getNumPoints();
                 double len = 0;

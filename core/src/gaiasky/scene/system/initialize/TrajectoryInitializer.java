@@ -40,7 +40,7 @@ public class TrajectoryInitializer extends AbstractInitSystem {
         var verts = Mapper.verts.get(entity);
         var line = Mapper.line.get(entity);
 
-        if (!trajectory.onlyBody) {
+        if (trajectory.bodyRepresentation.isOrbit()) {
             if (trajectory.provider != null) {
                 try {
                     trajectory.providerClass = (Class<? extends IOrbitDataProvider>) ClassReflection.forName(trajectory.provider);
@@ -66,10 +66,10 @@ public class TrajectoryInitializer extends AbstractInitSystem {
 
         // Initialize default colors if needed.
         if (body.color == null) {
-            body.color = new float[] { 0.8f, 0.8f, 0.8f, 1f };
+            body.color = new float[]{0.8f, 0.8f, 0.8f, 1f};
         }
-        if (trajectory.pointColor == null) {
-            trajectory.pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
+        if (trajectory.bodyColor == null) {
+            trajectory.bodyColor = new float[]{0.8f, 0.8f, 0.8f, 0.6f};
         }
     }
 

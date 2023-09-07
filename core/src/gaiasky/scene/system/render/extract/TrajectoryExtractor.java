@@ -50,7 +50,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
             var render = Mapper.render.get(entity);
             var label = Mapper.label.get(entity);
 
-            if (!trajectory.onlyBody) {
+            if (trajectory.bodyRepresentation.isOrbit()) {
                 var verts = Mapper.verts.get(entity);
 
                 // If there is overflow, return.

@@ -32,20 +32,30 @@ public class Trajectory implements Component {
     public Class<? extends IOrbitDataProvider> providerClass;
     public IOrbitDataProvider providerInstance;
     public OrbitComponent oc;
-    // Only adds the body, not the orbit
-    public boolean onlyBody = false;
-    // Use new method for orbital elements
+
+    /**
+     * Control the body/trajectory representation for this object. Note that the body can only be represented
+     * when using orbital elements.
+     */
+    public OrbitBodyRepresentation bodyRepresentation = OrbitBodyRepresentation.BODY_AND_ORBIT;
+
+    /**
+     * Changes the way in which transformations are applied to the orbit objects.
+     * Asteroids have this set to true.
+     */
     public boolean newMethod = false;
-    // Current orbit completion -- current delta from t0
+    // Current orbit completion -- current delta from t0.
     public double coord;
-    // The orientation model
+    // The orientation model.
     public OrbitOrientationModel model = OrbitOrientationModel.DEFAULT;
     public boolean isInOrbitalElementsGroup = false;
     /**
      * Refreshing state
      */
     public boolean refreshing = false;
-    /** Number of samples for the orbit data provider. **/
+    /**
+     * Number of samples for the orbit data provider.
+     **/
     public int numSamples = 100;
     public long orbitStartMs, orbitEndMs;
     /**
@@ -53,7 +63,9 @@ public class Trajectory implements Component {
      */
     public boolean mustRefresh;
 
-    /** Whether to close the trajectory (connect end point to start point) or not **/
+    /**
+     * Whether to close the trajectory (connect end point to start point) or not
+     **/
     public boolean closedLoop = true;
 
     /**
@@ -81,9 +93,10 @@ public class Trajectory implements Component {
 
     public OrbitDataLoaderParameters params;
     /**
-     * Point color
+     * Body color. Color to use to represent the body in orbital elements trajectories, when the {@link #bodyRepresentation}
+     * attribute enables the representation of the body for this trajectory.
      **/
-    public float[] pointColor;
+    public float[] bodyColor;
     /**
      * Point size
      **/
@@ -124,6 +137,7 @@ public class Trajectory implements Component {
     public void setPointSize(Long pointSize) {
         this.pointSize = pointSize;
     }
+
     public void setPointsize(Long pointSize) {
         setPointSize(pointSize);
     }
@@ -136,8 +150,12 @@ public class Trajectory implements Component {
         setPointSize(pointSize);
     }
 
+    public void setBodyColor(double[] color) {
+        bodyColor = GlobalResources.toFloatArray(color);
+    }
+
     public void setPointColor(double[] color) {
-        pointColor = GlobalResources.toFloatArray(color);
+        setBodyColor(color);
     }
 
     public void setPointcolor(double[] color) {
@@ -164,8 +182,45 @@ public class Trajectory implements Component {
         this.multiplier = multiplier;
     }
 
+    /**
+     * Mutes the orbit line in orbital elements trajectories.
+     *
+     * @param onlyBody Whether to display only the body for this trajectory.
+     * @deprecated Use {{@link #setBodyRepresentation(String)}} instead.
+     */
+    public void setOnlyBody(Boolean onlyBody) {
+        if (onlyBody) {
+            bodyRepresentation = OrbitBodyRepresentation.ONLY_BODY;
+        } else {
+            bodyRepresentation = OrbitBodyRepresentation.BODY_AND_ORBIT;
+        }
+    }
+
+    /**
+     * Alias method, @see {@link #setOnlyBody(Boolean)}.
+     *
+     * @deprecated Use {{@link #setBodyRepresentation(String)}} instead.
+     */
     public void setOnlybody(Boolean onlyBody) {
-        this.onlyBody = onlyBody;
+        this.setOnlyBody(onlyBody);
+    }
+
+    public boolean isOnlyBody() {
+        return bodyRepresentation.isOnlyBody();
+    }
+
+    /**
+     * Sets the body representation for this trajectory.
+     *
+     * @param representation The body representation model. See {@link OrbitBodyRepresentation} for more information.
+     */
+    public void setBodyRepresentation(String representation) {
+        representation = representation.toUpperCase().trim();
+        try {
+            this.bodyRepresentation = OrbitBodyRepresentation.valueOf(representation);
+        } catch (IllegalArgumentException e) {
+            logger.error(I18n.msg("notif.error", e.getLocalizedMessage()));
+        }
     }
 
     public void setNewmethod(Boolean newMethod) {
@@ -210,8 +265,21 @@ public class Trajectory implements Component {
         this.distDown = (float) Math.max(radius * distDown, 50 * Constants.KM_TO_U);
     }
 
+    /**
+     * Orientation model for this orbit/trajectory.
+     */
     public enum OrbitOrientationModel {
+        /**
+         * Equatorial plane is the reference plane, and aries (vernal equinox) is the reference direction.
+         */
         DEFAULT,
+
+        /**
+         * Extrasolar systems are typically specified using elements in a special reference system. In this reference
+         * system, the reference plane is the plane whose normal is the line of sight vector from the Sun to the planet or
+         * star for whom the orbit is defined. The reference direction is the direction from the object to the north
+         * celestial pole projected on the reference plane.
+         */
         EXTRASOLAR_SYSTEM;
 
         public boolean isDefault() {
@@ -223,4 +291,44 @@ public class Trajectory implements Component {
         }
     }
 
+    /**
+     * The body representation type for this orbit/trajectory. This only works with orbits defined via orbital
+     * elements.
+     */
+    public enum OrbitBodyRepresentation {
+        /**
+         * Body is not visually represented at all.
+         */
+        ONLY_ORBIT,
+
+        /**
+         * Only the body is visually represented. No orbit/trajectory line is present.
+         */
+        ONLY_BODY,
+
+        /**
+         * Both body and orbit/trajectory line are visually represented.
+         */
+        BODY_AND_ORBIT;
+
+        public boolean isOnlyBody() {
+            return this.equals(ONLY_BODY);
+        }
+
+        public boolean isOnlyOrbit() {
+            return this.equals(ONLY_ORBIT);
+        }
+
+        public boolean isBodyAndOrbit() {
+            return this.equals(BODY_AND_ORBIT);
+        }
+
+        public boolean isOrbit() {
+            return isOnlyOrbit() || isBodyAndOrbit();
+        }
+
+        public boolean isBody() {
+            return isOnlyBody() || isBodyAndOrbit();
+        }
+    }
 }

@@ -51,7 +51,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     private int sizeOffset;
     private int textureIndexOffset;
     private boolean forceAdd = false;
-    private final double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
+    private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0))};
 
     public ElementsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -108,48 +108,53 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
 
                     if (!inGpu(render)) {
                         var trajectory = Mapper.trajectory.get(render.entity);
-                        OrbitComponent oc = trajectory.oc;
 
-                        // 4 vertices per particle
-                        for (int vert = 0; vert < 4; vert++) {
-                            // Vertex POSITION
-                            tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
-                            tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
+                        // Respect body representation in trajectory.
+                        if (trajectory.bodyRepresentation.isBody()) {
 
-                            // UV coordinates
-                            tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                            tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+                            OrbitComponent oc = trajectory.oc;
 
-                            // COLOR
-                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(trajectory.pointColor[0], trajectory.pointColor[1], trajectory.pointColor[2], trajectory.pointColor[3]);
+                            // 4 vertices per particle
+                            for (int vert = 0; vert < 4; vert++) {
+                                // Vertex POSITION
+                                tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                                tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
-                            // ORBIT ELEMENTS 01
-                            tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
-                            tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                            tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
-                            tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
+                                // UV coordinates
+                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
-                            // ORBIT ELEMENTS 02
-                            tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsDouble.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsDouble.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsDouble.degRad);
+                                // COLOR
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(trajectory.bodyColor[0], trajectory.bodyColor[1], trajectory.bodyColor[2], trajectory.bodyColor[3]);
 
-                            // SIZE
-                            tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize;
+                                // ORBIT ELEMENTS 01
+                                tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
+                                tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
+                                tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
+                                tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
-                            // TEXTURE INDEX
-                            tempVerts[curr.vertexIdx + textureIndexOffset] = -1f;
+                                // ORBIT ELEMENTS 02
+                                tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
+                                tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsDouble.degRad);
+                                tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsDouble.degRad);
+                                tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsDouble.degRad);
 
-                            curr.vertexIdx += curr.vertexSize;
-                            curr.numVertices++;
-                            numVerticesAdded.incrementAndGet();
+                                // SIZE
+                                tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize;
+
+                                // TEXTURE INDEX
+                                tempVerts[curr.vertexIdx + textureIndexOffset] = -1f;
+
+                                curr.vertexIdx += curr.vertexSize;
+                                curr.numVertices++;
+                                numVerticesAdded.incrementAndGet();
+                            }
+                            // Indices
+                            quadIndices(curr);
+                            numParticlesAdded.incrementAndGet();
+
+                            setInGpu(render, true);
                         }
-                        // Indices
-                        quadIndices(curr);
-                        numParticlesAdded.incrementAndGet();
-
-                        setInGpu(render, true);
                     }
                 });
                 int count = numVerticesAdded.get() * curr.vertexSize;

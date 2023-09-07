@@ -58,11 +58,11 @@ public class ElementsSetInitializer extends AbstractInitSystem {
                 // The orbits need to go to the alwaysUpdate list.
                 if (Mapper.trajectory.has(e)) {
                     var trajectory = Mapper.trajectory.get(e);
-                    if (!trajectory.onlyBody) {
+                    if (trajectory.bodyRepresentation.isOrbit()) {
                         set.alwaysUpdate.add(e);
                     }
                 } else {
-                    // Not an orbit, always add
+                    // Not an orbit, always add.
                     set.alwaysUpdate.add(e);
                 }
             }

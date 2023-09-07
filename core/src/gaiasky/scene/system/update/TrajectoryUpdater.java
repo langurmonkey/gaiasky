@@ -70,7 +70,7 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
             }
         }
 
-        if (!trajectory.onlyBody) {
+        if (trajectory.bodyRepresentation.isOrbit()) {
             if (Mapper.tagHeliotropic.has(entity)) {
                 // Heliotropic orbit.
                 updateLocalTransformHeliotropic(GaiaSky.instance.time.getTime(), graph, trajectory);

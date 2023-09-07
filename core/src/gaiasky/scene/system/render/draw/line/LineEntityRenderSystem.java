@@ -263,7 +263,7 @@ public class LineEntityRenderSystem {
 
     public void renderTrajectory(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var trajectory = Mapper.trajectory.get(entity);
-        if (!trajectory.onlyBody) {
+        if (trajectory.bodyRepresentation.isOrbit()) {
             var base = lineView.base;
             var body = lineView.body;
             var verts = lineView.verts;
