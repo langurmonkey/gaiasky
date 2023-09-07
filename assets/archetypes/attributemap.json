@@ -205,7 +205,7 @@
     "Trajectory": {
       "description": "Defines attributes related to orbits and trajectory objects. See :ref:`orbits` for more information.",
       "orbitProvider": {
-        "description": "In *Orbit* archetype objects, this is the fully-qualified Java class that provides orbit data. This class needs to implement ``IOrbitDataProvider``. Possible values are ``gaiasky.data.orbit.OrbitalParametersProvider``, for orbits defined as orbital elements, or ``gaiasky.data.orbit.OrbitFileDataProvider``, for orbits sourced from a file of samples. See :ref:`orbits` for more information.",
+        "description": "In *Orbit* archetype objects, this is the fully-qualified Java class that provides orbit data. This class needs to implement ``IOrbitDataProvider``. |brsp| **Values:** |br| ``gaiasky.data.orbit.OrbitalParametersProvider`` -- orbit is defined with orbital elements. |br| ``gaiasky.data.orbit.OrbitFileDataProvider`` -- orbit defined from a file of samples. |brsp| See :ref:`orbits` for more information.",
         "units": "String",
         "aliases": [
           "provider"
@@ -216,7 +216,7 @@
         "units": "Map"
       },
       "orientationModel": {
-        "description": "The orientation model of this orbit. Must be one of 'default' or 'extrasolar_system'. See :ref:`orbits` for more information.",
+        "description": "The orientation model of this orbit. |brsp| **Values:** |br| ``default`` -- the default orientation. |br| ``extrasolar_system`` -- orientation for extrasolar systems. See :ref:`orbits` for more information.",
         "units": "String",
         "aliases": [
           "model:Orbit"
@@ -230,7 +230,7 @@
         ]
       },
       "bodyRepresentation": {
-        "description": "The body representation type for this orbit/trajectory. This only works with orbits defined via orbital elements. Possible values are 'only_orbit' (body is not visually represented at all), 'only_body' (only the body is visually represented, no line), and 'body_and_orbit' (both body and orbit line are represented).",
+        "description": "The body representation type for this orbit/trajectory. This only works with orbits defined via orbital elements. |brsp| **Values:** |br| ``only_orbit`` -- the body is not visually represented at all. |br| ``only_body`` -- only the body is visually represented, no line. |br| ``body_and_orbit`` -- both body and orbit line are represented.",
         "units": "String"
       },
       "bodyColor": {
@@ -291,7 +291,7 @@
     "ModelScaffolding": {
       "description": "Defines attributes related objects with 3D models.",
       "referencePlane": {
-        "description": "The reference plane to use for this model object. Can be one of 'ecliptic', 'galactic' or the default, 'equatorial'.",
+        "description": "The reference plane to use for this model object. |brsp| **Values:** |br| ``ecliptic`` |br| ``galactic`` |br| ``equatorial``",
         "units": "String",
         "aliases": [
           "refPlane",
@@ -377,7 +377,7 @@
     "RefSysTransform": {
       "description": "Defines an arbitrary reference system transformation via a 4x4 matrix. See :ref:`ref-sys-transform` for more information.",
       "transformFunction": {
-        "description": "Defines a transformation matrix to apply to the position of the object. The name of the transformation to apply. Possible values are 'equatorialToEcliptic', 'eclipticToEquatorial', 'equatorialToGalactic', 'galacticToEquatorial', 'eclipticToGalactic' and 'galacticToEcliptic'. See :ref:`ref-sys-transform` for more information.",
+        "description": "Defines a transformation matrix to apply to the position of the object. The name of the transformation to apply. |brsp| **Values:** |br| ``equatorialToEcliptic`` |br| ``eclipticToEquatorial`` |br| ``equatorialToGalactic`` |br| ``galacticToEquatorial`` |br| ``eclipticToGalactic`` |br| ``galacticToEcliptic`` |brsp| See :ref:`ref-sys-transform` for more information.",
         "units": "String",
         "aliases": [
           "transformName"
@@ -508,7 +508,7 @@
     "RenderType": {
       "description": "Defines attributes that control rendering operations for this object.",
       "renderGroup": {
-        "description": "The render group (see enum ``RenderGroup``) to use for this objects.",
+        "description": "This is an internal property used to fine-tune exactly the environment and shader to use to render the object. See `RenderGroup.java <https://codeberg.org/gaiasky/gaiasky/src/branch/master/core/src/gaiasky/render/RenderGroup.java>`__ for more information.",
         "units": "String",
         "aliases": [
           "rendergroup"
@@ -667,11 +667,11 @@
         "units": "String[]"
       },
       "modelFile": {
-        "description": "Model file to use (``obj``, ``obj.gz`` ``g3db``, ``g3dj``, ``gltf``, ``glb``). If present, the ``modelType`` and ``modelParams`` attributes are ignored. The model should have only positions (vector-3), normals (vector-3), and texture coordinates (vector-2) as vertex attributes. Only the first mesh of the model is used. Textures, lighting and material are ignored. This is only used in extended particle groups.",
+        "description": "Path to the model file to use (``obj``, ``obj.gz`` ``g3db``, ``g3dj``, ``gltf``, ``glb``). If present, the ``modelType`` and ``modelParams`` attributes are ignored. The model should have only positions (vector-3), normals (vector-3), and texture coordinates (vector-2) as vertex attributes. Only the first mesh of the model is used. Textures, lighting and material are ignored. This is only used in extended particle groups.",
         "units": "String"
       },
       "modelType": {
-        "description": "The model type to use for this particle set. One of (quad|sphere|icosphere). 'quad' renders particles as billboards, 'sphere' uses UV spheres, and 'icosphere' uses icosahedron-based spheres.  Defaults to 'quad'. This is only used in extended particle groups. To enable extended particle groups, you need to set 'type' to 'PARTICLES_EXT' in the 'providerParams' map.",
+        "description": "The model type to use for this particle set. |brsp| **Values:** |br| ``quad`` -- render billboards. |br| ``sphere`` render UV spheres. |br| ``icosphere`` render icosahedron-based spheres. |brsp| Defaults to 'quad'. This is only used in extended particle groups. To enable extended particle groups, you need to set 'type' to 'PARTICLES_EXT' in the 'providerParams' map.",
         "units": "String"
       },
       "modelParams": {
@@ -679,7 +679,7 @@
         "units": "Map<String,Object>"
       },
       "modelPrimitive": {
-        "description": "The GL primitive to use. One of (GL_TRIANGLES|GL_TRIANGLE_STRIP|GL_TRIANGLE_FAN|GL_LINES|GL_LINE_STRIP|GL_LINE_LOOP). Defaults to 'GL_TRIANGLES'. The 'GL_LINE*' primitives enable wireframe rendering, which is currently only supported by sphere and icosphere model types. This is only used in extended particle groups.",
+        "description": "The GL primitive to use. |brsp| **Values:** |br| ``GL_TRIANGLES`` |br| ``GL_TRIANGLE_STRIP`` |br| ``GL_TRIANGLE_FAN`` |br| ``GL_LINES`` |br| ``GL_LINE_STRIP`` |br| ``GL_LINE_LOOP`` |brsp| Defaults to ``GL_TRIANGLES``. The ``GL_LINE``* primitives enable wireframe rendering, which is currently only supported by sphere and ico-sphere model types. This is only used in extended particle groups.",
         "units": "String"
       }
     },
@@ -799,7 +799,7 @@
     "Mesh": {
       "description": "Defines attributes related to meshes and iso-density surfaces. See :ref:`mesh-objects` for more information.",
       "shading": {
-        "description": "Shading mode for the mesh. Can be 'additive', for additive blending, 'dust', to use an opaque mesh with transparency at the edges, or 'regular', to use the regular general-purpose PBR shader.",
+        "description": "Shading mode for the mesh. |brsp| **Values:** |br| ``additive`` -- additive blending. |br| ``dust`` -- opaque mesh with dither transparency at the edges. |br| ``regular`` -- regular general-purpose PBR shader.",
         "units": "String"
       },
       "additiveBlending": {
@@ -820,7 +820,7 @@
     "Raymarching": {
       "description": "Defines attributes related to ray-marched objects.",
       "shader": {
-        "description": "Defines the fragment shader file to use to render this object. The fragment shader is processed for each pixel in the image, and must produce a ray-marched representation of the object.",
+        "description": "Path to the fragment shader GLSL file to use to render this object. The fragment shader is processed for each pixel in the image, and must produce a ray-marched representation of the object.",
         "units": "String"
       }
     }
