@@ -1,4 +1,4 @@
-#v30500
+#v30501
 # This file contains the key mappings for Gaia Sky.
 
 # Each line contains an action=keys pair, where action is the
@@ -47,6 +47,7 @@ action.toggle/element.galactic              = SHIFT_L G
 action.toggle/element.recursivegrid         = SHIFT_L R
 action.toggle/element.meshes                = SHIFT_L H
 action.toggle/element.clusters              = SHIFT_L V
+action.toggle/element.keyframes             = SHIFT_L K
 
 # Time
 action.dividetime                           = COMMA

@@ -171,11 +171,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         buildSuper();
 
         // Add path object to model
-        var entity = scene.archetypes().get("gaiasky.scenegraph.KeyframesPathObject").createEntity();
+        var entity = scene.archetypes().get("KeyframesPathObject").createEntity();
 
         var base = Mapper.base.get(entity);
         base.setName("keyframed.camera.path");
-        base.setComponentType(ComponentType.Others);
+        base.setComponentType(ComponentType.Keyframes);
 
         var graph = Mapper.graph.get(entity);
         graph.setParent(Scene.ROOT_NAME);

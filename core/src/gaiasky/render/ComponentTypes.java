@@ -121,6 +121,7 @@ public class ComponentTypes extends BitSet {
 
         VelocityVectors("icon-elem-arrows"),
         Titles("icon-elem-titles"),
+        Keyframes("icon-elem-keyframes"),
         Others("icon-elem-others"),
 
         // ALWAYS LAST

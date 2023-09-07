@@ -278,6 +278,9 @@ public class KeyBindings {
         // Toggle clusters
         addAction(new ProgramAction("action.toggle/element.clusters", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.clusters")));
 
+        // Toggle keyframes
+        addAction(new ProgramAction("action.toggle/element.keyframes", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.keyframes")));
+
         // Divide time warp
         addAction(new ProgramAction("action.dividetime", () -> {
             EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this);

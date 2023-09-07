@@ -212,7 +212,7 @@ public class SettingsManager {
 
         // UI scale mapping
         settings.program.ui.scale = MathUtilsDouble.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN,
-                                                         Constants.UI_SCALE_INTERNAL_MAX);
+                Constants.UI_SCALE_INTERNAL_MAX);
 
         // Default distance units
         if (settings.program.ui.distanceUnits == null) {
@@ -315,6 +315,13 @@ public class SettingsManager {
             settings.scene.renderer.virtualTextures = new VirtualTextureSettings();
             settings.scene.renderer.virtualTextures.cacheSize = 8;
             settings.scene.renderer.virtualTextures.detectionBufferFactor = 8.0;
+        }
+
+        // Update visibility with new elements if needed
+        if (!settings.scene.visibility.containsKey("Keyframes")) {
+            settings.scene.visibility.put("Keyframes", true);
+            // Also update key bindings!
+
         }
 
         settings.initialized = true;
