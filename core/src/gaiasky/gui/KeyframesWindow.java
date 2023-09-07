@@ -609,6 +609,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        skipBack.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.start"), skin));
         // Step back.
         stepBack = new OwnImageButton(skin, "media-step-backward");
         stepBack.addListener((event) -> {
@@ -619,6 +620,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        stepBack.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.skip.backward"), skin));
         // Play/pause.
         playPause = new OwnImageButton(skin, "media-play-pause");
         playPause.addListener((event) -> {
@@ -638,6 +640,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        playPause.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.play.pause"), skin));
         // Step forward.
         stepForward = new OwnImageButton(skin, "media-step-forward");
         stepForward.addListener((event) -> {
@@ -648,6 +651,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        stepForward.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.skip.forward"), skin));
         // Skip forward.
         skipForward = new OwnImageButton(skin, "media-skip-forward");
         skipForward.addListener((event) -> {
@@ -658,6 +662,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        skipForward.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.end"), skin));
 
         // Add to buttons.
         HorizontalGroup mediaButtons = new HorizontalGroup();
