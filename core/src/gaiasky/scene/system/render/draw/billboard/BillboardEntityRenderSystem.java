@@ -272,9 +272,9 @@ public class BillboardEntityRenderSystem implements IObserver {
         float[] color = isModel ? body.color : celestial.colorPale;
 
         // Alpha channel:
-        // - models:    alpha * (1 - fadeOpacity)
-        // - particles: alpha * opacity
-        float a = extra == null ? alpha * (1f - scaffolding.fadeOpacity) : alpha * base.opacity;
+        // - models:    alpha * (1 - fadeOpacity) * base.opacity
+        // - particles: alpha * base.opacity
+        float a = extra == null ? alpha * (1f - scaffolding.fadeOpacity) * base.opacity : alpha * base.opacity;
         shader.setUniformf("u_color", color[0], color[1], color[2], a);
         shader.setUniformf("u_inner_rad", (float) celestial.innerRad);
         shader.setUniformf("u_distance", (float) body.distToCamera);
