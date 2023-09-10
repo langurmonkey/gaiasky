@@ -659,8 +659,8 @@ void main() {
     fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround
-    #define exposure 4.0
-    fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
+    #define exposure 1.0
+    fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor, 0.0, 1.0);
     #endif// atmosphereGround
 
     #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)
