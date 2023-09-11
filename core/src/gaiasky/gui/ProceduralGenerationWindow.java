@@ -629,7 +629,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(new OwnLabel(I18n.msg("gui.procedural.param.atm"), skin, "header")).colspan(2).left().padBottom(pad34).row();
 
         // Wavelengths
-        OwnSliderPlus wavelength0 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "[0]"), 0.4f, 1.0f, 0.01f, skin);
+        OwnSliderPlus wavelength0 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "0"), 0.4f, 1.0f, 0.01f, skin);
         wavelength0.setWidth(fieldWidthAll / 3f - pad10 * 1.3f);
         wavelength0.setValue((float) ac.wavelengths[0]);
         wavelength0.addListener(new ChangeListener() {
@@ -638,7 +638,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 ac.wavelengths[0] = wavelength0.getMappedValue();
             }
         });
-        OwnSliderPlus wavelength1 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "[1]"), 0.4f, 1.0f, 0.01f, skin);
+        OwnSliderPlus wavelength1 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "1"), 0.4f, 1.0f, 0.01f, skin);
         wavelength1.setWidth(fieldWidthAll / 3f - pad10 * 1.3f);
         wavelength1.setValue((float) ac.wavelengths[1]);
         wavelength1.addListener(new ChangeListener() {
@@ -647,7 +647,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 ac.wavelengths[1] = wavelength1.getMappedValue();
             }
         });
-        OwnSliderPlus wavelength2 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "[2]"), 0.4f, 1.0f, 0.01f, skin);
+        OwnSliderPlus wavelength2 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "2"), 0.4f, 1.0f, 0.01f, skin);
         wavelength2.setWidth(fieldWidthAll / 3f - pad10 * 1.3f);
         wavelength2.setValue((float) ac.wavelengths[1]);
         wavelength2.addListener(new ChangeListener() {
