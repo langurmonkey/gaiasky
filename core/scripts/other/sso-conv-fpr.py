@@ -20,6 +20,7 @@ class SSO(object):
         self.parent = "fpr-asteroids-hook"
         self.archetype = "Orbit"
         self.provider = "gaiasky.data.orbit.OrbitalParametersProvider"
+        self.transformFunction = "eclipticToEquatorial"
         self.ct = [ "Asteroids", "Orbits" ]
         self.orbit = {}
         self.orbit["epoch"] = epoch
@@ -43,35 +44,38 @@ def to_json(line, idx):
     jdjan12010 = values[2]
     epoch = float(jdjan12010) + REF_EPOCH
     # Mean anomaly [deg]
-    meananomaly = float(values[13])
+    meananomaly = float(values[8])
     # Semimajor axis [Km]
-    a_au = float(values[15])
+    a_au = float(values[3])
     semimajoraxis = a_au * AU_TO_KM
     # Eccentricity
-    eccentricity = float(values[10])
+    eccentricity = float(values[4])
     # Argument of pericenter [deg]
-    argofpericenter = float(values[14])
+    argofpericenter = float(values[7])
     # Ascending node [deg]
-    ascendingnode = float(values[12])
+    ascendingnode = float(values[6])
     # Period in days
     period = pow(a_au, 1.5) * Y_TO_D
     # Inclination [deg]
-    inclination = float(values[11])
+    inclination = float(values[5])
 
     bean = SSO(name, color, epoch, meananomaly, semimajoraxis, eccentricity, argofpericenter, ascendingnode, period, inclination)
     
     jsonstr = json.dumps(bean.__dict__)
     
     return jsonstr
-    
 
-with open('/media/tsagrista/Daten/Gaia/data/sso/FPR/FPR-SSO-result.elements.csv', 'r') as fr:
+#file = '/media/tsagrista/Daten/Gaia/data/sso/FPR/fpr-00-20230702/FPR-SSO-result.elements.csv'
+file = '/media/tsagrista/Daten/Gaia/data/sso/FPR/fpr-01-20230911/all.source.fpr.csv'
+
+with open(file, 'r') as fr:
     lines = fr.readlines()
     with open('/tmp/sso-fpr.json', 'w') as fw:
         fw.write("{\"objects\" : [\n")
         fw.write("{ \"name\" : \"fpr-asteroids-hook\", \"position\" : [0.0, 0.0, 0.0], \"ct\" : [\"Asteroids\"], \"fadeout\" : [1e-5, 2e-4], \"parent\" : \"Universe\", \"archetype\" : \"OrbitalElementsGroup\" },\n")
 
         N = min(N_MAX, len(lines))
+        # Skip first line (header)
         for idx, line in enumerate(lines[1:N]):
             if line.strip():
                 jsonstring = to_json(line, idx)
