@@ -319,7 +319,7 @@ public class GaiaSkyDesktop implements IObserver {
                 internalVersion = (Integer) internalProps.get("configVersion");
             }
 
-            // Check latest version
+            // Check latest version.
             if (userProps == null) {
                 out.println("Your current configuration file is corrupted! Overwriting...");
                 userConfExists = false;
@@ -332,14 +332,14 @@ public class GaiaSkyDesktop implements IObserver {
                 overwrite = true;
             }
         } else {
-            // No user configuration exists, try to morph the old configuration into the new one
+            // No user configuration exists, try to morph the old configuration into the new one.
             try {
                 Path propertiesFile = SysUtils.getConfigDir().resolve(vr ? "global.vr.properties" : "global.properties");
                 if (Files.exists(propertiesFile)) {
                     out.println("Old configuration file detected!");
                     out.println("    -> Converting " + propertiesFile + " to " + userFolderConfFile);
                     SettingsMorph.morphSettings(propertiesFile, userFolderConfFile);
-                    // Move old properties file so that they are not converted on the next run
+                    // Move old properties file so that they are not converted on the next run.
                     Files.move(propertiesFile, SysUtils.getConfigDir().resolve(vr ? "global.vr.properties.old" : "global.properties.old"));
                     userConfExists = true;
                 }
