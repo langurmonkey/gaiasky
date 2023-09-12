@@ -163,7 +163,7 @@ public class GaiaSkyDesktop implements IObserver {
             return;
         }
 
-        int code = 0;
+        int statusCode = 0;
         try {
             // Check java version.
             javaVersionCheck();
@@ -277,11 +277,11 @@ public class GaiaSkyDesktop implements IObserver {
             CrashReporter.writeLastSessionLog(logger);
         } catch (Exception e) {
             CrashReporter.reportCrash(e, logger);
-            code = 1;
+            statusCode = 1;
         }
 
         // Shutdown JVM gracefully.
-        System.exit(code);
+        System.exit(statusCode);
     }
 
     private static void checkLogger(final ConsoleLogger consoleLogger) {
