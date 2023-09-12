@@ -101,7 +101,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /**
-     * Singleton instance..
+     * Singleton instance.
      **/
     public static GaiaSky instance;
     /**
@@ -181,7 +181,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Time frame provider.
      */
     public ITimeFrameProvider time;
-    /** Flag indicating whether the window has been successfully created. **/
+    /**
+     * Flag indicating whether the window has been successfully created.
+     **/
     public boolean windowCreated = false;
     /**
      * Save state on exit.
@@ -201,10 +203,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private Runnable updateProcess;
     /**
      * Current update-render implementation.
-     * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
+     * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #mainUpdaterRenderer}.
      **/
     private Runnable updateRenderProcess;
-    /** Main post processor. **/
+    /**
+     * Main post processor.
+     **/
     private IPostProcessor postProcessor;
     /**
      * The session start time, in milliseconds.
@@ -233,7 +237,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private List<IGui> guis;
     // The sprite batch to render the back buffer to screen
     private SpriteBatch renderBatch;
-    /** Settings reference. **/
+    /**
+     * Settings reference.
+     **/
     private Settings settings;
     /**
      * Camera recording or not?
@@ -284,7 +290,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     /**
      * Updates and renders the scene.
      **/
-    private final Runnable runnableRender = () -> {
+    private final Runnable mainUpdaterRenderer = () -> {
 
         // Asynchronous load of textures and resources.
         assetManager.update();
@@ -386,7 +392,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (finished) {
             // Stages 1 and 2 are done, proceed.
             doneLoading();
-            updateRenderProcess = runnableRender;
+            updateRenderProcess = mainUpdaterRenderer;
         } else {
             if (settings.runtime.openXr) {
                 // Render to UI to frame buffer.
@@ -415,11 +421,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param debugMode    Output debug information.
      */
     public GaiaSky(final boolean skipWelcome,
-            final boolean vr,
-            final boolean externalView,
-            final boolean headless,
-            final boolean noScriptingServer,
-            final boolean debugMode) {
+                   final boolean vr,
+                   final boolean externalView,
+                   final boolean headless,
+                   final boolean noScriptingServer,
+                   final boolean debugMode) {
         super();
 
         // Instance and settings.
@@ -588,13 +594,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 @Override
                 public boolean showUI(boolean value,
-                        XrControllerDevice device) {
+                                      XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
                 public boolean accept(boolean value,
-                        XrControllerDevice device) {
+                                      XrControllerDevice device) {
                     if (value) {
                         return proceedToLoading(device);
                     }
@@ -603,7 +609,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 @Override
                 public boolean cameraMode(boolean value,
-                        XrControllerDevice device) {
+                                          XrControllerDevice device) {
                     if (value) {
                         return proceedToLoading(device);
                     }
@@ -612,19 +618,19 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 @Override
                 public boolean rotate(boolean value,
-                        XrControllerDevice device) {
+                                      XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
                 public boolean move(Vector2 value,
-                        XrControllerDevice device) {
+                                    XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
                 public boolean select(float value,
-                        XrControllerDevice device) {
+                                      XrControllerDevice device) {
                     return false;
                 }
 
@@ -732,12 +738,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
         final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
 
         windowCreated = true;
-        // Dispose of initial and loading GUIs.
-        welcomeGui.dispose();
-        welcomeGui = null;
-
-        loadingGui.dispose();
-        loadingGui = null;
+        // Dispose of welcome and loading GUIs.
+        if (welcomeGui != null) {
+            welcomeGui.dispose();
+            welcomeGui = null;
+        }
+        if (loadingGui != null) {
+            loadingGui.dispose();
+            loadingGui = null;
+        }
 
         // Dispose loading GUI VR.
         if (settings.runtime.openXr) {
@@ -974,9 +983,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
         } else {
             // At 5 AU in Y looking towards origin (top-down look).
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
-            EventManager.publish(Event.CAMERA_POS_CMD, this, (Object) new double[] { 0d, 5d * Constants.AU_TO_U, 0d });
-            EventManager.publish(Event.CAMERA_DIR_CMD, this, (Object) new double[] { 0d, -1d, 0d });
-            EventManager.publish(Event.CAMERA_UP_CMD, this, (Object) new double[] { 0d, 0d, 1d });
+            EventManager.publish(Event.CAMERA_POS_CMD, this, (Object) new double[]{0d, 5d * Constants.AU_TO_U, 0d});
+            EventManager.publish(Event.CAMERA_DIR_CMD, this, (Object) new double[]{0d, -1d, 0d});
+            EventManager.publish(Event.CAMERA_UP_CMD, this, (Object) new double[]{0d, 0d, 1d});
         }
 
         if (!isOn) {
@@ -1153,10 +1162,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
     @Override
     public void render() {
         try {
-            if (running.get() && !crashed.get()) {
+            if (running.get() && !crashed.get() && updateRenderProcess != null) {
                 // Run the render process.
                 updateRenderProcess.run();
-
             } else if (crashGui != null) {
                 // Crash information.
                 renderGui(crashGui);
@@ -1226,20 +1234,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
         updateResize();
 
         Timer.instance();
+
         // The actual frame time difference in seconds.
-        double dtGs;
-        if (settings.frame.active) {
-            // If frame output is active, we need to set our delta t according to
-            // the configured frame rate of the frame output system.
-            dtGs = 1.0 / settings.frame.targetFps;
-        } else if (camRecording) {
-            // If Camera is recording, we need to set our delta t according to
-            // the configured frame rate of the camrecorder.
-            dtGs = 1.0 / settings.camrecorder.targetFps;
-        } else {
-            // Max time step is 0.05 seconds (20 FPS). Not in RENDER_OUTPUT MODE.
-            dtGs = Math.min(dt, 0.05);
-        }
+        final double dtGs = getDtGs(dt);
 
         this.t += dtGs;
 
@@ -1283,6 +1280,29 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     /**
+     * Gets the actual delta time for this frame taking into account the frame output system and the camcorder.
+     *
+     * @param dt The real frame delta time.
+     * @return The actual delta time to use.
+     */
+    private double getDtGs(double dt) {
+        double dtGs;
+        if (settings.frame.active) {
+            // If frame output is active, we need to set our delta t according to
+            // the configured frame rate of the frame output system.
+            dtGs = 1.0 / settings.frame.targetFps;
+        } else if (camRecording) {
+            // If Camera is recording, we need to set our delta t according to
+            // the configured frame rate of the camrecorder.
+            dtGs = 1.0 / settings.camrecorder.targetFps;
+        } else {
+            // Max time step is 0.05 seconds (20 FPS). Not in RENDER_OUTPUT MODE.
+            dtGs = Math.min(dt, 0.05);
+        }
+        return dtGs;
+    }
+
+    /**
      * Runs the parked processes in the given list.
      *
      * @param processes The list of processes to run.
@@ -1305,7 +1325,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     @Override
     public void resize(final int width,
-            final int height) {
+                       final int height) {
         if (width != 0 && height != 0) {
             if (!initialized) {
                 resizeImmediate(width, height, true, true, true, true);
@@ -1333,11 +1353,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public void resizeImmediate(final int width,
-            final int height,
-            boolean resizePostProcessors,
-            boolean resizeRenderSys,
-            boolean resizeGuis,
-            boolean resizeScreenConf) {
+                                final int height,
+                                boolean resizePostProcessors,
+                                boolean resizeRenderSys,
+                                boolean resizeGuis,
+                                boolean resizeScreenConf) {
         try {
             final var renderWidth = (int) Math.round(width * settings.graphics.backBufferScale);
             final var renderHeight = (int) Math.round(height * settings.graphics.backBufferScale);
@@ -1454,197 +1474,197 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     @Override
     public void notify(final Event event,
-            Object source,
-            final Object... data) {
+                       Object source,
+                       final Object... data) {
         switch (event) {
-        case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
-            reinitialiseGUI1();
+            case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
+                reinitialiseGUI1();
 
-            // Initialise loading screen.
-            loadingGui = new LoadingGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, false);
-            loadingGui.initialize(assetManager, globalResources.getSpriteBatch());
-            Gdx.input.setInputProcessor(loadingGui.getGuiStage());
+                // Initialise loading screen.
+                loadingGui = new LoadingGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, false);
+                loadingGui.initialize(assetManager, globalResources.getSpriteBatch());
+                Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
-            // Also VR.
-            if (settings.runtime.openXr) {
-                // Create loading GUI VR.
-                loadingGuiVR = new StandaloneVRGui<>(xrDriver, LoadingGui.class, globalResources.getSkin(), null);
-                loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
-                xrDriver.setRenderer(loadingGuiVR);
+                // Also VR.
+                if (settings.runtime.openXr) {
+                    // Create loading GUI VR.
+                    loadingGuiVR = new StandaloneVRGui<>(xrDriver, LoadingGui.class, globalResources.getSkin(), null);
+                    loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
+                    xrDriver.setRenderer(loadingGuiVR);
 
-                // Dispose previous VR GUI.
-                welcomeGuiVR.dispose();
-                welcomeGuiVR = null;
-            }
-            this.updateRenderProcess = runnableLoadingGui;
-
-            // Load scene.
-            if (scene == null) {
-                final var dataFilesToLoad = new String[settings.data.dataFiles.size()];
-                var i = 0;
-                // Add data files.
-                // Our resolver in the SGLoader itself will resolve their full paths.
-                for (String dataFile : settings.data.dataFiles) {
-                    dataFilesToLoad[i] = dataFile;
-                    i++;
+                    // Dispose previous VR GUI.
+                    welcomeGuiVR.dispose();
+                    welcomeGuiVR = null;
                 }
-                assetManager.load(sceneName, Scene.class, new SceneLoaderParameters(dataFilesToLoad));
-            }
-        }
-        case RECORD_CAMERA_CMD -> {
-            if (data != null && data.length > 0) {
-                camRecording = (Boolean) data[0];
-            } else {
-                camRecording = !camRecording;
-            }
-        }
-        case CAMERA_MODE_CMD -> { // Register/unregister GUI.
-            final var mode = (CameraMode) data[0];
-            if (settings.program.modeStereo.isStereoHalfViewport()) {
-                guiRegistry.change(stereoGui);
-            } else if (mode == CameraMode.SPACECRAFT_MODE) {
-                guiRegistry.change(spacecraftGui);
-            } else {
-                guiRegistry.change(mainGui);
-            }
-        }
-        case STEREOSCOPIC_CMD -> {
-            final boolean stereoMode = (Boolean) data[0];
-            if (stereoMode && guiRegistry.current != stereoGui) {
-                guiRegistry.change(stereoGui);
-            } else if (!stereoMode && guiRegistry.previous != stereoGui) {
-                IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
-                guiRegistry.change(guiRegistry.previous, prev);
-            }
+                this.updateRenderProcess = runnableLoadingGui;
 
-            // Disable dynamic resolution.
-            // Post a message to the screen.
-            if (stereoMode) {
-                resetDynamicResolution();
-
-                var keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
-                var keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
-                final var mpi = new ModePopupInfo();
-                mpi.title = I18n.msg("gui.stereo.title");
-                mpi.header = I18n.msg("gui.stereo.notice.header");
-
-                mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
-                mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
-
-                EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
-            } else {
-                EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
-            }
-        }
-        case CUBEMAP_CMD -> {
-            var cubemapMode = (Boolean) data[0];
-            if (cubemapMode) {
-                resetDynamicResolution();
-            }
-        }
-        case SCENE_ADD_OBJECT_CMD -> {
-            final var toAdd = (Entity) data[0];
-            final var addToIndex = data.length == 1 || (Boolean) data[1];
-            if (scene != null) {
-                postRunnable(() -> {
-                    try {
-                        scene.insert(toAdd, addToIndex);
-                    } catch (Exception e) {
-                        logger.error(e);
+                // Load scene.
+                if (scene == null) {
+                    final var dataFilesToLoad = new String[settings.data.dataFiles.size()];
+                    var i = 0;
+                    // Add data files.
+                    // Our resolver in the SGLoader itself will resolve their full paths.
+                    for (String dataFile : settings.data.dataFiles) {
+                        dataFilesToLoad[i] = dataFile;
+                        i++;
                     }
-                });
-            }
-        }
-        case SCENE_ADD_OBJECT_NO_POST_CMD -> {
-            boolean addToIndex;
-            final var toAddPost = (Entity) data[0];
-            addToIndex = data.length == 1 || (Boolean) data[1];
-            if (scene != null) {
-                try {
-                    scene.insert(toAddPost, addToIndex);
-                } catch (Exception e) {
-                    logger.error(e);
+                    assetManager.load(sceneName, Scene.class, new SceneLoaderParameters(dataFilesToLoad));
                 }
             }
-        }
-        case SCENE_REMOVE_OBJECT_CMD -> {
-            Entity toRemove = null;
-            if (data[0] instanceof String) {
-                toRemove = scene.getEntity((String) data[0]);
-                if (toRemove == null)
-                    return;
-            } else if (data[0] instanceof Entity) {
-                toRemove = (Entity) data[0];
-            } else if (data[0] instanceof FocusView) {
-                toRemove = ((FocusView) data[0]).getEntity();
+            case RECORD_CAMERA_CMD -> {
+                if (data != null && data.length > 0) {
+                    camRecording = (Boolean) data[0];
+                } else {
+                    camRecording = !camRecording;
+                }
             }
-            if (toRemove != null) {
-                boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
+            case CAMERA_MODE_CMD -> { // Register/unregister GUI.
+                final var mode = (CameraMode) data[0];
+                if (settings.program.modeStereo.isStereoHalfViewport()) {
+                    guiRegistry.change(stereoGui);
+                } else if (mode == CameraMode.SPACECRAFT_MODE) {
+                    guiRegistry.change(spacecraftGui);
+                } else {
+                    guiRegistry.change(mainGui);
+                }
+            }
+            case STEREOSCOPIC_CMD -> {
+                final boolean stereoMode = (Boolean) data[0];
+                if (stereoMode && guiRegistry.current != stereoGui) {
+                    guiRegistry.change(stereoGui);
+                } else if (!stereoMode && guiRegistry.previous != stereoGui) {
+                    IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
+                    guiRegistry.change(guiRegistry.previous, prev);
+                }
+
+                // Disable dynamic resolution.
+                // Post a message to the screen.
+                if (stereoMode) {
+                    resetDynamicResolution();
+
+                    var keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
+                    var keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
+                    final var mpi = new ModePopupInfo();
+                    mpi.title = I18n.msg("gui.stereo.title");
+                    mpi.header = I18n.msg("gui.stereo.notice.header");
+
+                    mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
+                    mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
+
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
+                } else {
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
+                }
+            }
+            case CUBEMAP_CMD -> {
+                var cubemapMode = (Boolean) data[0];
+                if (cubemapMode) {
+                    resetDynamicResolution();
+                }
+            }
+            case SCENE_ADD_OBJECT_CMD -> {
+                final var toAdd = (Entity) data[0];
+                final var addToIndex = data.length == 1 || (Boolean) data[1];
                 if (scene != null) {
-                    final Entity entityToRemove = toRemove;
                     postRunnable(() -> {
                         try {
-                            scene.remove(entityToRemove, removeFromIndex);
+                            scene.insert(toAdd, addToIndex);
                         } catch (Exception e) {
-                            logger.warn(e);
+                            logger.error(e);
                         }
                     });
                 }
             }
-        }
-        case SCENE_REMOVE_OBJECT_NO_POST_CMD -> {
-            Entity toRemove;
-            toRemove = null;
-            if (data[0] instanceof String) {
-                toRemove = scene.getEntity((String) data[0]);
-                if (toRemove == null)
-                    return;
-            } else if (data[0] instanceof Entity) {
-                toRemove = (Entity) data[0];
-            } else if (data[0] instanceof FocusView) {
-                toRemove = ((FocusView) data[0]).getEntity();
-            }
-            if (toRemove != null) {
-                boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
+            case SCENE_ADD_OBJECT_NO_POST_CMD -> {
+                boolean addToIndex;
+                final var toAddPost = (Entity) data[0];
+                addToIndex = data.length == 1 || (Boolean) data[1];
                 if (scene != null) {
-                    scene.remove(toRemove, removeFromIndex);
+                    try {
+                        scene.insert(toAddPost, addToIndex);
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
                 }
             }
-        }
-        case SCENE_RELOAD_NAMES_CMD -> postRunnable(() -> {
-            scene.updateLocalizedNames();
-        });
-        case UI_SCALE_CMD -> {
-            if (guis != null) {
-                var uiScale = (Float) data[0];
-                for (IGui gui : guis) {
-                    gui.updateUnitsPerPixel(1f / uiScale);
+            case SCENE_REMOVE_OBJECT_CMD -> {
+                Entity toRemove = null;
+                if (data[0] instanceof String) {
+                    toRemove = scene.getEntity((String) data[0]);
+                    if (toRemove == null)
+                        return;
+                } else if (data[0] instanceof Entity) {
+                    toRemove = (Entity) data[0];
+                } else if (data[0] instanceof FocusView) {
+                    toRemove = ((FocusView) data[0]).getEntity();
+                }
+                if (toRemove != null) {
+                    boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
+                    if (scene != null) {
+                        final Entity entityToRemove = toRemove;
+                        postRunnable(() -> {
+                            try {
+                                scene.remove(entityToRemove, removeFromIndex);
+                            } catch (Exception e) {
+                                logger.warn(e);
+                            }
+                        });
+                    }
                 }
             }
-        }
-        case HOME_CMD, GO_HOME_INSTANT_CMD -> goHome();
-        case PARK_RUNNABLE -> {
-            String key = (String) data[0];
-            final var updateRunnable = (Runnable) data[1];
-            parkUpdateRunnable(key, updateRunnable);
-        }
-        case PARK_CAMERA_RUNNABLE -> {
-            String key;
-            key = (String) data[0];
-            final var cameraRunnable = (Runnable) data[1];
-            parkCameraRunnable(key, cameraRunnable);
-        }
-        case UNPARK_RUNNABLE -> {
-            String key;
-            key = (String) data[0];
-            removeRunnable(key);
-        }
-        case RESET_RENDERER -> {
-            if (sceneRenderer != null) {
-                sceneRenderer.resetRenderSystemFlags();
+            case SCENE_REMOVE_OBJECT_NO_POST_CMD -> {
+                Entity toRemove;
+                toRemove = null;
+                if (data[0] instanceof String) {
+                    toRemove = scene.getEntity((String) data[0]);
+                    if (toRemove == null)
+                        return;
+                } else if (data[0] instanceof Entity) {
+                    toRemove = (Entity) data[0];
+                } else if (data[0] instanceof FocusView) {
+                    toRemove = ((FocusView) data[0]).getEntity();
+                }
+                if (toRemove != null) {
+                    boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
+                    if (scene != null) {
+                        scene.remove(toRemove, removeFromIndex);
+                    }
+                }
             }
-        }
-        case SCENE_FORCE_UPDATE -> touchSceneGraph();
+            case SCENE_RELOAD_NAMES_CMD -> postRunnable(() -> {
+                scene.updateLocalizedNames();
+            });
+            case UI_SCALE_CMD -> {
+                if (guis != null) {
+                    var uiScale = (Float) data[0];
+                    for (IGui gui : guis) {
+                        gui.updateUnitsPerPixel(1f / uiScale);
+                    }
+                }
+            }
+            case HOME_CMD, GO_HOME_INSTANT_CMD -> goHome();
+            case PARK_RUNNABLE -> {
+                String key = (String) data[0];
+                final var updateRunnable = (Runnable) data[1];
+                parkUpdateRunnable(key, updateRunnable);
+            }
+            case PARK_CAMERA_RUNNABLE -> {
+                String key;
+                key = (String) data[0];
+                final var cameraRunnable = (Runnable) data[1];
+                parkCameraRunnable(key, cameraRunnable);
+            }
+            case UNPARK_RUNNABLE -> {
+                String key;
+                key = (String) data[0];
+                removeRunnable(key);
+            }
+            case RESET_RENDERER -> {
+                if (sceneRenderer != null) {
+                    sceneRenderer.resetRenderSystemFlags();
+                }
+            }
+            case SCENE_FORCE_UPDATE -> touchSceneGraph();
         }
 
     }
@@ -1672,7 +1692,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param runnable The runnable to park.
      */
     public void parkUpdateRunnable(final String key,
-            final Runnable runnable) {
+                                   final Runnable runnable) {
         parkRunnable(key, runnable, parkedUpdateRunnablesMap, parkedUpdateRunnables);
     }
 
@@ -1684,7 +1704,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param runnable The runnable to park.
      */
     public void parkCameraRunnable(final String key,
-            final Runnable runnable) {
+                                   final Runnable runnable) {
         parkRunnable(key, runnable, parkedCameraRunnablesMap, parkedCameraRunnables);
     }
 
@@ -1697,9 +1717,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param runnables The runnables list.
      */
     public void parkRunnable(final String key,
-            final Runnable runnable,
-            final Map<String, Runnable> map,
-            final Array<Runnable> runnables) {
+                             final Runnable runnable,
+                             final Map<String, Runnable> map,
+                             final Array<Runnable> runnables) {
         map.put(key, runnable);
         runnables.add(runnable);
     }
@@ -1715,8 +1735,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     private void removeRunnable(final String key,
-            final Map<String, Runnable> map,
-            final Array<Runnable> runnables) {
+                                final Map<String, Runnable> map,
+                                final Array<Runnable> runnables) {
         if (map.containsKey(key)) {
             final var r = map.get(key);
             if (r != null) {

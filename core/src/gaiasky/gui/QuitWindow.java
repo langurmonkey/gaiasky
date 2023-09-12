@@ -55,9 +55,12 @@ public class QuitWindow extends GenericDialog {
     protected boolean accept() {
         // Update exit confirmation
         Settings.settings.program.exitConfirmation = !doNotAsk.isChecked();
-        // Only run if it does not have an accept runnable already
-        // Otherwise, it comes from the exit hook
-        GaiaSky.postRunnable(() -> Gdx.app.exit());
+        // Only run if it does not have an accept runnable already.
+        // Otherwise, it comes from the exit hook.
+        GaiaSky.postRunnable(() -> {
+            // Exit GDX app.
+            Gdx.app.exit();
+        });
         return true;
     }
 

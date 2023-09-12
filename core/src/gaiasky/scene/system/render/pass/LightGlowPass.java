@@ -101,7 +101,9 @@ public class LightGlowPass {
             if (billboardStarsRenderer == null) {
                 billboardStarsRenderer = sceneRenderer.getOrInitializeRenderSystem(BILLBOARD_STAR);
             }
-            billboardStarsRenderer.render(stars, camera, 0, null);
+            if(billboardStarsRenderer != null) {
+                billboardStarsRenderer.render(stars, camera, 0, null);
+            }
 
             // Render models
             renderAssets.mbPixelLightingOpaque.begin(camera.getCamera());
@@ -111,7 +113,7 @@ public class LightGlowPass {
             renderAssets.mbPixelLightingOpaque.end();
 
             // Render tessellated models
-            if (modelsTess.size() > 0) {
+            if (!modelsTess.isEmpty()) {
                 renderAssets.mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
                 for (IRenderable model : modelsTess) {
                     sceneRenderer.renderModel(model, renderAssets.mbPixelLightingOpaqueTessellation);
