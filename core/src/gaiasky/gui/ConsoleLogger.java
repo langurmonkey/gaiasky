@@ -119,104 +119,93 @@ public class ConsoleLogger implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case POST_NOTIFICATION:
-            LoggerLevel level = (LoggerLevel) data[0];
-            Object[] dat = (Object[]) data[1];
-            StringBuilder message = new StringBuilder();
-            for (int i = 0; i < dat.length; i++) {
-                if (i != dat.length - 1 || !(dat[i] instanceof Boolean)) {
-                    message.append(dat[i].toString());
-                    if (i < dat.length - 1 && !(i == dat.length - 2 && dat[data.length - 1] instanceof Boolean)) {
-                        message.append(TAG_SEPARATOR);
+            case POST_NOTIFICATION -> {
+                LoggerLevel level = (LoggerLevel) data[0];
+                Object[] dat = (Object[]) data[1];
+                StringBuilder message = new StringBuilder();
+                for (int i = 0; i < dat.length; i++) {
+                    if (i != dat.length - 1 || !(dat[i] instanceof Boolean)) {
+                        message.append(dat[i].toString());
+                        if (i < dat.length - 1 && !(i == dat.length - 2 && dat[data.length - 1] instanceof Boolean)) {
+                            message.append(TAG_SEPARATOR);
+                        }
+                    }
+                }
+                addMessage(message.toString(), level);
+            }
+            case FOCUS_CHANGED -> {
+                if (data[0] != null) {
+                    if (data[0] instanceof String) {
+                        addMessage(I18n.msg("notif.camerafocus", data[0]));
+                    } else {
+                        var focus = (FocusView) data[0];
+                        addMessage(I18n.msg("notif.camerafocus", focus.getName()));
                     }
                 }
             }
-            addMessage(message.toString(), level);
-            break;
-        case FOCUS_CHANGED:
-            if (data[0] != null) {
-                if (data[0] instanceof String) {
-                    addMessage(I18n.msg("notif.camerafocus", data[0]));
+            case TIME_STATE_CMD -> {
+                Boolean bool = (Boolean) data[0];
+                if (bool == null) {
+                    addMessage(I18n.msg("notif.toggle", I18n.msg("gui.time")));
                 } else {
-                    var focus = (FocusView) data[0];
-                    addMessage(I18n.msg("notif.camerafocus", focus.getName()));
+                    addMessage(I18n.msg("notif.simulation." + (bool ? "resume" : "pause")));
                 }
             }
-            break;
-        case TIME_STATE_CMD:
-            Boolean bool = (Boolean) data[0];
-            if (bool == null) {
-                addMessage(I18n.msg("notif.toggle", I18n.msg("gui.time")));
-            } else {
-                addMessage(I18n.msg("notif.simulation." + (bool ? "resume" : "pause")));
+            case TOGGLE_VISIBILITY_CMD -> {
+                if (data.length == 2)
+                    addMessage(I18n.msg("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.msg((String) data[0])));
+                else
+                    addMessage(I18n.msg("notif.visibility.toggle", I18n.msg((String) data[0])));
             }
-            break;
-        case TOGGLE_VISIBILITY_CMD:
-            if (data.length == 2)
-                addMessage(I18n.msg("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.msg((String) data[0])));
-            else
-                addMessage(I18n.msg("notif.visibility.toggle", I18n.msg((String) data[0])));
-            break;
-        case FOCUS_LOCK_CMD:
-        case ORIENTATION_LOCK_CMD:
-        case OCTREE_PARTICLE_FADE_CMD:
-            addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
-            break;
-        case CAMERA_MODE_CMD:
-            CameraMode cm = (CameraMode) data[0];
-            if (cm != CameraMode.FOCUS_MODE)
-                addMessage(I18n.msg("notif.cameramode.change", data[0]));
-            break;
-        case TIME_WARP_CHANGED_INFO:
-            addMessage(I18n.msg("notif.timepace.change", data[0]));
-            break;
-        case FOV_CHANGE_NOTIFICATION:
+            case FOCUS_LOCK_CMD, ORIENTATION_LOCK_CMD, OCTREE_PARTICLE_FADE_CMD ->
+                    addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
+            case CAMERA_MODE_CMD -> {
+                CameraMode cm = (CameraMode) data[0];
+                if (cm != CameraMode.FOCUS_MODE)
+                    addMessage(I18n.msg("notif.cameramode.change", data[0]));
+            }
+            case TIME_WARP_CHANGED_INFO -> addMessage(I18n.msg("notif.timepace.change", data[0]));
+            case FOV_CHANGE_NOTIFICATION -> {
+            }
             // addMessage("Field of view changed to " + (float) data[0]);
-            break;
-        case JAVA_EXCEPTION:
-            Throwable t = (Throwable) data[0];
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            t.printStackTrace(pw);
-            String stackTrace = sw.toString();
-            if (data.length == 1) {
-                if (I18n.messages != null)
-                    addMessage(I18n.msg("notif.error", stackTrace));
-                else
-                    addMessage("Error: " + stackTrace);
-            } else {
-                if (I18n.messages != null)
-                    addMessage(I18n.msg("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
-                else
-                    addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
+            case JAVA_EXCEPTION -> {
+                Throwable t = (Throwable) data[0];
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                t.printStackTrace(pw);
+                String stackTrace = sw.toString();
+                if (data.length == 1) {
+                    if (I18n.messages != null)
+                        addMessage(I18n.msg("notif.error", stackTrace));
+                    else
+                        addMessage("Error: " + stackTrace);
+                } else {
+                    if (I18n.messages != null)
+                        addMessage(I18n.msg("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
+                    else
+                        addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
+                }
             }
-            break;
-        case ORBIT_DATA_LOADED:
-            addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), LoggerLevel.DEBUG);
-            break;
-        case SCREENSHOT_INFO:
-            addMessage(I18n.msg("notif.screenshot", data[0]));
-            break;
-        case STEREOSCOPIC_CMD:
-            addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
-            break;
-        case DISPLAY_GUI_CMD:
-            boolean displayGui = (Boolean) data[0];
-            addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
-            break;
-        case STEREO_PROFILE_CMD:
-            addMessage(I18n.msg("notif.stereoscopic.profile", Settings.StereoProfile.values()[(Integer) data[0]].toString()));
-            break;
-        case FRAME_OUTPUT_CMD:
-            boolean activated = (Boolean) data[0];
-            if (activated) {
-                addMessage(I18n.msg("notif.activated", I18n.msg("element.frameoutput")));
-            } else {
-                addMessage(I18n.msg("notif.deactivated", I18n.msg("element.frameoutput")));
+            case ORBIT_DATA_LOADED ->
+                    addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), LoggerLevel.DEBUG);
+            case SCREENSHOT_INFO -> addMessage(I18n.msg("notif.screenshot", data[0]));
+            case STEREOSCOPIC_CMD -> addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
+            case DISPLAY_GUI_CMD -> {
+                boolean displayGui = (Boolean) data[0];
+                addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
             }
-            break;
-        default:
-            break;
+            case STEREO_PROFILE_CMD ->
+                    addMessage(I18n.msg("notif.stereoscopic.profile", Settings.StereoProfile.values()[(Integer) data[0]].toString()));
+            case FRAME_OUTPUT_CMD -> {
+                boolean activated = (Boolean) data[0];
+                if (activated) {
+                    addMessage(I18n.msg("notif.activated", I18n.msg("element.frameoutput")));
+                } else {
+                    addMessage(I18n.msg("notif.deactivated", I18n.msg("element.frameoutput")));
+                }
+            }
+            default -> {
+            }
         }
     }
 

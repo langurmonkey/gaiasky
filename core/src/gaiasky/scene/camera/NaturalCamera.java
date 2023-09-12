@@ -1279,225 +1279,220 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case SCENE_LOADED:
-            this.scene = (Scene) data[0];
-            this.focus.setScene(this.scene);
-            this.closestBody.setScene(this.scene);
-            this.closestStarView.setScene(this.scene);
-            break;
-        case FOCUS_CHANGE_CMD:
-            setTrackingObject(null, null);
-            // Check the type of the parameter: IFocus or String
-            Entity newFocus = null;
+            case SCENE_LOADED -> {
+                this.scene = (Scene) data[0];
+                this.focus.setScene(this.scene);
+                this.closestBody.setScene(this.scene);
+                this.closestStarView.setScene(this.scene);
+            }
+            case FOCUS_CHANGE_CMD -> {
+                setTrackingObject(null, null);
+                // Check the type of the parameter: IFocus or String
+                Entity newFocus = null;
 
-            // Center focus or not
-            boolean centerFocus = !vr;
-            if (data.length > 1)
-                centerFocus = (Boolean) data[1];
-
-            String focusName = null;
-            if (data[0] instanceof String) {
-                focusName = (String) data[0];
-                newFocus = scene.getEntity(focusName);
-                diverted = !centerFocus;
-            } else if (data[0] instanceof FocusView) {
-                newFocus = ((FocusView) data[0]).getEntity();
-                diverted = !centerFocus;
-            } else if (data[0] instanceof Entity) {
-                newFocus = (Entity) data[0];
-                diverted = !centerFocus;
+                // Center focus or not
+                boolean centerFocus = !vr;
+                if (data.length > 1)
+                    centerFocus = (Boolean) data[1];
+                String focusName = null;
+                if (data[0] instanceof String) {
+                    focusName = (String) data[0];
+                    newFocus = scene.getEntity(focusName);
+                    diverted = !centerFocus;
+                } else if (data[0] instanceof FocusView) {
+                    newFocus = ((FocusView) data[0]).getEntity();
+                    diverted = !centerFocus;
+                } else if (data[0] instanceof Entity) {
+                    newFocus = (Entity) data[0];
+                    diverted = !centerFocus;
+                }
+                setFocus(focusName, newFocus);
+                checkFocus();
             }
-            setFocus(focusName, newFocus);
-
-            checkFocus();
-
-            break;
-        case FOV_CHANGED_CMD:
-            boolean checkMax = source instanceof Actor;
-            float fov = MathUtilsDouble.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
-
-            for (PerspectiveCamera cam : cameras) {
-                cam.fieldOfView = fov;
+            case FOV_CHANGED_CMD -> {
+                boolean checkMax = source instanceof Actor;
+                float fov = MathUtilsDouble.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
+                for (PerspectiveCamera cam : cameras) {
+                    cam.fieldOfView = fov;
+                }
+                fovFactor = camera.fieldOfView / 40f;
+                if (parent.current == this) {
+                    EventManager.publish(Event.FOV_CHANGE_NOTIFICATION, this, fov, fovFactor);
+                }
             }
-            fovFactor = camera.fieldOfView / 40f;
-            if (parent.current == this) {
-                EventManager.publish(Event.FOV_CHANGE_NOTIFICATION, this, fov, fovFactor);
+            case CUBEMAP_CMD -> {
+                boolean state = (boolean) data[0];
+                CubemapProjection p = (CubemapProjection) data[1];
+                if (p.isPlanetarium() && state && !vr) {
+                    fovBackup = GaiaSky.instance.cameraManager.getCamera().fieldOfView;
+                }
             }
-            break;
-        case CUBEMAP_CMD:
-            boolean state = (boolean) data[0];
-            CubemapProjection p = (CubemapProjection) data[1];
-            if (p.isPlanetarium() && state && !vr) {
-                fovBackup = GaiaSky.instance.cameraManager.getCamera().fieldOfView;
-            }
-            break;
-        case CAMERA_POS_CMD:
-            synchronized (updateLock) {
-                pos.set((double[]) data[0]);
-                posinv.set(pos).scl(-1d);
-            }
-            break;
-        case CAMERA_DIR_CMD:
-            synchronized (updateLock) {
-                direction.set((double[]) data[0]).nor();
-            }
-            break;
-        case CAMERA_UP_CMD:
-            synchronized (updateLock) {
-                up.set((double[]) data[0]).nor();
-            }
-            break;
-        case CAMERA_PROJECTION_CMD:
-            synchronized (updateLock) {
-                // Position
-                pos.set((double[]) data[0]);
-                posinv.set(pos).scl(-1d);
-                // Direction
-                direction.set((double[]) data[1]).nor();
-                // Up
-                up.set((double[]) data[2]).nor();
-                // Change projection flag
-                projectionFlag = true;
-            }
-            break;
-        case CAMERA_FWD:
-            synchronized (updateLock) {
-                addForwardForce((double) data[0]);
-            }
-            break;
-        case CAMERA_ROTATE:
-            synchronized (updateLock) {
-                addRotateMovement((double) data[0], (double) data[1], false, true);
-            }
-            break;
-        case CAMERA_TURN:
-            synchronized (updateLock) {
-                addRotateMovement((double) data[0], (double) data[1], true, true);
-            }
-            break;
-        case CAMERA_ROLL:
-            synchronized (updateLock) {
-                addRoll((double) data[0], Settings.settings.scene.camera.cinematic);
-            }
-            break;
-        case CAMERA_STOP:
-            synchronized (updateLock) {
-                stopTotalMovement();
-            }
-            break;
-        case CAMERA_CENTER:
-            synchronized (updateLock) {
-                diverted = false;
-            }
-            break;
-        case GO_TO_OBJECT_CMD:
-            if (this.focus != null && this.focus.isValid()) {
-                final IFocus f = this.focus;
-                GaiaSky.postRunnable(() -> {
-                    setTrackingObject(null, null);
-                    // Position camera near focus
-                    stopTotalMovement();
-
-                    f.getAbsolutePosition(aux1b);
-                    pos.set(aux1b);
-
-                    double dx = 0d;
-                    double dy = f.getSize() / 4d;
-                    double dz = -f.getSize() * 4d;
-                    if (vr) {
-                        dz = -dz;
-                    }
-
-                    pos.add(dx, dy, dz);
+            case CAMERA_POS_CMD -> {
+                synchronized (updateLock) {
+                    pos.set((double[]) data[0]);
                     posinv.set(pos).scl(-1d);
-                    direction.set(-dx, -dy, -dz).nor();
-                    up.set(direction.x, direction.z, -direction.y).nor();
-                    rotate(up, 0.01);
-                    updatePerspectiveCamera();
-                });
+                }
             }
-            break;
-        case ORIENTATION_LOCK_CMD:
-            synchronized (updateLock) {
-                previousOrientationAngle = 0;
+            case CAMERA_DIR_CMD -> {
+                synchronized (updateLock) {
+                    direction.set((double[]) data[0]).nor();
+                }
             }
-            break;
-        case FREE_MODE_COORD_CMD:
-            synchronized (updateLock) {
-                double ra = (Double) data[0];
-                double dec = (Double) data[1];
-                double dist = 1e12d * Constants.PC_TO_U;
-                aux1.set(MathUtilsDouble.degRad * ra, MathUtilsDouble.degRad * dec, dist);
-                Coordinates.sphericalToCartesian(aux1, aux2);
-                freeTargetPos.set(aux2);
-                facingFocus = false;
-                freeTargetOn = true;
+            case CAMERA_UP_CMD -> {
+                synchronized (updateLock) {
+                    up.set((double[]) data[0]).nor();
+                }
             }
-            break;
-        case FOCUS_NOT_AVAILABLE:
-            if (getMode().isFocus()) {
-                boolean found = false;
-                if (data[0] instanceof Entity) {
-                    var entity = (Entity) data[0];
-                    if (Mapper.octree.has(entity)) {
-                        // Octree wrapper.
-                        var root = Mapper.octant.get(entity);
-                        OctreeNode octant = this.focus.getOctant();
-                        if (octant != null && octant.getRoot() == root.octant) {
-                            found = true;
+            case CAMERA_PROJECTION_CMD -> {
+                synchronized (updateLock) {
+                    // Position
+                    pos.set((double[]) data[0]);
+                    posinv.set(pos).scl(-1d);
+                    // Direction
+                    direction.set((double[]) data[1]).nor();
+                    // Up
+                    up.set((double[]) data[2]).nor();
+                    // Change projection flag
+                    projectionFlag = true;
+                }
+            }
+            case CAMERA_FWD -> {
+                synchronized (updateLock) {
+                    addForwardForce((double) data[0]);
+                }
+            }
+            case CAMERA_ROTATE -> {
+                synchronized (updateLock) {
+                    addRotateMovement((double) data[0], (double) data[1], false, true);
+                }
+            }
+            case CAMERA_TURN -> {
+                synchronized (updateLock) {
+                    addRotateMovement((double) data[0], (double) data[1], true, true);
+                }
+            }
+            case CAMERA_ROLL -> {
+                synchronized (updateLock) {
+                    addRoll((double) data[0], Settings.settings.scene.camera.cinematic);
+                }
+            }
+            case CAMERA_STOP -> {
+                synchronized (updateLock) {
+                    stopTotalMovement();
+                }
+            }
+            case CAMERA_CENTER -> {
+                synchronized (updateLock) {
+                    diverted = false;
+                }
+            }
+            case GO_TO_OBJECT_CMD -> {
+                if (this.focus != null && this.focus.isValid()) {
+                    final IFocus f = this.focus;
+                    GaiaSky.postRunnable(() -> {
+                        setTrackingObject(null, null);
+                        // Position camera near focus
+                        stopTotalMovement();
+
+                        f.getAbsolutePosition(aux1b);
+                        pos.set(aux1b);
+
+                        double dx = 0d;
+                        double dy = f.getSize() / 4d;
+                        double dz = -f.getSize() * 4d;
+                        if (vr) {
+                            dz = -dz;
                         }
-                    } else if (Mapper.datasetDescription.has(entity)) {
-                        // Generic catalog.
-                        var graph = Mapper.graph.get(entity);
-                        found = graph.children != null && graph.children.contains(focus.getEntity(), true);
-                    } else if (Mapper.focus.has(entity)) {
-                        // Focus.
-                        focus.setEntity(entity);
-                        found = isFocus(entity);
+
+                        pos.add(dx, dy, dz);
+                        posinv.set(pos).scl(-1d);
+                        direction.set(-dx, -dy, -dz).nor();
+                        up.set(direction.x, direction.z, -direction.y).nor();
+                        rotate(up, 0.01);
+                        updatePerspectiveCamera();
+                    });
+                }
+            }
+            case ORIENTATION_LOCK_CMD -> {
+                synchronized (updateLock) {
+                    previousOrientationAngle = 0;
+                }
+            }
+            case FREE_MODE_COORD_CMD -> {
+                synchronized (updateLock) {
+                    double ra = (Double) data[0];
+                    double dec = (Double) data[1];
+                    double dist = 1e12d * Constants.PC_TO_U;
+                    aux1.set(MathUtilsDouble.degRad * ra, MathUtilsDouble.degRad * dec, dist);
+                    Coordinates.sphericalToCartesian(aux1, aux2);
+                    freeTargetPos.set(aux2);
+                    facingFocus = false;
+                    freeTargetOn = true;
+                }
+            }
+            case FOCUS_NOT_AVAILABLE -> {
+                if (getMode().isFocus()) {
+                    boolean found = false;
+                    if (data[0] instanceof Entity) {
+                        var entity = (Entity) data[0];
+                        if (Mapper.octree.has(entity)) {
+                            // Octree wrapper.
+                            var root = Mapper.octant.get(entity);
+                            OctreeNode octant = this.focus.getOctant();
+                            if (octant != null && octant.getRoot() == root.octant) {
+                                found = true;
+                            }
+                        } else if (Mapper.datasetDescription.has(entity)) {
+                            // Generic catalog.
+                            var graph = Mapper.graph.get(entity);
+                            found = graph.children != null && graph.children.contains(focus.getEntity(), true);
+                        } else if (Mapper.focus.has(entity)) {
+                            // Focus.
+                            focus.setEntity(entity);
+                            found = isFocus(entity);
+                        }
+                    }
+                    if (found) {
+                        // Set camera  free
+                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                     }
                 }
-                if (found) {
-                    // Set camera  free
-                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+            }
+            case TOGGLE_VISIBILITY_CMD -> {
+                if (getMode().isFocus()) {
+                    ComponentType ct = ComponentType.getFromKey((String) data[0]);
+                    if (this.focus != null && ct != null && this.focus.getCt().isEnabled(ct)) {
+                        // Set camera  free
+                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+                    }
                 }
             }
-            break;
-        case TOGGLE_VISIBILITY_CMD:
-            if (getMode().isFocus()) {
-                ComponentType ct = ComponentType.getFromKey((String) data[0]);
-                if (this.focus != null && ct != null && this.focus.getCt().isEnabled(ct)) {
-                    // Set camera  free
-                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+            case CAMERA_CENTER_FOCUS_CMD -> {
+                synchronized (updateLock) {
+                    setCenterFocus((Boolean) data[0]);
                 }
             }
-            break;
-        case CAMERA_CENTER_FOCUS_CMD:
-            synchronized (updateLock) {
-                setCenterFocus((Boolean) data[0]);
+            case CONTROLLER_CONNECTED_INFO ->
+                    Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
+            case CONTROLLER_DISCONNECTED_INFO -> {
+                // Empty.
             }
-            break;
-        case CONTROLLER_CONNECTED_INFO:
-            Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
-            break;
-        case CONTROLLER_DISCONNECTED_INFO:
-            // Nothing
-            break;
-        case NEW_DISTANCE_SCALE_FACTOR:
-            synchronized (updateLock) {
-                DIST_A = 0.1 * Constants.PC_TO_U;
-                DIST_B = 5.0 * Constants.KPC_TO_U;
-                DIST_C = 5000.0 * Constants.MPC_TO_U;
+            case NEW_DISTANCE_SCALE_FACTOR -> {
+                synchronized (updateLock) {
+                    DIST_A = 0.1 * Constants.PC_TO_U;
+                    DIST_B = 5.0 * Constants.KPC_TO_U;
+                    DIST_C = 5000.0 * Constants.MPC_TO_U;
+                }
             }
-            break;
-        case CAMERA_TRACKING_OBJECT_CMD:
-            final Entity newTrackingObject = (Entity) data[0];
-            final String newTrackingName = (String) data[1];
-            synchronized (updateLock) {
-                this.setTrackingObject(newTrackingObject, newTrackingName != null ? newTrackingName.toLowerCase() : null);
+            case CAMERA_TRACKING_OBJECT_CMD -> {
+                final Entity newTrackingObject = (Entity) data[0];
+                final String newTrackingName = (String) data[1];
+                synchronized (updateLock) {
+                    this.setTrackingObject(newTrackingObject, newTrackingName != null ? newTrackingName.toLowerCase() : null);
+                }
             }
-            break;
-        default:
-            break;
+            default -> {
+            }
         }
 
     }

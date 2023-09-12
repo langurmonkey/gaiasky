@@ -35,8 +35,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.TextUtils;
-import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.camera.rec.Keyframe;
+import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.InterpolationDouble;
@@ -57,6 +57,7 @@ import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
@@ -111,6 +112,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      **/
     private Cell<?> notice;
     /**
+     * Keyframes visibility.
+     */
+    private Button visibility;
+    /**
      * Scroll for keyframes
      **/
     private OwnScrollPane rightScroll;
@@ -126,7 +131,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private long lastMs = 0L;
     private Color colorBak;
 
-    /** Playback buttons. **/
+    /**
+     * Playback buttons.
+     **/
     private Button skipBack, stepBack, playPause, stepForward, skipForward;
     /**
      * Cell that contains the timeline slider.
@@ -243,6 +250,27 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         OwnLabel nameLabel = new OwnLabel(I18n.msg("gui.keyframes.name") + ":", skin);
         left.add(nameLabel).center().left().padRight(pad18).padBottom(pad18).padLeft(pad10);
         left.add(nameInput).center().left().padBottom(pad18).padRight(pad10).row();
+
+        // KEYFRAMES VISIBILITY
+        var ct = ComponentType.Keyframes;
+        Image icon = new Image(skin.getDrawable(ct.style));
+        visibility = new OwnTextIconButton(TextUtils.capitalise(I18n.msg("gui.keyframes.visibility")), icon, skin, "toggle");
+        // Tooltip (with or without hotkey)
+        String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
+        if (hk != null) {
+            visibility.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(Objects.requireNonNull(ct.getName())), hk, skin));
+        } else {
+            visibility.addListener(new OwnTextTooltip(TextUtils.capitalise(Objects.requireNonNull(ct.getName())), skin));
+        }
+        visibility.setChecked(GaiaSky.instance.sceneRenderer.isOn(ct));
+        visibility.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, visibility, ct.key, visibility.isChecked());
+                return true;
+            }
+            return false;
+        });
+        left.add(visibility).colspan(2).center().pad(pad18).row();
 
         left.pack();
 
@@ -494,7 +522,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * @param cDir  The direction
      * @param cUp   The up
      * @param cTime The time
-     *
      * @return True if the keyframe was added, false otherwise
      */
     private boolean addKeyframe(int index,
@@ -549,7 +576,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
             } else {
                 logger.info(I18n.msg("gui.keyframes.notadded") + "-" + I18n.msg("gui.keyframes.error.values", secOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong"),
-                                                                                nameOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong")));
+                        nameOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong")));
             }
         } catch (Exception e) {
             logger.error(I18n.msg("gui.keyframes.notadded") + " - " + I18n.msg("gui.keyframes.error.input"), e);
@@ -562,7 +589,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * Adds a new keyframe at the given index position using the current camera state and time.
      *
      * @param index The position of the keyframe, negative to add at the end.
-     *
      * @return True if the keyframe was added, false otherwise.
      */
     private boolean addKeyframe(int index) {
@@ -1090,7 +1116,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     public GenericDialog show(Stage stage,
                               Action action) {
         // Subscriptions
-        EventManager.instance.subscribe(this, Event.KEYFRAME_PLAY_FRAME, Event.KEYFRAMES_REFRESH, Event.KEYFRAME_SELECT, Event.KEYFRAME_UNSELECT, Event.KEYFRAME_ADD);
+        EventManager.instance.subscribe(this, Event.KEYFRAME_PLAY_FRAME, Event.KEYFRAMES_REFRESH, Event.KEYFRAME_SELECT, Event.KEYFRAME_UNSELECT, Event.KEYFRAME_ADD, Event.TOGGLE_VISIBILITY_CMD);
         // Re-add if necessary
         if (Mapper.graph.get(keyframesPathEntity).parent == null) {
             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, keyframesPathEntity, false);
@@ -1190,43 +1216,56 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case KEYFRAME_ADD -> addKeyframe(-1);
-        case KEYFRAME_PLAY_FRAME -> {
-            if (source == manager) {
-                // Just need to update the widgets.
+            case KEYFRAME_ADD -> addKeyframe(-1);
+            case KEYFRAME_PLAY_FRAME -> {
+                if (source == manager) {
+                    // Just need to update the widgets.
 
-                // Set timeline.
-                timelineSlider.setProgrammaticChangeEvents(false);
-                timelineSlider.setMappedValue(manager.currentPath.i);
-                timelineSlider.setProgrammaticChangeEvents(true);
+                    // Set timeline.
+                    timelineSlider.setProgrammaticChangeEvents(false);
+                    timelineSlider.setMappedValue(manager.currentPath.i);
+                    timelineSlider.setProgrammaticChangeEvents(true);
 
-                // Check end.
-                if (manager.isIdle()) {
-                    playPause.setProgrammaticChangeEvents(false);
-                    playPause.setChecked(false);
-                    playPause.setProgrammaticChangeEvents(true);
+                    // Check end.
+                    if (manager.isIdle()) {
+                        playPause.setProgrammaticChangeEvents(false);
+                        playPause.setChecked(false);
+                        playPause.setProgrammaticChangeEvents(true);
+                    }
                 }
             }
-        }
-        case KEYFRAMES_REFRESH -> reinitialiseKeyframes(manager.keyframes, null);
-        case KEYFRAME_SELECT -> {
-            Keyframe kf = (Keyframe) data[0];
-            OwnLabel nl = keyframeNames.get(kf);
-            if (nl != null) {
-                colorBak = nl.getColor().cpy();
-                nl.setColor(skin.getColor("theme"));
-                scrollToKeyframe(kf);
+            case KEYFRAMES_REFRESH -> reinitialiseKeyframes(manager.keyframes, null);
+            case KEYFRAME_SELECT -> {
+                Keyframe kf = (Keyframe) data[0];
+                OwnLabel nl = keyframeNames.get(kf);
+                if (nl != null) {
+                    colorBak = nl.getColor().cpy();
+                    nl.setColor(skin.getColor("theme"));
+                    scrollToKeyframe(kf);
+                }
             }
-        }
-        case KEYFRAME_UNSELECT -> {
-            Keyframe kf = (Keyframe) data[0];
-            OwnLabel nl = keyframeNames.get(kf);
-            if (nl != null && colorBak != null) {
-                nl.setColor(colorBak);
+            case KEYFRAME_UNSELECT -> {
+                Keyframe kf = (Keyframe) data[0];
+                OwnLabel nl = keyframeNames.get(kf);
+                if (nl != null && colorBak != null) {
+                    nl.setColor(colorBak);
+                }
             }
-        }
-        default -> {
-        }
+            case TOGGLE_VISIBILITY_CMD -> {
+                String key = (String) data[0];
+                Button b = visibility;
+                if (key.equals(ComponentType.Keyframes.key) && b != null && source != b) {
+                    b.setProgrammaticChangeEvents(false);
+                    if (data.length == 2) {
+                        b.setChecked((Boolean) data[1]);
+                    } else {
+                        b.setChecked(!b.isChecked());
+                    }
+                    b.setProgrammaticChangeEvents(true);
+                }
+            }
+            default -> {
+            }
         }
     }
 

@@ -215,7 +215,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
             switch (event) {
-                case POST_NOTIFICATION:
+                case POST_NOTIFICATION -> {
                     LoggerLevel level = (LoggerLevel) data[0];
                     Object[] dat = (Object[]) data[1];
                     var message = new java.lang.StringBuilder();
@@ -235,8 +235,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                         }
                     }
                     addMessage(message.toString(), permanent, level);
-                    break;
-                case FOCUS_CHANGED:
+                }
+                case FOCUS_CHANGED -> {
                     if (data[0] != null) {
                         if (data[0] instanceof String) {
                             addMessage(I18n.msg("notif.camerafocus", data[0]));
@@ -245,38 +245,33 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                             addMessage(I18n.msg("notif.camerafocus", focus.getName()));
                         }
                     }
-                    break;
-                case TIME_STATE_CMD:
+                }
+                case TIME_STATE_CMD -> {
                     Boolean bool = (Boolean) data[0];
                     if (bool == null) {
                         addMessage(I18n.msg("notif.toggle", I18n.msg("gui.time")));
                     } else {
                         addMessage(I18n.msg("notif.simulation." + (bool ? "resume" : "pause")));
                     }
-                    break;
-                case TOGGLE_VISIBILITY_CMD:
+                }
+                case TOGGLE_VISIBILITY_CMD -> {
                     if (data.length == 2)
                         addMessage(I18n.msg("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.msg((String) data[0])));
                     else
                         addMessage(I18n.msg("notif.visibility.toggle", I18n.msg((String) data[0])));
-                    break;
-                case FOCUS_LOCK_CMD:
-                case ORIENTATION_LOCK_CMD:
-                case OCTREE_PARTICLE_FADE_CMD:
-                    addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
-                    break;
-                case CAMERA_MODE_CMD:
+                }
+                case FOCUS_LOCK_CMD, ORIENTATION_LOCK_CMD, OCTREE_PARTICLE_FADE_CMD ->
+                        addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
+                case CAMERA_MODE_CMD -> {
                     CameraMode cm = (CameraMode) data[0];
                     if (cm != CameraMode.FOCUS_MODE)
                         addMessage(I18n.msg("notif.cameramode.change", data[0]));
-                    break;
-                case TIME_WARP_CHANGED_INFO:
-                    addMessage(I18n.msg("notif.timepace.change", data[0]));
-                    break;
-                case FOV_CHANGE_NOTIFICATION:
-                    // addMessage("Field of view changed to " + (float) data[0]);
-                    break;
-                case JAVA_EXCEPTION:
+                }
+                case TIME_WARP_CHANGED_INFO -> addMessage(I18n.msg("notif.timepace.change", data[0]));
+                case FOV_CHANGE_NOTIFICATION -> {
+                }
+                // addMessage("Field of view changed to " + (float) data[0]);
+                case JAVA_EXCEPTION -> {
                     Throwable t = (Throwable) data[0];
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
@@ -293,32 +288,26 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                         else
                             addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
                     }
-                    break;
-                case ORBIT_DATA_LOADED:
-                    addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, LoggerLevel.DEBUG);
-                    break;
-                case SCREENSHOT_INFO:
-                    addMessage(I18n.msg("notif.screenshot", data[0]));
-                    break;
-                case STEREOSCOPIC_CMD:
-                    addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
-                    break;
-                case DISPLAY_GUI_CMD:
+                }
+                case ORBIT_DATA_LOADED ->
+                        addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, LoggerLevel.DEBUG);
+                case SCREENSHOT_INFO -> addMessage(I18n.msg("notif.screenshot", data[0]));
+                case STEREOSCOPIC_CMD -> addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
+                case DISPLAY_GUI_CMD -> {
                     boolean displayGui = (Boolean) data[0];
                     addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
-                    break;
-                case STEREO_PROFILE_CMD:
-                    addMessage(I18n.msg("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
-                    break;
-                case FRAME_OUTPUT_CMD:
+                }
+                case STEREO_PROFILE_CMD ->
+                        addMessage(I18n.msg("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
+                case FRAME_OUTPUT_CMD -> {
                     boolean activated = (Boolean) data[0];
                     if (activated) {
                         addMessage(I18n.msg("notif.activated", I18n.msg("element.frameoutput")));
                     } else {
                         addMessage(I18n.msg("notif.deactivated", I18n.msg("element.frameoutput")));
                     }
-                    break;
-                case SCREEN_NOTIFICATION_CMD:
+                }
+                case SCREEN_NOTIFICATION_CMD -> {
                     String title = (String) data[0];
                     String[] msgs = (String[]) data[1];
 
@@ -326,9 +315,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                     addMessage(title);
                     for (String msg : msgs)
                         addMessage(msg);
-
-                    break;
-                case MODE_POPUP_CMD:
+                }
+                case MODE_POPUP_CMD -> {
                     ModePopupInfo mpi = (ModePopupInfo) data[0];
                     if (mpi != null && Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
                         addMessage(mpi.title);
@@ -350,9 +338,9 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                             }
                         }
                     }
-                    break;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
         }
     }
