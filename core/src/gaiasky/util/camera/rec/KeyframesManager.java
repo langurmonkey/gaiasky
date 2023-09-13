@@ -95,7 +95,6 @@ public class KeyframesManager implements IObserver {
      * Gets the frame number of the given keyframe using the current target frame rate setting.
      *
      * @param kf The keyframe.
-     *
      * @return The frame number corresponding to exactly this keyframe if the keyframe is valid and in the keyframes list, otherwise -1.
      * The frame number is in [0,n-1].
      */
@@ -259,7 +258,6 @@ public class KeyframesManager implements IObserver {
      *
      * @param keyframes The array of keyframes.
      * @param pathType  The path type.
-     *
      * @return Array of path parts.
      */
     private PathPart[] positionsToPathParts(Array<Keyframe> keyframes,
@@ -336,6 +334,7 @@ public class KeyframesManager implements IObserver {
 
     /**
      * Skips to the given frame.
+     *
      * @param frame The frame number.
      */
     public void skip(long frame) {
@@ -368,65 +367,88 @@ public class KeyframesManager implements IObserver {
         up.set(currentPath.data.get(ip + 6), currentPath.data.get(ip + 7), currentPath.data.get(ip + 8));
     }
 
+    /**
+     * Checks that all keyframe timings fall perfectly on a frame, so that
+     * t(kf) * FPS % 1 = 0 holds.
+     *
+     * @return True if the keyframe timings are consistent with the camcorder FPS setting.
+     */
+    public boolean checkKeyframeTimings() {
+        if (!keyframes.isEmpty()) {
+            double fPS = Settings.settings.camrecorder.targetFps;
+            double sPF = 1.0 / fPS;
+            long msPF = (long) (sPF * 1000L);
+
+            for (Keyframe kf : keyframes) {
+                double frames = kf.seconds * fPS;
+                if (frames % 1.0 != 0.0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public void notify(final Event event,
                        Object source,
                        final Object... data) {
 
         switch (event) {
-        case KEYFRAMES_FILE_SAVE -> {
-            Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
-            String fileName = (String) data[1];
-            saveKeyframesFile(keyframes, fileName);
-        }
-        case KEYFRAMES_EXPORT -> {
-            var keyframes = (Array<Keyframe>) data[0];
-            var fileName = (String) data[1];
-            exportKeyframesFile(keyframes, fileName);
-        }
-        case UPDATE_CAM_RECORDER -> {
-            synchronized (this) {
-                t = (ITimeFrameProvider) data[0];
-                pos = (Vector3b) data[1];
-                dir = (Vector3d) data[2];
-                up = (Vector3d) data[3];
+            case KEYFRAMES_FILE_SAVE -> {
+                Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
+                String fileName = (String) data[1];
+                saveKeyframesFile(keyframes, fileName);
             }
-            if (state.get() == RecorderState.PLAYING && currentPath != null) {
-                // In playing mode, we set the frame and then advance to the next.
-
-                // Set frame.
-                setFrame();
-
-                // Advance step.
-                currentPath.i = (currentPath.i + 1) % currentPath.n;
-
-                // Check end.
-                if (currentPath.i == 0) {
-                    pause();
+            case KEYFRAMES_EXPORT -> {
+                var keyframes = (Array<Keyframe>) data[0];
+                var fileName = (String) data[1];
+                exportKeyframesFile(keyframes, fileName);
+            }
+            case UPDATE_CAM_RECORDER -> {
+                synchronized (this) {
+                    t = (ITimeFrameProvider) data[0];
+                    pos = (Vector3b) data[1];
+                    dir = (Vector3d) data[2];
+                    up = (Vector3d) data[3];
                 }
+                if (state.get() == RecorderState.PLAYING && currentPath != null) {
+                    // In playing mode, we set the frame and then advance to the next.
 
-                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
-            } else if (state.get() == RecorderState.STEPPING && currentPath != null) {
-                // In stepping mode, we set the frame and pause.
+                    // Set frame.
+                    setFrame();
 
-                // Set frame.
-                setFrame();
+                    // Advance step.
+                    currentPath.i = (currentPath.i + 1) % currentPath.n;
 
-                // Pause.
-                pause();
+                    // Check end.
+                    if (currentPath.i == 0) {
+                        pause();
+                    }
 
-                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
+                    EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
+                } else if (state.get() == RecorderState.STEPPING && currentPath != null) {
+                    // In stepping mode, we set the frame and pause.
+
+                    // Set frame.
+                    setFrame();
+
+                    // Pause.
+                    pause();
+
+                    EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
+                }
             }
-        }
-        case KEYFRAME_PLAY_FRAME -> {
-            if (source != this && currentPath != null) {
-                // Actually play frame.
-                long frame = (Long) data[0];
-                skip(frame);
+            case KEYFRAME_PLAY_FRAME -> {
+                if (source != this && currentPath != null) {
+                    // Actually play frame.
+                    long frame = (Long) data[0];
+                    skip(frame);
+                }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
     }
 

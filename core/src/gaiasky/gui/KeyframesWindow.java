@@ -316,14 +316,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         totalTime += kf1.seconds;
                         totalDist += aux.set(kf1.pos).sub(kf0.pos).len();
                     }
-                    // Loop over keyframes and assign new times
+                    // Loop over keyframes and assign new times.
                     for (int i = 1; i < n; i++) {
                         Keyframe kf0 = manager.keyframes.get(i - 1);
                         Keyframe kf1 = manager.keyframes.get(i);
                         double dist = aux.set(kf1.pos).sub(kf0.pos).len();
                         kf1.seconds = totalTime * dist / totalDist;
                     }
-                    // Reload window contents
+                    // Reload window contents.
                     reinitialiseKeyframes(manager.keyframes, null);
 
                     synchronized (view) {
@@ -332,6 +332,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     }
                     logger.info(I18n.msg("gui.keyframes.normalize.done"));
 
+                    // Check timings.
+                    checkKeyframeTimings();
                 }
                 return true;
             }
@@ -343,7 +345,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(pad18);
 
-        // Open keyframes
+        // Open keyframes.
         OwnTextIconButton open = new OwnTextIconButton(I18n.msg("gui.keyframes.load"), skin, "open");
         open.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.load"), skin));
         open.pad(pad10);
@@ -357,10 +359,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.exists(result) && Files.isRegularFile(result)) {
-                            // Load selected file
+                            // Load selected file.
                             try {
                                 Array<Keyframe> kfs = manager.loadKeyframesFile(result);
-                                // Update current instance
+                                // Update current instance.
                                 reinitialiseKeyframes(kfs, null);
                                 synchronized (view) {
                                     view.setEntity(keyframesPathEntity);
@@ -385,6 +387,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         }
                     }
                     notice.clearActor();
+                    pack();
                     return true;
                 });
 
@@ -394,7 +397,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // Save keyframes
+        // Save keyframes.
         OwnTextIconButton save = new OwnTextIconButton(I18n.msg("gui.keyframes.save"), skin, "save");
         save.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.save"), skin));
         save.pad(pad10);
@@ -413,6 +416,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         warn.setColor(1f, .4f, .4f, 1f);
                         notice.setActor(warn);
                     }
+                    pack();
                 });
                 fnw.show(stage);
                 return true;
@@ -420,7 +424,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // Export to camera path
+        // Export to camera path.
         OwnTextIconButton export = new OwnTextIconButton(I18n.msg("gui.keyframes.export"), skin, "export");
         export.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.export"), skin));
         export.pad(pad10);
@@ -445,7 +449,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // Keyframe preferences
+        // Keyframe preferences.
         Button preferences = new OwnTextIconButton(I18n.msg("gui.preferences"), skin, "preferences");
         preferences.setName("keyframe preferences");
         preferences.pad(pad10);
@@ -607,6 +611,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         }
         boolean result = addKeyframe(index, cPos, cDir, cUp, cTime);
         updateCurrentPathAndTimeline();
+        checkKeyframeTimings();
         return result;
     }
 
@@ -759,6 +764,19 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
         }
 
+        // Check timings if necessary.
+        checkKeyframeTimings();
+    }
+
+    private void checkKeyframeTimings() {
+        if (!manager.checkKeyframeTimings() && notice != null) {
+            Label warn = new OwnLabel(I18n.msg("gui.keyframes.timings", Settings.settings.camrecorder.targetFps), skin);
+            warn.setColor(1f, .4f, .4f, 1f);
+            notice.setActor(warn);
+        } else if (notice != null) {
+            notice.clearActor();
+        }
+        pack();
     }
 
     private void addKeyframesToTable(Array<Keyframe> keyframes,
