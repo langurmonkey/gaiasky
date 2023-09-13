@@ -34,6 +34,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class AtmosphereComponent extends NamedComponent implements IUpdatable<AtmosphereComponent> {
@@ -204,18 +205,18 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
 
         // These are here to get the desired effect inside the atmosphere
         if (mat.has(AtmosphereAttribute.KrESun))
-            ((AtmosphereAttribute) mat.get(AtmosphereAttribute.KrESun)).value = m_Kr * m_ESun;
+            ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.KrESun))).value = m_Kr * m_ESun;
         else
             mat.set(new AtmosphereAttribute(AtmosphereAttribute.KrESun, m_Kr * m_ESun));
 
         if (mat.has(AtmosphereAttribute.KmESun))
-            ((AtmosphereAttribute) mat.get(AtmosphereAttribute.KmESun)).value = m_Km * m_ESun;
+            ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.KmESun))).value = m_Km * m_ESun;
         else
             mat.set(new AtmosphereAttribute(AtmosphereAttribute.KmESun, m_Km * m_ESun));
 
         // Camera height
         if (mat.has(AtmosphereAttribute.CameraHeight))
-            ((AtmosphereAttribute) mat.get(AtmosphereAttribute.CameraHeight)).value = camHeight;
+            ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.CameraHeight))).value = camHeight;
         else
             mat.set(new AtmosphereAttribute(AtmosphereAttribute.CameraHeight, camHeight));
 
@@ -224,11 +225,11 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
             // Camera position must be corrected using the rotation angle of the planet
             aux3.mul(Coordinates.getTransformD(inverseRefPlaneTransform)).rotate(rc.ascendingNode, 0, 1, 0).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
         }
-        ((Vector3Attribute) mat.get(Vector3Attribute.PlanetPos)).value.set(aux3.put(aux));
+        ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.PlanetPos))).value.set(aux3.put(aux));
         // CameraPos = -PlanetPos
         aux3.scl(-1f);
 
-        ((Vector3Attribute) mat.get(Vector3Attribute.CameraPos)).value.set(aux3.put(aux));
+        ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.CameraPos))).value.set(aux3.put(aux));
 
         // Light position respect the earth: LightPos = SunPos - EarthPos
         if (parentTranslation != null) {
@@ -239,12 +240,12 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
             // Camera position must be corrected using the rotation angle of the planet
             aux3.mul(Coordinates.getTransformD(inverseRefPlaneTransform)).rotate(rc.ascendingNode, 0, 1, 0).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
         }
-        ((Vector3Attribute) mat.get(Vector3Attribute.LightPos)).value.set(aux3.put(aux));
+        ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.LightPos))).value.set(aux3.put(aux));
 
         // Alpha value
-        ((AtmosphereAttribute) mat.get(AtmosphereAttribute.Alpha)).value = alpha;
+        ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.Alpha))).value = alpha;
         // Number of samples
-        ((AtmosphereAttribute) mat.get(AtmosphereAttribute.nSamples)).value = samples;
+        ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.nSamples))).value = samples;
     }
 
     public void setQuality(Long quality) {

@@ -45,7 +45,7 @@ void main(void) {
 
     float lma = luma(fragColor.rbg);
     float scl = smoothstep(0.05, 0.2, lma);
-    fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl;
+    fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl * v_frontColor.a;
     #ifdef eclipsingBodyFlag
     fragColor *= v_eclipseFactor;
     #endif // eclipsingBodyFlag
