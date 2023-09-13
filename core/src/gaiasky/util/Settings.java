@@ -87,7 +87,7 @@ public class Settings {
     private static final Log logger = Logger.getLogger(Settings.class);
     // Static settings
     public static String APPLICATION_NAME = "Gaia Sky";
-    public static String APPLICATION_NAME_TITLE = "G a i a   S k y";
+    public static String APPLICATION_NAME_TITLE = "G a i a  S k y";
     // The settings instance
     public static Settings settings;
 

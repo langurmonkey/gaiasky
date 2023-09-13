@@ -226,8 +226,8 @@ public class WelcomeGui extends AbstractGui {
         float pad28 = 28f;
         float pad32 = 32f;
 
-        float bw = 540f;
-        float bh = 110f;
+        float buttonWidth = 440f;
+        float buttonHeight = 110f;
 
         Table centerContent = new Table(skin);
         centerContent.center();
@@ -237,7 +237,7 @@ public class WelcomeGui extends AbstractGui {
         centerContent.padRight(pad32 * 5f);
 
         Set<String> removed = removeNonExistent();
-        if (removed.size() > 0) {
+        if (!removed.isEmpty()) {
             logger.warn(I18n.msg("gui.welcome.warn.nonexistent", removed.size()));
             logger.warn(TextUtils.setToStr(removed));
         }
@@ -247,21 +247,27 @@ public class WelcomeGui extends AbstractGui {
         int numTotalCatalogsEnabled = numTotalDatasetsEnabled();
         boolean baseDataPresent = baseDataPresent();
 
-        // Logo.
+        // Logo and title.
+        Table titleGroup = new Table(skin);
+
         FileHandle gsIcon = Gdx.files.internal("icon/gs_icon.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         Image logo = new Image(iconTex);
+        logo.setScale(1.4f);
         logo.setOrigin(Align.center);
 
-        // Title
-        Table titleGroup = new Table(skin);
         OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+        gaiaSky.setFontScale(1.5f);
         OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
-        version.setColor(skin.getColor("theme"));
+        version.setColor(skin.getColor("blue"));
+        Table title = new Table(skin);
+        title.add(gaiaSky).bottom().left().padBottom(pad16).row();
+        title.add(version).bottom().left().padRight(pad16);
 
-        titleGroup.add(gaiaSky).padBottom(pad32).padRight(pad32 * 2f);
-        titleGroup.add(version).padBottom(pad32).row();
+        titleGroup.add(logo).center().padRight(pad32 * 3f);
+        titleGroup.add(new Separator(skin, "regular")).fillY().padRight(pad32);
+        titleGroup.add(title);
 
         String textStyle = "main-title-s";
 
@@ -270,7 +276,7 @@ public class WelcomeGui extends AbstractGui {
         startButton.setSpace(pad18);
         startButton.setContentAlign(Align.center);
         startButton.align(Align.center);
-        startButton.setSize(bw, bh);
+        startButton.setSize(buttonWidth, buttonHeight);
         startButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Check base data is enabled
@@ -309,7 +315,7 @@ public class WelcomeGui extends AbstractGui {
         datasetManagerButton.setSpace(pad18);
         datasetManagerButton.setContentAlign(Align.center);
         datasetManagerButton.align(Align.center);
-        datasetManagerButton.setSize(bw * 0.8f, bh * 0.8f);
+        datasetManagerButton.setSize(buttonWidth * 0.8f, buttonHeight * 0.8f);
         datasetManagerButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 addDatasetManagerWindow(serverDatasets);
@@ -364,7 +370,7 @@ public class WelcomeGui extends AbstractGui {
         OwnTextIconButton exitButton = new OwnTextIconButton(I18n.msg("gui.exit"), skin, "quit");
         exitButton.setSpace(pad16);
         exitButton.align(Align.center);
-        exitButton.setSize(bw * 0.5f, bh * 0.6f);
+        exitButton.setSize(buttonWidth * 0.5f, buttonHeight * 0.6f);
         exitButton.addListener(new OwnTextTooltip(I18n.msg("context.quit"), skin, 10));
         exitButton.addListener(new ClickListener() {
             public void clicked(InputEvent event,
@@ -382,10 +388,8 @@ public class WelcomeGui extends AbstractGui {
         });
         buttonList.add(exitButton);
 
-        // Logo
-        centerContent.add(logo).center().padBottom(pad16).colspan(2).row();
         // Title
-        centerContent.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
+        centerContent.add(titleGroup).center().padLeft(pad32 * 2f).padBottom(pad18 * 6f).colspan(2).row();
 
         // Start button
         centerContent.add(startButton).right().top().padBottom(pad18 * 10f).padRight(pad28 * 2f);

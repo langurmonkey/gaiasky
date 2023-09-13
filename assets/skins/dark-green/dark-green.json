@@ -1292,6 +1292,10 @@
       "background": "separator-context",
       "thickness": 3
     },
+    "regular": {
+      "background": "separator",
+      "thickness": 3
+    },
     "menu": {
       "background": "separator-menu",
       "thickness": 2
