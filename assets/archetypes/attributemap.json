@@ -679,7 +679,7 @@
         "units": "Map<String,Object>"
       },
       "modelPrimitive": {
-        "description": "The GL primitive to use. |brsp| **Values:** |br| ``GL_TRIANGLES`` |br| ``GL_TRIANGLE_STRIP`` |br| ``GL_TRIANGLE_FAN`` |br| ``GL_LINES`` |br| ``GL_LINE_STRIP`` |br| ``GL_LINE_LOOP`` |brsp| Defaults to ``GL_TRIANGLES``. The ``GL_LINE``* primitives enable wireframe rendering, which is currently only supported by sphere and ico-sphere model types. This is only used in extended particle groups.",
+        "description": "The GL primitive to use. |brsp| **Values:** |br| ``GL_TRIANGLES`` |br| ``GL_TRIANGLE_STRIP`` |br| ``GL_TRIANGLE_FAN`` |br| ``GL_LINES`` |br| ``GL_LINE_STRIP`` |br| ``GL_LINE_LOOP`` |brsp| Defaults to ``GL_TRIANGLES``. The ``GL_LINE`` primitives enable wireframe rendering, which is currently only supported by sphere and ico-sphere model types. This is only used in extended particle groups.",
         "units": "String"
       }
     },
