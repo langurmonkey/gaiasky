@@ -18,8 +18,6 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.util.Settings;
 
-import java.time.Instant;
-
 public class RaymarchingInitializer extends AbstractInitSystem {
 
     public RaymarchingInitializer(boolean setUp, Family family, int priority) {

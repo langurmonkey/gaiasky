@@ -6,7 +6,6 @@
 
 package gaiasky.util.gdx.model.gltf.data.extensions;
 
-import gaiasky.util.gdx.model.gltf.data.material.GLTFMaterial;
 import gaiasky.util.gdx.model.gltf.data.texture.GLTFTextureInfo;
 
 public class KHRMaterialsTransmission {

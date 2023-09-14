@@ -7,8 +7,6 @@
 
 package gaiasky.util.math;
 
-import com.badlogic.gdx.utils.TimeUtils;
-
 /**
  * Implements a linear function for interpolation of real univariate functions.
  */

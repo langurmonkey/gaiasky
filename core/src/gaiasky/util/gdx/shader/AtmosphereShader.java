@@ -17,8 +17,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.IntRenderable;
-import gaiasky.util.gdx.shader.DefaultIntShader.Inputs;
-import gaiasky.util.gdx.shader.DefaultIntShader.Setters;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 

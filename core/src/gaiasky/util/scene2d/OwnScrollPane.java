@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
-import gaiasky.util.GuiUtils;
 
 public class OwnScrollPane extends ScrollPane {
     private float ownWidth = 0f, ownHeight = 0f;

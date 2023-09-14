@@ -11,7 +11,9 @@ import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.actions.Action;
 import gaiasky.vr.openxr.input.actions.InputAction;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.openxr.*;
+import org.lwjgl.openxr.XrActionSet;
+import org.lwjgl.openxr.XrActionSetCreateInfo;
+import org.lwjgl.openxr.XrSessionActionSetsAttachInfo;
 import org.lwjgl.system.MemoryStack;
 import oshi.util.tuples.Pair;
 
@@ -19,10 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.lwjgl.openxr.XR10.*;
-import static org.lwjgl.openxr.XR10.xrAttachSessionActionSets;
-import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryStack.stackPointers;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 public abstract class ActionSet implements AutoCloseable {
 

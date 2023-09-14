@@ -7,7 +7,6 @@
 
 package gaiasky.util.gdx.shader.provider;
 
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.IntShader;
 

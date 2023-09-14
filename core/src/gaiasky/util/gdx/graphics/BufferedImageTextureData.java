@@ -17,10 +17,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class BufferedImageTextureData implements TextureData {
     private static final Log logger = Logger.getLogger(BufferedImageTextureData.class);

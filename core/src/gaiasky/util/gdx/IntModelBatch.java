@@ -9,9 +9,10 @@ package gaiasky.util.gdx;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
-import com.badlogic.gdx.graphics.g3d.utils.*;
+import com.badlogic.gdx.graphics.g3d.utils.DefaultTextureBinder;
+import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
+import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
 import com.badlogic.gdx.utils.*;
-import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.DefaultIntShader;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.IntShader;

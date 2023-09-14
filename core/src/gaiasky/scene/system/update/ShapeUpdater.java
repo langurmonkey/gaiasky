@@ -12,10 +12,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.LightingUtils;
-
-import java.util.Locale;
 
 public class ShapeUpdater extends AbstractUpdateSystem {
 

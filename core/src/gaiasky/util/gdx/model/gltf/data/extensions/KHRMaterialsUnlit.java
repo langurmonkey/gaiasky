@@ -6,8 +6,6 @@
 
 package gaiasky.util.gdx.model.gltf.data.extensions;
 
-import gaiasky.util.gdx.model.gltf.data.material.GLTFMaterial;
-
 public class KHRMaterialsUnlit {
 	public static final String EXT = "KHR_materials_unlit";
 }

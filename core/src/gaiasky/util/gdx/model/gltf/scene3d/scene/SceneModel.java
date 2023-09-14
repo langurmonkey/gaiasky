@@ -7,9 +7,7 @@
 package gaiasky.util.gdx.model.gltf.scene3d.scene;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.environment.BaseLight;
-import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.util.gdx.model.IntModel;

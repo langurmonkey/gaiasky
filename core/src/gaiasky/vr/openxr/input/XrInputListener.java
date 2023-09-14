@@ -8,7 +8,6 @@
 package gaiasky.vr.openxr.input;
 
 import com.badlogic.gdx.math.Vector2;
-import gaiasky.vr.openxr.input.actions.Action;
 
 public interface XrInputListener {
 

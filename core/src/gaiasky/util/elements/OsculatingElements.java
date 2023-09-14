@@ -7,8 +7,6 @@
 
 package gaiasky.util.elements;
 
-import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 /**

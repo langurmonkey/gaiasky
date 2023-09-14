@@ -9,10 +9,8 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.util.Settings;
 
 public class BackgroundExtractor extends AbstractExtractSystem {
     public BackgroundExtractor(Family family, int priority) {

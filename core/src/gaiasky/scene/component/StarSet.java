@@ -16,9 +16,6 @@ import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
-import java.util.Map;
-import java.util.Set;
-
 public class StarSet extends ParticleSet {
     /**
      * Epoch for the times in the light curves in julian days.

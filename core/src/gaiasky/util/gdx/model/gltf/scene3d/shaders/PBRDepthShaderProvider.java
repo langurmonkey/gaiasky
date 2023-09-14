@@ -8,9 +8,6 @@ package gaiasky.util.gdx.model.gltf.scene3d.shaders;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.g3d.Renderable;
-import com.badlogic.gdx.graphics.g3d.Shader;
-import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRVertexAttributes;
 import gaiasky.util.gdx.shader.DepthIntShader;

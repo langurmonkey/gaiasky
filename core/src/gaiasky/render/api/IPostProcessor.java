@@ -16,7 +16,6 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public interface IPostProcessor extends Disposable {
     String DEFAULT_KEY = "%default%";

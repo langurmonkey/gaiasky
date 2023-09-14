@@ -7,7 +7,6 @@
 
 package gaiasky.util.coord;
 
-import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;

@@ -9,7 +9,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.scene.component.GraphNode;
 
 public interface EntityUpdater {
 

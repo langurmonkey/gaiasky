@@ -9,7 +9,6 @@ package gaiasky.util.gdx.model.gltf.scene3d.shaders;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.gdx.IntRenderable;

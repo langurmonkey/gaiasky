@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.AssetBean;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Focus;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;

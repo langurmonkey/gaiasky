@@ -8,7 +8,6 @@
 package gaiasky.desktop.util;
 
 import com.badlogic.gdx.utils.Array;
-import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.elements.OsculatingElements;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;

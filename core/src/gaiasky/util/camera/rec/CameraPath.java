@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import gaiasky.util.DoubleArray;
 import gaiasky.util.Settings;
-import gaiasky.util.SysUtils;
 import gaiasky.util.camera.rec.KeyframesManager.PathPart;
 import gaiasky.util.camera.rec.KeyframesManager.PathType;
 import gaiasky.util.i18n.I18n;

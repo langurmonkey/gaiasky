@@ -6,7 +6,6 @@
 
 package gaiasky.util.gdx.model.gltf.loaders.shared.scene;
 
-import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.util.gdx.model.IntNode;
 

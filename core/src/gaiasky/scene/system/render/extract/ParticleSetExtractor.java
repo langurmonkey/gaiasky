@@ -14,7 +14,6 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.StarSet;
-import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 
 public class ParticleSetExtractor extends AbstractExtractSystem {

@@ -20,8 +20,9 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.OwnButton;
+import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.scene2d.OwnLabel;
 
 public class PopupNotificationsInterface extends TableGuiInterface implements IObserver {
     protected final Table me;

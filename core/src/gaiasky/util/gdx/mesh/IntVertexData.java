@@ -8,8 +8,6 @@
 package gaiasky.util.gdx.mesh;
 
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.glutils.VertexArray;
-import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 

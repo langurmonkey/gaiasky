@@ -8,10 +8,9 @@
 package gaiasky.vr.openxr.input.actions;
 
 import gaiasky.vr.openxr.input.XrControllerDevice;
-import org.lwjgl.openxr.*;
+import org.lwjgl.openxr.XrActionStateGetInfo;
 
 import static org.lwjgl.openxr.XR10.XR_TYPE_ACTION_STATE_GET_INFO;
-import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 public abstract class SingleInputAction<T> extends Action implements InputAction {
 

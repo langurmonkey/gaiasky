@@ -7,8 +7,6 @@
 
 package gaiasky.util.coord;
 
-import java.util.List;
-
 public interface IPythonCoordinatesProvider {
 
     /**
