@@ -132,14 +132,14 @@ public class LoadingGui extends AbstractGui {
             tipGenerator = new TipsGenerator(skin);
             tip = new HorizontalGroup();
             tip.space(pad10);
-            tip.pad(10, 30, 10, 30);
+            tip.pad(10f, 30f, 10f, 30f);
             Container<HorizontalGroup> tipContainer = new Container<>(tip);
             tipContainer.setBackground(skin.getDrawable("table-bg"));
             bottomMiddle = new Table(skin);
             bottomMiddle.setFillParent(true);
             bottomMiddle.center().bottom();
-            bottomMiddle.padLeft(pad30).padBottom(pad10);
-            bottomMiddle.add(tipContainer);
+            bottomMiddle.padBottom(pad30);
+            bottomMiddle.add(tipContainer).fillX().expandX().height(90f);
         }
 
         // Version and build.
