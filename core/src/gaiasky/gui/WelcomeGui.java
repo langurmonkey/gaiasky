@@ -79,10 +79,10 @@ public class WelcomeGui extends AbstractGui {
     private WelcomeGuiKbdListener kbdListener;
 
     /**
-     * Creates an initial GUI
+     * Creates an initial GUI.
      *
-     * @param skipWelcome Skips the welcome screen if possible
-     * @param vrStatus    The status of VR
+     * @param skipWelcome Skips the welcome screen if possible.
+     * @param vrStatus    The status of VR.
      */
     public WelcomeGui(final Skin skin,
                       final Graphics graphics,
@@ -200,9 +200,7 @@ public class WelcomeGui extends AbstractGui {
                 }
                 return false;
             });
-
         }
-
     }
 
     private void buildWelcomeUI() {

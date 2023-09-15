@@ -36,6 +36,7 @@ import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.Separator;
 
 public class LoadingGui extends AbstractGui {
     private static final long tipTime = 3500;
@@ -61,7 +62,7 @@ public class LoadingGui extends AbstractGui {
         float pad30 = 48f;
         float pad10 = 16f;
         final Settings settings = Settings.settings;
-        // User interface
+        // User interface.
         Viewport vp;
         if (vr) {
             vp = new FixedScreenViewport(getBackBufferWidth(), getBackBufferHeight());
@@ -85,21 +86,34 @@ public class LoadingGui extends AbstractGui {
         center.setFillParent(true);
         center.center();
 
-        // Logo.
+        Table centerContent = new Table(skin);
+        centerContent.center();
+        centerContent.setBackground("table-bg");
+        centerContent.pad(pad30);
+        centerContent.padLeft(pad30 * 5f);
+        centerContent.padRight(pad30 * 5f);
+
+        // Logo and title.
+        Table titleGroup = new Table(skin);
+
         FileHandle gsIcon = Gdx.files.internal("icon/gs_icon.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         Image logo = new Image(iconTex);
+        logo.setScale(1.4f);
         logo.setOrigin(Align.center);
 
-        // Title.
-        HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(pad30 * 2f);
-        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(settings.runtime.openXr), skin, "main-title");
+        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+        gaiaSky.setFontScale(1.5f);
         OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
-        version.setColor(skin.getColor("theme"));
-        titleGroup.addActor(gaiaSky);
-        titleGroup.addActor(version);
+        version.setColor(skin.getColor("blue"));
+        Table title = new Table(skin);
+        title.add(gaiaSky).bottom().left().padBottom(pad10).row();
+        title.add(version).bottom().left().padRight(pad10);
+
+        titleGroup.add(logo).center().padRight(pad30 * 2f);
+        titleGroup.add(new Separator(skin, "regular")).fillY().padRight(pad30);
+        titleGroup.add(title);
 
         // Funny text.
         loadingTextGenerator = new LoadingTextGenerator();
@@ -107,15 +121,14 @@ public class LoadingGui extends AbstractGui {
         spin = new OwnLabel("0", skin, "main-title-xs");
         spin.setColor(skin.getColor("theme"));
 
-        center.add(logo).center().padBottom(pad10).row();
-        center.add(titleGroup).center().padBottom(pad10 * 2f).row();
-        center.add(spin).padBottom(pad30).row();
+        centerContent.add(titleGroup).width(1300).center().padBottom(pad30 * 2f).row();
+        centerContent.add(spin).padBottom(pad30).row();
 
         if (vr) {
             bottomMiddle = new VersionLineTable(skin, true);
             bottomMiddle.center().bottom();
         } else {
-            // Tips
+            // Tips.
             tipGenerator = new TipsGenerator(skin);
             tip = new HorizontalGroup();
             tip.space(pad10);
@@ -129,7 +142,7 @@ public class LoadingGui extends AbstractGui {
             bottomMiddle.add(tipContainer);
         }
 
-        // Version and build
+        // Version and build.
         topLeft = new VersionLineTable(skin);
 
         // SCREEN MODE BUTTON - TOP RIGHT
@@ -153,7 +166,10 @@ public class LoadingGui extends AbstractGui {
 
         // MESSAGE INTERFACE - BOTTOM
         notificationsInterface = new NotificationsInterface(skin, lock, false, false, false);
-        center.add(notificationsInterface);
+        centerContent.add(notificationsInterface);
+
+        // Add to center.
+        center.add(centerContent).center().size(1500, 750);
 
         interfaces.add(notificationsInterface);
 
