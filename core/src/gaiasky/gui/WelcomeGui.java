@@ -263,7 +263,7 @@ public class WelcomeGui extends AbstractGui {
         title.add(version).bottom().left().padRight(pad16);
 
         titleGroup.add(logo).center().padRight(pad32 * 3f);
-        titleGroup.add(new Separator(skin, "regular")).fillY().padRight(pad32);
+        titleGroup.add(new Separator(skin, "default")).fillY().padRight(pad32);
         titleGroup.add(title);
 
         String textStyle = "main-title-s";

@@ -250,7 +250,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         buttonGroup.addActor(generate);
 
         content.add(buttonGroup).center().colspan(2).padBottom(pad18).row();
-        content.add(new Separator(skin, "menu")).center().colspan(2).growX().padBottom(pad34);
+        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34);
 
         return generate;
     }

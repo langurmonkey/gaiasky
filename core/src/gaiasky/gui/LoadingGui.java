@@ -112,7 +112,7 @@ public class LoadingGui extends AbstractGui {
         title.add(version).bottom().left().padRight(pad10);
 
         titleGroup.add(logo).center().padRight(pad30 * 2f);
-        titleGroup.add(new Separator(skin, "regular")).fillY().padRight(pad30);
+        titleGroup.add(new Separator(skin, "default")).fillY().padRight(pad30);
         titleGroup.add(title);
 
         // Funny text.

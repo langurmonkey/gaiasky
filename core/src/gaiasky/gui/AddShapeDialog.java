@@ -17,10 +17,7 @@ import gaiasky.gui.beans.PrimitiveComboBoxBean;
 import gaiasky.gui.beans.ShapeComboBoxBean;
 import gaiasky.scene.api.IFocus;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.OwnCheckBox;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnSelectBox;
-import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 
 public class AddShapeDialog extends GenericDialog {
@@ -100,7 +97,7 @@ public class AddShapeDialog extends GenericDialog {
         // Track
         track = new OwnCheckBox(I18n.msg("gui.shape.track"), skin, pad10);
         track.setChecked(true);
-        content.add(track).left().colspan(2).padRight(pad18).padBottom(pad10);
+        content.add(track).left().colspan(2).padRight(pad18).padBottom(pad34).row();
 
         // Separator
         addSeparator(2);

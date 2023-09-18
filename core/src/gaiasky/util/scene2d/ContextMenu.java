@@ -214,7 +214,7 @@ public class ContextMenu extends Table {
     }
 
     public void addSeparator() {
-        add(new Separator(skin, "menu")).padTop(2f).padBottom(2f).fill().expand().row();
+        add(new Separator(skin, "gray")).padTop(2f).padBottom(2f).fillX().expandX().row();
     }
 
     /**

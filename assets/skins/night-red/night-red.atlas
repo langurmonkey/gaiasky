@@ -3233,32 +3233,35 @@ selection
   orig: 2, 2
   offset: 0, 0
   index: -1
-separator
+separator-dash
   rotate: false
   xy: 507, 791
   size: 13, 5
   orig: 13, 5
   offset: 0, 0
   index: -1
-separator-context
+separator-default
   rotate: false
-  xy: 187, 15
-  size: 2, 2
-  orig: 2, 2
+  xy: 254, 186
+  size: 5, 5
+  split: 2, 2, 2, 2
+  orig: 5, 5
   offset: 0, 0
   index: -1
-transparent
+separator-gray
   rotate: false
-  xy: 187, 15
-  size: 2, 2
-  orig: 2, 2
+  xy: 254, 186
+  size: 5, 5
+  split: 2, 2, 2, 2
+  orig: 5, 5
   offset: 0, 0
   index: -1
-separator-menu
+separator-white
   rotate: false
-  xy: 187, 9
-  size: 2, 2
-  orig: 2, 2
+  xy: 254, 186
+  size: 5, 5
+  split: 2, 2, 2, 2
+  orig: 5, 5
   offset: 0, 0
   index: -1
 sub-menu
@@ -3318,7 +3321,7 @@ textfield-focused
   index: -1
 tooltip-bg
   rotate: false
-  xy: 154, 34
+  xy: 187, 15
   size: 2, 2
   orig: 2, 2
   offset: 0, 0
@@ -3328,6 +3331,13 @@ tooltip-icon
   xy: 299, 229
   size: 22, 22
   orig: 22, 22
+  offset: 0, 0
+  index: -1
+transparent
+  rotate: false
+  xy: 187, 9
+  size: 2, 2
+  orig: 2, 2
   offset: 0, 0
   index: -1
 tree-minus

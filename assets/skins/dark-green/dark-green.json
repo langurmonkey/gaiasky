@@ -1289,15 +1289,23 @@
   },
   "gaiasky.util.scene2d.Separator$SeparatorStyle": {
     "default": {
-      "background": "separator-context",
-      "thickness": 3
+      "background": "separator-default",
+      "thickness": 1
     },
-    "regular": {
-      "background": "separator",
-      "thickness": 3
+    "small": {
+      "background": "separator-default-small",
+      "thickness": 2
     },
-    "menu": {
-      "background": "separator-menu",
+    "white": {
+      "background": "separator-white",
+      "thickness": 1
+    },
+    "gray": {
+      "background": "separator-gray",
+      "thickness": 1
+    },
+    "dash": {
+      "background": "separator-dash",
       "thickness": 2
     }
   },

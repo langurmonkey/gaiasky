@@ -393,7 +393,9 @@ public class AboutWindow extends GenericDialog {
         scrolls.add(glExtensionsScroll);
 
         // BUILD
-        contentSystem.add(buildInfo).colspan(2).align(Align.left).padTop(pad34).padBottom(pad10);
+        contentSystem.add(buildInfo).colspan(2).left().padTop(pad34);
+        contentSystem.row();
+        contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
         contentSystem.add(versionTitle).align(Align.topLeft).padRight(pad18).width(titleWidth);
         contentSystem.add(version).align(Align.left);
@@ -412,7 +414,9 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // PATHS
-        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
+        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad34);
+        contentSystem.row();
+        contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
         contentSystem.add(configTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(config).align(Align.left);
@@ -437,7 +441,9 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // JAVA
-        contentSystem.add(javaInfo).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
+        contentSystem.add(javaInfo).colspan(2).align(Align.left).padTop(pad34 * 2f);
+        contentSystem.row();
+        contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
         contentSystem.add(javaVersionTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(javaVersion).align(Align.left);
@@ -458,7 +464,9 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // SYSTEM
-        contentSystem.add(sysInfo).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
+        contentSystem.add(sysInfo).colspan(2).align(Align.left).padTop(pad34 * 2f);
+        contentSystem.row();
+        contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
         try {
             var si = new SystemInfo();
@@ -483,7 +491,9 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // GL
-        contentSystem.add(glInfo).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
+        contentSystem.add(glInfo).colspan(2).align(Align.left).padTop(pad34 * 2f);
+        contentSystem.row();
+        contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
         contentSystem.add(glVersionTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(glVersion).align(Align.left);

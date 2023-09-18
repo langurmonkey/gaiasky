@@ -340,12 +340,12 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
-     * Build the content here
+     * Build the content here.
      */
     protected abstract void build();
 
     /**
-     * Closes the window with the accept action
+     * Closes the window with the accept action.
      */
     public boolean closeAccept() {
         // Exit
@@ -360,7 +360,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
-     * Closes the window with the cancel action
+     * Closes the window with the cancel action.
      */
     public boolean closeCancel() {
         cancel();
@@ -379,13 +379,13 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected abstract boolean accept();
 
     /**
-     * The cancel function, if any
+     * The cancel function, if any.
      */
     protected abstract void cancel();
 
     /**
      * {@link #pack() Packs} the dialog and adds it to the stage with custom
-     * action which can be null for instant show
+     * action which can be null for instant show.
      */
     public GenericDialog show(Stage stage, Action action) {
         clearActions();
@@ -447,7 +447,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     /**
      * {@link #pack() Packs} the dialog and adds it to the stage, centered with
-     * default fadeIn action
+     * default fadeIn action.
      */
     public GenericDialog show(Stage stage) {
         show(stage, Actions.sequence(
@@ -467,7 +467,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
-     * {@link #pack() Packs} the dialog and adds it to the stage at the specified position
+     * {@link #pack() Packs} the dialog and adds it to the stage at the specified position.
      */
     public GenericDialog show(Stage stage, float x, float y) {
         show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds(), Interpolation.fade)));
@@ -478,7 +478,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     /**
      * Sets the keyboard focus, override in case you want to set the focus to a
-     * specific item
+     * specific item.
      **/
     public void setKeyboardFocus() {
 
@@ -533,26 +533,26 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
-     * Adds a horizontal separator to the main content table with the default colspan of 1
+     * Adds a horizontal separator to the main content table with the default colspan of 1.
      */
     public void addSeparator() {
         addSeparator(1);
     }
 
     /**
-     * Adds a horizontal separator to the main content table with the given colspan
+     * Adds a horizontal separator to the main content table with the given colspan.
      *
-     * @param colspan The colspan to use
+     * @param colspan The colspan to use.
      */
     public void addSeparator(int colspan) {
         if (content != null)
-            content.add(new Separator(skin, "menu")).padTop(pad18).padBottom(pad18).colspan(colspan).fill().expand().row();
+            content.add(new Separator(skin, "gray")).colspan(colspan).center().growX().padTop(pad18).padBottom(pad18).row();
     }
 
     /**
-     * Sets the runnable which runs when accept is clicked
+     * Sets the runnable which runs when accept is clicked.
      *
-     * @param r The runnable
+     * @param r The runnable.
      */
     public void setAcceptRunnable(Runnable r) {
         this.acceptRunnable = r;
@@ -563,9 +563,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
-     * Sets the runnable which runs when cancel is clicked
+     * Sets the runnable which runs when cancel is clicked.
      *
-     * @param r The runnable
+     * @param r The runnable.
      */
     public void setCancelRunnable(Runnable r) {
         this.cancelRunnable = r;

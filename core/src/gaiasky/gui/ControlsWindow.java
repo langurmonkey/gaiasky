@@ -72,7 +72,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         this.catalogManager = catalogManager;
 
         // Global resources
-        TextureRegion separatorTextureRegion = ((TextureRegionDrawable) skin.newDrawable("separator")).getRegion();
+        TextureRegion separatorTextureRegion = ((TextureRegionDrawable) skin.newDrawable("separator-dash")).getRegion();
         separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(separatorTextureRegion);
 
@@ -327,7 +327,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         int padBottom = Math.round(16f);
         int padSides = Math.round(8f);
-        int padSeparator = Math.round(3.2f);
+        int padSeparator = Math.round(15f);
 
         guiLayout.padTop(padSides);
 
@@ -338,7 +338,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             if (i < size - 1) {
                 // Not last
                 guiLayout.row();
-                guiLayout.add(new Image(separator)).left().fill(true, false).padBottom(padSeparator).padLeft(padSides);
+                guiLayout.add(new Image(separator)).left().fill(true, false).padTop(padSeparator).padLeft(padSides);
                 guiLayout.row();
             }
         }

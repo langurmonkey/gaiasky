@@ -315,7 +315,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             colormap.setChecked(!catalogInfo.plainColor);
             content.add(colormap).left().padBottom(pad10 * 2f).row();
 
-            content.add(new Separator(skin, "menu")).center().growX().padBottom(pad10 * 2f).row();
+            content.add(new Separator(skin, "gray")).center().growX().padBottom(pad10 * 2f).row();
 
             new ButtonGroup<>(plainColor, colormap);
 
