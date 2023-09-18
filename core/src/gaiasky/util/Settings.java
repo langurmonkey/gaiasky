@@ -56,14 +56,14 @@ public class Settings {
     /*
      * Source version, used to enable or disable datasets.
      * This is usually tag where each number is allocated 2 digits.
-     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
-     * Version = major * 10000 + minor * 100 + rev
-     * So 1.2.5 -> 10205
-     *    2.1.7 -> 20107
-     *
+     * Version = major.minor.rev-seq -> 1.2.5 major=1; minor=2; rev=5; seq=0
+     * Version = major * 1000000 + minor * 10000 + rev * 100 + seq
+     * So 1.2.5   -> 1020500
+     *    2.1.7   -> 2010700
+     *    3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static final int SOURCE_VERSION = 30504;
+    public static final int SOURCE_VERSION = 3050302;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the {@link File#getAbsolutePath()} call.
@@ -2322,5 +2322,14 @@ public class Settings {
             @JsonInclude(Include.NON_EMPTY)
             public String nonProxyHosts;
         }
+    }
+
+    /**
+     * Sets the configuration version. Adapts to the new min.maj.rev-seq format automagically.
+     *
+     * @param configVersion The configuration version.
+     */
+    public void setConfigVersion(int configVersion) {
+        this.configVersion = VersionChecker.correctVersionNumber(configVersion);
     }
 }

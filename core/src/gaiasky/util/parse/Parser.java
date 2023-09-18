@@ -21,7 +21,6 @@ public final class Parser {
      * </p>
      *
      * @param input String to parse
-     *
      * @return Parsed long or 0 if the parsing fails
      */
     public static long parseLong(String input) {
@@ -77,9 +76,7 @@ public final class Parser {
      * </p>
      *
      * @param input String to parse
-     *
      * @return Parsed long or 0 if the parsing fails
-     *
      * @throws NumberFormatException If the given input can not be parsed
      */
     public static long parseLongException(String input) throws NumberFormatException {
@@ -139,7 +136,6 @@ public final class Parser {
      * separator.
      *
      * @param input String to parse
-     *
      * @return Parsed double or Double.NaN if the parsing fails See also
      * {@link Parser#parseDoubleException(String)} If exceptions on
      * invalid input is necessary
@@ -290,9 +286,7 @@ public final class Parser {
      * separator.
      *
      * @param input String to parse
-     *
      * @return Parsed double or Double.NaN if the parsing fails
-     *
      * @throws NumberFormatException If the input string is invalid
      */
     public static double parseDoubleException(String input) throws NumberFormatException {
@@ -432,7 +426,6 @@ public final class Parser {
      * Method used to parse accepted boolean values in incoming messages
      *
      * @param what What to parse
-     *
      * @return True or false (also default return) depending on the value of
      * what
      */
@@ -451,7 +444,6 @@ public final class Parser {
      * returns 0.
      *
      * @param str The input string.
-     *
      * @return The integer representation of the string.
      */
     public static int parseInt(String str) {
@@ -476,7 +468,6 @@ public final class Parser {
      * not a valid integer representation.
      *
      * @param str The input string.
-     *
      * @return The integer representation of the string.
      */
     public static int parseIntException(String str) throws NumberFormatException {
@@ -497,11 +488,24 @@ public final class Parser {
     }
 
     /**
+     * Parses a string to an integer, and returns the default value if the string does not represent an integer.
+     * @param str The string.
+     * @param defaultValue The default value.
+     * @return The integer representation of the string, or the default value.
+     */
+    public static int parseIntOrElse(String str, int defaultValue) {
+        try {
+            return parseIntException(str);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
      * Convenience method which uses the double parser and casts the result. It
      * will not throw Please check {@link Parser#parseDouble(String)}.
      *
      * @param input The input string.
-     *
      * @return The parsed float, or 0 if the parsing failed.
      */
     public static float parseFloat(String input) {
@@ -513,9 +517,7 @@ public final class Parser {
      * Please check {@link Parser#parseDoubleException(String)}
      *
      * @param input The input string.
-     *
      * @return The parsed float, or {@link Float#NaN} if the parsing failed.
-     *
      * @throws NumberFormatException if the parsing failed.
      */
     public static float parseFloatException(String input) throws NumberFormatException {
@@ -526,7 +528,6 @@ public final class Parser {
      * Parses a float array in the form '[a, b, c, ...]
      *
      * @param input The input string.
-     *
      * @return The parsed float array, or null if the parsing failed.
      */
     public static float[] parseFloatArray(String input) {
@@ -549,7 +550,6 @@ public final class Parser {
      * Parses a float array in the form '[a, b, c, ...]
      *
      * @param input The input string.
-     *
      * @return The parsed float array, or null if the parsing failed.
      */
     public static float[] parseFloatArrayException(String input) throws NumberFormatException {
@@ -572,7 +572,6 @@ public final class Parser {
      * Parses a double precision float array in the form '[a, b, c, ...]
      *
      * @param input The input string.
-     *
      * @return The parsed double precision float array, or null if the parsing failed.
      */
     public static double[] parseDoubleArray(String input) {
@@ -595,7 +594,6 @@ public final class Parser {
      * Parses a double precision float array in the form '[a, b, c, ...]
      *
      * @param input The input string.
-     *
      * @return The parsed double precision float array, or null if the parsing failed.
      */
     public static double[] parseDoubleArrayException(String input) throws NumberFormatException {

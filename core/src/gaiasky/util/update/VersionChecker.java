@@ -26,7 +26,8 @@ import java.time.format.DateTimeParseException;
 import java.util.TreeSet;
 
 public class VersionChecker implements Runnable {
-    public static final int MAX_VERSION_NUMBER = 1000000;
+    public static final int MAX_VERSION_NUMBER = 100000000;
+    public static final int MIN_VERSION_NUMBER = 999999;
     private static final Logger.Log logger = Logger.getLogger(VersionChecker.class);
     private static final int VERSION_CHECK_TIMEOUT_MS = 5000;
     private final String stringUrl;
@@ -37,52 +38,46 @@ public class VersionChecker implements Runnable {
     }
 
     /**
-     * Attempts to convert a tag string (maj.min.rev) to an integer
+     * Attempts to convert a tag string (maj.min.rev-seq) to an integer
      * number:
-     * num = maj*10000 + min*100 + rev
+     * num = maj*1000000 + min*10000 + rev*100 + seq
      * <p>
      * So, for instance:
-     * 1.6.2 -> 010602
-     * 2.2.0 -> 020200
+     * 1.6.2 ->   01060200
+     * 2.2.0 ->   02020000
+     * 3.5.3-2 -> 03050302
      * <p>
      * Things like 2.4.0-RC4 are also detected, but the -RC4 suffix is ignored.
      * If no conversion is possible (no maj.min.rev is detected in the string),
      * the version is assumed to be a development branch and the maximum
-     * version number (1000000) is given.
+     * version number (100000000) is given.
      *
-     * @param tag The tag string
-     *
-     * @return The integer
+     * @param tag The tag string.
+     * @return The integer.
      */
     public static Integer stringToVersionNumber(String tag) {
         try {
             int v = 0;
-            String[] tokens = tag.split("\\.");
+            String[] tokens = tag.split("[.\\-]");
             if (tokens.length < 3) {
                 logger.debug("Could not parse version '" + tag + "', assuming development or beta version");
                 return MAX_VERSION_NUMBER;
             }
-            String major = parseSingleToken(tokens[0]);
-            String minor = parseSingleToken(tokens[1]);
-            String rev = parseSingleToken(tokens[2]);
+            String major = tokens[0];
+            String minor = tokens[1];
+            String rev = tokens[2];
+            String seq = tokens.length > 3 ? tokens[3] : "00";
 
-            v += Parser.parseInt(major) * 10000;
-            v += Parser.parseInt(minor) * 100;
-            v += Parser.parseInt(rev);
+            v += Parser.parseInt(major) * 1000000;
+            v += Parser.parseInt(minor) * 10000;
+            v += Parser.parseInt(rev) * 100;
+            v += Parser.parseIntOrElse(seq, 0);
 
             return v;
         } catch (Exception e) {
             logger.debug("Could not parse version '" + tag + "', assuming development or beta version");
             // Development-branch
             return MAX_VERSION_NUMBER;
-        }
-    }
-
-    private static String parseSingleToken(String token) {
-        if (token.contains("-")) {
-            return token.substring(0, token.indexOf("-"));
-        } else {
-            return token;
         }
     }
 
@@ -106,8 +101,8 @@ public class VersionChecker implements Runnable {
                 for (int i = 0; i < n; i++) {
                     String tag = result.get(i).getString("name");
 
-                    // Check tag is major.minor.rev
-                    if (tag.matches("^(\\D)?\\d+.\\d+(\\D{1})?(.\\d+)?$")) {
+                    // Check tag is "major.minor.revision-sequence"
+                    if (tag.matches("^(\\D)?\\d+.\\d+(\\D{1})?(.\\d+)?(-\\d+)?$")) {
                         Integer version = stringToVersionNumber(tag);
                         String commitDate = result.get(i).get("commit").getString("created");
                         //Format 2016-12-07T10:41:35+01:00
@@ -168,6 +163,19 @@ public class VersionChecker implements Runnable {
         public int compareTo(VersionObject versionObject) {
             return this.version.compareTo(versionObject.version);
         }
+    }
+
+    /**
+     * Adapts to the new min.maj.rev-seq format automagically.
+     *
+     * @param versionNumber The configuration version.
+     * @return The new version number, corrected for the new format.
+     */
+    public static int correctVersionNumber(int versionNumber) {
+        if (versionNumber > 0 && versionNumber <= VersionChecker.MIN_VERSION_NUMBER) {
+            versionNumber *= 100;
+        }
+        return versionNumber;
     }
 
 }

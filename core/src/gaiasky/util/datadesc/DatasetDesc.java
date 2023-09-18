@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.update.VersionChecker;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -102,7 +103,7 @@ public class DatasetDesc {
             this.myVersion = source.getInt("version");
 
         if (source.has("mingsversion"))
-            this.minGsVersion = source.getInt("mingsversion");
+            this.minGsVersion = VersionChecker.correctVersionNumber(source.getInt("mingsversion"));
 
         if (source.has("file"))
             this.file = source.getString("file");

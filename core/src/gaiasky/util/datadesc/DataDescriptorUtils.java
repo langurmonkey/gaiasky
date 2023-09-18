@@ -20,6 +20,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.update.VersionChecker;
 import org.apache.commons.io.FileUtils;
 
 import java.io.FileInputStream;
@@ -167,12 +168,12 @@ public class DataDescriptorUtils {
             JsonValue dst = dataDesc.child().child();
             while (dst != null) {
                 boolean hasMinGsVersion = dst.has("mingsversion");
-                int minGsVersion = dst.getInt("mingsversion", 0);
+                int minGsVersion = VersionChecker.correctVersionNumber(dst.getInt("mingsversion", 0));
                 int thisVersion = dst.getInt("version", 0);
 
                 // Only datasets with minGsVersion are supported.
                 // Only datasets with new format in 3.3.1 supported.
-                if (hasMinGsVersion && Settings.SOURCE_VERSION >= minGsVersion && minGsVersion >= 30301) {
+                if (hasMinGsVersion && Settings.SOURCE_VERSION >= minGsVersion && minGsVersion >= 3030100) {
                     // Dataset type
                     String type = dst.getString("type");
 
@@ -326,7 +327,7 @@ public class DataDescriptorUtils {
             dd.datasetType = dt;
 
             // Only datasets without "mingsversion" or with new format in 3.3.1 supported.
-            if (dd.minGsVersion < 0 || Settings.SOURCE_VERSION >= dd.minGsVersion && dd.minGsVersion >= 30301) {
+            if (dd.minGsVersion < 0 || Settings.SOURCE_VERSION >= dd.minGsVersion && dd.minGsVersion >= 3030100) {
                 dt.datasets.add(dd);
             }
         }
