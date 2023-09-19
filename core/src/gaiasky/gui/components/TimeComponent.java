@@ -7,8 +7,8 @@
 
 package gaiasky.gui.components;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -43,9 +43,10 @@ public class TimeComponent extends GuiComponent implements IObserver {
     private final int warpSteps;
     protected OwnLabel date;
     protected OwnLabel time;
-    protected ImageButton plus, minus;
+    protected OwnLabel warp, warpForward, warpBackward;
+    protected OwnImageButton playPause, stepForward, stepBackward;
     protected OwnTextIconButton dateEdit;
-    protected OwnSliderPlus warp;
+    protected OwnSliderPlus warpSlider;
     protected double[] timeWarpVector;
     // Guard to know when to fire warp events
     protected boolean warpGuard = false;
@@ -57,21 +58,30 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
         warpSteps = ((GlobalClock) GaiaSky.instance.time).warpSteps;
-        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD, Event.TIME_STATE_CMD);
     }
 
     @Override
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
         KeyBindings kb = KeyBindings.instance;
+        boolean redTheme = skin.getAtlas().getTextures().first().toString().contains("night-red");
 
         // Time
-        date = new OwnLabel("date UT", skin);
-        date.setWidth(contentWidth - 50);
+        date = new OwnLabel("date UT", skin, "msg-33");
+        date.setWidth(contentWidth - 65);
+        date.setAlignment(Align.center);
+        if (redTheme) {
+            date.setColor(Color.RED);
+        }
         date.setName("label date");
 
-        time = new OwnLabel("time UT", skin);
-        time.setWidth(contentWidth - 50);
+        time = new OwnLabel("time UT", skin, "msg-33");
+        time.setWidth(contentWidth - 65);
+        time.setAlignment(Align.center);
+        if (redTheme) {
+            time.setColor(Color.RED);
+        }
         time.setName("label time");
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
@@ -83,45 +93,75 @@ public class TimeComponent extends GuiComponent implements IObserver {
         });
         dateEdit.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
-        // Pace
+        // BWD label.
+        warpBackward = new OwnLabel("Time\nbackward", skin, "msg-15");
+        warpBackward.setAlignment(Align.left);
+        warpBackward.setColor(redTheme ? Color.RED : Color.GRAY);
+
+        // FWD label.
+        warpForward = new OwnLabel("Time\nforward", skin, "msg-15");
+        warpForward.setAlignment(Align.right);
+        warpForward.setColor(redTheme ? Color.RED : Color.GRAY);
+
+        // Warp factor.
+        warp = new OwnLabel("", skin, "big");
+        warp.setText(TextUtils.secondsToTimeUnit(GaiaSky.instance.time.getWarpFactor()) + "/" + I18n.msg("gui.unit.second"));
+        warp.setAlignment(Align.center);
+        warp.setWidth(190f);
+        warp.addListener(new OwnTextTooltip(I18n.msg("gui.warp.tooltip"), skin));
+
+        // Warp slider.
         timeWarpVector = ((GlobalClock) GaiaSky.instance.time).generateTimeWarpVector();
-        warp = new OwnSliderPlus(I18n.msg("gui.warp"), -warpSteps, warpSteps, 1, skin, "big-horizontal-arrow");
-        warp.setValueLabelTransform((value) -> TextUtils.getFormattedTimeWarp(timeWarpVector[value.intValue() + warpSteps]));
-        warp.setValue(getWarpIndex(GaiaSky.instance.time.getWarpFactor()) - warpSteps);
-        warp.setWidth(300f);
-        warp.addListener((event) -> {
+        warpSlider = new OwnSliderPlus("", -warpSteps, warpSteps, 1, skin, "time-warp");
+        warpSlider.setValueLabelTransform((value) -> TextUtils.getFormattedTimeWarp(timeWarpVector[value.intValue() + warpSteps]));
+        warpSlider.setValue(getWarpIndex(GaiaSky.instance.time.getWarpFactor()) - warpSteps);
+        warpSlider.setWidth(350f);
+        warpSlider.addListener(new OwnTextTooltip(I18n.msg("gui.warp"), skin));
+        warpSlider.addListener((event) -> {
             if (event instanceof ChangeEvent && !warpGuard) {
-                int index = (int) warp.getValue();
+                int index = (int) warpSlider.getValue();
                 double newWarp = timeWarpVector[index + warpSteps];
-                EventManager.publish(Event.TIME_WARP_CMD, warp, newWarp);
+                EventManager.publish(Event.TIME_WARP_CMD, warpSlider, newWarp);
             }
             return false;
         });
 
-        plus = new OwnImageButton(skin, "plus");
-        plus.setName("plus");
-        plus.addListener(event -> {
+        stepForward = new OwnImageButton(skin, "media-skip-forward");
+        stepForward.setName("plus");
+        stepForward.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Plus pressed
-                EventManager.publish(Event.TIME_WARP_INCREASE_CMD, plus);
+                EventManager.publish(Event.TIME_WARP_INCREASE_CMD, stepForward);
 
                 return true;
             }
             return false;
         });
-        plus.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime"), skin));
+        stepForward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime"), skin));
 
-        minus = new OwnImageButton(skin, "minus");
-        minus.setName("minus");
-        minus.addListener(event -> {
+        playPause = new OwnImageButton(skin, "media-play-pause");
+        playPause.setChecked(Settings.settings.runtime.timeOn);
+        playPause.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.TIME_STATE_CMD, playPause, playPause.isChecked());
+                return true;
+            }
+            return false;
+        });
+        String timeHotkey = KeyBindings.instance.getStringKeys("action.pauseresume");
+        playPause.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.playstop"), timeHotkey, skin));
+
+        stepBackward = new OwnImageButton(skin, "media-skip-backward");
+        stepBackward.setName("minus");
+        stepBackward.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Minus pressed
-                EventManager.publish(Event.TIME_WARP_DECREASE_CMD, minus);
+                EventManager.publish(Event.TIME_WARP_DECREASE_CMD, stepBackward);
                 return true;
             }
             return false;
         });
-        minus.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
+        stepBackward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
 
         /* Reset time */
         OwnTextIconButton resetTime = new OwnTextIconButton(I18n.msg("gui.resettime"), skin, "reset");
@@ -130,7 +170,6 @@ public class TimeComponent extends GuiComponent implements IObserver {
         resetTime.addListener(new OwnTextTooltip(I18n.msg("gui.resettime.tooltip"), skin));
         resetTime.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                // Events
                 EventManager m = EventManager.instance;
                 m.post(Event.TIME_CHANGE_CMD, resetTime, Instant.now());
                 m.post(Event.TIME_WARP_CMD, resetTime, 1d);
@@ -141,24 +180,36 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         Table timeGroup = new Table(skin);
 
-        // Date time
+        // Date time.
         Table dateGroup = new Table(skin);
         dateGroup.setWidth(contentWidth);
         Table datetimeGroup = new Table(skin);
-        datetimeGroup.add(date).left().padBottom(pad4).row();
-        datetimeGroup.add(time).left().padBottom(pad4);
-        dateGroup.add(datetimeGroup).left().padRight(pad12);
+        datetimeGroup.add(date).left().pad(pad4).row();
+        datetimeGroup.add(time).left().pad(pad4);
+        dateGroup.add(datetimeGroup).left().padRight(pad12).padLeft(pad9);
         dateGroup.add(dateEdit).right();
 
-        // Pace
-        Table paceGroup = new Table(skin);
-        paceGroup.add(minus).left().padRight(pad1);
-        paceGroup.add(warp).left().padRight(pad1);
-        paceGroup.add(plus).left();
+        // Time warp and controls.
+        Table textGroup = new Table(skin);
+        textGroup.add(warpBackward).left().padRight(pad4);
+        textGroup.add(warp).center().growX().padRight(pad4);
+        textGroup.add(warpForward).right();
 
-        // Add to table
-        timeGroup.add(dateGroup).left().padBottom(pad12).row();
-        timeGroup.add(paceGroup).left().padBottom(pad12).row();
+        Table controlsGroup = new Table(skin);
+        controlsGroup.add(stepBackward).center().pad(pad3).padLeft(pad12 * 2.2f).padRight(pad6);
+        controlsGroup.add(playPause).center().pad(pad3).padRight(pad6);
+        controlsGroup.add(stepForward).center().pad(pad3).padRight(pad6);
+        controlsGroup.add(resetTime).center().pad(pad3);
+
+        Table warpGroup = new Table(skin);
+        warpGroup.add(controlsGroup).center().row();
+        warpGroup.add(warpSlider).center().pad(0, pad9, 0, pad9).row();
+        warpGroup.add(textGroup).center().pad(0, pad9, 0, pad9).row();
+
+        // Add to table.
+        timeGroup.add(dateGroup).left().padBottom(pad9).row();
+        timeGroup.add(new Separator(skin, "gray")).center().growX().padBottom(pad20).padLeft(pad20).padRight(pad20).row();
+        timeGroup.add(warpGroup).left().padBottom(pad20 * 1.5f).row();
         timeGroup.add(resetTime).center();
 
         timeGroup.pack();
@@ -226,15 +277,21 @@ public class TimeComponent extends GuiComponent implements IObserver {
                 });
             }
             case TIME_WARP_CHANGED_INFO, TIME_WARP_CMD -> {
-                if (source != warp) {
+                if (source != warpSlider) {
                     double newWarp = (double) data[0];
                     int index = getWarpIndex(newWarp);
 
                     if (index >= 0) {
                         warpGuard = true;
-                        warp.setValue(index - warpSteps);
+                        warpSlider.setValue(index - warpSteps);
                         warpGuard = false;
                     }
+                    warp.setText(TextUtils.secondsToTimeUnit(newWarp) + "/" + I18n.msg("gui.unit.second"));
+                }
+            }
+            case TIME_STATE_CMD -> {
+                if (source != playPause) {
+                    playPause.setCheckedNoFire((Boolean) data[0]);
                 }
             }
             default -> {

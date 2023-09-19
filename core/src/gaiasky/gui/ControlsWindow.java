@@ -46,7 +46,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected VerticalGroup mainVertical;
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
-    protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null, playStop = null;
+    protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null;
     protected OwnTextIconButton map = null;
     protected TiledDrawable separator;
 
@@ -76,7 +76,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(separatorTextureRegion);
 
-        EventManager.instance.subscribe(this, Event.TIME_STATE_CMD, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.RECORD_CAMERA_CMD);
+        EventManager.instance.subscribe(this, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.RECORD_CAMERA_CMD);
     }
 
     /**
@@ -99,25 +99,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         panes = new HashMap<>();
 
         /* ----TIME GROUP---- */
-        playStop = new OwnImageButton(skin, "playstop");
-        playStop.setName("play stop");
-        playStop.setChecked(Settings.settings.runtime.timeOn);
-        playStop.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.TIME_STATE_CMD, playStop, playStop.isChecked());
-                return true;
-            }
-            return false;
-        });
-        String timeHotkey = KeyBindings.instance.getStringKeys("action.pauseresume");
-        playStop.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.playstop"), timeHotkey, skin));
-
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
 
         String shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.time");
 
-        CollapsiblePane time = new CollapsiblePane(ui, I18n.msg("gui.time"), timeComponent.getActor(), getContentWidth(), skin, true, shortcut, playStop);
+        CollapsiblePane time = new CollapsiblePane(ui, I18n.msg("gui.time"), timeComponent.getActor(), getContentWidth(), skin, true, shortcut);
         time.align(Align.left);
         mainActors.add(time);
         panes.put(timeComponent.getClass().getSimpleName(), time);
@@ -412,11 +399,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-            case TIME_STATE_CMD -> {
-                if (source != playStop) {
-                    playStop.setCheckedNoFire((Boolean) data[0]);
-                }
-            }
             case GUI_SCROLL_POSITION_CMD -> this.windowScroll.setScrollY((float) data[0]);
             case GUI_FOLD_CMD -> {
                 boolean collapse;

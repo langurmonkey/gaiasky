@@ -600,6 +600,9 @@
     "media-step-backward": {
       "imageUp": "iconic-media-step-backward"
     },
+    "reset": {
+      "imageUp": "iconic-reload"
+    },
     "playstop": {
       "imageUp": "play-icon",
       "imageChecked": "pause-icon"
@@ -862,10 +865,10 @@
       "knobBeforeFocused": "big-slider-knob-before-focused",
       "knobBeforeOver": "big-slider-knob-before-over"
     },
-    "big-horizontal-arrow": {
-      "background": "big-slider",
-      "backgroundOver": "big-slider-over",
-      "knob": "big-slider-knob-arrow"
+    "time-warp": {
+      "background": "huge-slider",
+      "backgroundOver": "huge-slider-over",
+      "knob": "huge-slider-knob"
     },
     "sc-engine": {
       "background": "sc-engine-power-bg",

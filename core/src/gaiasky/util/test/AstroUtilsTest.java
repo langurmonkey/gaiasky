@@ -22,5 +22,8 @@ public class AstroUtilsTest {
         System.out.println("dist[km]    : " + coord.z);
 
         System.out.println("J2010: " + AstroUtils.JD_J2010);
+
+        double jd = AstroUtils.getJulianDate(2000, 1, 1, 12, 0, 0, 0, true);
+        System.out.println("2000-01-01.5 JD: " + jd);
     }
 }
