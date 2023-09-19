@@ -66,31 +66,31 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         fade.currentDistance = body.distToCamera;
         gr.regime = body.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
         if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
-            // Baked fade-in as we get close to focus
+            // Baked fade-in as we get close to focus.
             IFocus focus = camera.getFocus();
-            base.opacity *= MathUtilsDouble.lint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
+            base.opacity *= (float) MathUtilsDouble.lint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
         }
 
         gr.fovFactor = camera.getFovFactor() * .75e-3f;
 
         updateLocalTransform(camera, body, gr, graph, transform);
-        // Distance in u_tessQuality
+        // Distance in u_tessQuality.
         getGridScaling(body.distToCamera, gr.scalingFading);
 
-        // Compute projection lines to refsys
+        // Compute projection lines to reference system.
         if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
             IFocus focus = camera.getFocus();
-            Vector3d cpos = D33;
-            Vector3d fpos = D34;
-            getCFPos(cpos, fpos, camera, focus, transform);
+            Vector3d cPos = D33;
+            Vector3d fPos = D34;
+            getCFPos(cPos, fPos, camera, focus, transform);
 
             // Line in XZ
-            getZXLine(gr.a, gr.b, cpos, fpos, transform);
+            getZXLine(gr.a, gr.b, cPos, fPos, transform);
             gr.d01 = gr.p01.set(gr.b).sub(gr.a).len();
             gr.p01.setLength(gr.d01 / 2d).add(gr.a);
 
             // Line in Y
-            getYLine(gr.c, gr.d, cpos, fpos, transform);
+            getYLine(gr.c, gr.d, cPos, fPos, transform);
             gr.d02 = gr.p02.set(gr.c).sub(gr.d).len();
             gr.p02.setLength(gr.d02 / 2d).add(gr.d);
         } else {
@@ -104,30 +104,30 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         IFocus focus = camera.getFocus();
         graph.localTransform.idt();
 
-        Vector3 vroffset = F34;
+        Vector3 vrOffset = F34;
         float vrScl = 1f;
         if (Settings.settings.runtime.openXr) {
             vrScl = 100f;
             if (camera.getCurrent() instanceof NaturalCamera) {
-                ((NaturalCamera) camera.getCurrent()).vrOffset.put(vroffset);
-                vroffset.scl((float) (1f / Constants.M_TO_U));
+                ((NaturalCamera) camera.getCurrent()).vrOffset.put(vrOffset);
+                vrOffset.scl((float) (1f / Constants.M_TO_U));
             }
         } else {
-            vroffset.set(0, 0, 0);
+            vrOffset.set(0, 0, 0);
         }
 
         if (Settings.settings.program.recursiveGrid.origin.isRefSys() || focus == null) {
-            // Coordinate origin - Sun
+            // Coordinate origin - Sun.
             if (gr.regime == 1)
                 graph.localTransform.translate(camera.getInversePos().put(F31));
             else
-                graph.localTransform.translate(camera.getInversePos().put(F31).setLength(vrScl).add(vroffset));
+                graph.localTransform.translate(camera.getInversePos().put(F31).setLength(vrScl).add(vrOffset));
         } else {
-            // Focus object
+            // Focus object.
             if (gr.regime == 1)
                 graph.localTransform.translate(focus.getAbsolutePosition(B31).sub(camera.getPos()).put(F31));
             else
-                graph.localTransform.translate(focus.getAbsolutePosition(B31).sub(camera.getPos()).setLength(vrScl).add(vroffset).put(F31));
+                graph.localTransform.translate(focus.getAbsolutePosition(B31).sub(camera.getPos()).setLength(vrScl).add(vrOffset).put(F31));
         }
         if (gr.regime == 1)
             graph.localTransform.scl((float) (body.distToCamera * 0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
@@ -137,7 +137,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         if (transform.matrixf != null)
             graph.localTransform.mul(transform.matrixf);
 
-        // Must rotate due to orientation of billboard
+        // Must rotate due to orientation of billboard.
         graph.localTransform.rotate(1, 0, 0, 90);
 
     }
@@ -165,19 +165,19 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void getCFPos(Vector3d cpos, Vector3d fpos, ICamera camera, IFocus focus, RefSysTransform tr) {
+    private void getCFPos(Vector3d cPos, Vector3d fPos, ICamera camera, IFocus focus, RefSysTransform tr) {
         Matrix4d inv = tr.matrix;
         Matrix4d trf = inv != null ? mat4daux.set(inv).inv() : mat4daux.idt();
-        camera.getPos().put(cpos).mul(trf);
-        Vector3b v3b = new Vector3b(fpos);
+        camera.getPos().put(cPos).mul(trf);
+        Vector3b v3b = new Vector3b(fPos);
         focus.getPredictedPosition(v3b, GaiaSky.instance.time, camera, false).mul(trf);
-        v3b.put(fpos).sub(cpos);
+        v3b.put(fPos).sub(cPos);
     }
 
-    private void getZXLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos, RefSysTransform tr) {
+    private void getZXLine(Vector3d a, Vector3d b, Vector3d cPos, Vector3d fPos, RefSysTransform tr) {
         Matrix4d inv = tr.matrix;
-        a.set(-cpos.x, -cpos.y, -cpos.z);
-        b.set(fpos.x, -cpos.y, fpos.z);
+        a.set(-cPos.x, -cPos.y, -cPos.z);
+        b.set(fPos.x, -cPos.y, fPos.z);
         if (inv != null) {
             // Back to equatorial
             a.mul(inv);
@@ -185,10 +185,10 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void getYLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos, RefSysTransform tr) {
+    private void getYLine(Vector3d a, Vector3d b, Vector3d cPos, Vector3d fPos, RefSysTransform tr) {
         Matrix4d inv = tr.matrix;
-        a.set(fpos.x, -cpos.y, fpos.z);
-        b.set(fpos.x, fpos.y, fpos.z);
+        a.set(fPos.x, -cPos.y, fPos.z);
+        b.set(fPos.x, fPos.y, fPos.z);
         if (inv != null) {
             // Back to equatorial
             a.mul(inv);

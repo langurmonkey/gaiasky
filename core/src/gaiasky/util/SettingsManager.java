@@ -180,7 +180,7 @@ public class SettingsManager {
 
     public void initSettings() {
 
-        // Initialize version
+        // Initialize version.
         VersionSettings versionSettings = new VersionSettings();
         String versionStr = vp.getProperty("version");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
@@ -197,7 +197,7 @@ public class SettingsManager {
         }
         versionSettings.initialize(versionStr, buildTime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
 
-        // Initialize runtime
+        // Initialize runtime.
         settings.runtime = new Settings.RuntimeSettings();
 
         settings.version = versionSettings;
@@ -205,57 +205,57 @@ public class SettingsManager {
 
         String arch = System.getProperty("sun.arch.data.model");
 
-        // Data location
+        // Data location.
         if (settings.data.location == null || settings.data.location.isBlank()) {
             settings.data.location = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");
         }
 
-        // UI scale mapping
+        // UI scale mapping.
         settings.program.ui.scale = MathUtilsDouble.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN,
                 Constants.UI_SCALE_INTERNAL_MAX);
 
-        // Default distance units
+        // Default distance units.
         if (settings.program.ui.distanceUnits == null) {
             settings.program.ui.distanceUnits = DistanceUnits.PC;
         }
 
-        // Eclipses
+        // Eclipses.
         if (settings.scene.renderer.eclipses == null) {
             settings.scene.renderer.eclipses = new EclipseSettings();
             settings.scene.renderer.eclipses.active = true;
             settings.scene.renderer.eclipses.outlines = false;
         }
 
-        // Back buffer resolution
+        // Back buffer resolution.
         settings.graphics.backBufferResolution = new int[2];
         settings.graphics.backBufferResolution[0] = (int) (settings.graphics.resolution[0] * settings.graphics.backBufferScale);
         settings.graphics.backBufferResolution[1] = (int) (settings.graphics.resolution[1] * settings.graphics.backBufferScale);
 
-        // Disable tessellation on macOS
+        // Disable tessellation on macOS.
         if (SysUtils.isMac() && settings.scene.renderer.elevation.type.isTessellation()) {
             settings.scene.renderer.elevation.type = ElevationType.NONE;
         }
 
-        // Minimap size
+        // Minimap size.
         settings.program.minimap.size = MathUtilsDouble.clamp(settings.program.minimap.size, Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
 
-        // Particle groups
+        // Particle groups.
         if (settings.scene.particleGroups == null) {
             settings.scene.particleGroups = new ParticleSettings();
         }
 
-        // Limit draw distance in 32-bit JVM
+        // Limit draw distance in 32-bit JVM.
         if (arch.equals("32")) {
             float delta = Math.abs(settings.scene.octree.threshold[1] - settings.scene.octree.threshold[0]);
             settings.scene.octree.threshold[0] = (float) Math.toRadians(80);
             settings.scene.octree.threshold[1] = settings.scene.octree.threshold[1] + delta;
         }
-        // Limit number of stars in 32-bit JVM
+        // Limit number of stars in 32-bit JVM.
         if (arch.equals("32")) {
             settings.scene.octree.maxStars = 1500000;
         }
 
-        // Frame output location
+        // Frame output location.
         try {
             String fl = settings.frame.location;
             if (fl == null || fl.isBlank()) {
@@ -268,7 +268,7 @@ public class SettingsManager {
             logger.error("Error initializing frame output location", e);
         }
 
-        // Screenshots location
+        // Screenshots location.
         try {
             String sl = settings.screenshot.location;
             if (sl == null || sl.isBlank()) {
@@ -281,7 +281,7 @@ public class SettingsManager {
             logger.error("Error initializing frame output location", e);
         }
 
-        // Add chromatic aberration if not there
+        // Add chromatic aberration if not there.
         if (settings.postprocess.chromaticAberration == null) {
             settings.postprocess.chromaticAberration = new ChromaticAberrationSettings();
             if (settings.runtime.openXr) {
@@ -289,7 +289,7 @@ public class SettingsManager {
             }
         }
 
-        // Set up proxy if needed
+        // Set up proxy if needed.
         if (settings.proxy != null) {
             if (settings.proxy.useSystemProxies != null) {
                 System.setProperty("java.net.useSystemProxies", Boolean.toString(settings.proxy.useSystemProxies));
@@ -307,21 +307,24 @@ public class SettingsManager {
                 setProxySettings(settings.proxy.ftp, "ftp");
             }
         }
-        // Set up proxy authenticator
+        // Set up proxy authenticator.
         initializeProxyAuthenticator();
 
-        // Virtual texture settings
+        // Virtual texture settings.
         if (settings.scene.renderer.virtualTextures == null) {
             settings.scene.renderer.virtualTextures = new VirtualTextureSettings();
             settings.scene.renderer.virtualTextures.cacheSize = 8;
             settings.scene.renderer.virtualTextures.detectionBufferFactor = 8.0;
         }
 
-        // Update visibility with new elements if needed
+        // Update visibility with new elements if needed.
         if (!settings.scene.visibility.containsKey("Keyframes")) {
             settings.scene.visibility.put("Keyframes", true);
-            // Also update key bindings!
+        }
 
+        // Grid style.
+        if (settings.program.recursiveGrid.style == null) {
+            settings.program.recursiveGrid.style = Settings.GridStyle.CONCENTRIC_RINGS;
         }
 
         settings.initialized = true;

@@ -53,8 +53,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
 
-import static gaiasky.util.Settings.OriginType.values;
-
 public class PreferencesWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(PreferencesWindow.class);
 
@@ -73,7 +71,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
-    private OwnSelectBox<String> recGridOrigin;
+    private OwnSelectBox<String> recGridOrigin, recGridStyle;
     private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
@@ -1195,6 +1193,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         recGridOrigin.setItems(origins);
         recGridOrigin.setSelectedIndex(settings.program.recursiveGrid.origin.ordinal());
 
+        // STYLE
+        OwnLabel styleLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.style"), skin);
+        styleLabel.setWidth(labelWidth);
+        String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.rings"), I18n.msg("gui.ui.recursivegrid.style.grid")};
+        recGridStyle = new OwnSelectBox<>(skin);
+        recGridStyle.setWidth(selectWidth);
+        recGridStyle.setItems(styles);
+        recGridStyle.setSelectedIndex(settings.program.recursiveGrid.style.ordinal());
+
         // PROJECTION LINES
         OwnLabel recGridProjectionLinesLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.projlines"), skin);
         recGridProjectionLines = new OwnCheckBox("", skin);
@@ -1204,6 +1211,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
         rg.add(recGridOrigin).left().padBottom(pad10).row();
+        rg.add(styleLabel).left().padBottom(pad10).padRight(pad34);
+        rg.add(recGridStyle).left().padBottom(pad10).row();
         rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
         rg.add(recGridProjectionLines).left().padBottom(pad10);
 
@@ -1438,7 +1447,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to content
         addContentGroup(contentControls, titleController, controller, 0f);
-        addContentGroup(contentControls, titleKeybindings , controlsScroll);
+        addContentGroup(contentControls, titleKeybindings, controlsScroll);
 
         /*
          * ==== SCREENSHOTS ====
@@ -2538,7 +2547,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointerGuides.isChecked(), pointerGuidesColor.getPickedColor(), pointerGuidesWidth.getMappedValue());
 
         // Recursive grid
-        settings.program.recursiveGrid.origin = values()[recGridOrigin.getSelectedIndex()];
+        settings.program.recursiveGrid.origin = OriginType.values()[recGridOrigin.getSelectedIndex()];
+        settings.program.recursiveGrid.style = GridStyle.values()[recGridStyle.getSelectedIndex()];
         settings.program.recursiveGrid.projectionLines = recGridProjectionLines.isChecked();
 
         // Minimap size

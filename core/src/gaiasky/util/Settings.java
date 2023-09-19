@@ -308,6 +308,11 @@ public class Settings {
 
     }
 
+    public enum GridStyle {
+        CONCENTRIC_RINGS,
+        SQUARE_GRID;
+    }
+
     public enum ElevationType {
         TESSELLATION,
         PARALLAX_MAPPING,
@@ -1423,10 +1428,16 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RecursiveGridSettings {
             public OriginType origin;
+            public GridStyle style;
+
             public boolean projectionLines;
 
             public void setOrigin(final String originString) {
                 origin = OriginType.valueOf(originString.toUpperCase());
+            }
+
+            public void setStyle(final String styleString) {
+                style = GridStyle.valueOf(styleString.toUpperCase());
             }
         }
 

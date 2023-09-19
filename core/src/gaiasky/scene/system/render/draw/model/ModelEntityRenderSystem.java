@@ -243,10 +243,13 @@ public class ModelEntityRenderSystem {
         } else {
             mc.depthTestDisable();
         }
+        // Distance in u_tessQuality.
         mc.setFloatExtAttribute(FloatAttribute.TessQuality, gr.scalingFading.getFirst().floatValue());
-        // Fading in u_heightScale
+        // Fading in u_heightScale.
         mc.setFloatExtAttribute(FloatAttribute.HeightScale, gr.scalingFading.getSecond().floatValue());
-        // FovFactor
+        // Grid style in u_elevationMultiplier.
+        mc.setFloatExtAttribute(FloatAttribute.ElevationMultiplier, (float) Settings.settings.program.recursiveGrid.style.ordinal());
+        // FovFactor.
         mc.setFloatExtAttribute(FloatAttribute.Ts, gr.fovFactor * 0.5f * Settings.settings.scene.lineWidth);
         modelBatch.render(mc.instance, mc.env);
     }
