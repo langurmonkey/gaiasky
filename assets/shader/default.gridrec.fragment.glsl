@@ -34,6 +34,13 @@ layout (location = 1) out vec4 velMap;
 #define PI 3.141592
 #define N 10.0
 #define WIDTH 2.0
+#define RAD PI / 180.0
+#define BASE_COL_DIAG vec4(1.0, 0.792, 0.09, 0.3)
+
+vec2 rotateUV(vec2 uv, float rotation) {
+    return vec2(cos(rotation) * (uv.x) + sin(rotation) * (uv.y),
+                cos(rotation) * (uv.y) - sin(rotation) * (uv.x));
+}
 
 vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col, vec4 lcol) {
     float lw = u_ts * WIDTH;
@@ -53,10 +60,25 @@ vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col, vec4 lcol) {
     // The grid in itself.
     float func = cos(PI * dist);
 
-    // Lines.
-    vec2 lines = smoothstep(factor, 1.0, pow(1.0 - abs(tc), vec2(3.0)));
+    // Lines (cross).
+    vec2 lines_cross = smoothstep(factor, 1.0, pow(1.0 - abs(tc), vec2(2.0)));
+    vec4 col_cross = lcol * max(lines_cross.x, lines_cross.y);
 
-    vec4 result = max(col * smoothstep(factor, 1.0, func), lcol * max(lines.x, lines.y));
+    // Lines (diagonal)
+    vec2 tc_rotated1 = rotateUV(tc, 30.0 * RAD);
+    vec2 lines_diag1 = smoothstep(factor, 1.0, pow(1.0 - abs(tc_rotated1), vec2(5.0)));
+    vec4 col_diag1 = BASE_COL_DIAG * max(lines_diag1.x, lines_diag1.y);
+
+    vec2 tc_rotated2 = rotateUV(tc, 60.0 * RAD);
+    vec2 lines_diag2 = smoothstep(factor, 1.0, pow(1.0 - abs(tc_rotated2), vec2(5.0)));
+    vec4 col_diag2 = BASE_COL_DIAG * max(lines_diag2.x, lines_diag2.y);
+
+    vec4 col_diag = max(col_diag1, col_diag2);
+
+    vec4 col_lines = max(col_cross, col_diag);
+
+
+    vec4 result = max(col * smoothstep(factor, 1.0, func), col_lines);
     result.a *= alpha;
     return result;
 }
