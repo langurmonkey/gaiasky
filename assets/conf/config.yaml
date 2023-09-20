@@ -346,8 +346,8 @@ program:
     origin: REFSYS
     # If origin is refsys, this option adds projection lines to the current focus.
     projectionLines: true
-    # Grid style [CONCENTRIC_RINGS|SQUARE_GRID].
-    style: CONCENTRIC_RINGS
+    # Recursive grid style [CIRCULAR|SQUARE].
+    style: CIRCULAR
   # Stereoscopic mode (3D).
   modeStereo:
     # Start in 3D mode.

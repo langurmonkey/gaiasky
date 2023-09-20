@@ -1196,7 +1196,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // STYLE
         OwnLabel styleLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.style"), skin);
         styleLabel.setWidth(labelWidth);
-        String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.rings"), I18n.msg("gui.ui.recursivegrid.style.grid")};
+        String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.circular"), I18n.msg("gui.ui.recursivegrid.style.square")};
         recGridStyle = new OwnSelectBox<>(skin);
         recGridStyle.setWidth(selectWidth);
         recGridStyle.setItems(styles);

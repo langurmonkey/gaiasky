@@ -309,8 +309,8 @@ public class Settings {
     }
 
     public enum GridStyle {
-        CONCENTRIC_RINGS,
-        SQUARE_GRID;
+        CIRCULAR,
+        SQUARE;
     }
 
     public enum ElevationType {
@@ -1433,11 +1433,21 @@ public class Settings {
             public boolean projectionLines;
 
             public void setOrigin(final String originString) {
+                try {
                 origin = OriginType.valueOf(originString.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    // Default.
+                    origin = OriginType.REFSYS;
+                }
             }
 
             public void setStyle(final String styleString) {
-                style = GridStyle.valueOf(styleString.toUpperCase());
+                try {
+                    style = GridStyle.valueOf(styleString.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    // Default.
+                    style = GridStyle.CIRCULAR;
+                }
             }
         }
 

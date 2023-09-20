@@ -324,7 +324,7 @@ public class SettingsManager {
 
         // Grid style.
         if (settings.program.recursiveGrid.style == null) {
-            settings.program.recursiveGrid.style = Settings.GridStyle.CONCENTRIC_RINGS;
+            settings.program.recursiveGrid.style = Settings.GridStyle.CIRCULAR;
         }
 
         settings.initialized = true;
