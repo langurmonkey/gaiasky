@@ -145,7 +145,7 @@ public class Settings {
     }
 
     public static String getApplicationTitle(boolean vr) {
-        return APPLICATION_NAME_TITLE + (vr ? "  VR" : "");
+        return APPLICATION_NAME_TITLE + (vr ? "\nVR" : "");
     }
 
     public static String getShortApplicationName() {
