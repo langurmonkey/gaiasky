@@ -152,7 +152,7 @@ public class XrControllerDevice {
 
     private void processMoveAction(Vec2fAction action,
                                    XrInputListener listener) {
-        if (action.isActive && action.changedSinceLastSync) {
+        if (action.isActive) {
             listener.move(action.currentState, action.getControllerDevice());
         }
     }
