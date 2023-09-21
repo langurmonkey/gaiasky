@@ -6,7 +6,7 @@
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
     <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="20/jdk-20.0.2+9" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" />
   </application>
   <files defaultOverwriteMode="1" defaultUninstallMode="2">
     <mountPoints>
@@ -1306,7 +1306,7 @@ return true;</property>
         <entry location="gs_icon.png" />
         <entry location="gsvr_icon.png" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="20/jdk-20.0.2+9" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" usePack200="false" overrideJdkRelease="true" />
     </windows>
     <macosArchive name="macOS Archive" id="966" includeAllDownloadableComponents="false" architecture="universal" launcherId="573">
       <exclude>
@@ -1317,7 +1317,7 @@ return true;</property>
         <entry location="gaiasky.desktop" />
         <entry location="rest-static" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="20/jdk-20.0.2+9" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
     </macosArchive>
     <unixInstaller name="Unix Installer" id="28" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1345,7 +1345,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="20/jdk-20.0.2+9" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxDeb>
@@ -1361,7 +1361,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="20/jdk-20.0.2+9" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
@@ -1380,7 +1380,7 @@ return true;</property>
         <entry location="rest-static" />
         <entry location="gaiasky" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="20/jdk-20.0.2+9" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
     </windowsArchive>
     <unixArchive name="Unix Archive" id="952" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1390,7 +1390,7 @@ return true;</property>
         <entry location="AppRun" />
         <entry location="gaiasky.cmd" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="20/jdk-20.0.2+9" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
     </unixArchive>
   </mediaSets>
   <buildIds>
