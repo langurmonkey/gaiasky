@@ -1009,8 +1009,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setTimeWarp(final double warp) {
-        em.post(Event.TIME_WARP_CMD, this, warp);
+    public void setTimeWarp(final double warpFactor) {
+        em.post(Event.TIME_WARP_CMD, this, warpFactor);
     }
 
     public void setTimeWarp(final long warp) {
