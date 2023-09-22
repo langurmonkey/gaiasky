@@ -1,3 +1,14 @@
+<a name="3.5.4-1"></a>
+## [3.5.4-1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.4) (2023-09-21)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.4...3.5.4-1)
+
+### Bug Fixes
+- move action stuttering on some systems due to no input changes since last sync. 
+- application title in loading screen squashes the logo. 
+
+### Build System
+- set bundled JRE version to 17 instead of 20; seemingly, there are non-negligible performance issues with the JRE 20 on some configurations. 
+
 <a name="3.5.4"></a>
 ## [3.5.4](https://codeberg.org/gaiasky/gaiasky/tree/3.5.3) (2023-09-20)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.3...3.5.4)
