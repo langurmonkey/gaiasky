@@ -62,7 +62,7 @@ public class LogWindow extends GenericDialog {
         }
 
         scroll = new OwnScrollPane(logs, skin, "minimalist-nobg");
-        scroll.setFadeScrollBars(true);
+        scroll.setFadeScrollBars(false);
         scroll.setScrollingDisabled(false, false);
         scroll.setSmoothScrolling(true);
         scroll.setHeight(h);

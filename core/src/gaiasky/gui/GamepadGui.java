@@ -1331,6 +1331,7 @@ public class GamepadGui extends AbstractGui {
         var c = new OwnScrollPane(t, skin, "minimalist-nobg");
         t.center();
         c.setFadeScrollBars(true);
+        c.setupFadeScrollBars(1f, 3f);
         c.setForceScroll(false, false);
         if (w > 0 && h > 0) {
             c.setSize(w, h);

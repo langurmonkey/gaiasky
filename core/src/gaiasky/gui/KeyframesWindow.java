@@ -291,7 +291,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll.setScrollingDisabled(true, false);
         rightScroll.setHeight(250f);
         rightScroll.setWidth(820f);
-        rightScroll.setFadeScrollBars(true);
+        rightScroll.setFadeScrollBars(false);
 
         right.add(keyframesTitle).top().left().padBottom(pad18).row();
         right.add(rightScroll).width(820f).height(250f).center().left().row();
