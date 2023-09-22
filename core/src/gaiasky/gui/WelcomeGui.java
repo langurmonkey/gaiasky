@@ -155,15 +155,20 @@ public class WelcomeGui extends AbstractGui {
             }
 
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
-            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null,
-                                        (digest) -> GaiaSky.postRunnable(() -> {
-                                            // Data descriptor ok. Skip welcome screen only if flag and base data present
-                                            if (skipWelcome && baseDataPresent()) {
-                                                startLoading();
-                                            } else {
-                                                buildWelcomeUI();
-                                            }
-                                        }), () -> {
+            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor,
+                    dataDescriptor,
+                    Settings.settings.program.offlineMode,
+                    null,
+                    null,
+                    (digest) -> GaiaSky.postRunnable(() -> {
+                        // Data descriptor ok. Skip welcome screen only if flag and base data present
+                        if (skipWelcome && baseDataPresent()) {
+                            startLoading();
+                        } else {
+                            buildWelcomeUI();
+                        }
+                    }),
+                    () -> {
                         // Fail?
                         downloadError = true;
                         if (Settings.settings.program.offlineMode) {
@@ -739,24 +744,24 @@ public class WelcomeGui extends AbstractGui {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case UI_RELOAD_CMD -> {
-            GaiaSky.postRunnable(() -> {
-                GlobalResources globalResources = GaiaSky.instance.getGlobalResources();
-                // Reinitialise GUI system
-                globalResources.updateSkin();
-                GenericDialog.updatePads();
-                // UI theme reload broadcast
-                EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));
-                // Reload window
-                this.skin = globalResources.getSkin();
-                reloadView();
-            });
-        }
-        case UI_SCALE_CMD -> {
-            float uiScale = (Float) data[0];
-            this.updateUnitsPerPixel(1f / uiScale);
-        }
+            case UI_RELOAD_CMD -> {
+                GaiaSky.postRunnable(() -> {
+                    GlobalResources globalResources = GaiaSky.instance.getGlobalResources();
+                    // Reinitialise GUI system
+                    globalResources.updateSkin();
+                    GenericDialog.updatePads();
+                    // UI theme reload broadcast
+                    EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));
+                    // Reload window
+                    this.skin = globalResources.getSkin();
+                    reloadView();
+                });
+            }
+            case UI_SCALE_CMD -> {
+                float uiScale = (Float) data[0];
+                this.updateUnitsPerPixel(1f / uiScale);
+            }
         }
     }
 

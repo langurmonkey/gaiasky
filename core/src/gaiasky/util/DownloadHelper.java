@@ -114,16 +114,16 @@ public class DownloadHelper {
 
                 if (status < 400) {
                     // We're going to download the file, create the streams
-                    InputStream is = httpResponse.getResultAsStream();
-                    OutputStream os = to.write(resume);
-
-                    byte[] bytes = new byte[1024];
-                    int count;
-                    long read = 0;
-                    long lastTimeMs = System.currentTimeMillis();
-                    long lastRead = 0;
-                    double bytesPerMs = 0;
                     try {
+                        InputStream is = httpResponse.getResultAsStream();
+                        OutputStream os = to.write(resume);
+
+                        byte[] bytes = new byte[1024];
+                        int count;
+                        long read = 0;
+                        long lastTimeMs = System.currentTimeMillis();
+                        long lastRead = 0;
+                        double bytesPerMs = 0;
                         long totalLength = length + startSize;
                         logger.info(I18n.msg("gui.download.starting", url));
                         logger.info("Reading " + length + " bytes " + (resume ? "(resuming from " + startSize + ", total is " + totalLength + ")" : ""));
