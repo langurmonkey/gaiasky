@@ -1,6 +1,6 @@
 #version 330 core
 
-#define exposure 0.65
+#define exposure 0.2
 
 #include shader/lib_logdepthbuff.glsl
 
