@@ -83,17 +83,11 @@ camera.full/camera.FREE_MODE                = NUM_0
 camera.full/camera.FOCUS_MODE               = NUM_1
 camera.full/camera.GAME_MODE                = NUM_2
 camera.full/camera.SPACECRAFT_MODE          = NUM_3
-camera.full/camera.GAIA_FOV1_MODE           = NUM_4
-camera.full/camera.GAIA_FOV2_MODE           = NUM_5
-camera.full/camera.GAIA_FOVS_MODE           = NUM_6
 
 camera.full/camera.FREE_MODE                = NUMPAD_0
 camera.full/camera.FOCUS_MODE               = NUMPAD_1
 camera.full/camera.GAME_MODE                = NUMPAD_2
 camera.full/camera.SPACECRAFT_MODE          = NUMPAD_3
-camera.full/camera.GAIA_FOV1_MODE           = NUMPAD_4
-camera.full/camera.GAIA_FOV2_MODE           = NUMPAD_5
-camera.full/camera.GAIA_FOVS_MODE           = NUMPAD_6
 
 # Cinematic camera
 action.toggle/camera.mode                   = CTRL_L M
