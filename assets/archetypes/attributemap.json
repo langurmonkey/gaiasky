@@ -820,7 +820,7 @@
     "Raymarching": {
       "description": "Defines attributes related to ray-marched objects.",
       "shader": {
-        "description": "Path to the fragment shader GLSL file to use to render this object. The fragment shader is processed for each pixel in the image, and must produce a ray-marched representation of the object.",
+        "description": "Path to the fragment shader GLSL file to use to render this object. The fragment shader is processed for each pixel in the image, and must produce a ray-marched representation of the object. The file must have one of the following extensions: ``.glsl``, ``.frag``, ``.fragment``, ``.glslf``, ``.fsh``. The fragment shader file is typically distributed with the dataset, and has the form ``$data/[dataset-name]/path/to/file.glsl``." ,
         "units": "String"
       }
     }
