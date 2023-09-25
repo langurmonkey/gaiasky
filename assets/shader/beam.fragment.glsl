@@ -27,7 +27,7 @@ in vec4 v_color;
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #define time v_time * 0.003

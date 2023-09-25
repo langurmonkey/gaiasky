@@ -1,8 +1,8 @@
 #version 330 core
 
-#include shader/lib_math.glsl
-#include shader/lib_dither8x8.glsl
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/math.glsl>
+#include <shader/lib/dither8x8.glsl>
+#include <shader/lib/logdepthbuff.glsl>
 
 uniform float u_alpha;
 uniform float u_zfar;
@@ -29,11 +29,11 @@ flat in int v_layer;
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.frag.glsl
+#include <shader/lib/velbuffer.frag.glsl>
 #endif
 
 #define decay 0.2

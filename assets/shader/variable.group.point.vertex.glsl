@@ -2,9 +2,9 @@
 
 #define N_VECS 5
 
-#include shader/lib_math.glsl
-#include shader/lib_geometry.glsl
-#include shader/lib_doublefloat.glsl
+#include <shader/lib/math.glsl>
+#include <shader/lib/geometry.glsl>
+#include <shader/lib/doublefloat.glsl>
 
 // UNIFORMS
 // time in julian days since epoch, as a 64-bit double encoded with two floats
@@ -50,18 +50,18 @@ layout (location=13) in vec4 a_vtimes5;
 out vec4 v_col;
 
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif // velocityBufferFlag
 
 float idx(vec4[N_VECS] v, int i) {

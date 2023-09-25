@@ -57,8 +57,8 @@ int sampleCount = 4;
 #define RAY_STEP M_TO_U * 0.1
 #define DIST_BIAS M_TO_U * 0.005
 
-#include shader/lib_logdepthbuff.glsl
-#include shader/lib_pack.glsl
+#include <shader/lib/logdepthbuff.glsl>
+#include <shader/lib/pack.glsl>
 
 #define getViewDepth(uv) 1.0 / recoverWValue(texture(u_texture1, uv).r, u_zfark.x, u_zfark.y)
 #define getNDCDepth(uv) texture(u_texture1, uv).r

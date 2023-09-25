@@ -38,16 +38,16 @@ uniform sampler2D u_svtIndirectionDiffuseTexture;
 // AMBIENT LIGHT
 in vec3 v_ambientLight;
 
-#include shader/lib_luma.glsl
+#include <shader/lib/luma.glsl>
 
 // CLOUD TEXTURE
 #if defined(svtIndirectionDiffuseTextureFlag)
-#include shader/lib_svt.glsl
+#include <shader/lib/svt.glsl>
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord));
 }
 #elif defined(diffuseCubemapFlag)
-#include shader/lib_cubemap.glsl
+#include <shader/lib/cubemap.glsl>
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_diffuseCubemap, UVtoXYZ(texCoord));
 }
@@ -65,7 +65,7 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
 uniform float u_eclipsingBodyRadius;
 uniform vec3 u_eclipsingBodyPos;
 
-#include shader/lib_math.glsl
+#include <shader/lib/math.glsl>
 #endif // eclipsingBodyFlag
 
 
@@ -94,14 +94,14 @@ in vec3 v_fragPosWorld;
 
 layout (location = 0) out vec4 fragColor;
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.frag.glsl
+#include <shader/lib/velbuffer.frag.glsl>
 #endif
 
 void main() {

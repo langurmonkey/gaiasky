@@ -170,7 +170,7 @@ float fy(float t, float a) {
     return a * t * sin(t);
 }
 
-#include shader/lib_luma.glsl
+#include <shader/lib/luma.glsl>
 
 #define N_SAMPLES 6
 void main(void) {

@@ -112,14 +112,14 @@ out vec3 v_shadowMapUv;
 
 // GEOMETRY (QUATERNIONS)
 #if defined(velocityBufferFlag) || defined(relativisticEffects)
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-    #include shader/lib_relativity.glsl
+    #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 
@@ -127,7 +127,7 @@ out vec3 v_shadowMapUv;
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+    #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 // Uniforms which are always available
@@ -258,7 +258,7 @@ out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif
 
 void main() {

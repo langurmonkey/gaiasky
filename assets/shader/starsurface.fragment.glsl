@@ -23,7 +23,7 @@ in float v_opacity;
 // View vector
 in vec3 v_viewVec;
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 layout (location = 0) out vec4 fragColor;
 
@@ -140,11 +140,11 @@ float noise(vec3 position, int octaves, float frequency, float persistence) {
 }
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.frag.glsl
+#include <shader/lib/velbuffer.frag.glsl>
 #endif
 
 void main() {

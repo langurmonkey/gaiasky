@@ -2,7 +2,7 @@
 
 #define exposure 0.2
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 uniform vec3 v3LightPos;
 uniform float g;
@@ -26,7 +26,7 @@ layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 velMap;
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 float luma(vec3 color) {

@@ -9,7 +9,7 @@ in float o_opacity;
 
 layout (location = 0) out vec4 fragColor;
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 void main() {
     fragColor = vec4(0.0, 0.0, 0.0, 1.0);

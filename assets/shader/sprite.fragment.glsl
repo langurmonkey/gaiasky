@@ -1,6 +1,6 @@
 #version 330 core
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 uniform sampler2D u_texture0;
 uniform float u_zfar;
@@ -14,7 +14,7 @@ layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 velMap;
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 vec4 draw() {

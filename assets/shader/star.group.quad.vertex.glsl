@@ -1,8 +1,8 @@
 #version 330 core
 
-#include shader/lib_math.glsl
-#include shader/lib_geometry.glsl
-#include shader/lib_doublefloat.glsl
+#include <shader/lib/math.glsl>
+#include <shader/lib/geometry.glsl>
+#include <shader/lib/doublefloat.glsl>
 
 // UNIFORMS
 // time in julian days since epoch, as a 64-bit double encoded with two floats
@@ -38,18 +38,18 @@ out vec4 v_col;
 out vec2 v_uv;
 
 #ifdef relativisticEffects
-    #include shader/lib_relativity.glsl
+    #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+    #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif // velocityBufferFlag
 
 void main() {
@@ -102,7 +102,7 @@ void main() {
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = quadSize;
-    #include shader/snip_billboard.glsl
+    #include <shader/snip_billboard.glsl>
 
     gl_Position = gpos;
     v_uv = a_texCoord0;

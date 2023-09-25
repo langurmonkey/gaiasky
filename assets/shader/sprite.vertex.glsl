@@ -1,6 +1,6 @@
 #version 330
 
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 
 in vec4 a_position;
 in vec2 a_texCoord0;
@@ -13,11 +13,11 @@ uniform vec3 u_camUp;
 uniform vec3 u_camShift;
 
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif// relativisticEffects
 
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
 // OUTPUTS
@@ -44,7 +44,7 @@ void main()
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = u_size;
-    #include shader/snip_billboard.glsl
+    #include <shader/snip_billboard.glsl>
 
     gl_Position = gpos;
 }

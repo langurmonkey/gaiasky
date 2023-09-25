@@ -15,14 +15,14 @@ out VS_OUT {
     float coord;
 } vs_out;
 
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif// relativisticEffects
 
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
 void main() {

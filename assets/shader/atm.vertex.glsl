@@ -5,14 +5,14 @@ uniform mat4 u_worldTrans;
 
 in vec3 a_position;
 
-#include shader/lib_atmscattering.glsl
+#include <shader/lib/atmscattering.glsl>
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-#include shader/lib_geometry.glsl
-#include shader/lib_relativity.glsl
+#include <shader/lib/geometry.glsl>
+#include <shader/lib/relativity.glsl>
 #endif// relativisticEffects
 
 
@@ -20,7 +20,7 @@ in vec3 a_position;
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
 #ifdef eclipsingBodyFlag
@@ -29,7 +29,7 @@ uniform float u_eclipsingBodyRadius;
 
 out float v_eclipseFactor;
 
-#include shader/lib_math.glsl
+#include <shader/lib/math.glsl>
 #endif// eclipsingBodyFlag
 
 void main(void) {

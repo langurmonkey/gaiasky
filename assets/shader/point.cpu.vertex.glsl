@@ -9,12 +9,12 @@ in float a_size;
 out vec4 v_col;
 
 #ifdef relativisticEffects
-    #include shader/lib_geometry.glsl
-    #include shader/lib_relativity.glsl
+    #include <shader/lib/geometry.glsl>
+    #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+    #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 void main() {

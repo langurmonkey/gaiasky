@@ -5,7 +5,7 @@ in vec4 v_col;
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 void main() {

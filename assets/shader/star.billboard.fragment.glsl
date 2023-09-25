@@ -1,6 +1,6 @@
 #version 330 core
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 uniform sampler2D u_texture0;
 uniform float u_radius;
@@ -31,11 +31,11 @@ layout (location = 0) out vec4 fragColor;
 #define light_decay 0.05
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.frag.glsl
+#include <shader/lib/velbuffer.frag.glsl>
 #endif
 
 float core(float distance_center, float inner_rad){

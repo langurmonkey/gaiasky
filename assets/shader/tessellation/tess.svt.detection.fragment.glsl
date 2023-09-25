@@ -18,8 +18,8 @@ layout (location = 0) out vec4 fragColor;
 // The reduction factor of the frame buffer of this pass has an impact on the determined mipmap level.
 float svtDetectionScaleFactor = -log2(u_svtDetectionFactor);
 
-#include shader/lib_logdepthbuff.glsl
-#include shader/lib_mipmap.glsl
+#include <shader/lib/logdepthbuff.glsl>
+#include <shader/lib/mipmap.glsl>
 
 void main() {
     // Aspect ratio of virtual texture.

@@ -14,7 +14,17 @@ import java.util.Scanner;
 
 public class ShaderTemplatingLoader {
 
+    private static final String GLSL_EXTENSION = "(glsl|glslv|glslf|vs|fs|gs|vert|frag|vsh|fsh)";
+    private static final String FILE_REFERENCE_REGEXP = "[^<>]+\\." + GLSL_EXTENSION;
+    private static final String FILE_REFERENCE_BRACKET_REGEXP = "<" + FILE_REFERENCE_REGEXP + ">";
+    private static final String INCLUDE_STATEMENT_REGEXP = "^\\s*#include\\s+(" + FILE_REFERENCE_REGEXP + "|" + FILE_REFERENCE_BRACKET_REGEXP + ")\\s*$";
+
     public static String load(String file) {
+        if (file.matches(FILE_REFERENCE_BRACKET_REGEXP)) {
+            // Strip brackets.
+            file = file.replace("<", "").replace(">", "");
+        }
+
         FileHandle fh = Gdx.files.internal(file);
         return load(fh);
     }
@@ -33,10 +43,10 @@ public class ShaderTemplatingLoader {
         Scanner scanner = new Scanner(in);
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if (line.matches("\\s*#include\\s+\\S+\\.glsl\\s*")) {
-                // Load file and include
+            if (line.matches(INCLUDE_STATEMENT_REGEXP)) {
+                // Load file and include.
                 String inc = line.substring(line.indexOf("#include") + 9);
-                String incSource = ShaderTemplatingLoader.load(inc);
+                String incSource = ShaderTemplatingLoader.load(inc.strip());
                 stringBuilder.append(incSource);
                 stringBuilder.append('\n');
             } else if (!line.isEmpty() && !line.startsWith("//")) {

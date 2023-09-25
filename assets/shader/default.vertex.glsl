@@ -114,23 +114,23 @@ out vec3 v_ambientLight;
 
 #endif // lightingFlag
 
-#include shader/lib_atmscattering.glsl
+#include <shader/lib/atmscattering.glsl>
 
 // GEOMETRY (QUATERNIONS)
 #if defined(velocityBufferFlag) || defined(relativisticEffects)
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 #endif
 
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif // velocityBufferFlag
 
 void main() {

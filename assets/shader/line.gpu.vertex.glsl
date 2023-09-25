@@ -15,18 +15,18 @@ out vec4 v_col;
 out float v_coord;
 out vec2 v_lineCenter;
 
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif// relativisticEffects
 
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif
 
 void main() {

@@ -50,7 +50,7 @@ uniform vec4 u_emissiveColor;
 
 #ifdef emissiveTextureFlag
 uniform sampler2D u_emissiveTexture;
-#include shader/lib_luma.glsl
+#include <shader/lib/luma.glsl>
 #endif
 
 #ifdef emissiveCubemapFlag
@@ -123,7 +123,7 @@ uniform int u_eclipseOutlines;
 uniform float u_eclipsingBodyRadius;
 uniform vec3 u_eclipsingBodyPos;
 
-#include shader/lib_math.glsl
+#include <shader/lib/math.glsl>
 
 #define UMBRA0 0.04
 #define UMBRA1 0.035
@@ -183,7 +183,7 @@ float getShadow(vec3 shadowMapUv) {
 ////// CUBEMAPS
 //////////////////////////////////////////////////////
 #ifdef cubemapFlag
-    #include shader/lib_cubemap.glsl
+    #include <shader/lib/cubemap.glsl>
 #endif // cubemapFlag
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ float getShadow(vec3 shadowMapUv) {
 ////// SVT
 //////////////////////////////////////////////////////
 #ifdef svtFlag
-#include shader/lib_svt.glsl
+#include <shader/lib/svt.glsl>
 #endif // svtFlag
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
@@ -333,13 +333,13 @@ in vec3 o_normalTan;
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
-#include shader/lib_atmfog.glsl
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/atmfog.glsl>
+#include <shader/lib/logdepthbuff.glsl>
 
 // http://www.thetenthplanet.de/archives/1180
 mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
@@ -361,11 +361,11 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 }
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.frag.glsl
+#include <shader/lib/velbuffer.frag.glsl>
 #endif // velocityBufferFlag
 
 #ifdef ssrFlag
-#include shader/lib_pack.glsl
+#include <shader/lib/pack.glsl>
 #endif // ssrFlag
 
 // MAIN

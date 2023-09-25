@@ -5,8 +5,8 @@
 // Modified by Sagrista, Toni
 #version 330 core
 
-#include shader/lib_luma.glsl
-#include shader/lib_normal.glsl
+#include <shader/lib/luma.glsl>
+#include <shader/lib/normal.glsl>
 
 uniform sampler2D u_texture0;
 // The inverse of the viewport dimensions along X and Y

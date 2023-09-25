@@ -14,7 +14,7 @@ uniform float u_ts;
 uniform float u_elevationMultiplier = 1.0;
 
 // Depth
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 

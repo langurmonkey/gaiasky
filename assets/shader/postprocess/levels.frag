@@ -21,8 +21,8 @@ uniform float u_exposure = 2.5;
 #ifdef toneMappingAuto
 uniform float u_avgLuma, u_maxLuma;
 
-#include shader/lib_luma.glsl
-#include shader/lib_math.glsl
+#include <shader/lib/luma.glsl>
+#include <shader/lib/math.glsl>
 
 // Reinhard tone mapping using average and maximum luminosity of previous frame
 vec3 reinhardToneMapping(vec3 pixelColor, float scale){

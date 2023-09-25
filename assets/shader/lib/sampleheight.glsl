@@ -1,7 +1,7 @@
 #ifndef GLSL_LIB_SAMPLEHEIGHT
 #define GLSL_LIB_SAMPLEHEIGHT
 
-#include shader/lib_noise.glsl
+#include <shader/lib/noise.glsl>
 vec4 sampleHeight(sampler2D tex, vec2 tc){
     if (u_heightSize.x < 0.0){
         // Use perlin noise

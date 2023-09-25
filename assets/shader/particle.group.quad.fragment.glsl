@@ -1,6 +1,6 @@
 #version 330 core
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 // UNIFORMS
 uniform float u_falloff;
@@ -19,11 +19,11 @@ layout (location = 0) out vec4 fragColor;
 #define PI 3.1415927
 
 #ifdef ssrFlag
-#include shader/lib_ssr.frag.glsl
+#include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.frag.glsl
+#include <shader/lib/velbuffer.frag.glsl>
 #endif // velocityBufferFlag
 
 vec4 programmatic(float dist) {

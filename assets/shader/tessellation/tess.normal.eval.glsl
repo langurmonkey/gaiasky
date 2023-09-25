@@ -6,7 +6,7 @@ layout (triangles) in;
 
 // GEOMETRY (QUATERNIONS)
 #if defined(velocityBufferFlag) || defined(relativisticEffects)
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 #endif
 
 #ifdef normalTextureFlag
@@ -38,11 +38,11 @@ uniform sampler2D u_svtCacheTexture;
 #endif
 
 #ifdef cubemapFlag
-    #include shader/lib_cubemap.glsl
+    #include <shader/lib/cubemap.glsl>
 #endif // cubemapFlag
 
 #ifdef svtFlag
-    #include shader/lib_svt.glsl
+    #include <shader/lib/svt.glsl>
 #endif // svtFlag
 
 // COLOR NORMAL
@@ -69,14 +69,14 @@ uniform sampler2D u_svtCacheTexture;
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif// relativisticEffects
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
 uniform mat4 u_projViewTrans;
@@ -134,7 +134,7 @@ out vec3 o_fragPosition;
 out float o_fragHeight;
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif
 
 #if defined(normalCubemapFlag) || defined(normalTextureFlag) || defined(svtIndirectionNormalTextureFlag)

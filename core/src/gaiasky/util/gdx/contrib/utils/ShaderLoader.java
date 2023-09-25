@@ -32,14 +32,14 @@ public final class ShaderLoader {
 
     public static ShaderProgram fromFile(String vertexFileName, String fragmentFileName, String defines) {
         String log = "\"" + vertexFileName + " / " + fragmentFileName + "\"";
-        if (defines.length() > 0) {
+        if (!defines.isEmpty()) {
             log += " w/ (" + defines.replace("\n", ", ") + ")";
         }
         log += "...";
         logger.debug("Compiling " + log);
 
-        String vpSrc = loadShaderCode(vertexFileName, "vert", "vertex", "vert.glsl", "glsl");
-        String fpSrc = loadShaderCode(fragmentFileName, "frag", "fragment", "frag.glsl", "glsl");
+        String vpSrc = loadShaderCode(vertexFileName, "vert", "vertex", "vert.glsl", "glsl", "vsh", "glslv");
+        String fpSrc = loadShaderCode(fragmentFileName, "frag", "fragment", "frag.glsl", "glsl", "fsh", "glslf");
 
         // Resolve includes
         vpSrc = ShaderTemplatingLoader.resolveIncludes(vpSrc);

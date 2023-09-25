@@ -1,8 +1,8 @@
 #version 330 core
 
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 #ifdef extendedParticlesFlag
-#include shader/lib_doublefloat.glsl
+#include <shader/lib/doublefloat.glsl>
 #endif // extendedParticlesFlag
 
 // UNIFORMS
@@ -41,17 +41,17 @@ out vec2 v_uv;
 out float v_textureIndex;
 
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 #define DAY_TO_YEAR 1.0 / 365.25
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif // velocityBufferFlag
 
 void main() {
@@ -94,7 +94,7 @@ void main() {
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = particleSize;
-    #include shader/snip_billboard.glsl
+    #include <shader/snip_billboard.glsl>
 
     gl_Position = gpos * u_vrScale;
 

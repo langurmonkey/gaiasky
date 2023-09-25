@@ -109,18 +109,18 @@ uniform float u_shadowPCFOffset;
 uniform mat4 u_shadowMapProjViewTrans;
 #endif //shadowMapFlag
 
-#include shader/lib_atmscattering.glsl
+#include <shader/lib/atmscattering.glsl>
 
 // GEOMETRY (QUATERNIONS)
 #if defined(velocityBufferFlag) || defined(relativisticEffects)
-    #include shader/lib_geometry.glsl
+    #include <shader/lib/geometry.glsl>
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-    #include shader/lib_relativity.glsl
+    #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 
@@ -128,7 +128,7 @@ uniform mat4 u_shadowMapProjViewTrans;
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+    #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 #ifdef blendedFlag
@@ -250,7 +250,7 @@ struct VertexData {
 out VertexData v_data;
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif
 
 void main() {

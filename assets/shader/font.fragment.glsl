@@ -1,6 +1,6 @@
 #version 330 core
 
-#include shader/lib_logdepthbuff.glsl
+#include <shader/lib/logdepthbuff.glsl>
 
 uniform sampler2D u_texture;
 uniform float u_scale;

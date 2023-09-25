@@ -1,6 +1,6 @@
 #version 330 core
 
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 
 in vec4 a_position;
 in vec4 a_color;
@@ -18,16 +18,16 @@ uniform float u_t; // time in seconds
 uniform float u_ttl; // time to live in seconds
 
 #ifdef relativisticEffects
-    #include shader/lib_relativity.glsl
+    #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+    #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 out vec4 v_col;
 
-#include shader/lib_math.glsl
+#include <shader/lib/math.glsl>
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;

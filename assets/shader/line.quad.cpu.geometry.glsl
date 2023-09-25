@@ -16,8 +16,8 @@ out vec2 v_uv;
 out float v_w;
 
 #ifdef velocityBufferFlag
-#include shader/lib_geometry.glsl
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/geometry.glsl>
+#include <shader/lib/velbuffer.vert.glsl>
 #endif
 
 void main() {

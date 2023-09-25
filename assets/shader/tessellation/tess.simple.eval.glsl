@@ -11,7 +11,7 @@ uniform samplerCube u_heightCubemap;
 #endif
 
 #ifdef cubemapFlag
-#include shader/lib_cubemap.glsl
+#include <shader/lib/cubemap.glsl>
 #endif // cubemapFlag
 
 // HEIGHT
@@ -27,8 +27,8 @@ uniform samplerCube u_heightCubemap;
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-#include shader/lib_geometry.glsl
-#include shader/lib_relativity.glsl
+#include <shader/lib/geometry.glsl>
+#include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 
@@ -36,7 +36,7 @@ uniform samplerCube u_heightCubemap;
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 // UNIFORMS

@@ -12,19 +12,19 @@ uniform mat4 u_projViewTrans;
 uniform float u_vrScale;
 
 #if defined(velocityBufferFlag) || defined(relativisticEffects)
-#include shader/lib_geometry.glsl
+#include <shader/lib/geometry.glsl>
 #endif
 
 #ifdef relativisticEffects
-#include shader/lib_relativity.glsl
+#include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
+#include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 #ifdef velocityBufferFlag
-#include shader/lib_velbuffer.vert.glsl
+#include <shader/lib/velbuffer.vert.glsl>
 #endif // velocityBufferFlag
 
 void main() {
