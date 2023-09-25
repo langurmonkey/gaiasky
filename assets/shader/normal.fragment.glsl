@@ -111,6 +111,18 @@ uniform samplerCube u_reflectionCubemap;
 
 #ifdef iridescenceFlag
 #include <shader/lib/iridescence.glsl>
+uniform float u_iridescenceFactor;
+uniform float u_iridescenceIOR;
+uniform float u_iridescenceThicknessMin;
+uniform float u_iridescenceThicknessMax;
+#endif
+
+#ifdef iridescenceTextureFlag
+uniform sampler2D u_iridescenceSampler;
+#endif
+
+#ifdef iridescenceThicknessTextureFlag
+uniform sampler2D u_iridescenceThicknessSampler;
 #endif
 
 #ifdef svtCacheTextureFlag
@@ -511,6 +523,8 @@ void main() {
         ambientOcclusion = 1.0;
     }
     #endif// occlusionMetallicRoughnessTextureFlag
+
+    // Occlusion strength is 1 by default.
     diffuse.rgb *= ambientOcclusion;
     specular.rgb *= ambientOcclusion;
 

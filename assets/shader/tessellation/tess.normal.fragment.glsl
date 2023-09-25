@@ -384,6 +384,14 @@ void main() {
     #endif
 
     float ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
+    #if defined(occlusionMetallicRoughnessTextureFlag)
+    // Sometimes ambient occlusion is not used, and it is set to 0.
+    if (ambientOcclusion == 0.0) {
+        ambientOcclusion = 1.0;
+    }
+    #endif// occlusionMetallicRoughnessTextureFlag
+
+    // Occlusion strength is 1 by default.
     diffuse.rgb *= ambientOcclusion;
     specular.rgb *= ambientOcclusion;
 
