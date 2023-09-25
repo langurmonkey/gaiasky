@@ -19,6 +19,7 @@ import gaiasky.util.gdx.model.gltf.loaders.exceptions.GLTFIllegalException;
 import gaiasky.util.gdx.model.gltf.loaders.shared.GLTFTypes;
 import gaiasky.util.gdx.model.gltf.loaders.shared.texture.TextureResolver;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRFloatAttribute;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRIridescenceAttribute;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRTextureAttribute;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRVolumeAttribute;
 import gaiasky.util.gdx.shader.Material;
@@ -177,13 +178,13 @@ public class PBRMaterialLoader extends MaterialLoaderBase {
                 KHRMaterialsIridescence ext = glMaterial.extensions.get(KHRMaterialsIridescence.class, KHRMaterialsIridescence.EXT);
                 if (ext != null) {
                     // TODO Activate
-                    //material.set(new PBRIridescenceAttribute(ext.iridescenceFactor, ext.iridescenceIor, ext.iridescenceThicknessMinimum, ext.iridescenceThicknessMaximum));
-                    //if (ext.iridescenceTexture != null) {
-                    //    material.set(getTextureMapPBR(PBRTextureAttribute.IridescenceTexture, ext.iridescenceTexture));
-                    //}
-                    //if (ext.iridescenceThicknessTexture != null) {
-                    //    material.set(getTextureMapPBR(PBRTextureAttribute.IridescenceThicknessTexture, ext.iridescenceThicknessTexture));
-                    //}
+                    material.set(new PBRIridescenceAttribute(ext.iridescenceFactor, ext.iridescenceIor, ext.iridescenceThicknessMinimum, ext.iridescenceThicknessMaximum));
+                    if (ext.iridescenceTexture != null) {
+                        material.set(getTextureMapPBR(PBRTextureAttribute.IridescenceTexture, ext.iridescenceTexture));
+                    }
+                    if (ext.iridescenceThicknessTexture != null) {
+                        material.set(getTextureMapPBR(PBRTextureAttribute.IridescenceThicknessTexture, ext.iridescenceThicknessTexture));
+                    }
                 }
             }
             {

@@ -26,6 +26,10 @@ import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRFloatAttribute;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRIridescenceAttribute;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRTextureAttribute;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRVolumeAttribute;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
@@ -61,7 +65,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_worldTrans;
     public final int u_normalMatrix;
     public final int u_bones;
-    // Material uniforms
+    // Material uniforms,
     public final int u_aoTexture;
     public final int u_opacity;
     public final int u_diffuseColor;
@@ -84,6 +88,19 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_heightSize;
     public final int u_tessQuality;
     public final int u_alphaTest;
+    public int u_ior;
+    // Iridescence.
+    public int u_iridescenceFactor;
+    public int u_iridescenceIOR;
+    public int u_iridescenceThicknessMin;
+    public int u_iridescenceThicknessMax;
+    public int u_iridescenceTexture;
+    public int u_iridescenceThicknessTexture;
+    // Volume
+    public int u_thicknessTexture;
+    public int u_thicknessFactor;
+    public int u_volumeDistance;
+    public int u_volumeColor;
     // Cubemaps.
     protected final int u_reflectionCubemap;
     protected final int u_diffuseCubemap;
@@ -278,6 +295,22 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtTileSize = register(Inputs.svtTileSize, Setters.svtTileSize);
         u_svtResolution = register(Inputs.svtResolution, Setters.svtResolution);
         u_svtDepth = register(Inputs.svtDepth, Setters.svtDepth);
+
+
+        // Iridescence
+        u_iridescenceFactor = register(Inputs.iridescenceFactorUniform, Setters.iridescenceFactorSetter);
+        u_iridescenceIOR = register(Inputs.iridescenceIORUniform, Setters.iridescenceIORSetter);
+        u_iridescenceThicknessMin = register(Inputs.iridescenceThicknessMinUniform, Setters.iridescenceThicknessMinSetter);
+        u_iridescenceThicknessMax = register(Inputs.iridescenceThicknessMaxUniform, Setters.iridescenceThicknessMaxSetter);
+        u_iridescenceTexture = register(Inputs.iridescenceTextureUniform, Setters.iridescenceTextureSetter);
+        u_iridescenceThicknessTexture = register(Inputs.iridescenceThicknessTextureUniform, Setters.iridescenceThicknessTextureSetter);
+        // Volume, IOR
+        u_ior = register(Inputs.iorUniform, Setters.iorSetter);
+        u_thicknessFactor = register(Inputs.thicknessFactorUniform, Setters.thicknessFactorSetter);
+        u_volumeDistance = register(Inputs.volumeDistanceUniform, Setters.volumeDistanceSetter);
+        u_volumeColor = register(Inputs.volumeColorUniform, Setters.volumeColorSetter);
+        u_thicknessTexture = register(Inputs.thicknessTextureUniform, Setters.thicknessTextureSetter);
+
         u_svtId = register(Inputs.svtId, Setters.svtId);
         u_svtDetectionFactor = register(Inputs.svtDetectionFactor, Setters.svtDetectionFactor);
         u_svtBufferTexture = register(Inputs.svtCacheTexture, Setters.svtBufferTexture);
@@ -440,6 +473,27 @@ public class DefaultIntShader extends BaseIntShader {
                 prefix.append("#define " + CubemapAttribute.ReflectionCubemapAlias + "Flag\n");
             }
         }
+        // Material Iridescence
+        if(attributes.has(PBRIridescenceAttribute.Type)){
+            prefix.append("#define iridescenceFlag\n");
+        }
+        if(attributes.has(PBRTextureAttribute.IridescenceTexture)){
+            prefix.append("#define iridescenceTextureFlag\n");
+        }
+        if(attributes.has(PBRTextureAttribute.IridescenceThicknessTexture)){
+            prefix.append("#define iridescenceThicknessTextureFlag\n");
+        }
+        // Volume, IOR
+        if(attributes.has(PBRVolumeAttribute.Type)){
+            prefix.append("#define volumeFlag\n");
+        }
+        if(attributes.has(PBRTextureAttribute.ThicknessTexture)){
+            prefix.append("#define thicknessTextureFlag\n");
+        }
+        if(attributes.has(PBRFloatAttribute.IOR)){
+            prefix.append("#define iorFlag\n");
+        }
+
         if (Settings.settings.postprocess.ssr.active) {
             prefix.append("#define ssrFlag\n");
         }
@@ -843,6 +897,21 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform heightCubemap = new Uniform("u_heightCubemap");
         public final static Uniform metallicCubemap = new Uniform("u_metallicCubemap");
         public final static Uniform roughnessCubemap = new Uniform("u_roughnessCubemap");
+
+
+        public final static Uniform iridescenceFactorUniform = new Uniform("u_iridescenceFactor");
+        public final static Uniform iridescenceIORUniform = new Uniform("u_iridescenceIOR");
+        public final static Uniform iridescenceThicknessMinUniform = new Uniform("u_iridescenceThicknessMin");
+        public final static Uniform iridescenceThicknessMaxUniform = new Uniform("u_iridescenceThicknessMax");
+        public final static Uniform iridescenceTextureUniform = new Uniform("u_iridescenceSampler", PBRTextureAttribute.IridescenceTexture);
+        public final static Uniform iridescenceThicknessTextureUniform = new Uniform("u_iridescenceThicknessSampler", PBRTextureAttribute.IridescenceThicknessTexture);
+
+        public final static Uniform iorUniform = new Uniform("u_ior");
+        public final static Uniform thicknessFactorUniform = new Uniform("u_thicknessFactor");
+        public final static Uniform volumeDistanceUniform = new Uniform("u_attenuationDistance");
+        public final static Uniform volumeColorUniform = new Uniform("u_attenuationColor");
+        public final static Uniform thicknessTextureUniform = new Uniform("u_thicknessSampler", PBRTextureAttribute.ThicknessTexture);
+
         public final static Uniform svtTileSize = new Uniform("u_svtTileSize", FloatAttribute.SvtTileSize);
         public final static Uniform svtResolution = new Uniform("u_svtResolution", Vector2Attribute.SvtResolution);
         public final static Uniform svtDepth = new Uniform("u_svtDepth", FloatAttribute.SvtDepth);
@@ -1318,6 +1387,87 @@ public class DefaultIntShader extends BaseIntShader {
                 }
             }
         };
+        public final static Setter iridescenceFactorSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
+                shader.set(inputID, a.factor);
+            }
+        };
+        public final static Setter iridescenceIORSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
+                shader.set(inputID, a.ior);
+            }
+        };
+        public final static Setter iridescenceThicknessMinSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
+                shader.set(inputID, a.thicknessMin);
+            }
+        };
+        public final static Setter iridescenceThicknessMaxSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
+                shader.set(inputID, a.thicknessMax);
+            }
+        };
+        public final static Setter iridescenceTextureSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+                        .get(PBRTextureAttribute.IridescenceTexture))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter iridescenceThicknessTextureSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+                        .get(PBRTextureAttribute.IridescenceThicknessTexture))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter iorSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRFloatAttribute a = combinedAttributes.get(PBRFloatAttribute.class, PBRFloatAttribute.IOR);
+                shader.set(inputID, a.value);
+            }
+        };
+        public final static Setter thicknessFactorSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRVolumeAttribute a = combinedAttributes.get(PBRVolumeAttribute.class, PBRVolumeAttribute.Type);
+                shader.set(inputID, a.thicknessFactor);
+            }
+        };
+        public final static Setter volumeDistanceSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRVolumeAttribute a = combinedAttributes.get(PBRVolumeAttribute.class, PBRVolumeAttribute.Type);
+                shader.set(inputID, a.attenuationDistance);
+            }
+        };
+        public final static Setter volumeColorSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                PBRVolumeAttribute a = combinedAttributes.get(PBRVolumeAttribute.class, PBRVolumeAttribute.Type);
+                shader.set(inputID, a.attenuationColor.r, a.attenuationColor.g, a.attenuationColor.b);
+            }
+        };
+        public final static Setter thicknessTextureSetter = new LocalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute)(Objects.requireNonNull(combinedAttributes
+                        .get(PBRTextureAttribute.ThicknessTexture)))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+
         public final static Setter svtTileSize = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
