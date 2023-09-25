@@ -381,25 +381,6 @@ public interface IScriptingInterface {
     void setCameraFree();
 
     /**
-     * Sets the camera in FoV1 mode. The camera is positioned in Gaia's focal
-     * plane and observes what Gaia observes through its field of view 1.
-     */
-    void setCameraFov1();
-
-    /**
-     * Sets the camera in FoV2 mode. The camera is positioned in Gaia's focal
-     * plane and observes what Gaia observes through its field of view 2.
-     */
-    void setCameraFov2();
-
-    /**
-     * Sets the camera in Fov1 and 2 mode. The camera is positioned in Gaia's
-     * focal plane and observes what Gaia observes through its two fields of
-     * view.
-     */
-    void setCameraFov1and2();
-
-    /**
      * Sets the camera position to the given coordinates, in Km, equatorial
      * system.
      *

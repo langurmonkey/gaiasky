@@ -65,7 +65,7 @@ import static gaiasky.render.RenderGroup.*;
 public class SceneRenderer implements ISceneRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneRenderer.class);
     // Indexes
-    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENXR_IDX = 4;
+    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_CUBEMAP_IDX = 2, SGR_OPENXR_IDX = 3;
     // The OpenXR driver. This is null if we are not in VR.
     private final XrDriver xrDriver;
     private final GlobalResources globalResources;
@@ -113,7 +113,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     /**
      * Render groups with autonomous systems. These are systems that do not need renderables.
      */
-    private final RenderGroup[] autonomousGroups = new RenderGroup[] { PARTICLE_EFFECTS };
+    private final RenderGroup[] autonomousGroups = new RenderGroup[]{PARTICLE_EFFECTS};
 
     public SceneRenderer(final XrDriver xrDriver,
                          final GlobalResources globalResources) {
@@ -212,10 +212,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         /*
          * INITIALIZE SGRs
          */
-        sgrList = new IRenderMode[5];
+        sgrList = new IRenderMode[4];
         sgrList[SGR_DEFAULT_IDX] = new RenderModeMain();
         sgrList[SGR_STEREO_IDX] = new RenderModeStereoscopic(globalResources.getSpriteBatch());
-        sgrList[SGR_FOV_IDX] = new RenderModeFov();
         sgrList[SGR_CUBEMAP_IDX] = new RenderModeCubemapProjections();
         sgrList[SGR_OPENXR_IDX] = new RenderModeOpenXR(GaiaSky.instance.scene, xrDriver, globalResources.getExtSpriteBatch());
         renderMode = null;
@@ -224,7 +223,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         GL30.glClampColor(GL30.GL_CLAMP_READ_COLOR, GL30.GL_FALSE);
 
         EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD,
-                                        Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
+                Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
 
         // Set clear color, depth and stencil.
         Gdx.gl.glClearColor(0, 0, 0, 0);
@@ -235,182 +234,188 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private AbstractRenderSystem initializeRenderSystem(final RenderGroup rg) {
         AbstractRenderSystem system = null;
         switch (rg) {
-        case SKYBOX -> // SKYBOX - (MW panorama, CMWB)
-                system = new ModelRenderer(this, SKYBOX, alphas, renderAssets.mbSkybox);
-        case MODEL_BG -> // MODEL BACKGROUND - (MW panorama, CMWB)
-                system = new ModelRenderer(this, MODEL_BG, alphas, renderAssets.mbVertexDiffuse);
-        case POINT_STAR -> {
-            // SINGLE STAR POINTS
-            system = new SingleStarQuadRenderer(this, POINT_STAR, alphas, renderAssets.starGroupShaders, ComponentType.Stars);
-            system.addPreRunnables(additiveBlendR, noDepthTestR);
-        }
-        case MODEL_VERT_GRID -> {
-            // MODEL GRID - (Ecl, Eq, Gal grids)
-            system = new ModelRenderer(this, MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
-            system.addPostRunnables(clearDepthR);
-        }
-        case MODEL_VERT_RECGRID -> {
-            // RECURSIVE GRID
-            system = new ModelRenderer(this, MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
-            system.addPreRunnables(regularBlendR, depthTestR);
-        }
-        case FONT_ANNOTATION -> {
-            // ANNOTATIONS - (grids)
-            system = new TextRenderer(this, FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
-            system.addPreRunnables(regularBlendR, noDepthTestR);
-            system.addPostRunnables(clearDepthR);
-        }
-        case BILLBOARD_STAR -> {
-            // BILLBOARD STARS
-            system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders,
-                                           Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
-            system.addPreRunnables(additiveBlendR, noDepthTestR);
-            system.addPostRunnables(lightGlowPass.getLpu());
-        }
-        case BILLBOARD_GAL -> {
-            // BILLBOARD GALAXIES
-            system = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders,
-                                           Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", ComponentType.Galaxies, false);
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-        }
-        case BILLBOARD_SPRITE -> {
-            // BILLBOARD SPRITES
-            system = new BillboardRenderer(this, BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null, ComponentType.Clusters,
-                                           false);
-            system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
-        }
-        case LINE -> {
-            // LINES CPU
-            system = getLineCPURenderSystem();
-        }
-        case LINE_GPU -> {
-            // LINES GPU
-            system = getLineGPURenderSystem();
-        }
-        case POINT -> // POINTS CPU
-                system = new PointPrimitiveRenderSystem(this, POINT, alphas, renderAssets.pointShaders);
-        case POINT_GPU -> {
-            // POINTS GPU
-            system = new PrimitiveVertexRenderSystem<>(this, POINT_GPU, alphas, renderAssets.primitiveGpuShaders, false);
-            system.addPreRunnables(regularBlendR, depthTestR);
-        }
-        case MODEL_PIX_DUST -> // MODELS DUST AND MESH
-                system = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
-        case MODEL_VERT_ADDITIVE -> system = new ModelRenderer(this, MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
-        case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY
-                system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
-        case MODEL_VERT_EARLY -> // MODEL PER-VERTEX-LIGHTING EARLY
-                system = new ModelRenderer(this, MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
-        case MODEL_DIFFUSE -> // MODEL DIFFUSE
-                system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
-        case MODEL_PIX -> // MODEL PER-PIXEL-LIGHTING
-                system = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPixelLighting);
-        case MODEL_PIX_TESS -> {
-            // MODEL PER-PIXEL-LIGHTING-TESSELLATION
-            system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
-            system.addPreRunnables(regularBlendR, depthTestR);
-        }
-        case MODEL_VERT_BEAM -> // MODEL BEAM
-                system = new ModelRenderer(this, MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
-        case BILLBOARD_GROUP -> // BILLBOARD GROUP
-                system = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
-        case PARTICLE_GROUP -> {
-            final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
-            system = switch (pointCloudModeParticles) {
-                case TRIANGLES -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
-                case POINTS -> new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
-            };
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            system.addPostRunnables(regularBlendR, depthWritesR);
-        }
-        case PARTICLE_GROUP_EXT_BILLBOARD -> {
-            // PARTICLE GROUP (EXTENDED, billboards)
-            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_BILLBOARD, alphas, renderAssets.particleGroupExtBillboardShaders);
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            system.addPostRunnables(regularBlendR, depthWritesR);
-        }
-        case PARTICLE_GROUP_EXT_MODEL -> {
-            // PARTICLE GROUP (EXTENDED, models)
-            system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_MODEL, alphas, renderAssets.particleGroupExtModelShaders);
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            system.addPostRunnables(regularBlendR, depthWritesR);
-        }
-        case STAR_GROUP -> {
-            // STAR GROUP
-            final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
-            system = switch (pointCloudMode) {
-                case TRIANGLES -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
-                case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
-            };
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            system.addPostRunnables(regularBlendR, depthWritesR);
-        }
-        case VARIABLE_GROUP -> {
-            // VARIABLE GROUP
-            final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
-            system = switch (pointCloudMode) {
-                case TRIANGLES -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-                case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-            };
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            system.addPostRunnables(regularBlendR, depthWritesR);
-        }
-        case ORBITAL_ELEMENTS_PARTICLE -> {
-            // ORBITAL ELEMENTS PARTICLES
-            system = new ElementsRenderer(this, ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            system.addPostRunnables(regularBlendR, depthWritesR);
-        }
-        case ORBITAL_ELEMENTS_GROUP -> {
-            // ORBITAL ELEMENTS GROUP
-            system = new ElementsSetRenderer(this, ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
-            system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            system.addPostRunnables(regularBlendR, depthWritesR);
-
-        }
-        case MODEL_VERT_STAR -> // MODEL STARS
-                system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
-        case FONT_LABEL -> // LABELS
-                system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d,
-                                          renderAssets.font2d, renderAssets.fontTitles);
-        case BILLBOARD_SSO -> {
-            // BILLBOARD SSO
-            system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders,
-                                           Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", null, false);
-            system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
-        }
-        case MODEL_ATM -> // MODEL ATMOSPHERE
-                system = new ModelRenderer(this, MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
-                    @Override
-                    public float getAlpha(IRenderable s) {
-                        return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
-                    }
-
-                    @Override
-                    protected boolean mustRender() {
-                        return alphas[ComponentType.Atmospheres.ordinal()] * alphas[ComponentType.Planets.ordinal()] > 0;
-                    }
+            case SKYBOX -> // SKYBOX - (MW panorama, CMWB)
+                    system = new ModelRenderer(this, SKYBOX, alphas, renderAssets.mbSkybox);
+            case MODEL_BG -> // MODEL BACKGROUND - (MW panorama, CMWB)
+                    system = new ModelRenderer(this, MODEL_BG, alphas, renderAssets.mbVertexDiffuse);
+            case POINT_STAR -> {
+                // SINGLE STAR POINTS
+                system = new SingleStarQuadRenderer(this, POINT_STAR, alphas, renderAssets.starGroupShaders, ComponentType.Stars);
+                system.addPreRunnables(additiveBlendR, noDepthTestR);
+            }
+            case MODEL_VERT_GRID -> {
+                // MODEL GRID - (Ecl, Eq, Gal grids)
+                system = new ModelRenderer(this, MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
+                system.addPostRunnables(clearDepthR);
+            }
+            case MODEL_VERT_RECGRID -> {
+                // RECURSIVE GRID
+                system = new ModelRenderer(this, MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
+                system.addPreRunnables(regularBlendR, depthTestR);
+            }
+            case FONT_ANNOTATION -> {
+                // ANNOTATIONS - (grids)
+                system = new TextRenderer(this, FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
+                system.addPreRunnables(regularBlendR, noDepthTestR);
+                system.addPostRunnables(clearDepthR);
+            }
+            case BILLBOARD_STAR -> {
+                // BILLBOARD STARS
+                system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders,
+                        Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
+                system.addPreRunnables(additiveBlendR, noDepthTestR);
+                system.addPostRunnables(lightGlowPass.getLpu());
+            }
+            case BILLBOARD_GAL -> {
+                // BILLBOARD GALAXIES
+                system = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders,
+                        Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", ComponentType.Galaxies, false);
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+            }
+            case BILLBOARD_SPRITE -> {
+                // BILLBOARD SPRITES
+                system = new BillboardRenderer(this, BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null, ComponentType.Clusters,
+                        false);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
+            }
+            case LINE -> {
+                // LINES CPU
+                system = getLineCPURenderSystem();
+            }
+            case LINE_GPU -> {
+                // LINES GPU
+                system = getLineGPURenderSystem();
+            }
+            case POINT -> // POINTS CPU
+                    system = new PointPrimitiveRenderSystem(this, POINT, alphas, renderAssets.pointShaders);
+            case POINT_GPU -> {
+                // POINTS GPU
+                system = new PrimitiveVertexRenderSystem<>(this, POINT_GPU, alphas, renderAssets.primitiveGpuShaders, false);
+                system.addPreRunnables(regularBlendR, depthTestR);
+            }
+            case MODEL_PIX_DUST -> // MODELS DUST AND MESH
+                    system = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
+            case MODEL_VERT_ADDITIVE ->
+                    system = new ModelRenderer(this, MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
+            case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY
+                    system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
+            case MODEL_VERT_EARLY -> // MODEL PER-VERTEX-LIGHTING EARLY
+                    system = new ModelRenderer(this, MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
+            case MODEL_DIFFUSE -> // MODEL DIFFUSE
+                    system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
+            case MODEL_PIX -> // MODEL PER-PIXEL-LIGHTING
+                    system = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPixelLighting);
+            case MODEL_PIX_TESS -> {
+                // MODEL PER-PIXEL-LIGHTING-TESSELLATION
+                system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
+                system.addPreRunnables(regularBlendR, depthTestR);
+            }
+            case MODEL_VERT_BEAM -> // MODEL BEAM
+                    system = new ModelRenderer(this, MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
+            case BILLBOARD_GROUP -> // BILLBOARD GROUP
+                    system = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
+            case PARTICLE_GROUP -> {
+                final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
+                system = switch (pointCloudModeParticles) {
+                    case TRIANGLES ->
+                            new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+                    case POINTS ->
+                            new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
                 };
-        case MODEL_CLOUD -> // MODEL CLOUDS
-                system = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
-        case MODEL_PIX_TRANSPARENT -> // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
-                system = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPixelLighting);
-        case LINE_LATE -> {
-            // LINE LATE (TRANSPARENCIES)
-            system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineCpuShaders);
-            system.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
-        }
-        case PARTICLE_EFFECTS -> {
-            // PARTICLE EFFECTS
-            system = new ParticleEffectsRenderer(this, PARTICLE_EFFECTS, alphas, renderAssets.particleEffectShaders);
-            system.addPreRunnables(additiveBlendR, noDepthTestR);
-            system.addPostRunnables(regularBlendR);
-        }
-        case SHAPE -> {
-            // SHAPES
-            system = new ShapeRenderer(this, SHAPE, alphas, globalResources.getShapeShader());
-            system.addPreRunnables(regularBlendR, depthTestR);
-        }
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPostRunnables(regularBlendR, depthWritesR);
+            }
+            case PARTICLE_GROUP_EXT_BILLBOARD -> {
+                // PARTICLE GROUP (EXTENDED, billboards)
+                system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_BILLBOARD, alphas, renderAssets.particleGroupExtBillboardShaders);
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPostRunnables(regularBlendR, depthWritesR);
+            }
+            case PARTICLE_GROUP_EXT_MODEL -> {
+                // PARTICLE GROUP (EXTENDED, models)
+                system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_MODEL, alphas, renderAssets.particleGroupExtModelShaders);
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPostRunnables(regularBlendR, depthWritesR);
+            }
+            case STAR_GROUP -> {
+                // STAR GROUP
+                final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
+                system = switch (pointCloudMode) {
+                    case TRIANGLES ->
+                            new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
+                    case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
+                };
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPostRunnables(regularBlendR, depthWritesR);
+            }
+            case VARIABLE_GROUP -> {
+                // VARIABLE GROUP
+                final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
+                system = switch (pointCloudMode) {
+                    case TRIANGLES ->
+                            new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+                    case POINTS ->
+                            new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+                };
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPostRunnables(regularBlendR, depthWritesR);
+            }
+            case ORBITAL_ELEMENTS_PARTICLE -> {
+                // ORBITAL ELEMENTS PARTICLES
+                system = new ElementsRenderer(this, ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPostRunnables(regularBlendR, depthWritesR);
+            }
+            case ORBITAL_ELEMENTS_GROUP -> {
+                // ORBITAL ELEMENTS GROUP
+                system = new ElementsSetRenderer(this, ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
+                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPostRunnables(regularBlendR, depthWritesR);
+
+            }
+            case MODEL_VERT_STAR -> // MODEL STARS
+                    system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
+            case FONT_LABEL -> // LABELS
+                    system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d,
+                            renderAssets.font2d, renderAssets.fontTitles);
+            case BILLBOARD_SSO -> {
+                // BILLBOARD SSO
+                system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders,
+                        Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", null, false);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
+            }
+            case MODEL_ATM -> // MODEL ATMOSPHERE
+                    system = new ModelRenderer(this, MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
+                        @Override
+                        public float getAlpha(IRenderable s) {
+                            return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
+                        }
+
+                        @Override
+                        protected boolean mustRender() {
+                            return alphas[ComponentType.Atmospheres.ordinal()] * alphas[ComponentType.Planets.ordinal()] > 0;
+                        }
+                    };
+            case MODEL_CLOUD -> // MODEL CLOUDS
+                    system = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
+            case MODEL_PIX_TRANSPARENT -> // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
+                    system = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPixelLighting);
+            case LINE_LATE -> {
+                // LINE LATE (TRANSPARENCIES)
+                system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineCpuShaders);
+                system.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
+            }
+            case PARTICLE_EFFECTS -> {
+                // PARTICLE EFFECTS
+                system = new ParticleEffectsRenderer(this, PARTICLE_EFFECTS, alphas, renderAssets.particleEffectShaders);
+                system.addPreRunnables(additiveBlendR, noDepthTestR);
+                system.addPostRunnables(regularBlendR);
+            }
+            case SHAPE -> {
+                // SHAPES
+                system = new ShapeRenderer(this, SHAPE, alphas, globalResources.getShapeShader());
+                system.addPreRunnables(regularBlendR, depthTestR);
+            }
         }
 
         // Add system.
@@ -436,9 +441,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         if (Settings.settings.runtime.openXr) {
             // Using Steam OpenVR renderer
             renderMode = sgrList[SGR_OPENXR_IDX];
-        } else if (camera.getNCameras() > 1) {
-            // FOV mode
-            renderMode = sgrList[SGR_FOV_IDX];
         } else if (Settings.settings.program.modeStereo.active) {
             // Stereoscopic mode
             renderMode = sgrList[SGR_STEREO_IDX];
@@ -588,7 +590,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if a given component type is on
      *
      * @param comp The component
-     *
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -599,7 +600,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if the component types are all on
      *
      * @param comp The components
-     *
      * @return Whether the components are all on
      */
     public boolean allOn(ComponentTypes comp) {
@@ -623,7 +623,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * of all components
      *
      * @param comp The components
-     *
      * @return The alpha value
      */
     public float alpha(ComponentTypes comp) {
@@ -649,57 +648,54 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD -> {
-            ComponentType ct = ComponentType.getFromKey((String) data[0]);
-            if (ct != null) {
-                int idx = ct.ordinal();
-                if (data.length == 2) {
-                    // We have the boolean
-                    boolean currentVisibility = visible.get(ct.ordinal());
-                    boolean newVisibility = (boolean) data[1];
-                    if (currentVisibility != newVisibility) {
-                        // Only update if visibility different
-                        if (newVisibility)
-                            visible.set(ct.ordinal());
-                        else
-                            visible.clear(ct.ordinal());
+            case TOGGLE_VISIBILITY_CMD -> {
+                ComponentType ct = ComponentType.getFromKey((String) data[0]);
+                if (ct != null) {
+                    int idx = ct.ordinal();
+                    if (data.length == 2) {
+                        // We have the boolean
+                        boolean currentVisibility = visible.get(ct.ordinal());
+                        boolean newVisibility = (boolean) data[1];
+                        if (currentVisibility != newVisibility) {
+                            // Only update if visibility different
+                            if (newVisibility)
+                                visible.set(ct.ordinal());
+                            else
+                                visible.clear(ct.ordinal());
+                            times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
+                        }
+                    } else {
+                        // Only toggle
+                        visible.flip(ct.ordinal());
                         times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                     }
-                } else {
-                    // Only toggle
-                    visible.flip(ct.ordinal());
-                    times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                 }
             }
-        }
-        case LINE_RENDERER_UPDATE -> GaiaSky.postRunnable(this::updateLineRenderSystems);
-        case STEREOSCOPIC_CMD -> {
-            boolean stereo = (Boolean) data[0];
-            if (stereo)
-                renderMode = sgrList[SGR_STEREO_IDX];
-            else {
-                if (Settings.settings.runtime.openXr)
-                    renderMode = sgrList[SGR_OPENXR_IDX];
-                else
-                    renderMode = sgrList[SGR_DEFAULT_IDX];
+            case LINE_RENDERER_UPDATE -> GaiaSky.postRunnable(this::updateLineRenderSystems);
+            case STEREOSCOPIC_CMD -> {
+                boolean stereo = (Boolean) data[0];
+                if (stereo)
+                    renderMode = sgrList[SGR_STEREO_IDX];
+                else {
+                    if (Settings.settings.runtime.openXr)
+                        renderMode = sgrList[SGR_OPENXR_IDX];
+                    else
+                        renderMode = sgrList[SGR_DEFAULT_IDX];
+                }
             }
-        }
-        case CUBEMAP_CMD -> {
-            boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openXr;
-            if (cubemap) {
-                renderMode = sgrList[SGR_CUBEMAP_IDX];
-            } else {
-                if (Settings.settings.runtime.openXr)
-                    renderMode = sgrList[SGR_OPENXR_IDX];
-                else
-                    renderMode = sgrList[SGR_DEFAULT_IDX];
+            case CUBEMAP_CMD -> {
+                boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openXr;
+                if (cubemap) {
+                    renderMode = sgrList[SGR_CUBEMAP_IDX];
+                } else {
+                    if (Settings.settings.runtime.openXr)
+                        renderMode = sgrList[SGR_OPENXR_IDX];
+                    else
+                        renderMode = sgrList[SGR_DEFAULT_IDX];
+                }
             }
-        }
-        case CAMERA_MODE_CMD -> {
-            CameraMode cm = (CameraMode) data[0];
-            if (cm.isGaiaFov())
-                renderMode = sgrList[SGR_FOV_IDX];
-            else {
+            case CAMERA_MODE_CMD -> {
+                CameraMode cm = (CameraMode) data[0];
                 if (Settings.settings.runtime.openXr)
                     renderMode = sgrList[SGR_OPENXR_IDX];
                 else if (Settings.settings.program.modeStereo.active)
@@ -710,16 +706,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     renderMode = sgrList[SGR_DEFAULT_IDX];
 
             }
-        }
-        case REBUILD_SHADOW_MAP_DATA_CMD -> shadowMapPass.buildShadowMapData();
-        case LIGHT_GLOW_CMD -> {
-            boolean glow = (Boolean) data[0];
-            if (glow) {
-                lightGlowPass.buildLightGlowData();
+            case REBUILD_SHADOW_MAP_DATA_CMD -> shadowMapPass.buildShadowMapData();
+            case LIGHT_GLOW_CMD -> {
+                boolean glow = (Boolean) data[0];
+                if (glow) {
+                    lightGlowPass.buildLightGlowData();
+                }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
     }
 
@@ -728,7 +723,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      *
      * @param type The component type.
      * @param t    The current time in seconds.
-     *
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type,

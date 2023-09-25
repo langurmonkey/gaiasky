@@ -9,7 +9,6 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
@@ -22,8 +21,6 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.camera.CameraManager;
-import gaiasky.scene.camera.FovCamera;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
@@ -113,15 +110,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
-        // Update projection if fovMode is 3
-        triComponent.fovMode = camera.getMode().getGaiaFovMode();
-        if (triComponent.fovMode == 3) {
-            // Cam is Fov1 & Fov2
-            FovCamera cam = ((CameraManager) camera).fovCamera;
-            // Update combined
-            PerspectiveCamera[] cams = camera.getFrontCameras();
-            shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
-        }
     }
 
     protected void renderObject(ExtShaderProgram shaderProgram,

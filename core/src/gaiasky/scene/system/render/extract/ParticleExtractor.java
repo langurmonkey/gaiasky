@@ -12,7 +12,6 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.camera.FovCamera;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.view.FocusView;
@@ -53,13 +52,11 @@ public class ParticleExtractor extends AbstractExtractSystem {
     }
 
     private void addToRenderParticle(ICamera camera, Entity entity, Body body, Render render, RenderType renderType) {
-        if (!(camera.getCurrent() instanceof FovCamera)) {
-            addToRender(render, renderType.renderGroup);
+        addToRender(render, renderType.renderGroup);
 
-            boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
-            if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number && hasPm) {
-                addToRender(render, RenderGroup.LINE);
-            }
+        boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
+        if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number && hasPm) {
+            addToRender(render, RenderGroup.LINE);
         }
         if (renderText(body, Mapper.sa.get(entity), Mapper.extra.get(entity))) {
             addToRender(render, RenderGroup.FONT_LABEL);
@@ -69,24 +66,19 @@ public class ParticleExtractor extends AbstractExtractSystem {
     private void addToRenderStar(ICamera camera, Entity entity, Body body, Render render, RenderType renderType) {
         addToRender(render, RenderGroup.POINT_STAR);
 
-        if (camera.getCurrent() instanceof FovCamera) {
-            // Render as point, do nothing
+        if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point) {
             addToRender(render, RenderGroup.BILLBOARD_STAR);
-        } else {
-            if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point) {
-                addToRender(render, RenderGroup.BILLBOARD_STAR);
-                if (body.distToCamera < Mapper.distance.get(entity).distance * Mapper.modelScaffolding.get(entity).sizeScaleFactor) {
-                    camera.checkClosestBody(entity);
-                    addToRender(render, RenderGroup.MODEL_VERT_STAR);
-                }
-            }
-            boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
-            if (hasPm && body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number) {
-                addToRender(render, RenderGroup.LINE);
+            if (body.distToCamera < Mapper.distance.get(entity).distance * Mapper.modelScaffolding.get(entity).sizeScaleFactor) {
+                camera.checkClosestBody(entity);
+                addToRender(render, RenderGroup.MODEL_VERT_STAR);
             }
         }
+        boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
+        if (hasPm && body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number) {
+            addToRender(render, RenderGroup.LINE);
+        }
 
-        if ((renderText(body, Mapper.sa.get(entity), Mapper.extra.get(entity)) || camera.getCurrent() instanceof FovCamera)) {
+        if ((renderText(body, Mapper.sa.get(entity), Mapper.extra.get(entity)))) {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
 

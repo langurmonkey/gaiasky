@@ -1311,12 +1311,10 @@ public class Settings {
         public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
                 case STEREOSCOPIC_CMD -> {
-                    if (!GaiaSky.instance.cameraManager.mode.isGaiaFov()) {
-                        modeStereo.active = (boolean) (Boolean) data[0];
-                        if (modeStereo.active && modeCubemap.active) {
-                            modeStereo.active = false;
-                            EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
-                        }
+                    modeStereo.active = (boolean) (Boolean) data[0];
+                    if (modeStereo.active && modeCubemap.active) {
+                        modeStereo.active = false;
+                        EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                     }
                 }
                 case STEREO_PROFILE_CMD -> modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
@@ -1434,7 +1432,7 @@ public class Settings {
 
             public void setOrigin(final String originString) {
                 try {
-                origin = OriginType.valueOf(originString.toUpperCase());
+                    origin = OriginType.valueOf(originString.toUpperCase());
                 } catch (IllegalArgumentException e) {
                     // Default.
                     origin = OriginType.REFSYS;

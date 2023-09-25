@@ -208,28 +208,11 @@ public abstract class AbstractCamera implements ICamera {
 
     @Override
     public boolean isVisible(double viewAngle, Vector3d pos, double distToCamera) {
-        return (!(this instanceof FovCamera) && viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
+        return (viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
     }
 
     public boolean isVisible(double viewAngle, Vector3b pos, double distToCamera) {
-        return (!(this instanceof FovCamera) && viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
-    }
-
-    /**
-     * Returns true if a body with the given position is observed in any of the
-     * given directions using the given cone angle.
-     *
-     * @param cb      The body.
-     * @param fCamera The FovCamera.
-     *
-     * @return True if the body is observed. False otherwise.
-     */
-    protected boolean computeVisibleFovs(Entity cb, FovCamera fCamera) {
-        var body = Mapper.body.get(cb);
-        var graph = Mapper.graph.get(cb);
-        Vector3d[] dirs;
-        dirs = fCamera.directions;
-        return GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[0]) || GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[1]);
+        return (viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
     }
 
     public double getDistance() {

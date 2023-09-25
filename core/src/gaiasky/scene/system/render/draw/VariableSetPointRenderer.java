@@ -20,8 +20,6 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.camera.CameraManager;
-import gaiasky.scene.camera.FovCamera;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
@@ -116,7 +114,7 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size() > 0) {
+        if (!renderables.isEmpty()) {
             ExtShaderProgram shaderProgram = getShaderProgram();
             float starPointSize = StarSettings.getStarPointSize();
 
@@ -129,15 +127,6 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
             shaderProgram.setUniformf("u_brightnessPower", Settings.settings.scene.star.power);
             shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
             addEffectsUniforms(shaderProgram, camera);
-            // Update projection if fovMode is 3
-            int fovMode = camera.getMode().getGaiaFovMode();
-            if (fovMode == 3) {
-                // Cam is Fov1 & Fov2
-                FovCamera cam = ((CameraManager) camera).fovCamera;
-                // Update combined
-                PerspectiveCamera[] cams = camera.getFrontCameras();
-                shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
-            }
             alphaSizeBrRc[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
             alphaSizeBrRc[3] = rc.scaleFactor;
 
@@ -224,7 +213,7 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                             shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && hl.isHlAllVisible() ? opacityLimitsHl : opacityLimits, 0, 2);
 
                             alphaSizeBrRc[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
+                            alphaSizeBrRc[1] = ((Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
                             shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
                             // Fixed size

@@ -320,21 +320,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraFov1() {
-        postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.GAIA_FOV1_MODE));
-    }
-
-    @Override
-    public void setCameraFov2() {
-        postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.GAIA_FOV2_MODE));
-    }
-
-    @Override
-    public void setCameraFov1and2() {
-        postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.GAIA_FOVS_MODE));
-    }
-
-    @Override
     public void setCameraPostion(final double[] vec) {
         setCameraPosition(vec);
     }

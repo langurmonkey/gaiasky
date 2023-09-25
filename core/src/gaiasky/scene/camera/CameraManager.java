@@ -45,7 +45,6 @@ public class CameraManager implements ICamera, IObserver {
     public CameraMode mode;
     public ICamera current;
     public NaturalCamera naturalCamera;
-    public FovCamera fovCamera;
     public SpacecraftCamera spacecraftCamera;
     public RelativisticCamera relativisticCamera;
     private final FocusView focusView;
@@ -63,11 +62,11 @@ public class CameraManager implements ICamera, IObserver {
     public CameraManager(AssetManager manager, CameraMode mode, boolean vr, GlobalResources globalResources) {
         // Initialize Cameras
         this.naturalCamera = new NaturalCamera(manager, this, vr, globalResources.getSpriteShader(), globalResources.getShapeShader());
-        this.fovCamera = new FovCamera(manager, this, globalResources.getSpriteBatch());
         this.spacecraftCamera = new SpacecraftCamera(this);
+        // TODO - develop relativistic camera.
         this.relativisticCamera = new RelativisticCamera(manager, this);
 
-        this.cameras = new ICamera[]{naturalCamera, fovCamera, spacecraftCamera};
+        this.cameras = new ICamera[]{naturalCamera, spacecraftCamera};
         this.focusView = new FocusView();
 
         this.mode = mode;
@@ -163,11 +162,6 @@ public class CameraManager implements ICamera, IObserver {
                 aux = backupCam(current);
                 current = spacecraftCamera;
                 restoreCam(spacecraftCamera, aux);
-                break;
-            case GAIA_FOV1_MODE:
-            case GAIA_FOV2_MODE:
-            case GAIA_FOVS_MODE:
-                current = fovCamera;
                 break;
             default:
                 break;
@@ -339,7 +333,7 @@ public class CameraManager implements ICamera, IObserver {
         IFocus newClosest = getClosest();
         EventManager.publish(Event.CAMERA_CLOSEST_INFO, this, newClosest, getClosestBody(), getClosestParticle());
 
-        if (!newClosest.equals(previousClosest)) {
+        if (newClosest != null && !newClosest.equals(previousClosest)) {
             EventManager.publish(Event.CAMERA_NEW_CLOSEST, this, newClosest);
             if (newClosest instanceof FocusView) {
                 focusView.setEntity(((FocusView) newClosest).getEntity());
@@ -699,19 +693,7 @@ public class CameraManager implements ICamera, IObserver {
         /**
          * SPACECRAFT_MODE
          **/
-        SPACECRAFT_MODE,
-        /**
-         * FOV1
-         **/
-        GAIA_FOV1_MODE,
-        /**
-         * FOV2
-         **/
-        GAIA_FOV2_MODE,
-        /**
-         * Both fields of view
-         **/
-        GAIA_FOVS_MODE;
+        SPACECRAFT_MODE;
 
         static TwoWayMap<String, CameraMode> equivalences;
 
@@ -729,10 +711,6 @@ public class CameraManager implements ICamera, IObserver {
 
         public String toStringI18n() {
             return I18n.msg(getKey());
-        }
-
-        public boolean isGaiaFov() {
-            return this.equals(CameraMode.GAIA_FOV1_MODE) || this.equals(CameraMode.GAIA_FOV2_MODE) || this.equals(CameraMode.GAIA_FOVS_MODE);
         }
 
         public boolean isSpacecraft() {
@@ -757,26 +735,6 @@ public class CameraManager implements ICamera, IObserver {
 
         public boolean useClosest() {
             return isFree() || isGame();
-        }
-
-        /**
-         * Returns the current FOV mode:
-         * <ul>
-         * <li>1 - FOV1</li>
-         * <li>2 - FOV2</li>
-         * <li>3 - FOV1&2</li>
-         * <li>0 - No FOV mode</li>
-         * </ul>
-         *
-         * @return The current FOV mode of the camera as an integer
-         */
-        public int getGaiaFovMode() {
-            return switch (this) {
-                case GAIA_FOV1_MODE -> 1;
-                case GAIA_FOV2_MODE -> 2;
-                case GAIA_FOVS_MODE -> 3;
-                default -> 0;
-            };
         }
     }
 
