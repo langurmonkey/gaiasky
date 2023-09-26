@@ -37,7 +37,9 @@ import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 import java.util.Objects;
 
 public class DefaultIntShader extends BaseIntShader {
-    /** Attributes which are not required but always supported. */
+    /**
+     * Attributes which are not required but always supported.
+     */
     private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
     private final static Attributes tmpAttributes = new Attributes();
     private static String defaultVertexShader = null;
@@ -87,6 +89,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_heightNoiseSize;
     public final int u_heightSize;
     public final int u_tessQuality;
+    public final int u_bodySize;
     public final int u_alphaTest;
     public int u_ior;
     // Iridescence.
@@ -150,7 +153,9 @@ public class DefaultIntShader extends BaseIntShader {
     protected final DirectionalLight[] directionalLights;
     protected final PointLight[] pointLights;
     protected final SpotLight[] spotLights;
-    /** The attributes that this shader supports */
+    /**
+     * The attributes that this shader supports
+     */
     protected final Bits attributesMask;
     protected final Config config;
     private final long vertexMask;
@@ -171,7 +176,9 @@ public class DefaultIntShader extends BaseIntShader {
     protected int spotLightsCutoffAngleOffset;
     protected int spotLightsExponentOffset;
     protected int spotLightsSize;
-    /** The renderable used to create this shader, invalid after the call to init */
+    /**
+     * The renderable used to create this shader, invalid after the call to init
+     */
     private IntRenderable renderable;
     private boolean lightsSet;
 
@@ -188,7 +195,7 @@ public class DefaultIntShader extends BaseIntShader {
                             final Config config,
                             final String prefix) {
         this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(),
-             config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
+                config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
     public DefaultIntShader(final IntRenderable renderable,
@@ -197,7 +204,7 @@ public class DefaultIntShader extends BaseIntShader {
                             final String vertexShader,
                             final String fragmentShader) {
         this(renderable, config,
-             new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+                new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
     public DefaultIntShader(final IntRenderable renderable,
@@ -282,6 +289,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_heightNoiseSize = register(Inputs.heightNoiseSize, Setters.heightNoiseSize);
         u_heightSize = register(Inputs.heightSize, Setters.heightSize);
         u_tessQuality = register(Inputs.tessQuality, Setters.tessQuality);
+        u_bodySize = register(Inputs.bodySize, Setters.bodySize);
         u_alphaTest = register(Inputs.alphaTest);
         u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights, config.numPointLights)) : -1;
         u_reflectionCubemap = register(Inputs.reflectionCubemap, Setters.reflectionCubemap);
@@ -474,23 +482,23 @@ public class DefaultIntShader extends BaseIntShader {
             }
         }
         // Material Iridescence
-        if(attributes.has(PBRIridescenceAttribute.Type)){
+        if (attributes.has(PBRIridescenceAttribute.Type)) {
             prefix.append("#define iridescenceFlag\n");
         }
-        if(attributes.has(PBRTextureAttribute.IridescenceTexture)){
+        if (attributes.has(PBRTextureAttribute.IridescenceTexture)) {
             prefix.append("#define iridescenceTextureFlag\n");
         }
-        if(attributes.has(PBRTextureAttribute.IridescenceThicknessTexture)){
+        if (attributes.has(PBRTextureAttribute.IridescenceThicknessTexture)) {
             prefix.append("#define iridescenceThicknessTextureFlag\n");
         }
         // Volume, IOR
-        if(attributes.has(PBRVolumeAttribute.Type)){
+        if (attributes.has(PBRVolumeAttribute.Type)) {
             prefix.append("#define volumeFlag\n");
         }
-        if(attributes.has(PBRTextureAttribute.ThicknessTexture)){
+        if (attributes.has(PBRTextureAttribute.ThicknessTexture)) {
             prefix.append("#define thicknessTextureFlag\n");
         }
-        if(attributes.has(PBRFloatAttribute.IOR)){
+        if (attributes.has(PBRFloatAttribute.IOR)) {
             prefix.append("#define iorFlag\n");
         }
 
@@ -730,7 +738,7 @@ public class DefaultIntShader extends BaseIntShader {
                 int idx = dirLightsLoc + i * dirLightsSize;
                 program.setUniformf(idx + dirLightsColorOffset, directionalLights[i].color.r, directionalLights[i].color.g, directionalLights[i].color.b);
                 program.setUniformf(idx + dirLightsDirectionOffset, directionalLights[i].direction.x, directionalLights[i].direction.y,
-                                    directionalLights[i].direction.z);
+                        directionalLights[i].direction.z);
                 if (dirLightsSize <= 0)
                     break;
             }
@@ -749,8 +757,8 @@ public class DefaultIntShader extends BaseIntShader {
 
                 int idx = pointLightsLoc + i * pointLightsSize;
                 program.setUniformf(idx + pointLightsColorOffset, pointLights[i].color.r * pointLights[i].intensity,
-                                    pointLights[i].color.g * pointLights[i].intensity,
-                                    pointLights[i].color.b * pointLights[i].intensity);
+                        pointLights[i].color.g * pointLights[i].intensity,
+                        pointLights[i].color.b * pointLights[i].intensity);
                 program.setUniformf(idx + pointLightsPositionOffset, pointLights[i].position.x, pointLights[i].position.y, pointLights[i].position.z);
                 if (pointLightsIntensityOffset >= 0)
                     program.setUniformf(idx + pointLightsIntensityOffset, pointLights[i].intensity);
@@ -795,25 +803,45 @@ public class DefaultIntShader extends BaseIntShader {
     }
 
     public static class Config {
-        /** File with the vertex shader, if any **/
+        /**
+         * File with the vertex shader, if any
+         **/
         public String vertexShaderFile = null;
-        /** File with the fragment shader, if any **/
+        /**
+         * File with the fragment shader, if any
+         **/
         public String fragmentShaderFile = null;
-        /** The uber vertex shader to use, null to use the default vertex shader. */
+        /**
+         * The uber vertex shader to use, null to use the default vertex shader.
+         */
         public String vertexShaderCode = null;
-        /** The uber fragment shader to use, null to use the default fragment shader. */
+        /**
+         * The uber fragment shader to use, null to use the default fragment shader.
+         */
         public String fragmentShaderCode = null;
-        /** The number of directional lights to use */
+        /**
+         * The number of directional lights to use
+         */
         public int numDirectionalLights = 3;
-        /** The number of point lights to use */
+        /**
+         * The number of point lights to use
+         */
         public int numPointLights = 0;
-        /** The number of spotlights to use */
+        /**
+         * The number of spotlights to use
+         */
         public int numSpotLights = 0;
-        /** The number of bones to use */
+        /**
+         * The number of bones to use
+         */
         public int numBones = 0;
-        /** Set to 0 to disable culling. */
+        /**
+         * Set to 0 to disable culling.
+         */
         public int defaultCullFace = GL20.GL_BACK;
-        /** Set to 0 to disable depth test. */
+        /**
+         * Set to 0 to disable depth test.
+         */
         public int defaultDepthFunc = GL20.GL_LEQUAL;
 
         public Config() {
@@ -871,7 +899,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform roughnessColor = new Uniform("u_roughnessColor", ColorAttribute.Roughness);
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureAttribute.Roughness);
         public final static Uniform occlusionMetallicRoughnessTexture = new Uniform("u_occlusionMetallicRoughnessTexture",
-                                                                                    TextureAttribute.OcclusionMetallicRoughness);
+                TextureAttribute.OcclusionMetallicRoughness);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
@@ -880,6 +908,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform heightNoiseSize = new Uniform("u_heightNoiseSize", FloatAttribute.HeightNoiseSize);
         public final static Uniform heightSize = new Uniform("u_heightSize", Vector2Attribute.HeightSize);
         public final static Uniform tessQuality = new Uniform("u_tessQuality", FloatAttribute.TessQuality);
+        public final static Uniform bodySize = new Uniform("u_bodySize", FloatAttribute.BodySize);
         public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
         public final static Uniform time = new Uniform("u_time", FloatAttribute.Time);
@@ -1292,6 +1321,16 @@ public class DefaultIntShader extends BaseIntShader {
                     shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.TessQuality)))).value);
             }
         };
+        public final static Setter bodySize = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(FloatAttribute.BodySize))
+                    shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.BodySize)))).value);
+            }
+        };
         public final static Setter reflectionCubemap = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
@@ -1389,80 +1428,80 @@ public class DefaultIntShader extends BaseIntShader {
         };
         public final static Setter iridescenceFactorSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
                 shader.set(inputID, a.factor);
             }
         };
         public final static Setter iridescenceIORSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
                 shader.set(inputID, a.ior);
             }
         };
         public final static Setter iridescenceThicknessMinSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
                 shader.set(inputID, a.thicknessMin);
             }
         };
         public final static Setter iridescenceThicknessMaxSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRIridescenceAttribute a = combinedAttributes.get(PBRIridescenceAttribute.class, PBRIridescenceAttribute.Type);
                 shader.set(inputID, a.thicknessMax);
             }
         };
         public final static Setter iridescenceTextureSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes
                         .get(PBRTextureAttribute.IridescenceTexture))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
         public final static Setter iridescenceThicknessTextureSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes
                         .get(PBRTextureAttribute.IridescenceThicknessTexture))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
         public final static Setter iorSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRFloatAttribute a = combinedAttributes.get(PBRFloatAttribute.class, PBRFloatAttribute.IOR);
                 shader.set(inputID, a.value);
             }
         };
         public final static Setter thicknessFactorSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRVolumeAttribute a = combinedAttributes.get(PBRVolumeAttribute.class, PBRVolumeAttribute.Type);
                 shader.set(inputID, a.thicknessFactor);
             }
         };
         public final static Setter volumeDistanceSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRVolumeAttribute a = combinedAttributes.get(PBRVolumeAttribute.class, PBRVolumeAttribute.Type);
                 shader.set(inputID, a.attenuationDistance);
             }
         };
         public final static Setter volumeColorSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 PBRVolumeAttribute a = combinedAttributes.get(PBRVolumeAttribute.class, PBRVolumeAttribute.Type);
                 shader.set(inputID, a.attenuationColor.r, a.attenuationColor.g, a.attenuationColor.b);
             }
         };
         public final static Setter thicknessTextureSetter = new LocalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute)(Objects.requireNonNull(combinedAttributes
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
                         .get(PBRTextureAttribute.ThicknessTexture)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1634,7 +1673,7 @@ public class DefaultIntShader extends BaseIntShader {
         }
 
         public static class ACubemap extends LocalSetter {
-            private final static float[] ones = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            private final static float[] ones = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
             private final static Vector3 tmpV1 = new Vector3();
             public final int dirLightsOffset;
             public final int pointLightsOffset;

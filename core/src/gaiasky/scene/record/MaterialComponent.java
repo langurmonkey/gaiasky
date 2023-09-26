@@ -50,7 +50,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
-    /** Default texture parameters **/
+    /**
+     * Default texture parameters
+     **/
     protected static final OwnTextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
@@ -108,9 +110,13 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     // Biome lookup texture.
     public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-lut.png";
     public float biomeHueShift = 0;
-    /** Add also color even if texture is present **/
+    /**
+     * Add also color even if texture is present
+     **/
     public boolean colorIfTexture = false;
-    /** The actual material **/
+    /**
+     * The actual material
+     **/
     private Material material, ringMaterial;
     private final AtomicBoolean heightGenerated = new AtomicBoolean(false);
     private final AtomicBoolean heightInitialized = new AtomicBoolean(false);
@@ -217,7 +223,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
@@ -239,7 +244,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams) {
@@ -561,7 +565,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                                 int y = (int) (ih - ih * MathUtilsDouble.clamp(height, 0, 1));
 
                                 java.awt.Color argb = new java.awt.Color(lut.getRGB(x, y));
-                                float[] rgb = new float[] { argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f };
+                                float[] rgb = new float[]{argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f};
                                 if (biomeHueShift != 0) {
                                     // Shift hue of lookup table by an amount in degrees
                                     float[] hsb = ColorUtils.rgbToHsb(rgb);
@@ -735,15 +739,15 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public void setSpecular(Double specular) {
         float r = specular.floatValue();
-        this.specularColor = new float[] { r, r, r };
+        this.specularColor = new float[]{r, r, r};
     }
 
     public void setSpecular(double[] specular) {
         if (specular.length > 1) {
-            this.specularColor = new float[] { (float) specular[0], (float) specular[1], (float) specular[2] };
+            this.specularColor = new float[]{(float) specular[0], (float) specular[1], (float) specular[2]};
         } else {
             float r = (float) specular[0];
-            this.specularColor = new float[] { r, r, r };
+            this.specularColor = new float[]{r, r, r};
         }
     }
 
@@ -765,15 +769,15 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public void setEmissive(Double emissive) {
         float r = emissive.floatValue();
-        this.emissiveColor = new float[] { r, r, r };
+        this.emissiveColor = new float[]{r, r, r};
     }
 
     public void setEmissive(double[] emissive) {
         if (emissive.length > 1) {
-            this.emissiveColor = new float[] { (float) emissive[0], (float) emissive[1], (float) emissive[2] };
+            this.emissiveColor = new float[]{(float) emissive[0], (float) emissive[1], (float) emissive[2]};
         } else {
             float r = (float) emissive[0];
-            this.emissiveColor = new float[] { r, r, r };
+            this.emissiveColor = new float[]{r, r, r};
         }
     }
 
@@ -843,7 +847,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public void setMetallic(Double metallicColor) {
         float r = metallicColor.floatValue();
-        this.metallicColor = new float[] { r, r, r };
+        this.metallicColor = new float[]{r, r, r};
     }
 
     public void setMetallic(String metallic) {
@@ -852,10 +856,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public void setReflection(double[] metallic) {
         if (metallic.length > 1) {
-            this.metallicColor = new float[] { (float) metallic[0], (float) metallic[1], (float) metallic[2] };
+            this.metallicColor = new float[]{(float) metallic[0], (float) metallic[1], (float) metallic[2]};
         } else {
             float r = (float) metallic[0];
-            this.metallicColor = new float[] { r, r, r };
+            this.metallicColor = new float[]{r, r, r};
         }
     }
 
@@ -1059,49 +1063,49 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case ELEVATION_TYPE_CMD -> {
-            if (this.hasHeight() && this.material != null) {
-                ElevationType newType = (ElevationType) data[0];
-                GaiaSky.postRunnable(() -> {
-                    if (newType.isNone()) {
-                        removeElevationData();
-                    } else {
-                        if (height.endsWith(Constants.GEN_KEYWORD))
-                            initializeGenElevationData();
-                        else if (heightData == null) {
-                            if (this.material.has(TextureAttribute.Height)) {
-                                initializeElevationData(((TextureAttribute) Objects.requireNonNull(this.material.get(TextureAttribute.Height))).textureDescription.texture);
-                            } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
-                                if (!height.endsWith(Constants.GEN_KEYWORD)) {
-                                    Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
-                                    if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
-                                        initializeElevationData(tex);
+            case ELEVATION_TYPE_CMD -> {
+                if (this.hasHeight() && this.material != null) {
+                    ElevationType newType = (ElevationType) data[0];
+                    GaiaSky.postRunnable(() -> {
+                        if (newType.isNone()) {
+                            removeElevationData();
+                        } else {
+                            if (height.endsWith(Constants.GEN_KEYWORD))
+                                initializeGenElevationData();
+                            else if (heightData == null) {
+                                if (this.material.has(TextureAttribute.Height)) {
+                                    initializeElevationData(((TextureAttribute) Objects.requireNonNull(this.material.get(TextureAttribute.Height))).textureDescription.texture);
+                                } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
+                                    if (!height.endsWith(Constants.GEN_KEYWORD)) {
+                                        Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
+                                        if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                                            initializeElevationData(tex);
+                                        }
+                                    } else {
+                                        initializeGenElevationData();
                                     }
-                                } else {
-                                    initializeGenElevationData();
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
-        }
-        case ELEVATION_MULTIPLIER_CMD -> {
-            if (this.hasHeight() && this.material != null) {
-                float newMultiplier = (Float) data[0];
-                GaiaSky.postRunnable(() -> {
-                    this.material.set(new FloatAttribute(FloatAttribute.ElevationMultiplier, newMultiplier));
-                });
+            case ELEVATION_MULTIPLIER_CMD -> {
+                if (this.hasHeight() && this.material != null) {
+                    float newMultiplier = (Float) data[0];
+                    GaiaSky.postRunnable(() -> {
+                        this.material.set(new FloatAttribute(FloatAttribute.ElevationMultiplier, newMultiplier));
+                    });
+                }
             }
-        }
-        case TESSELLATION_QUALITY_CMD -> {
-            if (this.hasHeight() && this.material != null) {
-                float newQuality = (Float) data[0];
-                GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.TessQuality, newQuality)));
+            case TESSELLATION_QUALITY_CMD -> {
+                if (this.hasHeight() && this.material != null) {
+                    float newQuality = (Float) data[0];
+                    GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.TessQuality, newQuality)));
+                }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
     }
 

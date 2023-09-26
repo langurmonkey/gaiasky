@@ -356,6 +356,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, true);
             case NONE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
+
     }
 
     public void update(Matrix4 localTransform,
@@ -481,6 +482,20 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
             ba.blended = blendEnabled;
             ba.opacity = alpha;
+        }
+    }
+
+    private boolean sizeSet = false;
+
+    public void setSize(double sizeInternal) {
+        if (!sizeSet && instance != null) {
+            float sizeKm = (float) (sizeInternal * Constants.U_TO_KM);
+            int n = instance.materials.size;
+            for (int i = 0; i < n; i++) {
+                Material mat = instance.materials.get(i);
+                mat.set(new FloatAttribute(FloatAttribute.BodySize, sizeKm));
+            }
+            sizeSet = true;
         }
     }
 
@@ -692,7 +707,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void setUsecolor(String usecolor) {
-       setUseColor(usecolor);
+        setUseColor(usecolor);
     }
 
     public void setUseColor(String useColor) {

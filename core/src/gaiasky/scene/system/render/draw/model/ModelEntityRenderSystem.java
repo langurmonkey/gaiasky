@@ -156,6 +156,7 @@ public class ModelEntityRenderSystem {
         ModelComponent mc = model.model;
         if (mc != null && mc.instance != null && mc.isModelInitialised()) {
             var base = Mapper.base.get(entity);
+            var body = Mapper.body.get(entity);
             if (scaffolding != null && shadow) {
                 prepareShadowEnvironment(entity, model, scaffolding);
             }
@@ -164,11 +165,11 @@ public class ModelEntityRenderSystem {
             if (scaffolding != null) {
                 alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity;
             } else {
-                var body = Mapper.body.get(entity);
                 alphaFactor = body.color[3] * base.opacity;
             }
 
             mc.update(alpha * alphaFactor, relativistic);
+            model.model.setSize(body.size);
             batch.render(mc.instance, mc.env);
         }
     }
@@ -524,6 +525,7 @@ public class ModelEntityRenderSystem {
             }
             model.model.updateEclipsingBodyUniforms(entity);
             model.model.update(alpha * base.opacity, relativistic);
+            model.model.setSize(body.size);
             batch.render(model.model.instance, model.model.env);
         }
     }

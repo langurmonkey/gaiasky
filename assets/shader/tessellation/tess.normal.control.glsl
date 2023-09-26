@@ -4,8 +4,10 @@
 
 layout(vertices = N_VERTICES) out;
 
-// Tessellation quality in [1,7]
+// Tessellation quality factor in [1,10]
 uniform float u_tessQuality = 4.0;
+// Body size in kilometers.
+uniform float u_bodySize;
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
@@ -51,7 +53,7 @@ out float l_fadeFactor[N_VERTICES];
 #endif
 
 #ifdef svtIndirectionHeightTextureFlag
-#define QUALITY_SCALE 300.0
+#define QUALITY_SCALE 200.0
 #else
 #define QUALITY_SCALE 100.0
 #endif
@@ -67,12 +69,14 @@ vec3 center(vec3 p1, vec3 p2, vec3 p3){
 }
 
 float tessellationLevel(vec3 center){
-    // Distance scaling variable
+    // Distance scaling variable.
     float tessellationFactor = u_tessQuality * QUALITY_SCALE;
     const float tessellationSlope = 1.0;
 
-    float d = length(center) * U_TO_KM;
-    return mix(0.0, float(gl_MaxTessGenLevel), tessellationFactor / pow(d, tessellationSlope));
+    float distKm = length(center) * U_TO_KM;
+    // Scaling factor, calibrated with the diameter of Earth.
+    float scalingFactor = u_bodySize / 12750.0;
+    return mix(0.0, float(gl_MaxTessGenLevel), scalingFactor * tessellationFactor / pow(distKm, tessellationSlope) );
 }
 
 void main(){

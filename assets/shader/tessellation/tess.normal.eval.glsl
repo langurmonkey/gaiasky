@@ -189,7 +189,7 @@ void main(void){
     // Normal to apply height
     o_data.normal = normalize(u * l_data[0].normal + v * l_data[1].normal + w * l_data[2].normal);
 
-    // Use height texture to move vertex along normal
+    // Use height texture to move vertex along normal.
     float h = fetchHeight(o_data.texCoords).r;
     o_fragHeight = h * u_heightScale * u_elevationMultiplier;
     vec3 dh = o_data.normal * o_fragHeight;
