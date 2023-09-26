@@ -144,8 +144,11 @@ out float o_fragHeight;
     }
 #elif defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
     // maps the height scale in internal units to a normal strength
-    float computeNormalStrength(float heightScale){
-        vec2 heightSpanKm = vec2(0.0, u_heightScale);
+    float computeNormalStrength(float heightScale) {
+        // The top heightScale value to map the normal strength.
+        float topHeightScaleMap = 15.0;
+
+        vec2 heightSpanKm = vec2(0.0, u_heightScale * topHeightScaleMap);
         vec2 span = vec2(0.1, 1.0);
         heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
         // normalize to [0,1]
@@ -156,9 +159,9 @@ out float o_fragHeight;
     vec3 calcNormal(vec2 p, vec2 dp){
         vec4 h;
         vec2 size = vec2(computeNormalStrength(u_heightScale * u_elevationMultiplier), 0.0);
-        if (dp.x < 0.0){
+        if (dp.x < 0.0) {
             // Generated height using perlin noise
-            dp = vec2(3e-4);
+            dp = vec2(3.0e-4);
         }
         h.x = fetchHeight(vec2(p.x - dp.x, p.y)).r;
         h.y = fetchHeight(vec2(p.x + dp.x, p.y)).r;
