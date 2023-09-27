@@ -15,7 +15,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.KeyBindings;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -54,10 +53,10 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         visible = v;
     }
 
-    public void initialize() {
+    @Override
+    public void initialize(float componentWidth) {
         float space4 = 6.4f;
         float space2 = 3.2f;
-        float contentWidth = ControlsWindow.getContentWidth();
         float buttonPadHor = 6f;
         float buttonPadVert = 6f;
         int visTableCols = 5;
@@ -132,7 +131,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // NUM FACTOR
         pmNumFactorSlider = new OwnSliderPlus(I18n.msg("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
         pmNumFactorSlider.setName("proper motion vectors number factor");
-        pmNumFactorSlider.setWidth(contentWidth);
+        pmNumFactorSlider.setWidth(componentWidth);
         pmNumFactorSlider.setMappedValue(Settings.settings.scene.properMotion.number);
         pmNumFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -147,7 +146,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // LEN FACTOR
         pmLenFactorSlider = new OwnSliderPlus(I18n.msg("gui.pmlenfactor"), Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, Constants.SLIDER_STEP_SMALL, skin);
         pmLenFactorSlider.setName("proper motion vectors number factor");
-        pmLenFactorSlider.setWidth(contentWidth);
+        pmLenFactorSlider.setWidth(componentWidth);
         pmLenFactorSlider.setValue(Settings.settings.scene.properMotion.length);
         pmLenFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -172,7 +171,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         };
         pmColorMode = new OwnSelectBox<>(skin);
         pmColorMode.setItems(cms);
-        pmColorMode.setWidth(contentWidth);
+        pmColorMode.setWidth(componentWidth);
         pmColorMode.setSelectedIndex(Settings.settings.scene.properMotion.colorMode);
         pmColorMode.setName("proper motion color mode");
         pmColorMode.addListener((event) -> {
@@ -209,7 +208,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // INDIVIDUAL VISIBILITY
         OwnTextIconButton individualVisibility = new OwnTextIconButton(I18n.msg("gui.visibility.individual"), skin, "eye");
         individualVisibility.align(Align.center);
-        individualVisibility.setWidth(contentWidth);
+        individualVisibility.setWidth(componentWidth);
         individualVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, individualVisibility);

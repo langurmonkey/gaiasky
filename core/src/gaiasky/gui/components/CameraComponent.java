@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.KeyBindings;
 import gaiasky.gui.beans.CameraComboBoxBean;
 import gaiasky.scene.camera.CameraManager.CameraMode;
@@ -44,8 +43,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void initialize() {
-        final float contentWidth = ControlsWindow.getContentWidth();
+    public void initialize(float componentWidth) {
 
         cinematic = new OwnCheckBox(I18n.msg("gui.camera.cinematic"), skin, pad8);
         cinematic.setName("cinematic camera");
@@ -66,7 +64,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         }
         cameraMode = new OwnSelectBox<>(skin);
         cameraMode.setName("camera mode");
-        cameraMode.setWidth(contentWidth);
+        cameraMode.setWidth(componentWidth);
         cameraMode.setItems(cameraOptions);
         cameraMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -199,7 +197,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView = new OwnSliderPlus(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_TINY, false, skin);
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
-        fieldOfView.setWidth(contentWidth);
+        fieldOfView.setWidth(componentWidth);
         fieldOfView.setValue(Settings.settings.scene.camera.fov);
         fieldOfView.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
         fieldOfView.addListener(event -> {
@@ -244,7 +242,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraSpeedLimit = new OwnSelectBox<>(skin);
         cameraSpeedLimit.setName("camera speed limit");
-        cameraSpeedLimit.setWidth(contentWidth);
+        cameraSpeedLimit.setWidth(componentWidth);
         cameraSpeedLimit.setItems(speedLimits);
         cameraSpeedLimit.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -259,7 +257,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // CAMERA SPEED
         cameraSpeed = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
-        cameraSpeed.setWidth(contentWidth);
+        cameraSpeed.setWidth(componentWidth);
         cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
@@ -272,7 +270,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // ROTATION SPEED
         rotateSpeed = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
-        rotateSpeed.setWidth(contentWidth);
+        rotateSpeed.setWidth(componentWidth);
         rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
@@ -285,7 +283,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // TURNING SPEED
         turnSpeed = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
-        turnSpeed.setWidth(contentWidth);
+        turnSpeed.setWidth(componentWidth);
         turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {

@@ -21,7 +21,10 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.*;
+import gaiasky.gui.ColorPicker;
+import gaiasky.gui.ColorPickerAbstract;
+import gaiasky.gui.ColormapPicker;
+import gaiasky.gui.DatasetPreferencesWindow;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -33,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
-    private final float pad = 4.8f;
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
@@ -42,6 +44,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final CatalogManager catalogManager;
     private VerticalGroup group;
     private OwnLabel noDatasetsLabel = null;
+    private float componentWidth;
 
     public DatasetsComponent(final Skin skin, final Stage stage, final CatalogManager catalogManager) {
         super(skin, stage);
@@ -55,7 +58,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(float componentWidth) {
+        this.componentWidth = componentWidth;
 
         group = new VerticalGroup();
         group.columnAlign(Align.left);
@@ -155,7 +159,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        imageMap.put(ci.name, new OwnImageButton[] { eye, mark });
+        imageMap.put(ci.name, new OwnImageButton[]{eye, mark});
         controls.addActor(eye);
         if (ci.isHighlightable()) {
             controls.addActor(mark);
@@ -185,6 +189,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 26), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
 
+        float pad = 4.8f;
         if (ci.isHighlightable()) {
             t.add(controls).left().padBottom(pad);
             t.add(cp).right().size(28.8f).padRight(pad6).padBottom(pad).row();
@@ -244,7 +249,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         c.setFillParent(true);
         c.align(Align.topLeft);
         c.minHeight(80f);
-        c.width(ControlsWindow.getContentWidth() * 0.94f);
+        c.width(componentWidth * 0.94f);
 
         // Info
         ScrollPane scroll = new OwnScrollPane(c, skin, "minimalist-nobg");
@@ -254,12 +259,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
-        scroll.setWidth(ControlsWindow.getContentWidth() * 0.94f);
+        scroll.setWidth(componentWidth * 0.94f);
 
         CollapsibleEntry catalogWidget = new CollapsibleEntry(nameLabel, scroll, skin);
         catalogWidget.align(Align.topLeft);
         catalogWidget.pad(pad9);
-        catalogWidget.setWidth(ControlsWindow.getContentWidth() * 0.94f);
+        catalogWidget.setWidth(componentWidth * 0.94f);
         catalogWidget.setExpandRunnable(() -> EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this));
         catalogWidget.setCollapseRunnable(() -> EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this));
         catalogWidget.addListener(new InputListener() {
@@ -347,7 +352,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private void addNoDatasets() {
         if (groupMap != null && groupMap.isEmpty() && noDatasetsLabel == null) {
             noDatasetsLabel = new OwnLabel(I18n.msg("gui.dataset.notfound"), skin);
-            noDatasetsLabel.setWidth(ControlsWindow.getContentWidth() * 0.94f);
+            noDatasetsLabel.setWidth(componentWidth * 0.94f);
             noDatasetsLabel.setAlignment(Align.left, Align.left);
             group.addActor(noDatasetsLabel);
             group.pack();
@@ -357,70 +362,70 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
         switch (event) {
-        case CATALOG_ADD -> {
-            removeNoDatasets();
-            addCatalogInfo((CatalogInfo) data[0]);
-        }
-        case CATALOG_REMOVE -> {
-            String datasetName = (String) data[0];
-            if (groupMap.containsKey(datasetName)) {
-                groupMap.get(datasetName).remove();
-                groupMap.remove(datasetName);
-                imageMap.remove(datasetName);
-                colorMap.remove(datasetName);
-                EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
+            case CATALOG_ADD -> {
+                removeNoDatasets();
+                addCatalogInfo((CatalogInfo) data[0]);
             }
-            addNoDatasets();
-        }
-        case CATALOG_VISIBLE -> {
-            if (source != this) {
+            case CATALOG_REMOVE -> {
                 String datasetName = (String) data[0];
-                boolean visible = (Boolean) data[1];
-                OwnImageButton eye = imageMap.get(datasetName)[0];
-                eye.setCheckedNoFire(!visible);
+                if (groupMap.containsKey(datasetName)) {
+                    groupMap.get(datasetName).remove();
+                    groupMap.remove(datasetName);
+                    imageMap.remove(datasetName);
+                    colorMap.remove(datasetName);
+                    EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
+                }
+                addNoDatasets();
             }
-        }
-        case PER_OBJECT_VISIBILITY_CMD -> {
-            if (source != this) {
-                FocusView obj = (FocusView) data[0];
-                String datasetName = (String) data[1];
-                boolean checked = (Boolean) data[2];
-                if (Mapper.mesh.has(obj.getEntity())) {
+            case CATALOG_VISIBLE -> {
+                if (source != this) {
+                    String datasetName = (String) data[0];
+                    boolean visible = (Boolean) data[1];
                     OwnImageButton eye = imageMap.get(datasetName)[0];
-                    eye.setCheckedNoFire(!checked);
+                    eye.setCheckedNoFire(!visible);
                 }
             }
-        }
-        case CATALOG_HIGHLIGHT -> {
-            if (source != this) {
-                CatalogInfo ci = (CatalogInfo) data[0];
-                float[] col = ci.hlColor;
-                if (colorMap.containsKey(ci.name) && col != null) {
-                    colorMap.get(ci.name).setPickedColor(col);
+            case PER_OBJECT_VISIBILITY_CMD -> {
+                if (source != this) {
+                    FocusView obj = (FocusView) data[0];
+                    String datasetName = (String) data[1];
+                    boolean checked = (Boolean) data[2];
+                    if (Mapper.mesh.has(obj.getEntity())) {
+                        OwnImageButton eye = imageMap.get(datasetName)[0];
+                        eye.setCheckedNoFire(!checked);
+                    }
                 }
+            }
+            case CATALOG_HIGHLIGHT -> {
+                if (source != this) {
+                    CatalogInfo ci = (CatalogInfo) data[0];
+                    float[] col = ci.hlColor;
+                    if (colorMap.containsKey(ci.name) && col != null) {
+                        colorMap.get(ci.name).setPickedColor(col);
+                    }
 
-                if (imageMap.containsKey(ci.name)) {
-                    boolean hl = (Boolean) data[1];
-                    OwnImageButton hig = imageMap.get(ci.name)[1];
-                    hig.setCheckedNoFire(hl);
+                    if (imageMap.containsKey(ci.name)) {
+                        boolean hl = (Boolean) data[1];
+                        OwnImageButton hig = imageMap.get(ci.name)[1];
+                        hig.setCheckedNoFire(hl);
+                    }
                 }
             }
-        }
-        case CATALOG_POINT_SIZE_SCALING_CMD -> {
-            if (source != this) {
-                String datasetName = (String) data[0];
-                double val = (Double) data[1];
-                if (scalingMap.containsKey(datasetName)) {
-                    OwnSliderPlus slider = scalingMap.get(datasetName);
-                    slider.setProgrammaticChangeEvents(false);
-                    slider.setMappedValue(val);
-                    slider.setProgrammaticChangeEvents(true);
-                }
+            case CATALOG_POINT_SIZE_SCALING_CMD -> {
+                if (source != this) {
+                    String datasetName = (String) data[0];
+                    double val = (Double) data[1];
+                    if (scalingMap.containsKey(datasetName)) {
+                        OwnSliderPlus slider = scalingMap.get(datasetName);
+                        slider.setProgrammaticChangeEvents(false);
+                        slider.setMappedValue(val);
+                        slider.setProgrammaticChangeEvents(true);
+                    }
 
+                }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
 
     }

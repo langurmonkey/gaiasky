@@ -53,6 +53,7 @@ public class FullGui extends AbstractGui {
     private final CatalogManager catalogManager;
     private final FocusView view;
     protected ControlsWindow controlsWindow;
+    protected ControlsInterface controlsInterface;
     protected MinimapWindow minimapWindow;
     protected Container<FocusInfoInterface> fi;
     protected Container<TopInfoInterface> ti;
@@ -129,6 +130,13 @@ public class FullGui extends AbstractGui {
 
         // CONTROLS WINDOW
         addControlsWindow();
+
+        // CONTROLS INTERFACE - TOP LEFT
+        //controlsInterface = new ControlsInterface(skin, stage);
+        //controlsInterface.setFillParent(true);
+        //controlsInterface.top().left();
+        //controlsInterface.pad(pad5);
+        //interfaces.add(controlsInterface);
 
         // FOCUS INFORMATION - BOTTOM RIGHT
         focusInterface = new FocusInfoInterface(skin);
@@ -258,6 +266,9 @@ public class FullGui extends AbstractGui {
             }
             if (ni != null) {
                 stage.addActor(ni);
+            }
+            if (controlsInterface != null) {
+                stage.addActor(controlsInterface);
             }
             if (messagesInterface != null) {
                 stage.addActor(messagesInterface);

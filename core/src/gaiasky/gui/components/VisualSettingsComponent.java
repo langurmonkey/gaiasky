@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.ControlsWindow;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -42,12 +41,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         super(skin, stage);
     }
 
-    public void initialize() {
-        float contentWidth = ControlsWindow.getContentWidth();
+    @Override
+    public void initialize(float componentWidth) {
         /* Star brightness */
         starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
         starBrightness.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.info"), skin));
-        starBrightness.setWidth(contentWidth);
+        starBrightness.setWidth(componentWidth);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
         starBrightness.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -60,7 +59,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         /* Star brightness power */
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
-        magnitudeMultiplier.setWidth(contentWidth);
+        magnitudeMultiplier.setWidth(componentWidth);
         magnitudeMultiplier.setMappedValue(Settings.settings.scene.star.power);
         magnitudeMultiplier.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -73,7 +72,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         /* Star glow factor */
         starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR, Constants.SLIDER_STEP_TINY * 0.1f, skin);
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
-        starGlowFactor.setWidth(contentWidth);
+        starGlowFactor.setWidth(componentWidth);
         starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
         starGlowFactor.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -86,7 +85,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         /* Point size */
         pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
         pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
-        pointSize.setWidth(contentWidth);
+        pointSize.setWidth(componentWidth);
         pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
         pointSize.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -99,7 +98,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         /* Star min opacity */
         starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
         starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
-        starBaseLevel.setWidth(contentWidth);
+        starBaseLevel.setWidth(componentWidth);
         starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
         starBaseLevel.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -111,7 +110,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Ambient light */
         ambientLight = new OwnSliderPlus(I18n.msg("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
-        ambientLight.setWidth(contentWidth);
+        ambientLight.setWidth(componentWidth);
         ambientLight.setMappedValue(Settings.settings.scene.renderer.ambient);
         ambientLight.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -123,7 +122,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Label size */
         labelSize = new OwnSliderPlus(I18n.msg("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
-        labelSize.setWidth(contentWidth);
+        labelSize.setWidth(componentWidth);
         labelSize.setMappedValue(Settings.settings.scene.label.size);
         labelSize.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -136,7 +135,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Line width */
         lineWidth = new OwnSliderPlus(I18n.msg("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
-        lineWidth.setWidth(contentWidth);
+        lineWidth.setWidth(componentWidth);
         lineWidth.setMappedValue(Settings.settings.scene.lineWidth);
         lineWidth.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -149,7 +148,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Elevation multiplier */
         elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, Constants.SLIDER_STEP_TINY, false, skin);
-        elevMult.setWidth(contentWidth);
+        elevMult.setWidth(componentWidth);
         elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
         elevMult.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -163,7 +162,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         /* Reset defaults */
         OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
         resetDefaults.align(Align.center);
-        resetDefaults.setWidth(contentWidth);
+        resetDefaults.setWidth(componentWidth);
         resetDefaults.addListener(new OwnTextTooltip(I18n.msg("gui.resetdefaults.tooltip"), skin));
         resetDefaults.addListener(event -> {
             if (event instanceof ChangeEvent) {

@@ -29,7 +29,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.BookmarksManager.BookmarkNode;
-import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.NewBookmarkFolderDialog;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -68,11 +67,10 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void initialize() {
-        float contentWidth = ControlsWindow.getContentWidth();
+    public void initialize(float componentWidth) {
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
-        searchBox.setWidth(contentWidth);
+        searchBox.setWidth(componentWidth);
         searchBox.setMessageText(I18n.msg("gui.objects.search"));
         searchBox.addListener(event -> {
             if (event instanceof InputEvent) {
@@ -312,7 +310,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksScrollPane.setScrollingDisabled(true, false);
 
         bookmarksScrollPane.setHeight(300f);
-        bookmarksScrollPane.setWidth(contentWidth);
+        bookmarksScrollPane.setWidth(componentWidth);
 
         /*
          * ADD TO CONTENT
@@ -474,7 +472,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         EventManager.instance.removeAllSubscriptions(this);
     }
 
-    private static class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
+    public static class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
         public BookmarkNode node;
 
         public TreeNode(BookmarkNode node, Skin skin) {

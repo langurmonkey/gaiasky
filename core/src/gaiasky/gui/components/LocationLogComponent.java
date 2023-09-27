@@ -15,7 +15,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.ControlsWindow;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.LocationLogManager;
@@ -39,8 +38,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void initialize() {
-        final float contentWidth = ControlsWindow.getContentWidth();
+    public void initialize(float componentWidth) {
 
         locations = new VerticalGroup().align(Align.topLeft).columnAlign(Align.left).space(pad8);
         /*
@@ -53,7 +51,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
         scrollPane.setScrollingDisabled(true, false);
 
         scrollPane.setHeight(260f);
-        scrollPane.setWidth(contentWidth);
+        scrollPane.setWidth(componentWidth);
 
         VerticalGroup locationGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(pad12);
         locationGroup.addActor(scrollPane);

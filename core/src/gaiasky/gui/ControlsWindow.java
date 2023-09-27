@@ -100,7 +100,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /* ----TIME GROUP---- */
         TimeComponent timeComponent = new TimeComponent(skin, ui);
-        timeComponent.initialize();
+        timeComponent.initialize(getContentWidth());
 
         String shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.time");
 
@@ -151,7 +151,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         playCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera"), skin));
 
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
-        cameraComponent.initialize();
+        cameraComponent.initialize(getContentWidth());
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.camera");
 
@@ -163,7 +163,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         /* ----OBJECT TOGGLES GROUP---- */
         VisibilityComponent visibilityComponent = new VisibilityComponent(skin, ui);
         visibilityComponent.setVisibilityEntitites(visibilityEntities, visible);
-        visibilityComponent.initialize();
+        visibilityComponent.initialize(getContentWidth());
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.visibility");
 
@@ -174,7 +174,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /* ----LIGHTING GROUP---- */
         VisualSettingsComponent visualSettingsComponent = new VisualSettingsComponent(skin, ui);
-        visualSettingsComponent.initialize();
+        visualSettingsComponent.initialize(getContentWidth());
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.lighting");
 
@@ -185,7 +185,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /* ----DATASETS---- */
         DatasetsComponent datasetsComponent = new DatasetsComponent(skin, ui, catalogManager);
-        datasetsComponent.initialize();
+        datasetsComponent.initialize(getContentWidth());
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.dataset.title");
 
@@ -196,7 +196,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /* ----LOCATION LOG---- */
         LocationLogComponent locationLogComponent = new LocationLogComponent(skin, ui);
-        locationLogComponent.initialize();
+        locationLogComponent.initialize(getContentWidth());
 
         CollapsiblePane locationLog = new CollapsiblePane(ui, I18n.msg("gui.locationlog"), locationLogComponent.getActor(), getContentWidth(), skin, false, null);
         locationLog.align(Align.left);
@@ -206,7 +206,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         /* ----BOOKMARKS---- */
         BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, ui);
         bookmarksComponent.setScene(scene);
-        bookmarksComponent.initialize();
+        bookmarksComponent.initialize(getContentWidth());
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
 
@@ -228,8 +228,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         /* BUTTONS */
         float bw = 48f, bh = 48f;
         KeyBindings kb = KeyBindings.instance;
-        Image icon = new Image(skin.getDrawable("map-icon"));
-        map = new OwnTextIconButton("", icon, skin, "toggle");
+        map = new OwnTextIconButton("", skin, "menu-map");
         map.setSize(bw, bh);
         map.setName("map");
         map.setChecked(Settings.settings.program.minimap.active);

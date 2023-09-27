@@ -352,6 +352,54 @@
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+    "menu-time": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-clock"
+    },
+    "menu-camera": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-video"
+    },
+    "menu-types": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-eye"
+    },
+    "menu-visuals": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-bolt"
+    },
+    "menu-datasets": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-hard-drive"
+    },
+    "menu-location-log": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-map-marker"
+    },
+    "menu-bookmarks": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-bookmark"
+    },
+    "menu-map": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "map-icon"
+    },
     "eye": {
       "imageUp": "iconic-eye"
     },

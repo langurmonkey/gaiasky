@@ -22,7 +22,8 @@ public class MessagesInterface extends TableGuiInterface implements IObserver {
     /** Lock object for synchronization **/
     private final Object lock;
     Map<Integer, Widget> customElements;
-    private Label headline, subhead;
+    private final Label headline;
+    private final Label subhead;
 
     public MessagesInterface(Skin skin, Object lock) {
         super(skin);

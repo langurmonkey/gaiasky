@@ -36,8 +36,9 @@ public abstract class GuiComponent {
 
     /**
      * Initialises the component.
+     * @param componentWidth The target width of the component.
      */
-    public abstract void initialize();
+    public abstract void initialize(float componentWidth);
 
     public Actor getActor() {
         return component;

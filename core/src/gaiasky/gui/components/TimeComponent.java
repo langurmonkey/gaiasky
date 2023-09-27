@@ -17,7 +17,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.KeyBindings;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
@@ -62,14 +61,13 @@ public class TimeComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void initialize() {
-        float contentWidth = ControlsWindow.getContentWidth();
+    public void initialize(float componentWidth) {
         KeyBindings kb = KeyBindings.instance;
         boolean redTheme = skin.getAtlas().getTextures().first().toString().contains("night-red");
 
         // Time
         date = new OwnLabel("date UT", skin, "msg-33");
-        date.setWidth(contentWidth - 65);
+        date.setWidth(componentWidth - 65);
         date.setAlignment(Align.center);
         if (redTheme) {
             date.setColor(Color.RED);
@@ -77,7 +75,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         date.setName("label date");
 
         time = new OwnLabel("time UT", skin, "msg-33");
-        time.setWidth(contentWidth - 65);
+        time.setWidth(componentWidth - 65);
         time.setAlignment(Align.center);
         if (redTheme) {
             time.setColor(Color.RED);
@@ -166,7 +164,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         /* Reset time */
         OwnTextIconButton resetTime = new OwnTextIconButton(I18n.msg("gui.resettime"), skin, "reset");
         resetTime.align(Align.center);
-        resetTime.setWidth(contentWidth);
+        resetTime.setWidth(componentWidth);
         resetTime.addListener(new OwnTextTooltip(I18n.msg("gui.resettime.tooltip"), skin));
         resetTime.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -182,7 +180,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         // Date time.
         Table dateGroup = new Table(skin);
-        dateGroup.setWidth(contentWidth);
+        dateGroup.setWidth(componentWidth);
         Table datetimeGroup = new Table(skin);
         datetimeGroup.add(date).left().pad(pad4).row();
         datetimeGroup.add(time).left().pad(pad4);
