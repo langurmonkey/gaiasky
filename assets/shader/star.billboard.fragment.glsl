@@ -134,8 +134,11 @@ vec4 closeUp(float dist, float level) {
     // Rotation matrix.
     mat3 mr = mat3(u_matrix[0].xyz, u_matrix[1].xyz, u_matrix[2].xyz);
 
-    // We need coordinates in [-1,1].
-    vec2 p = (v_uv * 25.0) - 12.5;
+    // Flip u coordinate.
+    vec2 uv = v_uv;
+    uv.u = 1.0 - uv.u;
+    // We need coordinates in [-12.5,12.5].
+    vec2 p = (uv * 25.0) - 12.5;
     vec3 ray = normalize(vec3(p, 2.0));
     vec3 pos = vec3(0.0, 0.0, 3.0);
 
