@@ -174,7 +174,7 @@ vec4 draw() {
     // level > 1 if u_distance > u_radius * model_const
     float level = (u_distance - u_radius) / ((u_radius * model_const) - u_radius);
 
-    // -------------------------------|-------------------------------|------------x
+    // -------------------------------|-------------------------------|------------x OBJECT
     //                                                                 ---radius---
     //                                 -------------radius * model_const-----------
     //              > 1.0            1.0                              0.0
