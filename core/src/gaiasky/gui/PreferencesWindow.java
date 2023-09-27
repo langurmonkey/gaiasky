@@ -65,7 +65,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY,
             highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
-            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr, eclipses, eclipseOutlines;
+            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr, eclipses, eclipseOutlines, starSpheres;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
@@ -182,6 +182,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabsTable.align(Align.left | Align.top);
 
         final OwnTextIconButton tabGraphics = createTab(I18n.msg("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin);
+        final OwnTextIconButton tabScene = createTab(I18n.msg("gui.ui.scene.settings"), new Image(skin.getDrawable("iconic-compass")), skin);
         final OwnTextIconButton tabUI = createTab(I18n.msg("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin);
         final OwnTextIconButton tabPerformance = createTab(I18n.msg("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin);
         final OwnTextIconButton tabControls = createTab(I18n.msg("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin);
@@ -194,6 +195,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnTextIconButton tabSystem = createTab(I18n.msg("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin);
 
         tabsTable.add(tabGraphics).row();
+        tabsTable.add(tabScene).row();
         tabsTable.add(tabUI).row();
         tabsTable.add(tabPerformance).row();
         tabsTable.add(tabControls).row();
@@ -208,6 +210,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         tabButtons = new Array<>();
         tabButtons.add(tabGraphics);
+        tabButtons.add(tabScene);
         tabButtons.add(tabUI);
         tabButtons.add(tabPerformance);
         tabButtons.add(tabControls);
@@ -639,35 +642,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to content
         addContentGroup(contentGraphicsTable, titleShadows, shadows);
 
-        // ECLIPSES
-        Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
-        Table eclipsesTable = new Table();
-        // Enable eclipses
-        OwnLabel eclipsesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.enable"), skin);
-        eclipses = new OwnCheckBox("", skin);
-        eclipses.setChecked(settings.scene.renderer.eclipses.active);
-        eclipses.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                // Enable or disable resolution
-                enableComponents(eclipses.isChecked(), eclipseOutlines);
-                return true;
-            }
-            return false;
-        });
-        // Eclipse outlines
-        OwnLabel eclipsesOutlinesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.outlines"), skin);
-        eclipseOutlines = new OwnCheckBox("", skin);
-        eclipseOutlines.setChecked(settings.scene.renderer.eclipses.outlines);
-
-        labels.add(eclipsesLabel, eclipsesOutlinesLabel);
-
-        eclipsesTable.add(eclipsesLabel).left().padRight(pad34).padBottom(pad10);
-        eclipsesTable.add(eclipses).left().padRight(pad18).padBottom(pad10).row();
-        eclipsesTable.add(eclipsesOutlinesLabel).left().padRight(pad34).padBottom(pad10);
-        eclipsesTable.add(eclipseOutlines).left().padRight(pad18).padBottom(pad10);
-
-        // Add to content
-        addContentGroup(contentGraphicsTable, titleEclipses, eclipsesTable);
 
         // IMAGE LEVELS
         Label titleDisplay = new OwnLabel(I18n.msg("gui.graphics.imglevels"), skin, "header");
@@ -966,9 +940,106 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         /*
+         * ==== SCENE ====
+         */
+        final Table contentSceneTable = new Table(skin);
+        final OwnScrollPane contentScene = new OwnScrollPane(contentSceneTable, skin, "minimalist-nobg");
+        contentScene.setWidth(contentWidth);
+        contentScene.setHeight(scrollHeight);
+        contentScene.setScrollingDisabled(true, false);
+        contentScene.setFadeScrollBars(false);
+        contentSceneTable.align(Align.top | Align.left);
+
+
+        // RECURSIVE GRID
+        OwnLabel titleRecgrid = new OwnLabel(I18n.msg("gui.ui.recursivegrid"), skin, "header");
+        Table rg = new Table();
+
+        // ORIGIN
+        OwnLabel originLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.origin"), skin);
+        String[] origins = new String[]{I18n.msg("gui.ui.recursivegrid.origin.refsys"), I18n.msg("gui.ui.recursivegrid.origin.focus")};
+        recGridOrigin = new OwnSelectBox<>(skin);
+        recGridOrigin.setWidth(selectWidth);
+        recGridOrigin.setItems(origins);
+        recGridOrigin.setSelectedIndex(settings.program.recursiveGrid.origin.ordinal());
+
+        // STYLE
+        OwnLabel styleLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.style"), skin);
+        String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.circular"), I18n.msg("gui.ui.recursivegrid.style.square")};
+        recGridStyle = new OwnSelectBox<>(skin);
+        recGridStyle.setWidth(selectWidth);
+        recGridStyle.setItems(styles);
+        recGridStyle.setSelectedIndex(settings.program.recursiveGrid.style.ordinal());
+
+        // PROJECTION LINES
+        OwnLabel recGridProjectionLinesLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.projlines"), skin);
+        recGridProjectionLines = new OwnCheckBox("", skin);
+        recGridProjectionLines.setName("origin projection lines cb");
+        recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
+
+        labels.add(originLabel, styleLabel, recGridProjectionLinesLabel);
+
+        // Add to table
+        rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
+        rg.add(recGridOrigin).left().padBottom(pad10).row();
+        rg.add(styleLabel).left().padBottom(pad10).padRight(pad34);
+        rg.add(recGridStyle).left().padBottom(pad10).row();
+        rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
+        rg.add(recGridProjectionLines).left().padBottom(pad10);
+
+        // Add to content
+        addContentGroup(contentSceneTable, titleRecgrid, rg, 0f);
+
+        // ECLIPSES
+        Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
+        Table eclipsesTable = new Table();
+        // Enable eclipses
+        OwnLabel eclipsesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.enable"), skin);
+        eclipses = new OwnCheckBox("", skin);
+        eclipses.setChecked(settings.scene.renderer.eclipses.active);
+        eclipses.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                // Enable or disable resolution
+                enableComponents(eclipses.isChecked(), eclipseOutlines);
+                return true;
+            }
+            return false;
+        });
+        // Eclipse outlines
+        OwnLabel eclipsesOutlinesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.outlines"), skin);
+        eclipseOutlines = new OwnCheckBox("", skin);
+        eclipseOutlines.setChecked(settings.scene.renderer.eclipses.outlines);
+
+        labels.add(eclipsesLabel, eclipsesOutlinesLabel);
+
+        eclipsesTable.add(eclipsesLabel).left().padRight(pad34).padBottom(pad10);
+        eclipsesTable.add(eclipses).left().padRight(pad18).padBottom(pad10).row();
+        eclipsesTable.add(eclipsesOutlinesLabel).left().padRight(pad34).padBottom(pad10);
+        eclipsesTable.add(eclipseOutlines).left().padRight(pad18).padBottom(pad10);
+
+        // Add to content
+        addContentGroup(contentSceneTable, titleEclipses, eclipsesTable);
+
+        // STARS
+        OwnLabel titleStars = new OwnLabel(I18n.msg("gui.ui.scene.stars"), skin, "header");
+        Table starsTable = new Table();
+
+        // Render stars as spheres
+        OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.starspheres"), skin);
+        starSpheres = new OwnCheckBox("", skin);
+        starSpheres.setChecked(settings.scene.star.renderStarSpheres);
+
+        labels.add(starSpheresLabel);
+
+        starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
+
+        // Add to content
+        addContentGroup(contentSceneTable, titleStars, starsTable);
+
+        /*
          * ==== UI ====
          */
-        float labelWidth = 400f;
 
         final Table contentUI = new Table(skin);
         contentUI.setWidth(contentWidth);
@@ -980,7 +1051,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LANGUAGE
         OwnLabel langLabel = new OwnLabel(I18n.msg("gui.ui.language"), skin);
-        langLabel.setWidth(labelWidth);
         File i18nDir = new File(Settings.ASSETS_LOC + File.separator + "i18n");
         String i18nName = "gsbundle";
         String[] files = i18nDir.list();
@@ -1017,7 +1087,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
-        themeLabel.setWidth(labelWidth);
 
         StrComboBoxBean[] themes = new StrComboBoxBean[]{new StrComboBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
                 new StrComboBoxBean(I18n.msg("gui.theme.darkblue"), "dark-blue"), new StrComboBoxBean(I18n.msg("gui.theme.darkorange"), "dark-orange"),
@@ -1039,7 +1108,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // SCALING
         OwnLabel uiScaleLabel = new OwnLabel(I18n.msg("gui.ui.theme.scale"), skin);
-        uiScaleLabel.setWidth(labelWidth);
         uiScale = new OwnSliderPlus("", Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_SMALL, Constants.UI_SCALE_INTERNAL_MIN,
                 Constants.UI_SCALE_INTERNAL_MAX, skin);
         uiScale.setWidth(sliderWidth);
@@ -1057,7 +1125,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // MINIMAP SIZE
         OwnLabel minimapSizeLabel = new OwnLabel(I18n.msg("gui.ui.minimap.size"), skin, "default");
-        minimapSizeLabel.setWidth(labelWidth);
         minimapSize = new OwnSliderPlus("", Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE, 1f, skin);
         minimapSize.setName("minimapSize");
         minimapSize.setWidth(sliderWidth);
@@ -1065,7 +1132,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // PREFERRED DISTANCE UNITS
         OwnLabel distUnitsLabel = new OwnLabel(I18n.msg("gui.ui.distance.units"), skin, "default");
-        distUnitsLabel.setWidth(labelWidth);
         DistanceUnits[] dus = DistanceUnits.values();
         ComboBoxBean[] distUnits = new ComboBoxBean[dus.length];
         for (int idu = 0; idu < dus.length; idu++) {
@@ -1083,7 +1149,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         modeChangeInfo.setChecked(settings.program.ui.modeChangeInfo);
 
         // LABELS
-        labels.addAll(langLabel, themeLabel);
+        labels.addAll(langLabel, themeLabel, uiScaleLabel, minimapSizeLabel, distUnitsLabel, modeChangeInfoLabel);
 
         // Add to table
         ui.add(langLabel).left().padRight(pad34).padBottom(pad18);
@@ -1162,7 +1228,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // GUIDES WIDTH
         OwnLabel pointerGuidesWidthLabel = new OwnLabel(I18n.msg("gui.ui.pointer.guides.width"), skin, "default");
-        pointerGuidesWidthLabel.setWidth(labelWidth);
         pointerGuidesWidth = new OwnSliderPlus("", Constants.MIN_POINTER_GUIDES_WIDTH, Constants.MAX_POINTER_GUIDES_WIDTH, Constants.SLIDER_STEP_TINY, skin);
         pointerGuidesWidth.setName("pointerguideswidth");
         pointerGuidesWidth.setWidth(sliderWidth);
@@ -1180,47 +1245,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         pg.add(pointerGuidesWidthLabel).left().padBottom(pad10).padRight(pad34);
         pg.add(pointerGuidesWidth).left().padBottom(pad10).padRight(pad34);
 
-        /* RECURSIVE GRID */
-        OwnLabel titleRecgrid = new OwnLabel(I18n.msg("gui.ui.recursivegrid"), skin, "header");
-        Table rg = new Table();
-
-        // ORIGIN
-        OwnLabel originLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.origin"), skin);
-        originLabel.setWidth(labelWidth);
-        String[] origins = new String[]{I18n.msg("gui.ui.recursivegrid.origin.refsys"), I18n.msg("gui.ui.recursivegrid.origin.focus")};
-        recGridOrigin = new OwnSelectBox<>(skin);
-        recGridOrigin.setWidth(selectWidth);
-        recGridOrigin.setItems(origins);
-        recGridOrigin.setSelectedIndex(settings.program.recursiveGrid.origin.ordinal());
-
-        // STYLE
-        OwnLabel styleLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.style"), skin);
-        styleLabel.setWidth(labelWidth);
-        String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.circular"), I18n.msg("gui.ui.recursivegrid.style.square")};
-        recGridStyle = new OwnSelectBox<>(skin);
-        recGridStyle.setWidth(selectWidth);
-        recGridStyle.setItems(styles);
-        recGridStyle.setSelectedIndex(settings.program.recursiveGrid.style.ordinal());
-
-        // PROJECTION LINES
-        OwnLabel recGridProjectionLinesLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.projlines"), skin);
-        recGridProjectionLines = new OwnCheckBox("", skin);
-        recGridProjectionLines.setName("origin projection lines cb");
-        recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
-
-        // Add to table
-        rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(recGridOrigin).left().padBottom(pad10).row();
-        rg.add(styleLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(recGridStyle).left().padBottom(pad10).row();
-        rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(recGridProjectionLines).left().padBottom(pad10);
 
         // Add to content
         addContentGroup(contentUI, titleUI, ui, 0f);
         addContentGroup(contentUI, titleCrosshair, ch);
         addContentGroup(contentUI, titleGuides, pg);
-        addContentGroup(contentUI, titleRecgrid, rg);
 
 
         /*
@@ -2175,6 +2204,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         /* ADD ALL CONTENT */
         addTabContent(contentGraphics);
+        addTabContent(contentScene);
         addTabContent(contentUI);
         addTabContent(contentPerformance);
         addTabContent(contentControls);
@@ -2488,6 +2518,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // We just deactivated eclipses!
             EventManager.publish(Event.ECLIPSES_CMD, this, eclipses.isChecked());
         }
+
+        // Star spheres
+        settings.scene.star.renderStarSpheres = starSpheres.isChecked();
 
         // Fade time
         settings.scene.fadeMs = MathUtils.clamp(fadeTimeField.getLongValue(settings.scene.fadeMs), Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);

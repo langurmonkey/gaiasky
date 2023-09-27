@@ -52,7 +52,9 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
             } else {
                 addToRender(render, RenderGroup.STAR_GROUP);
             }
-            addToRender(render, RenderGroup.MODEL_VERT_STAR);
+            if (Settings.settings.scene.star.renderStarSpheres) {
+                addToRender(render, RenderGroup.MODEL_VERT_STAR);
+            }
             if (Settings.settings.scene.star.group.billboard) {
                 addToRender(render, RenderGroup.BILLBOARD_STAR);
             }

@@ -132,6 +132,8 @@ scene:
     numLabels: 0
   # Star settings.
   star:
+    # Render star spheres.
+    renderStarSpheres: false
     # Star brightness factor.
     brightness: 2.0
     # Modulate the brightness of stars with this power.

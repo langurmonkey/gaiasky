@@ -68,7 +68,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
 
         if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point) {
             addToRender(render, RenderGroup.BILLBOARD_STAR);
-            if (body.distToCamera < Mapper.distance.get(entity).distance * Mapper.modelScaffolding.get(entity).sizeScaleFactor) {
+            if (Settings.settings.scene.star.renderStarSpheres && body.distToCamera < Mapper.distance.get(entity).distance * Mapper.modelScaffolding.get(entity).sizeScaleFactor) {
                 camera.checkClosestBody(entity);
                 addToRender(render, RenderGroup.MODEL_VERT_STAR);
             }

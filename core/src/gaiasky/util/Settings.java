@@ -931,6 +931,7 @@ public class Settings {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class StarSettings implements IObserver {
+            public boolean renderStarSpheres;
             public float brightness;
             public float power;
             public float pointSize;

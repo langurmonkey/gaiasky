@@ -10,6 +10,7 @@ package gaiasky.scene.system.render.draw.billboard;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -123,9 +124,10 @@ public class BillboardEntityRenderSystem implements IObserver {
             if (solidAngle >= thPointTimesFovFactor) {
                 double fuzzySize = getRenderSizeStarSet(size, radius, distToCamera, solidAngle);
                 // Ease into billboard.
-                alpha *= MathUtilsDouble.lint(solidAngle, thPointTimesFovFactor, thPointTimesFovFactor * 2f, 0, 1);
+                alpha *= (float) MathUtilsDouble.lint(solidAngle, thPointTimesFovFactor, thPointTimesFovFactor * 2f, 0, 1);
 
                 Vector3 pos = starPos.put(F31);
+                shader.setUniformMatrix("u_matrix", camera.getCamera().view);
                 shader.setUniformf("u_pos", pos);
                 shader.setUniformf("u_size", (float) fuzzySize);
 
@@ -264,7 +266,11 @@ public class BillboardEntityRenderSystem implements IObserver {
             // Only for models.
             float len = billboardPosition.len();
             billboardPosition.nor().scl(len * 0.99f);
+        } else {
+            // Projection matrix for star corona.
+            shader.setUniformMatrix("u_matrix", camera.getCamera().view);
         }
+
         shader.setUniformf("u_pos", billboardPosition);
         shader.setUniformf("u_size", fuzzySize);
 
