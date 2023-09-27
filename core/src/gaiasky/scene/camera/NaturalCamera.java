@@ -918,10 +918,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         // Half a second after we have stopped zooming, real friction kicks in
         if (fullStop) {
+            double elevation = focus.getElevationAt(pos);
             double counterAmount = lastFwdAmount < 0 && cinematic ? Math.min(speedScaling, 200) : 2;
             if (getMode().isFocus() && lastFwdAmount > 0) {
-                double factor = cinematic ? 100 : 1;
-                counterAmount *= factor / ((focus.getDistToCamera() - focus.getRadius()) / focus.getRadius());
+                counterAmount *= 1.0 / ((focus.getDistToCamera() - elevation) / elevation);
             }
             // The last term applies a greater scale when the direction and velocity vector face in the same general direction.
             double scl = -velocity * counterAmount * dt;

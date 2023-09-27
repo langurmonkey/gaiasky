@@ -11,6 +11,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import gaiasky.GaiaSky;
 import gaiasky.scene.record.BilinearInterpolator.GridModel;
@@ -36,9 +37,16 @@ public class HeightDataPixmap implements IHeightData {
 
     public HeightDataPixmap(Texture texture, Runnable finished) {
         if (texture != null && texture.getTextureData() instanceof PixmapTextureData) {
+            // Directly get pixmap texture data.
             heightPixmap = texture.getTextureData().consumePixmap();
             initModel();
+        } else if (texture != null && texture.getTextureData() instanceof FileTextureData) {
+            // Load it.
+            var fileTextureData = (FileTextureData) texture.getTextureData();
+            heightPixmap = new Pixmap(fileTextureData.getFileHandle());
+            initModel();
         } else {
+            // No data.
             heightPixmap = null;
         }
         if (finished != null) {
@@ -48,7 +56,7 @@ public class HeightDataPixmap implements IHeightData {
 
     private void initModel(){
         this.model = new GridModel() {
-            private Color color = new Color();
+            private final Color color = new Color();
             @Override
             public int getWidth() {
                 assert heightPixmap != null;
