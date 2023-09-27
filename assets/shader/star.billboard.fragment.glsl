@@ -136,7 +136,7 @@ vec4 closeUp(float dist, float level) {
 
     // Flip u coordinate.
     vec2 uv = v_uv;
-    uv.u = 1.0 - uv.u;
+    uv.x = 1.0 - uv.x;
     // We need coordinates in [-12.5,12.5].
     vec2 p = (uv * 25.0) - 12.5;
     vec3 ray = normalize(vec3(p, 2.0));
