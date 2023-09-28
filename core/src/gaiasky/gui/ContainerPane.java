@@ -28,7 +28,7 @@ public class ContainerPane extends Table {
 
         OwnLabel titleLabel = new OwnLabel(title, skin, "header");
         add(titleLabel).top().center().row();
-        add(new Separator(skin, "small")).top().left().growX().padBottom(pad20).row();
+        add(new Separator(skin, "small")).top().left().growX().padBottom(pad20 * 2f).row();
         add(actor);
         pack();
 

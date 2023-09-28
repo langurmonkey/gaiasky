@@ -57,7 +57,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
         warpSteps = ((GlobalClock) GaiaSky.instance.time).warpSteps;
-        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD, Event.TIME_STATE_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD,
+                Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD, Event.TIME_STATE_CMD);
     }
 
     @Override

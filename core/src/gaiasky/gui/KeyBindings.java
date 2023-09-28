@@ -460,6 +460,10 @@ public class KeyBindings {
             EventManager.publish(Event.UPSCALE_FILTER_CMD, this, newFilter);
             logger.info("Upscaling filter: " + newFilter);
         }));
+
+        for(var a : actions.keySet()) {
+           System.out.println(a);
+        }
     }
 
     private void initMappings() {

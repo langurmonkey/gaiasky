@@ -46,7 +46,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected VerticalGroup mainVertical;
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
-    protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null;
     protected OwnTextIconButton buttonMinimap = null;
     protected TiledDrawable separator;
 
@@ -76,7 +75,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(separatorTextureRegion);
 
-        EventManager.instance.subscribe(this, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.RECORD_CAMERA_CMD);
+        EventManager.instance.subscribe(this, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP);
     }
 
     /**
@@ -110,52 +109,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         panes.put(timeComponent.getClass().getSimpleName(), time);
 
         /* ----CAMERA---- */
-        // Record camera button
-        recCamera = new OwnImageButton(skin, "rec");
-        recCamera.setName("recCam");
-        recCamera.setChecked(Settings.settings.runtime.recordCamera);
-        recCamera.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.RECORD_CAMERA_CMD, recCamera, recCamera.isChecked(), null);
-                return true;
-            }
-            return false;
-        });
-        recCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.reccamera"), skin));
-
-        // Record camera (keyframes)
-        recKeyframeCamera = new OwnImageButton(skin, "rec-key");
-        recKeyframeCamera.setName("recKeyframeCamera");
-        recKeyframeCamera.setChecked(Settings.settings.runtime.recordKeyframeCamera);
-        recKeyframeCamera.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_KEYFRAMES_WINDOW_ACTION, recKeyframeCamera);
-                return true;
-            }
-            return false;
-        });
-        recKeyframeCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.reccamerakeyframe"), skin));
-
-        // Play camera button
-        playCamera = new OwnImageButton(skin, "play");
-        playCamera.setName("playCam");
-        playCamera.setChecked(false);
-        playCamera.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_PLAYCAMERA_ACTION, playCamera);
-                return true;
-            }
-            return false;
-        });
-
-        playCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera"), skin));
-
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize(getContentWidth());
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.camera");
 
-        CollapsiblePane camera = new CollapsiblePane(ui, I18n.msg("gui.camera"), cameraComponent.getActor(), getContentWidth(), skin, false, shortcut, recCamera, recKeyframeCamera, playCamera);
+        CollapsiblePane camera = new CollapsiblePane(ui, I18n.msg("gui.camera"), cameraComponent.getActor(), getContentWidth(), skin, false, shortcut);
         camera.align(Align.left);
         mainActors.add(camera);
         panes.put(cameraComponent.getClass().getSimpleName(), camera);
@@ -433,12 +392,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             case TOGGLE_MINIMAP -> {
                 buttonMinimap.setCheckedNoFire(!buttonMinimap.isChecked());
-            }
-            case RECORD_CAMERA_CMD -> {
-                boolean state = (Boolean) data[0];
-                if (source != recCamera) {
-                    recCamera.setCheckedNoFire(state);
-                }
             }
             default -> {
             }
