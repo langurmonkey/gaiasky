@@ -233,7 +233,7 @@ public class WelcomeGui extends AbstractGui {
 
         Table centerContent = new Table(skin);
         centerContent.center();
-        centerContent.setBackground("table-bg");
+        centerContent.setBackground("bg-corner-bright");
         centerContent.pad(pad32);
         centerContent.padLeft(pad32 * 5f);
         centerContent.padRight(pad32 * 5f);

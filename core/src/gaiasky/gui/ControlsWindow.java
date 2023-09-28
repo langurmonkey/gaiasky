@@ -47,7 +47,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
     protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null;
-    protected OwnTextIconButton map = null;
+    protected OwnTextIconButton buttonMinimap = null;
     protected TiledDrawable separator;
 
     /**
@@ -208,104 +208,95 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         bookmarksComponent.setScene(scene);
         bookmarksComponent.initialize(getContentWidth());
 
-        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
+        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.bookmarks");
 
         CollapsiblePane bookmarks = new CollapsiblePane(ui, I18n.msg("gui.bookmarks"), bookmarksComponent.getActor(), getContentWidth(), skin, false, shortcut);
         bookmarks.align(Align.left);
         mainActors.add(bookmarks);
         panes.put(bookmarksComponent.getClass().getSimpleName(), bookmarks);
 
-        /* ----GAIA SCAN GROUP---- */
-        //	GaiaComponent gaiaComponent = new GaiaComponent(skin, ui);
-        //	gaiaComponent.initialize();
-        //
-        //	CollapsiblePane gaia = new CollapsiblePane(ui, I18n.txt("gui.gaiascan"), gaiaComponent.getActor(), skin, false);
-        //	gaia.align(Align.left);
-        //	mainActors.add(gaia);
-        //	panes.put(gaiaComponent.getClass().getSimpleName(), gaia);
-
         Table buttonsTable;
         /* BUTTONS */
         float bw = 48f, bh = 48f;
         KeyBindings kb = KeyBindings.instance;
-        map = new OwnTextIconButton("", skin, "menu-map");
-        map.setSize(bw, bh);
-        map.setName("map");
-        map.setChecked(Settings.settings.program.minimap.active);
+        buttonMinimap = new OwnTextIconButton("", skin, "menu-map");
+        buttonMinimap.setSize(bw, bh);
+        buttonMinimap.setName("map");
+        buttonMinimap.setChecked(Settings.settings.program.minimap.active);
         String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
-        map.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
-        map.addListener(event -> {
+        buttonMinimap.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
+        buttonMinimap.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_MINIMAP_ACTION, map, map.isChecked());
+                EventManager.publish(Event.SHOW_MINIMAP_ACTION, buttonMinimap, buttonMinimap.isChecked());
             }
             return false;
         });
-        Button load = new OwnTextIconButton("", skin, "load");
-        load.setSize(bw, bh);
-        load.setName("loadcatalog");
-        load.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
-        load.addListener(event -> {
+        OwnTextButton buttonLoad = new OwnTextIconButton("", skin, "load");
+        buttonLoad.setSize(bw, bh);
+        buttonLoad.setName("loadcatalog");
+        buttonLoad.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
+        buttonLoad.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, load);
-                uncheck(load);
+                EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, buttonLoad);
+                buttonLoad.setCheckedNoFire(false);
             }
             return false;
         });
-        Button preferences = new OwnTextIconButton("", skin, "preferences");
-        preferences.setSize(bw, bh);
-        preferences.setName("preferences");
+        OwnTextButton buttonSettings = new OwnTextIconButton("", skin, "preferences");
+        buttonSettings.setSize(bw, bh);
+        buttonSettings.setName("preferences");
         String prefsHotkey = kb.getStringKeys("action.preferences");
-        preferences.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.preferences"), prefsHotkey, skin));
-        preferences.addListener(event -> {
+        buttonSettings.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.preferences"), prefsHotkey, skin));
+        buttonSettings.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_PREFERENCES_ACTION, preferences);
-                uncheck(preferences);
+                EventManager.publish(Event.SHOW_PREFERENCES_ACTION, buttonSettings);
+                buttonSettings.setCheckedNoFire(false);
             }
             return false;
         });
-        Button showLog = new OwnTextIconButton("", skin, "log");
-        showLog.setSize(bw, bh);
-        showLog.setName("show log");
-        showLog.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
-        showLog.addListener((event) -> {
+        OwnTextButton buttonLog = new OwnTextIconButton("", skin, "log");
+        buttonLog.setSize(bw, bh);
+        buttonLog.setName("show log");
+        buttonLog.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
+        buttonLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LOG_ACTION, showLog);
-                uncheck(showLog);
+                EventManager.publish(Event.SHOW_LOG_ACTION, buttonLog);
+                buttonLog.setCheckedNoFire(false);
             }
             return false;
         });
-        Button about = new OwnTextIconButton("", skin, "help");
-        about.setSize(bw, bh);
-        about.setName("about");
+        OwnTextButton buttonHelp = new OwnTextIconButton("", skin, "help");
+        buttonHelp.setSize(bw, bh);
+        buttonHelp.setName("about");
         String helpHotkey = kb.getStringKeys("action.help");
-        about.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.help"), helpHotkey, skin));
-        about.addListener(event -> {
+        buttonHelp.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.help"), helpHotkey, skin));
+        buttonHelp.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_ABOUT_ACTION, about);
-                uncheck(about);
+                EventManager.publish(Event.SHOW_ABOUT_ACTION, buttonHelp);
+                buttonHelp.setCheckedNoFire(false);
             }
             return false;
         });
-        Button quit = new OwnTextIconButton("", skin, "quit");
-        quit.setSize(bw, bh);
-        quit.setName("quit");
-        quit.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
-        quit.addListener(event -> {
+        OwnTextButton buttonQuit = new OwnTextIconButton("", skin, "quit");
+        buttonQuit.setSize(bw, bh);
+        buttonQuit.setName("quit");
+        buttonQuit.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
+        buttonQuit.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_QUIT_ACTION, quit);
-                uncheck(quit);
+                EventManager.publish(Event.SHOW_QUIT_ACTION, buttonQuit);
+                buttonQuit.setCheckedNoFire(false);
             }
             return false;
         });
 
         float pad = 3f;
         buttonsTable = new Table(skin);
-        buttonsTable.add(map).pad(pad).top().left();
-        buttonsTable.add(load).pad(pad).top().left();
-        buttonsTable.add(preferences).pad(pad).top().left();
-        buttonsTable.add(showLog).pad(pad).top().left();
-        buttonsTable.add(about).pad(pad).top().left();
-        buttonsTable.add(quit).pad(pad).top().left();
+        buttonsTable.add(buttonMinimap).pad(pad).top().left();
+        buttonsTable.add(buttonLoad).pad(pad).top().left();
+        buttonsTable.add(buttonSettings).pad(pad).top().left();
+        buttonsTable.add(buttonLog).pad(pad).top().left();
+        buttonsTable.add(buttonHelp).pad(pad).top().left();
+        buttonsTable.add(buttonQuit).pad(pad).top().left();
 
         buttonsTable.pack();
 
@@ -355,12 +346,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         pack();
         recalculateSize();
-    }
-
-    private void uncheck(Button b) {
-        b.setProgrammaticChangeEvents(false);
-        b.setChecked(false);
-        b.setProgrammaticChangeEvents(true);
     }
 
     public void recalculateSize() {
@@ -442,16 +427,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             case SHOW_MINIMAP_ACTION -> {
                 boolean show = (Boolean) data[0];
-                if (source != map) {
-                    map.setProgrammaticChangeEvents(false);
-                    map.setChecked(show);
-                    map.setProgrammaticChangeEvents(true);
+                if (source != buttonMinimap) {
+                    buttonMinimap.setCheckedNoFire(show);
                 }
             }
             case TOGGLE_MINIMAP -> {
-                map.setProgrammaticChangeEvents(false);
-                map.setChecked(!map.isChecked());
-                map.setProgrammaticChangeEvents(true);
+                buttonMinimap.setCheckedNoFire(!buttonMinimap.isChecked());
             }
             case RECORD_CAMERA_CMD -> {
                 boolean state = (Boolean) data[0];

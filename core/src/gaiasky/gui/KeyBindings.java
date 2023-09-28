@@ -214,9 +214,6 @@ public class KeyBindings {
         // run quit action
         addAction(new ProgramAction("action.exit", runnableQuit, noCleanMode));
 
-        // exit
-        //addAction(new ProgramAction("action.exit", runnableQuit), CTRL_L, Keys.Q);
-
         // show preferences dialog
         addAction(new ProgramAction("action.preferences", () -> EventManager.publish(Event.SHOW_PREFERENCES_ACTION, this), noCleanMode));
 
@@ -226,12 +223,11 @@ public class KeyBindings {
         // load catalog
         addAction(new ProgramAction("action.loadcatalog", () -> EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, this), noCleanMode));
 
+        // play camera path
+        addAction(new ProgramAction("action.playcamera", () -> EventManager.publish(Event.SHOW_PLAYCAMERA_ACTION, this), noCleanMode));
+
         // show log dialog
         addAction(new ProgramAction("action.log", () -> EventManager.publish(Event.SHOW_LOG_ACTION, this), noCleanMode));
-
-        // show play camera dialog
-        //addAction(new ProgramAction("action.playcamera", () ->
-        //        EventManager.publish(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);
 
         // Toggle orbits
         addAction(new ProgramAction("action.toggle/element.orbits", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits")));
@@ -381,12 +377,6 @@ public class KeyBindings {
 
         // Search dialog
         final Runnable runnableSearch = () -> EventManager.publish(Event.SHOW_SEARCH_ACTION, this);
-        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
-
-        // Search dialog
-        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
-
-        // Search dialog
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // Toggle particle fade

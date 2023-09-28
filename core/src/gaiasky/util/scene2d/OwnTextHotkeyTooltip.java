@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
 
 public class OwnTextHotkeyTooltip extends Tooltip<Table> {
-    private final Table table;
     private final OwnLabel label;
     private OwnLabel labelHotkey;
 
@@ -44,7 +43,7 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
             text = sb.toString();
         }
 
-        table = new Table(skin);
+        Table table = new Table(skin);
 
         label = new OwnLabel(text, skin);
 

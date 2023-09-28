@@ -1,4 +1,4 @@
-#v30501
+#v3050402
 # This file contains the key mappings for Gaia Sky.
 
 # Each line contains an action=keys pair, where action is the
@@ -24,12 +24,13 @@ action.home                                 = HOME
 action.preferences                          = P
 
 # Show log
-action.log                                  = L
+action.log                                  = ALT_L L
 
 # Load catalog
 action.loadcatalog                          = CTRL_L O
 
-#action.playcamera                          = C
+# Play camera
+action.playcamera                           = ALT_L C
 
 # Visibility toggles
 action.toggle/element.orbits                = SHIFT_L O
@@ -114,12 +115,12 @@ action.resettime                            = CTRL_L R
 action.toggle/gui.minimap.title             = TAB
 
 # GUI elements
-action.expandcollapse.pane/gui.time         = ALT_L T
-action.expandcollapse.pane/gui.camera       = ALT_L C
-action.expandcollapse.pane/gui.visibility   = ALT_L V
-action.expandcollapse.pane/gui.lighting     = ALT_L L
-action.expandcollapse.pane/gui.dataset.title= ALT_L D
-action.expandcollapse.pane/gui.bookmarks    = ALT_L B
+action.expandcollapse.pane/gui.time         = T
+action.expandcollapse.pane/gui.camera       = C
+action.expandcollapse.pane/gui.visibility   = V
+action.expandcollapse.pane/gui.lighting     = L
+action.expandcollapse.pane/gui.dataset.title= D
+action.expandcollapse.pane/gui.bookmarks    = B
 
 # Master/slave
 action.slave.configure                      = S L V

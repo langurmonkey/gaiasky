@@ -1634,6 +1634,7 @@ public class Settings {
             public String theme;
             public float scale;
             public long animationMs = 600;
+            public boolean newUI = true;
             public boolean modeChangeInfo;
             public DistanceUnits distanceUnits;
 

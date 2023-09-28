@@ -128,15 +128,17 @@ public class FullGui extends AbstractGui {
         ni.pad(0, pad, pad, 0);
         interfaces.add(notificationsInterface);
 
-        // CONTROLS WINDOW
-        addControlsWindow();
-
-        // CONTROLS INTERFACE - TOP LEFT
-        //controlsInterface = new ControlsInterface(skin, stage);
-        //controlsInterface.setFillParent(true);
-        //controlsInterface.top().left();
-        //controlsInterface.pad(pad5);
-        //interfaces.add(controlsInterface);
+        if (Settings.settings.program.ui.newUI) {
+            // CONTROLS INTERFACE - TOP LEFT
+            controlsInterface = new ControlsInterface(skin, stage, scene, catalogManager, visibilityEntities, visible);
+            controlsInterface.setFillParent(true);
+            controlsInterface.top().left();
+            controlsInterface.pad(pad5);
+            interfaces.add(controlsInterface);
+        } else {
+            // CONTROLS WINDOW
+            addControlsWindow();
+        }
 
         // FOCUS INFORMATION - BOTTOM RIGHT
         focusInterface = new FocusInfoInterface(skin);
@@ -199,57 +201,57 @@ public class FullGui extends AbstractGui {
 
         /* VERSION CHECK */
         if (Settings.settings.program.update.lastCheck == null || Instant.now().toEpochMilli() - Settings.settings.program.update.lastCheck.toEpochMilli() > UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
-            // Start version check
-            VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
-            vc.setListener(event -> {
-                if (event instanceof VersionCheckEvent) {
-                    VersionCheckEvent vce = (VersionCheckEvent) event;
-                    if (!vce.isFailed()) {
-                        // Check version
-                        String tagVersion = vce.getTag();
-                        Integer versionNumber = vce.getVersionNumber();
-
-                        Settings.settings.program.update.lastCheck = Instant.now();
-
-                        if (versionNumber > Settings.settings.version.versionNumber) {
-                            logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion));
-                            // There's a new version!
-                            UpdatePopup newVersion = new UpdatePopup(tagVersion, stage, skin);
-                            newVersion.pack();
-                            float ww = newVersion.getWidth();
-                            float margin = 8f;
-                            newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
-                            stage.addActor(newVersion);
-                        } else {
-                            // No new version
-                            logger.info(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
-                        }
-
-                    } else {
-                        // Handle failed case
-                        // Do nothing
-                        logger.info(I18n.msg("gui.newversion.fail"));
-                    }
-                }
-                return false;
-            });
-
-            // Start in 10 seconds
-            Thread vct = new Thread(vc);
-            Timer.Task t = new Timer.Task() {
-                @Override
-                public void run() {
-                    logger.info(I18n.msg("gui.newversion.checking"));
-                    vct.start();
-                }
-            };
+            // Start check for new versions.
+            final Timer.Task t = getVersionCheckTask();
             Timer.schedule(t, 10);
         }
 
     }
 
-    public void recalculateOptionsSize() {
-        controlsWindow.recalculateSize();
+    private Timer.Task getVersionCheckTask() {
+        VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
+        vc.setListener(event -> {
+            if (event instanceof VersionCheckEvent) {
+                VersionCheckEvent vce = (VersionCheckEvent) event;
+                if (!vce.isFailed()) {
+                    // Check version
+                    String tagVersion = vce.getTag();
+                    Integer versionNumber = vce.getVersionNumber();
+
+                    Settings.settings.program.update.lastCheck = Instant.now();
+
+                    if (versionNumber > Settings.settings.version.versionNumber) {
+                        logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion));
+                        // There's a new version!
+                        UpdatePopup newVersion = new UpdatePopup(tagVersion, stage, skin);
+                        newVersion.pack();
+                        float ww = newVersion.getWidth();
+                        float margin = 8f;
+                        newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
+                        stage.addActor(newVersion);
+                    } else {
+                        // No new version
+                        logger.info(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
+                    }
+
+                } else {
+                    // Handle failed case
+                    // Do nothing
+                    logger.info(I18n.msg("gui.newversion.fail"));
+                }
+            }
+            return false;
+        });
+
+        // Start in 10 seconds
+        Thread vct = new Thread(vc);
+        return new Timer.Task() {
+            @Override
+            public void run() {
+                logger.info(I18n.msg("gui.newversion.checking"));
+                vct.start();
+            }
+        };
     }
 
     protected void rebuildGui() {
@@ -258,7 +260,7 @@ public class FullGui extends AbstractGui {
             boolean collapsed;
             if (controlsWindow != null) {
                 collapsed = controlsWindow.isCollapsed();
-                recalculateOptionsSize();
+                controlsWindow.recalculateSize();
                 if (collapsed)
                     controlsWindow.collapseInstant();
                 controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
@@ -645,11 +647,13 @@ public class FullGui extends AbstractGui {
     public boolean updateUnitsPerPixel(float upp) {
         boolean cool = super.updateUnitsPerPixel(upp);
         if (cool) {
-            controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
-            controlsWindow.recalculateSize();
-            if (stage.getHeight() < controlsWindow.getHeight()) {
-                // Collapse
-                controlsWindow.collapseInstant();
+            if (controlsWindow != null) {
+                controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
+                controlsWindow.recalculateSize();
+                if (stage.getHeight() < controlsWindow.getHeight()) {
+                    // Collapse
+                    controlsWindow.collapseInstant();
+                }
             }
         }
         return cool;

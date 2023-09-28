@@ -309,7 +309,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksScrollPane.setFadeScrollBars(false);
         bookmarksScrollPane.setScrollingDisabled(true, false);
 
-        bookmarksScrollPane.setHeight(300f);
+        bookmarksScrollPane.setHeight(400f);
         bookmarksScrollPane.setWidth(componentWidth);
 
         /*

@@ -92,12 +92,12 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dateEdit.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
         // BWD label.
-        warpBackward = new OwnLabel("Time\nbackward", skin, "msg-15");
+        warpBackward = new OwnLabel(I18n.msg("gui.time.bwd"), skin, "msg-15");
         warpBackward.setAlignment(Align.left);
         warpBackward.setColor(redTheme ? Color.RED : Color.GRAY);
 
         // FWD label.
-        warpForward = new OwnLabel("Time\nforward", skin, "msg-15");
+        warpForward = new OwnLabel(I18n.msg("gui.time.fwd"), skin, "msg-15");
         warpForward.setAlignment(Align.right);
         warpForward.setColor(redTheme ? Color.RED : Color.GRAY);
 
@@ -105,7 +105,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         warp = new OwnLabel("", skin, "big");
         warp.setText(TextUtils.secondsToTimeUnit(GaiaSky.instance.time.getWarpFactor()) + "/" + I18n.msg("gui.unit.second"));
         warp.setAlignment(Align.center);
-        warp.setWidth(190f);
+        warp.setWidth(componentWidth - 160f);
         warp.addListener(new OwnTextTooltip(I18n.msg("gui.warp.tooltip"), skin));
 
         // Warp slider.
@@ -113,7 +113,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         warpSlider = new OwnSliderPlus("", -warpSteps, warpSteps, 1, skin, "time-warp");
         warpSlider.setValueLabelTransform((value) -> TextUtils.getFormattedTimeWarp(timeWarpVector[value.intValue() + warpSteps]));
         warpSlider.setValue(getWarpIndex(GaiaSky.instance.time.getWarpFactor()) - warpSteps);
-        warpSlider.setWidth(350f);
+        warpSlider.setWidth(componentWidth);
         warpSlider.addListener(new OwnTextTooltip(I18n.msg("gui.warp"), skin));
         warpSlider.addListener((event) -> {
             if (event instanceof ChangeEvent && !warpGuard) {

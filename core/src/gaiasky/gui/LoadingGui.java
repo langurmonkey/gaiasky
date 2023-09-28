@@ -88,7 +88,7 @@ public class LoadingGui extends AbstractGui {
 
         Table centerContent = new Table(skin);
         centerContent.center();
-        centerContent.setBackground("table-bg");
+        centerContent.setBackground("bg-corner-bright");
         centerContent.pad(pad30);
         centerContent.padLeft(pad30 * 5f);
         centerContent.padRight(pad30 * 5f);

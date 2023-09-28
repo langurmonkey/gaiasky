@@ -7,6 +7,7 @@
 
 package gaiasky.gui.components;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -50,7 +51,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
-        scrollPane.setHeight(260f);
+        scrollPane.setHeight(360f);
         scrollPane.setWidth(componentWidth);
 
         VerticalGroup locationGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(pad12);
@@ -76,9 +77,10 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             Label name = new OwnLabel(TextUtils.capString(lr.name, 14), skin, "default");
             name.addListener(new OwnTextTooltip(lr.name, skin));
             name.setWidth(165f);
-            Label time = new OwnLabel("(" + lr.elapsedString() + ")", skin, "default-pink");
+            Label time = new OwnLabel("(" + lr.elapsedString() + ")", skin, "msg-17");
+            time.setColor(Color.CORAL);
             time.addListener(new OwnTextTooltip(I18n.msg("gui.locationlog.visited", lr.entryTime), skin));
-            time.setWidth(40f);
+            time.setWidth(60f);
 
             OwnTextIconButton goToLoc = new OwnTextIconButton("", skin, "go-to");
             goToLoc.addListener(new OwnTextTooltip(I18n.msg("gui.locationlog.goto.location", lr.entryTime), skin));

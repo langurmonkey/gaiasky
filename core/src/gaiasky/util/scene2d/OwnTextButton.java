@@ -98,4 +98,10 @@ public class OwnTextButton extends TextButton {
         }
     }
 
+    public void setCheckedNoFire(boolean isChecked) {
+        this.setProgrammaticChangeEvents(false);
+        this.setChecked(isChecked);
+        this.setProgrammaticChangeEvents(true);
+    }
+
 }

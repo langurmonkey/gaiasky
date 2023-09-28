@@ -65,7 +65,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY,
             highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
-            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr, eclipses, eclipseOutlines, starSpheres;
+            crosshairHome, pointerGuides, newUI, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr, eclipses, eclipseOutlines, starSpheres;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
@@ -330,8 +330,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         mode.add(fullScreen).left().padRight(pad18);
         mode.add(fullScreenResolutions).left().row();
-        mode.add(windowed).left().padRight(pad18).padTop(pad18).padBottom(pad10);
-        mode.add(windowedResolutions).left().padTop(pad18).padBottom(pad10).row();
+        mode.add(windowed).left().padRight(pad18).padTop(pad18).padBottom(pad18);
+        mode.add(windowedResolutions).left().padTop(pad18).padBottom(pad18).row();
         mode.add(vsyncLabel).left().padRight(pad34).padBottom(pad10);
         mode.add(vsync).left().padBottom(pad10).row();
         mode.add(maxFpsLabel).left().padRight(pad34).padBottom(pad10);
@@ -1148,8 +1148,20 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         modeChangeInfo = new OwnCheckBox("", skin);
         modeChangeInfo.setChecked(settings.program.ui.modeChangeInfo);
 
+        // NEW UI
+        OwnLabel newUILabel = new OwnLabel(I18n.msg("gui.ui.newui"), skin);
+        newUI = new OwnCheckBox("", skin);
+        newUI.setName("new ui cb");
+        newUI.setChecked(settings.program.ui.newUI);
+        OwnImageButton newUITooltip = new OwnImageButton(skin, "tooltip");
+        newUITooltip.addListener(new OwnTextTooltip(I18n.msg("gui.ui.newui.info"), skin));
+        HorizontalGroup newUIGroup = new HorizontalGroup();
+        newUIGroup.space(pad18);
+        newUIGroup.addActor(newUI);
+        newUIGroup.addActor(newUITooltip);
+
         // LABELS
-        labels.addAll(langLabel, themeLabel, uiScaleLabel, minimapSizeLabel, distUnitsLabel, modeChangeInfoLabel);
+        labels.addAll(langLabel, themeLabel, uiScaleLabel, minimapSizeLabel, distUnitsLabel, modeChangeInfoLabel, newUILabel);
 
         // Add to table
         ui.add(langLabel).left().padRight(pad34).padBottom(pad18);
@@ -1165,6 +1177,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ui.add(distUnitsSelect).colspan(2).left().padRight(pad10).padBottom(pad18).row();
         ui.add(modeChangeInfoLabel).left().padRight(pad10).padBottom(pad18);
         ui.add(modeChangeInfo).colspan(2).left().padRight(pad10).padBottom(pad18).row();
+        ui.add(newUILabel).left().padRight(pad10).padBottom(pad18);
+        ui.add(newUIGroup).left().colspan(2).padBottom(pad10).row();
 
 
         /* CROSSHAIR AND MARKERS */
@@ -2561,7 +2575,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.UI_SCALE_CMD, this, factor);
 
         boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.getLocale());
-        boolean reloadUI = reloadLang || !settings.program.ui.theme.equals(newTheme.value) || settings.program.minimap.size != minimapSize.getValue();
+        boolean reloadUI = reloadLang ||
+                !settings.program.ui.theme.equals(newTheme.value) ||
+                settings.program.minimap.size != minimapSize.getValue() ||
+                settings.program.ui.newUI != newUI.isChecked();
+
         settings.program.locale = languageBean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
         settings.program.ui.theme = newTheme.value;
@@ -2586,6 +2604,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Minimap size
         settings.program.minimap.size = minimapSize.getValue();
+
+        // New UI
+        settings.program.ui.newUI = newUI.isChecked();
 
         // Distance units
         settings.program.ui.distanceUnits = DistanceUnits.values()[distUnitsSelect.getSelectedIndex()];
