@@ -32,6 +32,10 @@ import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
+/**
+ * Implements the controls of Gaia Sky as a drop-in replacement to {@link ControlsWindow}. Here, the controls
+ * are accessed as a series of buttons anchored to the left of the screen.
+ */
 public class ControlsInterface extends TableGuiInterface implements IObserver {
 
     private final Table tableComponentButtons;
@@ -256,6 +260,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
             if (event instanceof ChangeEvent) {
                 if (button.isChecked()) {
                     // Add pane.
+                    pane.clearActions();
                     activeComponentCell.clearActor();
                     selectComponentButton(button);
                     activeComponentCell.padTop(padTop);
@@ -265,6 +270,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                             Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds() * 0.5f)));
                 } else {
                     // Remove pane.
+                    pane.clearActions();
                     pane.addAction(Actions.sequence(
                             Actions.alpha(1f),
                             Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds() * 0.5f),
