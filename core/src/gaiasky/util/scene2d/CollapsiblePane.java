@@ -148,7 +148,7 @@ public class CollapsiblePane extends Table {
         HorizontalGroup headerGroupLeft = new HorizontalGroup();
         headerGroupLeft.space(space).align(Align.left);
 
-        if (topIcons != null && topIcons.length > 0) {
+        if (topIcons != null) {
             for (Actor topIcon : topIcons) {
                 if (topIcon != null)
                     headerGroupLeft.addActor(topIcon);
