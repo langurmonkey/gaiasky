@@ -804,11 +804,19 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void setRing(String ring) {
-        this.ring = Settings.settings.data.dataFile(ring);
+        setRingDiffuse(ring);
     }
 
-    public void setRingnormal(String ringnormal) {
-        this.ringnormal = Settings.settings.data.dataFile(ringnormal);
+    public void setRingDiffuse(String ringDiffuse) {
+        this.ring = Settings.settings.data.dataFile(ringDiffuse);
+    }
+
+    public void setRingnormal(String ringNormal) {
+        setRingNormal(ringNormal);
+    }
+
+    public void setRingNormal(String ringNormal) {
+        this.ringnormal = Settings.settings.data.dataFile(ringNormal);
     }
 
     public void setRingDiffuseScattering(Double ringDiffuseScattering) {
