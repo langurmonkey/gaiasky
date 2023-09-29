@@ -570,7 +570,8 @@ void main() {
 
     // Shadow
     #ifdef shadowMapFlag
-    float shdw = clamp(getShadow(v_data.shadowMapUv), 0.0, 1.0);
+    float transparency = 1.0 - texture(u_shadowTexture, v_data.shadowMapUv.xy).g;
+    float shdw = clamp(getShadow(v_data.shadowMapUv) + transparency, 0.0, 1.0);
     #else
     float shdw = 1.0;
     #endif// shadowMapFlag

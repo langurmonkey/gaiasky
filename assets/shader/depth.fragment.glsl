@@ -63,10 +63,10 @@ layout (location = 0) out vec4 fragColor;
 
 // Renders a depth map for the shadow mapping algorithm
 void main() {
-    // Fetch transparency value from diffuse color.
+    // Fetch opacity value from diffuse color.
     vec4 diffuse = fetchColorDiffuse(v_data.color, v_data.texCoords, vec4(1.0, 1.0, 1.0, 1.0));
-    float value = clamp(0.5 - diffuse.a, 0.0, 1.0);
+    float opacity = diffuse.a;
 
-    // Weight actual z value using transparency.
-    fragColor = vec4(gl_FragCoord.z + value, 0.0, 0.0, 1.0);
+    // Fill buffer with depth and transparency.
+    fragColor = vec4(gl_FragCoord.z, opacity, 0.0, 1.0);
 }
