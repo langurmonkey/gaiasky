@@ -1,3 +1,26 @@
+<a name="3.5.5"></a>
+## [3.5.5](https://codeberg.org/gaiasky/gaiasky/tree/3.5.4-1) (2023-09-29)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.4-1...3.5.5)
+
+### Features
+- add new user interface which replaces the old controls window. The old controls window is still available (activate it in preferences window). 
+- add new 'play camera path' action, bound to `alt`+`c` by default.
+- update default control pane key bindings (time, camera, visibility, etc.) to not use the Alt key. 
+- add better star close-up shader, and a new 'scene settings' section in preferences window with an option to render stars as spheres. 
+- prepare PBR shader to accept iridescence, transmission and thickness values.
+- revamp shader include directive to accept different extensions and file references in angle brackets. All shader libraries moved to `shader/lib`. 
+- retire Gaia FOV camera modes. 
+- adjust default atmosphere exposure value. 
+- disable fading scrollbars everywhere. 
+- tune normal strength in tessellation shaders to map to elevation multiplier. 
+
+### Bug Fixes
+- enable full shader file names in raymarching shaders. 
+- typo, 'user interface resetted' -> 'user interface reset'. 
+- restore height sampling functionality to prevent clipping through tessellated terrain.
+- remove cinematic camera slow-down when close to the surface of a planet. 
+- scale tessellation quality using the body size to prevent severe slow-downs in smaller bodies. 
+
 <a name="3.5.4-1"></a>
 ## [3.5.4-1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.4) (2023-09-21)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.4...3.5.4-1)
