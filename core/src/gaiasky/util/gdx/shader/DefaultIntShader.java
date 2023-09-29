@@ -81,6 +81,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_shininess;
     public final int u_roughnessColor;
     public final int u_roughnessTexture;
+    public final int u_diffuseScatteringColor;
     public final int u_occlusionMetallicRoughnessTexture;
     public final int u_normalTexture;
     public final int u_heightTexture;
@@ -281,6 +282,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_shininess = register(Inputs.shininess, Setters.shininess);
         u_roughnessColor = register(Inputs.roughnessColor, Setters.roughnessColor);
         u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
+        u_diffuseScatteringColor = register(Inputs.diffuseScatteringColor, Setters.diffuseScatteringColor);
         u_occlusionMetallicRoughnessTexture = register(Inputs.occlusionMetallicRoughnessTexture, Setters.occlusionMetallicRoughnessTexture);
         u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
         u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
@@ -418,8 +420,9 @@ public class DefaultIntShader extends BaseIntShader {
             else if (attr.usage == Usage.TextureCoordinates)
                 prefix.append("#define texCoord").append(attr.unit).append("Flag\n");
         }
-        if (attributes.has(BlendingAttribute.Type))
+        if (attributes.has(BlendingAttribute.Type)) {
             prefix.append("#define " + BlendingAttribute.Alias + "Flag\n");
+        }
         if (attributes.has(TextureAttribute.Diffuse)) {
             prefix.append("#define " + TextureAttribute.DiffuseAlias + "Flag\n");
         }
@@ -467,10 +470,13 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define " + ColorAttribute.MetallicAlias + "Flag\n");
         if (attributes.has(ColorAttribute.Roughness))
             prefix.append("#define " + ColorAttribute.RoughnessAlias + "Flag\n");
+        if (attributes.has(ColorAttribute.DiffuseScattering))
+            prefix.append("#define " + ColorAttribute.DiffuseScatteringAlias + "Flag\n");
         if (attributes.has(FloatAttribute.AlphaTest))
             prefix.append("#define " + FloatAttribute.AlphaTestAlias + "Flag\n");
         if (attributes.has(FloatAttribute.Shininess))
             prefix.append("#define " + FloatAttribute.ShininessAlias + "Flag\n");
+
 
         if (attributes.has(Matrix4Attribute.PrevProjView)) {
             prefix.append("#define velocityBufferFlag\n");
@@ -898,6 +904,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform shininess = new Uniform("u_shininess", FloatAttribute.Shininess);
         public final static Uniform roughnessColor = new Uniform("u_roughnessColor", ColorAttribute.Roughness);
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureAttribute.Roughness);
+        public final static Uniform diffuseScatteringColor = new Uniform("u_diffuseScatteringColor", ColorAttribute.DiffuseScattering);
         public final static Uniform occlusionMetallicRoughnessTexture = new Uniform("u_occlusionMetallicRoughnessTexture",
                 TextureAttribute.OcclusionMetallicRoughness);
 
@@ -1236,6 +1243,15 @@ public class DefaultIntShader extends BaseIntShader {
                 final int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Roughness)))).textureDescription);
                 shader.set(inputID, unit);
+            }
+        };
+        public final static Setter diffuseScatteringColor = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, ((ColorAttribute) (Objects.requireNonNull(combinedAttributes.get(ColorAttribute.DiffuseScattering)))).color);
             }
         };
         public final static Setter occlusionMetallicRoughnessTexture = new LocalSetter() {

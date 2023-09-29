@@ -27,6 +27,8 @@ public class ColorAttribute extends Attribute {
     public static final int AmbientLight = register(AmbientLightAlias);
     public final static String FogAlias = "fogColor";
     public static final int Fog = register(FogAlias);
+    public final static String DiffuseScatteringAlias = "diffuseScatteringColor";
+    public final static int DiffuseScattering = register(DiffuseScatteringAlias);
     public final Color color = new Color();
 
     public ColorAttribute(final int index) {

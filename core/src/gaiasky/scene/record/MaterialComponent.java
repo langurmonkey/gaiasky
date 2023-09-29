@@ -93,6 +93,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public float[] specularColor;
     public float[] metallicColor;
     public float[] emissiveColor;
+    public float[] diffuseScatteringColor;
+    public float[] ringDiffuseScatteringColor;
     public float roughnessColor = Float.NaN;
     /**
      * Height scale in internal units. The mapping value of white in the height map (maximum height value in this body). Black is mapped to 0.
@@ -309,6 +311,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (emissiveColor != null) {
             material.set(new ColorAttribute(ColorAttribute.Emissive, emissiveColor[0], emissiveColor[1], emissiveColor[2], 1f));
         }
+        if (diffuseScatteringColor != null) {
+            material.set(new ColorAttribute(ColorAttribute.DiffuseScattering, diffuseScatteringColor[0], diffuseScatteringColor[1], diffuseScatteringColor[2], 1f));
+        }
         if (height != null && material.get(TextureAttribute.Height) == null) {
             if (!height.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(heightUnpacked, Texture.class);
@@ -327,6 +332,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             }
             if (ringnormal != null && ringMaterial.get(TextureAttribute.Normal) == null) {
                 ringMaterial.set(new TextureAttribute(TextureAttribute.Normal, manager.get(ringnormalUnpacked, Texture.class)));
+            }
+            if (ringDiffuseScatteringColor != null) {
+                ringMaterial.set(new ColorAttribute(ColorAttribute.DiffuseScattering, ringDiffuseScatteringColor[0], ringDiffuseScatteringColor[1], ringDiffuseScatteringColor[2], 1f));
             }
             ringMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
             if (!culling)
@@ -781,12 +789,40 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
     }
 
+    public void setDiffuseScattering(Double diffuseScattering) {
+        float r = diffuseScattering.floatValue();
+        this.diffuseScatteringColor = new float[]{r, r, r};
+    }
+
+    public void setDiffuseScattering(double[] diffuseScattering) {
+        if (diffuseScattering.length > 1) {
+            this.diffuseScatteringColor = new float[]{(float) diffuseScattering[0], (float) diffuseScattering[1], (float) diffuseScattering[2]};
+        } else {
+            float r = (float) diffuseScattering[0];
+            this.diffuseScatteringColor = new float[]{r, r, r};
+        }
+    }
+
     public void setRing(String ring) {
         this.ring = Settings.settings.data.dataFile(ring);
     }
 
     public void setRingnormal(String ringnormal) {
         this.ringnormal = Settings.settings.data.dataFile(ringnormal);
+    }
+
+    public void setRingDiffuseScattering(Double ringDiffuseScattering) {
+        float r = ringDiffuseScattering.floatValue();
+        this.ringDiffuseScatteringColor = new float[]{r, r, r};
+    }
+
+    public void setRingDiffuseScattering(double[] ringDiffuseScattering) {
+        if (ringDiffuseScattering.length > 1) {
+            this.ringDiffuseScatteringColor = new float[]{(float) ringDiffuseScattering[0], (float) ringDiffuseScattering[1], (float) ringDiffuseScattering[2]};
+        } else {
+            float r = (float) ringDiffuseScattering[0];
+            this.ringDiffuseScatteringColor = new float[]{r, r, r};
+        }
     }
 
     public void setHeight(String height) {

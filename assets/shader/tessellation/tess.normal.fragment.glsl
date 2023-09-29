@@ -81,6 +81,10 @@ uniform sampler2D u_roughnessTexture;
 uniform samplerCube u_roughnessCubemap;
 #endif
 
+#ifdef diffuseScatteringColorFlag
+uniform vec4 u_diffuseScatteringColor;
+#endif
+
 #ifdef AOTextureFlag
 uniform sampler2D u_aoTexture;
 #endif
@@ -279,6 +283,11 @@ float getShadow(vec3 shadowMapUv) {
 #elif defined(roughnessColorFlag)
     #define fetchColorRoughness(texCoord) u_roughnessColor.rgb;
 #endif // roughness
+
+// DIFFUSE SCATTERING COLOR
+#if defined(diffuseScatteringColorFlag)
+#define fetchColorDiffuseScattering() u_diffuseScatteringColor.rgb
+#endif // diffuse scattering
 
 // COLOR AMBIENT OCCLUSION
 #if defined(occlusionMetallicRoughnessTextureFlag)
@@ -529,6 +538,14 @@ void main() {
     }
     diffuseColor *= diffuse.rgb;
     #endif // directionalLightsFlag
+
+    // Diffuse scattering
+    #ifdef diffuseScatteringColorFlag
+    vec3 diffuseScattering = fetchColorDiffuseScattering();
+    diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion * shdw;
+    #else
+    vec3 diffuseScattering = vec3(0.0);
+    #endif // diffuseScatteringColorFlag
 
     // Final color equation
     fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
