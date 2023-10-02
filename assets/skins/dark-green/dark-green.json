@@ -953,6 +953,10 @@
       "font": "title-23",
       "fontColor": "blue"
     },
+    "header-red": {
+      "font": "title-23",
+      "fontColor": "red"
+    },
     "header-s": {
       "font": "title-20",
       "fontColor": "theme2"

@@ -24,7 +24,7 @@ public class ContainerPane extends Table {
         final float pad10 = 10f;
         final float pad20 = 10f;
 
-        background("bg-border-dark");
+        background("bg-pane-border-dark");
 
         OwnLabel titleLabel = new OwnLabel(title, skin, "header");
         add(titleLabel).top().center().row();

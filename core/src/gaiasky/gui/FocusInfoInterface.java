@@ -71,7 +71,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     public FocusInfoInterface(Skin skin, boolean vr) {
         super(skin);
-        this.setBackground("table-bg");
+        this.setBackground("bg-pane");
         this.maximized = true;
         this.skin = skin;
         this.content = new Table(skin);

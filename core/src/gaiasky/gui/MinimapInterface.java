@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.Separator;
 
 public class MinimapInterface extends TableGuiInterface {
     private final MinimapWidget minimap;
@@ -19,31 +20,33 @@ public class MinimapInterface extends TableGuiInterface {
 
     public MinimapInterface(final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
         super(skin);
-        float pad = 5f;
         minimap = new MinimapWidget(skin, shapeShader, spriteShader);
 
+        Table mainTable = new Table(skin);
+        mainTable.pad(10f);
+        mainTable.setBackground("bg-pane");
+
         Table side = new Table(skin);
-        side.setBackground("table-bg");
         side.add(minimap.getSideProjection());
         Table top = new Table(skin);
-        top.setBackground("table-bg");
         top.add(minimap.getTopProjection());
 
         mapName = new OwnLabel("", skin, "header");
-        OwnLabel sideLabel = new OwnLabel(I18n.msg("gui.minimap.vert.side"), skin, "header");
+        OwnLabel sideLabel = new OwnLabel(I18n.msg("gui.minimap.vert.side"), skin, "default-red");
         Table sideLabelTable = new Table(skin);
-        sideLabelTable.setBackground("table-bg");
-        sideLabelTable.add(sideLabel).pad(pad);
-        OwnLabel topLabel = new OwnLabel(I18n.msg("gui.minimap.vert.top"), skin, "header");
+        sideLabelTable.add(sideLabel);
+        OwnLabel topLabel = new OwnLabel(I18n.msg("gui.minimap.vert.top"), skin, "default-red");
         Table topLabelTable = new Table(skin);
-        topLabelTable.setBackground("table-bg");
-        topLabelTable.add(topLabel).pad(pad);
+        topLabelTable.add(topLabel);
 
-        add(mapName).right().colspan(2).padBottom(pad * 2f).row();
-        add(sideLabelTable).top().padBottom(pad);
-        add(side).padBottom(pad).row();
-        add(topLabelTable).top().padBottom(pad);
-        add(top).padBottom(pad).row();
+        mainTable.add(mapName).right().colspan(3).row();
+        mainTable.add(sideLabelTable).width(25f).center().padBottom(20f);
+        mainTable.add(new Separator(skin, "small")).growY().padBottom(20f);
+        mainTable.add(side).padBottom(20f).row();
+        mainTable.add(topLabelTable).width(25f).center();
+        mainTable.add(new Separator(skin, "small")).growY();
+        mainTable.add(top);
+        add(mainTable);
 
         pack();
 
