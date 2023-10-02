@@ -670,6 +670,12 @@
     "eye": {
       "imageUp": "eye-icon"
     },
+    "select-all": {
+      "imageUp": "iconic-check"
+    },
+    "select-none": {
+      "imageUp": "iconic-x"
+    },
     "expand-collapse": {
       "imageUp": "iconic-arrow-expand",
       "imageChecked": "iconic-arrow-collapse",

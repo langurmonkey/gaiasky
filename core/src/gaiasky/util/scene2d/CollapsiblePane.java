@@ -118,18 +118,20 @@ public class CollapsiblePane extends Table {
         else
             expandIcon.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.expandcollapse.group"), shortcut, skin));
 
-        // Detach icon
-        detachIcon = new OwnImageButton(skin, detachButtonStyle);
-        detachIcon.setName("detach-panel");
-        detachIcon.setChecked(false);
-        detachIcon.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                detach();
-                return true;
-            }
-            return false;
-        });
-        detachIcon.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.detach.group"), skin));
+        if (detachButtonStyle != null) {
+            // Detach icon
+            detachIcon = new OwnImageButton(skin, detachButtonStyle);
+            detachIcon.setName("detach-panel");
+            detachIcon.setChecked(false);
+            detachIcon.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    detach();
+                    return true;
+                }
+                return false;
+            });
+            detachIcon.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.detach.group"), skin));
+        }
 
         // Question icon
         OwnLabel questionLabel = new OwnLabel("(?)", skin, "question");
@@ -157,13 +159,19 @@ public class CollapsiblePane extends Table {
 
         HorizontalGroup headerGroupRight = new HorizontalGroup();
         headerGroupRight.space(space).align(Align.right);
-        //headerGroupRight.addActor(expandIcon);
-        headerGroupRight.addActor(detachIcon);
+        if (detachIcon != null) {
+            headerGroupRight.addActor(detachIcon);
+        }
 
         headerTable.add(titleGroup).left().padRight(6.4f);
-        headerTable.add(headerGroupLeft).left().pad(6.4f);
-        headerTable.add().expandX();
-        headerTable.add(headerGroupRight).right();
+
+        if(detachIcon != null) {
+            headerTable.add(headerGroupLeft).right().pad(6.4f);
+            headerTable.add().expandX();
+            headerTable.add(headerGroupRight).right();
+        } else {
+            headerTable.add(headerGroupLeft).right().pad(6.4f).expandX();
+        }
 
         add(headerTable).padBottom(this.space).width(width).row();
         contentCell = add().prefHeight(0).width(width);
