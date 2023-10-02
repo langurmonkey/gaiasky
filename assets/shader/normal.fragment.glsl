@@ -599,11 +599,11 @@ void main() {
             if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
                 // Penumbra.
                 outline = 1.0;
-                outlineColor = vec4(0.0, 1.0, 0.0, 1.0);
+                outlineColor = vec4(0.95, 0.625, 0.0, 1.0);
             } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
                 // Umbra.
                 outline = 1.0;
-                outlineColor = vec4(1.0, 0.0, 0.0, 1.0);
+                outlineColor = vec4(0.85, 0.26, 0.21, 1.0);
             }
         }
         #endif// eclipseOutlines
