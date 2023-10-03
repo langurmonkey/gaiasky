@@ -1,3 +1,18 @@
+<a name="3.5.5-1"></a>
+## [3.5.5-1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5) (2023-10-03)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5...3.5.5-1)
+
+### Features
+- update umbra and penumbra highlight colors.
+- improve default pane background, touch up mini-map layout.
+- add collapsible groups and per-group 'select all' and 'select none' controls to dataset manager. 
+- add transparency support (encoded in diffuse texture/color) to shadow maps.
+- add support for scattering diffuse material properties in default and tessellation shaders.
+
+### Bug Fixes
+- regression where all actions were printed to stdout. 
+- unexpected and weird behaviour when spamming repeatedly left buttons in new UI. 
+
 <a name="3.5.5"></a>
 ## [3.5.5](https://codeberg.org/gaiasky/gaiasky/tree/3.5.4-1) (2023-09-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.4-1...3.5.5)
