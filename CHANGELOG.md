@@ -1,3 +1,14 @@
+<a name="3.5.5-2"></a>
+## [3.5.5-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5-1) (2023-10-04)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5-1...3.5.5-2)
+
+### Bug Fixes
+- crash fetching entity elevation due to the focus not being set yet. 
+
+### Build System
+- add check for revision >= 2 in release script. 
+- automate creation of HTML downloads table and properly use 'pkgver' and 'pkgrel' fields in AUR package. 
+
 <a name="3.5.5-1"></a>
 ## [3.5.5-1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5) (2023-10-03)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5...3.5.5-1)
