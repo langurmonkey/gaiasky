@@ -240,10 +240,10 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean touchDown(int screenX,
-                             int screenY,
-                             int pointer,
-                             int button) {
+    public boolean touchDown(final int screenX,
+                             final int screenY,
+                             final int pointer,
+                             final int button) {
         if (isActive()) {
             if (Settings.settings.runtime.inputEnabled) {
                 touched |= (1 << pointer);

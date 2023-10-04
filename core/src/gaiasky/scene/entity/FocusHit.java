@@ -53,9 +53,9 @@ public class FocusHit {
                                          int screenY,
                                          Vector3 pos,
                                          NaturalCamera camera,
-                                         PerspectiveCamera pcamera,
+                                         float viewportWidth,
                                          double pixelSize) {
-        return pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize;
+        return pos.dst(screenX % viewportWidth, screenY, pos.z) <= pixelSize;
     }
 
     private double computeHitSolidAngleCelestial(FocusView view,
@@ -97,7 +97,7 @@ public class FocusHit {
 
                 PerspectiveCamera perspectiveCamera;
                 if (Settings.settings.program.modeStereo.active) {
-                    if (screenX < Gdx.graphics.getWidth() / 2f) {
+                    if (screenX < w / 2f) {
                         perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
                         perspectiveCamera = camera.getCameraStereoRight();
@@ -107,15 +107,19 @@ public class FocusHit {
                     perspectiveCamera = camera.camera;
                 }
 
+                float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
+                float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
+
                 angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
-                double pixelSize = Math.max(pixelDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                double pixelSize = Math.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                 perspectiveCamera.project(pos);
-                pos.y = perspectiveCamera.viewportHeight - pos.y;
+                pos.y = viewportHeight - pos.y;
                 if (Settings.settings.program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance
-                if (checkClickDistance(screenX, screenY, pos, camera, perspectiveCamera, pixelSize)) {
+                if (checkClickDistance(screenX, screenY, pos, camera, viewportWidth, pixelSize)) {
                     //Hit
                     hits.add(entity);
                 }
@@ -279,7 +283,7 @@ public class FocusHit {
 
                         PerspectiveCamera perspectiveCamera;
                         if (Settings.settings.program.modeStereo.active) {
-                            if (screenX < Gdx.graphics.getWidth() / 2f) {
+                            if (screenX < w / 2f) {
                                 perspectiveCamera = camera.getCameraStereoLeft();
                             } else {
                                 perspectiveCamera = camera.getCameraStereoRight();
@@ -289,16 +293,20 @@ public class FocusHit {
                             perspectiveCamera = camera.camera;
                         }
 
+                        float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                        float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
+                        float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
+
                         angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / perspectiveCamera.fieldOfView);
-                        double pixelSize = Math.max(pixelDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                        double pixelSize = Math.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                         perspectiveCamera.project(posFloat);
-                        posFloat.y = perspectiveCamera.viewportHeight - posFloat.y;
+                        posFloat.y = viewportHeight - posFloat.y;
                         if (Settings.settings.program.modeStereo.active) {
                             posFloat.x /= 2;
                         }
 
                         // Check click distance
-                        if (posFloat.dst(screenX % perspectiveCamera.viewportWidth, screenY, posFloat.z) <= pixelSize) {
+                        if (posFloat.dst(screenX % viewportWidth, screenY, posFloat.z) <= pixelSize) {
                             //Hit
                             temporalHits.add(new Pair<>(i, angle));
                         }
@@ -395,8 +403,7 @@ public class FocusHit {
             var entity = view.getEntity();
 
             Vector3 pos = F31;
-            Vector3b aux = B31;
-            Vector3b posb = EntityUtils.getAbsolutePosition(entity, aux).add(camera.posinv);
+            Vector3b posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.posinv);
             pos.set(posb.valuesf());
 
             if (camera.direction.dot(posb) > 0) {
@@ -405,27 +412,31 @@ public class FocusHit {
                 // when we are close by
                 double angle = view.getSolidAngle();
 
-                PerspectiveCamera pcamera;
+                PerspectiveCamera perspectiveCamera;
                 if (Settings.settings.program.modeStereo.active) {
-                    if (screenX < Gdx.graphics.getWidth() / 2f) {
-                        pcamera = camera.getCameraStereoLeft();
+                    if (screenX < w / 2f) {
+                        perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
-                        pcamera = camera.getCameraStereoRight();
+                        perspectiveCamera = camera.getCameraStereoRight();
                     }
-                    pcamera.update();
+                    perspectiveCamera.update();
                 } else {
-                    pcamera = camera.camera;
+                    perspectiveCamera = camera.camera;
                 }
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pcamera.fieldOfView);
-                double pixelSize = ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2;
-                pcamera.project(pos);
-                pos.y = pcamera.viewportHeight - pos.y;
+                float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
+                float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
+
+                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                double pixelSize = ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2;
+                perspectiveCamera.project(pos);
+                pos.y = viewportHeight - pos.y;
                 if (Settings.settings.program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance
-                if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
+                if (checkClickDistance(screenX, screenY, pos, camera, viewportWidth, pixelSize)) {
                     //Hit
                     hits.add(entity);
                 }
