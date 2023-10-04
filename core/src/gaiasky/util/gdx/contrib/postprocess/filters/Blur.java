@@ -23,6 +23,7 @@ public final class Blur extends MultipassFilter {
     private BlurType type;
     private float amount;
     private int passes;
+
     public Blur(int width, int height) {
         // precompute constants
         this.invWidth = 1f / (float) width;
@@ -96,95 +97,96 @@ public final class Blur extends MultipassFilter {
         float dy = this.invHeight;
 
         switch (this.type) {
-        case Gaussian3x3:
-        case Gaussian5x5:
-            computeKernel(this.type.tap.radius, this.amount, outWeights);
-            computeOffsets(this.type.tap.radius, this.invWidth, this.invHeight, outOffsetsH, outOffsetsV);
-            break;
+            case Gaussian3x3:
+            case Gaussian5x5:
+            case Gaussian7x7:
+                computeKernel(this.type.tap.radius, this.amount, outWeights);
+                computeOffsets(this.type.tap.radius, this.invWidth, this.invHeight, outOffsetsH, outOffsetsV);
+                break;
 
-        case Gaussian3x3b:
-            // weights and offsets are computed from a binomial distribution
-            // and reduced to be used *only* with bilinearly-filtered texture lookups
-            //
-            // with radius = 1f
+            case Gaussian3x3b:
+                // weights and offsets are computed from a binomial distribution
+                // and reduced to be used *only* with bilinearly-filtered texture lookups
+                //
+                // with radius = 1f
 
-            // weights
-            outWeights[0] = 0.352941f;
-            outWeights[1] = 0.294118f;
-            outWeights[2] = 0.352941f;
+                // weights
+                outWeights[0] = 0.352941f;
+                outWeights[1] = 0.294118f;
+                outWeights[2] = 0.352941f;
 
-            // horizontal offsets
-            outOffsetsH[0] = -1.33333f;
-            outOffsetsH[1] = 0f;
-            outOffsetsH[2] = 0f;
-            outOffsetsH[3] = 0f;
-            outOffsetsH[4] = 1.33333f;
-            outOffsetsH[5] = 0f;
+                // horizontal offsets
+                outOffsetsH[0] = -1.33333f;
+                outOffsetsH[1] = 0f;
+                outOffsetsH[2] = 0f;
+                outOffsetsH[3] = 0f;
+                outOffsetsH[4] = 1.33333f;
+                outOffsetsH[5] = 0f;
 
-            // vertical offsets
-            outOffsetsV[0] = 0f;
-            outOffsetsV[1] = -1.33333f;
-            outOffsetsV[2] = 0f;
-            outOffsetsV[3] = 0f;
-            outOffsetsV[4] = 0f;
-            outOffsetsV[5] = 1.33333f;
+                // vertical offsets
+                outOffsetsV[0] = 0f;
+                outOffsetsV[1] = -1.33333f;
+                outOffsetsV[2] = 0f;
+                outOffsetsV[3] = 0f;
+                outOffsetsV[4] = 0f;
+                outOffsetsV[5] = 1.33333f;
 
-            // scale offsets from binomial space to screen space
-            for (int i = 0; i < c.length * 2; i++) {
-                outOffsetsH[i] *= dx;
-                outOffsetsV[i] *= dy;
-            }
+                // scale offsets from binomial space to screen space
+                for (int i = 0; i < c.length * 2; i++) {
+                    outOffsetsH[i] *= dx;
+                    outOffsetsV[i] *= dy;
+                }
 
-            break;
+                break;
 
-        case Gaussian5x5b:
+            case Gaussian5x5b:
 
-            // weights and offsets are computed from a binomial distribution
-            // and reduced to be used *only* with bilinearly-filtered texture lookups
-            //
-            // with radius = 2f
+                // weights and offsets are computed from a binomial distribution
+                // and reduced to be used *only* with bilinearly-filtered texture lookups
+                //
+                // with radius = 2f
 
-            // weights
-            outWeights[0] = 0.0702703f;
-            outWeights[1] = 0.316216f;
-            outWeights[2] = 0.227027f;
-            outWeights[3] = 0.316216f;
-            outWeights[4] = 0.0702703f;
+                // weights
+                outWeights[0] = 0.0702703f;
+                outWeights[1] = 0.316216f;
+                outWeights[2] = 0.227027f;
+                outWeights[3] = 0.316216f;
+                outWeights[4] = 0.0702703f;
 
-            // horizontal offsets
-            outOffsetsH[0] = -3.23077f;
-            outOffsetsH[1] = 0f;
-            outOffsetsH[2] = -1.38462f;
-            outOffsetsH[3] = 0f;
-            outOffsetsH[4] = 0f;
-            outOffsetsH[5] = 0f;
-            outOffsetsH[6] = 1.38462f;
-            outOffsetsH[7] = 0f;
-            outOffsetsH[8] = 3.23077f;
-            outOffsetsH[9] = 0f;
+                // horizontal offsets
+                outOffsetsH[0] = -3.23077f;
+                outOffsetsH[1] = 0f;
+                outOffsetsH[2] = -1.38462f;
+                outOffsetsH[3] = 0f;
+                outOffsetsH[4] = 0f;
+                outOffsetsH[5] = 0f;
+                outOffsetsH[6] = 1.38462f;
+                outOffsetsH[7] = 0f;
+                outOffsetsH[8] = 3.23077f;
+                outOffsetsH[9] = 0f;
 
-            // vertical offsets
-            outOffsetsV[0] = 0f;
-            outOffsetsV[1] = -3.23077f;
-            outOffsetsV[2] = 0f;
-            outOffsetsV[3] = -1.38462f;
-            outOffsetsV[4] = 0f;
-            outOffsetsV[5] = 0f;
-            outOffsetsV[6] = 0f;
-            outOffsetsV[7] = 1.38462f;
-            outOffsetsV[8] = 0f;
-            outOffsetsV[9] = 3.23077f;
+                // vertical offsets
+                outOffsetsV[0] = 0f;
+                outOffsetsV[1] = -3.23077f;
+                outOffsetsV[2] = 0f;
+                outOffsetsV[3] = -1.38462f;
+                outOffsetsV[4] = 0f;
+                outOffsetsV[5] = 0f;
+                outOffsetsV[6] = 0f;
+                outOffsetsV[7] = 1.38462f;
+                outOffsetsV[8] = 0f;
+                outOffsetsV[9] = 3.23077f;
 
-            // scale offsets from binomial space to screen space
-            for (int i = 0; i < c.length * 2; i++) {
-                outOffsetsH[i] *= dx;
-                outOffsetsV[i] *= dy;
-            }
+                // scale offsets from binomial space to screen space
+                for (int i = 0; i < c.length * 2; i++) {
+                    outOffsetsH[i] *= dx;
+                    outOffsetsV[i] *= dy;
+                }
 
-            break;
-        default:
-            hasdata = false;
-            break;
+                break;
+            default:
+                hasdata = false;
+                break;
         }
 
         if (hasdata) {
@@ -193,35 +195,29 @@ public final class Blur extends MultipassFilter {
     }
 
     private void computeKernel(int blurRadius, float blurAmount, float[] outKernel) {
-        int radius = blurRadius;
-
-        // float sigma = (float)radius / amount;
-        float sigma = blurAmount;
-
-        float twoSigmaSquare = 2.0f * sigma * sigma;
+        float twoSigmaSquare = 2.0f * blurAmount * blurAmount;
         float sigmaRoot = (float) Math.sqrt(twoSigmaSquare * Math.PI);
         float total = 0.0f;
-        float distance = 0.0f;
-        int index = 0;
+        float distance;
+        int index;
 
-        for (int i = -radius; i <= radius; ++i) {
+        for (int i = -blurRadius; i <= blurRadius; ++i) {
             distance = i * i;
-            index = i + radius;
+            index = i + blurRadius;
             outKernel[index] = (float) Math.exp(-distance / twoSigmaSquare) / sigmaRoot;
             total += outKernel[index];
         }
 
-        int size = (radius * 2) + 1;
+        int size = (blurRadius * 2) + 1;
         for (int i = 0; i < size; ++i) {
             outKernel[i] /= total;
         }
     }
 
     private void computeOffsets(int blurRadius, float dx, float dy, float[] outOffsetH, float[] outOffsetV) {
-        int radius = blurRadius;
 
         final int X = 0, Y = 1;
-        for (int i = -radius, j = 0; i <= radius; ++i, j += 2) {
+        for (int i = -blurRadius, j = 0; i <= blurRadius; ++i, j += 2) {
             outOffsetH[j + X] = i * dx;
             outOffsetH[j + Y] = 0;
 
@@ -236,7 +232,7 @@ public final class Blur extends MultipassFilter {
     }
 
     // @formatter:off
-    private enum Tap {
+    protected enum Tap {
         Tap3x3(1),
         Tap5x5(2),
         Tap7x7(3);
@@ -250,10 +246,10 @@ public final class Blur extends MultipassFilter {
 
     public enum BlurType {
         Gaussian3x3(Tap.Tap3x3),
-        Gaussian3x3b(Tap.Tap3x3), // R=5 (11x11, policy "higher-then-discard")
+        Gaussian3x3b(Tap.Tap3x3),
         Gaussian5x5(Tap.Tap5x5),
-        Gaussian5x5b(Tap.Tap5x5), // R=9 (19x19, policy "higher-then-discard")
-        ;
+        Gaussian5x5b(Tap.Tap5x5),
+        Gaussian7x7(Tap.Tap7x7);
 
         public final Tap tap;
 

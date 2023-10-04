@@ -40,6 +40,7 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
+import gaiasky.util.gdx.contrib.postprocess.filters.Blur;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
@@ -228,12 +229,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.set(ssrEffect);
 
         // CAMERA MOTION BLUR
-        CameraMotion cameraBlur = new CameraMotion(width, height);
-        cameraBlur.setBlurScale(.8f);
-        cameraBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
-        cameraBlur.setEnabledOptions(false, false);
-        ppb.set(cameraBlur);
-        updateCameraBlur(ppb, gq);
+        //CameraMotion cameraBlur = new CameraMotion(width, height);
+        //cameraBlur.setBlurScale(.8f);
+        //cameraBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
+        //cameraBlur.setEnabledOptions(false, false);
+        //ppb.set(cameraBlur);
+        //updateCameraBlur(ppb, gq);
 
         // Add to scene graph
         initializeBlurObject();
@@ -318,9 +319,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         // BLOOM
         Bloom bloom = new Bloom((int) (width * settings.postprocess.bloom.fboScale), (int) (height * settings.postprocess.bloom.fboScale));
         bloom.setBloomIntesnity(settings.postprocess.bloom.intensity);
-        bloom.setBlurPasses(20);
-        bloom.setBlurAmount(10);
-        bloom.setThreshold(0f);
+        bloom.setBlurPasses(10);
+        bloom.setBlurAmount(0);
+        bloom.setBloomSaturation(0.7f);
+        bloom.setThreshold(0.3f);
         bloom.setEnabled(settings.postprocess.bloom.intensity > 0);
         ppb.set(bloom);
 

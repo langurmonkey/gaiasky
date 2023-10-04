@@ -25,7 +25,6 @@ public final class Bloom extends PostProcessorEffect {
     private final Blur blur;
     private final Threshold threshold;
     private final Combine combine;
-    private Settings settings;
     private boolean blending = false;
     private int sFactor, dFactor;
 
@@ -37,7 +36,15 @@ public final class Bloom extends PostProcessorEffect {
         combine = new Combine();
         disposables.addAll(blur, threshold, combine, pingPongBuffer);
 
-        setSettings(new Settings("default", 3, 0.2f, 1f, .85f, 1.1f, .85f));
+        blur.setAmount(0);
+        blur.setPasses(3);
+        blur.setType(BlurType.Gaussian5x5b);
+        setThreshold(0.3f);
+        setBaseIntensity(1f);
+        setBaseSaturation(0.85f);
+        setBloomIntesnity(1.1f);
+        setBloomSaturation(0.85f);
+
     }
 
     public void setBaseIntensity(float intensity) {
@@ -82,27 +89,6 @@ public final class Bloom extends PostProcessorEffect {
         blur.setType(type);
     }
 
-    public Settings getSettings() {
-        return settings;
-    }
-
-    public void setSettings(Settings settings) {
-        this.settings = settings;
-
-        // setup threshold filter
-        setThreshold(settings.bloomThreshold);
-
-        // setup combine filter
-        setBaseIntensity(settings.baseIntensity);
-        setBaseSaturation(settings.baseSaturation);
-        setBloomIntesnity(settings.bloomIntensity);
-        setBloomSaturation(settings.bloomSaturation);
-
-        // setup blur filter
-        setBlurPasses(settings.blurPasses);
-        setBlurAmount(settings.blurAmount);
-        setBlurType(settings.blurType);
-    }
 
     public int getBlurPasses() {
         return blur.getPasses();
