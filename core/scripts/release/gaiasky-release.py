@@ -171,6 +171,13 @@ if __name__ == '__main__':
             print()
             print()
 
+            # Check revision >= 2
+            if '-' in arguments.tag:
+                revision = arguments.tag[arguments.tag.rfind('-')+1:]
+                if int(revision) < 2:
+                    print("ERROR: revision number can't be less than 2 -> %d" % int(revision))
+                    exit()
+
             commands = defs["releasecommands"]
 
             for command in commands:
