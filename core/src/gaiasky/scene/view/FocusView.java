@@ -158,7 +158,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public boolean isParticle() {
-        return extra != null;
+        return isValid() && extra != null;
     }
 
     @Override
@@ -473,6 +473,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                                          ITimeFrameProvider time,
                                          ICamera camera,
                                          boolean force) {
+        if (!isValid()) {
+            return out;
+        }
         if (getSet() != null) {
             Instant futureTime = time.getTime().plus((long) (time.getHdiff() * Nature.H_TO_MS), ChronoUnit.MILLIS);
             return getSet().getAbsolutePosition(futureTime, out);
@@ -504,6 +507,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getDistToCamera() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getDistToCamera();
@@ -514,6 +520,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getClosestDistToCamera() {
+        if (!isValid()) {
+            return 0;
+        }
         if (starSet != null) {
             return starSet.getClosestDistToCamera();
         } else {
@@ -523,6 +532,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getSolidAngle() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getSolidAngle();
@@ -533,6 +545,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getSolidAngleApparent() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getSolidAngleApparent();
@@ -543,6 +558,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getCandidateSolidAngleApparent() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getCandidateSolidAngleApparent();
@@ -553,6 +571,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getAlpha() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getAlpha();
@@ -563,6 +584,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getDelta() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getDelta();
@@ -573,6 +597,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getSize() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getSize();
@@ -583,6 +610,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getRadius() {
+        if (!isValid()) {
+            return 0;
+        }
         var set = getSet();
         if (set != null) {
             return set.getRadius();
@@ -593,6 +623,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getElevationAt(Vector3b camPos) {
+        if (!isValid()) {
+            return 0;
+        }
         if (isModel()) {
             return getElevationAt(camPos, false);
         } else {
@@ -656,8 +689,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                     height = heightNormalized * mc.mtc.heightScale;
 
                     // Debug by painting on diffuse texture at same position.
-                    //var mat =mc.mtc.getMaterial();
-                    //if(mat.has(TextureAttribute.Diffuse)) {
+                    // var mat = mc.mtc.getMaterial();
+                    // if(mat.has(TextureAttribute.Diffuse)) {
                     //    Texture diffuse = ((TextureAttribute) Objects.requireNonNull(mat.get(TextureAttribute.Diffuse))).textureDescription.texture;
                     //    if(!diffuse.isManaged()){
                     //        p.setColor((float) heightNormalized, 1, 0, 1);
@@ -794,7 +827,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public boolean isCoordinatesTimeOverflow() {
-        return Mapper.coordinates.has(entity) && Mapper.coordinates.get(entity).timeOverflow;
+        return isValid() && Mapper.coordinates.has(entity) && Mapper.coordinates.get(entity).timeOverflow;
     }
 
     @Override
@@ -827,7 +860,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public boolean isForceLabel(String name) {
-        if (isSet()) {
+        if (isValid() && isSet()) {
             return getSet().isForceLabel(name);
         } else {
             return isForceLabel();
@@ -845,7 +878,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public boolean isForceLabel() {
-        if (Mapper.label.has(entity)) {
+        if (isValid() && Mapper.label.has(entity)) {
             return Mapper.label.get(entity).forceLabel;
         }
         return false;
@@ -905,11 +938,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * @return True if the entity is a particle or star set.
      */
     public boolean isSet() {
-        return particleSet != null || starSet != null;
+        return isValid() && (particleSet != null || starSet != null);
     }
 
     public boolean isStarSet() {
-        return starSet != null;
+        return isValid() && starSet != null;
     }
 
     public ParticleSet getSet() {
@@ -917,19 +950,19 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public boolean isModel() {
-        return Mapper.modelScaffolding.has(entity);
+        return isValid() && Mapper.modelScaffolding.has(entity);
     }
 
     public boolean isCluster() {
-        return Mapper.cluster.has(entity);
+        return isValid() && Mapper.cluster.has(entity);
     }
 
     public boolean isCelestial() {
-        return Mapper.celestial.has(entity);
+        return isValid() && Mapper.celestial.has(entity);
     }
 
     public boolean hasProperMotion() {
-        return Mapper.pm.has(entity) || starSet != null;
+        return isValid() && Mapper.pm.has(entity) || starSet != null;
     }
 
     public double getMuAlpha() {
@@ -957,7 +990,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 return set.focus.mudelta();
             else
                 return 0;
-        } else if (Mapper.pm.has(entity)) {
+        } else if (isValid() && Mapper.pm.has(entity)) {
             var pm = Mapper.pm.get(entity);
             if (pm.pmSph != null) {
                 return pm.pmSph.y;
@@ -975,7 +1008,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 return set.focus.radvel();
             else
                 return 0;
-        } else if (Mapper.pm.has(entity)) {
+        } else if (isValid() && Mapper.pm.has(entity)) {
             var pm = Mapper.pm.get(entity);
             if (pm.pmSph != null) {
                 return pm.pmSph.z;
@@ -1008,7 +1041,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     private void initHighlight() {
-        if (hl == null)
+        if (isValid() && hl == null)
             hl = Mapper.highlight.get(entity);
     }
 
@@ -1016,6 +1049,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * Marks the element for update in VRAM.
      */
     public void markForUpdate() {
+        if (!isValid()) {
+            return;
+        }
         var set = getSet();
         if (set != null) {
             set.markForUpdate(Mapper.render.get(entity));

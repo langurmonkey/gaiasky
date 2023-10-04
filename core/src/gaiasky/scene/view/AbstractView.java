@@ -43,13 +43,17 @@ public abstract class AbstractView {
      * all component references to null.
      */
     public void clearEntity() {
-        this.entity = null;
-        entityCleared();
+        synchronized (this) {
+            this.entity = null;
+            entityCleared();
+        }
     }
 
     /** Returns the current entity under this view. **/
     public Entity getEntity() {
-        return this.entity;
+        synchronized (this) {
+            return this.entity;
+        }
     }
 
     /**
@@ -59,11 +63,13 @@ public abstract class AbstractView {
      * @param entity The new entity.
      */
     public void setEntity(Entity entity) {
-        if (entity != null && (this.entity != entity || !componentsCheck(entity))) {
-            clearEntity();
-            entityCheck(entity);
-            this.entity = entity;
-            entityChanged();
+        synchronized (this) {
+            if (entity != null && (this.entity != entity || !componentsCheck(entity))) {
+                clearEntity();
+                entityCheck(entity);
+                this.entity = entity;
+                entityChanged();
+            }
         }
     }
 
