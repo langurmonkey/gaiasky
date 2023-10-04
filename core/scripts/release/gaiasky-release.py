@@ -94,7 +94,7 @@ def gen_downloads_table(gsfolder):
     packages_dir = max(glob.glob(os.path.join(gsfolder, 'releases', 'packages-*')), key=os.path.getmtime)
     packages_name = os.path.basename(packages_dir)
     version_rev = packages_name[9:]
-    version = packages_name[9:pg.rfind('.')]
+    version = packages_name[9:packages_name.rfind('.')]
     version_underscore = version.replace('.', '_')
 
     # Prepare SHA256 checksums.
