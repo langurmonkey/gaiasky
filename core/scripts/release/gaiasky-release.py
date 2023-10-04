@@ -9,7 +9,7 @@ This script prepares Gaia Sky for a new release
     0.1
 """
 
-import argparse, os, sys, json
+import argparse, os, sys, json, glob
 from tempfile import mkstemp
 from shutil import move
 from os import fdopen, remove
@@ -89,6 +89,40 @@ def process_files(defs, gsfolder, do=True):
             comment_line("%s/%s" % (gsfolder, file), line, commentchar, uncomment=False)
 
 
+    # Find tag/version.
+def gen_downloads_table(gsfolder):
+    packages_dir = max(glob.glob(os.path.join(gsfolder, 'releases', 'packages-*')), key=os.path.getmtime)
+    packages_name = os.path.basename(packages_dir)
+    version_rev = packages_name[9:]
+    version = packages_name[9:pg.rfind('.')]
+    version_underscore = version.replace('.', '_')
+
+    # Prepare SHA256 checksums.
+    shamap = {}
+    shaf = open(os.path.join(packages_dir, 'sha256sums'))
+    for line in shaf:
+        tokens = line.split(' ')
+        key = tokens[1][tokens[1].rfind('.') + 1:].strip()
+        shamap[key] = tokens[0]
+
+    fin = open(os.path.join(gsfolder, 'core', 'scripts', 'release', 'downloads-table.template.html'), 'rt')
+    fout = open(os.path.join(packages_dir, 'downloads-table.html'), 'wt')
+
+    for line in fin:
+        # Substitute version and revision.
+        line = line.replace('${VERSION_FLAT}', version_underscore).replace('${VERSION_REVISION}', version_rev)
+        line = line.replace('${SHA256_DEB}', shamap['deb'])
+        line = line.replace('${SHA256_RPM}', shamap['rpm'])
+        line = line.replace('${SHA256_SH}', shamap['sh'])
+        line = line.replace('${SHA256_APPIMAGE}', shamap['appimage'])
+        line = line.replace('${SHA256_WIN}', shamap['exe'])
+        line = line.replace('${SHA256_DMG}', shamap['dmg'])
+        line = line.replace('${SHA256_TAR}', shamap['gz'])
+        fout.write(line)
+
+    print("Generated downloads table file: %s" % fout.name)
+
+
 if __name__ == '__main__':
     arguments = check_args(sys.argv[1:])
 
@@ -99,81 +133,85 @@ if __name__ == '__main__':
     if arguments.def_file is None:
         arguments.def_file = "%s/%s" % (get_script_path(), "gaiasky-release-none.json")
 
-    print("Loading definitions file: %s" % arguments.def_file)
-    with open(arguments.def_file, 'r') as f:
-        defs = json.load(f)
+        print("Loading definitions file: %s" % arguments.def_file)
+        with open(arguments.def_file, 'r') as f:
+            defs = json.load(f)
 
-    # Make sure the version is set wherever it needs to be set
-    print("Before running this script:")
-    print()
-    print("- Bump up the version number in core/exe/de.uni_heidelberg.zah.GaiaSky.metainfo.xml")
-    print("- Make sure that $GS/releasenotes.txt exists and is ready, otherwise we will auto-generate it!")
-    print()
-    input("Press any key to continue, or C-c to quit...")
-
-    releaserules = defs["releaserules"]
-
-    # PROCESS FILES
-    process_files(releaserules, arguments.gs_folder, do=not arguments.undo)
-
-    # If undo, end 
-    if arguments.undo:
-        print("Undid possible changes, finishing here")
-        print("Note that -t is not supported with -u")
-        exit()
-
-    # CREATE RELEASE - Only if not undo, tag is not empty and we have commands to run
-    if arguments.tag is not None and defs["releasecommands"] is not None:
-        if arguments.tag_annotation is None:
-            arguments.tag_annotation = "Version %s" % arguments.tag
-
+        # Make sure the version is set wherever it needs to be set
+        print("Before running this script:")
         print()
+        print("- Bump up the version number in core/exe/de.uni_heidelberg.zah.GaiaSky.metainfo.xml")
+        print("- Make sure that $GS/releasenotes.txt exists and is ready, otherwise we will auto-generate it!")
         print()
-        print("======================== CREATE RELEASE ======================")
-        print("  base:          %s" % arguments.gs_folder)
-        print("  tag:           %s" % arguments.tag)
-        print("  annotation:    %s" % arguments.tag_annotation)
-        print("==============================================================")
-        print()
-        print()
+        input("Press any key to continue, or C-c to quit...")
 
-        commands = defs["releasecommands"]
+        releaserules = defs["releaserules"]
 
-        for command in commands:
-            cmdstr = []
-            for cmd in command.split():
-                for key in arguments.__dict__:
-                    if "&%s&" % key in cmd:
-                        cmd = cmd.replace("&%s&" % key, "%s" % arguments.__dict__[key])
-                cmdstr.append(cmd)
+        # PROCESS FILES
+        process_files(releaserules, arguments.gs_folder, do=not arguments.undo)
 
-            print("==> RUNNING: %s" % cmdstr)
-            p = subprocess.Popen(cmdstr, cwd=arguments.gs_folder)
-            p.wait()
+        # If undo, end 
+        if arguments.undo:
+            print("Undid possible changes, finishing here")
+            print("Note that -t is not supported with -u")
+            exit()
 
-        # REVERT FILES
-        process_files(releaserules, arguments.gs_folder, do=False)
+        # CREATE RELEASE - Only if not undo, tag is not empty and we have commands to run
+        if arguments.tag is not None and defs["releasecommands"] is not None:
+            if arguments.tag_annotation is None:
+                arguments.tag_annotation = "Version %s" % arguments.tag
 
-        # PRINT TODOS
-        print()
-        print()
-        print("================ TODOs ================")
-        print()
-        print(" > Your release %s is in %s/releases" % (arguments.tag, arguments.gs_folder))
-        print(" > Generate the changelog for the new tag and prepend it to CHANGELOG.md: generate-changelog %s" % arguments.tag)
-        print(" > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget updates.xml)")
-        print(" > Update symlink to latest: rm latest && ln -s new_release latest")
-        print(" > Generate the html listings for the new files: dir2html")
-        print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
-        print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
-        print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
-        print(" > Add new release to codeberg: https://codeberg.org/gaiasky/gaiasky/releases")
-        print(" > Create new docs tag (%s) and generate the docs: make versions publish" % arguments.tag)
-        print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
-        print(" > Update flatpak repo and do pull request. See here: https://codeberg.org/gaiasky/gaiasky/issues/337#issuecomment-521949")
-        print(" > Post to social media")
-        print()
-        print(">DONE<")
+            print()
+            print()
+            print("======================== CREATE RELEASE ======================")
+            print("  base:          %s" % arguments.gs_folder)
+            print("  tag:           %s" % arguments.tag)
+            print("  annotation:    %s" % arguments.tag_annotation)
+            print("==============================================================")
+            print()
+            print()
 
-    else:
-        print("You must give a tag number!")
+            commands = defs["releasecommands"]
+
+            for command in commands:
+                cmdstr = []
+                for cmd in command.split():
+                    for key in arguments.__dict__:
+                        if "&%s&" % key in cmd:
+                            cmd = cmd.replace("&%s&" % key, "%s" % arguments.__dict__[key])
+                    cmdstr.append(cmd)
+
+                print("==> RUNNING: %s" % cmdstr)
+                p = subprocess.Popen(cmdstr, cwd=arguments.gs_folder)
+                p.wait()
+
+            # REVERT FILES
+            process_files(releaserules, arguments.gs_folder, do=False)
+
+            # HTML DOWNLOADS TABLE
+            gen_downloads_table(arguments.gs_folder)
+
+            # PRINT TODOS
+            print()
+            print()
+            print("================ TODOs ================")
+            print()
+            print(" > Your release %s is in %s/releases" % (arguments.tag, arguments.gs_folder))
+            print(" > Generate the changelog for the new tag and prepend it to CHANGELOG.md: generate-changelog %s" % arguments.tag)
+            print(" > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget updates.xml)")
+            print(" > Update symlink to latest: rm latest && ln -s new_release latest")
+            print(" > Generate the html listings for the new files: dir2html")
+            print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
+            print("     > The HTML downloads table is in the packages folder!")
+            print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
+            print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
+            print(" > Add new release to codeberg: https://codeberg.org/gaiasky/gaiasky/releases")
+            print(" > Create new docs tag (%s) and generate the docs: make versions publish" % arguments.tag)
+            print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
+            print(" > Update flatpak repo and do pull request. See here: https://codeberg.org/gaiasky/gaiasky/issues/337#issuecomment-521949")
+            print(" > Post to social media")
+            print()
+            print(">DONE<")
+
+        else:
+            print("You must give a tag number!")

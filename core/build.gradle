@@ -435,11 +435,17 @@ tasks.register('createArch') {
         String sha256Tar = new File("$packageDir/" + project.distName + ".tar.gz.sha-256").text
         sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
 
-        String tagRevEscaped = "$tagRev"
-        tagRevEscaped = tagRevEscaped.replace(":", "_").replace("/", "_").replace("-", "_").replace(" ", "_");
+        String tagVersion = tagRev.substring(0, tagRev.lastIndexOf("."))
+        String tagRevision = "1"
+        if (tagVersion.contains("-")) {
+            String v = tagVersion
+            tagVersion = tagVersion.substring(0, tagVersion.lastIndexOf("-"))
+            tagRevision = v.substring(v.lastIndexOf("-") + 1)
+        }
 
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
-        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision.escaped@', value: "$tagRevEscaped")
+        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version@', value: "$tagVersion")
+        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@revision@', value: "$tagRevision")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@sha256checksum@', value: sha256Tar)
 
