@@ -27,7 +27,7 @@ sha256sums=("@sha256checksum@")
 validpgpkeys=()
 
 prepare() {
-	cd "$pkgname-${pkgver//_/-}"
+	cd "$pkgname-${versionstr//_/-}"
 }
 
 build() {
@@ -39,7 +39,7 @@ check() {
 }
 
 package() {
-	cd "$pkgname-${pkgver//_/-}"
+	cd "$pkgname-${versionstr//_/-}"
 	mkdir -p "$pkgdir/opt/gaiasky/"
 	mv * "$pkgdir/opt/gaiasky/"
 }
