@@ -149,7 +149,7 @@ vec4 closeUp(float dist, float level) {
 
     float s3 = ringRayNoise(ray, pos, 0.96, 1.0, mr, u_time);
     color.xyz += mix(v_color.rgb, vec3(1.0, 0.95, 1.0), pow(s3, 3.0)) * s3 * 0.8 * v_color.a;
-    color.xyz = max(color.xyz, pow((1.0 - length(p)) * 2.6, 3.0) * v_color.rgb);
+    color.xyz = max(color.xyz, pow(clamp(1.0 - length(p), 0.0, 1.0) * 2.6, 3.0) * v_color.rgb);
 
     return clamp(color, vec4(0.0), vec4(1.0));
 
