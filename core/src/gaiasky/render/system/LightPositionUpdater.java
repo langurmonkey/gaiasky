@@ -37,7 +37,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     private float[] positions;
     private float[] solidAngles;
     private float[] colors;
-    private Texture glowTex;
+    private Texture occlusionTexture;
 
     public LightPositionUpdater() {
         this.lock = new Object();
@@ -78,8 +78,8 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
      *
      * @param tex The texture
      */
-    public void setGlowTexture(Texture tex) {
-        this.glowTex = tex;
+    public void setOcclusionTexture(Texture tex) {
+        this.occlusionTexture = tex;
     }
 
     @Override
@@ -168,9 +168,9 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                         }
                     }
                 }
-                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, lightIndex, positions, solidAngles, colors, glowTex);
+                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, lightIndex, positions, solidAngles, colors, occlusionTexture);
             } else {
-                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, 0, positions, solidAngles, colors, glowTex);
+                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, 0, positions, solidAngles, colors, occlusionTexture);
             }
         }
 

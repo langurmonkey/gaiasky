@@ -34,9 +34,6 @@ public class BillboardEntityRenderSystem implements IObserver {
 
     private final Vector3 F31 = new Vector3();
     private final Vector3b B31 = new Vector3b();
-    private final Vector3b B32 = new Vector3b();
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
 
     private final Color c = new Color();
 

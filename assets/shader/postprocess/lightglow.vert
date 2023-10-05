@@ -17,7 +17,7 @@
 
 #define N 8
 
-// Pre pass
+// Occlusion pass.
 uniform sampler2D u_texture2;
 
 uniform vec2 u_viewport;
@@ -60,7 +60,7 @@ void main() {
         lum += texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar)).r;
         lum /= u_nSamples;
 
-        v_lums[li] = lum;
+        v_lums[li] = clamp(lum, 0.0, 1.0);
     }
     v_texCoords = a_texCoord0;
     gl_Position = a_position;

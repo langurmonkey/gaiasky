@@ -40,7 +40,6 @@ public class ModelEntityRenderSystem {
     private final ParticleUtils utils;
     private final SceneRenderer sceneRenderer;
     private final Vector3b aux3b2 = new Vector3b();
-    private final Vector3d aux3d1 = new Vector3d(), aux3d2 = new Vector3d();
 
     public ModelEntityRenderSystem(SceneRenderer sr) {
         this.sceneRenderer = sr;

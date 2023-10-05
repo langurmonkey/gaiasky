@@ -16,13 +16,12 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.process.RenderModeOpenXR;
-import gaiasky.render.system.AbstractRenderSystem;
-import gaiasky.render.system.IRenderSystem;
 import gaiasky.render.system.LightPositionUpdater;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
+import gaiasky.scene.system.render.draw.BillboardRenderer;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL30;
@@ -36,11 +35,12 @@ public class LightGlowPass {
 
     private final SceneRenderer sceneRenderer;
     // Light glow pre-render
-    private FrameBuffer glowFrameBuffer;
+    private FrameBuffer occlusionFrameBuffer;
     private final List<IRenderable> stars;
     private final LightPositionUpdater lpu;
     private final Array<Entity> controllers = new Array<>();
-    private IRenderSystem billboardStarsRenderer = null;
+    private BillboardRenderer billboardStarsRenderer = null;
+    private boolean uiViewCreated = false;
 
     public LightGlowPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
@@ -49,23 +49,30 @@ public class LightGlowPass {
     }
 
     public void buildLightGlowData() {
-        if (glowFrameBuffer == null) {
+        if (occlusionFrameBuffer == null) {
             GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(1920, 1080);
-            fbb.addBasicColorTextureAttachment(Pixmap.Format.RGBA8888);
-            fbb.addBasicDepthRenderBuffer();
-            glowFrameBuffer = new GaiaSkyFrameBuffer(fbb, 0, 1);
+            if (!Settings.settings.program.safeMode && Gdx.graphics.isGL30Available()) {
+                // Float color and depth buffers.
+                fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+                fbb.addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT24, GL30.GL_FLOAT);
+            } else {
+                // Regular buffers.
+                fbb.addBasicColorTextureAttachment(Pixmap.Format.RGBA8888);
+                fbb.addBasicDepthRenderBuffer();
+            }
+            occlusionFrameBuffer = new GaiaSkyFrameBuffer(fbb, 0, 1);
         }
     }
 
     public void renderGlowPass(ICamera camera,
                                FrameBuffer frameBuffer) {
         if (frameBuffer == null) {
-            frameBuffer = glowFrameBuffer;
+            frameBuffer = occlusionFrameBuffer;
         }
         if (Settings.settings.postprocess.lightGlow.active && frameBuffer != null) {
             var renderLists = sceneRenderer.getRenderLists();
             var renderAssets = sceneRenderer.getRenderAssets();
-            // Get all billboard stars
+            // Get all billboard stars.
             List<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
 
             stars.clear();
@@ -77,13 +84,13 @@ public class LightGlowPass {
                 }
             }
 
-            // Get all models
+            // Get all models.
             List<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
             List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
 
-            // VR controllers
+            // VR controllers.
             if (Settings.settings.runtime.openXr) {
-                RenderModeOpenXR sgrVR = (RenderModeOpenXR) sceneRenderer.getRenderModeOpenXR();
+                RenderModeOpenXR sgrVR = sceneRenderer.getRenderModeOpenXR();
                 if (sceneRenderer.getVrContext() != null) {
                     for (Entity m : sgrVR.controllerObjects) {
                         var render = Mapper.render.get(m);
@@ -93,26 +100,22 @@ public class LightGlowPass {
                 }
             }
 
+
+            if (billboardStarsRenderer == null) {
+                billboardStarsRenderer = (BillboardRenderer) sceneRenderer.getOrInitializeRenderSystem(BILLBOARD_STAR);
+            }
+
             frameBuffer.begin();
-            Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            // Render billboard stars
-            if (billboardStarsRenderer == null) {
-                billboardStarsRenderer = sceneRenderer.getOrInitializeRenderSystem(BILLBOARD_STAR);
-            }
-            if(billboardStarsRenderer != null) {
-                billboardStarsRenderer.render(stars, camera, 0, null);
-            }
-
-            // Render models
+            // Render models.
             renderAssets.mbPixelLightingOpaque.begin(camera.getCamera());
             for (IRenderable model : models) {
                 sceneRenderer.renderModel(model, renderAssets.mbPixelLightingOpaque);
             }
             renderAssets.mbPixelLightingOpaque.end();
 
-            // Render tessellated models
+            // Render tessellated models.
             if (!modelsTess.isEmpty()) {
                 renderAssets.mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
                 for (IRenderable model : modelsTess) {
@@ -120,23 +123,30 @@ public class LightGlowPass {
                 }
                 renderAssets.mbPixelLightingOpaqueTessellation.end();
             }
-            //}
 
-            // Set texture to updater
-            lpu.setGlowTexture(frameBuffer.getColorBufferTexture());
+            // Render billboard stars.
+            if (billboardStarsRenderer != null) {
+                billboardStarsRenderer.renderStud(stars, camera, 0);
+            }
+
+            // Set texture to updater.
+            lpu.setOcclusionTexture(frameBuffer.getColorBufferTexture());
 
             frameBuffer.end();
 
+            //if (!uiViewCreated) {
+            //    GaiaSky.postRunnable(() -> {
+            //        // Create UI view
+            //        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", glowFrameBuffer);
+            //    });
+            //    uiViewCreated = true;
+            //}
         }
 
     }
 
-    public void setBillboardStarsRenderer(AbstractRenderSystem system) {
-        this.billboardStarsRenderer = system;
-    }
-
-    public FrameBuffer getGlowFrameBuffer() {
-        return glowFrameBuffer;
+    public FrameBuffer getOcclusionFrameBuffer() {
+        return occlusionFrameBuffer;
     }
 
     public LightPositionUpdater getLpu() {

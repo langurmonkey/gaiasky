@@ -24,8 +24,8 @@ public final class GlowFilter extends Filter<GlowFilter> {
     private float orientation = 0f;
     private float backbufferScale = 1f;
 
-    // Contains a pre pass texture which is used to compute occlusion
-    private Texture prePassTexture;
+    // Contains a pre pass texture which is used to compute occlusion.
+    private Texture occlusionTexture;
     private Texture lightGlowTexture;
 
     public GlowFilter(int width, int height) {
@@ -85,13 +85,13 @@ public final class GlowFilter extends Filter<GlowFilter> {
         setParam(Param.LightGlowTexture, u_texture1);
     }
 
-    public Texture getPrePassTexture() {
-        return prePassTexture;
+    public Texture getOcclusionTexture() {
+        return occlusionTexture;
     }
 
-    public void setPrePassTexture(Texture tex) {
-        prePassTexture = tex;
-        setParam(Param.PrePassTexture, u_texture2);
+    public void setOcclusionTexture(Texture tex) {
+        occlusionTexture = tex;
+        setParam(Param.OcclusionTexture, u_texture2);
     }
 
     public void setOrientation(float o) {
@@ -104,7 +104,7 @@ public final class GlowFilter extends Filter<GlowFilter> {
         // Re-implement super to batch every parameter
         setParams(Param.Texture, u_texture0);
         setParams(Param.LightGlowTexture, u_texture1);
-        setParams(Param.PrePassTexture, u_texture2);
+        setParams(Param.OcclusionTexture, u_texture2);
         setParams(Param.NSamples, nSamples);
         setParams(Param.TextureScale, textureScale);
         setParams(Param.SpiralScale, spiralScale);
@@ -126,15 +126,15 @@ public final class GlowFilter extends Filter<GlowFilter> {
         inputTexture.bind(u_texture0);
         if (lightGlowTexture != null)
             lightGlowTexture.bind(u_texture1);
-        if (prePassTexture != null)
-            prePassTexture.bind(u_texture2);
+        if (occlusionTexture != null)
+            occlusionTexture.bind(u_texture2);
     }
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
         LightGlowTexture("u_texture1", 0),
-        PrePassTexture("u_texture2", 0),
+        OcclusionTexture("u_texture2", 0),
         LightPositions("u_lightPositions", 2),
         LightViewAngles("u_lightViewAngles", 1),
         LightColors("u_lightColors", 3),

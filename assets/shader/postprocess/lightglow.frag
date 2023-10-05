@@ -3,9 +3,9 @@
 
 #define MAX_LIGHTS 8
 
-// Current frame
+// Current frame.
 uniform sampler2D u_texture0;
-// Glow texture
+// Star texture.
 uniform sampler2D u_texture1;
 
 uniform vec2 u_viewport;
@@ -63,6 +63,6 @@ void main() {
         float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
         fragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
     }
-    fragColor.rgb += texture(u_texture0, v_texCoords).rgb;
+    fragColor.rgb = clamp(fragColor.rgb + texture(u_texture0, v_texCoords).rgb, 0.0, 1.0);
     fragColor.a = 1.0;
 }

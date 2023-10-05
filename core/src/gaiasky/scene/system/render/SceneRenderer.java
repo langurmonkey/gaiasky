@@ -83,7 +83,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Alpha values for each type.
      **/
     public float[] alphas;
-    private final ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
+    private final ModelEntityRenderSystem modelEntityRenderSystem = new ModelEntityRenderSystem(this);
     /**
      * Render lists for all render groups.
      * The front render lists contain the objects which are actually rendered in the current cycle. The back
@@ -263,7 +263,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 // BILLBOARD STARS
                 system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders,
                         Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
-                system.addPreRunnables(additiveBlendR, noDepthTestR);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(lightGlowPass.getLpu());
             }
             case BILLBOARD_GAL -> {
@@ -458,7 +458,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         if (r instanceof Render) {
             Render render = (Render) r;
             if (Mapper.model.has(render.entity)) {
-                renderObject.renderOpaque(render.entity, batch, (float) 1, false);
+                modelEntityRenderSystem.renderOpaque(render.entity, batch, (float) 1, false);
             }
         }
     }
@@ -506,7 +506,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     @Override
     public FrameBuffer getGlowFrameBuffer() {
-        return lightGlowPass.getGlowFrameBuffer();
+        return lightGlowPass.getOcclusionFrameBuffer();
     }
 
     public IRenderSystem getOrInitializeRenderSystem(RenderGroup rg) {
@@ -912,7 +912,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     public ModelEntityRenderSystem getModelRenderSystem() {
-        return renderObject;
+        return modelEntityRenderSystem;
     }
 
     public Map<XrControllerDevice, Entity> getXRControllerToModel() {

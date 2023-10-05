@@ -40,7 +40,6 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
-import gaiasky.util.gdx.contrib.postprocess.filters.Blur;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
@@ -685,7 +684,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 var angles = (float[]) data[2];
                 var colors = (float[]) data[3];
                 var alphas = new float[nLights];
-                var prePass = (Texture) data[4];
+                var occlusionTexture = (Texture) data[4];
                 var lensFlareSettings = Settings.settings.postprocess.lensFlare;
                 var nLightsFlare = 0;
                 int i = 0;
@@ -712,8 +711,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             lightGlow.setLightPositions(nLights, lightPos);
                             lightGlow.setLightSolidAngles(angles);
                             lightGlow.setLightColors(colors);
-                            if (prePass != null)
-                                lightGlow.setPrePassTexture(prePass);
+                            if (occlusionTexture != null) {
+                                lightGlow.setOcclusionTexture(occlusionTexture);
+                            }
                         }
                         if (!lensFlareSettings.type.isPseudoLensFlare()) {
                             LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);

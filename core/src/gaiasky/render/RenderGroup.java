@@ -51,10 +51,6 @@ public enum RenderGroup {
      **/
     BILLBOARD_GROUP(800),
     /**
-     * Star billboards
-     **/
-    BILLBOARD_STAR(900),
-    /**
      * Particle group
      **/
     PARTICLE_GROUP(1000),
@@ -138,6 +134,10 @@ public enum RenderGroup {
      * IntShader - front (planets, satellites...)
      **/
     BILLBOARD_SSO(5000),
+    /**
+     * Star billboards
+     **/
+    BILLBOARD_STAR(5500),
     /**
      * Atmospheres of planets
      **/

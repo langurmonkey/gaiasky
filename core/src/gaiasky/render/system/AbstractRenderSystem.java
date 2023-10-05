@@ -182,7 +182,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
      * @param shaderProgram The program.
      * @param camera        The camera.
      */
-    protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram,
+    public void addDepthBufferUniforms(ExtShaderProgram shaderProgram,
                                           ICamera camera) {
         if (!depthBufferFlag) {
             shaderProgram.setUniformf("u_zfar", (float) camera.getFar());

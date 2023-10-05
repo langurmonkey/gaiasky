@@ -74,12 +74,12 @@ public final class LightGlow extends PostProcessorEffect {
         glow.setLightGlowTexture(tex);
     }
 
-    public Texture getPrePassTexture() {
-        return glow.getPrePassTexture();
+    public Texture getOcclusionTexture() {
+        return glow.getOcclusionTexture();
     }
 
-    public void setPrePassTexture(Texture tex) {
-        glow.setPrePassTexture(tex);
+    public void setOcclusionTexture(Texture tex) {
+        glow.setOcclusionTexture(tex);
     }
 
     public boolean isBlendingEnabled() {
