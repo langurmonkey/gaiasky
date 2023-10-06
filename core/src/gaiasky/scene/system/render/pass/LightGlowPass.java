@@ -14,6 +14,9 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.process.RenderModeOpenXR;
 import gaiasky.render.system.LightPositionUpdater;
@@ -25,6 +28,7 @@ import gaiasky.scene.system.render.draw.BillboardRenderer;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL40;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +44,8 @@ public class LightGlowPass {
     private final LightPositionUpdater lpu;
     private final Array<Entity> controllers = new Array<>();
     private BillboardRenderer billboardStarsRenderer = null;
-    private boolean uiViewCreated = false;
+    // Disable texture view.
+    private boolean uiViewCreated = true;
 
     public LightGlowPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
@@ -51,15 +56,8 @@ public class LightGlowPass {
     public void buildLightGlowData() {
         if (occlusionFrameBuffer == null) {
             GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(1920, 1080);
-            if (!Settings.settings.program.safeMode && Gdx.graphics.isGL30Available()) {
-                // Float color and depth buffers.
-                fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
-                fbb.addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT24, GL30.GL_FLOAT);
-            } else {
-                // Regular buffers.
-                fbb.addBasicColorTextureAttachment(Pixmap.Format.RGBA8888);
-                fbb.addBasicDepthRenderBuffer();
-            }
+            fbb.addBasicColorTextureAttachment(Pixmap.Format.RGBA8888);
+            fbb.addBasicDepthRenderBuffer();
             occlusionFrameBuffer = new GaiaSkyFrameBuffer(fbb, 0, 1);
         }
     }
@@ -126,7 +124,17 @@ public class LightGlowPass {
 
             // Render billboard stars.
             if (billboardStarsRenderer != null) {
+                // Additive blend.
+                Gdx.gl.glEnable(GL20.GL_BLEND);
+                GL40.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                // Depth test, no writes.
+                Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+                Gdx.gl.glDepthMask(false);
                 billboardStarsRenderer.renderStud(stars, camera, 0);
+                // Reset state.
+                Gdx.gl.glDisable(GL20.GL_BLEND);
+                Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+                Gdx.gl.glDepthMask(true);
             }
 
             // Set texture to updater.
@@ -134,13 +142,13 @@ public class LightGlowPass {
 
             frameBuffer.end();
 
-            //if (!uiViewCreated) {
-            //    GaiaSky.postRunnable(() -> {
-            //        // Create UI view
-            //        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", glowFrameBuffer);
-            //    });
-            //    uiViewCreated = true;
-            //}
+            if (!uiViewCreated) {
+                GaiaSky.postRunnable(() -> {
+                    // Create UI view
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", occlusionFrameBuffer, 0.5f, false, true);
+                });
+                uiViewCreated = true;
+            }
         }
 
     }

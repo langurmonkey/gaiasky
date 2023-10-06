@@ -17,6 +17,10 @@
 
 #define N 8
 
+// Current frame.
+uniform sampler2D u_texture0;
+// Star texture.
+uniform sampler2D u_texture1;
 // Occlusion pass.
 uniform sampler2D u_texture2;
 
@@ -32,6 +36,8 @@ in vec2 a_texCoord0;
 out vec2 v_texCoords;
 
 out float v_lums[N];
+
+#define saturate(x) clamp(x, 0.0, 1.0)
 
 float fx(float t, float a){
     return a * t * cos(t);
@@ -54,13 +60,13 @@ void main() {
         float lum = 0.0;
         for (int idx = 0; idx < u_nSamples; idx++){
             vec2 curr_coord = clamp(u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
-            lum += (clamp(texture(u_texture2, curr_coord), 0.0, 1.0)).r;
+            lum += (saturate(texture(u_texture2, curr_coord))).r;
             t += dt;
         }
         lum += texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar)).r;
         lum /= u_nSamples;
 
-        v_lums[li] = clamp(lum, 0.0, 1.0);
+        v_lums[li] = saturate(lum);
     }
     v_texCoords = a_texCoord0;
     gl_Position = a_position;

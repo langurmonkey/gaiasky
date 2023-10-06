@@ -39,6 +39,8 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/velbuffer.frag.glsl>
 #endif
 
+#define saturate(x) clamp(x, 0.0, 1.0)
+
 float core(float distance_center, float inner_rad){
     if (inner_rad == 0.0){
         return 0.0;
@@ -113,8 +115,7 @@ vec4 farAway(float dist, float level) {
     if (u_lightScattering == 1) {
         // Light scattering, simple star
         float core = core(dist, u_inner_rad);
-        float light = light(dist, light_decay);
-        return (v_color + (core * 5.0)) * (light + core) * v_color.a;
+        return saturate((v_color + core * 5.0) * core * v_color.a);
     } else {
         // No light scattering, star rays
         level = min(level, 1.0);
@@ -122,7 +123,7 @@ vec4 farAway(float dist, float level) {
         float light = light(dist, light_decay * 2.0);
         float core = core(dist, u_inner_rad);
 
-        return (v_color + core) * (corona * (1.0 - level) + light + core) * v_color.a;
+        return saturate((v_color + core) * (corona * (1.0 - level) + light + core) * v_color.a);
     }
 }
 
@@ -149,9 +150,9 @@ vec4 closeUp(float dist, float level) {
 
     float s3 = ringRayNoise(ray, pos, 0.96, 1.0, mr, u_time);
     color.xyz += mix(v_color.rgb, vec3(1.0, 0.95, 1.0), pow(s3, 3.0)) * s3 * 0.8 * v_color.a;
-    color.xyz = max(color.xyz, pow(clamp(1.0 - length(p), 0.0, 1.0) * 2.6, 3.0) * v_color.rgb);
+    color.xyz = max(color.xyz, pow(saturate(1.0 - length(p)) * 2.6, 3.0) * v_color.rgb);
 
-    return clamp(color, vec4(0.0), vec4(1.0));
+    return saturate(color);
 
     #else
 
@@ -195,7 +196,7 @@ vec4 draw() {
 }
 
 void main() {
-    fragColor = draw();
+    fragColor = saturate(draw());
 
     // Add outline
     //if (v_uv.x > 0.99 || v_uv.x < 0.01 || v_uv.y > 0.99 || v_uv.y < 0.01) {

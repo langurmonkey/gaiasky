@@ -123,11 +123,11 @@ public final class GlowFilter extends Filter<GlowFilter> {
 
     @Override
     protected void onBeforeRender() {
-        inputTexture.bind(u_texture0);
         if (lightGlowTexture != null)
             lightGlowTexture.bind(u_texture1);
         if (occlusionTexture != null)
             occlusionTexture.bind(u_texture2);
+        inputTexture.bind(u_texture0);
     }
 
     public enum Param implements Parameter {

@@ -103,14 +103,6 @@ public enum RenderGroup {
      **/
     FONT_LABEL(2200),
     /**
-     * Regular billboard sprite
-     **/
-    BILLBOARD_SPRITE(2300),
-    /**
-     * IntShader - galaxies
-     **/
-    BILLBOARD_GAL(2400),
-    /**
      * Recursive grid
      */
     MODEL_VERT_RECGRID(2500),
@@ -134,6 +126,14 @@ public enum RenderGroup {
      * IntShader - front (planets, satellites...)
      **/
     BILLBOARD_SSO(5000),
+    /**
+     * Regular billboard sprite
+     **/
+    BILLBOARD_SPRITE(5300),
+    /**
+     * IntShader - galaxies
+     **/
+    BILLBOARD_GAL(5400),
     /**
      * Star billboards
      **/

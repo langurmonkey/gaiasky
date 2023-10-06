@@ -26,7 +26,10 @@ import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
-import gaiasky.render.process.*;
+import gaiasky.render.process.RenderModeCubemapProjections;
+import gaiasky.render.process.RenderModeMain;
+import gaiasky.render.process.RenderModeOpenXR;
+import gaiasky.render.process.RenderModeStereoscopic;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.IRenderSystem;
@@ -225,10 +228,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD,
                 Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
 
-        // Set clear color, depth and stencil.
-        Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClearDepthf(1);
-        Gdx.gl.glClearStencil(0);
     }
 
     private AbstractRenderSystem initializeRenderSystem(final RenderGroup rg) {
@@ -255,28 +254,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case FONT_ANNOTATION -> {
                 // ANNOTATIONS - (grids)
-                system = new TextRenderer(this, FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
+                system = new TextRenderer(this, FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null,
+                        null, renderAssets.font2d, null);
                 system.addPreRunnables(regularBlendR, noDepthTestR);
                 system.addPostRunnables(clearDepthR);
-            }
-            case BILLBOARD_STAR -> {
-                // BILLBOARD STARS
-                system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders,
-                        Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
-                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
-                system.addPostRunnables(lightGlowPass.getLpu());
-            }
-            case BILLBOARD_GAL -> {
-                // BILLBOARD GALAXIES
-                system = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders,
-                        Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", ComponentType.Galaxies, false);
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-            }
-            case BILLBOARD_SPRITE -> {
-                // BILLBOARD SPRITES
-                system = new BillboardRenderer(this, BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null, ComponentType.Clusters,
-                        false);
-                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case LINE -> {
                 // LINES CPU
@@ -376,12 +357,31 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case MODEL_VERT_STAR -> // MODEL STARS
                     system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
             case FONT_LABEL -> // LABELS
-                    system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d,
-                            renderAssets.font2d, renderAssets.fontTitles);
+                    system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader,
+                            renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
             case BILLBOARD_SSO -> {
                 // BILLBOARD SSO
                 system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders,
-                        Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", null, false);
+                        Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", false);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
+            }
+            case BILLBOARD_STAR -> {
+                // BILLBOARD STARS
+                system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders,
+                        Settings.settings.scene.star.getStarTexture(), true);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
+                system.addPostRunnables(lightGlowPass.getLpu());
+            }
+            case BILLBOARD_GAL -> {
+                // BILLBOARD GALAXIES
+                system = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders,
+                        Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", false);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
+            }
+            case BILLBOARD_SPRITE -> {
+                // BILLBOARD SPRITES
+                system = new BillboardRenderer(this, BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null,
+                        false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case MODEL_ATM -> // MODEL ATMOSPHERE
@@ -464,6 +464,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     public void clearScreen() {
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClearDepthf(1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 

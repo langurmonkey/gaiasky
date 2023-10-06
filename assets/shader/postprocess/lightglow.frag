@@ -7,6 +7,8 @@
 uniform sampler2D u_texture0;
 // Star texture.
 uniform sampler2D u_texture1;
+// Occlusion pass.
+uniform sampler2D u_texture2;
 
 uniform vec2 u_viewport;
 uniform float u_textureScale;
@@ -19,6 +21,8 @@ uniform float u_backbufferScale;
 
 in float v_lums[MAX_LIGHTS];
 in vec2 v_texCoords;
+
+#define saturate(x) clamp(x, 0.0, 1.0)
 
 layout (location = 0) out vec4 fragColor;
 
@@ -61,8 +65,7 @@ void main() {
 
         float color_glow = brightness(starImage(glow_tc));
         float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
-        fragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
+        fragColor.rgb += vec3(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc);
     }
-    fragColor.rgb = clamp(fragColor.rgb + texture(u_texture0, v_texCoords).rgb, 0.0, 1.0);
-    fragColor.a = 1.0;
+    fragColor.rgb = saturate(fragColor.rgb + texture(u_texture0, v_texCoords).rgb);
 }

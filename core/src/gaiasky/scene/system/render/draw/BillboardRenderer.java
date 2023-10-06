@@ -35,7 +35,6 @@ import java.util.List;
 
 public class BillboardRenderer extends AbstractRenderSystem implements IObserver {
 
-    private final ComponentType componentType;
     private final BillboardView view;
     private final BillboardEntityRenderSystem renderSystem;
     private IntMesh mesh;
@@ -43,9 +42,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
     // Render metadata
 
-    public BillboardRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
+    public BillboardRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, float w, float h, boolean starTextureListener) {
         super(sceneRenderer, rg, alphas, programs);
-        this.componentType = componentType;
         init(texturePath, w, h, starTextureListener);
 
         this.view = new BillboardView();
@@ -59,11 +57,10 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
      * @param alphas              The alphas list.
      * @param shaderPrograms      The shader programs to render the quad with.
      * @param texturePath         The path to the texture to use for the billboards.
-     * @param componentType       The component type.
      * @param starTextureListener Whether to listen for star texture setting changes.
      */
-    public BillboardRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
-        this(sceneRenderer, rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
+    public BillboardRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, boolean starTextureListener) {
+        this(sceneRenderer, rg, alphas, shaderPrograms, texturePath, 2, 2, starTextureListener);
     }
 
     private void init(String tex0, float w, float h, boolean starTextureListener) {
@@ -78,16 +75,16 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
         // We won't need indices if we use GL_TRIANGLE_FAN to draw our quad
         // TRIANGLE_FAN will draw the vertices in this order: 0, 1, 2; 0, 2, 3
         mesh = new IntMesh(true, 4, 6,
-                new VertexAttribute[] {
+                new VertexAttribute[]{
                         new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE),
                         new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE),
-                        new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0") });
+                        new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0")});
 
         mesh.setVertices(vertices, 0, vertices.length);
         mesh.getIndicesBuffer().position(0);
         mesh.getIndicesBuffer().limit(6);
 
-        int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
+        int[] indices = new int[]{0, 1, 2, 0, 2, 3};
         mesh.setIndices(indices);
 
         if (starTextureListener) {
@@ -144,32 +141,30 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if ((componentType == null || alphas[componentType.ordinal()] != 0)) {
-            renderables.sort(comp);
+        renderables.sort(comp);
 
-            ExtShaderProgram shaderProgram = getShaderProgram();
+        ExtShaderProgram shaderProgram = getShaderProgram();
 
-            shaderProgram.begin();
+        shaderProgram.begin();
 
-            if (billboardTexture != null) {
-                billboardTexture.bind(0);
-            }
-
-            // Global uniforms
-            addCameraUpCubemapMode(shaderProgram, camera);
-            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_time", (float) t);
-
-            // Rel, grav, z-buffer
-            addEffectsUniforms(shaderProgram, camera);
-
-            // Render each sprite
-            renderables.forEach(r -> {
-                Entity entity = ((Render) r).entity;
-                render(entity, shaderProgram, mesh, camera);
-            });
-            shaderProgram.end();
+        if (billboardTexture != null) {
+            billboardTexture.bind(0);
         }
+
+        // Global uniforms
+        addCameraUpCubemapMode(shaderProgram, camera);
+        shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+        shaderProgram.setUniformf("u_time", (float) t);
+
+        // Rel, grav, z-buffer
+        addEffectsUniforms(shaderProgram, camera);
+
+        // Render each sprite
+        renderables.forEach(r -> {
+            Entity entity = ((Render) r).entity;
+            render(entity, shaderProgram, mesh, camera);
+        });
+        shaderProgram.end();
     }
 
     /**
