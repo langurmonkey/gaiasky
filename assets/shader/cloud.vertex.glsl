@@ -218,34 +218,28 @@ out vec3 v_ambientLight;
 //////////////////////////////////////////////////////
 ////// POINTS LIGHTS
 //////////////////////////////////////////////////////
-#ifdef lightingFlag
-    #if defined(numPointLights) && (numPointLights > 0)
-	#define pointLightsFlag
-    #endif // numPointLights
-#endif //lightingFlag
+#if defined(numPointLights) && (numPointLights > 0)
+#define pointLightsFlag
+#endif // numPointLights
 
 #ifdef pointLightsFlag
-    struct PointLight
-    {
-	vec3 color;
-	vec3 position;
-	float intensity;
-    };
-    uniform PointLight u_pointLights[numPointLights];
+struct PointLight {
+    vec3 color;
+    vec3 position;
+    float intensity;
+};
+uniform PointLight u_pointLights[numPointLights];
 #endif
 
 //////////////////////////////////////////////////////
 ////// DIRECTIONAL LIGHTS
 //////////////////////////////////////////////////////
-#ifdef lightingFlag
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
 #endif // numDirectionalLights
-#endif //lightingFlag
 
 #ifdef directionalLightsFlag
-struct DirectionalLight
-{
+struct DirectionalLight {
     vec3 color;
     vec3 direction;
 };
@@ -318,10 +312,17 @@ void main() {
 	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
-    #ifdef directionalLightsFlag
+    #if defined(directionalLightsFlag) && defined(pointLightsFlag)
+    if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
         v_lightDir = normalize(-u_dirLights[0].direction * worldToTangent);
         v_lightCol = u_dirLights[0].color;
-    #else
+    } else {
+        v_lightDir = normalize(-pos.xyz + u_pointLights[0].position * worldToTangent);
+        v_lightCol = u_pointLights[0].color;
+    }
+    #endif // directionalLightsFlag && pointLightsFlag
+
+    #if !defined(directionalLightsFlag) && !defined(pointLightsFlag)
         v_lightDir = vec3(0.0, 0.0, 0.0);
         v_lightCol = vec3(0.0);
     #endif // directionalLightsFlag

@@ -41,9 +41,9 @@ uniform DirectionalLight u_dirLights[numDirectionalLights];
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-#ifdef directionalLightsFlag
+    #ifdef directionalLightsFlag
     DirectionalLight directionalLights[numDirectionalLights];
-#endif// directionalLightsFlag
+    #endif// directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
@@ -55,6 +55,7 @@ struct VertexData {
 #ifdef metallicFlag
     vec3 reflect;
 #endif// metallicFlag
+    mat3 tbn;
 };
 in VertexData v_data;
 

@@ -46,11 +46,11 @@ public class RenderAssets {
     private static final Log logger = Logger.getLogger(RenderAssets.class);
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
-    public ExtShaderProgram[] starBillboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders, primitiveGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
+    public ExtShaderProgram[] billboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders, primitiveGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
     public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbVertexLightingBeam, mbVertexLightingThruster, mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation, mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
     public BitmapFont font2d, font3d, fontTitles;
     public ExtSpriteBatch spriteBatch, fontBatch;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
 
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
@@ -90,7 +90,7 @@ public class RenderAssets {
         String[] namesColMap = GlobalResources.combinations(namesSourceColMap.toArray());
 
         // Direct shaders
-        starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names),
+        billboardDesc = loadShader(manager, "shader/billboard.vertex.glsl", "shader/billboard.fragment.glsl", TextUtils.concatAll("regular.billboard", names),
                 defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", TextUtils.concatAll("sprite", names), defines);
         billboardGroupDesc = loadShader(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl",
@@ -190,9 +190,9 @@ public class RenderAssets {
         String[] names = GlobalResources.combinations(new String[]{" (ssr)", " (vel)", " (rel)", " (grav)"});
 
         /*
-          STAR BILLBOARD SHADER
+          BILLBOARD SHADER
          */
-        starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, TextUtils.concatAll("star.billboard", names));
+        billboardShaders = fetchShaderProgram(manager, billboardDesc, TextUtils.concatAll("regular.billboard", names));
 
         /*
          * GALAXY SHADER

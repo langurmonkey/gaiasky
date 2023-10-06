@@ -10,7 +10,6 @@ package gaiasky.scene.system.render.draw.billboard;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -28,7 +27,6 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 public class BillboardEntityRenderSystem implements IObserver {
 

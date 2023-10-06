@@ -310,13 +310,23 @@ struct DirectionalLight {
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif // directionalLightsFlag
 
+#if defined(numPointLights) && (numPointLights > 0)
+#define pointLightsFlag
+#endif// numPointLights
+
+#ifdef pointLightsFlag
+struct PointLight {
+    vec3 color;
+    vec3 position;
+    float intensity;
+};
+uniform PointLight u_pointLights[numPointLights];
+#endif // numPointLights
+
 // INPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-    #ifdef directionalLightsFlag
-    DirectionalLight directionalLights[numDirectionalLights];
-    #endif // directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
@@ -328,6 +338,7 @@ struct VertexData {
     #ifdef reflectionCubemapFlag
     vec3 reflect;
     #endif // reflectionCubemapFlag
+    mat3 tbn;
 };
 in VertexData o_data;
 
@@ -443,7 +454,12 @@ void main() {
     vec4 outlineColor;
     vec3 f = o_data.fragPosWorld;
     vec3 m = u_eclipsingBodyPos;
-    vec3 l = -u_dirLights[0].direction * u_vrScale;
+    vec3 l;
+    if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
+        l = -u_dirLights[0].direction * u_vrScale;
+    } else {
+        l = normalize(u_pointLights[0].position - o_data.fragPosWorld) * u_vrScale;
+    }
     vec3 fl = f + l;
     float dist = dist_segment_point(f, fl, m);
     float dot_NM = dot(normalize(normalVector.xyz), normalize(m - f));
@@ -511,22 +527,26 @@ void main() {
     float NL0;
     vec3 L0;
 
-    // Loop for directional light contributitons
+    int validLights = 0;
+
+    // DIRECTIONAL LIGHTS
     #ifdef directionalLightsFlag
-    vec3 V = o_data.viewDir;
-    // Loop for directional light contributitons
+    // Loop for directional light contributions.
     for (int i = 0; i < numDirectionalLights; i++) {
-        vec3 col = o_data.directionalLights[i].color;
+        vec3 V = o_data.viewDir;
+        vec3 col = u_dirLights[i].color;
         // Skip non-lights
         if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
             continue;
+        } else {
+            validLights++;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-        vec3 L = o_data.directionalLights[i].direction;
+        vec3 L = normalize(-u_dirLights[i].direction * o_data.tbn);
         vec3 H = normalize(L - V);
-        float NL = max(0.0, dot(N, L));
-        float NH = max(0.0, dot(N, H));
-        if (i == 0){
+        float NL = max(0.00001, dot(N, L));
+        float NH = max(0.00001, dot(N, H));
+        if (validLights == 1){
             NL0 = NL;
             L0 = L;
         }
@@ -537,8 +557,46 @@ void main() {
         shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
         diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
     }
-    diffuseColor *= diffuse.rgb;
     #endif // directionalLightsFlag
+
+    // POINT LIGHTS
+    #ifdef pointLightsFlag
+    // Loop for point light contributions.
+    for (int i = 0; i < numPointLights; i++) {
+        vec3 V = o_data.viewDir;
+        vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
+        // Skip non-lights
+        if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+            continue;
+        } else {
+            validLights++;
+        }
+        // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
+        vec3 L = normalize((u_pointLights[i].position - o_data.fragPosWorld) * o_data.tbn);
+        vec3 H = normalize(L - V);
+        float NL = max(0.00001, dot(N, L));
+        float NH = max(0.00001, dot(N, H));
+        if (validLights == 1){
+            NL0 = NL;
+            L0 = L;
+        }
+
+        selfShadow *= saturate(4.0 * NL);
+
+        specularColor += specular * min(1.0, pow(NH, 40.0));
+        shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
+        diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
+    }
+    #endif // pointLightsFlag
+
+    // Diffuse texture contribution.
+    if (validLights == 0) {
+        // Only ambient contribution, we have no illuminating directional lights.
+        diffuseColor = saturate(diffuse.rgb * ambient);
+    } else {
+        // Regular shading.
+        diffuseColor *= diffuse.rgb;
+    }
 
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag
@@ -549,7 +607,7 @@ void main() {
     #endif // diffuseScatteringColorFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
+    fragColor = vec4(diffuseColor + diffuseScattering + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
     fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround
@@ -558,20 +616,18 @@ void main() {
         fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
     #endif // atmosphereGround
 
-
     #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)
     if (outline > 0.0) {
         fragColor = outlineColor;
     }
     #endif // eclipsingBodyFlag && eclipseOutlines
 
-
     if (fragColor.a <= 0.0) {
         discard;
     }
 
     #ifdef ssrFlag
-        normalBuffer = vec4(normalVector.xyz, 1.0);
+    normalBuffer = vec4(normalVector.xyz, 1.0);
     #endif // ssrFlag
 
     // Logarithmic depth buffer

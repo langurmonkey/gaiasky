@@ -329,13 +329,27 @@ uniform vec3 u_ambientCubemap[6];
 #endif // ambientCubemapFlag
 
 //////////////////////////////////////////////////////
+////// DIRECTIONAL LIGHTS
+//////////////////////////////////////////////////////
+#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+#define directionalLightsFlag
+#endif // numDirectionalLights
+
+#ifdef directionalLightsFlag
+struct DirectionalLight
+{
+    vec3 color;
+    vec3 direction;
+};
+uniform DirectionalLight u_dirLights[numDirectionalLights];
+#endif // direcitonalLightsFlag
+
+//////////////////////////////////////////////////////
 ////// POINTS LIGHTS
 //////////////////////////////////////////////////////
-#ifdef lightingFlag
 #if defined(numPointLights) && (numPointLights > 0)
 #define pointLightsFlag
 #endif // numPointLights
-#endif //lightingFlag
 
 #ifdef pointLightsFlag
 struct PointLight
@@ -345,25 +359,7 @@ struct PointLight
     float intensity;
 };
 uniform PointLight u_pointLights[numPointLights];
-#endif
-
-//////////////////////////////////////////////////////
-////// DIRECTIONAL LIGHTS
-//////////////////////////////////////////////////////
-#ifdef lightingFlag
-#if defined(numDirectionalLights) && (numDirectionalLights > 0)
-#define directionalLightsFlag
-#endif // numDirectionalLights
-#endif //lightingFlag
-
-#ifdef directionalLightsFlag
-struct DirectionalLight
-{
-    vec3 color;
-    vec3 direction;
-};
-uniform DirectionalLight u_dirLights[numDirectionalLights];
-#endif
+#endif // pointLightsFlag
 
 out vec3 v_lightDir;
 out vec3 v_lightCol;
@@ -418,9 +414,14 @@ void main() {
     squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
-    #ifdef directionalLightsFlag
-    v_lightDir = normalize(-u_dirLights[0].direction);
-    v_lightCol = u_dirLights[0].color;
+    #if defined(directionalLightsFlag) && defined(pointLightsFlag)
+    if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
+        v_lightDir = normalize(-u_dirLights[0].direction);
+        v_lightCol = u_dirLights[0].color;
+    } else {
+        v_lightDir = normalize(u_pointLights[0].position - pos.xyz);
+        v_lightCol = u_pointLights[0].color;
+    }
     #else
     v_lightDir = vec3(0.0, 0.0, 0.0);
     v_lightCol = vec3(0.0);

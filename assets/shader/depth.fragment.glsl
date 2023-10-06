@@ -34,16 +34,30 @@ struct DirectionalLight {
     vec3 color;
     vec3 direction;
 };
-uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif// directionalLightsFlag
+
+#if defined(numPointLights) && (numPointLights > 0)
+#define pointLightsFlag
+#endif// numPointLights
+
+#ifdef pointLightsFlag
+struct PointLight {
+    vec3 color;
+    vec3 position;
+    float intensity;
+};
+#endif // numPointLights
 
 // INPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-#ifdef directionalLightsFlag
+    #ifdef directionalLightsFlag
     DirectionalLight directionalLights[numDirectionalLights];
-#endif// directionalLightsFlag
+    #endif// directionalLightsFlag
+    #ifdef pointLightsFlag
+    PointLight pointLights[numPointLights];
+    #endif// pointLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;

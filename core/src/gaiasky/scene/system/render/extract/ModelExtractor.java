@@ -136,7 +136,7 @@ public class ModelExtractor extends AbstractExtractSystem {
     }
 
     private boolean renderTessellated(Model model) {
-        return Settings.settings.scene.renderer.elevation.type.isTessellation() && model.model.hasHeight();
+        return Settings.settings.scene.renderer.elevation.type.isTessellation() && model.model.isTessellated();
     }
 
     private boolean renderText(Base base,

@@ -221,24 +221,6 @@ uniform mat4 u_shadowMapProjViewTrans;
 #endif // ambientCubemapFlag
 
 //////////////////////////////////////////////////////
-////// POINTS LIGHTS
-//////////////////////////////////////////////////////
-#ifdef lightingFlag
-    #if defined(numPointLights) && (numPointLights > 0)
-	#define pointLightsFlag
-    #endif // numPointLights
-#endif //lightingFlag
-
-#ifdef pointLightsFlag
-struct PointLight {
-	vec3 color;
-	vec3 position;
-	float intensity;
-};
-uniform PointLight u_pointLights[numPointLights];
-#endif
-
-//////////////////////////////////////////////////////
 ////// DIRECTIONAL LIGHTS
 //////////////////////////////////////////////////////
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
@@ -253,6 +235,22 @@ struct DirectionalLight {
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif // directionalLightsFlag
 
+//////////////////////////////////////////////////////
+////// POINT LIGHTS
+//////////////////////////////////////////////////////
+#if defined(numPointLights) && (numPointLights > 0)
+#define pointLightsFlag
+#endif // numPointLights
+
+#ifdef pointLightsFlag
+struct PointLight {
+    vec3 color;
+    vec3 position;
+    float intensity;
+};
+uniform PointLight u_pointLights[numPointLights];
+#endif
+
 // OUTPUT
 struct VertexData {
     vec2 texCoords;
@@ -260,6 +258,9 @@ struct VertexData {
     #ifdef directionalLightsFlag
     DirectionalLight directionalLights[numDirectionalLights];
     #endif // directionalLightsFlag
+    #ifdef pointLightsFlag
+    PointLight pointLights[numPointLights];
+    #endif // pointLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
@@ -341,6 +342,18 @@ void main() {
             v_data.directionalLights[i].color = u_dirLights[i].color;
         }
     #endif // directionalLightsFlag
+
+    #ifdef pointLightsFlag
+        for (int i = 0; i < numPointLights; i++) {
+            #ifdef heightFlag
+            v_data.pointLights[i].position = normalize(u_pointLights[i].position - pos.xyz);
+            #else
+            v_data.pointLights[i].position = normalize((u_pointLights[i].position - pos.xyz) * TBN);
+            #endif // heightFlag
+            v_data.pointLights[i].color = u_pointLights[i].color;
+            v_data.pointLights[i].intensity = u_pointLights[i].intensity;
+        }
+    #endif // pointLightsFlag
 
     // Camera is at origin, view direction is inverse of vertex position
     #ifdef heightFlag

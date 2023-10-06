@@ -361,13 +361,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                             renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
             case BILLBOARD_SSO -> {
                 // BILLBOARD SSO
-                system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders,
+                system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.billboardShaders,
                         Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case BILLBOARD_STAR -> {
                 // BILLBOARD STARS
-                system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders,
+                system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.billboardShaders,
                         Settings.settings.scene.star.getStarTexture(), true);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(lightGlowPass.getLpu());

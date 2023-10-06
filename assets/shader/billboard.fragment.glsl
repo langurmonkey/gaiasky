@@ -7,7 +7,7 @@ uniform float u_radius;
 uniform float u_apparent_angle;
 uniform float u_inner_rad;
 uniform float u_time;
-// Distance in u to the star
+// Distance in u to the billboard
 uniform float u_distance;
 // Whether light scattering is enabled or not
 uniform int u_lightScattering;
@@ -60,7 +60,7 @@ float average(vec4 color) {
     return (color.r + color.g + color.b) / 3.0;
 }
 
-float starTexture(vec2 uv){
+float billboardTexture(vec2 uv){
     return average(texture(u_texture0, uv));
 }
 
@@ -109,17 +109,17 @@ float ringRayNoise(vec3 ray, vec3 pos, float r, float size, mat3 mr, float anim)
 #endif// detailedCorona
 
 vec4 farAway(float dist, float level) {
-    // We are far away from the star
+    // We are far away from the object
     level = u_distance / (u_radius * rays_const);
 
     if (u_lightScattering == 1) {
-        // Light scattering, simple star
+        // Light scattering
         float core = core(dist, u_inner_rad);
         return saturate((v_color + core * 5.0) * core * v_color.a);
     } else {
-        // No light scattering, star rays
+        // No light scattering
         level = min(level, 1.0);
-        float corona = starTexture(v_uv);
+        float corona = billboardTexture(v_uv);
         float light = light(dist, light_decay * 2.0);
         float core = core(dist, u_inner_rad);
 
@@ -156,11 +156,11 @@ vec4 closeUp(float dist, float level) {
 
     #else
 
-    // We are close to the star
+    // We are close to the billboard
     level = min(level, 1.0);
     float level_corona = float(u_lightScattering) * level;
 
-    float corona = starTexture(v_uv);
+    float corona = billboardTexture(v_uv);
     float light = light(dist, light_decay * 2.0);
     float core = core(dist, u_inner_rad);
 

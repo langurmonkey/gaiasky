@@ -828,15 +828,15 @@ public class DefaultIntShader extends BaseIntShader {
         /**
          * The number of directional lights to use
          */
-        public int numDirectionalLights = 3;
+        public int numDirectionalLights = Constants.N_DIR_LIGHTS;
         /**
          * The number of point lights to use
          */
-        public int numPointLights = 0;
+        public int numPointLights = Constants.N_POINT_LIGHTS;
         /**
          * The number of spotlights to use
          */
-        public int numSpotLights = 0;
+        public int numSpotLights = Constants.N_SPOT_LIGHTS;
         /**
          * The number of bones to use
          */
@@ -1721,7 +1721,8 @@ public class DefaultIntShader extends BaseIntShader {
                     }
 
                     if (combinedAttributes.has(PointLightsAttribute.Type)) {
-                        Array<PointLight> lights = ((PointLightsAttribute) Objects.requireNonNull(combinedAttributes.get(PointLightsAttribute.Type))).lights;
+                        Array<PointLight> lights = ((PointLightsAttribute) Objects.requireNonNull(
+                                combinedAttributes.get(PointLightsAttribute.Type))).lights;
                         for (int i = pointLightsOffset; i < lights.size; i++)
                             cacheAmbientCubemap.add(lights.get(i).color, lights.get(i).position, tmpV1, lights.get(i).intensity);
                     }

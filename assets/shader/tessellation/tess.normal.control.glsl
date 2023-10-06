@@ -9,23 +9,9 @@ uniform float u_tessQuality = 4.0;
 // Body size in kilometers.
 uniform float u_bodySize;
 
-#if defined(numDirectionalLights) && (numDirectionalLights > 0)
-#define directionalLightsFlag
-#endif // numDirectionalLights
-
-#ifdef directionalLightsFlag
-struct DirectionalLight {
-    vec3 color;
-    vec3 direction;
-};
-#endif // directionalLightsFlag
-
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-    #ifdef directionalLightsFlag
-    DirectionalLight directionalLights[numDirectionalLights];
-    #endif // directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
@@ -37,6 +23,7 @@ struct VertexData {
     #ifdef reflectionCubemapFlag
     vec3 reflect;
     #endif // reflectionCubemapFlag
+    mat3 tbn;
 };
 
 // INPUT
@@ -99,12 +86,6 @@ void main(){
     l_data[id].texCoords = v_data[id].texCoords;
     l_data[id].normal = v_data[id].normal;
     l_data[id].viewDir = v_data[id].viewDir;
-    #ifdef directionalLightsFlag
-    for (int i = 0; i < numDirectionalLights; i++) {
-        l_data[id].directionalLights[i].color = v_data[id].directionalLights[i].color;
-        l_data[id].directionalLights[i].direction = v_data[id].directionalLights[i].direction;
-    }
-    #endif
     l_data[id].ambientLight = v_data[id].ambientLight;
     l_data[id].opacity = v_data[id].opacity;
     l_data[id].color = v_data[id].color;
@@ -121,4 +102,6 @@ void main(){
     #ifdef shadowMapFlag
     l_data[id].shadowMapUv = v_data[id].shadowMapUv;
     #endif
+
+    l_data[id].tbn = v_data[id].tbn;
 }

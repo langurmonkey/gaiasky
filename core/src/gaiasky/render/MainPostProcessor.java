@@ -454,7 +454,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
      */
     private void updateGraphicsQuality(PostProcessBean ppb, GraphicsQuality gq) {
         updateGlow(ppb, gq);
-        updateCameraBlur(ppb, gq);
+        // updateCameraBlur(ppb, gq);
         updateFxaa(ppb, gq);
     }
 
@@ -484,14 +484,16 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
         CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
-        if (gq.isUltra()) {
-            cameraMotionBlur.setBlurMaxSamples(60);
-        } else if (gq.isHigh()) {
-            cameraMotionBlur.setBlurMaxSamples(50);
-        } else if (gq.isNormal()) {
-            cameraMotionBlur.setBlurMaxSamples(35);
-        } else {
-            cameraMotionBlur.setBlurMaxSamples(20);
+        if (cameraMotionBlur != null) {
+            if (gq.isUltra()) {
+                cameraMotionBlur.setBlurMaxSamples(60);
+            } else if (gq.isHigh()) {
+                cameraMotionBlur.setBlurMaxSamples(50);
+            } else if (gq.isNormal()) {
+                cameraMotionBlur.setBlurMaxSamples(35);
+            } else {
+                cameraMotionBlur.setBlurMaxSamples(20);
+            }
         }
     }
 
@@ -965,8 +967,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
-                        if (cameraMotion != null)
+                        if (cameraMotion != null) {
                             cameraMotion.setEnabled(enabled);
+                        }
                     }
                 }
                 if (enabled && blurObjectAdded) {
@@ -981,7 +984,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.get(CameraMotion.class).setEnabled(enabled);
+                        CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
+                        if (cameraMotion != null) {
+                            cameraMotion.setEnabled(enabled);
+                        }
                         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                         if (lightglow != null) {
                             lightglow.setNSamples(enabled ? 1 : Settings.settings.postprocess.lightGlow.samples);
@@ -1115,8 +1121,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
-                        if (cameraMotionBlur != null)
+                        if (cameraMotionBlur != null) {
                             cameraMotionBlur.setVelocityScale(fps / 60f);
+                        }
                     }
                 }
             }

@@ -195,46 +195,10 @@ uniform mat4 u_shadowMapProjViewTrans;
     uniform vec3 u_ambientCubemap[6];
 #endif // ambientCubemapFlag
 
-//////////////////////////////////////////////////////
-////// POINTS LIGHTS
-//////////////////////////////////////////////////////
-#ifdef lightingFlag
-    #if defined(numPointLights) && (numPointLights > 0)
-	#define pointLightsFlag
-    #endif // numPointLights
-#endif //lightingFlag
-
-#ifdef pointLightsFlag
-struct PointLight {
-	vec3 color;
-	vec3 position;
-	float intensity;
-};
-uniform PointLight u_pointLights[numPointLights];
-#endif
-
-//////////////////////////////////////////////////////
-////// DIRECTIONAL LIGHTS
-//////////////////////////////////////////////////////
-#if defined(numDirectionalLights) && (numDirectionalLights > 0)
-#define directionalLightsFlag
-#endif // numDirectionalLights
-
-#ifdef directionalLightsFlag
-struct DirectionalLight {
-    vec3 color;
-    vec3 direction;
-};
-uniform DirectionalLight u_dirLights[numDirectionalLights];
-#endif // directionalLightsFlag
-
 // OUTPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-    #ifdef directionalLightsFlag
-    DirectionalLight directionalLights[numDirectionalLights];
-    #endif // directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
@@ -246,6 +210,7 @@ struct VertexData {
     #ifdef reflectionCubemapFlag
     vec3 reflect;
     #endif // reflectionCubemapFlag
+    mat3 tbn;
 };
 out VertexData v_data;
 
@@ -289,6 +254,7 @@ void main() {
     g_tangent = normalize(u_normalMatrix * g_tangent);
 
     mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
+    v_data.tbn = TBN;
 
     #ifdef ambientLightFlag
 	v_data.ambientLight = u_ambientLight;
@@ -304,16 +270,9 @@ void main() {
 	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
-    #ifdef directionalLightsFlag
-        for (int i = 0; i < numDirectionalLights; i++) {
-            v_data.directionalLights[i].direction = normalize(-u_dirLights[i].direction * TBN);
-            v_data.directionalLights[i].color = u_dirLights[i].color;
-        }
-    #endif // directionalLightsFlag
-
     // Camera is at origin, view direction is inverse of vertex position
     pushNormal();
-    v_data.viewDir = normalize((pos.xyz - u_vrOffset) * TBN);
+    v_data.viewDir = normalize(normalize(pos.xyz - u_vrOffset) * TBN);
 
     #ifdef reflectionCubemapFlag
     #ifndef normalTextureFlag

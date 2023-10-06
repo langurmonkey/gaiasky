@@ -64,7 +64,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     }
 
     private void init(String tex0, float w, float h, boolean starTextureListener) {
-        setStarTexture(tex0);
+        setBillboardTexture(tex0);
 
         // Init comparator
         comp = new DistanceEntityComparator<>();
@@ -92,7 +92,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
         }
     }
 
-    public void setStarTexture(String texturePath) {
+    public void setBillboardTexture(String texturePath) {
         if (texturePath != null) {
             billboardTexture = new Texture(Settings.settings.data.dataFileHandle(texturePath), true);
             billboardTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -181,7 +181,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.BILLBOARD_TEXTURE_IDX_CMD) {
-            GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+            GaiaSky.postRunnable(() -> setBillboardTexture(Settings.settings.scene.star.getStarTexture()));
         }
     }
 }

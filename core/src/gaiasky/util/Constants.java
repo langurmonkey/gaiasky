@@ -210,6 +210,10 @@ public class Constants {
     public static final int PREC = 32;
     /** Number of directional lights. **/
     public static final int N_DIR_LIGHTS = 3;
+    /** Number of point lights. **/
+    public static final int N_POINT_LIGHTS = 3;
+    /** Number of spotlights. **/
+    public static final int N_SPOT_LIGHTS = 0;
     /**
      * Distance unit scaling (mainly for VR)
      */

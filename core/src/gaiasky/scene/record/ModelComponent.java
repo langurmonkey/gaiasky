@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -73,6 +74,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public String type, modelFile;
     public double scale = 1d;
     public boolean culling = true;
+
     /**
      * COMPONENTS
      */
@@ -118,10 +120,40 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     /**
-     * Returns the given directional light
+     * Returns the given point light.
      *
-     * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}.
-     * @return The directional light with index i
+     * @param i The index of the light (must be less than {@link Constants#N_POINT_LIGHTS}).
+     * @return The point light with index i.
+     */
+    public PointLight point(int i) {
+        var attribute = env.get(PointLightsAttribute.Type);
+        if (attribute != null) {
+            var pointLightsAttribute = (PointLightsAttribute) attribute;
+            if (pointLightsAttribute.lights.size > i) {
+                return pointLightsAttribute.lights.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Turns off all point lights.
+     */
+    public void clearPoints() {
+        var attribute = env.get(PointLightsAttribute.Type);
+        if (attribute != null) {
+            var pointLightsAttribute = (PointLightsAttribute) attribute;
+            for (PointLight light : pointLightsAttribute.lights) {
+                light.color.set(0f, 0f, 0f, 1f);
+            }
+        }
+    }
+
+    /**
+     * Returns the given directional light.
+     *
+     * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}).
+     * @return The directional light with index i.
      */
     public DirectionalLight directional(int i) {
         var attribute = env.get(DirectionalLightsAttribute.Type);
@@ -135,7 +167,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     /**
-     * Turns off all directional lights
+     * Turns off all directional lights.
      */
     public void clearDirectionals() {
         var attribute = env.get(DirectionalLightsAttribute.Type);
@@ -194,6 +226,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 DirectionalLight dLight = new DirectionalLight();
                 dLight.color.set(0f, 0f, 0f, 1f);
                 env.add(dLight);
+            }
+            // Point lights.
+            for (int i = 0; i < Constants.N_POINT_LIGHTS; i++) {
+                PointLight pointLight = new PointLight();
+                pointLight.color.set(0f, 0f, 0f, 1f);
+                env.add(pointLight);
             }
 
         }
@@ -877,6 +915,14 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public boolean hasHeight() {
         return mtc != null && mtc.hasHeight();
+    }
+
+    /**
+     * Returns whether this model is tessellated or not.
+     * @return Whether the model is tessellated.
+     */
+    public boolean isTessellated() {
+        return hasHeight();
     }
 
     @Override

@@ -87,23 +87,9 @@ uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 uniform float u_vrScale;
 
-#if defined(numDirectionalLights) && (numDirectionalLights > 0)
-#define directionalLightsFlag
-#endif // numDirectionalLights
-
-#ifdef directionalLightsFlag
-struct DirectionalLight {
-    vec3 color;
-    vec3 direction;
-};
-#endif // directionalLightsFlag
-
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-    #ifdef directionalLightsFlag
-    DirectionalLight directionalLights[numDirectionalLights];
-    #endif // directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
@@ -115,6 +101,7 @@ struct VertexData {
     #ifdef reflectionCubemapFlag
     vec3 reflect;
     #endif // reflectionCubemapFlag
+    mat3 tbn;
 };
 // INPUT
 in VertexData l_data[gl_MaxPatchVertices];
@@ -221,12 +208,6 @@ void main(void){
     o_data.color = (u * l_data[0].color + v * l_data[1].color + w * l_data[2].color);
     o_data.viewDir = (u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir);
     o_data.fragPosWorld = (u * l_data[0].fragPosWorld + v * l_data[1].fragPosWorld + w * l_data[2].fragPosWorld);
-    #ifdef directionalLightsFlag
-    for (int i = 0; i < numDirectionalLights; i++){
-        o_data.directionalLights[i].direction = (u * l_data[0].directionalLights[i].direction + v * l_data[1].directionalLights[i].direction + w * l_data[2].directionalLights[i].direction);
-        o_data.directionalLights[i].color = (u * l_data[0].directionalLights[i].color + v * l_data[1].directionalLights[i].color + w * l_data[2].directionalLights[i].color);
-    }
-    #endif // directionalLightsFlag
     o_data.ambientLight = (u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight);
     #ifdef reflectionCubemapFlag
     o_data.reflect = (u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect);
@@ -240,4 +221,6 @@ void main(void){
     #ifdef shadowMapFlag
     o_data.shadowMapUv = (u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv);
     #endif // shadowMapFlag
+
+    o_data.tbn = (u * l_data[0].tbn + v * l_data[1].tbn + w * l_data[2].tbn);
 }

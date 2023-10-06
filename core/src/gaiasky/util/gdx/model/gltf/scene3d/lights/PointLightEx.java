@@ -9,11 +9,11 @@ package gaiasky.util.gdx.model.gltf.scene3d.lights;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.util.gdx.model.gltf.data.extensions.KHRLightsPunctual;
 
-public class PointLightEx extends PointLight
-{
+public class PointLightEx extends PointLight {
 	/** Optional range in meters.
-	 * see {@link net.mgsx.gltf.data.extensions.KHRLightsPunctual.GLTFLight#range} */
+	 * see {@link KHRLightsPunctual.GLTFLight#range} */
 	public Float range;
 	
 	@Override
