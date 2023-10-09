@@ -583,7 +583,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.add(elevationTypeLabel, tessQualityLabel);
 
         elevation.add(elevationTypeLabel).left().padRight(pad34).padBottom(pad10);
-        elevation.add(elevationSb).left().padRight(pad18).padBottom(pad10).row();
+        elevation.add(elevationSb).left().padRight(pad18).padBottom(pad10);
+        elevation.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
         elevation.add(tessQualityLabel).left().padRight(pad34).padBottom(pad10);
         elevation.add(tessQuality).left().padRight(pad18).padBottom(pad10);
 
@@ -2505,14 +2506,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Elevation representation
         ElevationType newType = elevationSb.getSelected().type;
         if (SysUtils.isMac() && newType.isTessellation()) {
-            newType = ElevationType.NONE;
+            newType = ElevationType.REGULAR;
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.elevation.macos"));
             logger.info(I18n.msg("gui.elevation.macos"));
         }
         boolean reloadElevation = newType != settings.scene.renderer.elevation.type;
-        if (reloadElevation) {
-            EventManager.publish(Event.ELEVATION_TYPE_CMD, this, newType);
-        }
+        settings.scene.renderer.elevation.type = newType;
+        restartDialog = restartDialog || reloadElevation;
 
         // Tess quality
         EventManager.publish(Event.TESSELLATION_QUALITY_CMD, this, tessQuality.getValue());

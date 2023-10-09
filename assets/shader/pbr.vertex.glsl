@@ -137,50 +137,45 @@ uniform mat4 u_shadowMapProjViewTrans;
     const float u_opacity = 1.0;
 #endif
 
-#ifdef diffuseColorFlag
-    uniform vec4 u_diffuseColor;
-#endif
+// HEIGHT
+#ifdef heightTextureFlag
+uniform sampler2D u_heightTexture;
+#endif // heightTextureFlag
 
-#ifdef diffuseTextureFlag
-    uniform sampler2D u_diffuseTexture;
-#endif
+#ifdef heightCubemapFlag
+uniform samplerCube u_heightCubemap;
+#endif // heightCubemapFlag
 
-#ifdef specularColorFlag
-    uniform vec4 u_specularColor;
-#endif
+#ifdef svtIndirectionHeightTextureFlag
+uniform sampler2D u_svtIndirectionHeightTexture;
+// We import this here because we only use the SVT for the height channel.
+uniform sampler2D u_svtCacheTexture;
+#endif // svtIndirectionHeightTextureFlag
 
-#ifdef specularTextureFlag
-    uniform sampler2D u_specularTexture;
-#endif
-
-#ifdef normalTextureFlag
-    uniform sampler2D u_normalTexture;
-#endif
-
-#ifdef bumpTextureFlag
-    uniform sampler2D u_bumpTexture;
-#endif
-
-
-#if defined(diffuseTextureFlag) || defined(specularTextureFlag)
-    #define textureFlag
-#endif
-
-#if defined(specularTextureFlag) || defined(specularColorFlag)
-    #define specularFlag
-#endif
-
-#if defined(heightTextureFlag)
-    uniform sampler2D u_heightTexture;
-    uniform float u_heightScale;
+#if defined(heightTextureFlag) || defined(heightCubemapFlag) || defined(svtIndirectionHeightTextureFlag)
     #define heightFlag
+#endif
+
+#ifdef heightFlag
+    uniform float u_heightScale;
+    uniform float u_elevationMultiplier;
+    uniform vec2 u_heightSize;
     #define KM_TO_U 1.0E-6
     #define HIEIGHT_FACTOR 0.001 * KM_TO_U
-#endif //heightFlag
+#endif // heightFlag
 
-#if defined(specularFlag) || defined(fogFlag)
-    #define cameraPositionFlag
-#endif
+// HEIGHT
+#if defined(noHeightFlag)
+    #define fetchHeight(texCoord) vec4(0.0)
+#elif defined(svtIndirectionHeightTextureFlag)
+    #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
+#elif defined(heightCubemapFlag)
+    #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
+#elif defined(heightTextureFlag)
+    #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
+#else
+    #define fetchHeight(texCoord) vec4(0.0)
+#endif // height
 
 
 #if defined(normalFlag) && defined(binormalFlag) && defined(tangentFlag)
@@ -272,8 +267,13 @@ struct VertexData {
     #ifdef metallicFlag
     vec3 reflect;
     #endif // metallicFlag
+    mat3 tbn;
 };
 out VertexData v_data;
+
+#ifdef heightFlag
+out float v_fragHeight;
+#endif // heightFlag
 
 #ifdef velocityBufferFlag
 #include <shader/lib/velbuffer.vert.glsl>
@@ -282,10 +282,24 @@ out VertexData v_data;
 void main() {
     computeAtmosphericScatteringGround();
 
+    // Tangent space transform
+    calculateTangentVectors();
+    g_normal = normalize(u_normalMatrix * g_normal);
+    g_binormal = normalize(u_normalMatrix * g_binormal);
+    g_tangent = normalize(u_normalMatrix * g_tangent);
+
     v_data.opacity = u_opacity;
 
     // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;
+
+    #if defined(heightFlag) && !defined(parallaxMappingFlag)
+    // Use height texture to move vertex along normal.
+    float h = fetchHeight(g_texCoord0).r;
+    v_fragHeight = h * u_heightScale * u_elevationMultiplier;
+    vec3 dh = g_normal * v_fragHeight;
+    pos += vec4(dh, 0.0);
+    #endif // heightFlag && !parallaxMappingFlag
 
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
@@ -308,15 +322,9 @@ void main() {
 	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
     #endif // shadowMapFlag
 
-    // Tangent space transform
-    calculateTangentVectors();
-    g_normal = normalize(u_normalMatrix * g_normal);
-    g_binormal = normalize(u_normalMatrix * g_binormal);
-    g_tangent = normalize(u_normalMatrix * g_tangent);
 
-    #ifndef heightFlag
     mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
-    #endif // heightFlag
+    v_data.tbn = TBN;
 
     #ifdef ambientLightFlag
 	v_data.ambientLight = u_ambientLight;

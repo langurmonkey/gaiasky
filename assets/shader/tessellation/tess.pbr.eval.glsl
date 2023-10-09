@@ -9,6 +9,7 @@ layout (triangles) in;
 #include <shader/lib/geometry.glsl>
 #endif
 
+// NORMAL
 #ifdef normalTextureFlag
 uniform sampler2D u_normalTexture;
 #endif
@@ -21,6 +22,7 @@ uniform samplerCube u_normalCubemap;
 uniform sampler2D u_svtIndirectionNormalTexture;
 #endif
 
+// HEIGHT
 #ifdef heightTextureFlag
 uniform sampler2D u_heightTexture;
 #endif
@@ -33,6 +35,7 @@ uniform samplerCube u_heightCubemap;
 uniform sampler2D u_svtIndirectionHeightTexture;
 #endif
 
+// SVT
 #ifdef svtCacheTextureFlag
 uniform sampler2D u_svtCacheTexture;
 #endif
@@ -55,7 +58,9 @@ uniform sampler2D u_svtCacheTexture;
 #endif // normal
 
 // HEIGHT
-#if defined(svtIndirectionHeightTextureFlag)
+#if defined(noHeightFlag)
+    #define fetchHeight(texCoord) vec4(0.0)
+#elif defined(svtIndirectionHeightTextureFlag)
     #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
 #elif defined(heightCubemapFlag)
     #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
@@ -83,7 +88,6 @@ uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
 uniform float u_elevationMultiplier;
-uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 uniform float u_vrScale;
 

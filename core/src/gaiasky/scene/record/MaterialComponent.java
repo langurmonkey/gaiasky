@@ -317,9 +317,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (height != null && material.get(TextureAttribute.Height) == null) {
             if (!height.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(heightUnpacked, Texture.class);
-                if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
-                    initializeElevationData(tex);
-                }
+                initializeElevationData(tex);
             } else {
                 initializeGenElevationData();
             }
@@ -433,10 +431,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             addSVTAttributes(material, specularSvt, svtId);
         }
         if (heightSvt != null) {
-            if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
-                addSVTAttributes(material, heightSvt, svtId);
-                initializeElevationData(heightSvt, manager);
-            }
+            addSVTAttributes(material, heightSvt, svtId);
+            initializeElevationData(heightSvt, manager);
         }
         if (metallicSvt != null) {
             addSVTAttributes(material, metallicSvt, svtId);

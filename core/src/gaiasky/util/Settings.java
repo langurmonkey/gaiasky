@@ -314,9 +314,14 @@ public class Settings {
     }
 
     public enum ElevationType {
+        REGULAR,
         TESSELLATION,
         PARALLAX_MAPPING,
         NONE;
+
+        public boolean isRegular() {
+            return this.equals(REGULAR);
+        }
 
         public boolean isTessellation() {
             return this.equals(TESSELLATION);

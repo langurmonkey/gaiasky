@@ -238,8 +238,12 @@ scene:
       outlines: false
     # Elevation representation settings.
     elevation:
-      # Elevation type [TESSELLATION|PARALLAX_MAPPING|NONE].
-      type: NONE
+      # Elevation type [REGULAR|TESSELLATION|PARALLAX_MAPPING|NONE].
+      # REGULAR: regular vertical vertex displacement.
+      # TESSELLATION: vertex displacement with terrain tessellation.
+      # PARALLAX_MAPPING: tricks in the fragment shader to map height.
+      # NONE: no elevation representation.
+      type: REGULAR
       # Elevation multiplier, in [0.0, 10.0].
       multiplier: 0.85
       # Tessellation quality, in [1.0, 7.0].

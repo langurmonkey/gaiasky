@@ -74,6 +74,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public String type, modelFile;
     public double scale = 1d;
     public boolean culling = true;
+    public boolean tessellated = false;
 
     /**
      * COMPONENTS
@@ -922,7 +923,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * @return Whether the model is tessellated.
      */
     public boolean isTessellated() {
-        return hasHeight();
+        return tessellated && hasHeight();
     }
 
     @Override

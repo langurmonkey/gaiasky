@@ -457,6 +457,12 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define heightFlag\n");
         }
 
+        if (Settings.settings.scene.renderer.elevation.type.isParallaxMapping()) {
+            prefix.append("#define parallaxMappingFlag\n");
+        } else if(Settings.settings.scene.renderer.elevation.type.isNone()) {
+            prefix.append("#define noHeightFlag\n");
+        }
+
         if (attributes.has(TextureAttribute.Ambient)) {
             prefix.append("#define " + TextureAttribute.AmbientAlias + "Flag\n");
         }

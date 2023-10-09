@@ -20,6 +20,7 @@ vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
+// DIFFUSE
 #ifdef diffuseColorFlag
 uniform vec4 u_diffuseColor;
 #endif
@@ -32,6 +33,7 @@ uniform sampler2D u_diffuseTexture;
 uniform samplerCube u_diffuseCubemap;
 #endif
 
+// SPECULAR
 #ifdef specularColorFlag
 uniform vec4 u_specularColor;
 #endif
@@ -44,6 +46,7 @@ uniform sampler2D u_specularTexture;
 uniform samplerCube u_specularCubemap;
 #endif
 
+// EMISSIVE
 #ifdef emissiveColorFlag
 uniform vec4 u_emissiveColor;
 #endif
@@ -57,6 +60,7 @@ uniform sampler2D u_emissiveTexture;
 uniform samplerCube u_emissiveCubemap;
 #endif
 
+// METALLIC
 #ifdef metallicColorFlag
 uniform vec4 u_metallicColor;
 #endif
@@ -69,6 +73,7 @@ uniform sampler2D u_metallicTexture;
 uniform samplerCube u_metallicCubemap;
 #endif
 
+// ROUGHNESS
 #ifdef roughnessColorFlag
 uniform vec4 u_roughnessColor;
 #endif
@@ -81,22 +86,27 @@ uniform sampler2D u_roughnessTexture;
 uniform samplerCube u_roughnessCubemap;
 #endif
 
+// DIFFUSE SCATTERING
 #ifdef diffuseScatteringColorFlag
 uniform vec4 u_diffuseScatteringColor;
 #endif
 
+// AMBIENT OCCLUSION
 #ifdef AOTextureFlag
 uniform sampler2D u_aoTexture;
 #endif
 
+// OCCLUSION-METALLIC-ROUGHNESS
 #ifdef occlusionMetallicRoughnessTextureFlag
 uniform sampler2D u_occlusionMetallicRoughnessTexture;
 #endif
 
+// REFLECTION
 #ifdef reflectionCubemapFlag
 uniform samplerCube u_reflectionCubemap;
 #endif
 
+// SVT
 #ifdef svtCacheTextureFlag
 uniform sampler2D u_svtCacheTexture;
 #endif
@@ -117,10 +127,12 @@ uniform sampler2D u_svtIndirectionEmissiveTexture;
 uniform sampler2D u_svtIndirectionMetallicTexture;
 #endif
 
+// SHININESS
 #ifdef shininessFlag
 uniform float u_shininess;
 #endif
 
+// ECLIPSES
 #ifdef eclipsingBodyFlag
 uniform float u_vrScale;
 uniform int u_eclipseOutlines;
@@ -360,25 +372,7 @@ layout (location = 0) out vec4 fragColor;
 
 #include <shader/lib/atmfog.glsl>
 #include <shader/lib/logdepthbuff.glsl>
-
-// http://www.thetenthplanet.de/archives/1180
-mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
-    // get edge vectors of the pixel triangle
-    vec3 dp1 = dFdx( p );
-    vec3 dp2 = dFdy( p );
-    vec2 duv1 = dFdx( uv );
-    vec2 duv2 = dFdy( uv );
-
-    // solve the linear system
-    vec3 dp2perp = cross( dp2, N );
-    vec3 dp1perp = cross( N, dp1 );
-    vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
-    vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;
-
-    // construct a scale-invariant frame
-    float invmax = inversesqrt( max( dot(T,T), dot(B,B) ) );
-    return mat3( T * invmax, B * invmax, N );
-}
+#include <shader/lib/cotangent.glsl>
 
 #ifdef velocityBufferFlag
 #include <shader/lib/velbuffer.frag.glsl>
@@ -427,7 +421,7 @@ void main() {
     vec3 N = o_normalTan;
     #if defined(normalTextureFlag) || defined(normalCubemapFlag)
         #ifdef metallicFlag
-            // Perturb the normal to get reflect direction
+            // Perturb the normal to get reflect direction.
             pullNormal();
             mat3 TBN = cotangentFrame(g_normal, -o_data.viewDir, texCoords);
             normalVector.xyz = TBN * N;
@@ -518,6 +512,12 @@ void main() {
         #endif // ssrFlag
     #endif // metallicFlag
 
+    #ifdef iorFlag
+    vec3 f0 = vec3(pow(( u_ior - 1.0) /  (u_ior + 1.0), 2.0));
+    #else
+    vec3 f0 = vec3(0.04); // from ior 1.5 value
+    #endif // iorFlag
+
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);
     vec3 specularColor = vec3(0.0);
@@ -566,7 +566,7 @@ void main() {
         vec3 V = o_data.viewDir;
         vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
         // Skip non-lights
-        if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+        if (all(equal(col, vec3(0.0)))) {
             continue;
         } else {
             validLights++;
@@ -613,7 +613,9 @@ void main() {
     #ifdef atmosphereGround
         #define exposure 1.0
         fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor, 0.0, 1.0);
-        fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
+        #if defined(heightFlag) && !defined(parallaxMappingFlag)
+            fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
+        #endif // heightFlag && !parallaxMappingFlag
     #endif // atmosphereGround
 
     #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)

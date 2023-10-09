@@ -357,6 +357,57 @@ float getShadow(vec3 shadowMapUv) {
 #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
 #endif// height
 
+#ifdef heightFlag
+uniform float u_heightScale;
+uniform float u_elevationMultiplier;
+uniform vec2 u_heightSize;
+
+#define fetchHeightSize() vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y)
+#else
+#define fetchHeightSize() vec2(0.0)
+#endif // heightFlag
+
+#if defined(normalCubemapFlag) || defined(normalTextureFlag) || defined(svtIndirectionNormalTextureFlag)
+// Use normal map
+vec3 calcNormal(vec2 p, vec2 dp) {
+    return normalize(fetchColorNormal(p).rgb * 2.0 - 1.0);
+}
+#elif defined(heightFlag)
+// maps the height scale in internal units to a normal strength
+float computeNormalStrength(float heightScale) {
+    // The top heightScale value to map the normal strength.
+    float topHeightScaleMap = 15.0;
+
+    vec2 heightSpanKm = vec2(0.0, u_heightScale * topHeightScaleMap);
+    vec2 span = vec2(0.1, 1.0);
+    heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
+    // normalize to [0,1]
+    heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
+    return span.x + (span.y - span.x) * heightScale;
+}
+// Use height texture for normals
+vec3 calcNormal(vec2 p, vec2 dp){
+    vec4 h;
+    vec2 size = vec2(computeNormalStrength(u_heightScale * u_elevationMultiplier), 0.0);
+    if (dp.x < 0.0) {
+        // Generated height using perlin noise
+        dp = vec2(3.0e-4);
+    }
+    h.x = fetchHeight(vec2(p.x - dp.x, p.y)).r;
+    h.y = fetchHeight(vec2(p.x + dp.x, p.y)).r;
+    h.z = fetchHeight(vec2(p.x, p.y - dp.y)).r;
+    h.w = fetchHeight(vec2(p.x, p.y + dp.y)).r;
+    vec3 va = normalize(vec3(size.xy, -h.x + h.y));
+    vec3 vb = normalize(vec3(size.yx, -h.z + h.w));
+    vec3 n = cross(va, vb);
+    return normalize(n);
+}
+#else
+vec3 calcNormal(vec2 p, vec2 dp){
+    return vec3(0.0);
+}
+#endif // normalTextureFlag
+
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
 #endif// numDirectionalLights
@@ -403,6 +454,7 @@ struct VertexData {
     #ifdef metallicFlag
     vec3 reflect;
     #endif// metallicFlag
+    mat3 tbn;
 };
 in VertexData v_data;
 
@@ -421,15 +473,8 @@ layout (location = 0) out vec4 fragColor;
 #define saturate(x) clamp(x, 0.0, 1.0)
 
 
-
-#ifdef heightFlag
-uniform float u_heightScale;
-uniform vec2 u_heightSize;
-uniform float u_heightNoiseSize;
-
-#define KM_TO_U 1.0E-6
+#if defined(heightFlag) && defined(parallaxMapping)
 #define HEIGHT_FACTOR 70.0
-
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
     // number of depth layers
     const float minLayers = 8;
@@ -470,28 +515,11 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 
     return finalTexCoords;
 }
-#endif// heightFlag
+#endif // heightFlag && parallaxMappingFlag
 
+#include <shader/lib/atmfog.glsl>
 #include <shader/lib/logdepthbuff.glsl>
-
-// http://www.thetenthplanet.de/archives/1180
-mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
-    // get edge vectors of the pixel triangle
-    vec3 dp1 = dFdx(p);
-    vec3 dp2 = dFdy(p);
-    vec2 duv1 = dFdx(uv);
-    vec2 duv2 = dFdy(uv);
-
-    // solve the linear system
-    vec3 dp2perp = cross(dp2, N);
-    vec3 dp1perp = cross(N, dp1);
-    vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
-    vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;
-
-    // construct a scale-invariant frame
-    float invmax = inversesqrt(max(dot(T, T), dot(B, B)));
-    return mat3(T * invmax, B * invmax, N);
-}
+#include <shader/lib/cotangent.glsl>
 
 #ifdef velocityBufferFlag
 #include <shader/lib/velbuffer.frag.glsl>
@@ -505,46 +533,10 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 void main() {
     vec2 texCoords = v_data.texCoords;
 
-    vec3 viewDir;
-    // TBN and viewDir do not depend on light
-    #ifdef heightFlag
-    // Compute tangent space
-    pullNormal();
-    mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-    viewDir = normalize(v_data.viewDir * TBN);
+    #ifdef parallaxMappingFlag
     // Parallax occlusion mapping
-    texCoords = parallaxMapping(texCoords, viewDir);
-    #else// heightFlag
-    viewDir = v_data.viewDir;
-    #endif// heightFlag
-
-    #ifdef directionalLightsFlag
-    vec3 dirLightDir[numDirectionalLights], dirLightCol[numDirectionalLights];
-    for (int i = 0; i < numDirectionalLights; i++) {
-        #ifdef heightFlag
-        dirLightDir[i] = normalize(v_data.directionalLights[i].direction * TBN);
-        dirLightCol[i] = v_data.directionalLights[i].color;
-        #else// heightFlag
-        dirLightDir[i] = v_data.directionalLights[i].direction;
-        dirLightCol[i] = v_data.directionalLights[i].color;
-        #endif// heightFlag
-    }
-    #endif// directionalLightsFlag
-
-    #ifdef pointLightsFlag
-    vec3 pointLightPos[numPointLights], pointLightCol[numPointLights];
-    float pointLightIntensity[numPointLights];
-    for (int i = 0; i < numPointLights; i++) {
-        #ifdef heightFlag
-        pointLightPos[i] = normalize(v_data.pointLights[i].position * TBN);
-        pointLightCol[i] = v_data.pointLights[i].color;
-        #else// heightFlag
-        pointLightPos[i] = v_data.pointLights[i].position;
-        pointLightCol[i] = v_data.pointLights[i].color;
-        #endif// heightFlag
-        pointLightIntensity[i] = v_data.pointLights[i].intensity;
-    }
-    #endif// pointLightsFlag
+    texCoords = parallaxMapping(texCoords, normalize(v_data.viewDir * TBN));
+    #endif // parallaxMappingFlag
 
     vec4 diffuse = fetchColorDiffuse(v_data.color, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
     vec4 emissive = fetchColorEmissive(texCoords);
@@ -578,25 +570,20 @@ void main() {
     #endif
 
     vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
+    vec3 N = calcNormal(texCoords, fetchHeightSize());
     #if defined(normalTextureFlag) || defined(normalCubemapFlag)
-    // Normal in tangent space
-    vec3 N = normalize(vec3(fetchColorNormal(texCoords) * 2.0 - 1.0));
-    #ifdef metallicFlag
-    // Perturb the normal to get reflect direction
-    pullNormal();
-    #ifndef heightFlag
-    mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-    #endif// heighFlag
-    normalVector.xyz = TBN * N;
-    vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
-    #endif// metallicFlag
+        #ifdef metallicFlag
+            // Perturb the normal to get reflect direction.
+            pullNormal();
+            mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
+            normalVector.xyz = TBN * N;
+            vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
+        #endif// metallicFlag
     #else
-    // Normal in tangent space
-    vec3 N = vec3(0.0, 0.0, 1.0);
-    normalVector.xyz = v_data.normal;
-    #ifdef metallicFlag
-    vec3 reflectDir = normalize(v_data.reflect);
-    #endif// metallicFlag
+        normalVector.xyz = v_data.normal;
+        #ifdef metallicFlag
+            vec3 reflectDir = normalize(v_data.reflect);
+        #endif// metallicFlag
     #endif// normalTextureFlag
 
     // Shadow
@@ -654,29 +641,29 @@ void main() {
     #endif// ssrFlag
 
     #ifdef metallicFlag
-    // Roughness.
-    float roughness = 0.0;
-    #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
-    vec3 roughness3 = fetchColorRoughness(texCoords);
-    roughness = roughness3.r;
-    #elif defined(shininessFlag)
-    roughness = 1.0 - u_shininess;
-    #endif// roughness, shininessFlag
+        // Roughness.
+        float roughness = 0.0;
+        #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
+            vec3 roughness3 = fetchColorRoughness(texCoords);
+            roughness = roughness3.r;
+        #elif defined(shininessFlag)
+            roughness = 1.0 - u_shininess;
+        #endif// roughness, shininessFlag
 
-    #ifdef reflectionCubemapFlag
-    reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
-    #endif// reflectionCubemapFlag
+        #ifdef reflectionCubemapFlag
+            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
+        #endif// reflectionCubemapFlag
 
-    // Metallic.
-    vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
-    reflectionColor = reflectionColor * metallicColor;
-    #ifdef ssrFlag
-    vec3 rmc = diffuse.rgb * metallicColor;
-    reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
-    reflectionColor *= 0.0;
-    #else
-    reflectionColor += reflectionColor * diffuse.rgb;
-    #endif// ssrFlag
+        // Metallic.
+        vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
+        reflectionColor = reflectionColor * metallicColor;
+        #ifdef ssrFlag
+            vec3 rmc = diffuse.rgb * metallicColor;
+            reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
+            reflectionColor *= 0.0;
+        #else
+            reflectionColor += reflectionColor * diffuse.rgb;
+        #endif// ssrFlag
     #endif// metallicFlag
 
     #ifdef iorFlag
@@ -689,6 +676,10 @@ void main() {
     vec3 diffuseColor = vec3(0.0);
     vec3 specularColor = vec3(0.0);
     float selfShadow = 1.0;
+    vec3 fog = vec3(0.0);
+
+    float NL0;
+    vec3 L0;
 
     int validLights = 0;
 
@@ -696,8 +687,8 @@ void main() {
     #ifdef directionalLightsFlag
     // Loop for directional light contributions.
     for (int i = 0; i < numDirectionalLights; i++) {
-        vec3 V = viewDir;
-        vec3 col = dirLightCol[i];
+        vec3 V = v_data.viewDir;
+        vec3 col = u_dirLights[i].color;
         // Skip non-lights
         if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
             continue;
@@ -705,10 +696,14 @@ void main() {
             validLights++;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-        vec3 L = dirLightDir[i];
+        vec3 L = normalize(-u_dirLights[i].direction * v_data.tbn);
         vec3 H = normalize(L - V);
         float NL = max(0.00001, dot(N, L));
         float NH = max(0.00001, dot(N, H));
+        if (validLights == 1){
+            NL0 = NL;
+            L0 = L;
+        }
 
         selfShadow *= saturate(4.0 * NL);
 
@@ -722,8 +717,8 @@ void main() {
     #ifdef pointLightsFlag
     // Loop for point light contributions.
     for (int i = 0; i < numPointLights; i++) {
-        vec3 V = viewDir;
-        vec3 col = pointLightCol[i] * pointLightIntensity[i];
+        vec3 V = v_data.viewDir;
+        vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
         // Skip non-lights
         if (all(equal(col, vec3(0.0)))) {
             continue;
@@ -731,10 +726,14 @@ void main() {
             validLights++;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-        vec3 L = normalize(pointLightPos[i]);
+        vec3 L = normalize((u_pointLights[i].position - v_data.fragPosWorld) * v_data.tbn);
         vec3 H = normalize(L - V);
         float NL = max(0.00001, dot(N, L));
         float NH = max(0.00001, dot(N, H));
+        if (validLights == 1){
+            NL0 = NL;
+            L0 = L;
+        }
 
         selfShadow *= saturate(4.0 * NL);
 
@@ -766,8 +765,11 @@ void main() {
     fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround
-    #define exposure 1.0
-    fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor, 0.0, 1.0);
+        #define exposure 1.0
+        fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor, 0.0, 1.0);
+        #if defined(heightFlag) && !defined(parallaxMappingFlag)
+            fragColor.rgb = applyFog(fragColor.rgb, v_data.viewDir, L0 * -1.0, NL0);
+        #endif // heightFlag && !parallaxMappingFlag
     #endif // atmosphereGround
 
     #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)

@@ -259,6 +259,9 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     private void initializeModel(Base base, Body body, Model model, Celestial celestial, Billboard bb, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus, boolean isBillboardGal) {
+        // Models are tessellated if tessellation is active and their size is very large.
+        model.model.tessellated = Settings.settings.scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
+
         // Billboard.
         bb.renderConsumer = isBillboardGal ? BillboardEntityRenderSystem::renderBillboardGalaxy : BillboardEntityRenderSystem::renderBillboardCelestial;
 
