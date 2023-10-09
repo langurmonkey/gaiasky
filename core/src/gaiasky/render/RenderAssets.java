@@ -144,23 +144,23 @@ public class RenderAssets {
         manager.load("per-vertex-lighting-thruster", GroundShaderProvider.class,
                 new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/thruster.fragment.glsl"));
 
-        manager.load("per-pixel-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/normal.fragment.glsl"));
+        manager.load("per-pixel-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/pbr.vertex.glsl", "shader/pbr.fragment.glsl"));
         manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class,
-                new TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl",
-                        "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
-        manager.load("per-pixel-lighting-dust", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/dust.fragment.glsl"));
+                new TessellationShaderProviderParameter("shader/tessellation/tess.pbr.vertex.glsl", "shader/tessellation/tess.pbr.control.glsl",
+                        "shader/tessellation/tess.pbr.eval.glsl", "shader/tessellation/tess.pbr.fragment.glsl"));
+        manager.load("per-pixel-lighting-dust", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/pbr.vertex.glsl", "shader/dust.fragment.glsl"));
         manager.load("per-pixel-lighting-depth", RelativisticShaderProvider.class,
-                new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/depth.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/depth.fragment.glsl"));
         manager.load("per-pixel-lighting-depth-tessellation", TessellationShaderProvider.class,
                 new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.depth.control.glsl",
                         "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.depth.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class,
-                new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/opaque.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque-tessellation", TessellationShaderProvider.class,
                 new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
                         "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
         manager.load("per-pixel-lighting-svtdetection", RelativisticShaderProvider.class,
-                new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/svt.detection.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/svt.detection.fragment.glsl"));
         manager.load("per-pixel-lighting-svtdetection-tessellation", TessellationShaderProvider.class,
                 new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
                         "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.svt.detection.fragment.glsl"));

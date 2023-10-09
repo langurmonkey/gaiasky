@@ -335,13 +335,13 @@ public class DefaultIntShader extends BaseIntShader {
 
     public static String getDefaultVertexShader() {
         if (defaultVertexShader == null)
-            defaultVertexShader = ShaderTemplatingLoader.load(Gdx.files.internal("shader/normal.vertex.glsl"));
+            defaultVertexShader = ShaderTemplatingLoader.load(Gdx.files.internal("shader/pbr.vertex.glsl"));
         return defaultVertexShader;
     }
 
     public static String getDefaultFragmentShader() {
         if (defaultFragmentShader == null)
-            defaultFragmentShader = ShaderTemplatingLoader.load(Gdx.files.internal("shader/normal.fragment.glsl"));
+            defaultFragmentShader = ShaderTemplatingLoader.load(Gdx.files.internal("shader/pbr.fragment.glsl"));
         return defaultFragmentShader;
     }
 

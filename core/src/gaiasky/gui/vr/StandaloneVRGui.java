@@ -148,7 +148,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         instance = new IntModelInstance(model);
 
         // Model batch.
-        batch = new IntModelBatch(new GroundShaderProvider(Gdx.files.internal("shader/normal.vertex.glsl"), Gdx.files.internal("shader/normal.fragment.glsl")));
+        batch = new IntModelBatch(new GroundShaderProvider(Gdx.files.internal("shader/pbr.vertex.glsl"), Gdx.files.internal("shader/pbr.fragment.glsl")));
 
         // Controller environment.
         controllersEnvironment = new Environment();
