@@ -106,7 +106,23 @@ uniform sampler2D u_occlusionMetallicRoughnessTexture;
 uniform samplerCube u_reflectionCubemap;
 #endif
 
-// SVT
+// IRIDESCENCE
+//#ifdef iridescenceFlag
+//#include <shader/lib/iridescence.glsl>
+//uniform float u_iridescenceFactor;
+//uniform float u_iridescenceIOR;
+//uniform float u_iridescenceThicknessMin;
+//uniform float u_iridescenceThicknessMax;
+//#endif
+//
+//#ifdef iridescenceTextureFlag
+//uniform sampler2D u_iridescenceSampler;
+//#endif
+//
+//#ifdef iridescenceThicknessTextureFlag
+//uniform sampler2D u_iridescenceThicknessSampler;
+//#endif
+
 #ifdef svtCacheTextureFlag
 uniform sampler2D u_svtCacheTexture;
 #endif
@@ -117,6 +133,10 @@ uniform sampler2D u_svtIndirectionDiffuseTexture;
 
 #ifdef svtIndirectionSpecularTextureFlag
 uniform sampler2D u_svtIndirectionSpecularTexture;
+#endif
+
+#ifdef svtIndirectionHeightTextureFlag
+uniform sampler2D u_svtIndirectionHeightTexture;
 #endif
 
 #ifdef svtIndirectionEmissiveTextureFlag
@@ -131,6 +151,10 @@ uniform sampler2D u_svtIndirectionMetallicTexture;
 #ifdef shininessFlag
 uniform float u_shininess;
 #endif
+
+#if defined(heightTextureFlag) || defined(heightCubemapFlag) || defined(svtIndirectionHeightTextureFlag)
+#define heightFlag
+#endif// heightTextureFlag
 
 // ECLIPSES
 #ifdef eclipsingBodyFlag
@@ -241,6 +265,7 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
 #endif // emissive
 
+// SVT emissive
 #if defined(svtIndirectionEmissiveTextureFlag)
     #define fetchColorEmissive(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionEmissiveTexture, texCoord))
 #elif defined(emissiveCubemapFlag)
@@ -249,7 +274,7 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
 #else
     #define fetchColorEmissive(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
-#endif // emissive
+#endif // SVT emissive
 
 // COLOR SPECULAR
 #if defined(svtIndirectionSpecularTextureFlag)
@@ -298,7 +323,7 @@ float getShadow(vec3 shadowMapUv) {
 
 // DIFFUSE SCATTERING COLOR
 #if defined(diffuseScatteringColorFlag)
-#define fetchColorDiffuseScattering() u_diffuseScatteringColor.rgb
+    #define fetchColorDiffuseScattering() u_diffuseScatteringColor.rgb
 #endif // diffuse scattering
 
 // COLOR AMBIENT OCCLUSION
@@ -311,7 +336,7 @@ float getShadow(vec3 shadowMapUv) {
 #endif // ambient occlusion
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
-#define directionalLightsFlag
+    #define directionalLightsFlag
 #endif // numDirectionalLights
 
 #ifdef directionalLightsFlag
@@ -347,9 +372,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef reflectionCubemapFlag
+    #ifdef metallicFlag
     vec3 reflect;
-    #endif // reflectionCubemapFlag
+    #endif // metallicFlag
     mat3 tbn;
 };
 in VertexData o_data;
@@ -365,7 +390,7 @@ in vec3 o_normalTan;
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag
-#include <shader/lib/ssr.frag.glsl>
+    #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
 #define saturate(x) clamp(x, 0.0, 1.0)
@@ -375,11 +400,11 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/cotangent.glsl>
 
 #ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
+    #include <shader/lib/velbuffer.frag.glsl>
 #endif // velocityBufferFlag
 
 #ifdef ssrFlag
-#include <shader/lib/pack.glsl>
+    #include <shader/lib/pack.glsl>
 #endif // ssrFlag
 
 // MAIN
@@ -390,19 +415,20 @@ void main() {
     vec4 emissive = fetchColorEmissive(texCoords);
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = o_data.ambientLight;
+
     #ifdef atmosphereGround
-    vec3 night = emissive.rgb;
-    emissive = vec4(0.0);
+        vec3 night = emissive.rgb;
+        emissive = vec4(0.0);
     #else
-    vec3 night = vec3(0.0);
-    #endif
+        vec3 night = vec3(0.0);
+    #endif // atmosphereGround
 
     float ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
     #if defined(occlusionMetallicRoughnessTextureFlag)
-    // Sometimes ambient occlusion is not used, and it is set to 0.
-    if (ambientOcclusion == 0.0) {
-        ambientOcclusion = 1.0;
-    }
+        // Sometimes ambient occlusion is not used, and it is set to 0.
+        if (ambientOcclusion == 0.0) {
+            ambientOcclusion = 1.0;
+        }
     #endif// occlusionMetallicRoughnessTextureFlag
 
     // Occlusion strength is 1 by default.
@@ -412,10 +438,10 @@ void main() {
     // Alpha value from textures
     float texAlpha = 1.0;
     #if defined(diffuseTextureFlag) || defined(diffuseCubemapFlag)
-    texAlpha = diffuse.a;
+        texAlpha = diffuse.a;
     #elif defined(emissiveTextureFlag)
-    texAlpha = luma(emissive.rgb);
-    #endif
+        texAlpha = luma(emissive.rgb);
+    #endif // diffuseTextureFlag || diffuseCubemapFlag
 
     vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
     vec3 N = o_normalTan;
@@ -429,56 +455,56 @@ void main() {
         #endif // metallicFlag
     #else
         normalVector.xyz = o_data.normal;
-        #ifdef reflectionCubemapFlag
+        #ifdef metallicFlag
             vec3 reflectDir = normalize(o_data.reflect);
-        #endif // reflectionCubemapFlag
+        #endif // metallicFlag
     #endif // normalTextureFlag
 
     // Shadow
     #ifdef shadowMapFlag
-    float transparency = 1.0 - texture(u_shadowTexture, o_data.shadowMapUv.xy).g;
-    float shdw = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
+        float transparency = 1.0 - texture(u_shadowTexture, o_data.shadowMapUv.xy).g;
+        float shdw = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
     #else
-    float shdw = 1.0;
-    #endif
+        float shdw = 1.0;
+    #endif // shadowMapFlag
 
     // Eclipses
     #ifdef eclipsingBodyFlag
-    float outline = -1.0;
-    vec4 outlineColor;
-    vec3 f = o_data.fragPosWorld;
-    vec3 m = u_eclipsingBodyPos;
-    vec3 l;
-    if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
-        l = -u_dirLights[0].direction * u_vrScale;
-    } else {
-        l = normalize(u_pointLights[0].position - o_data.fragPosWorld) * u_vrScale;
-    }
-    vec3 fl = f + l;
-    float dist = dist_segment_point(f, fl, m);
-    float dot_NM = dot(normalize(normalVector.xyz), normalize(m - f));
-    if (dot_NM > -0.15) {
-        if (dist < u_eclipsingBodyRadius * 1.5) {
-            float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
-            shdw *= eclfac;
-            if (dist < u_eclipsingBodyRadius * UMBRA0) {
-                shdw = 0.0;
-            }
+        float outline = -1.0;
+        vec4 outlineColor;
+        vec3 f = o_data.fragPosWorld;
+        vec3 m = u_eclipsingBodyPos;
+        vec3 l;
+        if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
+            l = -u_dirLights[0].direction * u_vrScale;
+        } else {
+            l = normalize(u_pointLights[0].position - o_data.fragPosWorld) * u_vrScale;
         }
-        #ifdef eclipseOutlines
-        if(dot_NM > 0.0) {
-            if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
-                // Penumbra.
-                outline = 1.0;
-                outlineColor = vec4(0.95, 0.625, 0.0, 1.0);
-            } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
-                // Umbra.
-                outline = 1.0;
-                outlineColor = vec4(0.85, 0.26, 0.21, 1.0);
+        vec3 fl = f + l;
+        float dist = dist_segment_point(f, fl, m);
+        float dot_NM = dot(normalize(normalVector.xyz), normalize(m - f));
+        if (dot_NM > -0.15) {
+            if (dist < u_eclipsingBodyRadius * 1.5) {
+                float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
+                shdw *= eclfac;
+                if (dist < u_eclipsingBodyRadius * UMBRA0) {
+                    shdw = 0.0;
+                }
             }
+            #ifdef eclipseOutlines
+                if(dot_NM > 0.0) {
+                    if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
+                        // Penumbra.
+                        outline = 1.0;
+                        outlineColor = vec4(0.95, 0.625, 0.0, 1.0);
+                    } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
+                        // Umbra.
+                        outline = 1.0;
+                        outlineColor = vec4(0.85, 0.26, 0.21, 1.0);
+                    }
+                }
+            #endif// eclipseOutlines
         }
-        #endif// eclipseOutlines
-    }
     #endif // eclipsingBodyFlag
 
     // Reflection
@@ -489,6 +515,7 @@ void main() {
     #endif // ssrFlag
 
     #ifdef metallicFlag
+        // Roughness.
         float roughness = 0.0;
         #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
             vec3 roughness3 = fetchColorRoughness(texCoords);
@@ -501,6 +528,7 @@ void main() {
             reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
         #endif // reflectionCubemapFlag
 
+        // Metallic.
         vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
         reflectionColor = reflectionColor * metallicColor;
         #ifdef ssrFlag
@@ -512,11 +540,11 @@ void main() {
         #endif // ssrFlag
     #endif // metallicFlag
 
-    #ifdef iorFlag
-    vec3 f0 = vec3(pow(( u_ior - 1.0) /  (u_ior + 1.0), 2.0));
-    #else
-    vec3 f0 = vec3(0.04); // from ior 1.5 value
-    #endif // iorFlag
+    //#ifdef iorFlag
+    //    vec3 f0 = vec3(pow(( u_ior - 1.0) /  (u_ior + 1.0), 2.0));
+    //#else
+    //    vec3 f0 = vec3(0.04); // from ior 1.5 value
+    //#endif // iorFlag
 
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);
@@ -531,62 +559,62 @@ void main() {
 
     // DIRECTIONAL LIGHTS
     #ifdef directionalLightsFlag
-    // Loop for directional light contributions.
-    for (int i = 0; i < numDirectionalLights; i++) {
-        vec3 V = o_data.viewDir;
-        vec3 col = u_dirLights[i].color;
-        // Skip non-lights
-        if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
-            continue;
-        } else {
-            validLights++;
-        }
-        // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-        vec3 L = normalize(-u_dirLights[i].direction * o_data.tbn);
-        vec3 H = normalize(L - V);
-        float NL = max(0.00001, dot(N, L));
-        float NH = max(0.00001, dot(N, H));
-        if (validLights == 1){
-            NL0 = NL;
-            L0 = L;
-        }
+        // Loop for directional light contributions.
+        for (int i = 0; i < numDirectionalLights; i++) {
+            vec3 V = o_data.viewDir;
+            vec3 col = u_dirLights[i].color;
+            // Skip non-lights
+            if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+                continue;
+            } else {
+                validLights++;
+            }
+            // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
+            vec3 L = normalize(-u_dirLights[i].direction * o_data.tbn);
+            vec3 H = normalize(L - V);
+            float NL = max(0.00001, dot(N, L));
+            float NH = max(0.00001, dot(N, H));
+            if (validLights == 1) {
+                NL0 = NL;
+                L0 = L;
+            }
 
-        selfShadow *= saturate(4.0 * NL);
+            selfShadow *= saturate(4.0 * NL);
 
-        specularColor += specular * min(1.0, pow(NH, 40.0));
-        shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
-        diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
-    }
+            specularColor += specular * min(1.0, pow(NH, 40.0));
+            shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
+            diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
+        }
     #endif // directionalLightsFlag
 
     // POINT LIGHTS
     #ifdef pointLightsFlag
-    // Loop for point light contributions.
-    for (int i = 0; i < numPointLights; i++) {
-        vec3 V = o_data.viewDir;
-        vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
-        // Skip non-lights
-        if (all(equal(col, vec3(0.0)))) {
-            continue;
-        } else {
-            validLights++;
-        }
-        // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-        vec3 L = normalize((u_pointLights[i].position - o_data.fragPosWorld) * o_data.tbn);
-        vec3 H = normalize(L - V);
-        float NL = max(0.00001, dot(N, L));
-        float NH = max(0.00001, dot(N, H));
-        if (validLights == 1){
-            NL0 = NL;
-            L0 = L;
-        }
+        // Loop for point light contributions.
+        for (int i = 0; i < numPointLights; i++) {
+            vec3 V = o_data.viewDir;
+            vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
+            // Skip non-lights
+            if (all(equal(col, vec3(0.0)))) {
+                continue;
+            } else {
+                validLights++;
+            }
+            // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
+            vec3 L = normalize((u_pointLights[i].position - o_data.fragPosWorld) * o_data.tbn);
+            vec3 H = normalize(L - V);
+            float NL = max(0.00001, dot(N, L));
+            float NH = max(0.00001, dot(N, H));
+            if (validLights == 1){
+                NL0 = NL;
+                L0 = L;
+            }
 
-        selfShadow *= saturate(4.0 * NL);
+            selfShadow *= saturate(4.0 * NL);
 
-        specularColor += specular * min(1.0, pow(NH, 40.0));
-        shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
-        diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
-    }
+            specularColor += specular * min(1.0, pow(NH, 40.0));
+            shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
+            diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
+        }
     #endif // pointLightsFlag
 
     // Diffuse texture contribution.
@@ -600,10 +628,10 @@ void main() {
 
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag
-    vec3 diffuseScattering = fetchColorDiffuseScattering();
-    diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion * shdw;
+        vec3 diffuseScattering = fetchColorDiffuseScattering();
+        diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion * shdw;
     #else
-    vec3 diffuseScattering = vec3(0.0);
+        vec3 diffuseScattering = vec3(0.0);
     #endif // diffuseScatteringColorFlag
 
     // Final color equation
@@ -619,9 +647,9 @@ void main() {
     #endif // atmosphereGround
 
     #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)
-    if (outline > 0.0) {
-        fragColor = outlineColor;
-    }
+        if (outline > 0.0) {
+            fragColor = outlineColor;
+        }
     #endif // eclipsingBodyFlag && eclipseOutlines
 
     if (fragColor.a <= 0.0) {
@@ -629,13 +657,13 @@ void main() {
     }
 
     #ifdef ssrFlag
-    normalBuffer = vec4(normalVector.xyz, 1.0);
+        normalBuffer = vec4(normalVector.xyz, 1.0);
     #endif // ssrFlag
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
     #ifdef velocityBufferFlag
-    velocityBuffer();
+        velocityBuffer();
     #endif // velocityBufferFlag
 }
