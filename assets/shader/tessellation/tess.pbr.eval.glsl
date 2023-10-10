@@ -122,18 +122,12 @@ out float o_fadeFactor;
 #endif
 out vec3 o_normalTan;
 out vec3 o_fragPosition;
-out float o_fragHeight;
 
 #ifdef velocityBufferFlag
 #include <shader/lib/velbuffer.vert.glsl>
 #endif
 
-#if defined(normalCubemapFlag) || defined(normalTextureFlag) || defined(svtIndirectionNormalTextureFlag)
-    // Use normal map
-    vec3 calcNormal(vec2 p, vec2 dp) {
-        return normalize(fetchColorNormal(p).rgb * 2.0 - 1.0);
-    }
-#elif defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
+#if defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
     // maps the height scale in internal units to a normal strength
     float computeNormalStrength(float heightScale) {
         // The top heightScale value to map the normal strength.
@@ -165,9 +159,9 @@ out float o_fragHeight;
     }
 #else
     vec3 calcNormal(vec2 p, vec2 dp){
-        return vec3(0.0);
+        return vec3(0.0, 0.0, 1.0);
     }
-#endif // normalTextureFlag
+#endif // heightTexture/Cubemap/SVT
 
 void main(void){
     float u = gl_TessCoord.x;
@@ -185,24 +179,24 @@ void main(void){
 
     // Use height texture to move vertex along normal.
     float h = fetchHeight(o_data.texCoords).r;
-    o_fragHeight = h * u_heightScale * u_elevationMultiplier;
-    vec3 dh = o_data.normal * o_fragHeight;
+    float fragHeight = h * u_heightScale * u_elevationMultiplier;
+    vec3 dh = o_data.normal * fragHeight;
     pos += vec4(dh, 0.0);
 
 
     #ifdef relativisticEffects
-    pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
+        pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif// relativisticEffects
 
     #ifdef gravitationalWaves
-    pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+        pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 
     #ifdef velocityBufferFlag
-    velocityBufferCam(gpos, pos);
+        velocityBufferCam(gpos, pos);
     #endif// velocityBufferFlag
 
     // Plumbing
@@ -214,16 +208,16 @@ void main(void){
     o_data.fragPosWorld = (u * l_data[0].fragPosWorld + v * l_data[1].fragPosWorld + w * l_data[2].fragPosWorld);
     o_data.ambientLight = (u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight);
     #ifdef reflectionCubemapFlag
-    o_data.reflect = (u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect);
+        o_data.reflect = (u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect);
     #endif // reflectionCubemapFlag
 
     #ifdef atmosphereGround
-    o_atmosphereColor = (u * l_atmosphereColor[0] + v * l_atmosphereColor[1] + w * l_atmosphereColor[2]);
-    o_fadeFactor = (u * l_fadeFactor[0] + v * l_fadeFactor[1] + w * l_fadeFactor[2]);
+        o_atmosphereColor = (u * l_atmosphereColor[0] + v * l_atmosphereColor[1] + w * l_atmosphereColor[2]);
+        o_fadeFactor = (u * l_fadeFactor[0] + v * l_fadeFactor[1] + w * l_fadeFactor[2]);
     #endif
 
     #ifdef shadowMapFlag
-    o_data.shadowMapUv = (u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv);
+        o_data.shadowMapUv = (u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv);
     #endif // shadowMapFlag
 
     o_data.tbn = (u * l_data[0].tbn + v * l_data[1].tbn + w * l_data[2].tbn);

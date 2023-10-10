@@ -40,12 +40,9 @@
 #define pushNormalValue(value) v_data.normal = (value)
 #if defined(normalFlag)
     vec3 g_normal = a_normal;
-    #define passNormalValue(value) pushNormalValue(value)
 #else
     vec3 g_normal = vec3(0.0, 0.0, 1.0);
-    #define passNormalValue(value) nop()
 #endif
-#define passNormal() passNormalValue(g_normal)
 #define pushNormal() pushNormalValue(g_normal)
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -137,6 +134,10 @@ uniform mat4 u_shadowMapProjViewTrans;
     const float u_opacity = 1.0;
 #endif
 
+#ifdef svtCacheTextureFlag
+uniform sampler2D u_svtCacheTexture;
+#endif
+
 // HEIGHT
 #ifdef heightTextureFlag
 uniform sampler2D u_heightTexture;
@@ -148,8 +149,6 @@ uniform samplerCube u_heightCubemap;
 
 #ifdef svtIndirectionHeightTextureFlag
 uniform sampler2D u_svtIndirectionHeightTexture;
-// We import this here because we only use the SVT for the height channel.
-uniform sampler2D u_svtCacheTexture;
 #endif // svtIndirectionHeightTextureFlag
 
 #if defined(heightTextureFlag) || defined(heightCubemapFlag) || defined(svtIndirectionHeightTextureFlag)
@@ -161,7 +160,9 @@ uniform sampler2D u_svtCacheTexture;
     uniform float u_elevationMultiplier;
     uniform vec2 u_heightSize;
     #define KM_TO_U 1.0E-6
-    #define HIEIGHT_FACTOR 0.001 * KM_TO_U
+    #define fetchHeightSize() vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y)
+#else
+    #define fetchHeightSize() vec2(0.0)
 #endif // heightFlag
 
 // HEIGHT
@@ -176,6 +177,28 @@ uniform sampler2D u_svtCacheTexture;
 #else
     #define fetchHeight(texCoord) vec4(0.0)
 #endif // height
+
+// NORMAL
+#ifdef normalTextureFlag
+uniform sampler2D u_normalTexture;
+#endif
+
+#ifdef normalCubemapFlag
+uniform samplerCube u_normalCubemap;
+#endif
+
+#ifdef svtIndirectionNormalTextureFlag
+uniform sampler2D u_svtIndirectionNormalTexture;
+#endif
+
+// COLOR NORMAL
+#if defined(svtIndirectionNormalTextureFlag)
+    #define fetchColorNormal(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionNormalTexture, texCoord))
+#elif defined(normalCubemapFlag)
+    #define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
+#elif defined(normalTextureFlag)
+    #define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
+#endif// normal
 
 
 #if defined(normalFlag) && defined(binormalFlag) && defined(tangentFlag)
@@ -233,14 +256,47 @@ struct VertexData {
     mat3 tbn;
 };
 out VertexData v_data;
-
-#ifdef heightFlag
-out float v_fragHeight;
-#endif // heightFlag
+out vec3 v_normalTan;
 
 #ifdef velocityBufferFlag
 #include <shader/lib/velbuffer.vert.glsl>
 #endif
+
+#if defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
+    // maps the height scale in internal units to a normal strength
+    float computeNormalStrength(float heightScale) {
+        // The top heightScale value to map the normal strength.
+        float topHeightScaleMap = 15.0;
+
+        vec2 heightSpanKm = vec2(0.0, u_heightScale * topHeightScaleMap);
+        vec2 span = vec2(0.1, 1.0);
+        heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
+        // normalize to [0,1]
+        heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
+        return span.x + (span.y - span.x) * heightScale;
+    }
+    // Use height texture for normals
+    vec3 calcNormal(vec2 p, vec2 dp) {
+        vec4 h;
+        vec2 size = vec2(computeNormalStrength(u_heightScale * u_elevationMultiplier), 0.0);
+        if (dp.x < 0.0) {
+            // Generated height using perlin noise
+            dp = vec2(3.0e-4);
+        }
+        h.x = fetchHeight(vec2(p.x - dp.x, p.y)).r;
+        h.y = fetchHeight(vec2(p.x + dp.x, p.y)).r;
+        h.z = fetchHeight(vec2(p.x, p.y - dp.y)).r;
+        h.w = fetchHeight(vec2(p.x, p.y + dp.y)).r;
+        vec3 va = normalize(vec3(size.xy, -h.x + h.y));
+        vec3 vb = normalize(vec3(size.yx, -h.z + h.w));
+        vec3 n = cross(va, vb);
+        return normalize(n);
+    }
+#else
+    vec3 calcNormal(vec2 p, vec2 dp) {
+        return vec3(0.0, 0.0, 1.0);
+    }
+#endif // heightTexture/Cubemap/SVT
 
 void main() {
     computeAtmosphericScatteringGround();
@@ -251,6 +307,10 @@ void main() {
     g_binormal = normalize(u_normalMatrix * g_binormal);
     g_tangent = normalize(u_normalMatrix * g_tangent);
 
+    mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
+    v_data.tbn = TBN;
+
+    v_normalTan = calcNormal(g_texCoord0, fetchHeightSize());
     v_data.opacity = u_opacity;
 
     // Location in world coordinates (world origin is at the camera)
@@ -259,8 +319,8 @@ void main() {
     #if defined(heightFlag) && !defined(parallaxMappingFlag)
     // Use height texture to move vertex along normal.
     float h = fetchHeight(g_texCoord0).r;
-    v_fragHeight = h * u_heightScale * u_elevationMultiplier;
-    vec3 dh = g_normal * v_fragHeight;
+    float fragHeight = h * u_heightScale * u_elevationMultiplier;
+    vec3 dh = g_normal * fragHeight;
     pos += vec4(dh, 0.0);
     #endif // heightFlag && !parallaxMappingFlag
 
@@ -286,8 +346,6 @@ void main() {
     #endif // shadowMapFlag
 
 
-    mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
-    v_data.tbn = TBN;
 
     #ifdef ambientLightFlag
 	v_data.ambientLight = u_ambientLight;
@@ -303,12 +361,7 @@ void main() {
 	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
-    // Camera is at origin, view direction is inverse of vertex position
-    #ifdef heightFlag
-    v_data.viewDir = normalize(pos.xyz - u_vrOffset);
-    #else
     v_data.viewDir = normalize(normalize(pos.xyz - u_vrOffset) * TBN);
-    #endif // heightFlag
 
     #ifdef metallicFlag
     #ifndef normalTextureFlag
@@ -317,7 +370,7 @@ void main() {
     #endif // normalTextureFlag
     #endif // metallicFlag
 
-    pushNormalValue(g_normal);
+    pushNormal();
     pushColor(g_color);
     pushTexCoord0(g_texCoord0);
 }

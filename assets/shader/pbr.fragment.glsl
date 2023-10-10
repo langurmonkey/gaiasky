@@ -1,24 +1,9 @@
 #version 330 core
 
-////////////////////////////////////////////////////////////////////////////////////
-////////// NORMAL ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-vec3 g_normal = vec3(0.0, 0.0, 1.0);
-#define pullNormal() g_normal = v_data.normal
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// BINORMAL ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-vec3 g_binormal = vec3(0.0, 0.0, 1.0);
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// TANGENT ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-vec3 g_tangent = vec3(1.0, 0.0, 0.0);
-
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
+uniform vec3 u_vrOffset = vec3(0.0);
 
 // DIFFUSE
 #ifdef diffuseColorFlag
@@ -110,6 +95,7 @@ uniform sampler2D u_aoTexture;
 uniform sampler2D u_occlusionMetallicRoughnessTexture;
 #endif
 
+// HEIGHT
 #ifdef heightTextureFlag
 uniform sampler2D u_heightTexture;
 #endif
@@ -152,6 +138,10 @@ uniform sampler2D u_svtIndirectionDiffuseTexture;
 uniform sampler2D u_svtIndirectionSpecularTexture;
 #endif
 
+#ifdef svtIndirectionNormalTextureFlag
+uniform sampler2D u_svtIndirectionNormalTexture;
+#endif
+
 #ifdef svtIndirectionHeightTextureFlag
 uniform sampler2D u_svtIndirectionHeightTexture;
 #endif
@@ -174,19 +164,7 @@ uniform float u_shininess;
 #endif// heightTextureFlag
 
 // ECLIPSES
-#ifdef eclipsingBodyFlag
-uniform float u_vrScale;
-uniform int u_eclipseOutlines;
-uniform float u_eclipsingBodyRadius;
-uniform vec3 u_eclipsingBodyPos;
-
-#include <shader/lib/math.glsl>
-
-#define UMBRA0 0.04
-#define UMBRA1 0.035
-#define PENUMBRA0 1.7
-#define PENUMBRA1 1.69
-#endif // eclipsingBodyFlag
+#include <shader/lib/eclipses.glsl>
 
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
@@ -370,57 +348,6 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
 #endif// height
 
-#ifdef heightFlag
-    uniform float u_heightScale;
-    uniform float u_elevationMultiplier;
-    uniform vec2 u_heightSize;
-
-    #define fetchHeightSize() vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y)
-#else
-    #define fetchHeightSize() vec2(0.0)
-#endif // heightFlag
-
-#if defined(normalCubemapFlag) || defined(normalTextureFlag) || defined(svtIndirectionNormalTextureFlag)
-    // Use normal map
-    vec3 calcNormal(vec2 p, vec2 dp) {
-        return normalize(fetchColorNormal(p).rgb * 2.0 - 1.0);
-    }
-#elif defined(heightFlag)
-    // maps the height scale in internal units to a normal strength
-    float computeNormalStrength(float heightScale) {
-        // The top heightScale value to map the normal strength.
-        float topHeightScaleMap = 15.0;
-
-        vec2 heightSpanKm = vec2(0.0, u_heightScale * topHeightScaleMap);
-        vec2 span = vec2(0.1, 1.0);
-        heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
-        // normalize to [0,1]
-        heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
-        return span.x + (span.y - span.x) * heightScale;
-    }
-    // Use height texture for normals
-    vec3 calcNormal(vec2 p, vec2 dp) {
-        vec4 h;
-        vec2 size = vec2(computeNormalStrength(u_heightScale * u_elevationMultiplier), 0.0);
-        if (dp.x < 0.0) {
-            // Generated height using perlin noise
-            dp = vec2(3.0e-4);
-        }
-        h.x = fetchHeight(vec2(p.x - dp.x, p.y)).r;
-        h.y = fetchHeight(vec2(p.x + dp.x, p.y)).r;
-        h.z = fetchHeight(vec2(p.x, p.y - dp.y)).r;
-        h.w = fetchHeight(vec2(p.x, p.y + dp.y)).r;
-        vec3 va = normalize(vec3(size.xy, -h.x + h.y));
-        vec3 vb = normalize(vec3(size.yx, -h.z + h.w));
-        vec3 n = cross(va, vb);
-        return normalize(n);
-    }
-#else
-    vec3 calcNormal(vec2 p, vec2 dp) {
-        return vec3(0.0);
-    }
-#endif // normalTextureFlag
-
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
     #define directionalLightsFlag
 #endif // numDirectionalLights
@@ -470,6 +397,8 @@ in vec4 v_atmosphereColor;
 in float v_fadeFactor;
 #endif // atmosphereGround
 
+in vec3 v_normalTan;
+
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
@@ -479,54 +408,12 @@ layout (location = 0) out vec4 fragColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
-
-#if defined(heightFlag) && defined(parallaxMapping)
-#define HEIGHT_FACTOR 70.0
-vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
-    // number of depth layers
-    const float minLayers = 8;
-    const float maxLayers = 32;
-    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
-    // calculate the size of each layer
-    float layerDepth = 1.0 / numLayers;
-    // depth of current layer
-    float currentLayerDepth = 0.0;
-
-    // the amount to shift the texture coordinates per layer (from vector P)
-    vec2 P = viewDir.xy / viewDir.z * u_heightScale * HEIGHT_FACTOR;
-    vec2 deltaTexCoords = P / numLayers;
-
-    // get initial values
-    vec2  currentTexCoords     = texCoords;
-    float currentDepthMapValue = fetchHeight(currentTexCoords).r;
-
-    while (currentLayerDepth < currentDepthMapValue) {
-        // shift texture coordinates along direction of P
-        currentTexCoords -= deltaTexCoords;
-        // get depthmap value at current texture coordinates
-        currentDepthMapValue = fetchHeight(currentTexCoords).r;
-        // get depth of next layer
-        currentLayerDepth += layerDepth;
-    }
-
-    // get texture coordinates before collision (reverse operations)
-    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
-
-    // get depth after and before collision for linear interpolation
-    float afterDepth  = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = fetchHeight(prevTexCoords).r - currentLayerDepth + layerDepth;
-
-    // interpolation of texture coordinates
-    float weight = afterDepth / (afterDepth - beforeDepth);
-    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
-
-    return finalTexCoords;
-}
+#if defined(heightFlag) && defined(parallaxMappingFlag)
+    #include <shader/lib/parallaxmapping.glsl>
 #endif // heightFlag && parallaxMappingFlag
 
 #include <shader/lib/atmfog.glsl>
 #include <shader/lib/logdepthbuff.glsl>
-#include <shader/lib/cotangent.glsl>
 
 #ifdef velocityBufferFlag
     #include <shader/lib/velbuffer.frag.glsl>
@@ -540,9 +427,9 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 void main() {
     vec2 texCoords = v_data.texCoords;
 
-    #ifdef parallaxMappingFlag
+    #if defined(heightFlag) && defined(parallaxMappingFlag)
         // Parallax occlusion mapping
-        texCoords = parallaxMapping(texCoords, normalize(v_data.viewDir * TBN));
+        texCoords = parallaxMapping(texCoords, normalize(v_data.fragPosWorld - u_vrOffset));
     #endif // parallaxMappingFlag
 
     vec4 diffuse = fetchColorDiffuse(v_data.color, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
@@ -577,17 +464,19 @@ void main() {
         texAlpha = luma(emissive.rgb);
     #endif // diffuseTextureFlag || diffuseCubemapFlag
 
-    vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
-    vec3 N = calcNormal(texCoords, fetchHeightSize());
+    vec4 normalVector;
+    vec3 N;
     #if defined(normalTextureFlag) || defined(normalCubemapFlag)
+        // Fetch from normal map.
+        N = normalize(fetchColorNormal(texCoords).rgb * 2.0 - 1.0);
+        // To tangent space.
+        normalVector.xyz = v_data.tbn * N;
         #ifdef metallicFlag
-            // Perturb the normal to get reflect direction.
-            pullNormal();
-            mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-            normalVector.xyz = TBN * N;
             vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
         #endif // metallicFlag
     #else
+        // Fetch from previous stage.
+        N = v_normalTan;
         normalVector.xyz = v_data.normal;
         #ifdef metallicFlag
             vec3 reflectDir = normalize(v_data.reflect);
@@ -604,41 +493,14 @@ void main() {
 
     // Eclipses
     #ifdef eclipsingBodyFlag
-        float outline = -1.0;
-        vec4 outlineColor;
-        vec3 f = v_data.fragPosWorld;
-        vec3 m = u_eclipsingBodyPos;
-        vec3 l;
+        vec3 lightDirection;
         if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
-            l = -u_dirLights[0].direction * u_vrScale;
+            lightDirection = -u_dirLights[0].direction;
         } else {
-            l = normalize(u_pointLights[0].position - v_data.fragPosWorld) * u_vrScale;
+            lightDirection = normalize(u_pointLights[0].position - v_data.fragPosWorld);
         }
-        vec3 fl = f + l;
-        float dist = dist_segment_point(f, fl, m);
-        float dot_NM = dot(normalize(normalVector.xyz), normalize(m - f));
-        if (dot_NM > -0.15) {
-            if (dist < u_eclipsingBodyRadius * 1.5) {
-                float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
-                shdw *= eclfac;
-                if (dist < u_eclipsingBodyRadius * UMBRA0) {
-                    shdw = 0.0;
-                }
-            }
-            #ifdef eclipseOutlines
-                if(dot_NM > 0.0) {
-                    if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
-                        // Penumbra.
-                        outline = 1.0;
-                        outlineColor = vec4(0.95, 0.625, 0.0, 1.0);
-                    } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
-                        // Umbra.
-                        outline = 1.0;
-                        outlineColor = vec4(0.85, 0.26, 0.21, 1.0);
-                    }
-                }
-            #endif// eclipseOutlines
-        }
+        float outline;
+        vec4 outlineColor = eclipseColor(v_data.fragPosWorld, lightDirection, normalVector.xyz, outline, shdw);
     #endif // eclipsingBodyFlag
 
     // Reflection

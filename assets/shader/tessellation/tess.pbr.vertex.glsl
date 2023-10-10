@@ -39,13 +39,10 @@
 
 #define pushNormalValue(value) v_data.normal = (value)
 #if defined(normalFlag)
-    vec3 g_normal = a_normal;
-    #define passNormalValue(value) pushNormalValue(value)
+vec3 g_normal = a_normal;
 #else
-    vec3 g_normal = vec3(0.0, 0.0, 1.0);
-    #define passNormalValue(value) nop()
+vec3 g_normal = vec3(0.0, 0.0, 1.0);
 #endif
-#define passNormal() passNormalValue(g_normal)
 #define pushNormal() pushNormalValue(g_normal)
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -271,7 +268,6 @@ void main() {
     #endif // ambientCubemapFlag
 
     // Camera is at origin, view direction is inverse of vertex position
-    pushNormal();
     v_data.viewDir = normalize(normalize(pos.xyz - u_vrOffset) * TBN);
 
     #ifdef reflectionCubemapFlag
@@ -281,6 +277,7 @@ void main() {
     #endif // normalTextureFlag
     #endif // reflectionCubemapFlag
 
+    pushNormal();
     pushColor(g_color);
     pushTexCoord0(g_texCoord0);
 }

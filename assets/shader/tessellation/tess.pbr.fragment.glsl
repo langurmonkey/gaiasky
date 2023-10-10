@@ -1,21 +1,5 @@
 #version 410 core
 
-////////////////////////////////////////////////////////////////////////////////////
-////////// NORMAL ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-vec3 g_normal = vec3(0.0, 0.0, 1.0);
-#define pullNormal() g_normal = o_data.normal
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// BINORMAL ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-vec3 g_binormal = vec3(0.0, 0.0, 1.0);
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// TANGENT ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-vec3 g_tangent = vec3(1.0, 0.0, 0.0);
-
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
@@ -44,6 +28,15 @@ uniform sampler2D u_specularTexture;
 
 #ifdef specularCubemapFlag
 uniform samplerCube u_specularCubemap;
+#endif
+
+// NORMAL
+#ifdef normalTextureFlag
+uniform sampler2D u_normalTexture;
+#endif
+
+#ifdef normalCubemapFlag
+uniform samplerCube u_normalCubemap;
 #endif
 
 // EMISSIVE
@@ -135,6 +128,10 @@ uniform sampler2D u_svtIndirectionDiffuseTexture;
 uniform sampler2D u_svtIndirectionSpecularTexture;
 #endif
 
+#ifdef svtIndirectionNormalTextureFlag
+uniform sampler2D u_svtIndirectionNormalTexture;
+#endif
+
 #ifdef svtIndirectionHeightTextureFlag
 uniform sampler2D u_svtIndirectionHeightTexture;
 #endif
@@ -157,19 +154,7 @@ uniform float u_shininess;
 #endif// heightTextureFlag
 
 // ECLIPSES
-#ifdef eclipsingBodyFlag
-uniform float u_vrScale;
-uniform int u_eclipseOutlines;
-uniform float u_eclipsingBodyRadius;
-uniform vec3 u_eclipsingBodyPos;
-
-#include <shader/lib/math.glsl>
-
-#define UMBRA0 0.04
-#define UMBRA1 0.035
-#define PENUMBRA0 1.7
-#define PENUMBRA1 1.69
-#endif // eclipsingBodyFlag
+#include <shader/lib/eclipses.glsl>
 
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
@@ -291,6 +276,15 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorSpecular(texCoord, defaultValue) defaultValue
 #endif // specular
 
+// COLOR NORMAL
+#if defined(svtIndirectionNormalTextureFlag)
+#define fetchColorNormal(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionNormalTexture, texCoord))
+#elif defined(normalCubemapFlag)
+#define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
+#elif defined(normalTextureFlag)
+#define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
+#endif// normal
+
 // COLOR METALLIC
 #ifdef svtIndirectionMetallicTextureFlag
     #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
@@ -397,7 +391,6 @@ layout (location = 0) out vec4 fragColor;
 
 #include <shader/lib/atmfog.glsl>
 #include <shader/lib/logdepthbuff.glsl>
-#include <shader/lib/cotangent.glsl>
 
 #ifdef velocityBufferFlag
     #include <shader/lib/velbuffer.frag.glsl>
@@ -443,17 +436,19 @@ void main() {
         texAlpha = luma(emissive.rgb);
     #endif // diffuseTextureFlag || diffuseCubemapFlag
 
-    vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
-    vec3 N = o_normalTan;
+    vec4 normalVector;
+    vec3 N;
     #if defined(normalTextureFlag) || defined(normalCubemapFlag)
+        // Fetch from normal map.
+        N = normalize(fetchColorNormal(texCoords).rgb * 2.0 - 1.0);
+        // To tangent space.
+        normalVector.xyz = o_data.tbn * N;
         #ifdef metallicFlag
-            // Perturb the normal to get reflect direction.
-            pullNormal();
-            mat3 TBN = cotangentFrame(g_normal, -o_data.viewDir, texCoords);
-            normalVector.xyz = TBN * N;
             vec3 reflectDir = normalize(reflect(o_data.fragPosWorld, normalVector.xyz));
         #endif // metallicFlag
     #else
+        // Fetch from previous stage.
+        N = o_normalTan;
         normalVector.xyz = o_data.normal;
         #ifdef metallicFlag
             vec3 reflectDir = normalize(o_data.reflect);
@@ -470,41 +465,14 @@ void main() {
 
     // Eclipses
     #ifdef eclipsingBodyFlag
-        float outline = -1.0;
-        vec4 outlineColor;
-        vec3 f = o_data.fragPosWorld;
-        vec3 m = u_eclipsingBodyPos;
-        vec3 l;
+        vec3 lightDirection;
         if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
-            l = -u_dirLights[0].direction * u_vrScale;
+            lightDirection = -u_dirLights[0].direction;
         } else {
-            l = normalize(u_pointLights[0].position - o_data.fragPosWorld) * u_vrScale;
+            lightDirection = normalize(u_pointLights[0].position - o_data.fragPosWorld);
         }
-        vec3 fl = f + l;
-        float dist = dist_segment_point(f, fl, m);
-        float dot_NM = dot(normalize(normalVector.xyz), normalize(m - f));
-        if (dot_NM > -0.15) {
-            if (dist < u_eclipsingBodyRadius * 1.5) {
-                float eclfac = dist / (u_eclipsingBodyRadius * 1.5);
-                shdw *= eclfac;
-                if (dist < u_eclipsingBodyRadius * UMBRA0) {
-                    shdw = 0.0;
-                }
-            }
-            #ifdef eclipseOutlines
-                if(dot_NM > 0.0) {
-                    if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
-                        // Penumbra.
-                        outline = 1.0;
-                        outlineColor = vec4(0.95, 0.625, 0.0, 1.0);
-                    } else if (dist < u_eclipsingBodyRadius * UMBRA0 && dist > u_eclipsingBodyRadius * UMBRA1) {
-                        // Umbra.
-                        outline = 1.0;
-                        outlineColor = vec4(0.85, 0.26, 0.21, 1.0);
-                    }
-                }
-            #endif// eclipseOutlines
-        }
+        float outline;
+        vec4 outlineColor = eclipseColor(o_data.fragPosWorld, lightDirection, normalVector.xyz, outline, shdw);
     #endif // eclipsingBodyFlag
 
     // Reflection
