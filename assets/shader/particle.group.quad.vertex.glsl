@@ -94,7 +94,7 @@ void main() {
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = particleSize;
-    #include <shader/snip_billboard.glsl>
+    #include <shader/snippet/billboard.glsl>
 
     gl_Position = gpos * u_vrScale;
 
