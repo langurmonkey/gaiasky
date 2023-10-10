@@ -409,6 +409,7 @@ layout (location = 0) out vec4 fragColor;
 #define saturate(x) clamp(x, 0.0, 1.0)
 
 #if defined(heightFlag) && defined(parallaxMappingFlag)
+    uniform float u_heightScale;
     #include <shader/lib/parallaxmapping.glsl>
 #endif // heightFlag && parallaxMappingFlag
 

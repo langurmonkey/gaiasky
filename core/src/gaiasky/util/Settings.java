@@ -316,7 +316,6 @@ public class Settings {
     public enum ElevationType {
         REGULAR,
         TESSELLATION,
-        PARALLAX_MAPPING,
         NONE;
 
         public boolean isRegular() {
@@ -328,7 +327,7 @@ public class Settings {
         }
 
         public boolean isParallaxMapping() {
-            return this.equals(PARALLAX_MAPPING);
+            return false;
         }
 
         public boolean isNone() {
@@ -1203,7 +1202,11 @@ public class Settings {
                 public double multiplier;
                 public double quality;
 
-                public void setType(final String typeString) {
+                public void setType(String typeString) {
+                    // Parallax mapping discontinued after 3.5.5-2.
+                    if (typeString.equalsIgnoreCase("PARALLAX_MAPPING")) {
+                        typeString = "REGULAR";
+                    }
                     this.type = ElevationType.valueOf(typeString.toUpperCase());
                 }
             }
