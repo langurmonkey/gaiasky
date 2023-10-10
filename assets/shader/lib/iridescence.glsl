@@ -1,4 +1,4 @@
-﻿float sq(float t) {
+float sq(float t) {
     return t * t;
 }
 

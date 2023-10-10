@@ -147,7 +147,7 @@ uniform sampler2D u_svtIndirectionMetallicTexture;
 // SHININESS
 #ifdef shininessFlag
 uniform float u_shininess;
-#endif
+#endif // shininessFlag
 
 #if defined(heightTextureFlag) || defined(heightCubemapFlag) || defined(svtIndirectionHeightTextureFlag)
 #define heightFlag

@@ -1,4 +1,4 @@
-﻿#ifndef GLSL_LIB_ECLIPSES
+#ifndef GLSL_LIB_ECLIPSES
 #define GLSL_LIB_ECLIPSES
 
 #ifdef eclipsingBodyFlag
