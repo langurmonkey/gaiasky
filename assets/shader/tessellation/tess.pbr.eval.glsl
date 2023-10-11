@@ -122,6 +122,7 @@ out float o_fadeFactor;
 #endif
 out vec3 o_normalTan;
 out vec3 o_fragPosition;
+out float o_fragHeight;
 
 #ifdef velocityBufferFlag
 #include <shader/lib/velbuffer.vert.glsl>
@@ -179,8 +180,8 @@ void main(void){
 
     // Use height texture to move vertex along normal.
     float h = fetchHeight(o_data.texCoords).r;
-    float fragHeight = h * u_heightScale * u_elevationMultiplier;
-    vec3 dh = o_data.normal * fragHeight;
+    o_fragHeight = h * u_heightScale * u_elevationMultiplier;
+    vec3 dh = o_data.normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 
 

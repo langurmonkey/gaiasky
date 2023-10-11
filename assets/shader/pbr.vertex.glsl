@@ -257,6 +257,10 @@ struct VertexData {
 };
 out VertexData v_data;
 out vec3 v_normalTan;
+#if defined(heightFlag) && !defined(parallaxMappingFlag)
+out vec3 o_fragPosition;
+out float o_fragHeight;
+#endif // heightFlag
 
 #ifdef velocityBufferFlag
 #include <shader/lib/velbuffer.vert.glsl>
@@ -319,8 +323,8 @@ void main() {
     #if defined(heightFlag) && !defined(parallaxMappingFlag)
     // Use height texture to move vertex along normal.
     float h = fetchHeight(g_texCoord0).r;
-    float fragHeight = h * u_heightScale * u_elevationMultiplier;
-    vec3 dh = g_normal * fragHeight;
+    o_fragHeight = h * u_heightScale * u_elevationMultiplier;
+    vec3 dh = g_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
     #endif // heightFlag && !parallaxMappingFlag
 
@@ -332,6 +336,9 @@ void main() {
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWave
 
+    #if defined(heightFlag) && !defined(parallaxMappingFlag)
+    o_fragPosition = pos.xyz;
+    #endif // heightFlag
     v_data.fragPosWorld = pos.xyz;
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;

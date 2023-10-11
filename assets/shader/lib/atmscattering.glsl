@@ -91,8 +91,8 @@ void computeAtmosphericScatteringGround() {
     }
 
     float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.5;
-    v_heightNormalized = 1.0 - clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
-    v_fadeFactor = smoothstep(0.5, 1.0, 1.0 - v_heightNormalized);
+    float heightNormalized = 1.0 - clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
+    v_fadeFactor = smoothstep(0.5, 1.0, 1.0 - heightNormalized);
 
     v_atmosphereColor = vec4(v3FrontColor * (v3InvWavelength * fKrESun + fKmESun), fAlpha);
 }
