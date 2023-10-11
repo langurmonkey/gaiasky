@@ -12,6 +12,8 @@ uniform float u_heightScale;
 uniform float u_ts;
 // Grid style encoded in u_elevationMultiplier: 0 - concentric rings; 1 - uniform square grid
 uniform float u_elevationMultiplier = 1.0;
+// Time in seconds.
+uniform float u_time;
 
 // Depth
 #include <shader/lib/logdepthbuff.glsl>
@@ -36,6 +38,10 @@ layout (location = 1) out vec4 velMap;
 #define WIDTH 2.0
 #define RAD PI / 180.0
 #define BASE_COL_DIAG vec4(1.0, 0.792, 0.09, 0.3)
+
+#include <shader/lib/simple_noise.glsl>
+
+#define saturate(x) clamp(x, 0.0, 1.0)
 
 vec2 rotateUV(vec2 uv, float rotation) {
     return vec2(cos(rotation) * (uv.x) + sin(rotation) * (uv.y),
@@ -86,7 +92,7 @@ vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col, vec4 lcol) {
 vec4 circle(vec2 tc) {
     // in [-1..1]
     tc = (tc - 0.5) * 2.0;
-    float alpha = v_opacity * clamp(1.0 - pow(length(tc), 4.0), 0.0, 1.0);
+    float alpha = clamp(1.0 - pow(length(tc), 4.0), 0.0, 1.0);
 
     float fade = pow(u_heightScale, 0.5);
 
@@ -114,7 +120,7 @@ vec4 square_rec(vec2 tc, float d, float f, float alpha, vec4 col, vec4 lcol) {
 vec4 square(vec2 tc) {
     // in [-1..1]
     tc = abs((tc - 0.5) * 2.0);
-    float alpha = v_opacity * clamp(1.0 - pow(length(tc), 4.0), 0.0, 1.0);
+    float alpha = clamp(1.0 - pow(length(tc), 4.0), 0.0, 1.0);
 
     float fade = pow(u_heightScale, 0.5);
 
@@ -131,6 +137,20 @@ void main() {
     } else {
         fragColor = square(v_texCoords0);
     }
+    // Add background color.
+    fragColor.rgb = max(fragColor.rgb, u_diffuseColor.rgb);
+
+    // Add travelling pulse.
+    vec2 uv = abs((v_texCoords0 - 0.5) * 2.0);
+    float distCenter = length(uv);
+    float fac = clamp(pow(abs(sin(u_time * 1.5 - distCenter * 8.0)), 0.2), 0.5, 1.0);
+    fragColor.rgb *= fac;
+
+    // Fade background with distance from center.
+    fragColor.a = max(fragColor.a, (1.0 - distCenter) * 0.1) * v_opacity;
+
+    // Noise.
+    fragColor = saturate(fragColor + (0.3 * rand(1.0e2 * uv + u_time * 0.0001) - 0.15));
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     velMap = vec4(0.0, 0.0, 0.0, 1.0);

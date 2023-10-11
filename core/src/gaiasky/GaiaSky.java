@@ -358,7 +358,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (settings.graphics.fpsLimit > 0.0) {
             // If FPS limit is on, dynamic resolution is off.
             sleep(settings.graphics.fpsLimit);
-        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000
+        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.timeSinceMillis(startTime) > 10000
                 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openXr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate.
             var fps = 1f / graphics.getDeltaTime();
@@ -852,7 +852,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 // FPS.
                 EventManager.publish(Event.FPS_INFO, this, 1f / graphics.getDeltaTime());
                 // Current session time.
-                EventManager.publish(Event.DEBUG_TIME, this, TimeUtils.timeSinceMillis(startTime) / 1000d);
+                EventManager.publish(Event.DEBUG_TIME, this, getRunTimeSeconds());
                 // Memory.
                 EventManager.publish(Event.DEBUG_RAM, this, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
                 // V-RAM.
@@ -1744,6 +1744,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 map.remove(key);
             }
         }
+    }
+
+    /**
+     * Gets the run time in seconds of this Gaia Sky instance.
+     * @return The time, in seconds, since Gaia Sky started running.
+     */
+    public double getRunTimeSeconds(){
+        return TimeUtils.timeSinceMillis(startTime) / 1000d;
     }
 
 }
