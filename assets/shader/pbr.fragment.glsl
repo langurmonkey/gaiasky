@@ -296,7 +296,7 @@ float getShadow(vec3 shadowMapUv) {
 #endif// normal
 
 // COLOR METALLIC
-#ifdef svtIndirectionMetallicTextureFlag
+#if defined(svtIndirectionMetallicTextureFlag)
     #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
 #elif metallicCubemapFlag
     #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
