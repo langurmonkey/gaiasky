@@ -378,7 +378,9 @@ in vec4 o_atmosphereColor;
 in float o_fadeFactor;
 #endif // atmosphereGround
 
+#if !defined(normalTextureFlag) && !defined(normalCubemapFlag) && !defined(svtIndirectionNormalTextureFlag)
 in vec3 o_normalTan;
+#endif // !normalTextureFlag && !normalCubemapFlag && !normalSVT
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -438,7 +440,7 @@ void main() {
 
     vec4 normalVector;
     vec3 N;
-    #if defined(normalTextureFlag) || defined(normalCubemapFlag)
+    #if defined(normalTextureFlag) || defined(normalCubemapFlag) || defined(svtIndirectionNormalTextureFlag)
         // Fetch from normal map.
         N = normalize(fetchColorNormal(texCoords).rgb * 2.0 - 1.0);
         // To tangent space.

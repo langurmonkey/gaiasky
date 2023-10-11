@@ -25,50 +25,22 @@ uniform sampler2D u_diffuseTexture;
 #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor
 #endif// diffuse
 
-#if defined(numDirectionalLights) && (numDirectionalLights > 0)
-#define directionalLightsFlag
-#endif// numDirectionalLights
-
-#ifdef directionalLightsFlag
-struct DirectionalLight {
-    vec3 color;
-    vec3 direction;
-};
-#endif// directionalLightsFlag
-
-#if defined(numPointLights) && (numPointLights > 0)
-#define pointLightsFlag
-#endif// numPointLights
-
-#ifdef pointLightsFlag
-struct PointLight {
-    vec3 color;
-    vec3 position;
-    float intensity;
-};
-#endif // numPointLights
-
 // INPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-    #ifdef directionalLightsFlag
-    DirectionalLight directionalLights[numDirectionalLights];
-    #endif// directionalLightsFlag
-    #ifdef pointLightsFlag
-    PointLight pointLights[numPointLights];
-    #endif// pointLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
     vec4 color;
-#ifdef shadowMapFlag
+    #ifdef shadowMapFlag
     vec3 shadowMapUv;
-#endif// shadowMapFlag
+    #endif // shadowMapFlag
     vec3 fragPosWorld;
-#ifdef metallicFlag
+    #ifdef metallicFlag
     vec3 reflect;
-#endif// metallicFlag
+    #endif // metallicFlag
+    mat3 tbn;
 };
 in VertexData v_data;
 

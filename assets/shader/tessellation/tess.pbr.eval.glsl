@@ -202,7 +202,9 @@ void main(void){
 
     // Plumbing
     o_fragPosition = pos.xyz;
+    #if !defined(normalTextureFlag) && !defined(normalCubemapFlag) && !defined(svtIndirectionNormalTextureFlag)
     o_normalTan = calcNormal(o_data.texCoords, vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y));
+    #endif // !normalTextureFlag && !normalCubemapFlag && !normalSVT
     o_data.opacity = (u * l_data[0].opacity + v * l_data[1].opacity + w * l_data[2].opacity);
     o_data.color = (u * l_data[0].color + v * l_data[1].color + w * l_data[2].color);
     o_data.viewDir = (u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir);
