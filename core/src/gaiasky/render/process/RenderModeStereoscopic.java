@@ -48,7 +48,9 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
     private static final double EYE_ANGLE_DEG = 1.5;
 
-    /** Viewport to use in stereoscopic mode **/
+    /**
+     * Viewport to use in stereoscopic mode
+     **/
     private final Viewport stretchViewport;
     private final SpriteBatch sb;
     private final AnaglyphEffect anaglyphEffect;
@@ -61,7 +63,9 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     private final Vector3d aux3d;
     private final Vector3d aux4d;
     private final Vector3d aux5d;
-    /** Frame buffers for 3D mode (screen, screenshot, frame output) **/
+    /**
+     * Frame buffers for 3D mode (screen, screenshot, frame output)
+     **/
     Map<Integer, FrameBuffer> fb3D;
 
     public RenderModeStereoscopic(final SpriteBatch spriteBatch) {
@@ -163,10 +167,12 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
             boolean postProcess = postProcessCapture(ppb, fb1, tw, th, ppb::capture);
-            sgr.renderScene(camera, t, rc);
-
-            sendOrientationUpdate(cam, rw, rh);
-            postProcessRender(ppb, fb1, postProcess, camera, rw, rh);
+            try {
+                sgr.renderScene(camera, t, rc);
+            } finally {
+                sendOrientationUpdate(cam, rw, rh);
+                postProcessRender(ppb, fb1, postProcess, camera, rw, rh);
+            }
             Texture texLeft = fb1.getColorBufferTexture();
 
             // RIGHT EYE
@@ -182,10 +188,12 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
             postProcess = postProcessCapture(ppb, fb2, tw, th, ppb::capture);
-            sgr.renderScene(camera, t, rc);
-
-            sendOrientationUpdate(cam, rw, rh);
-            postProcessRender(ppb, fb2, postProcess, camera, rw, rh);
+            try {
+                sgr.renderScene(camera, t, rc);
+            } finally {
+                sendOrientationUpdate(cam, rw, rh);
+                postProcessRender(ppb, fb2, postProcess, camera, rw, rh);
+            }
             Texture texRight = fb2.getColorBufferTexture();
 
             // We have left and right images to texLeft and texRight
@@ -408,9 +416,9 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case SCREENSHOT_SIZE_UPDATE, FRAME_SIZE_UPDATE -> GaiaSky.postRunnable(this::clearFrameBufferMap);
-        default -> {
-        }
+            case SCREENSHOT_SIZE_UPDATE, FRAME_SIZE_UPDATE -> GaiaSky.postRunnable(this::clearFrameBufferMap);
+            default -> {
+            }
         }
 
     }

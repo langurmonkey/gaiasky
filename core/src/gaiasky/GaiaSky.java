@@ -1168,7 +1168,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 updateRenderProcess.run();
             } else if (crashGui != null) {
                 // Crash information.
+                assetManager.update();
                 renderGui(crashGui);
+                frames++;
             }
         } catch (Throwable t) {
             // Report the crash.

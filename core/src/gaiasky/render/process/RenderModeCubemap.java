@@ -273,18 +273,24 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         sgr.getLightGlowPass().renderGlowPass(camera, null);
 
         boolean postProcess = postProcessCapture(ppb, fb, wh, wh, ppb::captureCubemap);
-        sgr.renderScene(camera, t, rc);
-        sendOrientationUpdate(camera.getCamera(), rw, rh);
-        postProcessRender(ppb, fb, postProcess, camera, rw, rh);
+        try {
+            sgr.renderScene(camera, t, rc);
+        } finally {
+            sendOrientationUpdate(camera.getCamera(), rw, rh);
+            postProcessRender(ppb, fb, postProcess, camera, rw, rh);
+        }
     }
 
     protected void renderRegularFace90(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         sgr.getLightGlowPass().renderGlowPass(camera, null);
 
         boolean postProcess = postProcessCapture(ppb, fb, wh, wh, ppb::captureCubemap);
-        sgr.renderScene(camera, t, rc);
-        sendOrientationUpdate(camera.getCamera(), rw, rh);
-        postProcessRender(ppb, fb, postProcess, camera, rw, rh);
+        try {
+            sgr.renderScene(camera, t, rc);
+        } finally {
+            sendOrientationUpdate(camera.getCamera(), rw, rh);
+            postProcessRender(ppb, fb, postProcess, camera, rw, rh);
+        }
     }
 
     protected int getKey(int w, int h, int extra) {

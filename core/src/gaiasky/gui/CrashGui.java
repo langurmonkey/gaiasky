@@ -27,7 +27,7 @@ import java.io.StringWriter;
 
 public class CrashGui extends AbstractGui {
     protected Throwable crash;
-    protected CrashWindow crashWindow;
+    private CrashWindow crashWindow;
 
     public CrashGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Throwable crash) {
         this(skin, graphics, unitsPerPixel, crash, false);
@@ -111,7 +111,7 @@ public class CrashGui extends AbstractGui {
 
             // Stack trace
             float taw = 720f;
-            float tah = 240f;
+            float tah = 340f;
             content.add(new OwnLabel(I18n.msg("gui.crash.stack"), skin, "big")).left().padBottom(pad10).row();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

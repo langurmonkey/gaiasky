@@ -30,25 +30,27 @@ public class RenderModeMain extends RenderModeAbstract implements IRenderMode {
         extendViewport.apply();
 
         // Render
-        sgr.renderScene(camera, t, rc);
+        try {
+            sgr.renderScene(camera, t, rc);
+        } finally {
+            // Uncomment this to show the shadow map
+            //if (GlobalConf.scene.SHADOW_MAPPING) {
+            //    float screenSize = 300 * GlobalConf.SCALE_FACTOR;
+            //    int s = GlobalConf.scene.SHADOW_MAPPING_RESOLUTION;
+            //    float scl = screenSize / (float) s;
+            //    // Render shadow map
+            //    sb.begin();
+            //    for (int i = 0; i < sgr.shadowMapFb.length; i++) {
+            //        sb.draw(sgr.shadowMapFb[i].getColorBufferTexture(), 0, 0, 0, 0, s, s, scl, scl, 0f, 0, 0, s, s, false, false);
+            //    }
+            //    sb.end();
+            //}
 
-        // Uncomment this to show the shadow map
-        //if (GlobalConf.scene.SHADOW_MAPPING) {
-        //    float screenSize = 300 * GlobalConf.SCALE_FACTOR;
-        //    int s = GlobalConf.scene.SHADOW_MAPPING_RESOLUTION;
-        //    float scl = screenSize / (float) s;
-        //    // Render shadow map
-        //    sb.begin();
-        //    for (int i = 0; i < sgr.shadowMapFb.length; i++) {
-        //        sb.draw(sgr.shadowMapFb[i].getColorBufferTexture(), 0, 0, 0, 0, s, s, scl, scl, 0f, 0, 0, s, s, false, false);
-        //    }
-        //    sb.end();
-        //}
-
-        // GLFW reports a window size of 0x0 with AMD Graphics on Windows when minimizing
-        if (rw > 0 && rh > 0) {
-            sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postProcessRender(ppb, fb, postProcess, camera, tw, th);
+            // GLFW reports a window size of 0x0 with AMD Graphics on Windows when minimizing
+            if (rw > 0 && rh > 0) {
+                sendOrientationUpdate(camera.getCamera(), rw, rh);
+                postProcessRender(ppb, fb, postProcess, camera, tw, th);
+            }
         }
 
     }

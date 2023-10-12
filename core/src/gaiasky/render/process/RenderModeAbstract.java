@@ -15,6 +15,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 
@@ -62,6 +63,12 @@ public class RenderModeAbstract {
 
         resultBuffer = fb != null ? fb : ppb.pp.getCombinedBuffer().getResultBuffer();
     }
+
+    protected void postProcessCancel(PostProcessBean ppb, FrameBuffer fb, boolean postproc) {
+
+    }
+
+
 
     public RenderingContext getRenderingContext() {
         return rc;

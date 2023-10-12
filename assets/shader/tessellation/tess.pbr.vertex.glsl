@@ -249,7 +249,7 @@ void main() {
     g_normal = normalize(u_normalMatrix * g_normal);
     g_binormal = normalize(u_normalMatrix * g_binormal);
     g_tangent = normalize(u_normalMatrix * g_tangent);
-
+asd fasdf445
     mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
     v_data.tbn = TBN;
 
