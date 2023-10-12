@@ -91,7 +91,6 @@ public class WelcomeGui extends AbstractGui {
                       final XrLoadStatus vrStatus) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
-        this.lock = new Object();
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
         this.gamepadListener = new WelcomeGuiGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
@@ -154,6 +153,9 @@ public class WelcomeGui extends AbstractGui {
                 Timer.schedule(notification, 2);
             }
 
+            buildWaitingUI();
+
+            // Fetch descriptor file.
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
             DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor,
                     dataDescriptor,
@@ -188,8 +190,7 @@ public class WelcomeGui extends AbstractGui {
 
             /* CAPTURE SCROLL FOCUS */
             stage.addListener(event -> {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
+                if (event instanceof InputEvent ie) {
 
                     if (ie.getType() == Type.keyUp) {
                         if (ie.getKeyCode() == Input.Keys.ESCAPE) {
@@ -208,7 +209,23 @@ public class WelcomeGui extends AbstractGui {
         }
     }
 
+    private void buildWaitingUI() {
+        // Render message.
+        if (!Settings.settings.program.offlineMode) {
+            var table = new Table(skin);
+            table.setFillParent(true);
+            table.bottom().right().padBottom(40f).padRight(40f);
+            var gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+            gaiaSky.setFontScale(0.9f);
+            table.add(gaiaSky).bottom().right().padBottom(30f).row();
+            var msg = new OwnLabel(I18n.msg("gui.welcome.datasets.updates"), skin, "header-blue");
+            table.add(msg).bottom().right();
+            stage.addActor(table);
+        }
+    }
+
     private void buildWelcomeUI() {
+        stage.clear();
         addOwnListeners();
         buttonList = new Array<>();
         serverDatasets = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;

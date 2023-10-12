@@ -56,7 +56,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     protected float unitsPerPixel = 1;
 
     /** Lock for sync. **/
-    protected Object lock;
+    protected final Object lock;
 
     protected int backBufferWidth = -1, backBufferHeight = -1;
 
