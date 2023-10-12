@@ -110,8 +110,8 @@ public class CrashGui extends AbstractGui {
             content.add(new Link(Settings.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), Settings.REPO_ISSUES)).left().padBottom(pad18 * 3f).row();
 
             // Stack trace
-            float taw = 720f;
-            float tah = 340f;
+            float taw = 1000f;
+            float tah = 400f;
             content.add(new OwnLabel(I18n.msg("gui.crash.stack"), skin, "big")).left().padBottom(pad10).row();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -126,7 +126,7 @@ public class CrashGui extends AbstractGui {
             TextArea stackTrace = new OwnTextArea(sts, skin.get("regular", TextField.TextFieldStyle.class));
             stackTrace.setDisabled(true);
             stackTrace.setPrefRows(lines);
-            stackTrace.setWidth(1120f);
+            stackTrace.setWidth(taw + 20f);
             OwnScrollPane stScroll = new OwnScrollPane(stackTrace, skin, "default-nobg");
             stScroll.setWidth(taw);
             stScroll.setHeight(tah);
