@@ -13,15 +13,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.ComponentTypes;
+import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.RenderAssets;
-import gaiasky.render.RenderGroup;
-import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.IRenderable;
@@ -546,7 +544,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     }
                 }
             }
+        } catch (GdxRuntimeException | GaiaSkyShaderCompileException gre) {
+            // Escalate.
+            throw gre;
         } catch (Exception e) {
+            // Maybe we can live with this, only log.
             logger.error(e);
         }
 

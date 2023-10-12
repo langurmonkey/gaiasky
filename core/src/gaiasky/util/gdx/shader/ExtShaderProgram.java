@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
+import gaiasky.render.GaiaSkyShaderCompileException;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
@@ -43,7 +44,7 @@ public class ExtShaderProgram implements Disposable {
      * Default name for texture coordinates attributes, append texture unit number.
      **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
-    final static IntBuffer intbuf = BufferUtils.newIntBuffer(1);
+
     private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
     /**
      * The list of currently available shaders.
@@ -221,7 +222,7 @@ public class ExtShaderProgram implements Disposable {
     }
 
     /**
-     * Constructs a new ShaderProgram and immediately compiles it.
+     * Constructs a new shader program and immediately compiles it, if it is not lazy.
      *
      * @param name               The shader name, if any.
      * @param vertexFile         The vertex shader file.
@@ -245,18 +246,22 @@ public class ExtShaderProgram implements Disposable {
         if (fragmentShaderCode == null)
             throw new IllegalArgumentException("fragment shader must not be null");
 
-        if (prependVertexCode != null && prependVertexCode.length() > 0)
+        if (prependVertexCode != null && !prependVertexCode.isEmpty())
             vertexShaderCode = prependVertexCode + vertexShaderCode;
-        if (geometryShaderCode != null && prependGeometryCode != null && prependGeometryCode.length() > 0)
+        if (geometryShaderCode != null && prependGeometryCode != null && !prependGeometryCode.isEmpty())
             geometryShaderCode = prependGeometryCode + geometryShaderCode;
-        if (prependFragmentCode != null && prependFragmentCode.length() > 0)
+        if (prependFragmentCode != null && !prependFragmentCode.isEmpty())
             fragmentShaderCode = prependFragmentCode + fragmentShaderCode;
 
         this.isLazy = lazyLoading;
         this.name = name;
+
+        // Sources.
         this.vertexShaderSource = vertexShaderCode;
         this.geometryShaderSource = geometryShaderCode;
         this.fragmentShaderSource = fragmentShaderCode;
+
+        // Files.
         this.vertexShaderFile = vertexFile;
         this.geometryShaderFile = geometryFile;
         this.fragmentShaderFile = fragmentFile;
@@ -332,6 +337,10 @@ public class ExtShaderProgram implements Disposable {
         attributeSizes = new ObjectIntMap<>();
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void compile() {
         if (!isCompiled) {
             initializeLocalAssets();
@@ -358,17 +367,7 @@ public class ExtShaderProgram implements Disposable {
                 fetchUniforms();
                 addManagedShader(Gdx.app, this);
             } else {
-                logger.error(I18n.msg("notif.shader.compile.fail"));
-                if (vertexShaderFile != null) {
-                    logger.error(I18n.msg("notif.shader.vertex", vertexShaderFile));
-                }
-                if (geometryShaderFile != null) {
-                    logger.error(I18n.msg("notif.shader.geometry", geometryShaderFile));
-                }
-                if (fragmentShaderFile != null) {
-                    logger.error(I18n.msg("notif.shader.fragment", fragmentShaderFile));
-                }
-                logger.error(getLog());
+                throw new GaiaSkyShaderCompileException(this);
             }
 
         }
@@ -1300,12 +1299,28 @@ public class ExtShaderProgram implements Disposable {
     public String getVertexShaderSource() {
         return vertexShaderSource;
     }
+    public String getVertexShaderFileName() {
+        return vertexShaderFile;
+    }
+
+    /**
+     * @return the source of the vertex shader
+     */
+    public String getGeometryShaderSource() {
+        return geometryShaderSource;
+    }
+    public String getGeometryShaderFileName() {
+        return geometryShaderFile;
+    }
 
     /**
      * @return the source of the fragment shader
      */
     public String getFragmentShaderSource() {
         return fragmentShaderSource;
+    }
+    public String getFragmentShaderFileName() {
+        return fragmentShaderFile;
     }
 
     /**

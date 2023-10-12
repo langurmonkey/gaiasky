@@ -18,7 +18,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntIntMap;
+import gaiasky.render.GaiaSkyShaderCompileException;
 import gaiasky.util.Bits;
+import gaiasky.util.Logger;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
@@ -95,10 +97,12 @@ public abstract class BaseIntShader implements IntShader {
 
     /** Initialize this shader, causing all registered uniforms/attributes to be fetched. */
     public void init(final ExtShaderProgram program, final IntRenderable renderable) {
-        if (locations != null)
+        if (locations != null) {
             throw new GdxRuntimeException("Already initialized");
-        if (!program.isCompiled())
-            throw new GdxRuntimeException(program.getLog());
+        }
+        if (!program.isCompiled()) {
+            throw new GdxRuntimeException("Shader is not compiled: " + program.getName());
+        }
         this.program = program;
 
         final int n = uniforms.size;

@@ -48,6 +48,7 @@ public class SysUtils {
     private static final String DATA_DIR_NAME = "data";
     private static final String TMP_DIR_NAME = "tmp";
     private static final String CRASHREPORTS_DIR_NAME = "crashreports";
+    private static final String SHADER_OUT_DIR_NAME = "shaders";
     private static final String LOG_DIR_NAME = "log";
 
     static {
@@ -299,6 +300,14 @@ public class SysUtils {
      */
     public static Path getCrashReportsDir() {
         return getDataDir().resolve(CRASHREPORTS_DIR_NAME);
+    }
+
+    /**
+     * Gets a pointer to the shader output directory for the crash reports.
+     * @return A pointer to the shader output directory.
+     */
+    public static Path getCrashShadersDir() {
+       return getCrashReportsDir().resolve(SHADER_OUT_DIR_NAME);
     }
 
     /**

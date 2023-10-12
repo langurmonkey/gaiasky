@@ -17,33 +17,32 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.RenderAssets;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.TessellationShaderProgram;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
-public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProgram, ShaderProgramProvider.ShaderProgramParameter> {
+public class TessellationShaderProgramProvider extends AsynchronousAssetLoader<TessellationShaderProgram, TessellationShaderProgramProvider.ShaderProgramParameter> {
 
     private String vertexFileSuffix = ".vertex.glsl";
-    private String geometryFileSuffix = ".geometry.glsl";
+    private String controlFileSuffix = ".control.glsl";
+    private String evaluationFileSuffix = ".eval.glsl";
     private String fragmentFileSuffix = ".fragment.glsl";
 
-    public ShaderProgramProvider(FileHandleResolver resolver) {
+    public TessellationShaderProgramProvider(FileHandleResolver resolver) {
         super(resolver);
     }
 
-    public ShaderProgramProvider(FileHandleResolver resolver,
-                                 String vertexFileSuffix,
-                                 String geometryFileSuffix,
-                                 String fragmentFileSuffix) {
+    public TessellationShaderProgramProvider(FileHandleResolver resolver,
+                                             String vertexFileSuffix,
+                                             String controlFileSuffix,
+                                             String evaluationFileSuffix,
+                                             String fragmentFileSuffix) {
         super(resolver);
         this.vertexFileSuffix = vertexFileSuffix;
-        this.geometryFileSuffix = geometryFileSuffix;
+        this.controlFileSuffix = controlFileSuffix;
+        this.evaluationFileSuffix = evaluationFileSuffix;
         this.fragmentFileSuffix = fragmentFileSuffix;
     }
 
-    public ShaderProgramProvider(FileHandleResolver resolver,
-                                 String vertexFileSuffix,
-                                 String fragmentFileSuffix) {
-        this(resolver, vertexFileSuffix, null, fragmentFileSuffix);
-    }
 
     static public String getShaderCode(String prefix,
                                        String code) {
@@ -78,20 +77,21 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
     }
 
     @Override
-    public ExtShaderProgram loadSync(AssetManager manager,
+    public TessellationShaderProgram loadSync(AssetManager manager,
                                      String fileName,
                                      FileHandle file,
                                      ShaderProgramParameter parameter) {
-        String vertFileName = null, geomFileName = null, fragFileName = null;
+        String vertFileName = null, controlFileName = null, evaluationFileName = null, fragFileName = null;
         if (parameter != null) {
             if (parameter.vertexFile != null)
                 vertFileName = parameter.vertexFile;
-            if (parameter.geometryFile != null)
-                geomFileName = parameter.geometryFile;
+            if (parameter.controlFile != null)
+                controlFileName = parameter.controlFile;
+            if (parameter.evaluationFile != null)
+                evaluationFileName = parameter.evaluationFile;
             if (parameter.fragmentFile != null)
                 fragFileName = parameter.fragmentFile;
         }
-        // Try to work out shader file names.
         if (vertFileName == null && fileName.endsWith(fragmentFileSuffix)) {
             vertFileName = fileName.substring(0, fileName.length() - fragmentFileSuffix.length()) + vertexFileSuffix;
         }
@@ -99,16 +99,20 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
             fragFileName = fileName.substring(0, fileName.length() - vertexFileSuffix.length()) + fragmentFileSuffix;
         }
         FileHandle vertexFile = vertFileName == null ? file : resolve(vertFileName);
-        FileHandle geometryFile = geomFileName == null ? null : resolve(geomFileName);
+        FileHandle controlFile = controlFileName == null ? null : resolve(controlFileName);
+        FileHandle evaluationFile = evaluationFileName == null ? null : resolve(evaluationFileName);
         FileHandle fragmentFile = fragFileName == null ? file : resolve(fragFileName);
         String vertexCode = ShaderTemplatingLoader.load(vertexFile);
-        String geometryCode = ShaderTemplatingLoader.load(geometryFile);
-        String fragmentCode = vertexFile.equals(fragmentFile) ? vertexCode : ShaderTemplatingLoader.load(fragmentFile);
+        String controlCode = ShaderTemplatingLoader.load(controlFile);
+        String evaluationCode = ShaderTemplatingLoader.load(evaluationFile);
+        String fragmentCode = ShaderTemplatingLoader.load(fragmentFile);
         if (parameter != null) {
             if (parameter.prependVertexCode != null)
                 vertexCode = getShaderCode(parameter.prependVertexCode, vertexCode);
-            if (parameter.prependGeometryCode != null && geometryCode != null)
-                geometryCode = getShaderCode(parameter.prependGeometryCode, geometryCode);
+            if (parameter.prependControlCode != null && controlCode != null)
+                controlCode = getShaderCode(parameter.prependControlCode, controlCode);
+            if (parameter.prependEvaluationCode != null && evaluationCode != null)
+                evaluationCode = getShaderCode(parameter.prependEvaluationCode, evaluationCode);
             if (parameter.prependFragmentCode != null)
                 fragmentCode = getShaderCode(parameter.prependFragmentCode, fragmentCode);
         }
@@ -121,21 +125,26 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
                 || (parameter.name.contains(RenderAssets.SUFFIX_SSR) && !Settings.settings.postprocess.ssr.active)
         );
 
-        ExtShaderProgram shaderProgram = null;
-        if (geometryCode != null) {
-            shaderProgram = new ExtShaderProgram(parameter != null ? parameter.name : null, vertFileName, geomFileName, fragFileName, vertexCode, geometryCode, fragmentCode, lazyLoad);
-        } else {
-            shaderProgram = new ExtShaderProgram(parameter != null ? parameter.name : null, vertFileName, fragFileName, vertexCode, fragmentCode, lazyLoad);
-        }
+        TessellationShaderProgram shaderProgram = new TessellationShaderProgram(
+                parameter != null ? parameter.name : null,
+                vertFileName,
+                controlFileName,
+                evaluationFileName,
+                fragFileName,
+                vertexCode,
+                controlCode,
+                evaluationCode,
+                fragmentCode,
+                lazyLoad);
 
         if ((parameter == null || parameter.logOnCompileFailure) && !shaderProgram.isCompiled()) {
-            manager.getLogger().error("ExtShaderProgram " + fileName + " failed to compile:\n" + shaderProgram.getLog());
+            manager.getLogger().error("TessellationShaderProgram " + fileName + " failed to compile:\n" + shaderProgram.getLog());
         }
 
         return shaderProgram;
     }
 
-    static public class ShaderProgramParameter extends AssetLoaderParameters<ExtShaderProgram> {
+    static public class ShaderProgramParameter extends AssetLoaderParameters<TessellationShaderProgram> {
         /** Name of the shader. Optional. **/
         public String name;
         /**
@@ -144,9 +153,13 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
          */
         public String vertexFile;
         /**
-         * File name to be used for the geometry shader. If null, no geometry stage is created.
+         * File name to be used for the tessellation control shader.
          */
-        public String geometryFile;
+        public String controlFile;
+        /**
+         * File name to be used for the tessellation evaluation shader.
+         */
+        public String evaluationFile;
         /**
          * File name to be used for the fragment program instead of the default determined by the file name used to submit this
          * asset to AssetManager.
@@ -160,10 +173,15 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
          */
         public String prependVertexCode;
         /**
-         * Code that is always added to the geometry shader code. This is added as-is, and you should include a newline (`\n`) if
-         * needed. {@linkplain ExtShaderProgram#prependGeometryCode} is placed before this code.
+         * Code that is always added to the tessellation control shader code. This is added as-is, and you should include a newline (`\n`) if
+         * needed. {@linkplain gaiasky.util.gdx.shader.TessellationShaderProgram#prependControlCode} is placed before this code.
          */
-        public String prependGeometryCode;
+        public String prependControlCode;
+        /**
+         * Code that is always added to the tessellation evaluation shader code. This is added as-is, and you should include a newline (`\n`) if
+         * needed. {@linkplain gaiasky.util.gdx.shader.TessellationShaderProgram#prependEvaluationCode} is placed before this code.
+         */
+        public String prependEvaluationCode;
         /**
          * Code that is always added to the fragment shader code. This is added as-is, and you should include a newline (`\n`) if
          * needed. {@linkplain ExtShaderProgram#prependFragmentCode} is placed before this code.

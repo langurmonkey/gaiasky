@@ -129,7 +129,11 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtIndirectionEmissiveTexture;
     protected final int u_svtIndirectionMetallicTexture;
     protected final int u_svtIndirectionRoughnessTexture;
-    // Lighting uniforms
+    // Generic.
+    protected final int u_generic1;
+    protected final int u_generic2;
+
+    // Lighting uniforms.
     protected final int u_ambientCubemap;
     protected final int u_dirLights0color;
     protected final int u_dirLights0direction;
@@ -154,9 +158,6 @@ public class DefaultIntShader extends BaseIntShader {
     protected final DirectionalLight[] directionalLights;
     protected final PointLight[] pointLights;
     protected final SpotLight[] spotLights;
-    /**
-     * The attributes that this shader supports
-     */
     protected final Bits attributesMask;
     protected final Config config;
     private final long vertexMask;
@@ -330,6 +331,9 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtIndirectionMetallicTexture = register(Inputs.svtIndirectionMetallicTexture, Setters.svtIndirectionMetallicTexture);
         u_svtIndirectionEmissiveTexture = register(Inputs.svtIndirectionEmissiveTexture, Setters.svtIndirectionEmissiveTexture);
         u_svtIndirectionRoughnessTexture = register(Inputs.svtIndirectionRoughnessTexture, Setters.svtIndirectionRoughnessTexture);
+
+        u_generic1 = register(Inputs.generic1, Setters.generic1);
+        u_generic2 = register(Inputs.generic2, Setters.generic2);
     }
 
     public static String getDefaultVertexShader() {
@@ -964,6 +968,10 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform svtIndirectionEmissiveTexture = new Uniform("u_svtIndirectionEmissiveTexture");
         public final static Uniform svtIndirectionMetallicTexture = new Uniform("u_svtIndirectionMetallicTexture");
         public final static Uniform svtIndirectionRoughnessTexture = new Uniform("u_svtIndirectionRoughnessTexture");
+
+        public final static Uniform generic1 = new Uniform("u_generic1", FloatAttribute.Generic1);
+        public final static Uniform generic2 = new Uniform("u_generic2", FloatAttribute.Generic2);
+
     }
 
     public static class Setters {
@@ -1698,6 +1706,24 @@ public class DefaultIntShader extends BaseIntShader {
                     shader.set(inputID, shader.context.textureBinder.bind(
                             ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionRoughness)))).textureDescription));
                 }
+            }
+        };
+        public final static Setter generic1 = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Generic1)))).value);
+            }
+        };
+        public final static Setter generic2 = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Generic2)))).value);
             }
         };
 

@@ -211,6 +211,17 @@ public class IntModelBatch implements Disposable {
     }
 
     /**
+     * Cancels the current render operation without rendering anything. To use in case of a crash.
+     */
+    public void cancel() {
+        renderablesPool.flush();
+        renderables.clear();
+        if (ownContext)
+            context.end();
+        camera = null;
+    }
+
+    /**
      * Add a single {@link IntRenderable} to the batch. The {@link IntShaderProvider} will be used to fetch a suitable {@link IntShader}.
      * Can only be called after a call to {@link #begin(Camera)} and before a call to {@link #end()}.
      *

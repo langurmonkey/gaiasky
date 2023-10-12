@@ -67,6 +67,7 @@ import gaiasky.util.gdx.loader.is.GzipInputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.TessellationShaderProgram;
 import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gdx.shader.loader.AtmosphereShaderProviderLoader;
 import gaiasky.util.gdx.shader.loader.GroundShaderProviderLoader;

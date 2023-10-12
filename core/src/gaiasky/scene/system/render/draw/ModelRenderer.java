@@ -41,10 +41,15 @@ public class ModelRenderer extends AbstractRenderSystem {
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (mustRender()) {
             batch.begin(camera.getCamera());
-            renderables.forEach(r -> {
-                Render render = (Render) r;
-                renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagQuatOrientation.has(render.entity));
-            });
+            try {
+                renderables.forEach(r -> {
+                    Render render = (Render) r;
+                    renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagQuatOrientation.has(render.entity));
+                });
+            } catch(Exception e) {
+                batch.cancel();
+                throw e;
+            }
             batch.end();
         }
     }

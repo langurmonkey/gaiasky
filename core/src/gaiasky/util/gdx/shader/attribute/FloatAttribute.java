@@ -59,6 +59,12 @@ public class FloatAttribute extends Attribute {
     public static final String EclipsingBodyRadiusAlias = "eclipsingBodyRadius";
     public static final int EclipsingBodyRadius = register(EclipsingBodyRadiusAlias);
 
+    public static final String Generic1Alias = "generic1";
+    public static final int Generic1 = register(Generic1Alias);
+
+    public static final String Generic2Alias = "generic2";
+    public static final int Generic2 = register(Generic2Alias);
+
     public float value;
 
     public FloatAttribute(int index) {

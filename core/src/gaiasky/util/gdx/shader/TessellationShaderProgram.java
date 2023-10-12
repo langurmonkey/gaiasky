@@ -13,6 +13,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
+import gaiasky.render.GaiaSkyShaderCompileException;
+import gaiasky.util.Logger;
+import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL41;
 
@@ -21,6 +24,8 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 public class TessellationShaderProgram extends ExtShaderProgram {
+    private static final Logger.Log logger = Logger.getLogger(ExtShaderProgram.class);
+
     /**
      * the list of currently available shaders
      **/
@@ -29,49 +34,94 @@ public class TessellationShaderProgram extends ExtShaderProgram {
      * Code that is always added to the tessellation shaders, typically used to inject a #version line. Note that this is added
      * as-is, you should include a newline (`\n`) if needed.
      */
-    public static String prependTessControlCode = "";
-    public static String prependTessEvaluationCode = "";
+    public static String prependControlCode = "";
+    public static String prependEvaluationCode = "";
     /**
      * Tessellation control source.
      **/
-    private final String tessellationControlShaderSource;
+    private final String controlShaderSource;
     /**
      * Tessellation evaluation source.
      **/
-    private final String tessellationEvaluationShaderSource;
+    private final String evaluationShaderSource;
 
-    private int tessellationControlShaderHandle, tessellationEvaluationShaderHandle;
+    protected String controlShaderFile, evaluationShaderFile;
 
-    public TessellationShaderProgram(String vertexShader, String tessellationControlShader, String tessellationEvaluationShader, String fragmentShader) {
-        if (vertexShader == null)
-            throw new IllegalArgumentException("vertex shader must not be null");
-        if (tessellationControlShader == null)
-            throw new IllegalArgumentException("tess control shader must not be null");
-        if (tessellationEvaluationShader == null)
+    private int controlShaderHandle, evaluationShaderHandle;
+
+    public TessellationShaderProgram(String vertexShaderCode, String controlShaderCode, String evaluationShaderCode, String fragmentShaderCode) {
+        this(null, null, null, null, null, vertexShaderCode, controlShaderCode, evaluationShaderCode, fragmentShaderCode, false);
+    }
+
+    /**
+     * Constructs a new shader program and immediately compiles it, if it is not lazy.
+     *
+     * @param name                 The shader name, if any.
+     * @param vertexFile           The vertex shader file.
+     * @param tessControlFile      The tessellation control shader file.
+     * @param tessEvaluationFile   The tessellation evaluation shader file.
+     * @param fragmentFile         The fragment shader file.
+     * @param vertexShaderCode     The vertex shader code.
+     * @param controlShaderCode    The tessellation control shader code.
+     * @param evaluationShaderCode The tessellation evaluation shader code.
+     * @param fragmentShaderCode   The fragment shader code.
+     * @param lazyLoading          Whether to use lazy loading, only preparing the data without actually compiling the shaders.
+     */
+    public TessellationShaderProgram(String name, String vertexFile, String tessControlFile, String tessEvaluationFile, String fragmentFile, String vertexShaderCode, String controlShaderCode, String evaluationShaderCode, String fragmentShaderCode, boolean lazyLoading) {
+        if (vertexShaderCode == null) throw new IllegalArgumentException("vertex shader must not be null");
+        if (controlShaderCode == null) throw new IllegalArgumentException("tess control shader must not be null");
+        if (evaluationShaderCode == null)
             throw new IllegalArgumentException("tess evaluation shader must not be null");
-        if (fragmentShader == null)
-            throw new IllegalArgumentException("fragment shader must not be null");
+        if (fragmentShaderCode == null) throw new IllegalArgumentException("fragment shader must not be null");
 
-        if (prependVertexCode != null && prependVertexCode.length() > 0)
-            vertexShader = prependVertexCode + vertexShader;
-        if (prependTessControlCode != null && prependTessControlCode.length() > 0)
-            tessellationControlShader = prependTessControlCode + tessellationControlShader;
-        if (prependTessEvaluationCode != null && prependTessEvaluationCode.length() > 0)
-            tessellationEvaluationShader = prependTessEvaluationCode + tessellationEvaluationShader;
-        if (prependFragmentCode != null && prependFragmentCode.length() > 0)
-            fragmentShader = prependFragmentCode + fragmentShader;
+        if (prependVertexCode != null && !prependVertexCode.isEmpty())
+            vertexShaderCode = prependVertexCode + vertexShaderCode;
+        if (prependControlCode != null && !prependControlCode.isEmpty())
+            controlShaderCode = prependControlCode + controlShaderCode;
+        if (prependEvaluationCode != null && !prependEvaluationCode.isEmpty())
+            evaluationShaderCode = prependEvaluationCode + evaluationShaderCode;
+        if (prependFragmentCode != null && !prependFragmentCode.isEmpty())
+            fragmentShaderCode = prependFragmentCode + fragmentShaderCode;
 
-        this.vertexShaderSource = vertexShader;
-        this.tessellationControlShaderSource = tessellationControlShader;
-        this.tessellationEvaluationShaderSource = tessellationEvaluationShader;
-        this.fragmentShaderSource = fragmentShader;
-        initializeLocalAssets();
 
-        compileShaders(vertexShader, tessellationControlShader, tessellationEvaluationShader, fragmentShader);
-        if (isCompiled()) {
-            fetchAttributes();
-            fetchUniforms();
-            addManagedShader(Gdx.app, this);
+        // Sources.
+        this.vertexShaderSource = vertexShaderCode;
+        this.controlShaderSource = controlShaderCode;
+        this.evaluationShaderSource = evaluationShaderCode;
+        this.fragmentShaderSource = fragmentShaderCode;
+
+        // Files.
+        this.vertexShaderFile = vertexFile;
+        this.fragmentShaderFile = fragmentFile;
+        this.controlShaderFile = fragmentFile;
+        this.evaluationShaderFile = fragmentFile;
+
+        if (!lazyLoading) {
+            compile();
+        }
+    }
+
+    public void compile() {
+        if (!isCompiled) {
+            initializeLocalAssets();
+
+            if (name != null) {
+                logger.info(I18n.msg("notif.shader.compile", name));
+            }
+
+            if (vertexShaderFile != null || controlShaderFile != null || evaluationShaderFile != null || fragmentShaderFile != null) {
+                logger.debug(I18n.msg("notif.shader.load.tess", vertexShaderFile, controlShaderFile, evaluationShaderFile, fragmentShaderFile));
+            }
+
+            compileShaders(vertexShaderSource, controlShaderSource, evaluationShaderSource, fragmentShaderSource);
+            if (isCompiled()) {
+                fetchAttributes();
+                fetchUniforms();
+                addManagedShader(Gdx.app, this);
+            } else {
+                throw new GaiaSkyShaderCompileException(this);
+            }
+
         }
     }
 
@@ -79,12 +129,10 @@ public class TessellationShaderProgram extends ExtShaderProgram {
      * Invalidates all shaders so the next time they are used new handles are generated
      */
     public static void invalidateAllShaderPrograms(Application app) {
-        if (Gdx.gl == null)
-            return;
+        if (Gdx.gl == null) return;
 
         Array<TessellationShaderProgram> shaderArray = shaders.get(app);
-        if (shaderArray == null)
-            return;
+        if (shaderArray == null) return;
 
         for (int i = 0; i < shaderArray.size; i++) {
             shaderArray.get(i).invalidated = true;
@@ -120,11 +168,11 @@ public class TessellationShaderProgram extends ExtShaderProgram {
      */
     private void compileShaders(String vShader, String tcShader, String teShader, String fShader) {
         vertexShaderHandle = loadShader(GL30.GL_VERTEX_SHADER, vShader);
-        tessellationControlShaderHandle = loadShader(GL41.GL_TESS_CONTROL_SHADER, tcShader);
-        tessellationEvaluationShaderHandle = loadShader(GL41.GL_TESS_EVALUATION_SHADER, teShader);
+        controlShaderHandle = loadShader(GL41.GL_TESS_CONTROL_SHADER, tcShader);
+        evaluationShaderHandle = loadShader(GL41.GL_TESS_EVALUATION_SHADER, teShader);
         fragmentShaderHandle = loadShader(GL30.GL_FRAGMENT_SHADER, fShader);
 
-        if (vertexShaderHandle == -1 || tessellationControlShaderHandle == -1 || tessellationEvaluationShaderHandle == -1 || fragmentShaderHandle == -1) {
+        if (vertexShaderHandle == -1 || controlShaderHandle == -1 || evaluationShaderHandle == -1 || fragmentShaderHandle == -1) {
             isCompiled = false;
             return;
         }
@@ -142,8 +190,7 @@ public class TessellationShaderProgram extends ExtShaderProgram {
         IntBuffer intBuffer = BufferUtils.newIntBuffer(1);
 
         int shader = GL41.glCreateShader(type);
-        if (shader == 0)
-            return -1;
+        if (shader == 0) return -1;
 
         GL41.glShaderSource(shader, source);
         GL41.glCompileShader(shader);
@@ -167,12 +214,11 @@ public class TessellationShaderProgram extends ExtShaderProgram {
     }
 
     private int linkProgram(int program) {
-        if (program == -1)
-            return -1;
+        if (program == -1) return -1;
 
         GL41.glAttachShader(program, vertexShaderHandle);
-        GL41.glAttachShader(program, tessellationControlShaderHandle);
-        GL41.glAttachShader(program, tessellationEvaluationShaderHandle);
+        GL41.glAttachShader(program, controlShaderHandle);
+        GL41.glAttachShader(program, evaluationShaderHandle);
         GL41.glAttachShader(program, fragmentShaderHandle);
         GL41.glLinkProgram(program);
 
@@ -194,17 +240,32 @@ public class TessellationShaderProgram extends ExtShaderProgram {
 
     private void checkManaged() {
         if (invalidated) {
-            compileShaders(vertexShaderSource, tessellationControlShaderSource, tessellationEvaluationShaderSource, fragmentShaderSource);
+            compileShaders(vertexShaderSource, controlShaderSource, evaluationShaderSource, fragmentShaderSource);
             invalidated = false;
         }
     }
 
     private void addManagedShader(Application app, TessellationShaderProgram shaderProgram) {
         Array<TessellationShaderProgram> managedResources = shaders.get(app);
-        if (managedResources == null)
-            managedResources = new Array<>();
+        if (managedResources == null) managedResources = new Array<>();
         managedResources.add(shaderProgram);
         shaders.put(app, managedResources);
+    }
+
+    public String getControlShaderSource() {
+        return controlShaderSource;
+    }
+
+    public String getControlShaderFileName() {
+        return controlShaderFile;
+    }
+
+    public String getEvaluationShaderSource() {
+        return evaluationShaderSource;
+    }
+
+    public String getEvaluationShaderFileName() {
+        return evaluationShaderFile;
     }
 
     @Override
@@ -214,18 +275,17 @@ public class TessellationShaderProgram extends ExtShaderProgram {
             if (vertexShaderHandle != 0) {
                 GL41.glDeleteShader(vertexShaderHandle);
             }
-            if (tessellationControlShaderHandle != 0) {
-                GL41.glDeleteShader(tessellationControlShaderHandle);
+            if (controlShaderHandle != 0) {
+                GL41.glDeleteShader(controlShaderHandle);
             }
-            if (tessellationEvaluationShaderHandle != 0) {
-                GL41.glDeleteShader(tessellationEvaluationShaderHandle);
+            if (evaluationShaderHandle != 0) {
+                GL41.glDeleteShader(evaluationShaderHandle);
             }
             if (fragmentShaderHandle != 0) {
                 GL41.glDeleteShader(fragmentShaderHandle);
             }
             GL41.glDeleteProgram(program);
-            if (shaders.get(Gdx.app) != null)
-                shaders.get(Gdx.app).removeValue(this, true);
+            if (shaders.get(Gdx.app) != null) shaders.get(Gdx.app).removeValue(this, true);
 
             isDisposed = true;
         }
