@@ -1284,7 +1284,12 @@ public class Settings {
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
 
         public ProgramSettings() {
-            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD,
+                    Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
+                    Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
+                    Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
+                    Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
+                    Event.UI_SCALE_CMD, Event.RECURSIVE_GRID_ANIMATE_CMD);
         }
 
         @JsonIgnore
@@ -1397,6 +1402,11 @@ public class Settings {
                                 pointer.guides.width = (float) data[2];
                             }
                         }
+                    }
+                }
+                case RECURSIVE_GRID_ANIMATE_CMD -> {
+                    if (data.length > 0 && data[0] != null) {
+                        recursiveGrid.animate = (boolean) data[0];
                     }
                 }
                 case UI_SCALE_CMD -> ui.scale = (Float) data[0];

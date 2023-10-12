@@ -305,6 +305,8 @@ public enum Event {
      * with the resolution.
      **/
     CUBEMAP_RESOLUTION_CMD,
+    /** Enable/disable animation in recursive grid. Contains a boolean with the state. **/
+    RECURSIVE_GRID_ANIMATE_CMD,
     DEBUG_OBJECTS,
     DEBUG_QUEUE,
     DEBUG_RAM,

@@ -92,7 +92,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     // Backup values
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak, lensFlareBak;
-    private boolean lightGlowBak, debugInfoBak;
+    private boolean lightGlowBak, debugInfoBak, recGridAnimateBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
 
@@ -978,23 +978,39 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         recGridProjectionLines.setName("origin projection lines cb");
         recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
 
-        labels.add(originLabel, styleLabel, recGridProjectionLinesLabel);
+        // ANIMATION
+        OwnLabel animationLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.animate"), skin);
+        var animation = new OwnCheckBox("", skin);
+        animation.setChecked(settings.program.recursiveGrid.animate);
+        animation.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                // Enable or disable animation.
+                EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, animation, animation.isChecked());
+                return true;
+            }
+            return false;
+        });
 
-        // Add to table
+
+        labels.add(originLabel, styleLabel, recGridProjectionLinesLabel, animationLabel);
+
+        // Add to table.
         rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
         rg.add(recGridOrigin).left().padBottom(pad10).row();
         rg.add(styleLabel).left().padBottom(pad10).padRight(pad34);
         rg.add(recGridStyle).left().padBottom(pad10).row();
         rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(recGridProjectionLines).left().padBottom(pad10);
+        rg.add(recGridProjectionLines).left().padBottom(pad10).row();
+        rg.add(animationLabel).left().padBottom(pad10).padRight(pad34);
+        rg.add(animation).left().padBottom(pad10);
 
-        // Add to content
+        // Add to content.
         addContentGroup(contentSceneTable, titleRecgrid, rg, 0f);
 
         // ECLIPSES
         Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
         Table eclipsesTable = new Table();
-        // Enable eclipses
+        // Enable eclipses.
         OwnLabel eclipsesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.enable"), skin);
         eclipses = new OwnCheckBox("", skin);
         eclipses.setChecked(settings.scene.renderer.eclipses.active);
@@ -2308,6 +2324,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         debugInfoBak = settings.program.debugInfo;
         reprojectionBak = settings.postprocess.reprojection.mode;
         upscaleFilterBak = settings.postprocess.upscaleFilter;
+        recGridAnimateBak = settings.program.recursiveGrid.animate;
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -2791,6 +2808,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.SHOW_DEBUG_CMD, this, debugInfoBak);
         EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
         EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
+        EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, this, recGridAnimateBak);
     }
 
     private void reloadLanguage() {
