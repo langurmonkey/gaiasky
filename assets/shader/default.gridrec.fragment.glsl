@@ -14,6 +14,8 @@ uniform float u_ts;
 uniform float u_elevationMultiplier = 1.0;
 // Time in seconds.
 uniform float u_time;
+// Animation: active >0, inactive <0.
+uniform float u_generic1;
 
 // Depth
 #include <shader/lib/logdepthbuff.glsl>
@@ -140,17 +142,21 @@ void main() {
     // Add background color.
     fragColor.rgb = max(fragColor.rgb, u_diffuseColor.rgb);
 
-    // Add travelling pulse.
     vec2 uv = abs((v_texCoords0 - 0.5) * 2.0);
     float distCenter = length(uv);
-    float fac = clamp(pow(abs(sin(u_time * 1.5 - distCenter * 8.0)), 0.2), 0.5, 1.0);
-    fragColor.rgb *= fac;
+
+    // Animate with pulse and noise.
+    if (u_generic1 > 0.0) {
+        // Add travelling pulse.
+        float fac = clamp(pow(abs(sin(u_time * 1.5 - distCenter * 8.0)), 0.2), 0.5, 1.0);
+        fragColor.rgb *= fac;
+
+        // Noise.
+        fragColor = saturate(fragColor + (0.2 * rand(1.0e2 * uv + u_time * 0.0001) - 0.1));
+    }
 
     // Fade background with distance from center.
     fragColor.a = max(fragColor.a, (1.0 - distCenter) * 0.1) * v_opacity;
-
-    // Noise.
-    fragColor = saturate(fragColor + (0.3 * rand(1.0e2 * uv + u_time * 0.0001) - 0.15));
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     velMap = vec4(0.0, 0.0, 0.0, 1.0);

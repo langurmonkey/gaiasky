@@ -253,6 +253,10 @@ public class ModelEntityRenderSystem {
         mc.setFloatExtAttribute(FloatAttribute.Ts, gr.fovFactor * 0.5f * Settings.settings.scene.lineWidth);
         // Time.
         mc.setFloatExtAttribute(FloatAttribute.Time, (float) GaiaSky.instance.getRunTimeSeconds());
+        // Animation goes into generic1 (>0 yes, <0 no).
+        mc.setFloatExtAttribute(FloatAttribute.Generic1, Settings.settings.program.recursiveGrid.animate ? 1f : -1f);
+
+        // Render.
         modelBatch.render(mc.instance, mc.env);
     }
 

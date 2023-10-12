@@ -1436,6 +1436,7 @@ public class Settings {
         public static class RecursiveGridSettings {
             public OriginType origin;
             public GridStyle style;
+            public boolean animate = false;
 
             public boolean projectionLines;
 
