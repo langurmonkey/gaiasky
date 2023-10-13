@@ -68,7 +68,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
                        ICamera camera,
                        double t,
                        RenderingContext rc) {
-        if (renderables != null && renderables.size() != 0) {
+        if (renderables != null && !renderables.isEmpty()) {
             this.rc = rc;
             run(preRunners, renderables, camera);
             renderStud(renderables, camera, t);

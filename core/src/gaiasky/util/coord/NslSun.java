@@ -35,8 +35,6 @@ public class NslSun {
     static final double sineObliquity = Math.sin(Coordinates.OBLIQUITY_RAD_J2000);
     static final double cosineObliquity = Math.cos(Coordinates.OBLIQUITY_RAD_J2000);
     static final double ABERRATION_CONSTANT_J2000 = 20.49122;
-    // static final double ABERRATION_CONSTANT_J2000 =
-    // GaiaParam.Nature.ABERRATION_CONSTANT_J2000;
     /** Unit vectors **/
     static final Vector3d X_AXIS = Vector3d.getUnitX();
     static final Vector3d Y_AXIS = Vector3d.getUnitY();

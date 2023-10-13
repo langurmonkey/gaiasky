@@ -662,7 +662,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                             if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
                                 loader.unloadOctant(octant, octreeWrapper);
                             }
-                            if (octant != null && octant.objects != null && octant.objects.size() > 0) {
+                            if (octant != null && octant.objects != null && !octant.objects.isEmpty()) {
                                 nUnloaded += octant.objects.get(0).getStarCount();
                                 if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
                                     break;

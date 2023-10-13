@@ -26,8 +26,6 @@ import gaiasky.util.gdx.loader.CubemapLoader.CubemapParameter;
 public class CubemapLoader extends AsynchronousAssetLoader<OwnCubemap, CubemapParameter> {
     CubemapLoaderInfo info = new CubemapLoaderInfo();
 
-    ;
-
     public CubemapLoader(FileHandleResolver resolver) {
         super(resolver);
     }

@@ -53,7 +53,7 @@ public class BinaryVersion2 extends BinaryIOBase {
 
         // NAME
         String namesConcat = sb.namesConcat();
-        if (namesConcat == null || namesConcat.length() == 0) {
+        if (namesConcat == null || namesConcat.isEmpty()) {
             out.writeInt(0);
         } else {
             out.writeInt(namesConcat.length());

@@ -104,7 +104,7 @@ public class SceneJsonLoader {
                         loader.setName(name);
                     if (desc != null)
                         loader.setDescription(desc);
-                    if (params.size() > 0)
+                    if (!params.isEmpty())
                         loader.setParams(params);
 
                     if (child.has("params")) {

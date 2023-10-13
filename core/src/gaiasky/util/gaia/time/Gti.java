@@ -211,6 +211,6 @@ public class Gti implements Comparable<Gti> {
         st.setTime(start / 1000000);
         Date ed = new Date();
         ed.setTime(end / 1000000);
-        return st.toString() + " to " + ed.toString();
+        return st + " to " + ed;
     }
 }

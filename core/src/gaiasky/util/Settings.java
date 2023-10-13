@@ -310,7 +310,7 @@ public class Settings {
 
     public enum GridStyle {
         CIRCULAR,
-        SQUARE;
+        SQUARE
     }
 
     public enum ElevationType {

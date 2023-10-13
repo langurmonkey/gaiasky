@@ -234,7 +234,7 @@ public class PFMReader {
                 double v = j / (h - 1d);
 
                 List<Quad> matches = mesh.stream().filter(quad -> quad.containsAlt02(u, v)).collect(Collectors.toList());
-                if (matches.size() == 0) {
+                if (matches.isEmpty()) {
                     // Black
                     out[p + 0] = 0;
                     out[p + 1] = 0;

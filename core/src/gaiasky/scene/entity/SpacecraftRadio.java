@@ -23,7 +23,7 @@ import gaiasky.util.math.MathUtilsDouble;
 
 public class SpacecraftRadio extends EntityRadio {
 
-    private SpacecraftView view;
+    private final SpacecraftView view;
 
     public SpacecraftRadio(Entity entity) {
         super(entity);

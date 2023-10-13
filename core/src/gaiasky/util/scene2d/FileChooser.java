@@ -494,7 +494,7 @@ public class FileChooser extends GenericDialog {
 
     public Path getResult() {
         String path = currentDir.toAbsolutePath() + "/";
-        if (result != null && result.length() > 0) {
+        if (result != null && !result.isEmpty()) {
             String folder = currentDir.getFileName().toString();
             if (folder.equals(result)) {
                 if (Files.exists(Paths.get(path, result))) {

@@ -29,8 +29,13 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
     private static final Log logger = Logger.getLogger(SpacecraftCoordinates.class);
 
     private ISpacecraft spacecraft;
-    private Vector3d D31, D32, D33;
-    private Vector3b B31, B32, B33, B34;
+    private final Vector3d D31;
+    private final Vector3d D32;
+    private final Vector3d D33;
+    private final Vector3b B31;
+    private final Vector3b B32;
+    private final Vector3b B33;
+    private final Vector3b B34;
 
     public SpacecraftCoordinates() {
         this.D31 = new Vector3d();

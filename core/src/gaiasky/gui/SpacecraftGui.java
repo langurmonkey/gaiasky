@@ -77,7 +77,7 @@ public class SpacecraftGui extends AbstractGui {
     private SelectBox<MachineDefinition> machineSelector;
     // The spacecraft object
     private Entity sc;
-    private SpacecraftView view;
+    private final SpacecraftView view;
     // Camera to render the attitude indicator system
     private PerspectiveCamera aiCam;
     // Attitude indicator
@@ -601,66 +601,58 @@ public class SpacecraftGui extends AbstractGui {
     @Override
     public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
         switch (event) {
-        case SPACECRAFT_LOADED:
-            this.sc = (Entity) data[0];
-            this.view.setEntity(this.sc);
-            this.qf = view.getRotationQuaternion();
-            this.vel = view.vel();
-            break;
-        case SPACECRAFT_STABILISE_CMD:
-            Boolean state = (Boolean) data[0];
-            stabilise.setChecked(state);
-            break;
-        case SPACECRAFT_STOP_CMD:
-            state = (Boolean) data[0];
-            stop.setChecked(state);
-            break;
-        case SPACECRAFT_INFO:
-            double y = -(Double) data[0];
-            double p = -(Double) data[1];
-            double r = (Double) data[2];
-            double v = (Double) data[3];
-            double thf = (Double) data[4];
-            double epow = (Double) data[5];
-            double ypow = (Double) data[6];
-            double ppow = (Double) data[7];
-            double rpow = (Double) data[8];
-
-            yawvel.setText(nf.format(y) + "°");
-            pitchvel.setText(nf.format(p) + "°");
-            rollvel.setText(nf.format(r) + "°");
-
-            Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v, Settings.settings.program.ui.distanceUnits);
-            mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
-
-            thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
-
-            setPowerValuesSlider(thrustv, thrustvm, epow);
-            setPowerValuesSlider(thrusty, thrustym, ypow);
-            setPowerValuesSlider(thrustp, thrustpm, ppow);
-            setPowerValuesSlider(thrustr, thrustrm, rpow);
-
-            break;
-        case SPACECRAFT_NEAREST_INFO:
-            if (data[0] != null) {
-                closestname.setText((String) data[0]);
-                Pair<Double, String> closestDistance = GlobalResources.doubleToDistanceString((Double) data[1], Settings.settings.program.ui.distanceUnits);
-                closestdist.setText(sf.format(closestDistance.getFirst()) + " " + closestDistance.getSecond());
-            } else {
-                closestname.setText("");
-                closestdist.setText("");
+            case SPACECRAFT_LOADED -> {
+                this.sc = (Entity) data[0];
+                this.view.setEntity(this.sc);
+                this.qf = view.getRotationQuaternion();
+                this.vel = view.vel();
             }
-
-            break;
-        case SPACECRAFT_THRUST_INFO:
-            thrustEvents = false;
-
-            enginePower.setValue((Integer) data[0]);
-
-            thrustEvents = true;
-            break;
-        default:
-            break;
+            case SPACECRAFT_STABILISE_CMD -> {
+                Boolean state = (Boolean) data[0];
+                stabilise.setChecked(state);
+            }
+            case SPACECRAFT_STOP_CMD -> {
+                Boolean state = (Boolean) data[0];
+                stop.setChecked(state);
+            }
+            case SPACECRAFT_INFO -> {
+                double y = -(Double) data[0];
+                double p = -(Double) data[1];
+                double r = (Double) data[2];
+                double v = (Double) data[3];
+                double thf = (Double) data[4];
+                double epow = (Double) data[5];
+                double ypow = (Double) data[6];
+                double ppow = (Double) data[7];
+                double rpow = (Double) data[8];
+                yawvel.setText(nf.format(y) + "°");
+                pitchvel.setText(nf.format(p) + "°");
+                rollvel.setText(nf.format(r) + "°");
+                Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v, Settings.settings.program.ui.distanceUnits);
+                mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
+                thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
+                setPowerValuesSlider(thrustv, thrustvm, epow);
+                setPowerValuesSlider(thrusty, thrustym, ypow);
+                setPowerValuesSlider(thrustp, thrustpm, ppow);
+                setPowerValuesSlider(thrustr, thrustrm, rpow);
+            }
+            case SPACECRAFT_NEAREST_INFO -> {
+                if (data[0] != null) {
+                    closestname.setText((String) data[0]);
+                    Pair<Double, String> closestDistance = GlobalResources.doubleToDistanceString((Double) data[1], Settings.settings.program.ui.distanceUnits);
+                    closestdist.setText(sf.format(closestDistance.getFirst()) + " " + closestDistance.getSecond());
+                } else {
+                    closestname.setText("");
+                    closestdist.setText("");
+                }
+            }
+            case SPACECRAFT_THRUST_INFO -> {
+                thrustEvents = false;
+                enginePower.setValue((Integer) data[0]);
+                thrustEvents = true;
+            }
+            default -> {
+            }
         }
 
     }

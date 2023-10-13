@@ -95,7 +95,7 @@ public class ComplexArea implements Area {
         double radius = piHalf - this.altitude(centre);
         p = new Place(rnd);
         p.moveToRandom(rnd, centre, radius);
-        while (this.contains(p) == false) {
+        while (!this.contains(p)) {
             p.moveToRandom(rnd, centre, radius);
         }
         return p;

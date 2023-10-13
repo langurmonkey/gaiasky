@@ -182,7 +182,7 @@ public class PlaneDouble implements Serializable {
     }
 
     public String toString() {
-        return normal.toString() + ", " + d;
+        return normal + ", " + d;
     }
 
     /**

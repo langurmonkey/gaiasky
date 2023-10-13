@@ -326,16 +326,13 @@ public final class PostProcessor implements Disposable {
     /**
      * Starts capturing the scene as {@link #capture()}, but <strong>without</strong> clearing the screen.
      *
-     * @return true or false, whether or not capturing has been initiated.
+     * @return true or false, depending on whether capturing has been initiated.
      */
     public boolean captureNoClear(IntSupplier supplier) {
         hasCaptured = false;
 
         if (enabled && !capturing) {
             if (supplier.getAsInt() == 0) {
-                // no enabled effects
-                // Gdx.app.log( "PostProcessor::captureNoClear",
-                // "No post-processor effects enabled" );
                 return false;
             }
 

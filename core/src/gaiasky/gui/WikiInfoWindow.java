@@ -44,10 +44,10 @@ public class WikiInfoWindow extends GenericDialog {
 
     private Table table;
     private OwnScrollPane scroll;
-    private JsonReader reader;
+    private final JsonReader reader;
     private Cell<?> linkCell;
 
-    private float pad;
+    private final float pad;
     private boolean updating = false;
 
     public WikiInfoWindow(Stage stg, Skin skin) {
@@ -150,7 +150,7 @@ public class WikiInfoWindow extends GenericDialog {
 
     private class WikiDataListener {
 
-        private String wikiName;
+        private final String wikiName;
         private Cell<?> imgCell;
         //private Cell moreInfoCell;
         private Texture currentImageTexture;

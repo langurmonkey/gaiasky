@@ -18,7 +18,7 @@ import java.util.Comparator;
 
 public class SceneRenderableSorter implements IntRenderableSorter, Comparator<IntRenderable> {
 
-    public static enum Hints {
+    public enum Hints {
         OPAQUE_LAST
     }
 

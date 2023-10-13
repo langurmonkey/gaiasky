@@ -175,8 +175,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      */
     public static <T extends VectorDouble<T>> T calculate(final T out, final int i, final double u, final T[] points, final int degree,
             final boolean continuous, final T tmp) {
-        switch (degree) {
-        case 3:
+        if (degree == 3) {
             return cubic(out, i, u, points, continuous, tmp);
         }
         return out;
@@ -197,8 +196,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      */
     public static <T extends VectorDouble<T>> T derivative(final T out, final int i, final double u, final T[] points, final int degree,
             final boolean continuous, final T tmp) {
-        switch (degree) {
-        case 3:
+        if (degree == 3) {
             return cubic_derivative(out, i, u, points, continuous, tmp);
         }
         return out;

@@ -203,7 +203,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                         String fileName = texture.getString("filename", null);
                         if (fileName == null)
                             throw new GdxRuntimeException("Texture needs filename.");
-                        jsonTexture.fileName = materialDir + (materialDir.length() == 0 || materialDir.endsWith("/") ? "" : "/")
+                        jsonTexture.fileName = materialDir + (materialDir.isEmpty() || materialDir.endsWith("/") ? "" : "/")
                                 + fileName;
 
                         jsonTexture.uvTranslation = readVector2(texture.get("uvTranslation"), 0f, 0f);

@@ -255,7 +255,7 @@ public class TextUtils {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strs) {
             if (str != null && !str.isEmpty()) {
-                if (out.length() > 0)
+                if (!out.isEmpty())
                     out.append(split);
                 out.append(str);
             }
@@ -275,7 +275,7 @@ public class TextUtils {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strings) {
             if (str != null && !str.isEmpty()) {
-                if (out.length() > 0)
+                if (!out.isEmpty())
                     out.append(split);
                 out.append(str);
             }
@@ -295,7 +295,7 @@ public class TextUtils {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strings) {
             if (str != null && !str.isEmpty()) {
-                if (out.length() > 0)
+                if (!out.isEmpty())
                     out.append(split);
                 out.append(str);
             }

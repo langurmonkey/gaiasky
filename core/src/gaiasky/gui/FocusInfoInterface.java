@@ -432,7 +432,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                     id = "HIP " + view.getHip();
                 }
             }
-            if (id.length() == 0) {
+            if (id.isEmpty()) {
                 id = "-";
             }
             String idString = id;

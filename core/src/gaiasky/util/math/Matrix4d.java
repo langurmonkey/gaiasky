@@ -1610,9 +1610,9 @@ public class Matrix4d implements Serializable {
      * @return The aux matrix
      */
     public Matrix4 putIn(Matrix4 aux) {
-        float[] auxval = aux.val;
+        float[] auxVal = aux.val;
         for (int i = 0; i < val.length; i++) {
-            auxval[i] = (float) val[i];
+            auxVal[i] = (float) val[i];
         }
         return aux;
     }

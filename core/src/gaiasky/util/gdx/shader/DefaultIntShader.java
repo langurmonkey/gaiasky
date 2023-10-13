@@ -643,8 +643,6 @@ public class DefaultIntShader extends BaseIntShader {
     public int compareTo(IntShader other) {
         if (other == null)
             return -1;
-        if (other == this)
-            return 0;
         return 0;
     }
 

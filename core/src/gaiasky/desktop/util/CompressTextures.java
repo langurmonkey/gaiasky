@@ -9,8 +9,12 @@ package gaiasky.desktop.util;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.apache.commons.io.FileUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public class CompressTextures {
 
@@ -37,35 +41,35 @@ public class CompressTextures {
         }
 
         var loc = Path.of(cliArgs.location);
-        //if (Files.exists(loc)) {
-        //    try (Stream<Path> list = Files.list(loc)) {
-        //        list.forEach((entry) -> {
-        //            var file = entry.toFile();
-        //            if (file.exists() && file.isFile() && file.canRead()) {
-        //                var fileName = entry.toAbsolutePath().toString();
-        //                if (fileName.toLowerCase().endsWith(".jpg")
-        //                        || fileName.toLowerCase().endsWith(".jpeg")
-        //                        || fileName.toLowerCase().endsWith(".png")) {
-        //                    try {
-        //                        var outName = fileName.substring(0, fileName.lastIndexOf('.')) + ".zktx";
-        //                        var outFile = Path.of(outName).toFile();
-        //                        if (outFile.exists()) {
-        //                            // Delete!
-        //                            FileUtils.delete(outFile);
-        //                        }
-        //                        KTXProcessor.convert(fileName, outName, false, true, false);
-        //                    } catch (Exception e) {
-        //                        System.out.println("Error: " + e);
-        //                    }
-        //                }
-        //            }
-        //        });
-        //    } catch (IOException e) {
-        //        System.out.println("Error: " + e);
-        //    }
-        //} else {
-        //    System.out.println("Location does not exist: " + loc);
-        //}
+        if (Files.exists(loc)) {
+            try (Stream<Path> list = Files.list(loc)) {
+                list.forEach((entry) -> {
+                    var file = entry.toFile();
+                    if (file.exists() && file.isFile() && file.canRead()) {
+                        var fileName = entry.toAbsolutePath().toString();
+                        if (fileName.toLowerCase().endsWith(".jpg")
+                                || fileName.toLowerCase().endsWith(".jpeg")
+                                || fileName.toLowerCase().endsWith(".png")) {
+                            try {
+                                var outName = fileName.substring(0, fileName.lastIndexOf('.')) + ".zktx";
+                                var outFile = Path.of(outName).toFile();
+                                if (outFile.exists()) {
+                                    // Delete!
+                                    FileUtils.delete(outFile);
+                                }
+                                // KTXProcessor.convert(fileName, outName, false, true, false);
+                            } catch (Exception e) {
+                                System.out.println("Error: " + e);
+                            }
+                        }
+                    }
+                });
+            } catch (IOException e) {
+                System.out.println("Error: " + e);
+            }
+        } else {
+            System.out.println("Location does not exist: " + loc);
+        }
     }
 
     private static void printUsage(JCommander jc) {

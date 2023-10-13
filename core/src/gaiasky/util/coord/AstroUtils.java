@@ -444,14 +444,14 @@ public class AstroUtils {
 
     public static double getJulianDate(Instant instant) {
         LocalDateTime date = LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        int year = date.get(ChronoField.YEAR);
+        int year = date.getYear();
         int month = date.getMonthValue();
         int day = date.getDayOfMonth();
 
         int hour = date.getHour();
         int min = date.getMinute();
         int sec = date.getSecond();
-        int nanos = date.get(ChronoField.NANO_OF_SECOND);
+        int nanos = date.getNano();
         return getJulianDate(year, month, day, hour, min, sec, nanos, true);
     }
 

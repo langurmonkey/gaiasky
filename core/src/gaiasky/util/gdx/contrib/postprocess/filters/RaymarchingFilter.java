@@ -19,7 +19,9 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 zfark;
     private final Vector3 pos;
     private final float[] additional;
-    private Matrix4 frustumCorners, invView, combined;
+    private Matrix4 frustumCorners;
+    private final Matrix4 invView;
+    private final Matrix4 combined;
     private float timeSecs;
     private float size;
     /**

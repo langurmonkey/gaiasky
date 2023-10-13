@@ -15,5 +15,5 @@ public enum BlendMode {
     /** Uses GL_ONE and GL_ONE_MINUS_SRC_COLOR for source and destination in blend equation. **/
     COLOR,
     /** Disable blending **/
-    NONE;
+    NONE
 }

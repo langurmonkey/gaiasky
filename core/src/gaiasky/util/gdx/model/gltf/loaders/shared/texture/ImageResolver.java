@@ -14,9 +14,9 @@ import gaiasky.util.gdx.model.gltf.loaders.shared.data.DataFileResolver;
 
 public class ImageResolver implements Disposable {
 	
-	private Array<Pixmap> pixmaps = new Array<Pixmap>();	
+	private final Array<Pixmap> pixmaps = new Array<Pixmap>();
 	
-	private DataFileResolver dataFileResolver;
+	private final DataFileResolver dataFileResolver;
 	
 	public ImageResolver(DataFileResolver dataFileResolver) {
 		super();

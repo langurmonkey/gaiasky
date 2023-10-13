@@ -90,8 +90,8 @@ public class IBLBuilder implements Disposable
 	public boolean renderGradient = true;
 	
 	private final ShaderProgram sunShader;
-	private ShapeRenderer shapes;
-	private ShapeRenderer sunShapes;
+	private final ShapeRenderer shapes;
+	private final ShapeRenderer sunShapes;
 	
 	private IBLBuilder() {
 		shapes = new ShapeRenderer(20);
@@ -189,7 +189,7 @@ public class IBLBuilder implements Disposable
 				renderGradient(side, blur);
 				renderLights(side, false);
 				
-				maps[index] = ScreenUtils.getFrameBufferPixmap(0, 0, size, size);
+				maps[index] = Pixmap.createFromFrameBuffer(0, 0, size, size);
 				index++;
 			}
 			fbo.end();

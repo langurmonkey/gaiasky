@@ -17,7 +17,7 @@ public class GLTFExtensions implements Serializable{
 	private static final Json json = new Json();
 	
 	private JsonValue value;
-	private ObjectMap<String, Object> extentions = new ObjectMap<String, Object>();
+	private final ObjectMap<String, Object> extentions = new ObjectMap<String, Object>();
 
 	@Override
 	public void write(Json json) {

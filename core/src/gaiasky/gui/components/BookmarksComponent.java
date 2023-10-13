@@ -450,15 +450,14 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
             }
             case BOOKMARKS_ADD -> {
                 var d0 = data[0];
+                String name;
                 if (d0 instanceof String) {
-                    String name = (String) d0;
-                    reloadBookmarksTree();
-                    selectBookmark(name, false);
+                    name = (String) d0;
                 } else {
-                    String name = (String) data[4];
-                    reloadBookmarksTree();
-                    selectBookmark(name, false);
+                    name = (String) data[4];
                 }
+                reloadBookmarksTree();
+                selectBookmark(name, false);
             }
             case BOOKMARKS_REMOVE, BOOKMARKS_REMOVE_ALL -> reloadBookmarksTree();
             default -> {

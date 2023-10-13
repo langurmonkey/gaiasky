@@ -274,8 +274,10 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void setColor(final Color color) {
-        if ((colorSet = color != null) == true)
+        colorSet = color != null;
+        if (colorSet) {
             this.color.set(color);
+        }
     }
 
     @Override
@@ -1097,7 +1099,8 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void setVertexTransform(Matrix4 transform) {
-        if ((vertexTransformationEnabled = (transform != null)) == true) {
+        vertexTransformationEnabled = transform != null;
+        if (vertexTransformationEnabled) {
             this.positionTransform.set(transform);
             this.normalTransform.set(transform).inv().tra();
         }

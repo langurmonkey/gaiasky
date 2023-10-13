@@ -21,12 +21,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class CollapsibleEntry extends OwnButton {
     private Cell<?> contentCell, actorCell;
     private OwnImageButton collapse;
-    private Actor title, content;
+    private final Actor content;
     private Runnable expandRunnable, collapseRunnable;
 
     public CollapsibleEntry(Actor title, Actor content, Skin skin, String styleName, boolean changeCursor) {
         super(skin, styleName, changeCursor);
-        this.title = title;
         this.content = content;
         createActor(title, skin);
     }

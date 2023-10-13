@@ -121,7 +121,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
         // Slave status label
         slaveStatusLabel = new OwnLabel("", skin);
         content.add(slaveStatusLabel).colspan(2).center().padBottom(pad18 * 2f).row();
-        if (slaves.size() > 0)
+        if (!slaves.isEmpty())
             updateSlaveStatusText(slaves.get(0));
 
         // Yaw

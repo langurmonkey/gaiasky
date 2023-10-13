@@ -210,11 +210,10 @@ public class IntersectorDouble {
     public synchronized static double distanceLinePoint(Vector3d x1,
                                                         Vector3d x2,
                                                         Vector3d x0) {
-        Vector3d crs = auxd1;
         Vector3d aux1 = auxd2.set(x0).sub(x2);
-        double nominador = crs.set(x0).sub(x1).crs(aux1).len();
-        double denominador = aux1.set(x2).sub(x1).len();
-        return nominador / denominador;
+        double nominator = auxd1.set(x0).sub(x1).crs(aux1).len();
+        double denominator = aux1.set(x2).sub(x1).len();
+        return nominator / denominator;
     }
 
     /**

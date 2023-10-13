@@ -24,20 +24,20 @@ public class RulerRadio extends EntityRadio {
         var ruler = Mapper.ruler.get(entity);
 
         switch (event) {
-        case RULER_ATTACH_0:
-            String name = (String) data[0];
-            ruler.setName0(name);
-            break;
-        case RULER_ATTACH_1:
-            name = (String) data[0];
-            ruler.setName1(name);
-            break;
-        case RULER_CLEAR:
-            ruler.setName0(null);
-            ruler.setName1(null);
-            break;
-        default:
-            break;
+            case RULER_ATTACH_0 -> {
+                String name = (String) data[0];
+                ruler.setName0(name);
+            }
+            case RULER_ATTACH_1 -> {
+                String name = (String) data[0];
+                ruler.setName1(name);
+            }
+            case RULER_CLEAR -> {
+                ruler.setName0(null);
+                ruler.setName1(null);
+            }
+            default -> {
+            }
         }
 
     }

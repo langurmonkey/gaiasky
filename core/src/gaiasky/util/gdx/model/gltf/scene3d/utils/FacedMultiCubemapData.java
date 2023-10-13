@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 public class FacedMultiCubemapData implements CubemapData
 {
 	final protected TextureData[] data;
-	private int levels;
+	private final int levels;
 
 	/**
 	 * Construct Cubemap data for MipMap cubemap.

@@ -15,16 +15,17 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Archetype {
 
-    private Engine engine;
-    private Archetype parent;
-    private Family family;
-    private String name;
-    private Set<Class<? extends Component>> components;
+    private final Engine engine;
+    private final Archetype parent;
+    private final Family family;
+    private final String name;
+    private final Set<Class<? extends Component>> components;
 
     public Archetype(final Engine engine, final Archetype parent, final String name, Class<? extends Component>... componentClasses) {
         this.engine = engine;
@@ -32,9 +33,7 @@ public class Archetype {
         int lastIndex = name.lastIndexOf('.');
         this.name = lastIndex >= 0 ? name.substring(lastIndex + 1) : name;
         this.components = new HashSet<>(componentClasses.length);
-        for (Class<? extends Component> componentClass : componentClasses) {
-            this.components.add(componentClass);
-        }
+        Collections.addAll(this.components, componentClasses);
         this.family = Family.all(componentClasses).get();
     }
 

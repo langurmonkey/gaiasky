@@ -59,9 +59,9 @@ public class GlobalResources {
     private final ExtShaderProgram extSpriteShader;
     // Sprite batch using int indices
     private final ExtSpriteBatch extSpriteBatch;
-    private AssetManager manager;
+    private final AssetManager manager;
     private ShaderProgram shapeShader;
-    private ShaderProgram spriteShader;
+    private final ShaderProgram spriteShader;
     // Cursors
     private Cursor linkCursor;
     private Cursor resizeXCursor;
@@ -237,7 +237,7 @@ public class GlobalResources {
      * @return True if the buffers compare favourably, false otherwise
      */
     public static boolean equal(String buf, char[] compareTo, boolean ignoreCase) {
-        if (buf == null || compareTo == null || buf.length() == 0)
+        if (buf == null || compareTo == null || buf.isEmpty())
             return false;
         char a, b;
         int len = Math.min(buf.length(), compareTo.length);

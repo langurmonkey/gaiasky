@@ -14,7 +14,7 @@ import gaiasky.scene.system.initialize.ElementsSetInitializer;
 
 public class ElementsSetRadio extends EntityRadio {
 
-    private ElementsSetInitializer initializer;
+    private final ElementsSetInitializer initializer;
 
     public ElementsSetRadio(Entity entity, ElementsSetInitializer initializer) {
         super(entity);

@@ -91,7 +91,8 @@ public class ColorPicker extends ColorPickerAbstract {
     private class ColorPickerDialog extends GenericDialog {
         private final DecimalFormat nf;
         private final ColorPickerDialog cpd;
-        private float[] color, colorBak;
+        private final float[] color;
+        private final float[] colorBak;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;

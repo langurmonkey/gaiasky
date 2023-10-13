@@ -31,7 +31,7 @@ import gaiasky.util.scene2d.OwnLabel;
 public class WelcomeGuiVR extends AbstractGui {
 
     private Table center, bottom;
-    private WelcomeGui wg;
+    private final WelcomeGui wg;
 
     public WelcomeGuiVR(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);

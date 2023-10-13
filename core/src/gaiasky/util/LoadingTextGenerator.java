@@ -20,7 +20,7 @@ public class LoadingTextGenerator {
     private final String[] verbs;
     private final String[] adjectives;
     private final String[] objects;
-    private String[][] set;
+    private final String[][] set;
 
     public LoadingTextGenerator() {
         Locale locale = I18n.getLocaleFromLanguageTag(Settings.settings.program.getLocale());

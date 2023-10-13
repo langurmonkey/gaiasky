@@ -230,7 +230,7 @@ public class CommentedProperties extends java.util.Properties {
         for (int i = 0; i < lineData.size(); i++) {
             line = lineData.get(i);
             String key = keyData.get(i);
-            if (key.length() > 0) { // This is a 'property' line, so rebuild it
+            if (!key.isEmpty()) { // This is a 'property' line, so rebuild it
                 String k = saveConvert(key, true, false);
                 if (get(key) != null && (missing == null || !missing.containsKey(key))) {
                     String val = saveConvert((String) get(key), false, false);
@@ -257,7 +257,7 @@ public class CommentedProperties extends java.util.Properties {
         if (!keys.isEmpty()) {
             writer.println("# Remaining new properties");
             for (String key : keys) {
-                if (key.length() > 0) {
+                if (!key.isEmpty()) {
                     String k = saveConvert(key, true, false);
                     if (get(key) != null && (missing == null || !missing.containsKey(key))) {
                         String val = saveConvert((String) get(key), false, false);

@@ -171,8 +171,7 @@ public class Base implements Component, ICopy {
                 if (!localizedName.equalsIgnoreCase(names[localizedNameIndex])) {
                     if (localizedNameIndex == 0) {
                         // Add localized name to list
-                        int idx = addName(localizedName);
-                        localizedNameIndex = idx;
+                        localizedNameIndex = addName(localizedName);
                     } else {
                         // Update it
                         setName(localizedName, localizedNameIndex);

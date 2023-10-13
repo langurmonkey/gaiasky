@@ -72,7 +72,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             LocationRecord lr = locations.get(i);
             Table recordTable = new Table(skin);
             // Create location
-            Label num = new OwnLabel(Integer.toString(locations.size() - i) + ":", skin, "default-blue");
+            Label num = new OwnLabel(locations.size() - i + ":", skin, "default-blue");
             num.setWidth(30f);
             Label name = new OwnLabel(TextUtils.capString(lr.name, 14), skin, "default");
             name.addListener(new OwnTextTooltip(lr.name, skin));
@@ -121,7 +121,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             this.locations.addActor(mainTable);
         }
 
-        if (locations.size() == 0) {
+        if (locations.isEmpty()) {
             this.locations.addActor(new OwnLabel(I18n.msg("gui.locationlog.empty"), skin));
         }
 

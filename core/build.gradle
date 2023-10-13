@@ -143,7 +143,7 @@ tasks.register('copyToLib') {
         // Copy deps to dist lib folder
         ['runtimeClasspath'].each { mode ->
             copy {
-                duplicatesStrategy = 'include'
+                duplicatesStrategy = DuplicatesStrategy.INCLUDE
                 from configurations.getByName(mode).files
                 into project.distLib
                 exclude "**/data"

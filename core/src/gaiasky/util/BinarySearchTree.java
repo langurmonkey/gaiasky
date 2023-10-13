@@ -145,7 +145,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
         else if (x.compareTo(t.element) > 0)
             t.right = insert(x, t.right);
         else
-            throw new RuntimeException("Duplicate item: " + x.toString());  // Duplicate
+            throw new RuntimeException("Duplicate item: " + x);  // Duplicate
         return t;
     }
 

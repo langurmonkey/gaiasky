@@ -255,9 +255,6 @@ public class DecalUtils {
         tmp.set(up).crs(direction).nor();
         tmp2.set(direction).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, direction.x, tmp.y, tmp2.y, direction.y, tmp.z, tmp2.z, direction.z);
-        //tmp.set(direction);
-        //tmp2.set(up);
-        //lookAtRotation(rotation, tmp, tmp2);
     }
 
     /**
@@ -271,9 +268,6 @@ public class DecalUtils {
         tmp.set((float) up.x, (float) up.y, (float) up.z).crs((float) direction.x, (float) direction.y, (float) direction.z).nor();
         tmp2.set((float) direction.x, (float) direction.y, (float) direction.z).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, (float) direction.x, tmp.y, tmp2.y, (float) direction.y, tmp.z, tmp2.z, (float) direction.z);
-        //direction.put(tmp);
-        //up.put(tmp2);
-        //lookAtRotation(rotation, tmp, tmp2);
     }
 
 }

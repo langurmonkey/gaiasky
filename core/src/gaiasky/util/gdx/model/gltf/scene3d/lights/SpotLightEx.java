@@ -10,11 +10,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.util.gdx.model.gltf.data.extensions.KHRLightsPunctual;
 
 public class SpotLightEx extends SpotLight {
 
 	/** Optional range in meters.
-	 * see {@link net.mgsx.gltf.data.extensions.KHRLightsPunctual.GLTFLight#range} */
+	 * see {@link KHRLightsPunctual.GLTFLight#range} */
 	public Float range;
 
 	@Override

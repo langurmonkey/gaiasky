@@ -32,7 +32,10 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
     private final Color satc;
     private final Color nepc;
     private final Color urac;
-    private FocusView sat, ura, nep, jup;
+    private final FocusView sat;
+    private final FocusView ura;
+    private final FocusView nep;
+    private final FocusView jup;
 
     public OuterSolarSystemMinimapScale() {
         super();

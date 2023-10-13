@@ -374,15 +374,15 @@ public class ColorUtils {
         }
 
         // Green
+        double x;
         if (temp <= 66) {
-            double x = temp - 2;
+            x = temp - 2;
             g = -155.25485562709179 - 0.44596950469579133 * x + 104.49216199393888 * Math.log(x);
-            g = MathUtilsDouble.clamp(g, 0, 255);
         } else {
-            double x = temp - 50;
+            x = temp - 50;
             g = 325.4494125711974 + 0.07943456536662342 * x - 28.0852963507957 * Math.log(x);
-            g = MathUtilsDouble.clamp(g, 0, 255);
         }
+        g = MathUtilsDouble.clamp(g, 0, 255);
 
         // Blue
         if (temp >= 66) {
@@ -391,7 +391,7 @@ public class ColorUtils {
             if (temp <= 19) {
                 b = 0;
             } else {
-                double x = temp - 10;
+                x = temp - 10;
                 b = -254.76935184120902 + 0.8274096064007395 * x + 115.67994401066147 * Math.log(x);
                 b = MathUtilsDouble.clamp(b, 0, 255);
             }
@@ -476,7 +476,7 @@ public class ColorUtils {
 
     /**
      * Converts an RGB color value to HSL. Conversion formula adapted from
-     * http://en.wikipedia.org/wiki/HSL_color_space. Assumes r, g, and b are
+     * <a href="http://en.wikipedia.org/wiki/HSL_color_space">here</a>. Assumes r, g, and b are
      * contained in the set [0..255] and returns h, s, and l in the set [0..1]
      *
      * @param rgb Float array with the RGB values
@@ -513,7 +513,7 @@ public class ColorUtils {
 
     /**
      * Converts an HSL color value to RGB. Conversion formula adapted from
-     * http://en.wikipedia.org/wiki/HSL_color_space. Assumes h, s, and l are
+     * <a href="https://en.wikipedia.org/wiki/HSL_color_space">here</a>. Assumes h, s, and l are
      * contained in the set [0..1] and returns r, g, and b in the set [0..255].
      *
      * @param hsl Float array with the HSL values
@@ -602,7 +602,7 @@ public class ColorUtils {
                 break;
             }
         }
-        return 0xff000000 | (r << 16) | (g << 8) | (b << 0);
+        return 0xff000000 | (r << 16) | (g << 8) | (b);
     }
 
     public static int getRed(int rgb) {
@@ -614,7 +614,7 @@ public class ColorUtils {
     }
 
     public static int getBlue(int rgb) {
-        return (rgb >> 0) & 0xFF;
+        return (rgb) & 0xFF;
     }
 
     public static boolean isZero(Color c) {

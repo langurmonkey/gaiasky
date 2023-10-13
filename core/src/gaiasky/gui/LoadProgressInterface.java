@@ -16,12 +16,12 @@ import gaiasky.event.IObserver;
 import gaiasky.util.scene2d.OwnProgressBar;
 
 public class LoadProgressInterface extends TableGuiInterface implements IObserver {
-    private static int MAX_PROGRESS_BARS = 5;
+    private static final int MAX_PROGRESS_BARS = 5;
 
-    private ObjectMap<String, OwnProgressBar> progress;
-    private Skin skin;
-    private VerticalGroup stack;
-    private float width;
+    private final ObjectMap<String, OwnProgressBar> progress;
+    private final Skin skin;
+    private final VerticalGroup stack;
+    private final float width;
 
     public LoadProgressInterface(float width, Skin skin) {
         super(skin);

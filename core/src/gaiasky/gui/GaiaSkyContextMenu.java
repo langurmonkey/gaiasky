@@ -333,7 +333,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
         // Dataset highlight
         Collection<CatalogInfo> cis = catalogManager.getCatalogInfos();
-        if (cis != null && cis.size() > 0) {
+        if (cis != null && !cis.isEmpty()) {
             MenuItem dsHighlight = new MenuItem(I18n.msg("context.dataset.highlight"), skin, skin.getDrawable("highlight-on"));
             ContextMenu dsHighlightSubmenu = new ContextMenu(skin, "default");
             for (CatalogInfo ci : cis) {
@@ -358,7 +358,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         }
 
         // Dataset visibility
-        if (cis != null && cis.size() > 0) {
+        if (cis != null && !cis.isEmpty()) {
             MenuItem dsVisibility = new MenuItem(I18n.msg("context.dataset.visibility"), skin, skin.getDrawable("eye-icon"));
             ContextMenu dsVisibilitySubmenu = new ContextMenu(skin, "default");
             for (CatalogInfo ci : cis) {

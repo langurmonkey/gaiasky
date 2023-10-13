@@ -23,6 +23,7 @@ import gaiasky.util.scene2d.OwnLabel;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class RenderGui extends AbstractGui {
     protected Label time;
@@ -77,12 +78,8 @@ public class RenderGui extends AbstractGui {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
-            switch (event) {
-            case TIME_CHANGE_INFO:
+            if (Objects.requireNonNull(event) == Event.TIME_CHANGE_INFO) {
                 time.setText(df.format((Instant) data[0]));
-                break;
-            default:
-                break;
             }
         }
     }

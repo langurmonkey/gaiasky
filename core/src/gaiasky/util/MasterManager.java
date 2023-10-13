@@ -64,7 +64,7 @@ public class MasterManager implements IObserver {
 
         // Slave objects
         slaves = Settings.settings.program.net.master.slaves;
-        if (slaves != null && slaves.size() > 0) {
+        if (slaves != null && !slaves.isEmpty()) {
             slaveStates = new byte[slaves.size()];
             slaveFlags = new byte[slaves.size()];
             slavePingTimes = new long[slaves.size()];
@@ -75,7 +75,7 @@ public class MasterManager implements IObserver {
             }
         }
 
-        if (slaves != null && slaves.size() > 0) {
+        if (slaves != null && !slaves.isEmpty()) {
             responseHandlers = new ResponseHandler[slaves.size()];
             exceptHandlers = new ExceptHandler[slaves.size()];
             for (int i = 0; i < slaveStates.length; i++) {

@@ -77,12 +77,6 @@ public class SeparatedDataFileResolver implements DataFileResolver {
             }
         }
         return new String(bytes, 0, pos, StandardCharsets.UTF_8);
-        // TODO following code is cleaner but not emulated by libgdx GWT backend.
-//		try {
-//			return URLDecoder.decode(uri, "UTF-8");
-//		} catch (UnsupportedEncodingException e) {
-//			throw new GdxRuntimeException(e);
-//		}
     }
 
     @Override

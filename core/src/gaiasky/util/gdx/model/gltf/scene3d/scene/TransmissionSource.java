@@ -37,9 +37,9 @@ public class TransmissionSource implements Disposable {
 	/** attribute to be added to the environment in the final render pass. */
 	public final PBRTextureAttribute attribute = new PBRTextureAttribute(PBRTextureAttribute.TransmissionSourceTexture);
 	
-	private Array<IntRenderable> allRenderables = new Array<>();
-	private Array<IntRenderable> selectedRenderables = new Array<>();
-	private FlushablePool<IntRenderable> renderablePool = new FlushablePool<>() {
+	private final Array<IntRenderable> allRenderables = new Array<>();
+	private final Array<IntRenderable> selectedRenderables = new Array<>();
+	private final FlushablePool<IntRenderable> renderablePool = new FlushablePool<>() {
 		@Override
 		protected IntRenderable newObject() {
 			return new IntRenderable();

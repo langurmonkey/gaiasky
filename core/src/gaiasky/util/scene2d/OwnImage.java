@@ -31,8 +31,6 @@ public class OwnImage extends Image {
 
     @Override
     public void setSize(float width, float height) {
-        //setWidth(width);
-        //setHeight(height);
         ownwidth = width;
         ownheight = height;
         super.setSize(width, height);

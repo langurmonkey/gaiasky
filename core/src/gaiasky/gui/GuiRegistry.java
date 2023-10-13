@@ -432,7 +432,7 @@ public class GuiRegistry implements IObserver {
                                         GaiaSky.instance.getExecutorService().execute(() -> {
                                             var loaded = GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
                                             if (!loaded) {
-                                                logger.warn("The dataset could not be loaded: " + result.toAbsolutePath().toString());
+                                                logger.warn("The dataset could not be loaded: " + result.toAbsolutePath());
                                             }
                                         });
                                     } else {

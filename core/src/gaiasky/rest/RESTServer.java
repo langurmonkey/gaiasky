@@ -161,7 +161,7 @@ public class RESTServer {
 
         List<String> matchMethodsDeclarations = new ArrayList<>();
         for (Method allMethod : allMethods) {
-            if (methodName.length() == 0 || methodName.equals(allMethod.getName())) {
+            if (methodName.isEmpty() || methodName.equals(allMethod.getName())) {
                 String declaration = methodDeclarationString(allMethod);
                 matchMethodsDeclarations.add(declaration);
             }

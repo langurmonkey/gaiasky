@@ -123,7 +123,9 @@ public class ModifiedScanningLaw {
      */
     protected double deltaOmegaBeg;
     protected int omegaRevsBeg;
-    /** Additional fields used by numerical scanning laws */
+    /**
+     * Additional fields used by numerical scanning laws
+     */
     protected double deltaOmega, deltaOmegaDot, omegaDot, nuDot;
     /**
      * Variables for the Runge-Kutta integrator
@@ -188,7 +190,7 @@ public class ModifiedScanningLaw {
         s1min = 0.5;
 
         // default complex areas (none)
-        highDensityAreas = new ComplexArea[] {};
+        highDensityAreas = new ComplexArea[]{};
         refDir = new Vector3d[0];
 
         // THE REMAINING INITIALIZATIONS SHOULD NOT BE CHANGED!!!
@@ -367,7 +369,7 @@ public class ModifiedScanningLaw {
         ca.add(new CircleArea(new Place(dir1), radius1));
         ca.add(new CircleArea(new Place(dir2), radius2));
 
-        this.setHighDensityAreas(new ComplexArea[] { ca });
+        this.setHighDensityAreas(new ComplexArea[]{ca});
 
     }
 
@@ -402,7 +404,6 @@ public class ModifiedScanningLaw {
      * Integrate the MSL forward in time by an arbitrary step.
      *
      * @param tStepNs - time step
-     *
      * @see ModifiedScanningLaw#advanceScanningTo(long)
      */
     public void stepForward(long tStepNs) {
@@ -598,9 +599,8 @@ public class ModifiedScanningLaw {
     /**
      * Set the reference epoch to which the reference heliotropic angles refer
      *
-     * @param refEpoch
-     *
-     * @throws RuntimeException
+     * @param refEpoch The reference epoch.
+     * @throws RuntimeException If hte reference epoch is before the start time.
      */
     public void setRefEpoch(long refEpoch) throws RuntimeException {
         if (refEpoch > tBeg) {
@@ -609,15 +609,6 @@ public class ModifiedScanningLaw {
         this.refEpoch = refEpoch;
         initialized = false;
     }
-
-    // /**
-    // * Check whether the latest call to derivn gave a reduced z axis speed
-    // *
-    // * @return true if reduced
-    // */
-    // public boolean isReduced() {
-    // return dn.reduced;
-    // }
 
     /**
      * Get reference value of nu
@@ -754,34 +745,33 @@ public class ModifiedScanningLaw {
      * <p>
      * x = 0 returns kappa = kappaR, x = 1 returns kappaN.
      *
-     * @param x
-     * @param kappaN value for x = 1
-     * @param kappaR value for x = 0
-     * @param tf     type of transition function
-     *
-     * @return
+     * @param x      The x.
+     * @param kappaN value for x = 1.
+     * @param kappaR value for x = 0.
+     * @param tf     Type of transition function.
+     * @return Transition value.
      */
     protected double transitionKappa(double x, double kappaN, double kappaR, TransitionFunction tf) {
         double kappa = 0.0;
         switch (tf) {
-        case LINEAR:
-            kappa = kappaR * (1.0 - x) + kappaN * x;
-            break;
-        case COSINE:
-            kappa = 0.5 * ((kappaN + kappaR) - (kappaN - kappaR) * Math.cos(Math.PI * x));
-            break;
-        case SQUAREROOT:
-            kappa = Math.sqrt((1 - x) * kappaR * kappaR + x * kappaN * kappaN);
-            break;
-        case FANCY:
-            double p;
-            if (x < 0.5) {
-                p = x * x * (3 - 2 * x);
-            } else {
-                p = 1 - (1 - x) * (1 - x) * (1 + 2 * x);
-            }
-            kappa = Math.sqrt((1 - p) * kappaR * kappaR + p * kappaN * kappaN);
-            break;
+            case LINEAR:
+                kappa = kappaR * (1.0 - x) + kappaN * x;
+                break;
+            case COSINE:
+                kappa = 0.5 * ((kappaN + kappaR) - (kappaN - kappaR) * Math.cos(Math.PI * x));
+                break;
+            case SQUAREROOT:
+                kappa = Math.sqrt((1 - x) * kappaR * kappaR + x * kappaN * kappaN);
+                break;
+            case FANCY:
+                double p;
+                if (x < 0.5) {
+                    p = x * x * (3 - 2 * x);
+                } else {
+                    p = 1 - (1 - x) * (1 - x) * (1 + 2 * x);
+                }
+                kappa = Math.sqrt((1 - p) * kappaR * kappaR + p * kappaN * kappaN);
+                break;
         }
         return kappa;
     }
@@ -790,9 +780,8 @@ public class ModifiedScanningLaw {
      * The sigmoid function provides a smooth transition from 0 (for x << 0) to
      * 1 (for x >> 0)
      *
-     * @param x
-     *
-     * @return
+     * @param x The value.
+     * @return The sigmoid.
      */
     protected double sigmoid(double x) {
         double e = Math.exp(x);

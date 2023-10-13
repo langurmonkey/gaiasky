@@ -1508,6 +1508,6 @@ public enum Event {
     SVT_CACHE_SIZE_CMD,
 
     /** Set the new upscale filter. Contains the new {@link UpscaleFilter} object. **/
-    UPSCALE_FILTER_CMD;
+    UPSCALE_FILTER_CMD
 
 }

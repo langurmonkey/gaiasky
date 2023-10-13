@@ -73,7 +73,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
     final XrDriver driver;
     final XrInputListener listener;
     final XrViewManager viewManager;
-    private TextureView textureView;
+    private final TextureView textureView;
     FrameBuffer fbGui;
     ExtSpriteBatch sbScreen;
     Array<XrControllerDevice> controllers;
@@ -132,7 +132,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         IntModel model = pair.getFirst();
         Map<String, Material> materials = pair.getSecond();
         Material material;
-        if (materials.size() == 0) {
+        if (materials.isEmpty()) {
             material = new Material();
             materials.put("base", material);
         } else {
@@ -159,7 +159,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         controllersEnvironment.add(directionalLight);
 
         // Sprite batch for rendering to screen.
-        sbScreen = new ExtSpriteBatch(5);;
+        sbScreen = new ExtSpriteBatch(5);
 
         if (driver != null && listener != null) {
             driver.addListener(listener);

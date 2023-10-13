@@ -55,12 +55,12 @@ public class OwnMtlLoader {
         try {
             while ((line = reader.readLine()) != null) {
 
-                if (line.length() > 0 && line.charAt(0) == '\t')
+                if (!line.isEmpty() && line.charAt(0) == '\t')
                     line = line.substring(1).trim();
 
                 tokens = line.split("\\s+");
 
-                if (tokens[0].length() == 0) {
+                if (tokens[0].isEmpty()) {
                     continue;
                 } else if (tokens[0].charAt(0) == '#')
                     continue;

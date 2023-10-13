@@ -188,8 +188,6 @@ public class ArchiveViewWindow extends GenericDialog {
                     break;
                 out.append(buffer, 0, rsz);
             }
-        } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
         } catch (IOException ex) {
             logger.error(ex);
         }
@@ -200,7 +198,7 @@ public class ArchiveViewWindow extends GenericDialog {
         String data = slurp(is, 2046);
 
         if (format.equalsIgnoreCase("csv")) {
-            /** PARSE CSV **/
+            // Parse CSV.
             String[] rows = data.split(separator);
             if (rows.length <= 1) {
                 return null;
@@ -224,7 +222,7 @@ public class ArchiveViewWindow extends GenericDialog {
 
             return matrix;
         } else if (format.equalsIgnoreCase("json")) {
-            /** PARSE JSON **/
+            // Parse JSON.
             JsonReader json = new JsonReader();
             JsonValue root = json.parse(data);
 
@@ -327,8 +325,7 @@ public class ArchiveViewWindow extends GenericDialog {
         public void ko(String error) {
             // Error
             GaiaSky.postRunnable(() -> {
-                String msg = error;
-                table.add(new OwnLabel(msg, skin, "big"));
+                table.add(new OwnLabel(error, skin, "big"));
                 finish();
             });
         }

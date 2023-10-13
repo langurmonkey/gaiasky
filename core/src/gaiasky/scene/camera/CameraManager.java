@@ -297,7 +297,7 @@ public class CameraManager implements ICamera, IObserver {
         int screenX = Gdx.input.getX();
         int screenY = Gdx.input.getY();
         int width = Gdx.graphics.getWidth();
-        ;
+
         int height = Gdx.graphics.getHeight();
 
         // This check is for windows, which crashes when the window is minimized

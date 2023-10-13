@@ -235,8 +235,6 @@ public class AtmosphereShader extends BaseIntShader {
     public int compareTo(IntShader other) {
         if (other == null)
             return -1;
-        if (other == this)
-            return 0;
         return 0;
     }
 
@@ -299,7 +297,7 @@ public class AtmosphereShader extends BaseIntShader {
                 depthRangeFar = dta.depthRangeFar;
                 depthMask = dta.depthMask;
             } else if (!config.ignoreUnimplemented)
-                throw new GdxRuntimeException("Unknown material attribute: " + attr.toString());
+                throw new GdxRuntimeException("Unknown material attribute: " + attr);
         }
 
         context.setCullFace(cullFace);

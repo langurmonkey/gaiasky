@@ -25,7 +25,7 @@ public class HiddenHelperUser implements IObserver {
     private final Array<HelperTask> currentTasks;
     private long lastCommandTime;
     private Scene scene;
-    private FocusView view;
+    private final FocusView view;
 
     private HiddenHelperUser() {
         super();

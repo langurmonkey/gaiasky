@@ -395,7 +395,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Extra attributes
             if (view.isSet()) {
                 var set = view.getSet();
-                if (set.data().size() > 0) {
+                if (!set.data().isEmpty()) {
                     IParticleRecord first = set.data().get(0);
                     if (first.hasExtra()) {
                         ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();

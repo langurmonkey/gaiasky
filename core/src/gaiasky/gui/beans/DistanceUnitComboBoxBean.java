@@ -39,8 +39,8 @@ public class DistanceUnitComboBoxBean {
         AU(Nature.AU_TO_KM, I18n.msg("gui.unit.au")),
         LY(Nature.LY_TO_KM, I18n.msg("gui.unit.ly")),
         PC(Nature.PC_TO_KM, I18n.msg("gui.unit.pc"));
-        private double toKm;
-        private String text;
+        private final double toKm;
+        private final String text;
 
         DistanceUnit(double toKm, String text) {
             this.toKm = toKm;

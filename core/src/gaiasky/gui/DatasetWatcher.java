@@ -25,11 +25,11 @@ import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.OwnTextIconButton;
 
 public class DatasetWatcher implements IObserver {
-    private DatasetDesc dataset;
-    private OwnProgressBar progress;
-    private OwnTextIconButton button;
-    private OwnLabel status;
-    private Table table;
+    private final DatasetDesc dataset;
+    private final OwnProgressBar progress;
+    private final OwnTextIconButton button;
+    private final OwnLabel status;
+    private final Table table;
 
     public DatasetWatcher(DatasetDesc dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table) {
         super();

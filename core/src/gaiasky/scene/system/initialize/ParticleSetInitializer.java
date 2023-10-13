@@ -96,7 +96,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (starSet != null) {
             // Stars.
             // Is it a catalog of variable stars?
-            starSet.variableStars = starSet.pointData.size() > 0 && starSet.pointData.get(0) instanceof VariableRecord;
+            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.get(0) instanceof VariableRecord;
             if (starSet.numLabels > 0) {
                 initSortingData(entity, starSet, starSet);
             }
@@ -326,7 +326,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (set.meanPosition != null) {
             // Use given mean position.
             body.pos.set(set.meanPosition);
-        } else if (set.data() == null || set.data().size() == 0) {
+        } else if (set.data() == null || set.data().isEmpty()) {
             // Mean position is 0.
             body.pos.set(0, 0, 0);
         } else {

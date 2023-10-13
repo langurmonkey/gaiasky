@@ -61,16 +61,16 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     public Vector3d direction, up;
     public Vector3b relPos;
     private Entity sc;
-    private SpacecraftView view;
+    private final SpacecraftView view;
     /**
      * Implements gamepad camera input.
      **/
-    private SpacecraftGamepadListener gamepadListener;
+    private final SpacecraftGamepadListener gamepadListener;
     /**
      * Closest body apart from the spacecraft (second closest)
      **/
-    private FocusView secondClosest;
-    private FocusView auxView;
+    private final FocusView secondClosest;
+    private final FocusView auxView;
     private Vector3b scpos;
     private double targetDistance;
 

@@ -43,7 +43,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
     private Table filterTable;
     private Filter filter;
     private boolean filterEdited;
-    private float taWidth;
+    private final float taWidth;
 
     public DatasetPreferencesWindow(CatalogInfo ci, Skin skin, Stage stage) {
         super(I18n.msg("gui.preferences") + " - " + ci.name, skin, stage);
@@ -265,7 +265,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 // Extra attributes
                 if (Mapper.particleSet.has(ci.entity) || Mapper.starSet.has(ci.entity)) {
                     var set = Mapper.particleSet.has(ci.entity) ? Mapper.particleSet.get(ci.entity) : Mapper.starSet.get(ci.entity);
-                    if (set.data().size() > 0) {
+                    if (!set.data().isEmpty()) {
                         IParticleRecord first = set.data().get(0);
                         if (first.hasExtra()) {
                             ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();

@@ -14,8 +14,8 @@ import gaiasky.util.gdx.model.gltf.data.texture.GLTFImage;
 import java.nio.ByteBuffer;
 
 public interface DataFileResolver {
-	public void load(FileHandle file);
-	public GLTF getRoot();
-	public ByteBuffer getBuffer(int buffer);
-	public Pixmap load(GLTFImage glImage);
+	void load(FileHandle file);
+	GLTF getRoot();
+	ByteBuffer getBuffer(int buffer);
+	Pixmap load(GLTFImage glImage);
 }

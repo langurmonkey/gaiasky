@@ -313,17 +313,17 @@ public interface IntMeshPartBuilder {
 
         public VertexInfo set(Vector3 pos, Vector3 nor, Vector3 tan, Vector3 bin, Color col, Vector2 uv) {
             reset();
-            if ((hasPosition = pos != null) == true)
+            if ((hasPosition = pos != null))
                 position.set(pos);
-            if ((hasNormal = nor != null) == true)
+            if ((hasNormal = nor != null))
                 normal.set(nor);
-            if ((hasTangent = tan != null) == true)
+            if ((hasTangent = tan != null))
                 tangent.set(tan);
-            if ((hasBinormal = bin != null) == true)
+            if ((hasBinormal = bin != null))
                 tangent.set(bin);
-            if ((hasColor = col != null) == true)
+            if ((hasColor = col != null))
                 color.set(col);
-            if ((hasUV = uv != null) == true)
+            if ((hasUV = uv != null))
                 this.uv.set(uv);
             return this;
         }

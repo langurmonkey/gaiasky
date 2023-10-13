@@ -1206,7 +1206,7 @@ public class DatasetManagerWindow extends GenericDialog {
             try {
                 java.nio.file.Files.delete(p);
             } catch (IOException e) {
-                logger.error(e, "Failed cleaning up file: " + p.toString());
+                logger.error(e, "Failed cleaning up file: " + p);
             }
         }
     }
@@ -1428,7 +1428,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             }
                             File directory = dataPath.toRealPath().toFile();
                             // Expand possible wildcards.
-                            Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
+                            Collection<File> files = FileUtils.listFilesAndDirs(directory, WildcardFileFilter.builder().setWildcards(baseName).get(), WildcardFileFilter.builder().setWildcards(baseName).get());
                             for (File file : files) {
                                 if (!file.equals(directory) && file.exists()) {
                                     FileUtils.forceDelete(file);

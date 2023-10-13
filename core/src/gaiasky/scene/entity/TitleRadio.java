@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.event.Event;
 import gaiasky.scene.Mapper;
 
+import java.util.Objects;
+
 public class TitleRadio extends EntityRadio {
 
     public TitleRadio(Entity entity) {
@@ -23,17 +25,13 @@ public class TitleRadio extends EntityRadio {
     public void notify(Event event, Object source, Object... data) {
         var body = Mapper.body.get(entity);
 
-        switch (event) {
-        case UI_THEME_RELOAD_INFO:
+        if (Objects.requireNonNull(event) == Event.UI_THEME_RELOAD_INFO) {
             Skin skin = (Skin) data[0];
             // Get new theme color and put it in the label colour
             LabelStyle headerStyle = skin.get("header", LabelStyle.class);
             body.labelColor[0] = headerStyle.fontColor.r;
             body.labelColor[1] = headerStyle.fontColor.g;
             body.labelColor[2] = headerStyle.fontColor.b;
-            break;
-        default:
-            break;
         }
 
     }

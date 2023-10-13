@@ -162,18 +162,6 @@ public class TabbedPane extends Table {
         if (style == null)
             throw new IllegalArgumentException("style cannot be null.");
         this.style = style;
-
-        // Drawable background = style.up;
-        // if (background == null) {
-        // background = style.down;
-        // if (background == null) background = style.checked;
-        // }
-        // if (background != null) {
-        // padBottom(background.getBottomHeight());
-        // padTop(background.getTopHeight());
-        // padLeft(background.getLeftWidth());
-        // padRight(background.getRightWidth());
-        // }
         invalidateHierarchy();
     }
 
@@ -238,26 +226,6 @@ public class TabbedPane extends Table {
     private static class TabTitleButton extends TextButton {
 
         private final int index;
-
-        // private TabTitleButton(int index, String text, Skin skin) {
-        // super(text, skin);
-        // this.index = index;
-        // }
-        //
-        // private TabTitleButton(int index, String text, Skin skin, String styleName) {
-        // super(text, skin, styleName);
-        // this.index = index;
-        // }
-        //
-        // private TabTitleButton(int index, String text, TextButtonStyle style) {
-        // super(text, style);
-        // this.index = index;
-        // }
-        //
-        // private TabTitleButton(int index, String text, Drawable up, Drawable checked, BitmapFont font) {
-        // super(text, new TextButtonStyle(up, up, checked, font));
-        // this.index = index;
-        // }
 
         private TabTitleButton(int index, String text, TabbedPaneStyle style) {
             super(text, toTextButtonStyle(style));

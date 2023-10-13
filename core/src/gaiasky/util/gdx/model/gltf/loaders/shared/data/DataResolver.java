@@ -18,8 +18,8 @@ import java.nio.ShortBuffer;
 
 public class DataResolver {
 	
-	private GLTF glModel;
-	private DataFileResolver dataFileResolver;
+	private final GLTF glModel;
+	private final DataFileResolver dataFileResolver;
 	
 	public DataResolver(GLTF glModel, DataFileResolver dataFileResolver) {
 		super();

@@ -34,8 +34,6 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, TexturePa
         Texture texture;
     }
 
-    ;
-
     TextureLoaderInfo info = new TextureLoaderInfo();
 
     public OwnTextureLoader(FileHandleResolver resolver) {

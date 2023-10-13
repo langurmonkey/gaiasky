@@ -62,10 +62,6 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     }
 
     @Override
-    protected void initShaderProgram() {
-    }
-
-    @Override
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
         attributes.add(new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE));
@@ -186,11 +182,13 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                 var trans = Mapper.transform.get(first.entity);
                 var trajectory = Mapper.trajectory.get(first.entity);
                 Matrix4d refSysTransform = trans.matrix != null ? trans.matrix : null;
-                if (trajectory.model.isExtrasolar()) {
-                    refSysTransform.putIn(maux).inv();
-                    refSysTransformF.setToRotation(0, 1, 0, -90).mul(maux);
-                } else {
-                    refSysTransform.putIn(refSysTransformF).inv();
+                if (refSysTransform != null) {
+                    if (trajectory.model.isExtrasolar()) {
+                        refSysTransform.putIn(maux).inv();
+                        refSysTransformF.setToRotation(0, 1, 0, -90).mul(maux);
+                    } else {
+                        refSysTransform.putIn(refSysTransformF).inv();
+                    }
                 }
                 shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
 

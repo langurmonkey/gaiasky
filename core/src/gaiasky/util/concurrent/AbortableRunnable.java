@@ -15,5 +15,5 @@ public interface AbortableRunnable extends Runnable {
      *
      * @param abort The abort object.
      */
-    public void setAbort(AtomicBoolean abort);
+    void setAbort(AtomicBoolean abort);
 }

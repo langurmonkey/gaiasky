@@ -7,10 +7,8 @@
 
 package gaiasky.util.gaia.time;
 
-import java.io.Serializable;
 
-public class NanoSecs extends ConcreteDuration implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class NanoSecs extends ConcreteDuration {
 
     private long ns;
 
@@ -21,25 +19,25 @@ public class NanoSecs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * Construct object from number of nano seconds.
+     * Construct object from number of nanoseconds.
      *
-     * @param ns [ns]
+     * @param ns The amount of nanoseconds.
      */
     public NanoSecs(final long ns) {
         this.ns = ns;
     }
 
     /**
-     * @param nanoSecs
+     * @param nanoSecs The nanoseconds.
      *
-     * @return nanoSecs expressed in s
+     * @return nanoSecs expressed in s.
      */
     static public double asSecs(final long nanoSecs) {
         return (double) nanoSecs / (double) Duration.NS_PER_SEC;
     }
 
     /**
-     * @param nanoSecs
+     * @param nanoSecs The amount of nanoseconds.
      *
      * @return nanoSecs expressed in mins
      */
@@ -48,7 +46,7 @@ public class NanoSecs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param nanoSecs
+     * @param nanoSecs The amount of nanoseconds.
      *
      * @return nanoSecs expressed in hours
      */
@@ -57,7 +55,7 @@ public class NanoSecs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param nanoSecs
+     * @param nanoSecs The amount of nanoseconds.
      *
      * @return nanoSecs expressed in revs
      */
