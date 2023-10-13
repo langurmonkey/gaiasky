@@ -133,7 +133,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION,
                 Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE,
                 Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
-                Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);
+                Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
+                Event.FILM_GRAIN_CMD);
     }
 
     public void initializeOffScreenPostProcessors() {
@@ -325,6 +326,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         bloom.setEnabled(settings.postprocess.bloom.intensity > 0);
         ppb.set(bloom);
 
+
         // DISTORTION (STEREOSCOPIC MODE)
         Curvature curvature = new Curvature();
         curvature.setDistortion(1.2f);
@@ -340,6 +342,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         reprojection.setEnabled(settings.postprocess.reprojection.active);
         reprojection.setEnabledOptions(false, false);
         ppb.set(reprojection);
+
+        // FILM GRAIN
+        FilmGrain grain = new FilmGrain(settings.postprocess.filmGrain.intensity);
+        grain.setEnabledOptions(false, false);
+        grain.setEnabled(settings.postprocess.filmGrain.intensity != 0f);
+        ppb.set(grain);
 
         // CHROMATIC ABERRATION
         float amount = Settings.settings.postprocess.chromaticAberration.amount * GaiaSky.instance.cameraManager.getFovFactor();
@@ -830,6 +838,17 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         ChromaticAberration aberration = (ChromaticAberration) ppb.get(ChromaticAberration.class);
                         aberration.setAberrationAmount(amount);
                         aberration.setEnabled(amount > 0);
+                    }
+                }
+            });
+            case FILM_GRAIN_CMD -> GaiaSky.postRunnable(() -> {
+                var intensity = (float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        FilmGrain grain = (FilmGrain) ppb.get(FilmGrain.class);
+                        grain.setIntensity(intensity);
+                        grain.setEnabled(intensity != 0f);
                     }
                 }
             });

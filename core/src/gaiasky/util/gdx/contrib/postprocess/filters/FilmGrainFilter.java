@@ -8,54 +8,48 @@
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.MathUtils;
+import gaiasky.GaiaSky;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class ChromaticAberrationFilter extends Filter<ChromaticAberrationFilter> {
-    private float aberrationAmount;
+public final class FilmGrainFilter extends Filter<FilmGrainFilter> {
 
+    private float intensity;
     /**
-     * Creates a chromatic aberration filter with the given aberration amount.
+     * Creates a film grain filter with the given the intensity.
      *
-     * @param amount The aberration amount in [0,0.2].
+     * @param intensity The intensity.
      */
-    public ChromaticAberrationFilter(float amount) {
-        super(ShaderLoader.fromFile("screenspace", "chromaticaberration"));
-        this.aberrationAmount = amount;
+    public FilmGrainFilter(float intensity) {
+        super(ShaderLoader.fromFile("screenspace", "filmgrain"));
+        this.intensity = intensity;
         rebind();
     }
 
-    /**
-     * Updates the chromatic aberration amount.
-     *
-     * @param amount The aberration amount in [0,0.2].
-     */
-    public void setAberrationAmount(float amount) {
-        this.aberrationAmount = MathUtils.clamp(amount, Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT);
-        setParam(Param.AberrationAmount, aberrationAmount);
-    }
-
-    public float getAberrationAmount() {
-        return aberrationAmount;
+    public void setIntensity(float intensity) {
+        this.intensity = MathUtils.clamp(intensity, Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY);
+        setParam(Param.Intensity, intensity);
     }
 
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Texture, u_texture0);
-        setParams(Param.AberrationAmount, aberrationAmount);
+        setParams(Param.Intensity, intensity);
         endParams();
     }
 
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
+        setParam(Param.Time, (float) GaiaSky.instance.getRunTimeSeconds());
     }
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
-        AberrationAmount("u_aberrationAmount", 0);
+        Intensity("u_intensity", 0),
+        Time("u_time", 0);
         // @formatter:on
 
         private final String mnemonic;

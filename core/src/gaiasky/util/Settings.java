@@ -2078,6 +2078,7 @@ public class Settings {
         public BloomSettings bloom;
         public UnsharpMaskSettings unsharpMask;
         public ChromaticAberrationSettings chromaticAberration;
+        public FilmGrainSettings filmGrain;
         public LensFlareSettings lensFlare;
         public LightGlowSettings lightGlow;
         public LevelsSettings levels;
@@ -2089,7 +2090,10 @@ public class Settings {
         public GeometryWarpSettings warpingMesh;
 
         public PostprocessSettings() {
-            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);
+            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD,
+                    Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
+                    Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
+                    Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
@@ -2115,6 +2119,7 @@ public class Settings {
                 case BLOOM_CMD -> bloom.intensity = (float) data[0];
                 case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
                 case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
+                case FILM_GRAIN_CMD -> filmGrain.intensity = (float) data[0];
                 case LENS_FLARE_CMD -> {
                     float strength = (Float) data[0];
                     lensFlare.active = strength > 0;
@@ -2172,6 +2177,11 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ChromaticAberrationSettings {
             public float amount = 0.01f;
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class FilmGrainSettings {
+            public float intensity = 0.0f;
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)

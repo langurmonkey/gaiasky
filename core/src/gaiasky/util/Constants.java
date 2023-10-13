@@ -88,6 +88,8 @@ public class Constants {
     public static final float MAX_STAR_BRIGHTNESS = 8f;
     public static final float MIN_CHROMATIC_ABERRATION_AMOUNT = 0f;
     public static final float MAX_CHROMATIC_ABERRATION_AMOUNT = 0.05f;
+    public static final float MIN_FILM_GRAIN_INTENSITY = 0f;
+    public static final float MAX_FILM_GRAIN_INTENSITY = 1.0f;
     public static final float MIN_LENS_FLARE_STRENGTH = 0f;
     public static final float MAX_LENS_FLARE_STRENGTH = 1.5f;
     public static final float MIN_UNSHARP_MASK_FACTOR = 0f;

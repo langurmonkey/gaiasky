@@ -81,7 +81,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             smResolution, maxFpsInput;
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
             celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
-            chromaticAberration, lensFlare, velocityVectors;
+            chromaticAberration, filmGrain, lensFlare, velocityVectors;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
@@ -91,7 +91,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private Table controllersTable;
     // Backup values
     private ToneMapping toneMappingBak;
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak, lensFlareBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak,
+            aberrationBak, lensFlareBak, filmGrainBak;
     private boolean lightGlowBak, debugInfoBak, recGridAnimateBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
@@ -460,7 +461,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 Constants.SLIDER_STEP_TINY * 0.1f, skin);
         chromaticAberration.setName("chromatic aberration amount");
         chromaticAberration.setWidth(sliderWidth);
-        chromaticAberration.setValue(settings.postprocess.unsharpMask.factor);
+        chromaticAberration.setValue(settings.postprocess.chromaticAberration.amount);
         chromaticAberration.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, chromaticAberration, chromaticAberration.getValue());
@@ -469,8 +470,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
+        // FILM GRAIN
+        OwnLabel filmGrainLabel = new OwnLabel(I18n.msg("gui.filmgrain"), skin, "default");
+        filmGrain = new OwnSliderPlus("", Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY,
+                Constants.SLIDER_STEP_TINY * 0.1f, skin);
+        filmGrain.setName("film grain intensity");
+        filmGrain.setWidth(sliderWidth);
+        filmGrain.setValue(settings.postprocess.filmGrain.intensity);
+        filmGrain.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.FILM_GRAIN_CMD, filmGrain, filmGrain.getValue());
+                return true;
+            }
+            return false;
+        });
+
         // LABELS
-        labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel);
+        labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel, chromaticAberrationLabel, filmGrainLabel);
 
         // LENS FLARE
         OwnLabel lensFlareLabel = new OwnLabel(I18n.msg("gui.lensflare"), skin);
@@ -527,16 +543,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(lrLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(lineRenderer).left().padBottom(pad10);
         graphics.add(lineTooltip).left().padRight(pad10).padBottom(pad10).row();
+        graphics.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(lightGlow).left().padBottom(pad10).row();
+        graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(lensFlare).left().padBottom(pad10).row();
         graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(bloomEffect).left().padBottom(pad10).row();
         graphics.add(unsharpMaskLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(unsharpMask).left().padBottom(pad10).row();
         graphics.add(chromaticAberrationLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(chromaticAberration).left().padBottom(pad10).row();
-        graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(lensFlare).left().padBottom(pad10).row();
-        graphics.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(lightGlow).left().padBottom(pad10).row();
+        graphics.add(filmGrainLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(filmGrain).left().padBottom(pad10).row();
         graphics.add(fadeTimeLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(fadeTimeField).left().padRight(pad18).padBottom(pad10);
         graphics.add(fadeTimeTooltip).left().padRight(pad34).padBottom(pad10).row();
@@ -2312,6 +2330,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         aberrationBak = settings.postprocess.chromaticAberration.amount;
+        filmGrainBak = settings.postprocess.filmGrain.intensity;
         lensFlareBak = settings.postprocess.lensFlare.strength;
         lightGlowBak = settings.postprocess.lightGlow.active;
         brightnessBak = settings.postprocess.levels.brightness;
@@ -2803,6 +2822,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.BLOOM_CMD, this, bloomBak);
         EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMaskBak);
         EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, this, aberrationBak);
+        EventManager.publish(Event.FILM_GRAIN_CMD, this, filmGrainBak);
         EventManager.publish(Event.EXPOSURE_CMD, this, exposureBak);
         EventManager.publish(Event.TONEMAPPING_TYPE_CMD, this, toneMappingBak);
         EventManager.publish(Event.SHOW_DEBUG_CMD, this, debugInfoBak);

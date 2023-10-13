@@ -118,6 +118,10 @@ public enum Event {
      */
     CHROMATIC_ABERRATION_CMD,
     /**
+     * Contains the intensity of the film grain effect as a float.
+     */
+    FILM_GRAIN_CMD,
+    /**
      * Contains the brightness level (float) in [-1,1].
      **/
     BRIGHTNESS_CMD,

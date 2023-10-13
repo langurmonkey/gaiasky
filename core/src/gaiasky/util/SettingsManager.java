@@ -289,6 +289,11 @@ public class SettingsManager {
             }
         }
 
+        // Add film grain if not there.
+        if (settings.postprocess.filmGrain == null) {
+            settings.postprocess.filmGrain = new Settings.PostprocessSettings.FilmGrainSettings();
+        }
+
         // Set up proxy if needed.
         if (settings.proxy != null) {
             if (settings.proxy.useSystemProxies != null) {
