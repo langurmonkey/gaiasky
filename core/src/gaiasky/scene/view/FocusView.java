@@ -468,8 +468,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return time.getHdiff() != 0;
     }
 
-    @Override
     public Vector3b getPredictedPosition(Vector3b out,
+                                         String name,
                                          ITimeFrameProvider time,
                                          ICamera camera,
                                          boolean force) {
@@ -477,8 +477,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             return out;
         }
         if (getSet() != null) {
-            Instant futureTime = time.getTime().plus((long) (time.getHdiff() * Nature.H_TO_MS), ChronoUnit.MILLIS);
-            return getSet().getAbsolutePosition(futureTime, out);
+            if (name != null && !name.isBlank()) {
+                return getSet().getAbsolutePosition(name, time.getTime(), out);
+            } else {
+                return getSet().getAbsolutePosition(time.getTime(), out);
+            }
         } else {
             if (!mustUpdatePosition(time) && !force) {
                 return getAbsolutePosition(out);
@@ -503,6 +506,14 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 return out;
             }
         }
+    }
+
+    @Override
+    public Vector3b getPredictedPosition(Vector3b out,
+                                         ITimeFrameProvider time,
+                                         ICamera camera,
+                                         boolean force) {
+        return getPredictedPosition(out, null, time, camera, force);
     }
 
     @Override

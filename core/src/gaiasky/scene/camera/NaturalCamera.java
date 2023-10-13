@@ -534,7 +534,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // Track
                     if (!vr && this.trackingObject != null && this.trackingName != null) {
                         // Track the tracking object
-                        this.trackingObject.getAbsolutePosition(trackingName, aux5b);
+                        this.trackingObject.getPredictedPosition(aux5b, trackingName, time, this, false);
                         directionToTrackingObject(aux5b);
                     }
 
@@ -1287,6 +1287,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             case SCENE_LOADED -> {
                 this.scene = (Scene) data[0];
                 this.focus.setScene(this.scene);
+                this.focusView.setScene(this.scene);
+                this.trackingObject.setScene(this.scene);
                 this.closestBody.setScene(this.scene);
                 this.closestStarView.setScene(this.scene);
             }

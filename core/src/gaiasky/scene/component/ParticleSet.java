@@ -53,15 +53,25 @@ public class ParticleSet implements Component, IDisposable {
      * List that contains the point data. It contains only [x y z].
      */
     public List<IParticleRecord> pointData;
-    /** This flag enables muting particle rendering. **/
+    /**
+     * This flag enables muting particle rendering.
+     **/
     public boolean renderParticles = true;
-    /** Flag indicating whether the particle set holds stars or particles (extended or not). **/
+    /**
+     * Flag indicating whether the particle set holds stars or particles (extended or not).
+     **/
     public boolean isStars;
-    /** Flag indicating whether the particle set holds extended particles. **/
+    /**
+     * Flag indicating whether the particle set holds extended particles.
+     **/
     public boolean isExtended;
-    /** Whether to render the global set label or not. **/
+    /**
+     * Whether to render the global set label or not.
+     **/
     public boolean renderSetLabel = true;
-    /** Number of labels to render for this group. **/
+    /**
+     * Number of labels to render for this group.
+     **/
     public int numLabels = -1;
     /**
      * Fully qualified name of data provider class.
@@ -114,15 +124,19 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Particle size limits. Applies to legacy point render (using GL_POINTS).
      */
-    public double[] particleSizeLimitsPoint = new double[] { 2d, 50d };
+    public double[] particleSizeLimitsPoint = new double[]{2d, 50d};
     /**
      * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
-    public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
-    /** Texture files to use for rendering the particles, at random. Applies only to quads. **/
+    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0))};
+    /**
+     * Texture files to use for rendering the particles, at random. Applies only to quads.
+     **/
     public String[] textureFiles = null;
-    /** Reference to the texture array containing the textures for this set, if any. Applies only to quads. **/
+    /**
+     * Reference to the texture array containing the textures for this set, if any. Applies only to quads.
+     **/
     public TextureArray textureArray;
     /**
      * Temporary storage for the mean position of this particle set, if it is given externally.
@@ -138,9 +152,13 @@ public class ParticleSet implements Component, IDisposable {
      */
     public float[] ccMin = null, ccMax = null;
 
-    /** Particles for which forceLabel is enabled. **/
+    /**
+     * Particles for which forceLabel is enabled.
+     **/
     public Set<Integer> forceLabel;
-    /** Particles with special label colors. **/
+    /**
+     * Particles with special label colors.
+     **/
     public Map<Integer, float[]> labelColors;
 
     /**
@@ -291,7 +309,6 @@ public class ParticleSet implements Component, IDisposable {
      * and computes the geometric center of this group
      *
      * @param pointData The data
-     *
      * @return An map{string,int} mapping names to indices
      */
     public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
@@ -340,7 +357,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setPosition(int[] pos) {
-        setPosition(new double[] { pos[0], pos[1], pos[2] });
+        setPosition(new double[]{pos[0], pos[1], pos[2]});
     }
 
     public void setDataFile(String dataFile) {
@@ -413,7 +430,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setTexture(String texture) {
-        this.textureFiles = new String[] { texture };
+        this.textureFiles = new String[]{texture};
     }
 
     public void setTextures(String[] textures) {
@@ -463,7 +480,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setModelPrimitive(String modelPrimitive) {
-        this.modelPrimitive = switch(modelPrimitive) {
+        this.modelPrimitive = switch (modelPrimitive) {
             case "GL_TRIANGLE_STRIP", "gl_triangle_strip" -> GL30.GL_TRIANGLE_STRIP;
             case "GL_LINES", "gl_lines" -> GL30.GL_LINES;
             case "GL_LINE_LOOP", "gl_line_loop" -> GL30.GL_LINE_LOOP;
@@ -481,7 +498,6 @@ public class ParticleSet implements Component, IDisposable {
      * Returns the size of the particle at index i
      *
      * @param i The index
-     *
      * @return The size
      */
     public double getSize(int i) {
@@ -560,7 +576,6 @@ public class ParticleSet implements Component, IDisposable {
      * Checks whether the particle with the given index is visible
      *
      * @param index The index of the particle
-     *
      * @return The visibility of the particle
      */
     public boolean isVisible(int index) {
@@ -598,20 +613,58 @@ public class ParticleSet implements Component, IDisposable {
         }
     }
 
-    /** Returns the current focus position, if any, in the out vector. **/
-    public Vector3b getAbsolutePosition(Instant date,
+    /**
+     * Returns the position of the object with the given name at the given date, if any, in the out vector.
+     *
+     * @param date The date at which to get the position. If null, the position is given at the current simulation date.
+     * @param out  The out vector.
+     **/
+    public Vector3b getAbsolutePosition(String name,
+                                        Instant date,
                                         Vector3b out) {
-        double deltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), epochJd) * Nature.MS_TO_Y;
-        IParticleRecord focus = pointData.get(focusIndex);
-        if (focus.hasProperMotion()) {
-            Vector3b aux = this.fetchPosition(focus, null, B31, deltaYears);
+        name = name.toLowerCase().trim();
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            IParticleRecord pb = pointData.get(idx);
+            return getAbsolutePosition(pb, date, out);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the position of the given object at the given date, if any, in the out vector.
+     *
+     * @param date The date at which to get the position. If null, the position is given at the current simulation date.
+     * @param out  The out vector.
+     **/
+    public Vector3b getAbsolutePosition(IParticleRecord object,
+                                        Instant date,
+                                        Vector3b out) {
+        if (object.hasProperMotion()) {
+            double deltaYears = AstroUtils.getMsSince(date == null ? GaiaSky.instance.time.getTime() : date, epochJd) * Nature.MS_TO_Y;
+            Vector3b aux = this.fetchPosition(object, null, B31, deltaYears);
             return out.set(aux);
         } else {
             return getAbsolutePosition(out);
         }
     }
 
-    /** Returns the current focus position, if any, in the out vector. **/
+    /**
+     * Returns the current focus position at the given date, if any, in the out vector.
+     *
+     * @param date The date at which to get the position. If null, the position is given at the current simulation date.
+     * @param out  The out vector.
+     **/
+    public Vector3b getAbsolutePosition(Instant date,
+                                        Vector3b out) {
+        IParticleRecord focus = pointData.get(focusIndex);
+        return getAbsolutePosition(focus, date, out);
+    }
+
+    /**
+     * Returns the current focus position, if any, in the out vector.
+     **/
     public Vector3b getAbsolutePosition(Vector3b out) {
         return out.set(focusPosition);
     }
@@ -621,7 +674,6 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @param name The name.
      * @param out  The out vector.
-     *
      * @return The absolute position in the out vector.
      */
     public Vector3b getAbsolutePosition(String name,
@@ -642,13 +694,12 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @param name The name.
      * @param out  The out vector.
-     *
      * @return The absolute position in the out vector.
      */
     public Vector3d getAbsolutePosition(String name,
                                         Vector3d out) {
         var result = getAbsolutePosition(name, B34);
-        if(result != null) {
+        if (result != null) {
             out.set(result);
             return out;
         } else {
@@ -667,13 +718,12 @@ public class ParticleSet implements Component, IDisposable {
      *                   reference system instead of the camera reference system.
      * @param out        The output vector
      * @param deltaYears The delta years
-     *
      * @return The vector for chaining
      */
     public Vector3d fetchPositionDouble(IParticleRecord pb,
-                                  Vector3b camPos,
-                                  Vector3d out,
-                                  double deltaYears) {
+                                        Vector3b camPos,
+                                        Vector3d out,
+                                        double deltaYears) {
         Vector3d pm = D32.set(0, 0, 0);
         if (pb.hasProperMotion()) {
             pm.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
@@ -697,7 +747,6 @@ public class ParticleSet implements Component, IDisposable {
      *                   reference system instead of the camera reference system.
      * @param out        The output vector
      * @param deltaYears The delta years
-     *
      * @return The vector for chaining
      */
     public Vector3b fetchPosition(IParticleRecord pb,
