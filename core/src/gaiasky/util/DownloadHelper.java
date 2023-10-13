@@ -13,6 +13,7 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 
@@ -58,13 +59,18 @@ public class DownloadHelper {
             }
             return null;
         } else {
-            // Make a GET request to get data descriptor
+            // Make a 'GET' request to get data descriptor.
             HttpRequest request = new HttpRequest(HttpMethods.GET);
             request.setFollowRedirects(true);
             request.setTimeOut(2500);
             request.setUrl(url);
 
-            // Resume download if target file (?.tar.gz.part) exists
+            // Resume download if target file (?.tar.gz.part) exists.
+            // Check temp file last modified date, and remove it if it is older than Constants#PART_FILE_MAX_AGE_MS.
+            long age = TimeUtils.millis() - to.lastModified();
+            if (age > Constants.PART_FILE_MAX_AGE_MS && to.exists()) {
+               to.delete();
+            }
             final boolean resume = to.exists() && to.name().endsWith(".part");
             final long startSize;
 

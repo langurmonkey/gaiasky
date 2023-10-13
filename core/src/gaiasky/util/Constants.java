@@ -288,6 +288,11 @@ public class Constants {
      */
     public static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
 
+    /**
+     * Maximum age of part files, in milliseconds (6 hours).
+     */
+    public static long PART_FILE_MAX_AGE_MS = 6 * 3600 * 1000;
+
     public static float getCameraK() {
         return (float) CAMERA_K;
     }

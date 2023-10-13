@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.DistanceUnits;
@@ -309,14 +310,21 @@ public class GlobalResources {
     }
 
     /**
-     * Deletes recursively all non-partial files from the path.
+     * Deletes recursively all non-partial files from the path, and all partial files older than
+     * {@link Constants#PART_FILE_MAX_AGE_MS}.
      *
      * @param path the path to delete.
      *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static void deleteRecursively(Path path) throws IOException {
-        Files.walk(path).sorted(Comparator.reverseOrder()).filter(p -> !p.toString().endsWith(".part") && !Files.isDirectory(p)).map(Path::toFile).forEach(java.io.File::delete);
+        Files.walk(path).sorted(Comparator.reverseOrder())
+                // It is not a .part file, or it is a .part file older than 6 hours, and it is not a directory.
+                .filter(p -> (!p.toString().endsWith(".part") ||
+                             (p.toString().endsWith(".part") && (TimeUtils.millis() - p.toFile().lastModified() > Constants.PART_FILE_MAX_AGE_MS)))
+                        && !Files.isDirectory(p))
+                .map(Path::toFile)
+                .forEach(java.io.File::delete);
     }
 
     public static void copyFile(Path sourceFile, Path destFile, boolean ow) throws IOException {
