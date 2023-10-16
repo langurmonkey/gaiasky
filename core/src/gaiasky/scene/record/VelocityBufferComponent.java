@@ -17,6 +17,7 @@ import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
 import gaiasky.util.math.Vector3b;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class VelocityBufferComponent {
@@ -55,10 +56,10 @@ public class VelocityBufferComponent {
         }
 
         // Previous projection view matrix
-        ((Matrix4Attribute) material.get(Matrix4Attribute.PrevProjView)).value.set(cam.getPreviousProjView());
+        ((Matrix4Attribute) Objects.requireNonNull(material.get(Matrix4Attribute.PrevProjView))).value.set(cam.getPreviousProjView());
 
         // Camera position difference
-        Vector3 dCamPos = ((Vector3Attribute) material.get(Vector3Attribute.DCamPos)).value;
+        Vector3 dCamPos = ((Vector3Attribute) Objects.requireNonNull(material.get(Vector3Attribute.DCamPos))).value;
         Vector3b dp = cam.getPreviousPos();
         Vector3b p = cam.getPos();
         dCamPos.set(dp.x.subtract(p.x).floatValue(), dp.y.subtract(p.y).floatValue(), dp.z.subtract(p.z).floatValue());

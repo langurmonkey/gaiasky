@@ -183,7 +183,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
      * @param camera        The camera.
      */
     public void addDepthBufferUniforms(ExtShaderProgram shaderProgram,
-                                          ICamera camera) {
+                                       ICamera camera) {
         if (!depthBufferFlag) {
             shaderProgram.setUniformf("u_zfar", (float) camera.getFar());
             shaderProgram.setUniformf("u_k", Constants.getCameraK());
@@ -192,14 +192,14 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     /**
-     * Uniforms needed for the velocity buffer
+     * Uniforms needed for the velocity buffer.
      *
-     * @param shaderProgram The program
-     * @param camera        The camera
+     * @param shaderProgram The program.
+     * @param camera        The camera.
      */
     protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram,
                                             ICamera camera) {
-        // Velocity buffer
+        // Velocity buffer for motion blur effect.
         if (settings.postprocess.motionBlur.active) {
             shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(auxf));
             shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(auxf));
