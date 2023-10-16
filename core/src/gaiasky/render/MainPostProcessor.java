@@ -235,17 +235,17 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         //cameraBlur.setEnabledOptions(false, false);
         //ppb.set(cameraBlur);
         //updateCameraBlur(ppb, gq);
-
+        //
         // Add to scene graph
-        initializeBlurObject();
-        if (blurObject != null && !blurObjectAdded) {
-            GaiaSky.postRunnable(() -> {
-                scene.engine.addEntity(blurObject);
-                EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, blurObject, false);
-            });
-            blurObjectView = new BaseView(blurObject);
-            blurObjectAdded = true;
-        }
+        //initializeBlurObject();
+        //if (blurObject != null && !blurObjectAdded) {
+        //    GaiaSky.postRunnable(() -> {
+        //        scene.engine.addEntity(blurObject);
+        //        EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, blurObject, false);
+        //    });
+        //    blurObjectView = new BaseView(blurObject);
+        //    blurObjectAdded = true;
+        //}
 
         /*
          TODO
