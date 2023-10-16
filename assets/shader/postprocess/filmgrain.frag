@@ -15,10 +15,8 @@ void main() {
     fragColor = texture(u_texture0, v_texCoords);
 
     // Compute grain.
-    vec2 tc1 = v_texCoords.xy;
-    vec2 tc2 = v_texCoords.yx;
-    float t = u_time * 0.001;
-    vec3 grain = vec3(rand(tc1 + t), rand(tc2 + t), rand(-tc1 + t)) * u_intensity - u_intensity * 0.5;
+    float t = mod(u_time * 0.1, 5.0);
+    vec3 grain = vec3(rand(v_texCoords + t), rand(v_texCoords * 0.8 + t), rand(v_texCoords * 1.2 + t)) * u_intensity - u_intensity * 0.5;
 
     // Mix color with grain.
     fragColor.rgb = saturate(fragColor.rgb + grain);
