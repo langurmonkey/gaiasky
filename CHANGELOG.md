@@ -1,3 +1,37 @@
+<a name="3.5.6"></a>
+## [3.5.6](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5-2) (2023-10-20)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5-2...3.5.6)
+
+### Features
+- add film grain filter (disabled by default).
+- set a maximum age for .part download files of 6 hours.
+- improve recursive grid with travelling pulses and a noise mask.
+- add 'animate' setting to recursive grid preferences to toggle animation on and off.
+- add checkbox to control recursive grid animation.
+- add initial notice about Gaia Sky contacting the server to get the dataset updates list.
+- improve shader compilation error handling.
+- enable elevation (height) representation without tessellation in a new 'regular' mode. This is the new default mode, as tessellation is a bit to taxing on old and integrated GPUs.
+- discontinue parallax mapping elevation type; the new vertex displacement type supersedes it.
+- add full support for point lights, and use them for stars.
+- true depth-tested close-by stars, also working with light glow enabled.
+
+### Bug Fixes
+- prevent creation of background blur object, as camera motion blur was disabled a few versions ago.
+- use predicted position for tracking objects.
+- 'reload defaults' button in visual settings component actually sets the default value to the elevation multiplier slider.
+- new star shader in Intel GPUs.
+- mouse coordinates collision with objects when back buffer scale != 1.
+
+### Build System
+- set `-source` to 16 in gradle build script to enable pattern matching in `instanceof`.
+
+### Code Refactoring
+- move GLSL snippet shader chunks to own directory `assets/shader/snippet`. 
+- rename shaders from 'normal' to 'pbr'.
+
+### Style
+- code style now formats Javadoc comments.
+
 <a name="3.5.5-2"></a>
 ## [3.5.5-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5-1) (2023-10-04)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5-1...3.5.5-2)
