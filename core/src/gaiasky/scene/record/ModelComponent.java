@@ -34,6 +34,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.model.gltf.scene3d.model.ModelInstanceHack;
@@ -126,7 +127,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * @param i The index of the light (must be less than {@link Constants#N_POINT_LIGHTS}).
      * @return The point light with index i.
      */
-    public PointLight point(int i) {
+    public PointLight pointLight(int i) {
         var attribute = env.get(PointLightsAttribute.Type);
         if (attribute != null) {
             var pointLightsAttribute = (PointLightsAttribute) attribute;
@@ -135,6 +136,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
         }
         return null;
+    }
+
+    public boolean hasPointLight(int i) {
+        var point = pointLight(i);
+        return point != null && !ColorUtils.isZero(point.color);
     }
 
     /**
@@ -156,7 +162,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}).
      * @return The directional light with index i.
      */
-    public DirectionalLight directional(int i) {
+    public DirectionalLight dirLight(int i) {
         var attribute = env.get(DirectionalLightsAttribute.Type);
         if (attribute != null) {
             var directionalLightAttribute = (DirectionalLightsAttribute) attribute;
@@ -165,6 +171,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
         }
         return null;
+    }
+
+    public boolean hasDirLight(int i) {
+        var directional = dirLight(i);
+        return directional != null && !ColorUtils.isZero(directional.color);
     }
 
     /**
@@ -920,6 +931,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     /**
      * Returns whether this model is tessellated or not.
+     *
      * @return Whether the model is tessellated.
      */
     public boolean isTessellated() {

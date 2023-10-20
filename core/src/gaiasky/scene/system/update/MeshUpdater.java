@@ -32,7 +32,7 @@ public class MeshUpdater extends AbstractUpdateSystem {
         // Update light with global position
         var mc = model.model;
         if (mc != null) {
-            var directional = mc.directional(0);
+            var directional = mc.dirLight(0);
             if (directional != null) {
                 directional.direction.set(1f, 0f, 0f);
                 directional.color.set(1f, 1f, 1f, 1f);

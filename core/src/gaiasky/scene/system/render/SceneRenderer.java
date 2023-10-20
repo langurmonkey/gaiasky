@@ -454,8 +454,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     public void renderModel(IRenderable r,
                             IntModelBatch batch) {
-        if (r instanceof Render) {
-            Render render = (Render) r;
+        if (r instanceof Render render) {
             if (Mapper.model.has(render.entity)) {
                 modelEntityRenderSystem.renderOpaque(render.entity, batch, (float) 1, false);
             }

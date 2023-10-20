@@ -14,6 +14,9 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IRenderable;
@@ -51,9 +54,12 @@ public class ShadowMapRenderPass {
     /** Map containing the combined matrix for each model body. **/
     public Map<Entity, Matrix4> smCombinedMap;
 
+    // Are the textures displaying in the UI already?
+    private boolean uiViewCreated = true;
+
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
-    private Vector3b aux1b;
+    private Vector3b aux1b, aux2b;
 
     public ShadowMapRenderPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
@@ -70,6 +76,7 @@ public class ShadowMapRenderPass {
         aux2d = new Vector3d();
         aux3d = new Vector3d();
         aux1b = new Vector3b();
+        aux2b = new Vector3b();
 
         // Build frame buffers and arrays
         buildShadowMapData();
@@ -124,16 +131,23 @@ public class ShadowMapRenderPass {
             var model = Mapper.model.get(candidate);
             var scaffolding = Mapper.modelScaffolding.get(candidate);
 
-            Vector3 camDir = aux1.set(model.model.directional(0).direction);
-            // Direction is that of the light
-            cameraLight.direction.set(camDir);
 
             double radius = (body.size / 2.0) * scaffolding.sizeScaleFactor;
             // Distance from camera to object, radius * sv[0]
             double distance = radius * scaffolding.shadowMapValues[0];
             // Position, factor of radius
             Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
-            objPos.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
+            // Light direction depends on light.
+            Vector3 lightDir = aux1;
+            if (model.model.hasDirLight(0)) {
+                lightDir.set(model.model.dirLight(0).direction);
+            } else if (model.model.hasPointLight(0)) {
+                lightDir.set(model.model.pointLight(i).position);
+                aux2b.set(objPos).sub(lightDir).nor().put(lightDir);
+            }
+            // Direction is that of the light
+            cameraLight.direction.set(lightDir);
+            objPos.sub(camera.getPos()).sub(lightDir.nor().scl((float) distance));
             objPos.put(cameraLight.position);
             // Up is perpendicular to dir
             if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
@@ -166,6 +180,15 @@ public class ShadowMapRenderPass {
             smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
 
             shadowMapFb[i][j].end();
+
+            if(!uiViewCreated) {
+                final int ii = i;
+                GaiaSky.postRunnable(() -> {
+                    // Create UI view
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", shadowMapFb[ii][j].getColorBufferTexture(), 0.2f);
+                });
+                uiViewCreated = true;
+            }
             i++;
         }
     }
@@ -206,12 +229,12 @@ public class ShadowMapRenderPass {
             if (body.distToCamera < radius * 1.1) {
                 scaffolding.shadow = shadowNRender;
 
-                Vector3 shadowCameraDir = aux1.set(model.model.directional(0).direction);
+                Vector3 shadowCameraDir = aux1.set(model.model.dirLight(0).direction);
 
                 // Shadow camera direction is that of the light
                 cameraLight.direction.set(shadowCameraDir);
 
-                Vector3 shadowCamDir = aux1.set(model.model.directional(0).direction);
+                Vector3 shadowCamDir = aux1.set(model.model.dirLight(0).direction);
                 // Direction is that of the light
                 cameraLight.direction.set(shadowCamDir);
 
