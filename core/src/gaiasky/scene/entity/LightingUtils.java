@@ -30,36 +30,32 @@ public class LightingUtils {
 
     public static void updateLights(Model model, Body body, GraphNode graph, ICamera camera) {
         if (model.model != null && !model.model.isStaticLight() && body.distToCamera <= LIGHT_X1) {
-            // We use point lights for stars.
-            for (int i = 0; i < Constants.N_POINT_LIGHTS; i++) {
+            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
                 IFocus lightSource = camera.getCloseLightSource(i);
                 if (lightSource != null) {
                     if (lightSource instanceof Proximity.NearbyRecord) {
-                        var pointLight = model.model.point(i);
-                        if (pointLight != null) {
+                        var directional = model.model.directional(i);
+                        if(directional != null) {
+                            graph.translation.put(directional.direction);
                             Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
                             if (nr.isStar() || nr.isStarGroup()) {
                                 float[] col = nr.getColor();
                                 double closestDist = nr.getClosestDistToCamera();
                                 // Dim light with distance.
                                 float colFactor = (float) Math.pow(MathUtilsDouble.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
-                                pointLight.position.set(nr.pos.put(F31.get()));
-                                pointLight.color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
-                                pointLight.intensity = 1;
+                                directional.direction.sub(nr.pos.put(F31.get()));
+                                directional.color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
                             } else {
                                 Vector3b campos = camera.getPos();
-                                pointLight.position.set(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
-                                pointLight.color.set(1f, 1f, 1f, 1f);
-                                pointLight.intensity = 1;
+                                directional.direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
+                                directional.color.set(1f, 1f, 1f, 1f);
                             }
                         }
                     }
                 } else {
-                    // Disable light.
-                    var pointLight = model.model.point(i);
-                    if (pointLight != null) {
-                        pointLight.color.set(0f, 0f, 0f, 0f);
-                        pointLight.intensity = 0f;
+                    // Disable light
+                    if(model.model.directional(i) != null) {
+                        model.model.directional(i).color.set(0f, 0f, 0f, 0f);
                     }
                 }
             }

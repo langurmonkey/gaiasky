@@ -53,6 +53,7 @@ import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL40;
 
 import java.util.*;
@@ -463,7 +464,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     public void clearScreen() {
         Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClearDepthf(1);
+        GL32.glClearDepth(1000000.0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
