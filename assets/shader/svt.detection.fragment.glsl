@@ -9,39 +9,11 @@ uniform float u_svtTileSize;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
-#if defined(numDirectionalLights) && (numDirectionalLights > 0)
-#define directionalLightsFlag
-#endif// numDirectionalLights
-
-#ifdef directionalLightsFlag
-struct DirectionalLight {
-    vec3 color;
-    vec3 direction;
-};
-#endif// directionalLightsFlag
-
-#if defined(numPointLights) && (numPointLights > 0)
-#define pointLightsFlag
-#endif// numPointLights
-
-#ifdef pointLightsFlag
-struct PointLight {
-    vec3 color;
-    vec3 position;
-    float intensity;
-};
-#endif // numPointLights
 
 // INPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
-    #ifdef directionalLightsFlag
-    DirectionalLight directionalLights[numDirectionalLights];
-    #endif// directionalLightsFlag
-    #ifdef pointLightsFlag
-    PointLight pointLights[numPointLights];
-    #endif// pointLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
