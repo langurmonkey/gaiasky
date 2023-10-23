@@ -25,6 +25,7 @@ struct VertexData {
     #ifdef metallicFlag
     vec3 reflect;
     #endif// metallicFlag
+    mat3 tbn;
 };
 in VertexData v_data;
 

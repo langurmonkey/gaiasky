@@ -138,6 +138,17 @@ uniform mat4 u_shadowMapProjViewTrans;
 uniform sampler2D u_svtCacheTexture;
 #endif
 
+//////////////////////////////////////////////////////
+////// SVT
+//////////////////////////////////////////////////////
+#ifdef svtFlag
+// This next define avoids dFdx() and dFdy() to be called in the include, as they are not available in vertex shaders.
+#define svtVertexShader
+#include <shader/lib/svt.glsl>
+#endif // svtFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+
 // HEIGHT
 #ifdef heightTextureFlag
 uniform sampler2D u_heightTexture;

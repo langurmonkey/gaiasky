@@ -1,4 +1,5 @@
-#ifdef svtFlag
+#ifndef GLSL_LIB_SVT
+#define GLSL_LIB_SVT
 
 uniform vec2 u_svtResolution;
 uniform float u_svtTileSize;
@@ -13,7 +14,7 @@ const float mipBias = 0.0;
 Computes the mipmap level with the given textel coordinate and bias, similar to
 what textureQueryLod() does.
 */
-#if defined(tessellationEvaluationShader)
+#if defined(tessellationEvaluationShader) || defined(svtVertexShader)
 // We request the deepest level by default.
 float mipmapLevel(in vec2 texelCoord, in float bias) {
     return bias;
@@ -26,7 +27,7 @@ float mipmapLevel(in vec2 texelCoord, in float bias) {
     float deltaMaxSqr  = max(dot(dxVtc, dxVtc), dot(dyVtc, dyVtc));
     return 0.5 * log2(deltaMaxSqr) + bias;
 }
-#endif // tessellationEvaluationShader
+#endif // tessellationEvaluationShader || svtVertexShader
 
 /*
 This function queries the indirection buffer with the given texture coordinates
@@ -74,4 +75,4 @@ Same as previous, but using the default constant bias.
 vec2 svtTexCoords(sampler2D indirection, vec2 texCoords) {
     return svtTexCoords(indirection, texCoords, mipBias);
 }
-#endif// svtFlag
+#endif// GLSL_LIB_SVT
