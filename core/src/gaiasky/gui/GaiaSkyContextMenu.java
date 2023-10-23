@@ -71,7 +71,11 @@ public class GaiaSkyContextMenu extends ContextMenu {
         this.scene = scene;
         if (candidate != null && candidate.isValid()) {
             this.candidateName = candidate.getCandidateName();
-            this.candidateNameShort = TextUtils.capString(this.candidateName, 10);
+            if (this.candidateName != null) {
+                this.candidateNameShort = TextUtils.capString(this.candidateName, 10);
+            } else {
+                this.candidateNameShort = "";
+            }
         }
         build();
     }
