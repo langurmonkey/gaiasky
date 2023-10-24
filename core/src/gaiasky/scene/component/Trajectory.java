@@ -188,6 +188,7 @@ public class Trajectory implements Component {
      * @param onlyBody Whether to display only the body for this trajectory.
      * @deprecated Use {{@link #setBodyRepresentation(String)}} instead.
      */
+    @Deprecated
     public void setOnlyBody(Boolean onlyBody) {
         if (onlyBody) {
             bodyRepresentation = OrbitBodyRepresentation.ONLY_BODY;
@@ -201,6 +202,7 @@ public class Trajectory implements Component {
      *
      * @deprecated Use {{@link #setBodyRepresentation(String)}} instead.
      */
+    @Deprecated
     public void setOnlybody(Boolean onlyBody) {
         this.setOnlyBody(onlyBody);
     }

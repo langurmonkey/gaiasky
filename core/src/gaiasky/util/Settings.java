@@ -2055,6 +2055,7 @@ public class Settings {
              *
              * @deprecated Not used anymore.
              */
+            @Deprecated
             public KeyframesManager.PathType orientation;
 
             public void setPosition(final String positionString) {
