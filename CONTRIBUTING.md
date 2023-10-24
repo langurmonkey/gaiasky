@@ -1,10 +1,18 @@
 # Contributing to Gaia Sky
 
-First of all, thanks for reading this! It means you are considering to contribute to Gaia Sky, which is appreciated.
+First of all, thanks for reading this! It means you are considering to contribute to Gaia Sky, which is appreciated. In the next sections, we cover the versioning scheme of Gaia Sky and lay out the contributing rules.
+
+## Versioning scheme
+
+Gaia Sky uses a semantic versioning scheme which uses the format `major.minor.revision-release`.
+
+- `major.minor.revision` -- this is the version. Major and minor changes include feature changes of different degree. Usually, we publish a new **major** version with every Gaia data release. **Minor** versions contain successive updates and new features. **Revision** changes may include minor features or cosmetic changes.
+- `release` -- this is the release within the version. Releases include only bug fixes.
 
 ## How to contribute
 
 There are several ways to contribute to the Gaia Sky project:
+
 
 ### Merge requests and source code
 
