@@ -7,7 +7,9 @@ First of all, thanks for reading this! It means you are considering to contribut
 Gaia Sky uses a semantic versioning scheme which uses the format `major.minor.revision-release`.
 
 - `major.minor.revision` -- this is the version. Major and minor changes include feature changes of different degree. Usually, we publish a new **major** version with every Gaia data release. **Minor** versions contain successive updates and new features. **Revision** changes may include minor features or cosmetic changes.
-- `release` -- this is the release within the version. Releases include only bug fixes.
+- `release` -- this is the release within the version. Releases include only bug fixes. When omitted, the release number is 1.
+
+For example, version 3.4.2 is the same as 3.4.2-1. By contrast, 3.4.2-2 may include bug fixes over 3.4.2, but no new features. 3.4.3 may include new features bug generally no breaking changes. 3.5.0 may include big new features and API breaking changes.
 
 ## How to contribute
 
