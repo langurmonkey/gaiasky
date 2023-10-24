@@ -1,3 +1,13 @@
+<a name="3.5.6-2"></a>
+## [3.5.6-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.6) (2023-10-24)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.6...3.5.6-2)
+
+### Bug Fixes
+- null pointer in context menu. 
+- prevent SVT library to use `dFdx()` and `dFdy()` in vertex shaders. 
+- SVT detection shader still passing lights explicitly. 
+- shadow map camera direction with point lights. 
+
 <a name="3.5.6"></a>
 ## [3.5.6](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5-2) (2023-10-20)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5-2...3.5.6)
