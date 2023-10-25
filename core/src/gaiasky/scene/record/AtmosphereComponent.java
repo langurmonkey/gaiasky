@@ -264,8 +264,11 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         this.localTransform = localTransform;
     }
 
-    public void setFogcolor(double[] fogColor) {
+    public void setFogColor(double[] fogColor) {
         this.fogColor.set((float) fogColor[0], (float) fogColor[1], (float) fogColor[2]);
+    }
+    public void setFogcolor(double[] fogColor) {
+        setFogColor(fogColor);
     }
 
     public void setSamples(Long samples) {
@@ -276,8 +279,12 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         this.samples = samples.intValue();
     }
 
-    public void setFogdensity(Double fogDensity) {
+    public void setFogDensity(Double fogDensity) {
         this.fogDensity = fogDensity.floatValue();
+    }
+
+    public void setFogdensity(Double fogDensity) {
+        this.setFogDensity(fogDensity);
     }
 
     public void setM_Kr(Double m_Kr) {

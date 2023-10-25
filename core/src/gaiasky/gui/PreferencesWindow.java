@@ -2589,6 +2589,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // SVT cache size
         if (svtCacheSize != null) {
+            restartDialog = restartDialog || (int) svtCacheSize.getValue() != settings.scene.renderer.virtualTextures.cacheSize;
             GaiaSky.postRunnable(() -> EventManager.publish(Event.SVT_CACHE_SIZE_CMD, this, (int) svtCacheSize.getValue()));
         }
 

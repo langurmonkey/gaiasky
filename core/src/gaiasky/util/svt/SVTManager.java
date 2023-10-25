@@ -353,8 +353,7 @@ public class SVTManager implements IObserver {
         tile.state = STATE_CACHED;
 
         // Set material attributes if needed.
-        if (tile.tree.aux instanceof VirtualTextureComponent) {
-            var component = (VirtualTextureComponent) tile.tree.aux;
+        if (tile.tree.aux instanceof VirtualTextureComponent component) {
             if (!component.svtAttributesSet()) {
                 component.setSVTAttributes(cacheBuffer);
             }
@@ -442,8 +441,7 @@ public class SVTManager implements IObserver {
         var xy = tile.tree.getColRow(tile.level, tileUV[0], tileUV[1]);
         // In OpenGL, level 0 is the base level with the highest resolution, while n is the nth mipmap reduction image.
         // In our system, 0 is the root, the lowest detailed tiles, while depth is the base level (the highest resolution).
-        if (tile.tree.aux instanceof VirtualTextureComponent) {
-            var component = (VirtualTextureComponent) tile.tree.aux;
+        if (tile.tree.aux instanceof VirtualTextureComponent component) {
             if (component.indirectionBuffer != null) {
                 component.indirectionBuffer.draw(floatBuffer, xy[0], xy[1], 1, 1, tile.mipLevel(), GL30.GL_RGBA, GL30.GL_FLOAT);
             }
@@ -458,13 +456,11 @@ public class SVTManager implements IObserver {
             // Put in list.
             var id = (Integer) data[0];
             var comp = (NamedComponent) data[1];
-            if (comp instanceof MaterialComponent) {
-                var mc = (MaterialComponent) comp;
+            if (comp instanceof MaterialComponent mc) {
                 for (var vtc : mc.svts) {
                     addToVTMap(id, vtc);
                 }
-            } else if (comp instanceof CloudComponent) {
-                var cc = (CloudComponent) comp;
+            } else if (comp instanceof CloudComponent cc) {
                 addToVTMap(id, cc.diffuseSvt);
             }
         }

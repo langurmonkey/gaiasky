@@ -8,6 +8,7 @@
 package gaiasky.util.svt;
 
 import com.badlogic.gdx.utils.LongMap;
+import gaiasky.util.math.MathUtilsDouble;
 
 public class SVTQuadtree<T> {
     public final int MAX_LEVEL = 15;
@@ -40,7 +41,7 @@ public class SVTQuadtree<T> {
         this.name = name;
         this.tileSize = tileSize;
         this.root = new SVTQuadtreeNode[rootPositions];
-        this.levels = new LongMap[MAX_LEVEL];
+        this.levels = new LongMap[MAX_LEVEL + 1];
     }
 
     public void insert(final int level, final int col, final int row, T object) {
@@ -76,6 +77,10 @@ public class SVTQuadtree<T> {
     public SVTQuadtreeNode<T> getTile(int level, int col, int row) {
         assert level >= 0 && level <= MAX_LEVEL : "Level out of bounds: " + level;
         assert col >= 0 && row >= 0 : "Invalid Col/Row: " + col + ", " + row;
+
+        if (level > this.depth) {
+            return null;
+        }
 
         if (levels[level] == null) {
             return null;
