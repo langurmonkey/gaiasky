@@ -8,7 +8,6 @@
 package gaiasky.util.svt;
 
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.util.math.MathUtilsDouble;
 
 public class SVTQuadtree<T> {
     public final int MAX_LEVEL = 15;
@@ -23,18 +22,28 @@ public class SVTQuadtree<T> {
      * One of 8, 16, 32, 64, 128, 256, 512 or 1024.
      **/
     public final int tileSize;
-    /** The total number of tiles in the tree. **/
+    /**
+     * The total number of tiles in the tree.
+     **/
     public int numTiles;
-    /** Depth of the tree, e.g., the deepest level, in [0,n]. **/
+    /**
+     * Depth of the tree, e.g., the deepest level, in [0,n].
+     **/
     public int depth = 0;
 
-    /** Root node(s) of the tree. **/
+    /**
+     * Root node(s) of the tree.
+     **/
     public SVTQuadtreeNode<T>[] root;
 
-    /** Each tile is identified by its level and its UV. Here we can access tiles directly. **/
+    /**
+     * Each tile is identified by its level and its UV. Here we can access tiles directly.
+     **/
     public LongMap<SVTQuadtreeNode<T>>[] levels;
 
-    /** Auxiliary object to store additional data. **/
+    /**
+     * Auxiliary object to store additional data.
+     **/
     public Object aux;
 
     public SVTQuadtree(String name, int tileSize, int rootPositions) {
@@ -71,7 +80,6 @@ public class SVTQuadtree<T> {
      * @param level The level.
      * @param col   The column.
      * @param row   The row.
-     *
      * @return The tile with the given level, column and row, if it exists.
      */
     public SVTQuadtreeNode<T> getTile(int level, int col, int row) {
@@ -95,7 +103,6 @@ public class SVTQuadtree<T> {
      * @param level The level.
      * @param u     The U texture coordinate in [0,1].
      * @param v     The V texture coordinate in [0,1].
-     *
      * @return The tile at the given level and UV.
      */
     public SVTQuadtreeNode<T> getTileFromUV(int level, double u, double v) {
@@ -115,20 +122,46 @@ public class SVTQuadtree<T> {
         }
     }
 
+    /**
+     * Gets the column and row at the given level (with [0,0] being at the top-left) from the UV texture coordinates,
+     * with the origin at the bottom-left.
+     *
+     * @param level The level.
+     * @param u     The U coordinate.
+     * @param v     The V coordinate.
+     * @return The column and row, with the origin at the top-left.
+     */
     public int[] getColRow(int level, double u, double v) {
-        long vCount = getVTileCount(level);
-        long uCount = vCount * root.length;
-        final var col = (int) (u * uCount);
-        final var row = (int) (v * vCount);
-        return new int[] { col, row };
+        return getColRow(level, u, v, new int[2]);
     }
 
+    public int[] getColRow(int level, double u, double v, int[] colRow) {
+        long vCount = getVTileCount(level);
+        long uCount = vCount * root.length;
+        colRow[0] = (int) (u * uCount);
+        colRow[1] = (int) (vCount - (v * vCount));
+        return colRow;
+    }
+
+    /**
+     * Gets the UV texture coordinates from the given column, row and level. The UV coordinates start have the
+     * origin at the bottom-left, while the column and row have the origin at the top-left.
+     *
+     * @param level The level.
+     * @param col   The column.
+     * @param row   The row.
+     * @return The UV coordinates.
+     */
     public double[] getUV(int level, int col, int row) {
+        return getUV(level, col, row, new double[2]);
+    }
+
+    public double[] getUV(int level, int col, int row, double[] uv) {
         double vCount = getVTileCount(level);
         double uCount = vCount * root.length;
-        final var u = (double) col / uCount;
-        final var v = (vCount - row) / vCount;
-        return new double[] { u, v };
+        uv[0] = (double) col / uCount;
+        uv[1] = (vCount - row) / vCount;
+        return uv;
     }
 
     public boolean contains(int level, int col, int row) {
@@ -138,6 +171,7 @@ public class SVTQuadtree<T> {
     public long getKey(int level, int col, int row) {
         return (long) (level) << 45 | (long) col << 26 | (long) row;
     }
+
     public long getKey(SVTQuadtreeNode<T> tile) {
         return tile.getKey();
     }
@@ -149,6 +183,6 @@ public class SVTQuadtree<T> {
      */
     public int[] getResolution() {
         int tiles = (int) Math.pow(2, depth);
-        return new int[] { tileSize * tiles * root.length, tileSize * tiles };
+        return new int[]{tileSize * tiles * root.length, tileSize * tiles};
     }
 }

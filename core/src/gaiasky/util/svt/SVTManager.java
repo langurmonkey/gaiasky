@@ -183,6 +183,16 @@ public class SVTManager implements IObserver {
         }
 
         var tile = svt.tree.getTile((int) level, (int) x, (int) y);
+        // Try recursive lookup to higher levels.
+        // This is useful in incomplete levels.
+        if (tile == null && level > 0) {
+            double[] uv = svt.tree.getUV((int) level, (int) x, (int) y);
+            int l = (int) level;
+            do {
+                l -= 1;
+                tile = svt.tree.getTileFromUV(l, uv[0], uv[1]);
+            } while (tile == null && l > 0);
+        }
         if (tile != null && !observedTiles.contains(tile, true)) {
             observedTiles.add(tile);
         }
@@ -196,55 +206,57 @@ public class SVTManager implements IObserver {
         for (var tile : observedTiles) {
             var path = tile.object.toString();
             switch (tile.state) {
-            case STATE_NOT_LOADED -> {
-                // Load tile.
-                if (!manager.contains(path)) {
-                    manager.load(path, Pixmap.class);
-                    tile.state = STATE_LOADING;
-                } else {
-                    // In case the same SVT is used for multiple channels.
-                    if (tile.state == STATE_NOT_LOADED) {
+                case STATE_NOT_LOADED -> {
+                    // Load tile.
+                    if (!manager.contains(path)) {
+                        manager.load(path, Pixmap.class);
                         tile.state = STATE_LOADING;
+                    } else {
+                        // In case the same SVT is used for multiple channels.
+                        if (tile.state == STATE_NOT_LOADED) {
+                            tile.state = STATE_LOADING;
+                        }
                     }
                 }
-            }
-            case STATE_LOADING -> {
-                // Check if done.
-                if (manager.isLoaded(path)) {
-                    var pixmap = (Pixmap) manager.get(path);
-                    // Rescale if necessary, this should be avoided, as it is SLOW.
-                    if (pixmap.getWidth() != tile.tree.tileSize) {
-                        logger.warn("Rescaling tile: " + tile.toStringShort());
-                        Pixmap aux = new Pixmap(tile.tree.tileSize, tile.tree.tileSize, pixmap.getFormat());
-                        aux.drawPixmap(pixmap,
-                                       0, 0, pixmap.getWidth(), pixmap.getHeight(),
-                                       0, 0, tile.tree.tileSize, tile.tree.tileSize);
-                        manager.unload(path);
-                        pixmap = aux;
+                case STATE_LOADING -> {
+                    // Check if done.
+                    if (manager.isLoaded(path)) {
+                        var pixmap = (Pixmap) manager.get(path);
+                        // Rescale if necessary, this should be avoided, as it is SLOW.
+                        if (pixmap.getWidth() != tile.tree.tileSize) {
+                            logger.warn("Rescaling tile: " + tile.toStringShort());
+                            Pixmap aux = new Pixmap(tile.tree.tileSize, tile.tree.tileSize, pixmap.getFormat());
+                            aux.drawPixmap(pixmap,
+                                    0, 0, pixmap.getWidth(), pixmap.getHeight(),
+                                    0, 0, tile.tree.tileSize, tile.tree.tileSize);
+                            manager.unload(path);
+                            pixmap = aux;
+                        }
+                        // Retrieve texture and put in queue.
+                        tilePixmaps.put(path, pixmap);
+                        // Add to head of queue.
+                        queuedTiles.offerFirst(tile);
+                        tile.state = STATE_QUEUED;
                     }
-                    // Retrieve texture and put in queue.
-                    tilePixmaps.put(path, pixmap);
-                    // Add to head of queue.
+                }
+                case STATE_LOADED -> {
+                    // Already loaded, just add to the head of the queue.
                     queuedTiles.offerFirst(tile);
                     tile.state = STATE_QUEUED;
                 }
-            }
-            case STATE_LOADED -> {
-                // Already loaded, just add to the head of the queue.
-                queuedTiles.offerFirst(tile);
-                tile.state = STATE_QUEUED;
-            }
-            case STATE_QUEUED, STATE_CACHED -> {
-                // Update last accessed.
-                tile.accessed = now;
-            }
+                case STATE_QUEUED, STATE_CACHED -> {
+                    // Update last accessed.
+                    tile.accessed = now;
+                }
             }
         }
 
         int addedTiles = 0;
         int removedTiles = 0;
         SVTQuadtreeNode<Path> tile;
+        SVTQuadtreeNode<Path> finalTile = null;
         while ((tile = queuedTiles.poll()) != null && addedTiles < Settings.settings.scene.renderer.virtualTextures.maxTilesPerFrame) {
+            finalTile = tile;
             if (tile.state == STATE_QUEUED) {
                 if (!tileLocation.containsKey(tile)) {
                     if (tileLocation.size() < cacheSizeInTiles * cacheSizeInTiles) {
@@ -299,12 +311,12 @@ public class SVTManager implements IObserver {
         }
 
         if (!uiViewCreated && (addedTiles > 0 || removedTiles > 0)) {
-            final var lastTile = tile;
+            final var lastTile = finalTile;
             GaiaSky.postRunnable(() -> {
-                // Create UI view
+                // Create UI views with SVT cache and indirection textures.
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.05f);
                 if (lastTile != null) {
-                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", ((VirtualTextureComponent) lastTile.tree.aux).indirectionBuffer, 4f);
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", ((VirtualTextureComponent) lastTile.tree.aux).indirectionBuffer, 0.5f);
                 }
             });
             uiViewCreated = true;
@@ -325,7 +337,7 @@ public class SVTManager implements IObserver {
                                 int j,
                                 long now) {
         assert !tileLocation.containsKey(tile) : "Tile is already in the cache: " + tile;
-        tileLocation.put(tile, new int[] { i, j });
+        tileLocation.put(tile, new int[]{i, j});
         cacheBufferArray[i][j] = tile;
 
         var path = tile.object.toString();

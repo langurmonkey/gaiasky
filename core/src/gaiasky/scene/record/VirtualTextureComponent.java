@@ -103,8 +103,7 @@ public class VirtualTextureComponent extends NamedComponent {
                     materialProvider.getMaterial().set(new TextureAttribute(indirectionAttributeId, indirectionBuffer));
                     // Height textures need more information!
                     if (indirectionAttributeId == TextureAttribute.SvtIndirectionHeight) {
-                        if (materialProvider != null && materialProvider instanceof MaterialComponent) {
-                            var mc = (MaterialComponent) materialProvider;
+                        if (materialProvider != null && materialProvider instanceof MaterialComponent mc) {
                             int[] resolution = tree.getResolution();
                             mc.heightSize.set(resolution[0], resolution[1]);
                             material.set(new FloatAttribute(FloatAttribute.HeightScale, mc.heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));

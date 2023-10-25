@@ -41,7 +41,7 @@ public class HeightDataSVT implements IHeightData {
                         double[] tileUV = tile.getUV();
                         double tilesPerLevel = Math.pow(2.0, level);
                         double tileU = (u - tileUV[0]) * tilesPerLevel * svt.root.length;
-                        double tileV = 1.0 - (v - tileUV[1]) * tilesPerLevel;
+                        double tileV = (v - tileUV[1]) * tilesPerLevel;
                         model.setPixmap(pm);
                         return BilinearInterpolator.interpolate(tileU, tileV, model, false, false);
                     }

@@ -34,7 +34,7 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
     }
 
     /**
-     * Get the UV coordinates in [0,1] of the top left position of this tile.
+     * Get the UV coordinates in [0,1] of the top-left position of this tile. The UV coordinates start at the bottom-left.
      *
      * @return The UV coordinates of this tile.
      */
@@ -42,7 +42,7 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
         var numCols = (double) tree.getUTileCount(level);
         var numRows = (double) tree.getVTileCount(level);
 
-        return new double[] { (double) col / numCols, (double) row / numRows };
+        return new double[] { (double) col / numCols, 1.0 - (double) row / numRows };
     }
 
     /**
