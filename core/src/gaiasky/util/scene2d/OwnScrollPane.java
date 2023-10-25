@@ -55,8 +55,7 @@ public class OwnScrollPane extends ScrollPane {
     private void setFocusModeListener() {
         // Focus listener.
         addListener((e) -> {
-            if (e instanceof InputEvent) {
-                InputEvent ie = (InputEvent) e;
+            if (e instanceof InputEvent ie) {
                 e.setBubbles(bubbles);
                 if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
                     return this.getStage().setScrollFocus(this);
@@ -117,13 +116,6 @@ public class OwnScrollPane extends ScrollPane {
         } else {
             return super.getPrefHeight();
         }
-    }
-
-    /**
-     * Returns the amount to scroll vertically when the mouse wheel is scrolled.
-     */
-    protected float getMouseWheelY() {
-        return 30;
     }
 
 }
