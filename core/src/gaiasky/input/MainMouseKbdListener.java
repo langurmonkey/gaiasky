@@ -374,8 +374,9 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
             if (button == leftMouseButton) {
                 if (isKeyPressed(rollKey)) {
-                    if (dragDx != 0)
+                    if (dragDx != 0) {
                         camera.addRoll(dragDx, accel);
+                    }
                 } else {
                     camera.addRotateMovement(dragDx, dragDy, false, accel);
                 }
@@ -395,8 +396,9 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     }
                 }
             } else if (button == middleMouseButton) {
-                if (dragDx != 0)
+                if (dragDx != 0) {
                     camera.addForwardForce(dragDx);
+                }
             }
             camera.setGamepadInput(false);
             return false;

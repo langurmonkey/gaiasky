@@ -10,6 +10,7 @@ package gaiasky.scene.camera;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.math.Vector3b;
@@ -145,7 +146,6 @@ public interface ICamera {
      * Checks if the given entity is the current focus.
      *
      * @param entity The entity.
-     *
      * @return Whether the entity is focus.
      */
     boolean isFocus(Entity entity);
@@ -218,7 +218,17 @@ public interface ICamera {
 
     void swapBuffers();
 
-    /** Main input mode is a gamepad. **/
+    /**
+     * Main input mode is a gamepad.
+     **/
     void setGamepadInput(boolean state);
+
+    /**
+     * Sets the current pointer coordinates, as projected on the current focus object. This only applies when the
+     * camera is in focus mode, and the focus is a planet.
+     *
+     * @param point The Cartesian coordinates of the pointer on the sphere representing the focus object.
+     */
+    void setPointerProjectionOnFocus(Vector3 point);
 
 }

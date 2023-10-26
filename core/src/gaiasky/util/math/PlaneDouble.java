@@ -59,9 +59,9 @@ public class PlaneDouble implements Serializable {
      * Sets the plane normal and distance to the origin based on the three given points which are considered to be on the plane.
      * The normal is calculated via a cross product between (point1-point2)x(point2-point3)
      *
-     * @param point1
-     * @param point2
-     * @param point3
+     * @param point1 The first point
+     * @param point2 The second point
+     * @param point3 The third point
      */
     public void set(Vector3d point1, Vector3d point2, Vector3d point3) {
         normal.set(point1).sub(point2).crs(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).nor();

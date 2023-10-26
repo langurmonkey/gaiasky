@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
@@ -415,5 +416,10 @@ public abstract class AbstractCamera implements ICamera {
     @Override
     public void setGamepadInput(boolean state) {
         this.gamepadInput = state;
+    }
+
+    @Override
+    public void setPointerProjectionOnFocus(Vector3 point) {
+        // Empty.
     }
 }

@@ -24,7 +24,7 @@ import gaiasky.util.math.Vector3d;
 
 public class CameraUtils {
 
-    private static ModelUpdater updater = new ModelUpdater(null, 0);
+    private static final ModelUpdater updater = new ModelUpdater(null, 0);
 
     /**
      * Checks if the entity e is hit by the screen position x and y.
@@ -49,12 +49,14 @@ public class CameraUtils {
         boolean inter = intersectScreenSphere(f, e, camera, sx, sy, v0, v1, vec, intersection);
 
         if (inter) {
-            // We found an intersection point
+            // We found an intersection point.
             updater.setToLocalTransform(e, f.getBody(), f.getGraph(), 1, localTransformInv, false);
             localTransformInv.inv();
-            intersection.mul(localTransformInv);
+            // We use v0 because we need the unmodified intersection position in the camera manager.
+            v0.set(intersection);
+            v0.mul(localTransformInv);
 
-            in.set(intersection);
+            in.set(v0);
             Coordinates.cartesianToSpherical(in, out);
 
             lonlat[0] = (Nature.TO_DEG * out.x + 90) % 360;

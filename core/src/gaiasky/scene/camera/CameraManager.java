@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -252,6 +251,11 @@ public class CameraManager implements ICamera, IObserver {
         current.setGamepadInput(state);
     }
 
+    @Override
+    public void setPointerProjectionOnFocus(Vector3 point) {
+        current.setPointerProjectionOnFocus(point);
+    }
+
     public void backupCamera() {
         backupCamera = new BackupProjectionCamera(current.getCamera());
     }
@@ -300,14 +304,19 @@ public class CameraManager implements ICamera, IObserver {
 
         int height = Gdx.graphics.getHeight();
 
-        // This check is for windows, which crashes when the window is minimized
+        // This check is for Windows, which crashes when the window is minimized
         // as graphics.get[Width|Height]() returns 0.
         if (width > 0 && height > 0) {
             // Update Pointer and view Alpha/Delta
             updateRADEC(screenX, screenY, width / 2, height / 2);
         }
-        // Update Pointer LAT/LON
-        updateFocusLatLon(screenX, screenY);
+        // Update Pointer LAT/LON.
+        boolean ok = updateFocusLatLon(screenX, screenY);
+
+        // Surface mode.
+        if (ok && current.hasFocus() && ((FocusView) current.getFocus()).isPlanet()) {
+            current.setPointerProjectionOnFocus(intersection);
+        }
 
         // Work out and broadcast the closest objects
         IFocus closestBody = getClosestBody();
@@ -373,10 +382,10 @@ public class CameraManager implements ICamera, IObserver {
 
     }
 
-    private void updateFocusLatLon(int screenX, int screenY) {
+    private boolean updateFocusLatLon(int screenX, int screenY) {
         if (isNatural()) {
-            // Hover over planets gets us lat/lon
-            if (current.hasFocus() && Mapper.atmosphere.has(((FocusView) current.getFocus()).getEntity())) {
+            // Hover over planets gets us lat/lon.
+            if (current.hasFocus() && ((FocusView) current.getFocus()).isPlanet()) {
                 FocusView e = (FocusView) current.getFocus();
                 double[] lonlat = new double[2];
                 boolean ok = CameraUtils.getLonLat(e, e.getEntity(), getCurrent(), screenX, screenY, v0, v1, vec, intersection, in, out, localTransformInv, lonlat);
@@ -384,9 +393,10 @@ public class CameraManager implements ICamera, IObserver {
                 if (ok)
                     EventManager.publish(Event.LON_LAT_UPDATED, this, lonlat[0], lonlat[1], screenX, screenY);
 
+                return ok;
             }
-
         }
+        return false;
     }
 
     /**
