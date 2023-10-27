@@ -110,7 +110,7 @@ scene:
     # Camera speed multiplier.
     speed: 10.0
     # Camera turn velocity.
-    turn: 3000.0
+    turn: 1060.0
     # Camera rotation.
     rotate: 5000.0
     # Field of view in degrees.

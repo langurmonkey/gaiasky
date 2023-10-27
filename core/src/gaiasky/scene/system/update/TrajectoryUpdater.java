@@ -107,9 +107,8 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
             if (transformFunction != null) {
                 localTransformD.mul(transformFunction);
             }
-            if (parentGraph.orientation != null) {
+            if (transformFunction == null && parentGraph.orientation != null) {
                 localTransformD.mul(parentGraph.orientation);
-
             }
             if (trajectory.model.isExtrasolar()) {
                 localTransformD.rotate(0, 1, 0, 90);

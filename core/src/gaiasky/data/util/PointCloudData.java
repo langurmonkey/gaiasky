@@ -287,7 +287,7 @@ public class PointCloudData {
 
         long ep = e - s;
         long cp = c - s;
-        long wrapCurrentTime = ((cp % ep) + ep) % ep;
+        long  wrapCurrentTime = ep > 0 ? ((cp % ep) + ep) % ep : 0;
         return wrapCurrentTime + s;
     }
 
