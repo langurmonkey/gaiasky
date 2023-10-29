@@ -479,10 +479,6 @@ void main() {
 
     // Reflection
     vec3 reflectionColor = vec3(0.0);
-    // Reflection mask
-    #ifdef ssrFlag
-        reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
-    #endif // ssrFlag
 
     #ifdef metallicFlag
         // Roughness.
@@ -500,14 +496,12 @@ void main() {
 
         // Metallic.
         vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
-        reflectionColor = reflectionColor * metallicColor;
         #ifdef ssrFlag
             vec3 rmc = diffuse.rgb * metallicColor;
             reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
-            reflectionColor *= 0.0;
-        #else
-            reflectionColor += reflectionColor * diffuse.rgb;
         #endif // ssrFlag
+        reflectionColor = reflectionColor * metallicColor;
+        reflectionColor += reflectionColor * diffuse.rgb;
     #endif // metallicFlag
 
     //#ifdef iorFlag

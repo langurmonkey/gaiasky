@@ -325,12 +325,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                     }
                 }
             }
-            // Add skybox to materials if reflection present
-            if (!Settings.settings.postprocess.ssr.active) {
-                addReflectionCubemapAttribute(model.materials);
-            }
+            // Add skybox to materials.
+            addReflectionCubemapAttribute(model.materials);
         } else if (type != null) {
-            // We actually need to create the model
+            // We actually need to create the model.
             Bits attributes = Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates);
             if (params.containsKey("attributes")) {
                 attributes = Bits.indexes(((Long) params.get("attributes")).intValue());
@@ -951,18 +949,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                     mtc.setGenerated(false);
                 }
             });
-        } else if (event == Event.SSR_CMD) {
-            if (instance != null) {
-                // Update cubemap
-                boolean active = (Boolean) data[0];
-                if (active) {
-                    // Remove cubemap
-                    removeReflectionCubemapAttribute(instance.materials);
-                } else {
-                    // Add cubemap
-                    addReflectionCubemapAttribute(instance.materials);
-                }
-            }
         } else if (event == Event.ECLIPSES_CMD) {
             boolean active = (Boolean) data[0];
             if (!active) {
