@@ -49,7 +49,7 @@ bool isSamplingEnabled = true;
 // Ray-march iterations
 int iterationCount = 60;
 // Number of samples if sampling is enabled
-int sampleCount = 4;
+int sampleCount = 2;
 
 #define M_TO_U 1.0e-9
 #define PC_TO_U 3.08567758149137e7
@@ -148,12 +148,29 @@ vec2 raymarch(vec3 P, vec3 R) {
     }
 }
 
+// Computes the transition factor from cubemap (0) to SSR (1) at the edges.
+float transition(vec2 coords) {
+    #define MARGIN 0.2
+    #define MARGIN_FACTOR 1.0 / MARGIN
+
+    if (coords.x >= 0.0 && coords.x < MARGIN) {
+        return coords.x * MARGIN_FACTOR;
+    } else if (coords.x > 1.0 - MARGIN && coords.x <= 1.0) {
+        return abs(1.0 - (coords.x + MARGIN - 1.0) * MARGIN_FACTOR);
+    } else if (coords.y >= 0.0 && coords.y < MARGIN) {
+        return coords.y * MARGIN_FACTOR;
+    } else if (coords.y > 1.0 - MARGIN && coords.y <= 1.0) {
+        return abs(1.0 - (coords.y + MARGIN - 1.0) * MARGIN_FACTOR);
+    } else
+    return 1.0;
+}
+
 void main(void) {
     vec4 mask = texture(u_texture3, v_texCoords);
     vec3 maskColor = vec3(mask.r, unpack2(mask.g));
-    float roughness = clamp(mask.b * 0.3, 0.0, 0.3);
+    float metallic = mask.r;
     vec3 col = texture(u_texture0, v_texCoords).rgb;
-    if (mask.r > 0.0) {
+    if (metallic > 0.0) {
         // SSR
         vec3 N = (u_view * normalize(texture(u_texture2, v_texCoords))).xyz;
         vec3 P = viewFromDepth(v_texCoords).xyz;
@@ -162,6 +179,8 @@ void main(void) {
         vec3 R = normalize(reflect(normalize(P), normalize(N)));
 
         if (isSamplingEnabled) {
+            // Use roughness to randomize ray direction a bit.
+            float roughness = clamp(mask.b * 0.3, 0.0, 0.3);
             vec3 firstBasis = normalize(cross(vec3(0.0, 0.0, 1.0), R));
             vec3 secondBasis = normalize(cross(R, firstBasis));
             vec4 resultingColor = vec4(0.0);
@@ -169,6 +188,7 @@ void main(void) {
                 vec2 coeffs = vec2(random(v_texCoords + vec2(0, i)) + random(v_texCoords + vec2(i, 0))) * roughness;
                 vec3 reflectionDirectionRandomized = R + firstBasis * coeffs.x + secondBasis * coeffs.y;
                 vec2 coords = raymarch(P, normalize(reflectionDirectionRandomized));
+                float transition = transition(coords);
                 // We only use it if reflection is inside the screen.
                 if (all(greaterThan(coords, vec2(0.0))) && all(lessThan(coords, vec2(1.0)))) {
                     vec3 reflection = texture(u_texture0, coords).rgb;
@@ -178,19 +198,43 @@ void main(void) {
                 }
             }
             if (resultingColor.w == 0.0) {
+                // Use input color.
                 fragColor = vec4(col, 1.0);
             } else {
-                resultingColor /= resultingColor.w;
-                fragColor = vec4(mix(resultingColor.rgb, maskColor, 0.15), 1.0);
+                vec2 mainCoords = raymarch(P, R);
+                float transition = transition(mainCoords);
+                if (transition >= 1.0) {
+                    // Full SSR.
+                    resultingColor /= resultingColor.w;
+                    fragColor =vec4(mix(resultingColor.rgb, maskColor, 0.3), 1.0);
+                } else if (transition <= 0.0) {
+                    // Full cubemap.
+                    fragColor = vec4(col, 1.0);
+                } else {
+                    // Mix.
+                    resultingColor /= resultingColor.w;
+                    vec4 colSSR = vec4(mix(resultingColor.rgb, maskColor, 0.3), 1.0);
+                    vec4 colCubemap = vec4(col, 1.0);
+                    fragColor = mix(colCubemap, colSSR, transition);
+                }
             }
         } else {
             // Ray cast
             vec2 coords = raymarch(P, R);
-            if (all(greaterThan(coords, vec2(0.0))) && all(lessThan(coords, vec2(1.0)))) {
-                vec3 reflection = texture(u_texture0, coords).rgb;
-                fragColor = vec4(col + mix(reflection, maskColor, 0.15), 1.0);
-            } else {
+            float transition = transition(coords);
+            if (transition >= 1.0) {
+                // Full SSR.
+                vec3 resultingColor = texture(u_texture0, coords).rgb;
+                fragColor = vec4(mix(resultingColor.rgb, maskColor, 0.3), 1.0);
+            } else if (transition <= 0.0) {
+                // Full cubemap.
                 fragColor = vec4(col, 1.0);
+            } else {
+                // Mix.
+                vec3 resultingColor = texture(u_texture0, coords).rgb;
+                vec4 colSSR = vec4(mix(resultingColor.rgb, maskColor, 0.3), 1.0);
+                vec4 colCubemap = vec4(col, 1.0);
+                fragColor = mix(colCubemap, colSSR, transition);
             }
         }
     } else {
@@ -200,5 +244,5 @@ void main(void) {
     // View normal buffer
     //fragColor = vec4(texture(u_texture2, v_texCoords).xyz, 1.0);
     // View reflection mask
-    //fragColor = vec4(maskColor, 1.0);
+    //fragColor = vec4(metallic, 1.0);
 }

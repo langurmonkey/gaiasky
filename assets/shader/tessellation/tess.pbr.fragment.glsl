@@ -497,11 +497,10 @@ void main() {
         // Metallic.
         vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
         #ifdef ssrFlag
-            vec3 rmc = diffuse.rgb * metallicColor;
+            vec3 rmc = diffuse.rgb * metallicColor.r;
             reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
         #endif // ssrFlag
-        reflectionColor = reflectionColor * metallicColor;
-        reflectionColor += reflectionColor * diffuse.rgb;
+        reflectionColor = reflectionColor * metallicColor.r;
     #endif // metallicFlag
 
     //#ifdef iorFlag
