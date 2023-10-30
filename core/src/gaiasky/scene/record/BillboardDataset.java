@@ -22,18 +22,18 @@ import java.util.List;
 public class BillboardDataset {
     private static final Log logger = Logger.getLogger(BillboardDataset.class);
 
-    // The source file
+    // The source file.
     public String file;
-    // Unpacked file path
+    // Unpacked file path.
     public String fileUnpack;
-    // The data points
+    // The data points.
     public List<IParticleRecord> data;
-    // Type of data
+    // Type of data.
     public ParticleType type;
-    // Texture layers to use
+    // Texture layers to use.
     public int[] layers;
-    // Modulus (to skip data)
-    public int modulus = 0;
+    // Array with completion rate per graphics quality (to skip data).
+    public float[] completion;
     // Render size factor
     public float size = 1;
     // The intensity factor
@@ -94,17 +94,40 @@ public class BillboardDataset {
 
     public void setLayers(int[] layers) {
         this.layers = new int[layers.length];
-        for (int i = 0; i < layers.length; i++) {
-            this.layers[i] = layers[i];
+        System.arraycopy(layers, 0, this.layers, 0, layers.length);
+    }
+
+    /**
+     * Sets the completion rate to skip particles, in [0..1].
+     *
+     * @param completion The completion rate, applied to all graphics qualities.
+     */
+    public void setCompletion(Double completion) {
+        float c = completion.floatValue();
+        this.completion = new float[]{c, c, c, c};
+    }
+
+    /**
+     * Sets the completion rate array per graphics quality.
+     *
+     * @param completion Array with the completion rate for each quality setting.
+     */
+    public void setCompletion(double[] completion) {
+        int len = GraphicsQuality.values().length;
+        if (completion.length == len) {
+            this.completion = new float[]{(float) completion[0], (float) completion[1], (float) completion[2], (float) completion[3]};
+        } else {
+            // What to do?
+            logger.warn("The length of the completion array must be " + len + ", got " + completion.length);
         }
     }
 
-    public void setModulus(Long modulus) {
-        this.modulus = modulus.intValue();
+    public void setDepthMask(Boolean depthMask) {
+        this.depthMask = depthMask;
     }
 
     public void setDepthmask(Boolean depthMask) {
-        this.depthMask = depthMask;
+        setDepthMask(depthMask);
     }
 
     public void setBlending(String blending) {
@@ -112,12 +135,12 @@ public class BillboardDataset {
     }
 
     /**
-     * Sets the maximum size as a solid angle [deg].
+     * Set the maximum size as a solid angle [deg].
      * The same setting is used for all graphics quality settings.
      *
      * @param maxSize The maximum size in degrees.
      */
-    public void setMaxsize(Double maxSize) {
+    public void setMaxSize(Double maxSize) {
         this.maxSizes = new double[GraphicsQuality.values().length];
         double val = Math.tan(Math.toRadians(maxSize));
         for (int i = 0; i < GraphicsQuality.values().length; i++) {
@@ -126,12 +149,23 @@ public class BillboardDataset {
     }
 
     /**
-     * Sets the maximum size as a list of solid angles [deg], one
-     * for each of the graphics qualities LOW, NORMAL, HIGH and ULTRA.
+     * Alias to {@link #setMaxSize(Double)}.
+     *
+     * @param maxSize The maximum size in degrees.
+     * @deprecated Use {@link #setMaxSize(Double)} instead.
+     */
+    @Deprecated
+    public void setMaxsize(Double maxSize) {
+        setMaxSize(maxSize);
+    }
+
+    /**
+     * Set the maximum size as a list of solid angles [deg], one
+     * for each of the graphics qualities [LOW, MED, HIGH, ULTRA].
      *
      * @param maxSizes The maximum size per graphics quality, in degrees.
      */
-    public void setMaxsizes(double[] maxSizes) {
+    public void setMaxSizes(double[] maxSizes) {
         int len = GraphicsQuality.values().length;
         if (maxSizes.length == len) {
             this.maxSizes = new double[GraphicsQuality.values().length];
@@ -140,8 +174,19 @@ public class BillboardDataset {
             }
         } else {
             // What to do?
-            logger.warn("The length of the maximum sizes array must be 4, got " + maxSizes.length);
+            logger.warn("The length of the completion array must be " + len + ", got " + maxSizes.length);
         }
+    }
+
+    /**
+     * Alias to {@link #setMaxSizes(double[])}.
+     *
+     * @param maxSizes The maximum size per graphics quality, in degrees.
+     * @deprecated Use {@link #setMaxSizes(double[])} instead.
+     */
+    @Deprecated
+    public void setMaxsizes(double[] maxSizes) {
+        setMaxSizes(maxSizes);
     }
 
     public enum ParticleType {

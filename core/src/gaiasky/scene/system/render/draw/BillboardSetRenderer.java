@@ -190,7 +190,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
      *
      * @param bd The billboard dataset.
      * @param cg The color generator.
-     *
      * @return The GPU data object.
      */
     private GpuData convertDataToGpu(BillboardDataset bd,
@@ -208,6 +207,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         int uvOffset = 3;
         int particlePosOffset = 5;
         int additionalOffset = 8;
+        float completion = bd.completion == null ? 1f : bd.completion[Settings.settings.graphics.quality.ordinal()];
+
         List<IParticleRecord> data = bd.data;
         ad.vertices = new float[data.size() * vertexSize * 4];
         ad.indices = new int[data.size() * 6];
@@ -216,7 +217,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
         int i = 0;
         for (IParticleRecord particle : data) {
-            if (bd.modulus == 0 || i % bd.modulus == 0) {
+            if (completion == 1f || StdRandom.uniform() <= completion) {
                 int layer = StdRandom.uniform(nLayers);
                 for (int vert = 0; vert < 4; vert++) {
                     // Vertex POSITION
@@ -225,7 +226,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
                     // COLOR
                     double[] doubleData = particle.rawDoubleData();
-                    float[] col = doubleData.length >= 7 ? new float[] { (float) doubleData[4], (float) doubleData[5], (float) doubleData[6] } : cg.generateColor();
+                    float[] col = doubleData.length >= 7 ? new float[]{(float) doubleData[4], (float) doubleData[5], (float) doubleData[6]} : cg.generateColor();
                     col[0] = MathUtilsDouble.clamp(col[0], 0f, 1f);
                     col[1] = MathUtilsDouble.clamp(col[1], 0f, 1f);
                     col[2] = MathUtilsDouble.clamp(col[2], 0f, 1f);
@@ -287,7 +288,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
      *
      * @param render The render object.
      * @param base   The base component.
-     *
      * @return True if all data is already in the GPU.
      */
     private boolean streamToGpu(Render render,
@@ -334,24 +334,24 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
             var set = Mapper.billboardSet.get(render.entity);
 
             switch (set.status.get()) {
-            case NOT_LOADED -> {
-                // PRELOAD
-                set.setStatus(LoadStatus.LOADING);
-                GaiaSky.instance.getExecutorService().execute(() -> {
-                    convertDataToGpuFormat(render, base, set);
-                    set.setStatus(LoadStatus.READY);
-                });
-            }
-            case READY, PARTIALLY_LOADED -> {
-                // TO GPU, one component at a time.
-                if (streamToGpu(render, base)) {
-                    set.setStatus(LoadStatus.LOADED);
-                } else {
-                    set.setStatus(LoadStatus.PARTIALLY_LOADED);
+                case NOT_LOADED -> {
+                    // PRELOAD
+                    set.setStatus(LoadStatus.LOADING);
+                    GaiaSky.instance.getExecutorService().execute(() -> {
+                        convertDataToGpuFormat(render, base, set);
+                        set.setStatus(LoadStatus.READY);
+                    });
                 }
-                render(renderable, render, camera);
-            }
-            case LOADED -> render(renderable, render, camera);
+                case READY, PARTIALLY_LOADED -> {
+                    // TO GPU, one component at a time.
+                    if (streamToGpu(render, base)) {
+                        set.setStatus(LoadStatus.LOADED);
+                    } else {
+                        set.setStatus(LoadStatus.PARTIALLY_LOADED);
+                    }
+                    render(renderable, render, camera);
+                }
+                case LOADED -> render(renderable, render, camera);
             }
         }
     }
@@ -395,8 +395,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     BillboardDataset dataset = meshDataWrap.dataset;
                     // Blend mode
                     switch (dataset.blending) {
-                    case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-                    case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                        case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                        case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
                     }
                     // Depth mask
                     Gdx.gl20.glDepthMask(dataset.depthMask);
@@ -440,6 +440,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
     private interface ColorGenerator {
         float[] generateColor();
+
         float generateAlpha();
     }
 
@@ -448,10 +449,10 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
             float r = (float) StdRandom.gaussian() * 0.15f;
             if (StdRandom.uniform(2) == 0) {
                 // Blue/white star
-                return new float[] { 0.95f - r, 0.8f - r, 0.6f };
+                return new float[]{0.95f - r, 0.8f - r, 0.6f};
             } else {
                 // Red/white star
-                return new float[] { 0.95f, 0.8f - r, 0.6f - r };
+                return new float[]{0.95f, 0.8f - r, 0.6f - r};
             }
         }
 
@@ -465,7 +466,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         @Override
         public float[] generateColor() {
             float r = (float) Math.abs(StdRandom.uniform() * 0.2 + 0.07);
-            return new float[] { r, r, r };
+            return new float[]{r, r, r};
         }
 
         @Override
