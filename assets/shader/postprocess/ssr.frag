@@ -36,20 +36,20 @@ in vec3 v_ray;
 // OUTPUTS
 layout (location = 0) out vec4 fragColor;
 
-// Do a binary search pass in case no hit is found
+// Do a binary search pass in case no hit is found.
 bool isBinarySearchEnabled = true;
-// Use adaptive iterative convergence
+// Use adaptive iterative convergence.
 bool isAdaptiveStepEnabled = true;
-// Use exponential steps
+// Use exponential steps.
 bool isExponentialStepEnabled = true;
 // Take multiple samples with slightly randomized directions
-// depending on material roughness
+// depending on material roughness.
 bool isSamplingEnabled = true;
 
-// Ray-march iterations
-int iterationCount = 60;
-// Number of samples if sampling is enabled
-int sampleCount = 2;
+// Ray-march iterations.
+int iterationCount = 100;
+// Number of samples if sampling is enabled.
+int sampleCount = 3;
 
 #define M_TO_U 1.0e-9
 #define PC_TO_U 3.08567758149137e7
@@ -110,7 +110,7 @@ vec2 raymarch(vec3 P, vec3 R) {
         if (isBinarySearchEnabled && delta > 0) {
             break;
         }
-        if (isAdaptiveStepEnabled){
+        if (isAdaptiveStepEnabled) {
             float directionSign = sign(abs(marchingPosition.z) - depthFromScreen);
             //this is sort of adapting step, should prevent lining reflection by doing sort of iterative converging
             //some implementation doing it by binary search, but I found this idea more cheaty and way easier to implement
@@ -123,7 +123,7 @@ vec2 raymarch(vec3 P, vec3 R) {
             step *= 1.05;
         }
     }
-    if(isBinarySearchEnabled){
+    if (isBinarySearchEnabled) {
         for(; i < iterationCount; i++){
             step *= 0.5;
             marchingPosition = marchingPosition - step * sign(delta);
@@ -137,9 +137,9 @@ vec2 raymarch(vec3 P, vec3 R) {
             }
         }
     }
-    // This is specific to Gaia Sky
+    // This is specific to Gaia Sky.
     // Stars do not populate the depth buffer, so we only
-    // reflect things that are far away (> 1e6 km)
+    // reflect things that are far away (> 1e6 km).
     float z = getViewDepth(screenPosition);
     if(z < 1.0e9 * M_TO_U) {
         return vec2(-1.0);
