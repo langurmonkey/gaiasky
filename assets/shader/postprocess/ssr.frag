@@ -161,8 +161,13 @@ float transition(vec2 coords) {
         return coords.y * MARGIN_FACTOR;
     } else if (coords.y > 1.0 - MARGIN && coords.y <= 1.0) {
         return abs(1.0 - (coords.y + MARGIN - 1.0) * MARGIN_FACTOR);
-    } else
-    return 1.0;
+    } else if (coords.x >= MARGIN && coords.x <= 1.0 - MARGIN && coords.y >= MARGIN && coords.y <= 1.0 - MARGIN) {
+        // Full SSR.
+        return 1.0;
+    } else {
+        // Full Cubemap.
+        return 0.0;
+    }
 }
 
 void main(void) {
