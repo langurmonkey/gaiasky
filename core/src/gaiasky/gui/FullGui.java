@@ -100,8 +100,6 @@ public class FullGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        logger.info(I18n.msg("notif.gui.init"));
-
         interfaces = new Array<>();
 
         buildGui();

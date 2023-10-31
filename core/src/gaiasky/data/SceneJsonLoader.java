@@ -35,9 +35,9 @@ public class SceneJsonLoader {
     private static final Map<String, Entity> globalIndex = new HashMap<>();
 
     public synchronized static void loadScene(FileHandle[] jsonFiles, Scene scene) throws FileNotFoundException, ReflectionException {
-        logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
+        logger.info(I18n.msg("notif.loading", I18n.msg("gui.data.json.metadata.files")));
         for (FileHandle fh : jsonFiles) {
-            logger.info("\t" + fh.path() + " - exists: " + fh.exists());
+            logger.debug(I18n.msg("notif.file.exists", fh.path(), I18n.msg("gui." + fh.exists())));
             if (!fh.exists()) {
                 logger.error(I18n.msg("error.loading.notexistent", fh.path()));
             }

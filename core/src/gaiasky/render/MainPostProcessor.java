@@ -158,7 +158,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     private PostProcessBean newPostProcessor(RenderType rt, float width, float height, float targetWidth, float targetHeight, AssetManager manager) {
-        logger.info("Initialising " + rt.name() + " post-processor");
         PostProcessBean ppb = new PostProcessBean();
 
         Settings settings = Settings.settings;

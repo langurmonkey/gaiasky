@@ -277,7 +277,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             Pair<UCD, Double> pos3 = getDoubleUcd(ucdParser.POS3, row);
                             // Check missing pos3 -> Use default parallax
                             if (ucdParser.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
-                                c = new Pair<>(null, 0.04);
+                                c = new Pair<>(null, Constants.DEFAULT_PARALLAX);
                                 unitC = "mas";
                                 nInvalidParallaxes++;
                             } else {
@@ -291,7 +291,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             PositionType pt = ucdParser.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
                             // Check negative parallaxes -> Use default for consistency
                             if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
-                                c.setSecond(0.04);
+                                c.setSecond(Constants.DEFAULT_PARALLAX);
                                 unitC = "mas";
                                 nInvalidParallaxes++;
                             }
@@ -340,13 +340,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 Pair<UCD, Double> appMagPair = getDoubleUcd(ucdParser.MAG, row);
                                 if (appMagPair == null) {
                                     // Default magnitude.
-                                    appMag = 15;
+                                    appMag = Constants.DEFUALT_MAG;
                                 } else {
                                     appMag = appMagPair.getSecond();
                                 }
                             } else {
                                 // Default magnitude.
-                                appMag = 15;
+                                appMag = Constants.DEFUALT_MAG;
                             }
                             // Scale magnitude if needed.
                             double magScl = isStars && datasetOptions != null ? datasetOptions.magnitudeScale : 0f;
@@ -385,13 +385,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (!ucdParser.COL.isEmpty()) {
                                 Pair<UCD, Double> colPair = getDoubleUcd(ucdParser.COL, row);
                                 if (colPair == null) {
-                                    colorIndex = 0.656f;
+                                    colorIndex = (float) Constants.DEFAULT_COLOR;
                                 } else {
                                     colorIndex = colPair.getSecond().floatValue();
                                 }
                             } else {
                                 // Default color index for stars, NaN for others.
-                                colorIndex = isStars ? 0.656f : Float.NaN;
+                                colorIndex = isStars ? (float) Constants.DEFAULT_COLOR : Float.NaN;
                             }
 
                             // VARIABILITY
@@ -639,7 +639,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                         } catch (Exception e) {
                             logger.debug(e);
-                            logger.debug("Exception parsing row " + i + ": skipping");
+                            logger.debug(I18n.msg("debug.parse.row.skip", i));
                         }
                         i++;
                         if (updateCallback != null && i % step == 0) {
@@ -647,16 +647,16 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         }
                     }
                     if (nInvalidParallaxes > 0) {
-                        logger.warn("Found " + nInvalidParallaxes + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
+                        logger.warn(I18n.msg("warn.star.parallax", nInvalidParallaxes, Constants.DEFAULT_PARALLAX));
                     }
                     if (resampledLightCurves > 0) {
-                        logger.warn(resampledLightCurves + " light curves resampled to fit in default array size (=" + VariableSetInstancedRenderer.MAX_VARI + ")");
+                        logger.warn(I18n.msg("warn.star.vari.resample", resampledLightCurves, VariableSetInstancedRenderer.MAX_VARI));
                     }
                     if (noPeriods > 0) {
-                        logger.warn("Skipped " + noPeriods + " variable stars without a period");
+                        logger.warn(I18n.msg("warn.star.vari.noperiod", noPeriods));
                     }
                 } else {
-                    logger.error("Table not loaded: Position not found");
+                    logger.error(I18n.msg("error.star.noposition"));
                 }
             }
         } catch (Exception e) {

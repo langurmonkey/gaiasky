@@ -293,7 +293,7 @@ public class Scene {
             runOnce(sceneGraphBuilderSystem);
 
             GraphNode rootGraph = Mapper.graph.get(index.getEntity("Universe"));
-            logger.info("Initialized " + (rootGraph.numChildren + 1) + " into the scene graph.");
+            logger.info(I18n.msg("notif.sg.init", (rootGraph.numChildren + 1)));
         }
     }
 

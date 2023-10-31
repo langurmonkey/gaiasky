@@ -13,6 +13,7 @@ import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -48,11 +49,11 @@ public class BookmarksManager implements IObserver {
                 logger.error(e);
             }
         }
-        logger.info("Using bookmarks file: " + bookmarksFile);
+        logger.info(I18n.msg("gui.bookmark.file.use", bookmarksFile));
 
         bookmarks = loadBookmarks(bookmarksFile);
         if (bookmarks != null) {
-            logger.info(bookmarks.size() + " bookmarks loaded");
+            logger.info(I18n.msg("gui.bookmark.loaded", bookmarks.size()));
         }
 
     }

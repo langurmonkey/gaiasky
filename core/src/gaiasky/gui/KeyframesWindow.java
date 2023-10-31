@@ -547,7 +547,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 if (ni != null && !ni.isEmpty()) {
                     name = ni;
                 } else {
-                    name = "Keyframe " + (manager.keyframes.size + 1);
+                    name = I18n.msg("gui.keyframes.name.default", (manager.keyframes.size + 1));
                 }
 
                 Keyframe kf = new Keyframe(name, cPos, cDir, cUp, cTime, secsAfter, false);
@@ -722,7 +722,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             // Update timeline slider.
             timelineSlider = new OwnSlider(0f, manager.currentPath.n - 1, 1f, skin);
             timelineSlider.setWidth(800f);
-            timelineSlider.setValuePrefix("frame ");
+            timelineSlider.setValuePrefix(I18n.msg("gui.keyframes.frame").strip() + " ");
             timelineSlider.setValueFormatter(new DecimalFormat("######0"));
             timelineSlider.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
@@ -833,8 +833,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Can't modify time of first keyframe; it's always zero
         if (index > 0)
             secondsL.addListener((event) -> {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
+                if (event instanceof InputEvent ie) {
                     if (ie.getType().equals(InputEvent.Type.touchDown)) {
                         if (editing.notEmpty()) {
                             // Remove current
@@ -850,9 +849,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         stage.setKeyboardFocus(secondsInput);
                         editing.setSeconds(kf, index, secondsInput, prevT);
                         secondsInput.addListener((evt) -> {
-                            if (secondsInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
-                                InputEvent ievt = (InputEvent) evt;
-                                if (ievt.getType() == InputEvent.Type.keyDown && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
+                            if (secondsInput.isValid() && evt instanceof InputEvent ie2 && System.currentTimeMillis() - lastMs > 1500) {
+                                if (ie2.getType() == InputEvent.Type.keyDown && (ie2.getKeyCode() == Input.Keys.ENTER || ie2.getKeyCode() == Input.Keys.ESCAPE)) {
                                     double val = Double.parseDouble(secondsInput.getText());
                                     double t = 0;
                                     for (Keyframe k : manager.keyframes) {
@@ -860,7 +858,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                             break;
                                         t += k.seconds;
                                     }
-                                    ievt.cancel();
+                                    ie2.cancel();
                                     if (val > t) {
                                         kf.seconds = val - t;
                                         GaiaSky.postRunnable(() -> {
@@ -871,8 +869,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                         });
                                     }
                                     editing.unset();
-                                } else if (ievt.getType() == InputEvent.Type.keyUp && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
-                                    ievt.cancel();
+                                } else if (ie2.getType() == InputEvent.Type.keyUp && (ie2.getKeyCode() == Input.Keys.ENTER || ie2.getKeyCode() == Input.Keys.ESCAPE)) {
+                                    ie2.cancel();
                                 }
                             }
                             evt.setBubbles(false);
@@ -905,8 +903,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         keyframeNames.put(kf, nameL);
         nameL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.name"), skin));
         nameL.addListener((event) -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == InputEvent.Type.touchDown) {
                     if (editing.notEmpty()) {
                         // Remove current
@@ -926,9 +923,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     stage.setKeyboardFocus(nameInput);
                     editing.setName(kf, index, nameInput);
                     nameInput.addListener((evt) -> {
-                        if (nameInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
-                            InputEvent ievt = (InputEvent) evt;
-                            if (ievt.getType() == InputEvent.Type.keyDown && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
+                        if (nameInput.isValid() && evt instanceof InputEvent ie2 && System.currentTimeMillis() - lastMs > 1500) {
+                            if (ie2.getType() == InputEvent.Type.keyDown && (ie2.getKeyCode() == Input.Keys.ENTER || ie2.getKeyCode() == Input.Keys.ESCAPE)) {
                                 kf.name = nameInput.getText();
                                 addFrameName(kf, index, table);
                                 editing.unset();
@@ -1114,8 +1110,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private void addHighlightListener(Actor a,
                                       Keyframe kf) {
         a.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 synchronized (view) {
                     view.setEntity(keyframesPathEntity);
                     if (ie.getType() == InputEvent.Type.enter) {
@@ -1176,7 +1171,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                        boolean cleanModel) {
         // Clean camera.
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
-        if (focus != null && Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith("Keyframe")) {
+        if (focus != null && Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith(I18n.msg("gui.keyframes.name.default", 0).substring(0, 6))) {
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, Settings.settings.scene.homeObject);
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
         }

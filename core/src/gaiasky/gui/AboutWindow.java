@@ -170,7 +170,7 @@ public class AboutWindow extends GenericDialog {
         var author = new Table(skin);
         var authorName = new OwnLabel(Settings.AUTHOR_NAME, skin);
         var authorMail = new Link(Settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.AUTHOR_EMAIL);
-        var authorPage = new Link("tonisagrista.com", linkStyle, "https://tonisagrista.com");
+        var authorPage = new Link(Settings.AUTHOR_WEBSITE_TEXT, linkStyle, Settings.AUTHOR_WEBSITE_FULL);
         var authorMasto = new Link("@jumpinglangur@mastodon.social", linkStyle, "https://mastodon.social/@jumpinglangur");
         author.add(authorName).left().row();
         author.add(authorMail).left().row();

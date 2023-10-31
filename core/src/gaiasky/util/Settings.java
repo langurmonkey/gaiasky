@@ -83,6 +83,8 @@ public class Settings {
     public static final String AUTHOR_EMAIL = "tsagrista@ari.uni-heidelberg.de";
     public static final String AUTHOR_AFFILIATION = "Universität Heidelberg, Zentrum für Astronomie, Astronomisches Rechen-Institut";
     public static final String AUTHOR_AFFILIATION_PLAIN = "Universitaet Heidelberg, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
+    public static final String AUTHOR_WEBSITE_TEXT = "tonisagrista.com";
+    public static final String AUTHOR_WEBSITE_FULL = "https://tonisagrista.com";
     public static final String LICENSE_URL = "https://opensource.org/licenses/MPL-2.0";
     private static final Log logger = Logger.getLogger(Settings.class);
     // Static settings
@@ -401,6 +403,10 @@ public class Settings {
         UpscaleFilter(TextureFilter min, TextureFilter mag) {
             this.minification = min;
             this.magnification = mag;
+        }
+
+        public String toString() {
+            return I18n.msg("gui.upscale." + this.name().toLowerCase());
         }
     }
 

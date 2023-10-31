@@ -65,7 +65,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
         // Camera orientation
         OwnLabel orientation = new OwnLabel(I18n.msg("gui.cam.orientation"), skin);
-        OwnLabel orientationMethod = new OwnLabel("Slerp", skin);
+        OwnLabel orientationMethod = new OwnLabel(I18n.msg("gui.interpolation.slerp"), skin);
 
         // Time
         OwnLabel time = new OwnLabel(I18n.msg("gui.time"), skin);

@@ -18,6 +18,13 @@ public class Constants {
     /** Default resolution: height. **/
     public static final int DEFAULT_RESOLUTION_HEIGHT = 900;
 
+    /** Default star magnitude. **/
+    public static final double DEFUALT_MAG = 15;
+    /** Default star color index. **/
+    public static final double DEFAULT_COLOR = 0.656;
+    /** Default star parallax in mas. **/
+    public static final double DEFAULT_PARALLAX = 0.04;
+
     /**
      * Speed of light in km/h
      */
