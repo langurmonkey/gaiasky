@@ -317,14 +317,19 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         totalDist += aux.set(kf1.pos).sub(kf0.pos).len();
                     }
                     // Loop over keyframes and assign new times.
-                    for (int i = 1; i < n; i++) {
-                        Keyframe kf0 = manager.keyframes.get(i - 1);
-                        Keyframe kf1 = manager.keyframes.get(i);
-                        double dist = aux.set(kf1.pos).sub(kf0.pos).len();
-                        kf1.seconds = totalTime * dist / totalDist;
+                    // If total distance is 0, we do nothing.
+                    if (totalDist > 0) {
+                        for (int i = 1; i < n; i++) {
+                            Keyframe kf0 = manager.keyframes.get(i - 1);
+                            Keyframe kf1 = manager.keyframes.get(i);
+                            double dist = aux.set(kf1.pos).sub(kf0.pos).len();
+                            kf1.seconds = totalTime * dist / totalDist;
+                        }
+                        // Reload window contents.
+                        reinitialiseKeyframes(manager.keyframes, null);
+                    } else {
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.keyframes.normalize.dist.zero"));
                     }
-                    // Reload window contents.
-                    reinitialiseKeyframes(manager.keyframes, null);
 
                     synchronized (view) {
                         view.setEntity(keyframesPathEntity);
