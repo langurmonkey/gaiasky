@@ -1,8 +1,8 @@
 [NAME]
-gaiasky - interactive 3D simulation of the Universe
+gaiasky - real-time, 3D, astronomy visualization software
 
 [DESCRIPTION]
-Gaia Sky is a real-time, multiplatform and modern 3D Universe software. It enables the interactive exploration of the Universe, from the Solar System to the most distant galaxies. The flagship feature of Gaia Sky is the Gaia star catalog, which contains up to 1.33 billion unique stars with 3D positions, proper motions, radial velocities, magnitudes and colors.
+Gaia Sky is a real-time, multiplatform and modern 3D Universe software. It enables the interactive exploration of the Universe, from the Solar System to the most distant galaxies.
 
 [SEE ALSO]
 Online documentation: <https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest>
