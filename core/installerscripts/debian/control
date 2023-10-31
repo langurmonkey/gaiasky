@@ -1,0 +1,24 @@
+Source: gaiasky
+Section: education
+Priority: optional
+Maintainer: Toni Sagristà Sellés <me@tonisagrista.com>
+Build-Depends: debhelper-compat (= 13) openjdk-17-jdk gradle
+Standards-Version: 4.6.0
+Homepage: https://zah.uni-heidelberg.de/gaia/outreach/gaiasky
+#Vcs-Browser: https://salsa.debian.org/debian/gaiasky
+#Vcs-Git: https://salsa.debian.org/debian/gaiasky.git
+Rules-Requires-Root: no
+
+Package: gaiasky
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Real-time, 3D Universe software
+ Gaia Sky is a real-time, 3D, astronomy visualisation software which employs advanced
+ computer graphics techniques, like sparse virtual texturing, screen-space reflections,
+ real-time shadow maps, ray-marched distance fields, terrain tessellation or dynamic 
+ resolution, in order to represent the Universe in a visually appealing way while being
+ as scientifically accurate as possible.
+ .
+ Gaia Sky integrates tools to explore and manipulate astronomical catalogs in real time, 
+ like slicing/filtering and the integration with the SAMP protocol, which enables 
+ interoperability with other astronomical software packages. It also has support for VR.

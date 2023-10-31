@@ -288,10 +288,6 @@ tasks.register('dist') {
             include "gsvr_icon.ico"
         }
 
-        // Replace version in readme file
-        project.ext.versionFile = file("build/classes/java/main/version").text
-        ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
-
         if (!DefaultNativePlatform.currentOperatingSystem.windows) {
             // Give execute
             execPermission.exec()
@@ -435,13 +431,9 @@ tasks.register('createArch') {
         String sha256Tar = new File("$packageDir/" + project.distName + ".tar.gz.sha-256").text
         sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
 
-        String tagVersion = tagRev.substring(0, tagRev.lastIndexOf("."))
-        String tagRevision = "1"
-        if (tagVersion.contains("-")) {
-            String v = tagVersion
-            tagVersion = tagVersion.substring(0, tagVersion.lastIndexOf("-"))
-            tagRevision = v.substring(v.lastIndexOf("-") + 1)
-        }
+        def obj = getVersionRevision(tagRev)
+        String tagVersion = obj[0]
+        String tagRevision = obj[1]
 
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version@', value: "$tagVersion")
@@ -458,6 +450,56 @@ tasks.register('createArch') {
     }
 }
 
+tasks.register('createDebian') {
+    dependsOn createTar
+    doLast {
+        // DEBIAN directory
+        File debDebianDir = new File(project.packageDir + "/debian")
+        mkdir debDebianDir
+
+        copy {
+            from "installerscripts/debian"
+            into "$packageDir/debian"
+        }
+
+        // Read releasenotes.txt
+        // Take item lines and use '*' instead of '-'
+        def notesList = new File("$distDir/releasenotes.txt").text.readLines()
+        String notesStr = ""
+        for ( line in notesList ) {
+            def l = line.strip()
+            if (l.startsWith("-")) {
+                notesStr += l.replace('- ', ' * ')
+                notesStr += '\n'
+            }
+        }
+
+        def obj = getVersionRevision(tagRev)
+        String tagVersion = obj[0]
+        String tagRevision = obj[1]
+
+        ant.replace(file: "$packageDir/debian/changelog", token: '@version@', value: "$tagVersion-$tagRevision")
+        ant.replace(file: "$packageDir/debian/changelog", token: '@changelog@', value: "$notesStr")
+        ant.replace(file: "$packageDir/debian/changelog", token: '@date@', value: "${buildTime()}")
+
+        // Copy README.md and gaiasky.6.gz, uncompress.
+        copy {
+            from "$distDir/README.md"
+            into "$packageDir/debian/"
+        }
+        copy {
+            from "$distDir/gaiasky.6.gz"
+            into "$packageDir/debian/"
+        }
+        exec {
+            commandLine "gunzip", "$packageDir/debian/gaiasky.6.gz"
+        }
+
+
+    }
+}
+
+
 static def buildTime() {
     return new Date()
 }
@@ -467,41 +509,15 @@ def distDirSize() {
     return Math.round(dist.directorySize() / 1024)
 }
 
-tasks.register('createDeb') {
-    dependsOn createTar
-    doLast {
-        // Base deb directory
-        File debDir = new File(project.packageDir + "/$distName")
-        // Opt dir
-        File debOptDir = new File(project.packageDir + "/$distName/opt/gaiasky")
-        mkdir debOptDir
-        // DEBIAN directory
-        File debDEBIANDir = new File(project.packageDir + "/$distName/DEBIAN")
-        mkdir debDEBIANDir
-
-        copy {
-            from "installerscripts/debian"
-            into "$packageDir/$distName/DEBIAN"
-        }
-
-        ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@version.revision@', value: "$tagRev")
-        ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@installedsize@', value: "${distDirSize()}")
-        ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@date@', value: "${buildTime()}")
-
-        copy {
-            from "$distDir"
-            into "$packageDir/$distName/opt/gaiasky/"
-        }
-
-        // Create deb
-        exec {
-            executable "dpkg-deb"
-            args "--build", "$packageDir/$distName"
-        }
-
-        // Remove temp dir directory
-        delete debDir
+def getVersionRevision(String tagRev) {
+    String tagVersion = tagRev.substring(0, tagRev.lastIndexOf("."))
+    String tagRevision = "1"
+    if (tagVersion.contains("-")) {
+        String v = tagVersion
+        tagVersion = tagVersion.substring(0, tagVersion.lastIndexOf("-"))
+        tagRevision = v.substring(v.lastIndexOf("-") + 1)
     }
+    return [ tagVersion, tagRevision ]
 }
 
 tasks.register('prepareInstall4jScript') {
@@ -545,7 +561,7 @@ tasks.register('install4jMedia', Install4jTask) {
 
 
 tasks.register('pack') {
-    dependsOn 'install4jMedia', 'createAppImage', 'createArch'
+    dependsOn 'install4jMedia', 'createAppImage', 'createArch', 'createDebian'
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz and gaiasky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
