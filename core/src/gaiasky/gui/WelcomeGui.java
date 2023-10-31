@@ -245,7 +245,7 @@ public class WelcomeGui extends AbstractGui {
         float pad28 = 28f;
         float pad32 = 32f;
 
-        float buttonWidth = 440f;
+        float buttonWidth = 460f;
         float buttonHeight = 110f;
 
         Table centerContent = new Table(skin);
@@ -293,9 +293,12 @@ public class WelcomeGui extends AbstractGui {
         // Start Gaia Sky button
         OwnTextIconButton startButton = new OwnTextIconButton(I18n.msg("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
         startButton.setSpace(pad18);
+        startButton.setPad(pad16);
         startButton.setContentAlign(Align.center);
         startButton.align(Align.center);
-        startButton.setSize(buttonWidth, buttonHeight);
+        startButton.setHeight(buttonHeight);
+        startButton.pack();
+        startButton.setWidth(Math.max(startButton.getWidth(), buttonWidth));
         startButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Check base data is enabled
@@ -332,9 +335,12 @@ public class WelcomeGui extends AbstractGui {
         // Dataset manager button
         OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.msg("gui.welcome.dsmanager"), skin, "cloud-download");
         datasetManagerButton.setSpace(pad18);
+        datasetManagerButton.setPad(pad16);
         datasetManagerButton.setContentAlign(Align.center);
         datasetManagerButton.align(Align.center);
-        datasetManagerButton.setSize(buttonWidth * 0.8f, buttonHeight * 0.8f);
+        datasetManagerButton.setHeight(buttonHeight * 0.8f);
+        datasetManagerButton.pack();
+        datasetManagerButton.setWidth(Math.max(datasetManagerButton.getWidth(), buttonWidth * 0.8f));
         datasetManagerButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 addDatasetManagerWindow(serverDatasets);
