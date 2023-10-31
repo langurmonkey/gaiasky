@@ -1,7 +1,7 @@
 Source: gaiasky
 Section: education
 Priority: optional
-Maintainer: Toni Sagristà Sellés <me@tonisagrista.com>
+Maintainer: Toni Sagrista Selles <me@tonisagrista.com>
 Build-Depends: debhelper-compat (= 13) openjdk-17-jdk gradle
 Standards-Version: 4.6.0
 Homepage: https://zah.uni-heidelberg.de/gaia/outreach/gaiasky
