@@ -106,7 +106,6 @@ public class SeparatedDataFileResolver implements DataFileResolver {
             // data:application/octet-stream;base64,
             String[] headerBody = glImage.uri.split(",", 2);
             String header = headerBody[0];
-            System.out.println(header);
             String body = headerBody[1];
             byte[] data = Base64Coder.decode(body);
             return PixmapBinaryLoaderHack.load(data, 0, data.length);

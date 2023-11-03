@@ -9,6 +9,7 @@ package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,6 +23,8 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 public class GuiUtils {
+
+    private static final ThreadLocal<Vector2> vec2 = ThreadLocal.withInitial(Vector2::new);
 
     public static void addNoConnectionWindow(Skin skin, Stage stage) {
         addNoConnectionWindow(skin, stage, null);
@@ -247,8 +250,7 @@ public class GuiUtils {
     public static ScrollPane getScrollPaneIn(Actor actor) {
         if (actor instanceof ScrollPane) {
             return (ScrollPane) actor;
-        } else if (actor instanceof WidgetGroup) {
-            var group = (WidgetGroup) actor;
+        } else if (actor instanceof WidgetGroup group) {
             var children = group.getChildren();
             for (var child : children) {
                 ScrollPane scroll;
@@ -265,25 +267,22 @@ public class GuiUtils {
      * the actor is visible by moving the scroll position if required.
      *
      * @param actor The actor.
-     * @return True if the scroll needed to be moved.
      */
-    public static boolean ensureScrollVisible(Actor actor) {
+    public static void ensureScrollVisible(Actor actor) {
         if (actor != null) {
+
+            // Look for scroll pane.
             Actor parent = actor.getParent();
-            float x = actor.getX();
-            float y = actor.getY();
             while (parent != null && !(parent instanceof ScrollPane)) {
-                x += parent.getX();
-                y += parent.getY();
                 parent = parent.getParent();
             }
+
             if (parent != null) {
                 var scrollPane = (ScrollPane) parent;
-                scrollPane.scrollTo(x, y, actor.getWidth(), actor.getHeight());
-                return true;
+                var coordinates = actor.localToAscendantCoordinates(scrollPane.getActor(), vec2.get().set(actor.getX(), actor.getY()));
+                scrollPane.scrollTo(coordinates.x, coordinates.y, actor.getWidth(), Math.min(200f, actor.getHeight() * 10f));
             }
         }
-        return false;
     }
 
     /**
@@ -291,9 +290,8 @@ public class GuiUtils {
      *
      * @param group The group to test.
      * @param list  The output list where to put the scroll panes.
-     * @return The list.
      */
-    public static Array<OwnScrollPane> getScrollPanes(Group group, Array<OwnScrollPane> list) {
+    public static void getScrollPanes(Group group, Array<OwnScrollPane> list) {
         for (var actor : group.getChildren()) {
             if (actor instanceof OwnScrollPane) {
                 list.add((OwnScrollPane) actor);
@@ -302,7 +300,6 @@ public class GuiUtils {
                 getScrollPanes((WidgetGroup) actor, list);
             }
         }
-        return list;
     }
 
     /**

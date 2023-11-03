@@ -28,7 +28,7 @@ public class CollapsiblePane extends Table {
 
     /** Collapse speed in pixels per second **/
     protected float collapseSpeed;
-    CollapsibleWindow dialogWindow;
+    private CollapsibleWindow dialogWindow;
     ImageButton expandIcon, detachIcon;
     float lastX = -1, lastY = -1;
     Actor content;
@@ -56,7 +56,9 @@ public class CollapsiblePane extends Table {
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
+    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin,
+                           String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded,
+                           String shortcut, Actor... topIcons) {
         super(skin);
         this.stage = stage;
         this.labelText = labelText;
@@ -247,6 +249,7 @@ public class CollapsiblePane extends Table {
             expanding = false;
             collapsing = true;
         }
+        pack();
         EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
     }
 
@@ -303,6 +306,10 @@ public class CollapsiblePane extends Table {
         window.pack();
 
         return window;
+    }
+
+    public Button getExpandCollapseActor() {
+        return expandIcon;
     }
 
 }

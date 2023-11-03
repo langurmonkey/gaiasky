@@ -61,7 +61,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final DecimalFormat nf3;
     private final GlobalResources globalResources;
     private final Settings settings;
-    // This flag is active when the dialog is called from the welcome screen
+    // This flag is active when the dialog is called from the welcome screen.
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY,
             highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,

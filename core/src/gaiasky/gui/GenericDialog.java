@@ -175,13 +175,13 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     protected void setUpTabListeners() {
         if (tabContents != null && tabButtons != null && tabButtons.size == tabContents.size) {
-            // Let only one tab button be checked at a time
+            // Let only one tab button be checked at a time.
             ButtonGroup<Button> tabsGroup = new ButtonGroup<>();
             tabsGroup.setMinCheckCount(1);
             tabsGroup.setMaxCheckCount(1);
 
-            // Listen to changes in the tab button checked states
-            // Set visibility of the tab content to match the checked state
+            // Listen to changes in the tab button checked states.
+            // Set visibility of the tab content to match the checked state.
             ChangeListener tabListener = new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -210,7 +210,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     protected void recalculateButtonSize() {
-        // Width
+        // Width.
         float w = 128f;
         for (Actor button : buttonGroup.getChildren()) {
             w = Math.max(button.getWidth() + pad18 * 4f, w);
@@ -219,7 +219,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
             button.setWidth(w);
         }
 
-        // Height
+        // Height.
         float h = 30f;
         for (Actor button : buttonGroup.getChildren()) {
             h = Math.max(button.getHeight(), h);
@@ -273,10 +273,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         // Add keys for ESC, ENTER and TAB
         me.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent inputEvent = (InputEvent) event;
-                if (inputEvent.getType() == Type.keyUp) {
-                    int key = inputEvent.getKeyCode();
+            if (event instanceof InputEvent ie) {
+                if (ie.getType() == Type.keyUp) {
+                    int key = ie.getKeyCode();
                     switch (key) {
                     case Keys.ESCAPE -> {
                         if (escExit) {
@@ -309,8 +308,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         // CAPTURE SCROLL FOCUS
         stage.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
 
                 if (ie.getType() == Type.mouseMoved) {
                     for (OwnScrollPane scroll : scrolls) {
@@ -591,11 +589,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
     private void addOwnListeners() {
         if (mouseKbdListener != null) {
             var inputProcessor = Gdx.input.getInputProcessor();
-            if (inputProcessor instanceof InputMultiplexer) {
-                InputMultiplexer inputMultiplexer = (InputMultiplexer) inputProcessor;
+            if (inputProcessor instanceof InputMultiplexer inputMultiplexer) {
                 for (var processor : inputMultiplexer.getProcessors()) {
-                    if (processor instanceof AbstractMouseKbdListener) {
-                        var abstractMouseKbdListener = (AbstractMouseKbdListener) processor;
+                    if (processor instanceof AbstractMouseKbdListener abstractMouseKbdListener) {
                         if (abstractMouseKbdListener.isActive() && isModal()) {
                             abstractMouseKbdListener.deactivate();
                             backupMouseKbdListeners.add(abstractMouseKbdListener);
@@ -619,8 +615,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     private void removeOwnListeners() {
         if (mouseKbdListener != null) {
             var inputProcessor = Gdx.input.getInputProcessor();
-            if (inputProcessor instanceof InputMultiplexer) {
-                InputMultiplexer inputMultiplexer = (InputMultiplexer) inputProcessor;
+            if (inputProcessor instanceof InputMultiplexer inputMultiplexer) {
                 inputMultiplexer.removeProcessor(mouseKbdListener);
                 for (var abstractMouseKbdListener : backupMouseKbdListeners) {
                     abstractMouseKbdListener.activate();

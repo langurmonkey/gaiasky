@@ -11,6 +11,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -21,6 +22,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.gui.IGamepadMappings;
 import gaiasky.util.GuiUtils;
 
+/**
+ * A gamepad listener for GUI elements like windows and panes.
+ */
 public abstract class GuiGamepadListener extends AbstractGamepadListener {
     protected final Stage stage;
 
@@ -83,7 +87,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
         if (now - lastAxisEvtTime > axisEventDelay) {
             // Event-based
             if (axisCode == mappings.getAxisLstickV()) {
-                // LEFT STICK vertical - move focus vertically
+                // LEFT STICK vertical - move focus vertically.
                 if (value > 0) {
                     moveDown();
                     lastAxisEvtTime = now;
@@ -92,7 +96,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
                     lastAxisEvtTime = now;
                 }
             } else if (axisCode == mappings.getAxisLstickH()) {
-                // LEFT STICK horizontal - move focus horizontally
+                // LEFT STICK horizontal - move focus horizontally.
                 if (value > 0) {
                     moveRight();
                     lastAxisEvtTime = now;
@@ -101,13 +105,13 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
                     lastAxisEvtTime = now;
                 }
             } else if (axisCode == mappings.getAxisRstickV()) {
-                // RIGHT STICK vertical
+                // RIGHT STICK vertical.
                 if (value != 0) {
                     rightStickVertical(value);
                     lastAxisEvtTime = now;
                 }
             } else if (axisCode == mappings.getAxisRstickH()) {
-                // RIGHT STICK horizontal 
+                // RIGHT STICK horizontal.
                 if (value != 0) {
                     rightStickHorizontal(value);
                     lastAxisEvtTime = now;
@@ -177,11 +181,10 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
         Actor target = stage.getKeyboardFocus();
 
         if (target != null) {
-            if (target instanceof CheckBox) {
+            if (target instanceof Button b) {
                 // Check or uncheck.
-                CheckBox cb = (CheckBox) target;
-                if (!cb.isDisabled()) {
-                    cb.setChecked(!cb.isChecked());
+                if (!b.isDisabled()) {
+                    b.setChecked(!b.isChecked());
                 }
             } else {
                 // Fire change event.
@@ -266,7 +269,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
             // Move scroll.
             var scroll = GuiUtils.getScrollPaneIn(getContentContainers().get(0));
             if (scroll != null) {
-                scroll.setScrollY(scroll.getScrollY() + 150 * value);
+                scroll.setScrollY(scroll.getScrollY() + 300 * value);
             }
         }
     }

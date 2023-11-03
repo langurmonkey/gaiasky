@@ -673,7 +673,8 @@
     "expand-collapse": {
       "imageUp": "iconic-arrow-expand",
       "imageChecked": "iconic-arrow-collapse",
-      "imageDisabled": "disabled-icon"
+      "imageDisabled": "disabled-icon",
+      "focused": "textfield-focused"
     },
     "detach": {
       "imageUp": "detach-icon",

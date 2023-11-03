@@ -13,6 +13,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -438,11 +440,58 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private int addDatasetTypeGroup(Table leftTable, DatasetMode mode, DataDescriptor dataDescriptor, List<String> currentSetting, DatasetType type, List<DatasetDesc> filtered, float width, String filter) {
         int added = 0;
-        boolean anySelected = false;
         if (!filtered.isEmpty()) {
             final Array<CheckBox> groupCheckBoxes = new Array<>();
 
+            // Create collapsible group pane.
             Table contentTable = new Table(skin);
+            Table buttons = null;
+            if (mode == DatasetMode.INSTALLED) {
+                // Select all.
+                Button selectAll = new OwnImageButton(skin, "select-all");
+                selectAll.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        for (var checkBox : groupCheckBoxes) {
+                            if (!checkBox.isDisabled()) {
+                                checkBox.setChecked(true);
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                });
+                selectAll.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.select.all"), skin));
+
+                // Select none.
+                Button selectNone = new OwnImageButton(skin, "select-none");
+                selectNone.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        for (var checkBox : groupCheckBoxes) {
+                            if (!checkBox.isDisabled()) {
+                                checkBox.setChecked(false);
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                });
+                selectNone.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.select.none"), skin));
+
+                final float buttonSize = 17f;
+                buttons = new Table(skin);
+                buttons.padRight(pad20);
+                buttons.add(selectAll).size(buttonSize, buttonSize).right().bottom().padRight(pad10);
+                buttons.add(selectNone).size(buttonSize, buttonSize).right().bottom();
+            }
+
+            CollapsiblePane groupPane = new CollapsiblePane(stage, I18n.msg("gui.download.type." + type.typeStr),
+                    contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
+                    null, false, null, buttons);
+            leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
+            selectionOrder.add(new Pair<>(null, groupPane.getExpandCollapseActor()));
+
+            // Add datasets to content table.
+            boolean anySelected = false;
             for (DatasetDesc dataset : filtered) {
                 var t = new Table(skin);
                 t.pad(pad18, pad18, 0, pad18);
@@ -676,49 +725,10 @@ public class DatasetManagerWindow extends GenericDialog {
                 watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null, null));
                 added++;
             }
-
-            Table buttons = null;
-            if (mode == DatasetMode.INSTALLED) {
-                // Select all.
-                Button selectAll = new OwnImageButton(skin, "select-all");
-                selectAll.addListener(event -> {
-                    if (event instanceof ChangeEvent) {
-                        for (var checkBox : groupCheckBoxes) {
-                            if (!checkBox.isDisabled()) {
-                                checkBox.setChecked(true);
-                            }
-                        }
-                        return true;
-                    }
-                    return false;
-                });
-                selectAll.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.select.all"), skin));
-
-                // Select none.
-                Button selectNone = new OwnImageButton(skin, "select-none");
-                selectNone.addListener(event -> {
-                    if (event instanceof ChangeEvent) {
-                        for (var checkBox : groupCheckBoxes) {
-                            if (!checkBox.isDisabled()) {
-                                checkBox.setChecked(false);
-                            }
-                        }
-                        return true;
-                    }
-                    return false;
-                });
-                selectNone.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.select.none"), skin));
-
-                final float buttonSize = 17f;
-                buttons = new Table(skin);
-                buttons.padRight(pad20);
-                buttons.add(selectAll).size(buttonSize, buttonSize).right().bottom().padRight(pad10);
-                buttons.add(selectNone).size(buttonSize, buttonSize).right().bottom();
+            if(anySelected) {
+                groupPane.expandPane();
             }
 
-            // Create pane.
-            CollapsiblePane groupPane = new CollapsiblePane(stage, I18n.msg("gui.download.type." + type.typeStr), contentTable, width * 0.5f, skin, "hud-header", "expand-collapse", null, anySelected, null, buttons);
-            leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
         }
         return added;
     }
@@ -1135,7 +1145,6 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the file size.
      *
      * @param inputFilePath A file.
-     *
      * @return The size in bytes.
      */
     private long fileSize(String inputFilePath) {
@@ -1146,9 +1155,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the GZ uncompressed size.
      *
      * @param inputFilePath A gzipped file.
-     *
      * @return The uncompressed size in bytes.
-     *
      * @throws IOException If the file failed to read.
      */
     private long fileSizeGZUncompressed(String inputFilePath) throws IOException {
@@ -1481,16 +1488,42 @@ public class DatasetManagerWindow extends GenericDialog {
         scroll[1][1] = 0f;
     }
 
+    private static final int MAX_REC = 150;
+
     private boolean up() {
+        return up(0);
+    }
+
+    private boolean up(int recNum) {
+        if (recNum > MAX_REC) {
+            return false;
+        }
         selectedIndex = selectedIndex - 1;
         if (selectedIndex < 0) {
             selectedIndex = selectionOrder.size() - 1;
+        }
+        Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
+        // Skip collapsed and disabled entries.
+        if (!selection.getSecond().isDescendantOf(leftScroll) || (selection.getSecond() instanceof Disableable d) && d.isDisabled()) {
+            return up(recNum + 1);
         }
         return updateSelection();
     }
 
     private boolean down() {
+        return down(0);
+    }
+
+    private boolean down(int recNum) {
+        if (recNum > MAX_REC) {
+            return false;
+        }
         selectedIndex = (selectedIndex + 1) % selectionOrder.size();
+        Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
+        // Skip collapsed and disabled entries.
+        if (!selection.getSecond().isDescendantOf(leftScroll) || (selection.getSecond() instanceof Disableable d) && d.isDisabled()) {
+            return down(recNum + 1);
+        }
         return updateSelection();
     }
 
@@ -1500,14 +1533,19 @@ public class DatasetManagerWindow extends GenericDialog {
             Actor target = selection.getSecond();
             stage.setKeyboardFocus(target);
             // Move scroll, select parent container button (dataset widget), and use its position.
-            target = target.getParent();
-            while (!(target instanceof Button)) {
+            if (selection.getFirst() != null) {
                 target = target.getParent();
+                while (!(target instanceof Button)) {
+                    target = target.getParent();
+                }
             }
-            leftScroll.scrollTo(target.getX(), target.getY(), target.getWidth(), target.getHeight());
-            // Update right pane
-            GaiaSky.postRunnable(() -> reloadRightPane(right, selection.getFirst(), currentMode));
-            selectedDataset[currentMode.ordinal()] = selection.getFirst();
+            var coordinates = target.localToAscendantCoordinates(leftScroll.getActor(), new Vector2(target.getX(), target.getY()));
+            leftScroll.scrollTo(coordinates.x, coordinates.y, target.getWidth(), Math.min(200f, target.getHeight() * 10f));
+            if (selection.getFirst() != null) {
+                // Update right pane
+                GaiaSky.postRunnable(() -> reloadRightPane(right, selection.getFirst(), currentMode));
+                selectedDataset[currentMode.ordinal()] = selection.getFirst();
+            }
             return true;
         }
         return false;
