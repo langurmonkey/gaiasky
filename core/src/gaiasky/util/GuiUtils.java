@@ -26,6 +26,41 @@ public class GuiUtils {
 
     private static final ThreadLocal<Vector2> vec2 = ThreadLocal.withInitial(Vector2::new);
 
+    public static void addNotificationWindow(String title, String message, Skin skin, Stage stage, Runnable ok) {
+        GenericDialog dialog = new GenericDialog(title, skin, stage) {
+
+            @Override
+            protected void build() {
+                String text;
+                OwnLabel msg = new OwnLabel(message, skin);
+                content.add(msg).pad(pad18).row();
+
+            }
+
+            @Override
+            protected boolean accept() {
+                if (ok != null) {
+                    ok.run();
+                }
+                return true;
+            }
+
+            @Override
+            protected void cancel() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+
+        };
+
+        dialog.setAcceptText(I18n.msg("gui.ok"));
+        dialog.setCancelText(null);
+        dialog.buildSuper();
+        dialog.show(stage);
+    }
+
     public static void addNoConnectionWindow(Skin skin, Stage stage) {
         addNoConnectionWindow(skin, stage, null);
     }

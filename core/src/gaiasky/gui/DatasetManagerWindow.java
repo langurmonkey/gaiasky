@@ -725,7 +725,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null, null));
                 added++;
             }
-            if(anySelected) {
+            if (anySelected) {
                 groupPane.expandPane();
             }
 
@@ -951,12 +951,29 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void downloadDataset(DatasetDesc dataset, Runnable successRunnable) {
+        var tempDir = SysUtils.getTempDir(Settings.settings.data.location);
+
+        try {
+            var fileStore = Files.getFileStore(tempDir);
+
+            // Check for space. We need enough space for the compressed tar.gz package, plus the
+            // extracted data, so we do s + s * 1.5, with a base compression ratio of 0.666.
+            if (dataset.sizeBytes > 0 && dataset.sizeBytes + dataset.sizeBytes * 1.5 >= fileStore.getUsableSpace()) {
+                var title = I18n.msg("gui.download.space.error.title");
+                var msg = I18n.msg("gui.download.space.error", fileStore.toString());
+                logger.error(msg);
+                GuiUtils.addNotificationWindow(title, msg, skin, stage, null);
+                return;
+            }
+        } catch (IOException e) {
+            logger.warn("Error getting file store for temp dir: " + tempDir);
+        }
 
         String name = dataset.name;
         String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
 
         String filename = FilenameUtils.getName(url);
-        FileHandle tempDownload = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/" + filename + ".part");
+        FileHandle tempDownload = Gdx.files.absolute(tempDir + "/" + filename + ".part");
 
         ProgressRunnable progressDownload = (read, total, progress, speed) -> {
             try {
@@ -1019,12 +1036,13 @@ public class DatasetManagerWindow extends GenericDialog {
                 try {
                     // Extract.
                     decompress(tempDownload.path(), new File(dataLocation), dataset);
-                    // Remove archive.
-                    cleanupTempFile(tempDownload.path());
                 } catch (Exception e) {
                     logger.error(e, "Error decompressing: " + name);
                     errorMsg = "(decompressing error)";
                     errors++;
+                } finally {
+                    // Remove archive.
+                    cleanupTempFile(tempDownload.path());
                 }
             }
 
@@ -1112,6 +1130,9 @@ public class DatasetManagerWindow extends GenericDialog {
         String sizeKbStr = nf.format(sizeKb);
         TarArchiveEntry entry;
         long last = 0;
+        boolean error = false;
+        Exception errorException = null;
+        Array<File> processedFiles = new Array<>();
         while ((entry = tarIs.getNextTarEntry()) != null) {
             if (entry.isDirectory()) {
                 continue;
@@ -1124,7 +1145,14 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
 
-            IOUtils.copy(tarIs, new FileOutputStream(curFile));
+            try {
+                processedFiles.add(curFile);
+                IOUtils.copy(tarIs, new FileOutputStream(curFile));
+            } catch (IOException e) {
+                errorException = e;
+                error = true;
+                break;
+            }
 
             // Every 250 ms we update the view.
             long current = System.currentTimeMillis();
@@ -1136,6 +1164,17 @@ public class DatasetManagerWindow extends GenericDialog {
                     EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, val, progressString, null);
                 });
                 last = current;
+            }
+
+        }
+
+        if (error) {
+            String msg = I18n.msg("gui.download.extracting.error", errorException);
+            logger.error(errorException, msg);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, msg, -1f);
+            // Delete uncompressed files.
+            for (File f : processedFiles) {
+                deleteFile(f.toPath());
             }
 
         }
