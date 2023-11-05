@@ -102,9 +102,9 @@ public class DatasetManagerWindow extends GenericDialog {
     private final DecimalFormat nf;
     private final Set<DatasetWatcher> watchers;
     private final AtomicBoolean initialized;
-    private DataDescriptor serverDd, localDd;
+    private DataDescriptor serverDd;
     private DatasetMode currentMode;
-    private Cell<?> left, right;
+    private Cell<?> right;
     private OwnScrollPane leftScroll;
     private int selectedIndex = 0;
     private DatasetWatcher rightPaneWatcher;
@@ -348,7 +348,7 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void reloadInstalled(Table content, float width) {
-        this.localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
+        var localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
         reloadBothPanes(content, width, localDd, currentMode = DatasetMode.INSTALLED);
     }
 
@@ -360,7 +360,7 @@ public class DatasetManagerWindow extends GenericDialog {
             }
             content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad34 * 2f).row();
         } else {
-            left = content.add().top().left().padRight(pad34);
+            var left = content.add().top().left().padRight(pad34);
             right = content.add().top().left();
 
             int datasets = reloadLeftPane(left, dataDescriptor, mode, width);
@@ -412,9 +412,9 @@ public class DatasetManagerWindow extends GenericDialog {
         var added = populateLeftTable(leftTable, mode, dataDescriptor, Settings.settings.data.dataFiles, width, "");
 
         final var maxScrollHeight = stage.getHeight() * 0.65f;
-        leftScroll.setFadeScrollBars(maxScrollHeight > leftTable.getHeight());
+        leftScroll.setFadeScrollBars(false);
         leftScroll.setWidth(width * 0.52f);
-        leftScroll.setHeight(Math.min(maxScrollHeight, leftTable.getHeight()));
+        leftScroll.setHeight(maxScrollHeight);
         leftScroll.layout();
         leftScroll.setScrollX(scroll[mode.ordinal()][0]);
         leftScroll.setScrollY(scroll[mode.ordinal()][1]);

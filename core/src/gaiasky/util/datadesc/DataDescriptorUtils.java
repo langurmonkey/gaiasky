@@ -287,14 +287,14 @@ public class DataDescriptorUtils {
             while (it.hasNext()) {
                 DatasetDesc remote = it.next();
                 if (remote.checkPath.equals(path)) {
-                    // Found in remotes
+                    // Found in remotes.
                     dd = remote;
                     it.remove();
                     break;
                 }
             }
             if (dd == null) {
-                // Not found, create it
+                // Not found in remote (server) dataset list, create it.
                 dd = new DatasetDesc(reader, val, catalogFile);
             }
             dd.catalogFile = catalogFile;

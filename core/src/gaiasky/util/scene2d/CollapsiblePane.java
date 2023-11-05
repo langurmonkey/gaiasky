@@ -40,6 +40,7 @@ public class CollapsiblePane extends Table {
     float targetHeight;
     boolean expanding = false;
     boolean collapsing = false;
+    Runnable expandCollapseRunnable = null;
 
     /**
      * Creates a collapsible pane.
@@ -52,13 +53,33 @@ public class CollapsiblePane extends Table {
      * @param labelStyle        The style of the label.
      * @param expandButtonStyle The style of the expand icon.
      * @param detachButtonStyle The style of the detach icon.
+     * @param expanded          Whether the pane is expanded or collapsed to begin with.
      * @param shortcut          The shortcut to expand/collapse. Shown in a tooltip.
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin,
-                           String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded,
-                           String shortcut, Actor... topIcons) {
+    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
+        this(stage, labelText, content, width, skin, labelStyle, expandButtonStyle, detachButtonStyle, expanded, null, shortcut, topIcons);
+    }
+
+    /**
+     * Creates a collapsible pane.
+     *
+     * @param stage                  The main stage.
+     * @param labelText              The text of the label.
+     * @param content                The content actor.
+     * @param width                  The preferred width of this pane.
+     * @param skin                   The skin to use.
+     * @param labelStyle             The style of the label.
+     * @param expandButtonStyle      The style of the expand icon.
+     * @param detachButtonStyle      The style of the detach icon.
+     * @param expanded               Whether the pane is expanded or collapsed to begin with.
+     * @param expandCollapseRunnable Runs when the pane is expanded or collapsed.
+     * @param shortcut               The shortcut to expand/collapse. Shown in a tooltip.
+     * @param topIcons               List of top icons that will be added between the label and the
+     *                               expand/detach icons.
+     */
+    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, Runnable expandCollapseRunnable, String shortcut, Actor... topIcons) {
         super(skin);
         this.stage = stage;
         this.labelText = labelText;
@@ -66,6 +87,7 @@ public class CollapsiblePane extends Table {
         this.skin = skin;
         this.space = 6.4f;
         this.collapseSpeed = 100;
+        this.expandCollapseRunnable = expandCollapseRunnable;
 
         OwnLabel mainLabel = new OwnLabel(labelText, skin, labelStyle);
         float lw = mainLabel.getWidth();
@@ -167,7 +189,7 @@ public class CollapsiblePane extends Table {
 
         headerTable.add(titleGroup).left().padRight(6.4f);
 
-        if(detachIcon != null) {
+        if (detachIcon != null) {
             headerTable.add(headerGroupLeft).right().pad(6.4f);
             headerTable.add().expandX();
             headerTable.add(headerGroupRight).right();
@@ -248,6 +270,9 @@ public class CollapsiblePane extends Table {
             contentCell.clearActor();
             expanding = false;
             collapsing = true;
+        }
+        if (expandCollapseRunnable != null) {
+            expandCollapseRunnable.run();
         }
         pack();
         EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
