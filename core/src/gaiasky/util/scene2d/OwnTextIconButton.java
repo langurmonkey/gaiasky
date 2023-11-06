@@ -101,7 +101,7 @@ public class OwnTextIconButton extends OwnTextButton {
                 this.setIcon(this.icon);
             }
         } else {
-            if (this.style.fontColor != null) {
+            if (this.style != null && this.style.fontColor != null) {
                 this.icon.setColor(this.style.fontColor);
                 this.setIcon(this.icon);
             }

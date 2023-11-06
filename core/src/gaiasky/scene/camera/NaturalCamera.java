@@ -1514,7 +1514,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             case TOGGLE_VISIBILITY_CMD -> {
                 if (getMode().isFocus()) {
                     ComponentType ct = ComponentType.getFromKey((String) data[0]);
-                    if (this.focus != null && ct != null && this.focus.getCt().isEnabled(ct)) {
+                    if (this.focus != null && this.focus.isValid() && ct != null && this.focus.getCt().isEnabled(ct)) {
                         // Set camera  free
                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                     }

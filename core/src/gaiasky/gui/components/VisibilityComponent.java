@@ -86,6 +86,9 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     } else {
                         button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
                     }
+                    // In VR, protect 'Others' component type by disabling it. Otherwise, VR controllers, which are of type 'Others',
+                    // may disappear.
+                    button.setDisabled(ct.key.equals("element.others") && GaiaSky.instance.isVR());
 
                     visibilityButtonMap.put(name, button);
                     if (!ct.key.equals(name))
@@ -161,7 +164,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // PM COLOR MODE
         Label pmColorModeLabel = new Label(I18n.msg("gui.pm.colormode"), skin, "default");
 
-        ComboBoxBean[] cms = new ComboBoxBean[] {
+        ComboBoxBean[] cms = new ComboBoxBean[]{
                 new ComboBoxBean(I18n.msg("gui.pm.colormode.dir"), 0),
                 new ComboBoxBean(I18n.msg("gui.pm.colormode.speed"), 1),
                 new ComboBoxBean(I18n.msg("gui.pm.colormode.hasrv"), 2),
@@ -245,51 +248,51 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD -> {
-            String key = (String) data[0];
-            Button b = visibilityButtonMap.get(key);
-            if (b != null && source != b) {
-                b.setProgrammaticChangeEvents(false);
-                if (data.length == 2) {
-                    b.setChecked((Boolean) data[1]);
-                } else {
-                    b.setChecked(!b.isChecked());
+            case TOGGLE_VISIBILITY_CMD -> {
+                String key = (String) data[0];
+                Button b = visibilityButtonMap.get(key);
+                if (b != null && source != b) {
+                    b.setProgrammaticChangeEvents(false);
+                    if (data.length == 2) {
+                        b.setChecked((Boolean) data[1]);
+                    } else {
+                        b.setChecked(!b.isChecked());
+                    }
+                    b.setProgrammaticChangeEvents(true);
                 }
-                b.setProgrammaticChangeEvents(true);
             }
-        }
-        case PM_LEN_FACTOR_CMD -> {
-            if (source != pmLenFactorSlider) {
-                sendEvents = false;
-                float value = (Float) data[0];
-                pmLenFactorSlider.setValue(value);
-                sendEvents = true;
+            case PM_LEN_FACTOR_CMD -> {
+                if (source != pmLenFactorSlider) {
+                    sendEvents = false;
+                    float value = (Float) data[0];
+                    pmLenFactorSlider.setValue(value);
+                    sendEvents = true;
+                }
             }
-        }
-        case PM_NUM_FACTOR_CMD -> {
-            if (source != pmNumFactorSlider) {
-                sendEvents = false;
-                float value = (Float) data[0];
-                pmNumFactorSlider.setMappedValue(value);
-                sendEvents = true;
+            case PM_NUM_FACTOR_CMD -> {
+                if (source != pmNumFactorSlider) {
+                    sendEvents = false;
+                    float value = (Float) data[0];
+                    pmNumFactorSlider.setMappedValue(value);
+                    sendEvents = true;
+                }
             }
-        }
-        case PM_COLOR_MODE_CMD -> {
-            if (source != pmColorMode) {
-                sendEvents = false;
-                pmColorMode.setSelectedIndex((Integer) data[0]);
-                sendEvents = true;
+            case PM_COLOR_MODE_CMD -> {
+                if (source != pmColorMode) {
+                    sendEvents = false;
+                    pmColorMode.setSelectedIndex((Integer) data[0]);
+                    sendEvents = true;
+                }
             }
-        }
-        case PM_ARROWHEADS_CMD -> {
-            if (source != pmArrowheads) {
-                sendEvents = false;
-                pmArrowheads.setChecked((boolean) data[0]);
-                sendEvents = true;
+            case PM_ARROWHEADS_CMD -> {
+                if (source != pmArrowheads) {
+                    sendEvents = false;
+                    pmArrowheads.setChecked((boolean) data[0]);
+                    sendEvents = true;
+                }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
 
     }

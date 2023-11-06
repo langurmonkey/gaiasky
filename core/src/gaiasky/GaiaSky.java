@@ -67,7 +67,6 @@ import gaiasky.util.gdx.loader.is.GzipInputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.gdx.shader.TessellationShaderProgram;
 import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gdx.shader.loader.AtmosphereShaderProviderLoader;
 import gaiasky.util.gdx.shader.loader.GroundShaderProviderLoader;
@@ -705,7 +704,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 // Enable visibility of 'Others' if off (for VR controllers).
                 if (!settings.scene.visibility.get(ComponentType.Others.name())) {
-                    EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.others", false);
+                    EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.others", true);
                 }
 
                 // Create VRUI object.
@@ -1751,10 +1750,20 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     /**
      * Gets the run time in seconds of this Gaia Sky instance.
+     *
      * @return The time, in seconds, since Gaia Sky started running.
      */
-    public double getRunTimeSeconds(){
+    public double getRunTimeSeconds() {
         return TimeUtils.timeSinceMillis(startTime) / 1000d;
+    }
+
+    /**
+     * Is this instance of Gaia Sky using VR?
+     *
+     * @return The state of VR for this instance.
+     */
+    public boolean isVR() {
+        return vr;
     }
 
 }
