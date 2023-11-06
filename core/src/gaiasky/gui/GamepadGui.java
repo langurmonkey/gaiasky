@@ -717,6 +717,10 @@ public class GamepadGui extends AbstractGui {
                     }
                     return false;
                 });
+                // In VR, protect 'Others' component type by disabling it. Otherwise, VR controllers, which are of type 'Others',
+                // may disappear.
+                button.setDisabled(ct.key.equals("element.others") && GaiaSky.instance.isVR());
+
                 visibilityButtonMap.put(ct.key, button);
                 Cell<?> c = typesT.add(button).padBottom(buttonPadVert).left();
 
