@@ -96,7 +96,7 @@ public class OwnTextIconButton extends OwnTextButton {
     public void setDisabled(boolean isDisabled) {
         super.setDisabled(isDisabled);
         if (isDisabled) {
-            if (this.style.disabledFontColor != null) {
+            if (this.style != null && this.style.disabledFontColor != null) {
                 this.icon.setColor(this.style.disabledFontColor);
                 this.setIcon(this.icon);
             }
