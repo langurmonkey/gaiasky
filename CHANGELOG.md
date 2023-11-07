@@ -1,3 +1,36 @@
+<a name="3.5.7"></a>
+## [3.5.7](https://codeberg.org/gaiasky/gaiasky/tree/3.5.6-2) (2023-11-07)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.6-2...3.5.7)
+
+### Features
+- add surface exploration mode for planets, where the camera moves relative to the position of the pointer when close to a planet or moon. 
+- implement smooth transition between SSR-based reflections and cubemap-based reflections. 
+- add floating-point completion rates to billboard datasets. 
+- add Debian build files. Add Makefile. Add `createDebian` task to gradle build script. 
+- updated Bulgarian translation 
+
+### Bug Fixes
+- recursive tile lookup in sparse virtual textures module does not work correctly. 
+- crash when enabling 'Others' component type at startup in VR. 
+- sizing of datasets scroll pane with expand/collapse groups is incorrect in some instances. 
+- add free space check before downloads, and clean up properly after a failed extraction operation. Fixes [#744](https://codeberg.org/gaiasky/gaiasky/issues/744). 
+- autoscroll to target when cycling through UI elements with gamepad left stick. Selection and action with gamepad in dataset manager window. 
+- zero-length keyframed path crashes the 'normalize times' action. Fixes [#741](https://codeberg.org/gaiasky/gaiasky/issues/741). 
+- add missing, untranslated strings to I18N files. Fixes [#740](https://codeberg.org/gaiasky/gaiasky/issues/740). 
+- start and dataset manager buttons do not scale horizontally with content. 
+- ascending node parameter in rotation component does not apply correctly. Bump source version to 3.5.7, for new data is needed. 
+- prevent SVT level overflows, and prompt for restart when tile cache size is modified in preferences. 
+- remove custom amount of vertical scroll in scroll panes. Scrolling should now be much easier. 
+
+### Build System
+- upgrade to LibGDX 1.12.1 and LWJGL 3.3.3. 
+
+### Style
+- add missing deprecated tags to deprecated items. 
+
+### Merge Requests
+- Merge branch 'RacerBG-bg-update'
+
 <a name="3.5.6-2"></a>
 ## [3.5.6-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.6) (2023-10-24)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.6...3.5.6-2)
