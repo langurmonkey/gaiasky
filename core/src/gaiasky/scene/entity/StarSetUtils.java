@@ -66,7 +66,7 @@ public class StarSetUtils {
         body.setSize(6.0 * Constants.DISTANCE_SCALE_FACTOR);
 
         var label = Mapper.label.get(entity);
-        label.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
+        label.setLabelPosition(new double[] { 0.0, -5.0e7, -4e8 });
 
         var set = Mapper.starSet.get(entity);
         set.setData(data);

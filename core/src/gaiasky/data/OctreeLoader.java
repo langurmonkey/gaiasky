@@ -55,7 +55,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      */
     protected static final int PRELOAD_DEPTH = 3;
     /**
-     * Default load queue size in octants.
+     * Maximum load queue size.
      */
     protected static final int LOAD_QUEUE_MAX_SIZE = 100;
     /**
@@ -118,14 +118,22 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * from outside
      */
     private int dataVersionHint;
-    /** Utils class. **/
+    /**
+     * Utils class.
+     **/
     private StarSetUtils utils;
 
-    /** The scene graph builder. **/
+    /**
+     * The scene graph builder.
+     **/
     private SceneGraphBuilderSystem sceneGraphBuilder;
-    /** Base initializer object. **/
+    /**
+     * Base initializer object.
+     **/
     private BaseInitializer baseInitializer;
-    /** Initializer object for star sets. **/
+    /**
+     * Initializer object for star sets.
+     **/
     private ParticleSetInitializer setInitializer;
 
     /**
@@ -208,7 +216,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoSource.LOD, 1.5f, entity);
-            ci.nParticles = params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
+            ci.nParticles = params.containsKey("nObjects") ? (Long) params.get("nObjects") : -1;
+            ci.nParticles = ci.nParticles < 0 && params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
 
             var octree = Mapper.octree.get(entity);
@@ -222,7 +231,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             graph.parentName = Scene.ROOT_NAME;
 
             var fade = Mapper.fade.get(entity);
-            fade.setFadeout(new double[] { 8e3, 5e5 });
+            fade.setFadeout(new double[]{8e3, 5e5});
 
             var root = Mapper.octant.get(entity);
             root.octant = rootOctant;
@@ -240,7 +249,34 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                 logger.error(e);
             }
 
+            root.octant.updateCounts();
+
+            // Override number of labels in case we have a compact octree (~3 octants tops).
+            if (root.octant.numChildrenRec + 1 < 4 && Settings.settings.scene.star.group.numLabel <= 50) {
+                long numLabels = Math.max(Settings.settings.scene.star.group.numLabel, (long) (200.0 / (root.octant.numChildrenRec + 1)));
+                updateNumLabelsRecursive(root.octant, numLabels);
+            }
+
             return entity;
+        }
+    }
+
+    private void updateNumLabelsRecursive(final OctreeNode octant, final long numLabels) {
+        if (octant.objects != null && !octant.objects.isEmpty()) {
+            for (var sg : octant.objects) {
+                if (sg instanceof OctreeObjectView oov && oov.set != null) {
+                    oov.set.setNumLabels(Math.max(numLabels, oov.set.numLabels));
+                }
+            }
+        }
+
+        if(octant.children != null) {
+            for(int i = 0; i < 8; i++) {
+                if (octant.children[i] != null) {
+                   updateNumLabelsRecursive(octant.children[i], numLabels);
+                }
+
+            }
         }
     }
 
@@ -251,7 +287,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @param octreeWrapper The octree wrapper entity.
      * @param fullInit      Whether to fully initialise the objects (on-demand load) or
      *                      not (startup)
-     *
      * @return True if the octant was loaded, false otherwise
      */
     public boolean loadOctant(final OctreeNode octreeNode, final Entity octreeWrapper, final boolean fullInit) {
@@ -479,7 +514,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      *
      * @param lod           The level of detail to load.
      * @param octreeWrapper The octree wrapper entity.
-     *
      * @throws IOException When any of the level's files fails to load.
      */
     public void loadLod(final Integer lod, final Entity octreeWrapper) throws IOException {
@@ -513,7 +547,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @param octants       The list holding the octants to load.
      * @param octreeWrapper The octree wrapper.
      * @param abort         State variable that will be set to true if an abort is called.
-     *
      * @return The actual number of loaded octants.
      */
     public int loadOctants(final Array<OctreeNode> octants, final Entity octreeWrapper, final AtomicBoolean abort) {
@@ -579,24 +612,24 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case PAUSE_BACKGROUND_LOADING -> {
-            loadingPaused = true;
-            clearQueue();
-            logger.info("Background data loading thread paused");
-        }
-        case RESUME_BACKGROUND_LOADING -> {
-            loadingPaused = false;
-            clearQueue();
-            logger.info("Background data loading thread resumed");
-        }
-        case CLEAR_OCTANT_QUEUE -> clearQueue();
-        case DISPOSE -> {
-            if (daemon != null) {
-                daemon.stopDaemon(false);
+            case PAUSE_BACKGROUND_LOADING -> {
+                loadingPaused = true;
+                clearQueue();
+                logger.info("Background data loading thread paused");
             }
-        }
-        default -> {
-        }
+            case RESUME_BACKGROUND_LOADING -> {
+                loadingPaused = false;
+                clearQueue();
+                logger.info("Background data loading thread resumed");
+            }
+            case CLEAR_OCTANT_QUEUE -> clearQueue();
+            case DISPOSE -> {
+                if (daemon != null) {
+                    daemon.stopDaemon(false);
+                }
+            }
+            default -> {
+            }
         }
 
     }
