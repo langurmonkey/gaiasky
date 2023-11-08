@@ -610,7 +610,7 @@
         "units": "Double"
       },
       "numLabels": {
-        "description": "Number of labels to render for this particle group. Defaults to properties setting.",
+        "description": "Number of labels to render for this particle group. Defaults to the configuration setting.",
         "units": "Integer"
       },
       "profileDecay": {
@@ -773,6 +773,10 @@
         "aliases": [
           "variabilityEpoch:StarGroup"
         ]
+      },
+      "numLabels:StarGroup": {
+        "description": "Number of labels to render for this star group. Defaults to the configuration setting.",
+        "units": "Integer"
       }
     },
     "Attitude": {
