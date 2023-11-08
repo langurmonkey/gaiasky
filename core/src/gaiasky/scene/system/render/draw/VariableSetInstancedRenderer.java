@@ -58,7 +58,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD,
-                                        Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+                Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     @Override
@@ -243,32 +243,35 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                        Object source,
                        final Object... data) {
         switch (event) {
-        case STAR_BASE_LEVEL_CMD -> {
-            triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);
-            triComponent.touchStarParameters(getShaderProgram());
-        }
-        case STAR_BRIGHTNESS_CMD -> {
-            triComponent.updateStarBrightness((float) data[0]);
-            triComponent.touchStarParameters(getShaderProgram());
-        }
-        case STAR_BRIGHTNESS_POW_CMD -> {
-            triComponent.updateBrightnessPower((float) data[0]);
-            triComponent.touchStarParameters(getShaderProgram());
-        }
-        case STAR_POINT_SIZE_CMD -> {
-            triComponent.updateStarPointSize((float) data[0]);
-            triComponent.touchStarParameters(getShaderProgram());
-        }
-        case GPU_DISPOSE_VARIABLE_GROUP -> {
-            IRenderable renderable = (IRenderable) source;
-            int offset = getOffset(renderable);
-            clearMeshData(offset);
-            models.set(offset, null);
-            inGpu.remove(renderable);
-        }
-        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
-        default -> {
-        }
+            case STAR_BASE_LEVEL_CMD -> {
+                triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);
+                triComponent.touchStarParameters(getShaderProgram());
+            }
+            case STAR_BRIGHTNESS_CMD -> {
+                triComponent.updateStarBrightness((float) data[0]);
+                triComponent.touchStarParameters(getShaderProgram());
+            }
+            case STAR_BRIGHTNESS_POW_CMD -> {
+                triComponent.updateBrightnessPower((float) data[0]);
+                triComponent.touchStarParameters(getShaderProgram());
+            }
+            case STAR_POINT_SIZE_CMD -> {
+                triComponent.updateStarPointSize((float) data[0]);
+                triComponent.touchStarParameters(getShaderProgram());
+            }
+            case GPU_DISPOSE_VARIABLE_GROUP -> {
+                IRenderable renderable = (IRenderable) source;
+                int offset = getOffset(renderable);
+                if (offset >= 0) {
+                    clearMeshData(offset);
+                    models.set(offset, null);
+                    inGpu.remove(renderable);
+                }
+            }
+            case BILLBOARD_TEXTURE_IDX_CMD ->
+                    GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
+            default -> {
+            }
         }
     }
 

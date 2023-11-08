@@ -8,7 +8,10 @@
 package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -57,7 +60,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
         BRIGHTNESS_FACTOR = 10;
 
         alphaSizeBrRc = new float[4];
-        opacityLimitsHlShowAll = new float[] { 2, 4 };
+        opacityLimitsHlShowAll = new float[]{2, 4};
         aux1 = new Vector3();
         cmap = new Colormap();
         utils = new ParticleUtils();
@@ -75,7 +78,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     protected void initShaderProgram() {
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        opacityLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
+        opacityLimits = new float[]{Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1]};
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -94,7 +97,6 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
      * @param nVertices The max number of vertices this mesh data can hold
-     *
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
@@ -254,16 +256,19 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case STAR_BASE_LEVEL_CMD -> opacityLimits[0] = (float) data[0];
-        case GPU_DISPOSE_STAR_GROUP -> {
-            IRenderable renderable = (IRenderable) source;
-            int offset = getOffset(renderable);
-            clearMeshData(offset);
-            inGpu.remove(renderable);
-        }
-        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
-        default -> {
-        }
+            case STAR_BASE_LEVEL_CMD -> opacityLimits[0] = (float) data[0];
+            case GPU_DISPOSE_STAR_GROUP -> {
+                IRenderable renderable = (IRenderable) source;
+                int offset = getOffset(renderable);
+                if (offset >= 0) {
+                    clearMeshData(offset);
+                    inGpu.remove(renderable);
+                }
+            }
+            case BILLBOARD_TEXTURE_IDX_CMD ->
+                    GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+            default -> {
+            }
         }
     }
 

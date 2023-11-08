@@ -148,8 +148,7 @@ public class EventManager implements IObserver {
                 Iterator<IObserver> it = set.iterator();
                 while (it.hasNext()) {
                     IObserver obs = it.next();
-                    if (obs instanceof EntityRadio) {
-                        var radio = (EntityRadio) obs;
+                    if (obs instanceof EntityRadio radio) {
                         if (radio.getEntity() == entity) {
                             it.remove();
                         }
@@ -185,7 +184,7 @@ public class EventManager implements IObserver {
     public void post(final Event event, Object source, final Object... data) {
         synchronized (subscriptions) {
             Set<IObserver> observers = subscriptions.get(event.ordinal());
-            if (observers != null && observers.size() > 0) {
+            if (observers != null && !observers.isEmpty()) {
                 for (IObserver observer : observers) {
                     observer.notify(event, source, data);
                 }
