@@ -287,7 +287,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Labels.
         label.renderConsumer = LabelEntityRenderSystem::renderStarSet;
         label.renderFunction = LabelView::renderTextBase;
-        set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.star.group.numLabel;
+        set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.star.group.numLabels;
 
         // Lines.
         var line = Mapper.line.get(entity);

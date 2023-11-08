@@ -191,7 +191,7 @@ public class SettingsMorph {
         var group = new GroupSettings();
         group.billboard = bool("scene.star.group.billboard.flag", p);
         group.numBillboard = i32("scene.star.group.billboards", p);
-        group.numLabel = i32("scene.star.group.labels", p);
+        group.numLabels = i32("scene.star.group.labels", p);
         group.numVelocityVector = i32("scene.star.group.velocityvectors", p);
         star.group = group;
         star.threshold = new ThresholdSettings();

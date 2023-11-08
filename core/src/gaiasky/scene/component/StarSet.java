@@ -22,7 +22,9 @@ public class StarSet extends ParticleSet {
      */
     public double variabilityEpochJd;
     public double modelDist;
-    /** Does this contain variable stars? **/
+    /**
+     * Does this contain variable stars?
+     **/
     public boolean variableStars = false;
 
     /**
@@ -82,7 +84,6 @@ public class StarSet extends ParticleSet {
      * Returns the apparent solid angle of the star with the given index.
      *
      * @param index The index in the star list.
-     *
      * @return The apparent solid angle.
      */
     public double getSolidAngleApparent(int index) {

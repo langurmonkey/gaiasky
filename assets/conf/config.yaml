@@ -160,7 +160,7 @@ scene:
       # Maximum number of star billboards per group.
       numBillboard: 30
       # Maximum number of labels per star group. Applies unless overwritten.
-      numLabel: 50
+      numLabels: 50
       # Maximum number of velocity vectors per star group.
       numVelocityVector: 300
     # Star threshold values.

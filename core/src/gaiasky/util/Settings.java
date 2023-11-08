@@ -1038,7 +1038,7 @@ public class Settings {
                     case STAR_GROUP_BILLBOARD_CMD -> group.billboard = (boolean) data[0];
                     case STAR_GROUP_NEAREST_CMD -> {
                         group.numBillboard = (int) data[0];
-                        group.numLabel = (int) data[0];
+                        group.numLabels = (int) data[0];
                         group.numVelocityVector = (int) data[0];
                     }
                     case BILLBOARD_TEXTURE_IDX_CMD -> textureIndex = (int) data[0];
@@ -1053,8 +1053,16 @@ public class Settings {
             public static class GroupSettings {
                 public boolean billboard;
                 public int numBillboard;
-                public int numLabel;
+                public int numLabels;
                 public int numVelocityVector;
+
+                /**
+                 * Compatibility with old 'numLabel' property, renamed to 'numLabels'.
+                 * @param numLabels The number of labels to render for each star group.
+                 */
+                public void setNumLabel(int numLabels) {
+                    this.numLabels = numLabels;
+                }
             }
 
             @JsonIgnoreProperties(ignoreUnknown = true)
