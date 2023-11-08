@@ -610,6 +610,7 @@ public class XrDriver implements Disposable {
                 case XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING: {
                     XrEventDataInstanceLossPending instanceLossPending = XrEventDataInstanceLossPending.create(event.address());
                     logger.error("XrEventDataInstanceLossPending by " + instanceLossPending.lossTime());
+                    instanceLossPending.close();
                     return true;
                 }
                 case XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED: {
@@ -624,6 +625,7 @@ public class XrDriver implements Disposable {
                     break;
                 }
                 }
+                event.close();
                 event = readNextOpenXREvent();
             }
 
