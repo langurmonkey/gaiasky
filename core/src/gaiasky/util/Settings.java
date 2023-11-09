@@ -1053,7 +1053,7 @@ public class Settings {
             public static class GroupSettings {
                 public boolean billboard;
                 public int numBillboard;
-                public int numLabels;
+                public int numLabels = 30;
                 public int numVelocityVector;
 
                 /**
