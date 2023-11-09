@@ -48,7 +48,7 @@ public abstract class BinaryIOBase implements BinaryIO {
                 dataF[idx] = (float) mem.getDouble();
                 if (idx < 3) {
                     // Proper motions.
-                    dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
+                    dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
                 }
                 floatOffset = idx + 1;
             }
@@ -60,7 +60,7 @@ public abstract class BinaryIOBase implements BinaryIO {
             if (idx == ParticleRecord.I_FSIZE || (nFloats == 10  && idx < 3)) {
                 // 0-2 - Proper motions (only in version 2).
                 // 9 | 3 - Size (version 2 | 0-1).
-                dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
+                dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
             }
         }
         // HIP
@@ -116,7 +116,7 @@ public abstract class BinaryIOBase implements BinaryIO {
             int idx = i + floatOffset;
             dataF[idx] = in.readFloat();
             if (idx == ParticleRecord.I_FSIZE)
-                dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
+                dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
         // HIP
         dataF[ParticleRecord.I_FHIP] = in.readInt();

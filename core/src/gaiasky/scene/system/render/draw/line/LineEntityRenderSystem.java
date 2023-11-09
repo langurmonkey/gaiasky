@@ -467,7 +467,8 @@ public class LineEntityRenderSystem {
                     }
                     case 2 -> {
                         // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
-                        if (star.radvel() != 0) {
+                        float radialVelocity = star.radvel();
+                        if (Float.isFinite(radialVelocity) && radialVelocity != 0) {
                             r = ColorUtils.gBlue[0] + 0.2f;
                             g = ColorUtils.gBlue[1] + 0.4f;
                             b = ColorUtils.gBlue[2] + 0.4f;
@@ -479,10 +480,10 @@ public class LineEntityRenderSystem {
                     }
                     case 3 -> {
                         // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
-                        float rav = star.radvel();
-                        if (rav != 0) {
+                        float radialVelocity = star.radvel();
+                        if (Float.isFinite(radialVelocity) && radialVelocity != 0) {
                             // rv in [0:1]
-                            float rv = ((MathUtilsDouble.clamp(rav, -maxSpeedKms, maxSpeedKms) / maxSpeedKms) + 1) / 2;
+                            float rv = ((MathUtilsDouble.clamp(radialVelocity, -maxSpeedKms, maxSpeedKms) / maxSpeedKms) + 1) / 2;
                             ColorUtils.colormap_blue_white_red(rv, rgba);
                             r = rgba[0];
                             g = rgba[1];
