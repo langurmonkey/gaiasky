@@ -97,9 +97,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             // Stars.
             // Is it a catalog of variable stars?
             starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.get(0) instanceof VariableRecord;
-            if (starSet.numLabels > 0) {
-                initSortingData(entity, starSet, starSet);
-            }
+            // We need the sorting data ALWAYS, not only when numLabels > 0.
+            // We use them to draw the close-up stars.
+            initSortingData(entity, starSet, starSet);
 
             var model = Mapper.model.get(entity);
             // Star set.

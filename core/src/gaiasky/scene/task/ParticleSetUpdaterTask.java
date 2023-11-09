@@ -90,7 +90,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
      */
     public void update(ICamera camera) {
         var pointData = particleSet.pointData;
-        if (pointData != null && pointData.size() > 0 && pointData.get(0).names() != null) {
+        if (pointData != null && !pointData.isEmpty() && pointData.get(0).names() != null) {
             long t = TimeUtils.millis() - particleSet.lastSortTime;
             if (!particleSet.updating.get()
                     && base.opacity > 0
