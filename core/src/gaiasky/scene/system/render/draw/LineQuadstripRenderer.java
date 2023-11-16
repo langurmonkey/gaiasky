@@ -16,6 +16,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.tree.OctreeNode;
+import org.lwjgl.opengl.GL30;
 
 import java.util.List;
 
@@ -42,17 +44,22 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
 
         this.camera = camera;
         renderables.forEach(r -> {
-            Render render = (Render) r;
-            view.setEntity(render.entity);
+            int primitive = GL30.GL_LINES;
+            if (r instanceof Render render) {
+                view.setEntity(render.entity);
 
-            view.render(this, camera, getAlpha(render));
+                view.render(this, camera, getAlpha(render));
+                primitive = getGLPrimitive(render);
+            } else if (r instanceof OctreeNode octant) {
+                octant.render(this, camera, getAlpha(octant));
+            }
 
             shaderProgram.setUniformf("u_lineWidthTan", (float) (view.getLineWidth() * 0.8f * baseWidthAngleTan * Settings.settings.scene.lineWidth * camera.getFovFactor()));
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);
                 meshDouble.mesh.setVertices(meshDouble.vertices, 0, meshDouble.vertexIdx);
-                meshDouble.mesh.render(shaderProgram, getGLPrimitive(render));
+                meshDouble.mesh.render(shaderProgram, primitive);
 
                 meshDouble.clear();
             }

@@ -65,7 +65,7 @@ public class OctreeExtractor extends AbstractExtractSystem {
     }
 
     public void addToRenderLists(Base base, OctreeNode octant, ICamera camera) {
-        if (mustRender(base) && Settings.settings.runtime.drawOctree && octant.observed) {
+        if (mustRender(base) && Settings.settings.runtime.drawOctree) {
             boolean added = addToRender(octant, LINE);
 
             if (added) {
