@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://codeberg.org/gaiasky/gaiasky/raw/branch/master/assets/icon/gs_icon.png" alt="Gaia Sky logo" width="500" />
+<img src="https://codeberg.org/gaiasky/gaiasky/raw/branch/master/assets/icon/gs_icon.png" alt="Gaia Sky logo" width="150" />
 </p>
 
 # Gaia Sky
