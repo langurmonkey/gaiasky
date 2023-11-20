@@ -2,9 +2,9 @@
 
 <p align="center">
 <a href="https://codeberg.org/gaiasky/gaiasky/releases"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcodeberg.org%2Fapi%2Fv1%2Frepos%2Fgaiasky%2Fgaiasky%2Freleases%2Flatest&query=%24.tag_name&label=release" alt="Latest release" /></a>
+<a href="https://codeberg.org/gaiasky/gaiasky/issues"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcodeberg.org%2Fapi%2Fv1%2Frepos%2Fgaiasky%2Fgaiasky%2Fissues&query=%24.length&label=open%20issues" alt="Open issues" /></a>
 <a href="https://opensource.org/licenses/MPL-2.0"><img src="https://img.shields.io/badge/license-MPL%202.0-brightgreen.svg" alt="License: MPL2.0" /></a>
-<a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs"><img src="https://img.shields.io/badge/docs-master-3245a9" alt="Docs" /></a>
-<a href="https://codeberg.org/gaiasky/gaiasky/issues"><img src="https://img.shields.io/badge/issues-open-bbbb00.svg" alt="Issues" /></a>
+<a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs"><img src="https://img.shields.io/badge/docs-latest-3245a9" alt="Docs" /></a>
 <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/stats"><img src="https://img.shields.io/badge/stats-gaiasky-%234d7" alt="Stats" /></a>
 </p>
 
