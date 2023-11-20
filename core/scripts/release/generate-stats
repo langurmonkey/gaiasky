@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# This script generates the gitstats page for Gaia Sky.
+
+if [ -z "$GS" ]; then
+    echo "Please, set the variable \$GS to point to the gaiasky repository."
+    exit 1
+else
+  GSDIR="$GS"
+fi
+
+if ! command -v gitstats &> /dev/null
+then
+    echo "gitstats command could not be found."
+    exit 1
+fi
+
+OUTPUT="$GS/releases/stats"
+rm -rf "$OUTPUT"
+mkdir -p "$OUTPUT"
+
+# Run gitstats.
+gitstats -c style=gitstats.css $GS $OUTPUT/
+cp $GS/core/scripts/release/gitstats.css $OUTPUT/
+  
+# Done.
+echo "Gitstats generated into $OUTPUT"
