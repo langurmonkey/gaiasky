@@ -1,15 +1,12 @@
+<h3 align="center"><img src="assets/icon/gs_icon.png" alt="Gaia Sky" width="130px"><br>Gaia Sky - <i>Open source 3D Universe platform</i></h3>
+
 <p align="center">
-<img src="https://codeberg.org/gaiasky/gaiasky/raw/branch/master/assets/icon/gs_icon.png" alt="Gaia Sky logo" width="150" />
+<a href="https://codeberg.org/gaiasky/gaiasky/releases"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcodeberg.org%2Fapi%2Fv1%2Frepos%2Fgaiasky%2Fgaiasky%2Freleases%2Flatest&query=%24.tag_name&label=release" alt="Latest release" /></a>
+<a href="https://opensource.org/licenses/MPL-2.0"><img src="https://img.shields.io/badge/license-MPL%202.0-brightgreen.svg" alt="License: MPL2.0" /></a>
+<a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs"><img src="https://img.shields.io/badge/docs-master-3245a9" alt="Docs" /></a>
+<a href="https://codeberg.org/gaiasky/gaiasky/issues"><img src="https://img.shields.io/badge/issues-open-bbbb00.svg" alt="Issues" /></a>
+<a href="https://gaia.ari.uni-heidelberg.de/gaiasky/stats"><img src="https://img.shields.io/badge/stats-gaiasky-%234d7" alt="Stats" /></a>
 </p>
-
-# Gaia Sky
-
-<h2 align="center">An open source 3D universe simulator for desktop and VR with support for more than a billion objects</h2>
-
-[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
-[![Docs](https://img.shields.io/badge/docs-master-3245a9)](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)
-[![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://codeberg.org/gaiasky/gaiasky/issues)
-[![Stats](https://img.shields.io/badge/stats-gaiasky-%234d7)](https://gaia.ari.uni-heidelberg.de/gaiasky/stats)
 
 [**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://sci.esa.int/gaia) to chart more than 1 billion stars.
 
