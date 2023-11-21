@@ -11,6 +11,10 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   [[ $SOURCE != /* ]] && SOURCE="$GSDIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
 GSDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+# Detect installation to /usr/bin and /opt/gaiasky
+if [[ "$GSDIR" == "/usr/bin" ]]; then
+  GSDIR="/opt/gaiasky"
+fi
 # Escape spaces in GSDIR
 GSDIRESC=$(printf %q "$GSDIR")
 
