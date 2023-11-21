@@ -400,6 +400,7 @@ tasks.register('createAppImage') {
         exec {
             executable "appimagetool"
             args "-n", "$appimgDir", "$packageDir/$appImgFilename"
+            environment ARCH: "x86_64"
         }
 
         // Checksums
