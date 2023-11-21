@@ -17,7 +17,8 @@ if [[ "$GSDIR" == "/usr/bin" ]]; then
 fi
 
 # Libraries path
-GS_LIB_PATH="$GSDIR/lib/*"
+GS_LIB_PATH="$GSDIR/lib"
+GS_LIB_STRING="$GS_LIB_PATH/*"
 
 # Check directories exist and are valid
 if [ ! -d "$GSDIR" ]; then
@@ -99,7 +100,7 @@ OPTS="$OPTS -Dname=gaiasky"
 # Run.
 #
 
-CMD="$JAVA $OPTS -cp \"$GS_LIB_PATH\" gaiasky.desktop.GaiaSkyDesktop $@"
+CMD="$JAVA $OPTS -cp \"$GS_LIB_STRING\" gaiasky.desktop.GaiaSkyDesktop $@"
 # Uncomment to print run command
 # echo "$CMD"
 
