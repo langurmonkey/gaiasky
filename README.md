@@ -8,7 +8,7 @@
 <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/stats"><img src="https://img.shields.io/badge/stats-gaiasky-%234d7" alt="Stats" /></a>
 </p>
 
-[**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://sci.esa.int/gaia) to chart more than 1 billion stars.
+[**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://www.esa.int/Science_Exploration/Space_Science/Gaia) to chart more than 1 billion stars.
 
 A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Catalog](https://dx.doi.org/10.1109/TVCG.2018.2864508).
 
