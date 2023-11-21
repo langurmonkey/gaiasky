@@ -67,9 +67,18 @@ public abstract class AbstractGamepadMappings implements IGamepadMappings {
         if (Files.exists(mappingsPath)) {
             mappings = new GamepadMappings(null, mappingsPath);
         } else {
-            Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
+            // Check if internal mappings exist for that file.
+            final Path assetsLoc = Path.of(Settings.ASSETS_LOC);
+            Path internalMappings = assetsLoc.resolve(mappingsFile);
             if (Files.exists(internalMappings)) {
                 mappings = new GamepadMappings(null, internalMappings);
+            } else {
+                // Default file.
+                final Path defaultPath = assetsLoc.resolve("mappings").resolve("SDL_Controller.controller");
+                if (Files.exists(defaultPath)) {
+                    mappings = new GamepadMappings(null, defaultPath);
+                    // Update mappings path.
+                    Settings.settings.controls.gamepad.mappingsFile = defaultPath.toAbsolutePath().toString();                }
             }
         }
         return mappings;
