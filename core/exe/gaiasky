@@ -15,10 +15,19 @@ GSDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 if [[ "$GSDIR" == "/usr/bin" ]]; then
   GSDIR="/opt/gaiasky"
 fi
-# Escape spaces in GSDIR
-GSDIRESC=$(printf %q "$GSDIR")
 
-LIB_PATH="$GSDIR/lib/*"
+# Libraries path
+GS_LIB_PATH="$GSDIR/lib/*"
+
+# Check directories exist and are valid
+if [ ! -d "$GSDIR" ]; then
+  echo "Could not find Gaia Sky directory: $GSDIR"
+  exit 1
+fi
+if [ ! -d "$GS_LIB_PATH" ]; then
+  echo "Gaia Sky directory does not contain libraries: $GS_LIB_PATH"
+  exit 1
+fi
 
 #
 # Choose jre
@@ -52,8 +61,6 @@ JAVA=$(printf %q "$JAVA")
 #
 # Settings.
 #
-# Properties file - by default we use the file at $HOME/.gaiasky/config.yaml
-#OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/config.yaml"
 
 # Memory
 OPTS="$OPTS -Xms2g -Xmx6g"
@@ -92,7 +99,7 @@ OPTS="$OPTS -Dname=gaiasky"
 # Run.
 #
 
-CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaiasky.desktop.GaiaSkyDesktop $@"
+CMD="$JAVA $OPTS -cp \"$GS_LIB_PATH\" gaiasky.desktop.GaiaSkyDesktop $@"
 # Uncomment to print run command
 # echo "$CMD"
 
