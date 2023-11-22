@@ -1093,6 +1093,10 @@
       "font": "mono",
       "fontColor": "pink"
     },
+    "mono-pink-big": {
+      "font": "mono-big",
+      "fontColor": "pink"
+    },
     "msg-13": {
       "font": "ui-13",
       "fontColor": "white"

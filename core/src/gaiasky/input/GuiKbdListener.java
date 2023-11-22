@@ -33,23 +33,26 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
     }
 
     @Override
-    public boolean keyDown(int keycode) {
+    public boolean keyDown(int keyCode) {
         if (isActive()) {
             long now = TimeUtils.millis();
-            super.keyDown(keycode);
+            super.keyDown(keyCode);
             lastPollTime = now;
         }
         return false;
     }
 
     @Override
-    public boolean keyUp(final int keycode) {
+    public boolean keyUp(int keyCode) {
         if (isActive()) {
+            // Convert to logical.
+            keyCode = InputUtils.physicalToLogicalKeyCode(keyCode);
+
             long now = TimeUtils.millis();
-            super.keyUp(keycode);
+            super.keyUp(keyCode);
             lastPollTime = now;
 
-            return switch (keycode) {
+            return switch (keyCode) {
                 case Keys.UP -> moveUp();
                 case Keys.DOWN -> moveDown();
                 case Keys.LEFT -> moveLeft();

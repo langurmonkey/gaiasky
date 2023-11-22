@@ -29,6 +29,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.gui.beans.*;
+import gaiasky.input.InputUtils;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -170,8 +171,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final float inputWidth = 500f;
         final float selectWidth = 500f;
         final float scrollHeight = 640f;
-        final float controlsScrollWidth = 1000f;
-        final float controlsScrollHeight = 560f;
+        final float controlsScrollWidth = 1300f;
+        final float controlsScrollHeight = 600f;
         final float sliderWidth = 500f;
         final float buttonHeight = 40f;
 
@@ -1475,34 +1476,35 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table controls = new Table(skin);
         controls.align(Align.left | Align.top);
         // Header
-        controls.add(new OwnLabel(I18n.msg("gui.keymappings.action"), skin, "header")).left();
-        controls.add(new OwnLabel(I18n.msg("gui.keymappings.keys"), skin, "header")).left().row();
+        controls.add(new OwnLabel(I18n.msg("gui.keymappings.action"), skin, "header")).padBottom(pad18).left();
+        controls.add(new OwnLabel(I18n.msg("gui.keymappings.keys"), skin, "header")).padBottom(pad18).left().row();
 
-        controls.add(new OwnLabel(I18n.msg("action.forward"), skin)).left().padRight(pad18);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.UP).toUpperCase(), skin, "mono-pink")).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.backward"), skin)).left().padRight(pad18);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink")).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.left"), skin)).left().padRight(pad18);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink")).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.right"), skin)).left().padRight(pad18);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink")).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.forward"), skin, "big")).left().padRight(pad18).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.UP).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.backward"), skin, "big")).left().padRight(pad18).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.left"), skin, "big")).left().padRight(pad18).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.right"), skin, "big")).left().padRight(pad18).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
 
         // Controls
+        boolean plus = false;
         for (String[] action : data) {
             HorizontalGroup keysGroup = new HorizontalGroup();
             keysGroup.space(pad10);
             for (int j = 1; j < action.length; j++) {
                 String[] keys = action[j].split("\\+");
                 for (int k = 0; k < keys.length; k++) {
-                    keysGroup.addActor(new OwnLabel(keys[k].trim().replace('_', '-'), skin, "mono-pink"));
+                    keysGroup.addActor(new OwnLabel(keys[k].trim().replace('_', '-').replace("PL", "+"), skin, "mono-pink-big"));
                     if (k < keys.length - 1)
-                        keysGroup.addActor(new OwnLabel("+", skin));
+                        keysGroup.addActor(new OwnLabel("+", skin, "big"));
                 }
                 if (j < action.length - 1)
-                    keysGroup.addActor(new OwnLabel("/", skin));
+                    keysGroup.addActor(new OwnLabel("/", skin, "big"));
             }
-            controls.add(new OwnLabel(action[0], skin)).left().padRight(pad18);
-            controls.add(keysGroup).left().row();
+            controls.add(new OwnLabel(action[0], skin, "big")).left().padRight(pad18).padBottom(pad10);
+            controls.add(keysGroup).padBottom(pad10).left().row();
         }
 
         OwnScrollPane controlsScroll = new OwnScrollPane(controls, skin, "minimalist-nobg");
@@ -2912,10 +2914,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private String keyToString(int key) {
-        if (key == Keys.PLUS) {
-            return "+";
+        var str = InputUtils.physicalKeyCodeToLogicalKeyString(key);
+        if (str.equals("+")) {
+            str = "PL";
         }
-        return GSKeys.toString(key);
+        return str;
     }
 
     @Override

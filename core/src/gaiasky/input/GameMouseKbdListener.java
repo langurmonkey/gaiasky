@@ -129,8 +129,8 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean keyDown(int keycode) {
-        return super.keyDown(keycode);
+    public boolean keyDown(int keyCode) {
+        return super.keyDown(keyCode);
     }
 
     @Override

@@ -8,6 +8,7 @@
 package gaiasky.input;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.gui.IInputListener;
@@ -33,7 +34,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     }
 
     @Override
-    public boolean keyDown(int keycode) {
+    public boolean keyDown(int keyCode) {
         if (isActive()) {
             // Input-enabled setting only for non-GUI listeners.
             if (this instanceof GuiKbdListener || Settings.settings.runtime.inputEnabled) {
@@ -46,25 +47,39 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     }
 
     @Override
-    public boolean keyUp(int keycode) {
+    public boolean keyUp(int keyCode) {
         if (isActive()) {
             if (iCamera != null) {
                 iCamera.setGamepadInput(false);
             }
         }
         return false;
-
     }
 
-    public boolean isKeyPressed(int keycode) {
-        return Gdx.input.isKeyPressed(keycode);
+    /**
+     * Returns whether the key is pressed.
+     *
+     * @param keyCode The key code as found in {@link Input.Keys}.
+     * @return true or false.
+     */
+    public boolean isKeyPressed(int keyCode) {
+        return Gdx.input.isKeyPressed(keyCode);
+    }
+
+    /**
+     * Returns whether the given logical key code is pressed.
+     *
+     * @param keyCode The logical key code as found in {@link Input.Keys}.
+     * @return true or false.
+     */
+    public boolean isLogicalKeyPressed(int keyCode) {
+        return Gdx.input.isKeyPressed(InputUtils.physicalToLogicalKeyCode(keyCode));
     }
 
     /**
      * Returns true if all keys are pressed
      *
      * @param keys The keys to test
-     *
      * @return True if all are pressed
      */
     public boolean allPressed(int... keys) {
@@ -92,15 +107,28 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     }
 
     /**
-     * Returns true if any of the keys are pressed
+     * Returns true if any of the physical keys are pressed.
      *
-     * @param keys The keys to test
-     *
-     * @return True if any is pressed
+     * @param keys The keys to test.
+     * @return True if any physical keys are pressed.
      */
     public boolean anyPressed(int... keys) {
         for (int k : keys) {
             if (isKeyPressed(k))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Same as {@link AbstractMouseKbdListener#anyPressed(int...)}, but converts the physical keys to logical keys first.
+     *
+     * @param keys The logical keys.
+     * @return Whether any of the keys are pressed.
+     */
+    public boolean anyPressedLogical(int... keys) {
+        for (int k : keys) {
+            if (isLogicalKeyPressed(k))
                 return true;
         }
         return false;
@@ -143,4 +171,5 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     public void deactivate() {
         this.active.set(false);
     }
+
 }

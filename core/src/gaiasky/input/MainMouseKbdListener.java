@@ -451,12 +451,15 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean keyDown(int keycode) {
+    public boolean keyDown(int keyCode) {
         if (isActive()) {
+            // Convert to logical.
+            keyCode = InputUtils.physicalToLogicalKeyCode(keyCode);
+
             if (Settings.settings.runtime.inputEnabled) {
-                register.registerKeyDownTime(keycode, TimeUtils.millis());
+                register.registerKeyDownTime(keyCode, TimeUtils.millis());
             }
-            return super.keyDown(keycode);
+            return super.keyDown(keyCode);
         }
         return false;
     }

@@ -15,6 +15,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
+import gaiasky.input.InputUtils;
 import gaiasky.input.KeyRegister;
 import gaiasky.util.Settings;
 
@@ -22,6 +23,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * This input adapter binds the key mappings to the input system in Libgdx.
+ */
 public class KeyboardInputController extends InputAdapter implements IObserver {
 
     private final Input input;
@@ -43,23 +47,30 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
     }
 
     @Override
-    public boolean keyDown(int keycode) {
+    public boolean keyDown(int keyCode) {
+        // Convert to logical.
+        keyCode = InputUtils.physicalToLogicalKeyCode(keyCode);
+
         cleanSpecial();
 
         if (Settings.settings.runtime.inputEnabled) {
-            pressedKeys.add(keycode);
-            register.registerKeyDownTime(keycode, TimeUtils.millis());
+            pressedKeys.add(keyCode);
+            register.registerKeyDownTime(keyCode, TimeUtils.millis());
         }
         return false;
 
     }
 
     @Override
-    public boolean keyUp(int keycode) {
-        EventManager.publish(Event.INPUT_EVENT, this, keycode);
+    public boolean keyUp(int keyCode) {
+        // Convert to logical.
+        keyCode = InputUtils.physicalToLogicalKeyCode(keyCode);
+
+        EventManager.publish(Event.INPUT_EVENT, this, keyCode);
 
         cleanSpecial();
         long now = System.currentTimeMillis();
+
 
         if (Settings.settings.runtime.inputEnabled) {
             // Use key mappings
@@ -67,11 +78,11 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
             if (action != null && (now - register.lastKeyDownTime(pressedKeys) < action.maxKeyDownTimeMs)) {
                 action.run();
             }
-        } else if (keycode == Keys.ESCAPE) {
+        } else if (keyCode == Keys.ESCAPE) {
             // If input is not enabled, only escape works
             EventManager.publish(Event.SHOW_QUIT_ACTION, this);
         }
-        pressedKeys.remove(keycode);
+        pressedKeys.remove(keyCode);
         return false;
 
     }
