@@ -212,7 +212,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         if (closestStar != null) {
             double closestStarDist = closestStar.getClosestDistToCamera();
             String closestStarName = closestStar.getClosestName();
-            if (secondClosest != null) {
+            if (secondClosest != null && secondClosest.isValid()) {
                 if (secondClosest.getDistToCamera() < closestStarDist) {
                     closestName = secondClosest.getName();
                     closestDistance = secondClosest.getDistToCamera();
