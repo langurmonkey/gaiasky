@@ -689,5 +689,4 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public Stage getStage() {
         return stage;
     }
-
 }

@@ -33,7 +33,7 @@ public class LogWindow extends GenericDialog {
     private ScrollPane scroll;
 
     // Current number of messages in window
-    private int nmsg = 0;
+    private int numMessages = 0;
 
     private float w, h, pad;
 
@@ -97,15 +97,15 @@ public class LogWindow extends GenericDialog {
         });
         buttons.addActor(export);
 
-        content.add(scroll).padBottom(pad).row();
+        content.add(scroll).left().top().padBottom(pad).row();
         content.add(buttons).align(Align.center);
     }
 
     public void update() {
         if (logs != null) {
             List<MessageBean> list = NotificationsInterface.historical;
-            if (list.size() > nmsg) {
-                for (int i = nmsg; i < list.size(); i++) {
+            if (list.size() > numMessages) {
+                for (int i = numMessages; i < list.size(); i++) {
                     addMessage(list.get(i));
                 }
             }
@@ -116,8 +116,8 @@ public class LogWindow extends GenericDialog {
     public void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
         filename = filename.replace(":", "-");
-        Path gshome = SysUtils.getDataDir();
-        Path log = gshome.resolve(filename);
+        Path gsHome = SysUtils.getDataDir();
+        Path log = gsHome.resolve(filename);
 
         try {
             FileWriter fw = new FileWriter(log.toFile());
@@ -135,6 +135,9 @@ public class LogWindow extends GenericDialog {
     }
 
     public void updateScroll() {
+        if (scroll == null) {
+            return;
+        }
         scroll.setScrollPercentX(0);
         scroll.setScrollPercentY(1);
         scroll.invalidate();
@@ -145,7 +148,7 @@ public class LogWindow extends GenericDialog {
         Label msg = new OwnLabel(mb.msg, skin);
         logs.add(date).left().padRight(pad);
         logs.add(msg).left().row();
-        nmsg++;
+        numMessages++;
     }
 
     @Override
@@ -162,4 +165,22 @@ public class LogWindow extends GenericDialog {
 
     }
 
+
+    @Override
+    protected void sizeChanged() {
+        // The size of the actor changed (dialog has been resized).
+        // Update size of scroll pane.
+        if (scroll == null) {
+            return;
+        }
+        w = this.getWidth();
+        h = this.getHeight();
+
+        scroll.setWidth(w);
+        scroll.setHeight(h);
+        content.setWidth(w);
+        content.setHeight(h);
+        updateScroll();
+        invalidate();
+    }
 }
