@@ -16,6 +16,7 @@ import gaiasky.util.parse.Parser;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
 
 public class ColorUtils {
 
@@ -113,19 +114,15 @@ public class ColorUtils {
     }
 
     public static float[] hexToRgba(String hex) {
-        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f,
-                Integer.valueOf(hex.substring(5, 7), 16) / 255f, Integer.valueOf(hex.substring(7, 9), 16) / 255f };
+        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f, Integer.valueOf(hex.substring(7, 9), 16) / 255f };
     }
 
     public static float[] hexToRgb(String hex) {
-        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f,
-                Integer.valueOf(hex.substring(5, 7), 16) / 255f };
+        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f };
 
     }
 
-    public static float normalize(float value,
-                                  float min,
-                                  float max) {
+    public static float normalize(float value, float min, float max) {
         if (value > max)
             return max;
         if (value < min)
@@ -139,8 +136,7 @@ public class ColorUtils {
      *
      * @param value
      */
-    public static void grayscale(float value,
-                                 float[] rgba) {
+    public static void grayscale(float value, float[] rgba) {
         rgba[0] = value;
         rgba[1] = value;
         rgba[2] = value;
@@ -154,8 +150,7 @@ public class ColorUtils {
      * @param value The value
      * @param rgba  The color
      */
-    public static void colormap_blue_white_red(float value,
-                                               float[] rgba) {
+    public static void colormap_blue_white_red(float value, float[] rgba) {
         // Make it in [-1:1]
         float a = value * 2f - 1f;
         if (a <= 0) {
@@ -173,8 +168,7 @@ public class ColorUtils {
      *
      * @param value
      */
-    public static void colormap_short_rainbow(float value,
-                                              float[] rgba) {
+    public static void colormap_short_rainbow(float value, float[] rgba) {
         /* plot short rainbow RGB */
         float a = (1 - value) / 0.25f; //invert and group
         final int X = (int) Math.floor(a); //this is the integer part
@@ -217,8 +211,7 @@ public class ColorUtils {
      *
      * @param value The value in [0..1]
      */
-    public static void colormap_long_rainbow(float value,
-                                             float[] rgba) {
+    public static void colormap_long_rainbow(float value, float[] rgba) {
         if (rgba == null)
             return;
         /* plot long rainbow RGB */
@@ -268,26 +261,27 @@ public class ColorUtils {
      *
      * @param value The value to convert
      */
-    public static void colormap_yellow_to_red(float value,
-                                              float[] rgba) {
+    public static void colormap_yellow_to_red(float value, float[] rgba) {
         rgba[0] = 1;
         rgba[1] = value;
         rgba[2] = 0;
     }
 
-    public static void colormap_blue_to_magenta(float value,
-                                                float[] rgba) {
+    public static void colormap_blue_to_magenta(float value, float[] rgba) {
         rgba[0] = value;
         rgba[1] = 0;
         rgba[2] = 1;
     }
 
+    /**
+     * Initializes the data table needed for the Harre and Heller color conversion.
+     */
     private static void initHarreData() {
         if (teffToRGB_harre == null) {
             teffToRGB_harre = new float[105][];
-            FileHandle fh = Gdx.files.internal("data/teff-rgb.csv");
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(fh.read()));
+            FileHandle fh = Gdx.files.internal("data/teff-rgb.csv.gz");
+            try (var gzipStream = new GZIPInputStream(fh.read());
+                    var reader = new BufferedReader(new InputStreamReader(gzipStream))) {
                 // Skip header
                 reader.readLine();
                 int i = 0;
@@ -405,7 +399,6 @@ public class ColorUtils {
      * "http://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color">here</a>
      *
      * @param bv The B-V color index
-     *
      * @return The RGB as a float array in [0..1]
      */
     public static float[] BVtoRGB(double bv) {
@@ -464,11 +457,9 @@ public class ColorUtils {
      *
      * @param rgb        The RGB color
      * @param luminosity The new luminosity amount in [0..1]
-     *
      * @return The new RGB array
      */
-    public static float[] brighten(float[] rgb,
-                                   float luminosity) {
+    public static float[] brighten(float[] rgb, float luminosity) {
         float[] hsl = rgbToHsl(rgb);
         hsl[2] = luminosity;
         return hslToRgb(hsl);
@@ -480,7 +471,6 @@ public class ColorUtils {
      * contained in the set [0..255] and returns h, s, and l in the set [0..1]
      *
      * @param rgb Float array with the RGB values
-     *
      * @return Array The HSL representation
      */
     public static float[] rgbToHsl(float[] rgb) {
@@ -517,7 +507,6 @@ public class ColorUtils {
      * contained in the set [0..1] and returns r, g, and b in the set [0..255].
      *
      * @param hsl Float array with the HSL values
-     *
      * @return Array The RGB representation
      */
     public static float[] hslToRgb(float[] hsl) {
@@ -541,9 +530,7 @@ public class ColorUtils {
         return new float[] { r, g, b };
     }
 
-    private static float hue2rgb(float p,
-                                 float q,
-                                 float t) {
+    private static float hue2rgb(float p, float q, float t) {
         if (t < 0)
             t += 1;
         if (t > 1)
@@ -557,9 +544,7 @@ public class ColorUtils {
         return p;
     }
 
-    public static int HSBtoRGB(float hue,
-                               float saturation,
-                               float brightness) {
+    public static int HSBtoRGB(float hue, float saturation, float brightness) {
         int r = 0, g = 0, b = 0;
         if (saturation == 0) {
             r = g = b = (int) (brightness * 255.0f + 0.5f);
