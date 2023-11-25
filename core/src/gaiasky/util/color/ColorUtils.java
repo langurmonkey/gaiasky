@@ -314,9 +314,9 @@ public class ColorUtils {
      * Convert effective temperature to RGB using the Harre and Heller 2021 (Digital Color of Stars)
      * method.
      *
-     * @param teff The effective temperature of the star
+     * @param teff The effective temperature of the star.
      *
-     * @return The RGB color in a float array
+     * @return The RGB color in a float array.
      *
      * @see <a href="https://ui.adsabs.harvard.edu/abs/2021arXiv210106254H/abstract">Paper at ADS</a>
      */
@@ -350,11 +350,11 @@ public class ColorUtils {
     }
 
     /**
-     * Converts effective temperature in Kelvin (1000-40000) to RGB
+     * Converts effective temperature in Kelvin (1000-40000) to RGB.
      *
-     * @param teff Effective temperature
+     * @param teff Effective temperature.
      *
-     * @return The RGB color in a float array
+     * @return The RGB color in a float array.
      *
      * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
      * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
