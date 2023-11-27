@@ -80,11 +80,6 @@ public class GaiaSkyActionSet extends ActionSet {
         return actions;
     }
 
-    @Override
-    public boolean shouldSync() {
-        return true;
-    }
-
     public void getDefaultBindings(HashMap<String, List<Pair<Action, String>>> map) {
 
         // Oculus touch.

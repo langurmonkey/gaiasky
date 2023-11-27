@@ -41,7 +41,7 @@ public class UCDParser {
     public static String[] varimagscolnames = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
     public static String[] varitimescolnames = new String[] { "g_transit_time", "time_list", "time_series" };
     public static String[] periodcolnames = new String[] { "pf", "period" };
-    public Map<UCDType, Set<UCD>> ucdmap;
+    public Map<UCDType, Array<UCD>> ucdmap;
     // IDS
     public boolean hasid = false;
     public Array<UCD> ID;
@@ -198,7 +198,7 @@ public class UCDParser {
         }
 
         // ID and NAME
-        Set<UCD> meta = ucdmap.get(UCDType.META);
+        Array<UCD> meta = ucdmap.get(UCDType.META);
         if (meta != null)
             for (UCD candidate : meta) {
                 if (TextUtils.contains(candidate.ucdstrings, "meta.id")) {
@@ -217,7 +217,7 @@ public class UCDParser {
         this.hasname = !this.NAME.isEmpty();
 
         // POSITIONS
-        Set<UCD> pos = ucdmap.get(UCDType.POS);
+        Array<UCD> pos = ucdmap.get(UCDType.POS);
         if (pos != null) {
             String posrefsys = getBestRefsys(pos);
             for (UCD candidate : pos) {
@@ -327,7 +327,7 @@ public class UCDParser {
         this.haspm = !this.PMRA.isEmpty() && !this.PMDEC.isEmpty();
 
         // RADIAL VELOCITY
-        Set<UCD> spect = ucdmap.get(UCDType.SPECT);
+        Array<UCD> spect = ucdmap.get(UCDType.SPECT);
         if (spect != null)
             for (UCD candidate : spect) {
                 if (candidate.ucd[0][1].equalsIgnoreCase("dopplerVeloc"))
@@ -335,7 +335,7 @@ public class UCDParser {
             }
 
         // MAGNITUDES
-        Set<UCD> mag = ucdmap.get(UCDType.PHOT);
+        Array<UCD> mag = ucdmap.get(UCDType.PHOT);
         if (mag != null)
             for (UCD candidate : mag) {
                 if (TextUtils.contains(candidate.ucdstrings, "phot.mag")) {
@@ -350,7 +350,7 @@ public class UCDParser {
         this.hasmag = !this.MAG.isEmpty();
 
         // COLORS
-        Set<UCD> col = ucdmap.get(UCDType.PHOT);
+        Array<UCD> col = ucdmap.get(UCDType.PHOT);
         if (col != null) {
             for (UCD candidate : col) {
                 if (candidate.ucd[0][1].equals("color")) {
@@ -365,7 +365,7 @@ public class UCDParser {
         this.hascol = !this.COL.isEmpty();
 
         // SIZE
-        Set<UCD> phys = ucdmap.get(UCDType.PHYS);
+        Array<UCD> phys = ucdmap.get(UCDType.PHYS);
         if (phys != null) {
             for (UCD candidate : phys) {
                 if (candidate.ucd[0].length >= 2 && candidate.ucd[0][1].equals("size")) {
@@ -394,7 +394,7 @@ public class UCDParser {
         this.hasteff = !this.TEFF.isEmpty();
 
         // VARIABILITY
-        Set<UCD> vari = ucdmap.get(UCDType.VARI);
+        Array<UCD> vari = ucdmap.get(UCDType.VARI);
         if (vari != null) {
             for (UCD candidate : vari) {
                 if (candidate.ucd[0].length >= 3 && candidate.ucd[0][1].equals("time")) {
@@ -422,7 +422,7 @@ public class UCDParser {
         // REST OF COLUMNS
         Set<UCDType> keys = ucdmap.keySet();
         for (UCDType ucdType : keys) {
-            Set<UCD> ucds = ucdmap.get(ucdType);
+            Array<UCD> ucds = ucdmap.get(ucdType);
             for (UCD ucd : ucds) {
                 if (!has(ucd)) {
                     extra.add(ucd);
@@ -501,7 +501,7 @@ public class UCDParser {
         for (UCDType type : types) {
             // Get all unknown and missing
             if (ucdmap.containsKey(type)) {
-                Set<UCD> set = ucdmap.get(type);
+                Array<UCD> set = ucdmap.get(type);
                 // Check column names
                 for (UCD candidate : set) {
                     if (TextUtils.containsOrMatches(colnames, candidate.colname, true)) {
@@ -523,7 +523,7 @@ public class UCDParser {
         for (UCDType type : types) {
             // Get all unknown and missing
             if (ucdmap.containsKey(type)) {
-                Set<UCD> set = ucdmap.get(type);
+                Array<UCD> set = ucdmap.get(type);
                 // Check column names
                 for (UCD candidate : set) {
                     if (TextUtils.containsOrMatches(colnames, candidate.colname, true)) {
@@ -557,7 +557,7 @@ public class UCDParser {
 
     }
 
-    private String getBestRefsys(Set<UCD> ucds) {
+    private String getBestRefsys(Array<UCD> ucds) {
         boolean eq = false, ecl = false, gal = false, cart = false;
         for (UCD candidate : ucds) {
             eq = eq || candidate.ucd[0][1].equals("eq");
@@ -612,7 +612,7 @@ public class UCDParser {
 
     private void addToMap(UCD ucd) {
         if (!ucdmap.containsKey(ucd.type)) {
-            Set<UCD> set = new HashSet<>();
+            Array<UCD> set = new Array<>(2);
             set.add(ucd);
             ucdmap.put(ucd.type, set);
         } else {
