@@ -25,11 +25,13 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
+import org.eclipse.jetty.util.ConcurrentHashSet;
 
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OpenXRListener implements XrInputListener, IObserver {
     private static final Log logger = Logger.getLogger(OpenXRListener.class);
@@ -50,7 +52,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
     /** Map from VR device to model object **/
     private Map<XrControllerDevice, Entity> xrControllerToModel;
     /** All VR devices that are selecting right now. **/
-    private final Set<XrControllerDevice> selecting;
+    private final Set<XrControllerDevice> selecting = ConcurrentHashMap.newKeySet(2);
     private long selectingTime = 0;
     private long lastAxisMovedFrame = Long.MIN_VALUE;
 
@@ -59,7 +61,6 @@ public class OpenXRListener implements XrInputListener, IObserver {
         this.comp = new ViewAngleComparator<>();
         this.p0 = new Vector3d();
         this.p1 = new Vector3d();
-        selecting = new HashSet<>();
         this.focusView = new FocusView();
 
         EventManager.instance.subscribe(this, Event.VR_DRIVER_LOADED);
@@ -234,7 +235,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
         Entity sm = xrControllerToModel.get(device);
         var vr = sm != null ? Mapper.vr.get(sm) : null;
         boolean selectingDevice = selecting.contains(device);
-        if (!selectingDevice && value != 0f && !vr.hitUI) {
+        if (!selectingDevice && value != 0f && vr != null && !vr.hitUI) {
             startSelectionCountdown(device);
         } else if (selectingDevice && value == 0f) {
             stopSelectionCountdown(device);
