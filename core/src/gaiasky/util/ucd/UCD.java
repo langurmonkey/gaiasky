@@ -7,38 +7,41 @@
 
 package gaiasky.util.ucd;
 
+/**
+ * Represents the UCD (universal content descriptor) for a column of a table.
+ */
 public class UCD {
 
-    public String originalucd, converted, colname, unit;
-    public String[][] ucd;
-    public String[] ucdstrings;
+    public String originalUCD, converted, colName, unit;
+    public String[][] UCD;
+    public String[] UCDStrings;
     public UCDType type;
     public int index;
-    public UCD(String originalucd, String colname, String unit, int index) {
+    public UCD(String originalUCD, String colName, String unit, int index) {
         super();
 
         this.index = index;
-        this.colname = colname;
+        this.colName = colName;
         this.unit = unit;
-        if (originalucd != null && !originalucd.isEmpty()) {
-            this.originalucd = originalucd;
+        if (originalUCD != null && !originalUCD.isEmpty()) {
+            this.originalUCD = originalUCD;
             // Convert UCD1 to
-            this.converted = originalucd.toLowerCase().replace("_", ".");
+            this.converted = originalUCD.toLowerCase().replace("_", ".");
 
-            this.ucdstrings = this.converted.split(";");
+            this.UCDStrings = this.converted.split(";");
 
-            this.ucd = new String[ucdstrings.length][];
+            this.UCD = new String[UCDStrings.length][];
 
-            for (int i = 0; i < ucdstrings.length; i++) {
-                String singleucd = ucdstrings[i];
-                String[] ssplit = singleucd.split("\\.");
-                this.ucd[i] = ssplit;
+            for (int i = 0; i < UCDStrings.length; i++) {
+                String singleUCD = UCDStrings[i];
+                String[] sSplit = singleUCD.split("\\.");
+                this.UCD[i] = sSplit;
             }
 
             // Type
-            String currtype = this.ucd[0][0];
+            String currType = this.UCD[0][0];
             try {
-                this.type = UCDType.valueOf(currtype.toUpperCase());
+                this.type = UCDType.valueOf(currType.toUpperCase());
             } catch (Exception e) {
                 this.type = UCDType.UNKNOWN;
             }
@@ -50,7 +53,7 @@ public class UCD {
 
     @Override
     public String toString() {
-        return colname + (this.originalucd == null ? "" : " - " + this.originalucd);
+        return colName + (this.originalUCD == null ? "" : " - " + this.originalUCD);
     }
 
     @Override
@@ -61,12 +64,12 @@ public class UCD {
             return false;
         UCD ucd = (UCD) o;
         return index == ucd.index &&
-                originalucd.equals(ucd.originalucd) &&
-                colname.equals(ucd.colname) &&
+                originalUCD.equals(ucd.originalUCD) &&
+                colName.equals(ucd.colName) &&
                 unit.equals(ucd.unit);
     }
 
-    enum UCDType {
+    public enum UCDType {
         POS,
         PHOT,
         STAT,

@@ -3644,7 +3644,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         if (focusView.isSet()) {
                             ObjectDoubleMap.Keys<UCD> ucds = focusView.getSet().data().get(0).extraKeys();
                             for (UCD ucd : ucds)
-                                if (ucd.colname.equalsIgnoreCase(name))
+                                if (ucd.colName.equalsIgnoreCase(name))
                                     return new AttributeUCD(ucd);
                         }
                     }

@@ -34,10 +34,10 @@ public class AttributeUCD implements IAttribute {
         if (o == null || getClass() != o.getClass())
             return false;
         AttributeUCD that = (AttributeUCD) o;
-        return ucd.colname.equals(that.ucd.colname);
+        return ucd.colName.equals(that.ucd.colName);
     }
 
     public String toString() {
-        return ucd.colname;
+        return ucd.colName;
     }
 }

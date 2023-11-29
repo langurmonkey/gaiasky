@@ -539,7 +539,7 @@ public class ParticleRecord implements IParticleRecord {
         if (extra != null) {
             Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
-                if (ucd.originalucd.equals(name) || ucd.colname.equals(name)) {
+                if (ucd.originalUCD.equals(name) || ucd.colName.equals(name)) {
                     return true;
                 }
             }
@@ -557,7 +557,7 @@ public class ParticleRecord implements IParticleRecord {
         if (extra != null) {
             Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
-                if ((ucd.originalucd != null && ucd.originalucd.equals(name)) || (ucd.colname != null && ucd.colname.equals(name))) {
+                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
                     return extra.get(ucd, Double.NaN);
                 }
             }

@@ -56,7 +56,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     private static final Log logger = Logger.getLogger(STILDataProvider.class);
     // These names are not allowed
     private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
-    // Store already visited colname:attribute pairs.
+    // Store already visited colName:attribute pairs.
     private final Map<String, Integer> stringAttributesMap;
     // Store the last index for a given attribute.
     private final Map<String, Integer> lastIndexMap;
@@ -69,7 +69,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         super();
         stringAttributesMap = new HashMap<>();
         lastIndexMap = new HashMap<>();
-        // Logging level to WARN
+        // Logging level to WARN.
         try {
             java.util.logging.Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING);
             java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.WARNING);
@@ -109,9 +109,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * Gets the first ucd that can be translated to a double from the set.
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
-     * @param row  The row objects
+     * @param row  The row objects.
      *
-     * @return Pair of <UCD,Double>
+     * @return Pair of <UCD,Double>.
      */
     private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs,
                                            Object[] row) {
@@ -247,7 +247,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                 // Automatically switch to extended particles if proper motions, colors or sizes are found in the data file.
                 if (datasetOptions != null) {
-                    if ((ucdParser.haspm || ucdParser.hassize || ucdParser.hascol) && (datasetOptions.type == null || datasetOptions.type == DatasetLoadType.PARTICLES)) {
+                    if ((ucdParser.hasPm || ucdParser.hasSize || ucdParser.hasColor) && (datasetOptions.type == null || datasetOptions.type == DatasetLoadType.PARTICLES)) {
                         // Switch to extended.
                         datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
                     }
@@ -257,7 +257,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 int resampledLightCurves = 0;
                 int noPeriods = 0;
 
-                if (ucdParser.haspos) {
+                if (ucdParser.hasPos) {
                     BVToTeff_ballesteros bvToTEff = new BVToTeff_ballesteros();
 
                     int nInvalidParallaxes = 0;
@@ -376,7 +376,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     // We hope size is already in parsecs.
                                     sizePc = sizePair.getSecond().floatValue();
                                 }
-                                if (TextUtils.containsOrMatches(UCDParser.radiuscolnames, sizeUcd.colname, true)) {
+                                if (TextUtils.containsOrMatches(UCDParser.radiusColNames, sizeUcd.colName, true)) {
                                     // Radius, need to multiply by 2 to get diameter.
                                     sizePc *= 2.0;
                                 }
@@ -401,9 +401,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double[] variTimes = null;
                             double pf = 0.0;
                             int nVari = 0;
-                            if (ucdParser.hasvari) {
+                            if (ucdParser.hasVariability) {
                                 Pair<UCD, Double> period = getDoubleUcd(ucdParser.VARI_PERIOD, row);
-                                if (!ucdParser.hasperiod || period == null || !Double.isFinite(period.getSecond())) {
+                                if (!ucdParser.hasPeriod || period == null || !Double.isFinite(period.getSecond())) {
                                     // Skip stars without period
                                     noPeriods++;
                                     continue;
@@ -516,7 +516,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 assert idPair != null;
                                 try {
                                     id = Parser.parseLongException(idPair.getSecond());
-                                    if (isStars && idPair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                    if (isStars && idPair.getFirst().colName.equalsIgnoreCase("hip")) {
                                         hip = (int) id;
                                     }
                                 } catch (NumberFormatException e) {
@@ -707,8 +707,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 val = ((Number) row[extra.index]).doubleValue();
             } catch (Exception e) {
                 Object o = row[extra.index];
-                if (o instanceof Character) {
-                    Character c = (Character) o;
+                if (o instanceof Character c) {
                     val = getStringAttributeValue(extra, c.toString());
                 } else if (o instanceof String) {
                     val = getStringAttributeValue(extra, o);
@@ -729,19 +728,19 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             return -1;
         }
 
-        String key = extra.colname + ":" + value;
+        String key = extra.colName + ":" + value;
         int index = 0;
         if (stringAttributesMap.containsKey(key)) {
             index = stringAttributesMap.get(key);
-        } else if (lastIndexMap.containsKey(extra.colname)) {
-            index = lastIndexMap.get(extra.colname);
+        } else if (lastIndexMap.containsKey(extra.colName)) {
+            index = lastIndexMap.get(extra.colName);
         }
 
         val = index;
 
         if (!stringAttributesMap.containsKey(key)) {
             stringAttributesMap.put(key, index);
-            lastIndexMap.put(extra.colname, index + 1);
+            lastIndexMap.put(extra.colName, index + 1);
         }
         return val;
     }
