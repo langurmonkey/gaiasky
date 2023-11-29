@@ -1,3 +1,16 @@
+<a name="3.5.7-3"></a>
+## [3.5.7-3](https://codeberg.org/gaiasky/gaiasky/tree/3.5.7-2) (2023-11-29)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.7-2...3.5.7-3)
+
+### Bug Fixes
+- columns corresponding to the same UCD maintain the order of appearance in the source table when used. 
+- use concurrent hash set in 'selecting' list in the OpenXR input listener to prevent concurrent modification errors. 
+- resizing log window does not resize contents. Fixes [#749](https://codeberg.org/gaiasky/gaiasky/issues/749). 
+- prevent getting name from second closest if it is invalid. Fixes [#750](https://codeberg.org/gaiasky/gaiasky/issues/750). 
+- use logical keys instead of key codes by converting GDX's codes to GLFW, which uses the logical keyboard layout. Fixes [#748](https://codeberg.org/gaiasky/gaiasky/issues/748). 
+- rename makefile, update build script to detect `/opt/gaiasky` installation. 
+- use default mappings file if the configured one does not exist.
+
 <a name="3.5.7-2"></a>
 ## [3.5.7-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.7) (2023-11-21)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.7...3.5.7-2)
