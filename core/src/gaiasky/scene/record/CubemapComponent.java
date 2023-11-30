@@ -23,11 +23,15 @@ import gaiasky.util.i18n.I18n;
 
 public class CubemapComponent implements Disposable {
     private static final Log logger = Logger.getLogger(CubemapComponent.class);
-
     public OwnCubemap cubemap;
     public String location;
-    protected boolean loaded = false;
+    protected boolean loaded = false, prepared = false;
     protected String cmBack, cmFront, cmUp, cmDown, cmRight, cmLeft;
+
+
+    public CubemapComponent() {
+        super();
+    }
 
     public synchronized void initialize() {
         initialize(null);
@@ -42,15 +46,15 @@ public class CubemapComponent implements Disposable {
             loaded = true;
             try {
                 String cubemapLocation = location == null ? Settings.settings.data.reflectionSkyboxLocation : location;
-                String cubemapLocationUnapacked = Settings.settings.data.dataFile(cubemapLocation);
-                cubemapLocationUnapacked = GlobalResources.unpackAssetPath(cubemapLocationUnapacked);
-                logger.info(I18n.msg("notif.loading", "cubemap: " + cubemapLocationUnapacked));
-                cmBack = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "bk", "back", "b");
-                cmFront = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "ft", "front", "f");
-                cmUp = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "up", "top", "u", "t");
-                cmDown = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "dn", "bottom", "d");
-                cmRight = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "rt", "right", "r");
-                cmLeft = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "lf", "left", "l");
+                String cubemapLocationUnpacked = Settings.settings.data.dataFile(cubemapLocation);
+                cubemapLocationUnpacked = GlobalResources.unpackAssetPath(cubemapLocationUnpacked);
+                logger.info(I18n.msg("notif.loading", "cubemap: " + cubemapLocationUnpacked));
+                cmBack = GlobalResources.resolveCubemapSide(cubemapLocationUnpacked, "bk", "back", "b");
+                cmFront = GlobalResources.resolveCubemapSide(cubemapLocationUnpacked, "ft", "front", "f");
+                cmUp = GlobalResources.resolveCubemapSide(cubemapLocationUnpacked, "up", "top", "u", "t");
+                cmDown = GlobalResources.resolveCubemapSide(cubemapLocationUnpacked, "dn", "bottom", "d");
+                cmRight = GlobalResources.resolveCubemapSide(cubemapLocationUnpacked, "rt", "right", "r");
+                cmLeft = GlobalResources.resolveCubemapSide(cubemapLocationUnpacked, "lf", "left", "l");
 
                 addToLoad(cmBack, textureParams, manager);
                 addToLoad(cmFront, textureParams, manager);
@@ -65,7 +69,7 @@ public class CubemapComponent implements Disposable {
     }
 
     public synchronized void prepareCubemap(AssetManager manager) {
-        if (cubemap == null) {
+        if (cubemap == null && !prepared) {
             TextureData bk = manager.get(cmBack, Texture.class).getTextureData();
             TextureData ft = manager.get(cmFront, Texture.class).getTextureData();
             TextureData up = manager.get(cmUp, Texture.class).getTextureData();
@@ -73,6 +77,7 @@ public class CubemapComponent implements Disposable {
             TextureData rt = manager.get(cmRight, Texture.class).getTextureData();
             TextureData lf = manager.get(cmLeft, Texture.class).getTextureData();
             cubemap = new OwnCubemap(rt, lf, up, dn, ft, bk, TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+            prepared = true;
         }
     }
 
@@ -90,8 +95,7 @@ public class CubemapComponent implements Disposable {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
-     * @return The actual loaded texture path
+     * @return The actual loaded texture path.
      */
     private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
         if (manager == null)
@@ -101,8 +105,12 @@ public class CubemapComponent implements Disposable {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
-        logger.debug(I18n.msg("notif.loading", tex));
-        manager.load(tex, Texture.class, texParams);
+
+        // Only load asset if it has not been loaded yet.
+        if (!manager.contains(tex, Texture.class)) {
+            logger.debug(I18n.msg("notif.loading", tex));
+            manager.load(tex, Texture.class, texParams);
+        }
 
         return tex;
     }
@@ -112,7 +120,6 @@ public class CubemapComponent implements Disposable {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams) {

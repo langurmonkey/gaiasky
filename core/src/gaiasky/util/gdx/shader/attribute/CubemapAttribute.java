@@ -35,6 +35,9 @@ public class CubemapAttribute extends Attribute {
     public final static String HeightCubemapAlias = "heightCubemap";
     public final static int HeightCubemap = register(HeightCubemapAlias);
 
+    public final static String AmbientOcclusionCubemapAlias = "aoCubemap";
+    public final static int AmbientOcclusionCubemap = register(AmbientOcclusionCubemapAlias);
+
     public final TextureDescriptor<OwnCubemap> textureDescription;
 
     public CubemapAttribute(final int index) {

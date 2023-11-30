@@ -89,6 +89,10 @@ uniform vec4 u_diffuseScatteringColor;
 uniform sampler2D u_aoTexture;
 #endif
 
+#ifdef aoCubemapFlag
+uniform samplerCube u_aoCubemap;
+#endif
+
 // OCCLUSION-METALLIC-ROUGHNESS
 #ifdef occlusionMetallicRoughnessTextureFlag
 uniform sampler2D u_occlusionMetallicRoughnessTexture;
@@ -142,6 +146,10 @@ uniform sampler2D u_svtIndirectionEmissiveTexture;
 
 #ifdef svtIndirectionMetallicTextureFlag
 uniform sampler2D u_svtIndirectionMetallicTexture;
+#endif
+
+#ifdef svtIndirectionAoTextureFlag
+uniform sampler2D u_svtIndirectionAoTexture;
 #endif
 
 // SHININESS
@@ -321,8 +329,12 @@ float getShadow(vec3 shadowMapUv) {
 #endif // diffuse scattering
 
 // COLOR AMBIENT OCCLUSION
-#if defined(occlusionMetallicRoughnessTextureFlag)
+#if defined(svtIndirectionAoTextureFlag)
+    #define fetchColorAmbientOcclusion(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionAoTexture, texCoord)).r
+#elif defined(occlusionMetallicRoughnessTextureFlag)
     #define fetchColorAmbientOcclusion(texCoord) texture(u_occlusionMetallicRoughnessTexture, texCoord).r
+#elif defined(aoCubemapFlag)
+    #define fetchColorAmbientOcclusion(texCoord) texture(u_aoCubemap, UVtoXYZ(texCoord)).r
 #elif defined(AOTextureFlag)
     #define fetchColorAmbientOcclusion(texCoord) texture(u_aoTexture, texCoord).r
 #else
@@ -418,17 +430,19 @@ void main() {
         vec3 night = vec3(0.0);
     #endif // atmosphereGround
 
-    float ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
-    #if defined(occlusionMetallicRoughnessTextureFlag)
-        // Sometimes ambient occlusion is not used, and it is set to 0.
-        if (ambientOcclusion == 0.0) {
-            ambientOcclusion = 1.0;
-        }
-    #endif// occlusionMetallicRoughnessTextureFlag
+    #if !defined(occlusionCloudsFlag)
+        float ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
+        #if defined(occlusionMetallicRoughnessTextureFlag)
+            // Sometimes ambient occlusion is not used, and it is set to 0.
+            if (ambientOcclusion == 0.0) {
+                ambientOcclusion = 1.0;
+            }
+        #endif// occlusionMetallicRoughnessTextureFlag
 
-    // Occlusion strength is 1 by default.
-    diffuse.rgb *= ambientOcclusion;
-    specular.rgb *= ambientOcclusion;
+        // Occlusion strength is 1 by default.
+        diffuse.rgb *= ambientOcclusion;
+        specular.rgb *= ambientOcclusion;
+    #endif
 
     // Alpha value from textures
     float texAlpha = 1.0;
@@ -500,6 +514,7 @@ void main() {
             vec3 rmc = diffuse.rgb * metallicColor.r;
             reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
         #endif // ssrFlag
+        // Cubemap reflection color.
         reflectionColor = reflectionColor * metallicColor.r;
     #endif // metallicFlag
 
@@ -585,6 +600,14 @@ void main() {
         // Only ambient contribution, we have no illuminating directional lights.
         diffuseColor = saturate(diffuse.rgb * ambient);
     } else {
+        #ifdef occlusionCloudsFlag
+        // Ambient occlusion contains clouds, take into account light direction and normal.
+        float ambientOcclusion = fetchColorAmbientOcclusion(texCoords + L0.xy  * 0.0015);
+        ambientOcclusion = clamp(1.0 - 1.7 * ambientOcclusion, 0.0, 1.0);
+        diffuseColor *= ambientOcclusion;
+        specularColor *= ambientOcclusion;
+        #endif
+
         // Regular shading.
         diffuseColor *= diffuse.rgb;
     }
@@ -604,9 +627,9 @@ void main() {
     #ifdef atmosphereGround
         #define exposure 1.0
         fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor, 0.0, 1.0);
-        #if defined(heightFlag) && !defined(parallaxMappingFlag)
+        #if defined(heightFlag)
             fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
-        #endif // heightFlag && !parallaxMappingFlag
+        #endif // heightFlag
     #endif // atmosphereGround
 
     #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)

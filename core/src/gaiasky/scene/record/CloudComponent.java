@@ -70,6 +70,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
     public CubemapComponent diffuseCubemap;
     // Virtual texture.
     public VirtualTextureComponent diffuseSvt;
+    public Map<Object, Object> svtParams;
     // Model parameters
     public Map<String, Object> params;
     Vector3 aux;
@@ -372,6 +373,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
     }
 
     public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
+        this.svtParams = virtualTexture;
         setDiffuseSVT(convertToComponent(virtualTexture));
     }
 

@@ -50,7 +50,9 @@ import gaiasky.util.math.Vector3d;
 public class ModelInitializer extends AbstractInitSystem {
     private static final Logger.Log logger = Logger.getLogger(ModelInitializer.class.getSimpleName());
 
-    /** Reference to the spacecraft radio. **/
+    /**
+     * Reference to the spacecraft radio.
+     **/
     private SpacecraftRadio radio;
 
     public ModelInitializer(boolean setUp, Family family, int priority) {
@@ -123,7 +125,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
 
         // Initialize model body
-        initializeModel(base, body, model, celestial, bb, sa, label, scaffolding, graph, focus, isBillboardGal);
+        initializeModel(entity, base, body, model, celestial, bb, sa, label, scaffolding, graph, focus, isBillboardGal);
 
         // Init billboard
         if (isBillboard) {
@@ -258,7 +260,7 @@ public class ModelInitializer extends AbstractInitSystem {
         label.labelFactor = 0;
     }
 
-    private void initializeModel(Base base, Body body, Model model, Celestial celestial, Billboard bb, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus, boolean isBillboardGal) {
+    private void initializeModel(Entity entity, Base base, Body body, Model model, Celestial celestial, Billboard bb, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus, boolean isBillboardGal) {
         // Models are tessellated if tessellation is active and their size is very large.
         model.model.tessellated = Settings.settings.scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
 
@@ -304,6 +306,25 @@ public class ModelInitializer extends AbstractInitSystem {
                 model.model.print(logger);
             }
         }
+
+        // Clouds also act as ambient occlusion to models.
+        if (Mapper.cloud.has(entity)) {
+            var cloud = Mapper.cloud.get(entity);
+            if (model.model != null && model.model.mtc != null && cloud.cloud != null) {
+                if (cloud.cloud.diffuse != null) {
+                    model.model.mtc.ao = cloud.cloud.diffuse;
+                    model.model.mtc.setOcclusionClouds(true);
+                } else if (cloud.cloud.diffuseCubemap != null) {
+                    model.model.mtc.setAmbientOcclusionCubemap(cloud.cloud.diffuseCubemap.location);
+                    model.model.mtc.setOcclusionClouds(true);
+                } else if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
+                    model.model.mtc.setAoSVT(cloud.cloud.svtParams);
+                    model.model.mtc.setOcclusionClouds(true);
+                }
+            }
+        }
+
+        // Initialize model.
         if (model.model != null) {
             model.model.initialize(base.getName());
         }

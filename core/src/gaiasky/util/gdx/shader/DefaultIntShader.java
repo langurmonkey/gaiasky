@@ -114,6 +114,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_heightCubemap;
     protected final int u_roughnessCubemap;
     protected final int u_metallicCubemap;
+    protected final int u_aoCubemap;
 
     // SVT.
     protected final int u_svtTileSize;
@@ -129,6 +130,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtIndirectionEmissiveTexture;
     protected final int u_svtIndirectionMetallicTexture;
     protected final int u_svtIndirectionRoughnessTexture;
+    protected final int u_svtIndirectionAoTexture;
     // Generic.
     protected final int u_generic1;
     protected final int u_generic2;
@@ -197,7 +199,7 @@ public class DefaultIntShader extends BaseIntShader {
                             final Config config,
                             final String prefix) {
         this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(),
-             config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
+                config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
     public DefaultIntShader(final IntRenderable renderable,
@@ -206,7 +208,7 @@ public class DefaultIntShader extends BaseIntShader {
                             final String vertexShader,
                             final String fragmentShader) {
         this(renderable, config,
-             new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+                new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
     public DefaultIntShader(final IntRenderable renderable,
@@ -303,6 +305,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_heightCubemap = register(Inputs.heightCubemap, Setters.heightCubemap);
         u_roughnessCubemap = register(Inputs.roughnessCubemap, Setters.roughnessCubemap);
         u_metallicCubemap = register(Inputs.metallicCubemap, Setters.metallicCubemap);
+        u_aoCubemap = register(Inputs.aoCubemap, Setters.aoCubemap);
         u_svtTileSize = register(Inputs.svtTileSize, Setters.svtTileSize);
         u_svtResolution = register(Inputs.svtResolution, Setters.svtResolution);
         u_svtDepth = register(Inputs.svtDepth, Setters.svtDepth);
@@ -331,6 +334,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtIndirectionMetallicTexture = register(Inputs.svtIndirectionMetallicTexture, Setters.svtIndirectionMetallicTexture);
         u_svtIndirectionEmissiveTexture = register(Inputs.svtIndirectionEmissiveTexture, Setters.svtIndirectionEmissiveTexture);
         u_svtIndirectionRoughnessTexture = register(Inputs.svtIndirectionRoughnessTexture, Setters.svtIndirectionRoughnessTexture);
+        u_svtIndirectionAoTexture = register(Inputs.svtIndirectionAoTexture, Setters.svtIndirectionAoTexture);
 
         u_generic1 = register(Inputs.generic1, Setters.generic1);
         u_generic2 = register(Inputs.generic2, Setters.generic2);
@@ -541,6 +545,10 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define " + CubemapAttribute.MetallicCubemapAlias + "Flag\n");
             cubemap = true;
         }
+        if (attributes.has(CubemapAttribute.AmbientOcclusionCubemap)) {
+            prefix.append("#define " + CubemapAttribute.AmbientOcclusionCubemapAlias + "Flag\n");
+            cubemap = true;
+        }
         if (attributes.has(CubemapAttribute.RoughnessCubemap)) {
             prefix.append("#define " + CubemapAttribute.RoughnessCubemapAlias + "Flag\n");
             cubemap = true;
@@ -551,6 +559,10 @@ public class DefaultIntShader extends BaseIntShader {
         }
         if (cubemap) {
             prefix.append("#define cubemapFlag\n");
+        }
+
+        if (attributes.has(OcclusionCloudsAttribute.Type)) {
+            prefix.append("#define " + OcclusionCloudsAttribute.Alias + "Flag\n");
         }
 
         boolean svtCache = false;
@@ -585,6 +597,10 @@ public class DefaultIntShader extends BaseIntShader {
         }
         if (attributes.has(TextureAttribute.SvtIndirectionRoughness)) {
             prefix.append("#define " + TextureAttribute.SvtIndirectionRoughnessAlias + "Flag\n");
+            svtIndirection = true;
+        }
+        if (attributes.has(TextureAttribute.SvtIndirectionAmbientOcclusion)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionAmbientOcclusionAlias + "Flag\n");
             svtIndirection = true;
         }
         if (svtCache && svtIndirection && attributes.has(FloatAttribute.SvtId)
@@ -750,7 +766,7 @@ public class DefaultIntShader extends BaseIntShader {
                 int idx = dirLightsLoc + i * dirLightsSize;
                 program.setUniformf(idx + dirLightsColorOffset, directionalLights[i].color.r, directionalLights[i].color.g, directionalLights[i].color.b);
                 program.setUniformf(idx + dirLightsDirectionOffset, directionalLights[i].direction.x, directionalLights[i].direction.y,
-                                    directionalLights[i].direction.z);
+                        directionalLights[i].direction.z);
                 if (dirLightsSize <= 0)
                     break;
             }
@@ -769,8 +785,8 @@ public class DefaultIntShader extends BaseIntShader {
 
                 int idx = pointLightsLoc + i * pointLightsSize;
                 program.setUniformf(idx + pointLightsColorOffset, pointLights[i].color.r * pointLights[i].intensity,
-                                    pointLights[i].color.g * pointLights[i].intensity,
-                                    pointLights[i].color.b * pointLights[i].intensity);
+                        pointLights[i].color.g * pointLights[i].intensity,
+                        pointLights[i].color.b * pointLights[i].intensity);
                 program.setUniformf(idx + pointLightsPositionOffset, pointLights[i].position.x, pointLights[i].position.y, pointLights[i].position.z);
                 if (pointLightsIntensityOffset >= 0)
                     program.setUniformf(idx + pointLightsIntensityOffset, pointLights[i].intensity);
@@ -912,7 +928,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureAttribute.Roughness);
         public final static Uniform diffuseScatteringColor = new Uniform("u_diffuseScatteringColor", ColorAttribute.DiffuseScattering);
         public final static Uniform occlusionMetallicRoughnessTexture = new Uniform("u_occlusionMetallicRoughnessTexture",
-                                                                                    TextureAttribute.OcclusionMetallicRoughness);
+                TextureAttribute.OcclusionMetallicRoughness);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
@@ -938,6 +954,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform emissionCubemap = new Uniform("u_emissionCubemap");
         public final static Uniform heightCubemap = new Uniform("u_heightCubemap");
         public final static Uniform metallicCubemap = new Uniform("u_metallicCubemap");
+        public final static Uniform aoCubemap = new Uniform("u_aoCubemap");
         public final static Uniform roughnessCubemap = new Uniform("u_roughnessCubemap");
 
         public final static Uniform iridescenceFactorUniform = new Uniform("u_iridescenceFactor");
@@ -966,6 +983,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform svtIndirectionEmissiveTexture = new Uniform("u_svtIndirectionEmissiveTexture");
         public final static Uniform svtIndirectionMetallicTexture = new Uniform("u_svtIndirectionMetallicTexture");
         public final static Uniform svtIndirectionRoughnessTexture = new Uniform("u_svtIndirectionRoughnessTexture");
+        public final static Uniform svtIndirectionAoTexture = new Uniform("u_svtIndirectionAoTexture");
 
         public final static Uniform generic1 = new Uniform("u_generic1", FloatAttribute.Generic1);
         public final static Uniform generic2 = new Uniform("u_generic2", FloatAttribute.Generic2);
@@ -1439,6 +1457,18 @@ public class DefaultIntShader extends BaseIntShader {
                 }
             }
         };
+        public final static Setter aoCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.AmbientOcclusionCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(
+                            ((CubemapAttribute) Objects.requireNonNull(combinedAttributes.get(CubemapAttribute.AmbientOcclusionCubemap))).textureDescription));
+                }
+            }
+        };
         public final static Setter roughnessCubemap = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
@@ -1497,8 +1527,8 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes
-                        .get(PBRTextureAttribute.IridescenceTexture))).textureDescription);
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
+                        .get(PBRTextureAttribute.IridescenceTexture)))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -1508,8 +1538,8 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes
-                        .get(PBRTextureAttribute.IridescenceThicknessTexture))).textureDescription);
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
+                        .get(PBRTextureAttribute.IridescenceThicknessTexture)))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -1560,7 +1590,7 @@ public class DefaultIntShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
-                                                                                                                       .get(PBRTextureAttribute.ThicknessTexture)))).textureDescription);
+                        .get(PBRTextureAttribute.ThicknessTexture)))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -1706,6 +1736,18 @@ public class DefaultIntShader extends BaseIntShader {
                 }
             }
         };
+        public final static Setter svtIndirectionAoTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionAmbientOcclusion)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(
+                            ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionAmbientOcclusion)))).textureDescription));
+                }
+            }
+        };
         public final static Setter generic1 = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
@@ -1749,7 +1791,7 @@ public class DefaultIntShader extends BaseIntShader {
         }
 
         public static class ACubemap extends LocalSetter {
-            private final static float[] ones = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            private final static float[] ones = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
             private final static Vector3 tmpV1 = new Vector3();
             public final int dirLightsOffset;
             public final int pointLightsOffset;

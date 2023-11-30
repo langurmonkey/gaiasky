@@ -53,6 +53,8 @@ public class TextureAttribute extends Attribute {
     public final static int SvtIndirectionEmissive = register(SvtIndirectionEmissiveAlias);
     public final static String SvtIndirectionMetallicAlias = "svtIndirectionMetallicTexture";
     public final static int SvtIndirectionMetallic = register(SvtIndirectionMetallicAlias);
+    public final static String SvtIndirectionAmbientOcclusionAlias = "svtIndirectionAoTexture";
+    public final static int SvtIndirectionAmbientOcclusion = register(SvtIndirectionAmbientOcclusionAlias);
     public final TextureDescriptor<Texture> textureDescription;
     public float offsetU = 0;
     public float offsetV = 0;
