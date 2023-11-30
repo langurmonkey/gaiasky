@@ -62,7 +62,7 @@ public class TextUtils {
     }
 
     /**
-     * Breaks the character sequence with new line characters '\n' so that the lines have
+     * Breaks the string with new line ('\n') characters so that the lines have
      * approximately <code>breakChars</code> characters.
      *
      * @param in         The character sequence.
@@ -75,7 +75,7 @@ public class TextUtils {
     }
 
     /**
-     * Breaks the string with new line characters '\n' so that the lines have
+     * Breaks the string with new line ('\n') characters so that the lines have
      * approximately <code>breakChars</code> characters.
      *
      * @param in         The string.
@@ -88,12 +88,12 @@ public class TextUtils {
     }
 
     /**
-     * Breaks the string with new line characters '\n' so that the lines have
+     * Breaks the string with new line ('\n') characters so that the lines have
      * approximately <code>breakChars</code> characters.
      *
      * @param in         The string.
      * @param breakChars The number of characters per line.
-     * @param forceBreak Break the string even when there are not separator characters.
+     * @param forceBreak Break the string even when there are no separator characters.
      * @return The string, broken into lines.
      */
     public static String breakCharacters(String in,
@@ -109,8 +109,14 @@ public class TextUtils {
                     chars = 0;
                 } else {
                     chars++;
-                    if (chars > breakChars && (forceBreak || Character.isSpaceChar(c))) {
-                        sb.setCharAt(i, '\n');
+                    if (chars > breakChars && (forceBreak || Character.isSpaceChar(c) || c == '/' || c == '\\')) {
+                        if (Character.isSpaceChar(c)) {
+                            // Replace space with new line.
+                            sb.setCharAt(i, '\n');
+                        } else {
+                            // Add new line after.
+                            sb.insert(i + 1, '\n');
+                        }
                         chars = 0;
                     }
                 }
