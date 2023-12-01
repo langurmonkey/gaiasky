@@ -1231,7 +1231,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             }
             case TOGGLE_VISIBILITY_CMD -> {
                 // Check clouds.
-                if (occlusionClouds) {
+                if (occlusionClouds && getMaterial() != null) {
                     GaiaSky.postRunnable(() -> {
                         if (GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
                             // Add occlusion clouds attributes.
