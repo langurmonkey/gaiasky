@@ -21,9 +21,9 @@ import gaiasky.util.math.Vector3b;
 
 public class LightingUtils {
 
-    // At what distance the light has the maximum intensity
+    // At what distance the light has the maximum intensity.
     private static final double LIGHT_X0 = 0.1 * Constants.AU_TO_U;
-    // At what distance the light is 0
+    // At what distance the light is 0.
     private static final double LIGHT_X1 = 5e4 * Constants.AU_TO_U;
 
     private static final ThreadLocal<Vector3> F31 = new TLV3();

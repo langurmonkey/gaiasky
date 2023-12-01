@@ -311,7 +311,7 @@ public class ModelInitializer extends AbstractInitSystem {
         if (Mapper.cloud.has(entity)) {
             var cloud = Mapper.cloud.get(entity);
             if (model.model != null && model.model.mtc != null && cloud.cloud != null) {
-                if (cloud.cloud.diffuse != null) {
+                if (cloud.cloud.diffuse != null && !cloud.cloud.diffuse.endsWith(Constants.GEN_KEYWORD)) {
                     model.model.mtc.ao = cloud.cloud.diffuse;
                     model.model.mtc.setOcclusionClouds(true);
                 } else if (cloud.cloud.diffuseCubemap != null) {
