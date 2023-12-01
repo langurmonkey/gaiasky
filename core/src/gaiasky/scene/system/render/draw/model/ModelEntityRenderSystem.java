@@ -574,7 +574,7 @@ public class ModelEntityRenderSystem {
                              double t) {
         // Update cull face depending on distance.
         cloud.cloud.updateCullFace(Mapper.body.get(entity).distToCamera);
-        cloud.cloud.touch();
+        cloud.cloud.touch(model);
         ICamera cam = GaiaSky.instance.getICamera();
         cloud.cloud.mc.updateRelativisticEffects(cam);
         cloud.cloud.mc.updateVelocityBufferUniforms(cam);

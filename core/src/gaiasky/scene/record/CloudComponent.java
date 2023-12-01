@@ -23,7 +23,9 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.BlendMode;
+import gaiasky.render.ComponentTypes;
 import gaiasky.scene.api.IUpdatable;
+import gaiasky.scene.component.Model;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
@@ -45,7 +47,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static gaiasky.scene.record.MaterialComponent.convertToComponent;
 
 public class CloudComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<CloudComponent> {
-    /** Default texture parameters **/
+    /**
+     * Default texture parameters
+     **/
     protected static final OwnTextureParameter textureParams;
     private static final Log logger = Logger.getLogger(CloudComponent.class);
 
@@ -61,10 +65,14 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
     public NoiseComponent nc;
     public ModelComponent mc;
     public Matrix4 localTransform;
-    /** RGB color of generated clouds **/
-    public float[] color = new float[] { 1f, 1f, 1f, 0.7f };
+    /**
+     * RGB color of generated clouds
+     **/
+    public float[] color = new float[]{1f, 1f, 1f, 0.7f};
     public String diffuse, diffuseUnpacked;
-    /** The material component associated to the same model. **/
+    /**
+     * The material component associated to the same model.
+     **/
     public MaterialComponent materialComponent;
     // Cubemap.
     public CubemapComponent diffuseCubemap;
@@ -138,7 +146,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         mc.instance = new IntModelInstance(cloudModel, this.localTransform);
 
         if (!Settings.settings.scene.initialization.lazyTexture) {
-            initMaterial();
+            initMaterial(null);
         }
 
         // Subscribe to new graphics quality setting event
@@ -150,7 +158,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         texLoading = false;
     }
 
-    public void touch() {
+    public void touch(Model model) {
         if (Settings.settings.scene.initialization.lazyTexture && !texInitialised) {
 
             if (!texLoading) {
@@ -158,7 +166,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
                 // Set to loading
                 texLoading = true;
             } else if (isFinishedLoading(manager)) {
-                GaiaSky.postRunnable(this::initMaterial);
+                GaiaSky.postRunnable(() -> this.initMaterial(model));
 
                 // Set to initialised
                 texInitialised = true;
@@ -189,7 +197,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         }
     }
 
-    public void initMaterial() {
+    public void initMaterial(Model model) {
         material = mc.instance.materials.first();
 
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
@@ -197,7 +205,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
                 Texture tex = manager.get(diffuseUnpacked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
             } else {
-                initializeGenCloudData();
+                initializeGenCloudData(model);
             }
         }
         if (diffuseCubemap != null) {
@@ -242,7 +250,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         this.generated.set(generated);
     }
 
-    private synchronized void initializeGenCloudData() {
+    private synchronized void initializeGenCloudData(Model model) {
         if (!generated.get()) {
             generated.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
@@ -269,6 +277,15 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
                         cloudTex = new Texture(cloudPixmap, true);
                         cloudTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
                         material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
+                        // Add to material of main body as ambient occlusion.
+                        if (model != null && model.model != null && model.model.mtc != null &&
+                                GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+                            // Add occlusion clouds attributes.
+                            model.model.mtc.getMaterial().remove(OcclusionCloudsAttribute.Type);
+                            model.model.mtc.getMaterial().remove(TextureAttribute.AO);
+                            model.model.mtc.getMaterial().set(new TextureAttribute(TextureAttribute.AO, cloudTex));
+                            model.model.mtc.getMaterial().set(new OcclusionCloudsAttribute(true));
+                        }
                     }
                     long elapsed = TimeUtils.millis() - start;
                     logger.info(I18n.msg("gui.procedural.info.done", I18n.msg("gui.procedural.cloud"), elapsed / 1000d));
@@ -468,7 +485,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
     @Override
     public void updateWith(CloudComponent object) {
         // Random attributes.
-        if(object.size > 0) {
+        if (object.size > 0) {
             this.size = object.size;
         }
         // Regular texture.

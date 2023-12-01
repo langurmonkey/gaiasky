@@ -87,7 +87,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public boolean texInitialised, texLoading;
     public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao, occlusionMetallicRoughness;
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked,
-            heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked, occlusionMetallicRoughnessUnpacked;
+            heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked;
     // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
@@ -109,6 +109,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     // Cubemaps.
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap,
             roughnessCubemap, metallicCubemap, aoCubemap;
+    // AO texture.
+    public Texture aoTexture;
     // Occlusion clouds: ambient occlusion uses the cloud texture.
     public boolean occlusionClouds = false;
     // Biome lookup texture.
@@ -166,7 +168,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD))
             metallicUnpacked = addToLoad(metallic, getTP(metallic, true), manager);
         if (ao != null && !ao.endsWith(Constants.GEN_KEYWORD))
-            aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
+            aoUnpacked = addToLoad(ao, getTP(ao, true), manager);
         if (occlusionMetallicRoughness != null && !occlusionMetallicRoughness.endsWith(Constants.GEN_KEYWORD))
             occlusionMetallicRoughnessUnpacked = addToLoad(occlusionMetallicRoughness, getTP(occlusionMetallicRoughness, true), manager);
         if (height != null && !height.endsWith(Constants.GEN_KEYWORD))
@@ -229,7 +231,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 && ComponentUtils.isLoaded(heightUnpacked, manager)
                 && ComponentUtils.isLoaded(roughnessUnapcked, manager)
                 && ComponentUtils.isLoaded(metallicUnpacked, manager)
-                && ComponentUtils.isLoaded(aoUnapcked, manager)
+                && ComponentUtils.isLoaded(aoUnpacked, manager)
                 && ComponentUtils.isLoaded(diffuseCubemap, manager)
                 && ComponentUtils.isLoaded(normalCubemap, manager)
                 && ComponentUtils.isLoaded(emissiveCubemap, manager)
@@ -404,8 +406,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
         if (ao != null && material.get(TextureAttribute.AO) == null) {
             if (!ao.endsWith(Constants.GEN_KEYWORD)) {
-                Texture tex = manager.get(aoUnapcked, Texture.class);
-                material.set(new TextureAttribute(TextureAttribute.AO, tex));
+                aoTexture = manager.get(aoUnpacked, Texture.class);
+                material.set(new TextureAttribute(TextureAttribute.AO, aoTexture));
             }
         }
         if (occlusionMetallicRoughness != null && material.get(TextureAttribute.AO) == null) {
@@ -490,6 +492,11 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             EventManager.publish(Event.SVT_MATERIAL_INFO, this, svtId, this);
         }
 
+    }
+
+    private void addSVTAttributes(Material material,
+                                  VirtualTextureComponent svt) {
+        addSVTAttributes(material, svt, svt.id);
     }
 
     private void addSVTAttributes(Material material,
@@ -1157,7 +1164,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         disposeTexture(manager, material, height, heightUnpacked, TextureAttribute.Height, heightTex);
         disposeTexture(manager, material, metallic, metallicUnpacked, TextureAttribute.Metallic, null);
         disposeTexture(manager, material, roughness, roughnessUnapcked, TextureAttribute.Roughness, null);
-        disposeTexture(manager, material, ao, aoUnapcked, TextureAttribute.AO, null);
+        disposeTexture(manager, material, ao, aoUnpacked, TextureAttribute.AO, null);
         disposeCubemap(manager, material, CubemapAttribute.DiffuseCubemap, diffuseCubemap);
         disposeCubemap(manager, material, CubemapAttribute.NormalCubemap, normalCubemap);
         disposeCubemap(manager, material, CubemapAttribute.EmissiveCubemap, emissiveCubemap);
@@ -1235,12 +1242,20 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                     GaiaSky.postRunnable(() -> {
                         if (GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
                             // Add occlusion clouds attributes.
-                            getMaterial().set(new CubemapAttribute(CubemapAttribute.AmbientOcclusionCubemap, aoCubemap.cubemap));
+                            if (aoTexture != null) {
+                                material.set(new TextureAttribute(TextureAttribute.AO, aoTexture));
+                            } else if (aoCubemap != null) {
+                                getMaterial().set(new CubemapAttribute(CubemapAttribute.AmbientOcclusionCubemap, aoCubemap.cubemap));
+                            } else if (aoSvt != null) {
+                                material.set(new TextureAttribute(TextureAttribute.SvtIndirectionAmbientOcclusion, aoSvt.indirectionBuffer));
+                            }
                             getMaterial().set(new OcclusionCloudsAttribute(true));
                         } else {
                             // Remove occlusion clouds attributes.
                             getMaterial().remove(OcclusionCloudsAttribute.Type);
                             getMaterial().remove(CubemapAttribute.AmbientOcclusionCubemap);
+                            getMaterial().remove(TextureAttribute.AO);
+                            getMaterial().remove(TextureAttribute.SvtIndirectionAmbientOcclusion);
                         }
                     });
                 }
