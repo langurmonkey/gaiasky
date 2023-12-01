@@ -145,6 +145,7 @@ public class NoiseComponent extends NamedComponent {
         int y = 0;
 
         float thetaStep = piTimesTwo / N;
+        float phiStep = (float) (Math.PI / (M - 1));
         while (phi <= piDivTwo) {
             final double cosPhi = Math.cos(phi);
             final double sinPhi = Math.sin(phi);
@@ -160,10 +161,10 @@ public class NoiseComponent extends NamedComponent {
                 moisture[x][yf] = (float) m;
 
                 float nf = (float) n;
-                // Pixamp
+                // Create pixmap.
                 pixmap.drawPixel(x, yf, Color.rgba8888(nf, nf, nf, 1f));
             });
-            phi += (Math.PI / (M - 1));
+            phi += phiStep;
             y += 1;
 
             // Progress bar
