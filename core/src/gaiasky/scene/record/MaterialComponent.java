@@ -130,6 +130,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public MaterialComponent() {
         super();
+        svts = new Array<>();
         EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD,
                 Event.TESSELLATION_QUALITY_CMD, Event.TOGGLE_VISIBILITY_CMD);
     }
@@ -456,7 +457,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
 
         // Sparse Virtual Textures.
-        svts = new Array<>();
         int svtId = 0;
         if (diffuseSvt != null || normalSvt != null || emissiveSvt != null || specularSvt != null || heightSvt != null || metallicSvt != null || roughnessSvt != null || aoSvt != null) {
             svtId = SVTManager.nextSvtId();
