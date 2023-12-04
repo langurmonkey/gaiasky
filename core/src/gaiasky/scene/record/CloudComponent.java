@@ -212,7 +212,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
             diffuseCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.cubemap));
         }
-        if (diffuseSvt != null && materialComponent != null) {
+        if (diffuseSvt != null && materialComponent != null && materialComponent.svts != null) {
             if (materialComponent.diffuseSvt != null) {
                 // Use the ID of the main material.
                 addSVTAttributes(material, diffuseSvt, materialComponent.diffuseSvt.id);
