@@ -90,10 +90,10 @@ void main() {
     float solidAngle;
     float opacity;
     float pointSize;
-    if (u_fixedAngularSize <= 0) {
+    if (u_fixedAngularSize <= 0.0) {
         solidAngle = atan((a_size * u_alphaSizeBrRc.z) / dist);
         opacity = lint(solidAngle, u_thAnglePoint.x, u_thAnglePoint.y, u_opacityLimits.x, u_opacityLimits.y);
-        pointSize = max(3.3 * u_alphaSizeBrRc.w, pow(solidAngle * .5e8, u_brightnessPower) * u_alphaSizeBrRc.y * cubemapFactor);
+        pointSize = max(3.3 * u_alphaSizeBrRc.w, pow(solidAngle * 0.5e8, u_brightnessPower) * u_alphaSizeBrRc.y * cubemapFactor);
     } else {
         solidAngle = u_fixedAngularSize;
         opacity = 1.0;

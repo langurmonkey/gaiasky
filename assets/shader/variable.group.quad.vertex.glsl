@@ -137,10 +137,10 @@ void main() {
     float solidAngle;
     float opacity;
     float quadSize;
-    if (u_fixedAngularSize <= 0) {
+    if (u_fixedAngularSize <= 0.0) {
         solidAngle = atan(size / dist);
         opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
-        quadSize = clamp(size * pow(solidAngle * 5e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.003 * dist, 0.5 * dist);
+        quadSize = clamp(size * pow(solidAngle * 5.0e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.003 * dist, 0.5 * dist);
     } else {
         solidAngle = u_fixedAngularSize;
         opacity = clamp(size / 100.0, 0.0, 1.0);
