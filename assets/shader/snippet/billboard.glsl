@@ -8,7 +8,7 @@
 //   s_vert_pos (vec4) - vertex position
 //   s_obj_pos (vec3) - object position wrt camera
 //   s_proj_view (mat4) - camera view-projection matrix
-//   s_size (float) - scaling size
+//   s_size (float) - quad size
 //   u_camUp (vec3) - camera up (first component is NaN when mode is cubemap.
 // Returns:
 //   gpos (vec4) - the vertex position
@@ -33,7 +33,7 @@ if (isnan(u_camUp.x)) {
 //vec4 s_quat = billboard_quaternion(s_obj, s_up, s_right);
 vec4 s_quat = q_look_at(s_obj, s_up);
 
-// Scaling
+// Quad size
 vec4 vert_pos = vec4(s_vert_pos.xyz * s_size, s_vert_pos.w);
 
 // Rotation
