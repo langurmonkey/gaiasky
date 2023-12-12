@@ -63,6 +63,7 @@ action.decfov                               = CTRL_L L_BRACKET
 # Screen modes and effects
 action.togglefs                             = F11
 action.screenshot                           = F5
+action.screenshot.cubemap                   = F7
 action.toggle/element.frameoutput           = F6
 action.toggle/element.controls              = U
 action.toggle/element.360                   = CTRL_L K

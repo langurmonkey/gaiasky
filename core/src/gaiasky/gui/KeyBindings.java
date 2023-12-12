@@ -312,6 +312,9 @@ public class KeyBindings {
         // Take screenshot
         addAction(new ProgramAction("action.screenshot", () -> EventManager.publish(Event.SCREENSHOT_CMD, this, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1], Settings.settings.screenshot.location)));
 
+        // Save cubemap faces
+        addAction(new ProgramAction("action.screenshot.cubemap", () -> EventManager.publish(Event.SCREENSHOT_CUBEMAP_CMD, this, Settings.settings.screenshot.location)));
+
         // Toggle frame output
         addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.publish(Event.FRAME_OUTPUT_CMD, this, !Settings.settings.frame.active)));
 

@@ -1010,6 +1010,11 @@ public enum Event {
      * Informs of the new size of the screenshot system.
      */
     SCREENSHOT_SIZE_UPDATE,
+    /**
+     * Save the faces of the current cubemap to disk as image files. This only works when any of the cubemap modes
+     * is active. Contains the output directory name as a string.
+     */
+    SCREENSHOT_CUBEMAP_CMD,
 
     /**
      * Issues the frame output command. Contains a boolean with the state.

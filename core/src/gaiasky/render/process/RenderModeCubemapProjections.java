@@ -25,9 +25,13 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.Cube
 import gaiasky.util.gdx.contrib.postprocess.effects.WarpingMesh;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.loader.WarpMeshReader;
+import gaiasky.util.i18n.I18n;
+import gaiasky.util.screenshot.ImageRenderer;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 public class RenderModeCubemapProjections extends RenderModeCubemap implements IRenderMode, IObserver {
@@ -54,7 +58,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
         EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
                 Event.CUBEMAP_CMD, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.INDEXOFREFRACTION_CMD,
-                Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD);
+                Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.SCREENSHOT_CUBEMAP_CMD);
     }
 
     private void setProjection(CubemapProjection projection) {
@@ -178,11 +182,49 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
             case PLANETARIUM_ANGLE_CMD -> setPlanetariumAngle((float) data[0]);
             case INDEXOFREFRACTION_CMD -> GaiaSky.postRunnable(() -> setCelestialSphereIndexOfRefraction((float) data[0]));
             case PLANETARIUM_GEOMETRYWARP_FILE_CMD -> GaiaSky.postRunnable(() -> initializeGeometryWarp((Path) data[0]));
+            case SCREENSHOT_CUBEMAP_CMD -> {
+                if(GaiaSky.instance.sceneRenderer.isCubemapRenderMode()) {
+                    Path directory = Path.of((String) data[0]);
+                    var date = getCurrentTimeStamp();
+                    var name = "_cubemap_";
+                    GaiaSky.postRunnable(()->{
+                        // +Z
+                        saveFrameBufferToImage(zPosFb, directory, date + name + "zp" );
+                        // -Z
+                        saveFrameBufferToImage(zNegFb, directory, date + name + "zm" );
+                        // +X
+                        saveFrameBufferToImage(xPosFb, directory, date + name + "xp" );
+                        // -X
+                        saveFrameBufferToImage(xNegFb, directory, date + name + "xm" );
+                        // +Y
+                        saveFrameBufferToImage(yPosFb, directory, date + name + "yp" );
+                        // -Y
+                        saveFrameBufferToImage(yNegFb, directory, date + name + "ym" );
+
+                        Logger.getLogger(RenderModeCubemap.class).info(I18n.msg("gui.360.screenshot.ok", directory.resolve(date+name+"[...]")));
+                    });
+                } else {
+                    Logger.getLogger(RenderModeCubemap.class).warn(I18n.msg("gui.360.screenshot.nomode"));
+                }
+            }
 
             default -> {
             }
             }
         }
+    }
+
+    private static String getCurrentTimeStamp() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd_HHmmss");//dd/MM/yyyy
+        Date now = new Date();
+        return sdfDate.format(now);
+    }
+
+    private void saveFrameBufferToImage(FrameBuffer fb, Path location, String filename) {
+        Settings settings = Settings.settings;
+        fb.begin();
+        ImageRenderer.renderToImageGl20(location.toString(), filename, fb.getWidth(), fb.getHeight(), settings.screenshot.format, settings.screenshot.quality);
+        fb.end();
     }
 
     private void initializeGeometryWarp(Path file) {

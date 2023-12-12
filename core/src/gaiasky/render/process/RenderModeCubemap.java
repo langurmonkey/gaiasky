@@ -15,15 +15,23 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.Mosaic;
+import gaiasky.util.screenshot.ImageRenderer;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
