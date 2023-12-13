@@ -449,10 +449,13 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
         if (aoCubemap != null) {
             aoCubemap.prepareCubemap(manager);
-            material.set(new CubemapAttribute(CubemapAttribute.AmbientOcclusionCubemap, aoCubemap.cubemap));
+            // Only add occlusion clouds if clouds are actually visible.
+            if(!occlusionClouds || GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+                material.set(new CubemapAttribute(CubemapAttribute.AmbientOcclusionCubemap, aoCubemap.cubemap));
+            }
         }
         // Ambient occlusion represents clouds.
-        if (occlusionClouds) {
+        if (occlusionClouds && GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
             material.set(new OcclusionCloudsAttribute(true));
         }
 
