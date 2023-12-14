@@ -23,6 +23,8 @@ uniform float u_vrScale;
 uniform vec3 u_alphaSizeBr;
 // Brightness power
 uniform float u_brightnessPower;
+// Pixel scale factor
+uniform float u_pixelScale;
 uniform vec2 u_opacityLimits;
 // Fixed angular size
 uniform float u_fixedAngularSize;
@@ -138,9 +140,14 @@ void main() {
     float opacity;
     float quadSize;
     if (u_fixedAngularSize <= 0.0) {
-        solidAngle = atan(size / dist);
-        opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
-        quadSize = clamp(size * pow(solidAngle * 5.0e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.003 * dist, 0.5 * dist);
+        // We omit the arctangent and tangent, as per the small-angle approximation.
+        float d = dist * 1.0e-10;
+        solidAngle = size / d;
+        opacity = lint(solidAngle, u_solidAngleMap.x * 1.0e10, u_solidAngleMap.y * 1.0e10, u_opacityLimits.x, u_opacityLimits.y);
+        // Clamp solid angle, and back to physical quad size.
+        solidAngle = clamp(solidAngle, 9.0 * u_pixelScale, 1.0e2);
+        size = solidAngle * d;
+        quadSize = pow(size, u_brightnessPower) * u_alphaSizeBr.y;
     } else {
         solidAngle = u_fixedAngularSize;
         opacity = clamp(size / 100.0, 0.0, 1.0);

@@ -18,6 +18,7 @@ public class StarSetQuadComponent {
 
     protected float[] alphaSizeBr, opacityLimits, opacityLimitsHlShowAll;
     protected float starPointSize, brightnessPower;
+    protected float pixelScale;
     protected int fovMode;
     protected Texture starTex;
 
@@ -31,6 +32,7 @@ public class StarSetQuadComponent {
         this.opacityLimits = new float[2];
         this.opacityLimitsHlShowAll = new float[] { 0.95f, Settings.settings.scene.star.opacity[1] };
 
+        updatePixelScale(Settings.settings.graphics.backBufferResolution);
         updateStarBrightness(Settings.settings.scene.star.brightness);
         updateBrightnessPower(Settings.settings.scene.star.power);
         updateStarPointSize(Settings.settings.scene.star.pointSize);
@@ -47,6 +49,14 @@ public class StarSetQuadComponent {
     protected void starParameterUniforms(ExtShaderProgram shaderProgram) {
         shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
         shaderProgram.setUniformf("u_brightnessPower", brightnessPower);
+        shaderProgram.setUniformf("u_pixelScale", pixelScale);
+    }
+
+    public void updatePixelScaleUniform(ExtShaderProgram shaderProgram) {
+        updatePixelScale(Settings.settings.graphics.backBufferResolution);
+        shaderProgram.begin();
+        shaderProgram.setUniformf("u_pixelScale", pixelScale);
+        shaderProgram.end();
     }
 
     protected void touchStarParameters(ExtShaderProgram shaderProgram) {
@@ -58,6 +68,11 @@ public class StarSetQuadComponent {
         });
     }
 
+    protected void updatePixelScale(int[] backBufferSize) {
+        // Adjust to calibrated 2K resolution.
+        pixelScale = GaiaSky.instance.getEffectiveFovFactor() * (float) 1440 / (float) backBufferSize[1];
+    }
+
     protected void updateStarBrightness(float br) {
         // Remap brightness to [0,2]
         alphaSizeBr[2] = (br - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 4f;
@@ -66,6 +81,7 @@ public class StarSetQuadComponent {
     protected void updateBrightnessPower(float bp) {
         // Remap brightness power to [-1,1] and apply scaling
         brightnessPower = ((bp - Constants.MIN_STAR_BRIGHTNESS_POW) / (Constants.MAX_STAR_BRIGHTNESS_POW - Constants.MIN_STAR_BRIGHTNESS_POW)) - 0.8f;
+        brightnessPower = bp;
     }
 
     protected void updateStarPointSize(float ps) {

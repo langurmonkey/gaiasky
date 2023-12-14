@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30500
+configVersion: 3050800
 
 #
 # Data configuration
@@ -137,7 +137,7 @@ scene:
     # Star brightness factor.
     brightness: 2.0
     # Modulate the brightness of stars with this power.
-    power: 0.75
+    power: 1.00
     # Size scaling of stars.
     pointSize: 9.2
     # Control the glow amount when close to stars.

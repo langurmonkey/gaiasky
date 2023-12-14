@@ -63,7 +63,7 @@ public class Settings {
      *    3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static final int SOURCE_VERSION = 3050701;
+    public static final int SOURCE_VERSION = 3050800;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the {@link File#getAbsolutePath()} call.
@@ -710,7 +710,8 @@ public class Settings {
         public boolean useSRGB = false;
 
         public GraphicsSettings() {
-            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD, Event.BACKBUFFER_SCALE_CMD, Event.INDEXOFREFRACTION_CMD);
+            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD, Event.BACKBUFFER_SCALE_CMD,
+                    Event.INDEXOFREFRACTION_CMD);
         }
 
         public void setQuality(final String qualityString) {
@@ -739,16 +740,20 @@ public class Settings {
 
         @Override
         public void notify(final Event event, Object source, final Object... data) {
-            if (event == Event.LIMIT_FPS_CMD) {
-                fpsLimit = (Double) data[0];
-                if (fpsLimit > 0) {
-                    // When FPS limit is active, dynamic resolution must be inactive
-                    GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
+            switch (event) {
+                case LIMIT_FPS_CMD -> {
+                    fpsLimit = (Double) data[0];
+                    if (fpsLimit > 0) {
+                        // When FPS limit is active, dynamic resolution must be inactive
+                        GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
+                    }
                 }
-            } else if (event == Event.BACKBUFFER_SCALE_CMD) {
-                backBufferScale = (Float) data[0];
-            } else if (event == Event.INDEXOFREFRACTION_CMD) {
-                celestialSphereIndexOfRefraction = (Float) data[0];
+                case BACKBUFFER_SCALE_CMD -> {
+                    backBufferScale = (Float) data[0];
+                    backBufferResolution[0] = (int) Math.round(resolution[0] * backBufferScale);
+                    backBufferResolution[1] = (int) Math.round(resolution[1] * backBufferScale);
+                }
+                case INDEXOFREFRACTION_CMD -> celestialSphereIndexOfRefraction = (Float) data[0];
             }
         }
 
@@ -1058,6 +1063,7 @@ public class Settings {
 
                 /**
                  * Compatibility with old 'numLabel' property, renamed to 'numLabels'.
+                 *
                  * @param numLabels The number of labels to render for each star group.
                  */
                 public void setNumLabel(int numLabels) {
@@ -1385,6 +1391,7 @@ public class Settings {
                         EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 10f);
                     } else {
                         EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
+                        EventManager.publish(Event.FOV_CHANGE_NOTIFICATION, this, GaiaSky.instance.cameraManager.getCamera().fieldOfView, GaiaSky.instance.cameraManager.getFovFactor());
                     }
                 }
                 case CUBEMAP_PROJECTION_CMD -> {
