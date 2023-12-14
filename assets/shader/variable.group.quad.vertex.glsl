@@ -23,8 +23,8 @@ uniform float u_vrScale;
 uniform vec3 u_alphaSizeBr;
 // Brightness power
 uniform float u_brightnessPower;
-// Pixel scale factor
-uniform float u_pixelScale;
+// Minimum quad solid angle
+uniform float u_minQuadSolidAngle;
 uniform vec2 u_opacityLimits;
 // Fixed angular size
 uniform float u_fixedAngularSize;
@@ -56,11 +56,11 @@ out vec4 v_col;
 out vec2 v_uv;
 
 #ifdef relativisticEffects
-#include <shader/lib/relativity.glsl>
+    #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-#include <shader/lib/gravwaves.glsl>
+    #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
 #define LEN0 20000.0
@@ -141,12 +141,11 @@ void main() {
     float quadSize;
     if (u_fixedAngularSize <= 0.0) {
         // We omit the arctangent and tangent, as per the small-angle approximation.
-        float d = dist * 1.0e-10;
-        solidAngle = size / d;
-        opacity = lint(solidAngle, u_solidAngleMap.x * 1.0e10, u_solidAngleMap.y * 1.0e10, u_opacityLimits.x, u_opacityLimits.y);
+        solidAngle = size / dist;
+        opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
         // Clamp solid angle, and back to physical quad size.
-        solidAngle = clamp(solidAngle, 9.0 * u_pixelScale, 1.0e2);
-        size = solidAngle * d;
+        solidAngle = clamp(solidAngle, u_minQuadSolidAngle, 2.0e-8);
+        size = solidAngle * dist;
         quadSize = pow(size, u_brightnessPower) * u_alphaSizeBr.y;
     } else {
         solidAngle = u_fixedAngularSize;

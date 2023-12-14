@@ -18,7 +18,7 @@ public class StarSetQuadComponent {
 
     protected float[] alphaSizeBr, opacityLimits, opacityLimitsHlShowAll;
     protected float starPointSize, brightnessPower;
-    protected float pixelScale;
+    protected float minQuadSolidAngle;
     protected int fovMode;
     protected Texture starTex;
 
@@ -32,7 +32,7 @@ public class StarSetQuadComponent {
         this.opacityLimits = new float[2];
         this.opacityLimitsHlShowAll = new float[] { 0.95f, Settings.settings.scene.star.opacity[1] };
 
-        updatePixelScale(Settings.settings.graphics.backBufferResolution);
+        updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
         updateStarBrightness(Settings.settings.scene.star.brightness);
         updateBrightnessPower(Settings.settings.scene.star.power);
         updateStarPointSize(Settings.settings.scene.star.pointSize);
@@ -40,22 +40,26 @@ public class StarSetQuadComponent {
 
         shaderProgram.begin();
         // Uniforms that rarely change
-        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-11f, 1.0e-9f);
+        updateSolidAngleMap(shaderProgram);
         shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
         starParameterUniforms(shaderProgram);
         shaderProgram.end();
     }
 
+    private void updateSolidAngleMap(ExtShaderProgram shaderProgram) {
+        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-10f, 2.0e-9f);
+    }
+
     protected void starParameterUniforms(ExtShaderProgram shaderProgram) {
         shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
         shaderProgram.setUniformf("u_brightnessPower", brightnessPower);
-        shaderProgram.setUniformf("u_pixelScale", pixelScale);
+        shaderProgram.setUniformf("u_pixelScale", minQuadSolidAngle);
     }
 
-    public void updatePixelScaleUniform(ExtShaderProgram shaderProgram) {
-        updatePixelScale(Settings.settings.graphics.backBufferResolution);
+    public void updateMinQuadSolidAngleUniform(ExtShaderProgram shaderProgram) {
+        updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
         shaderProgram.begin();
-        shaderProgram.setUniformf("u_pixelScale", pixelScale);
+        shaderProgram.setUniformf("u_minQuadSolidAngle", minQuadSolidAngle);
         shaderProgram.end();
     }
 
@@ -68,9 +72,9 @@ public class StarSetQuadComponent {
         });
     }
 
-    protected void updatePixelScale(int[] backBufferSize) {
+    protected void updateMinQuadSolidAngle(int[] backBufferSize) {
         // Adjust to calibrated 2K resolution.
-        pixelScale = GaiaSky.instance.getEffectiveFovFactor() * (float) 1440 / (float) backBufferSize[1];
+        minQuadSolidAngle = 1.0e-9f * (float) 1440 / (float) backBufferSize[1];
     }
 
     protected void updateStarBrightness(float br) {
