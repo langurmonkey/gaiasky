@@ -36,6 +36,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.entity.LightingUtils;
 import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -48,6 +49,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
@@ -860,15 +862,20 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Magnitude multiplier
+        var nf = new DecimalFormat("####0.##");
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
         graphicsModel[0][1] = magnitudeMultiplier;
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
+        magnitudeMultiplier.setValueLabelTransform((val) -> {
+            float value = LightingUtils.mapStarBrightnessPow(val);
+            return nf.format(value);
+        });
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
-        magnitudeMultiplier.setMappedValue(Settings.settings.scene.star.power);
+        magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
         magnitudeMultiplier.addListener(event -> {
-            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, magnitudeMultiplier.getValue());
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, LightingUtils.mapStarBrightnessPow(magnitudeMultiplier.getValue()));
                 return true;
             }
             return false;

@@ -65,4 +65,17 @@ public class LightingUtils {
             }
         }
     }
+
+    /**
+     * Maps the star brightness power from [0.9, 1.1] to [1.1, 0.9].
+     * @param bp The brightness power, un-flipped.
+     * @return The mapped brightness power.
+     */
+    public static float mapStarBrightnessPow(float bp){
+        // bp should be already in [MIN_STAR_BRIGHTNESS_POW, MAX_STAR_BRIGHTNESS_POW]
+        // We just flip it, because we get [0.9, 1.1], but the shader needs [1.1, 0.9]
+        float len = Constants.MAX_STAR_BRIGHTNESS_POW - Constants.MIN_STAR_BRIGHTNESS_POW;
+        float normalized = (bp - Constants.MIN_STAR_BRIGHTNESS_POW) / len;
+        return Constants.MAX_STAR_BRIGHTNESS_POW - normalized * len;
+    }
 }

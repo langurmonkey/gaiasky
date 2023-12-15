@@ -1112,10 +1112,11 @@ public interface IScriptingInterface {
     void setStarBrightness(float brightness);
 
     /**
-     * Sets the star brightness power profile value. This allows for adjusting
-     * the shape of the curve: <code>brightness = brightness^power</code>. Default value is 0.6.
+     * Sets the star brightness power profile value in [1.1, 0.9]. Default value is 1.
+     * The power is applied to the star solid angle (from camera),
+     * before clamping, as sa = pow(sa, r).
      *
-     * @param power The power value.
+     * @param power The power value in [0, 100].
      */
     void setStarBrightnessPower(float power);
 

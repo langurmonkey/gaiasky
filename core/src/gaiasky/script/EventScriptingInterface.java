@@ -1020,6 +1020,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarBrightnessPower(float power) {
         if (checkFinite(power, "brightness-pow")) {
+            // Default to 1 in case of overflow to maintain compatibility.
+            if (power < Constants.MIN_STAR_BRIGHTNESS_POW || power > Constants.MAX_STAR_BRIGHTNESS_POW) {
+                power = 1.0f;
+            }
             em.post(Event.STAR_BRIGHTNESS_POW_CMD, this, power);
         }
     }

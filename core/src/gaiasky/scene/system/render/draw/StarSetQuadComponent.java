@@ -10,6 +10,7 @@ package gaiasky.scene.system.render.draw;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.GaiaSky;
 import gaiasky.scene.component.Highlight;
+import gaiasky.scene.entity.LightingUtils;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -30,7 +31,7 @@ public class StarSetQuadComponent {
     protected void initShaderProgram(ExtShaderProgram shaderProgram) {
         this.alphaSizeBr = new float[3];
         this.opacityLimits = new float[2];
-        this.opacityLimitsHlShowAll = new float[] { 0.95f, Settings.settings.scene.star.opacity[1] };
+        this.opacityLimitsHlShowAll = new float[]{0.95f, Settings.settings.scene.star.opacity[1]};
 
         updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
         updateStarBrightness(Settings.settings.scene.star.brightness);
@@ -40,27 +41,20 @@ public class StarSetQuadComponent {
 
         shaderProgram.begin();
         // Uniforms that rarely change
-        updateSolidAngleMap(shaderProgram);
-        shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
+        shaderProgram.setUniformf("u_thAnglePoint", 1.0e-10f, 1.5e-8f);
+        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-10f, 1.2e-9f);
         starParameterUniforms(shaderProgram);
         shaderProgram.end();
     }
 
     private void updateSolidAngleMap(ExtShaderProgram shaderProgram) {
-        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-10f, 2.0e-9f);
     }
 
     protected void starParameterUniforms(ExtShaderProgram shaderProgram) {
+        shaderProgram.setUniformf("u_minQuadSolidAngle", minQuadSolidAngle);
         shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
         shaderProgram.setUniformf("u_brightnessPower", brightnessPower);
         shaderProgram.setUniformf("u_pixelScale", minQuadSolidAngle);
-    }
-
-    public void updateMinQuadSolidAngleUniform(ExtShaderProgram shaderProgram) {
-        updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
-        shaderProgram.begin();
-        shaderProgram.setUniformf("u_minQuadSolidAngle", minQuadSolidAngle);
-        shaderProgram.end();
     }
 
     protected void touchStarParameters(ExtShaderProgram shaderProgram) {
@@ -83,8 +77,6 @@ public class StarSetQuadComponent {
     }
 
     protected void updateBrightnessPower(float bp) {
-        // Remap brightness power to [-1,1] and apply scaling
-        brightnessPower = ((bp - Constants.MIN_STAR_BRIGHTNESS_POW) / (Constants.MAX_STAR_BRIGHTNESS_POW - Constants.MIN_STAR_BRIGHTNESS_POW)) - 0.8f;
         brightnessPower = bp;
     }
 

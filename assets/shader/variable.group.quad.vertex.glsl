@@ -144,9 +144,8 @@ void main() {
         solidAngle = size / dist;
         opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
         // Clamp solid angle, and back to physical quad size.
-        solidAngle = clamp(solidAngle, u_minQuadSolidAngle, 2.0e-8);
-        size = solidAngle * dist;
-        quadSize = pow(size, u_brightnessPower) * u_alphaSizeBr.y;
+        solidAngle = clamp(pow(solidAngle, u_brightnessPower), u_minQuadSolidAngle, 2.0e-8);
+        quadSize = solidAngle * dist * u_alphaSizeBr.y;
     } else {
         solidAngle = u_fixedAngularSize;
         opacity = clamp(size / 100.0, 0.0, 1.0);

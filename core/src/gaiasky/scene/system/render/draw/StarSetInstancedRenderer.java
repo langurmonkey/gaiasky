@@ -238,6 +238,10 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                 triComponent.updateStarPointSize((float) data[0]);
                 triComponent.touchStarParameters(getShaderProgram());
             }
+            case BACKBUFFER_SCALE_CMD, FOV_CHANGE_NOTIFICATION -> {
+                triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
+                triComponent.touchStarParameters(getShaderProgram());
+            }
             case GPU_DISPOSE_STAR_GROUP -> {
                 IRenderable renderable = (IRenderable) source;
                 int offset = getOffset(renderable);
@@ -249,8 +253,6 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
             }
             case BILLBOARD_TEXTURE_IDX_CMD ->
                     GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
-            case BACKBUFFER_SCALE_CMD, FOV_CHANGE_NOTIFICATION ->
-                    GaiaSky.postRunnable(() -> triComponent.updateMinQuadSolidAngleUniform(getShaderProgram()));
             default -> {
             }
         }
@@ -258,6 +260,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
     @Override
     public void resize(int w, int h) {
-        triComponent.updateMinQuadSolidAngleUniform(getShaderProgram());
+        triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
+        triComponent.touchStarParameters(getShaderProgram());
     }
 }
