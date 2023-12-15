@@ -866,16 +866,12 @@ public class GamepadGui extends AbstractGui {
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
         graphicsModel[0][1] = magnitudeMultiplier;
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
-        magnitudeMultiplier.setValueLabelTransform((val) -> {
-            float value = LightingUtils.mapStarBrightnessPow(val);
-            return nf.format(value);
-        });
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
         magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
         magnitudeMultiplier.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, LightingUtils.mapStarBrightnessPow(magnitudeMultiplier.getValue()));
+                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, magnitudeMultiplier.getValue());
                 return true;
             }
             return false;

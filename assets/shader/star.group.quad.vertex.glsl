@@ -3,6 +3,7 @@
 #include <shader/lib/math.glsl>
 #include <shader/lib/geometry.glsl>
 #include <shader/lib/doublefloat.glsl>
+#include <shader/lib/angles.glsl>
 
 // UNIFORMS
 // time in julian days since epoch, as a 64-bit double encoded with two floats
@@ -91,7 +92,7 @@ void main() {
         solidAngle = a_size / dist;
         opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
         // Clamp solid angle, and back to physical quad size.
-        solidAngle = clamp(pow(solidAngle, u_brightnessPower), u_minQuadSolidAngle, 2.0e-8);
+        solidAngle = clamp(radians12(pow(degrees12(solidAngle), u_brightnessPower)), u_minQuadSolidAngle, 3.0e-8);
         quadSize = solidAngle * dist * u_alphaSizeBr.y;
     } else {
         solidAngle = u_fixedAngularSize;
