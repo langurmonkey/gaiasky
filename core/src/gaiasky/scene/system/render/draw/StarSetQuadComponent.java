@@ -10,7 +10,6 @@ package gaiasky.scene.system.render.draw;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.GaiaSky;
 import gaiasky.scene.component.Highlight;
-import gaiasky.scene.entity.LightingUtils;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -42,7 +41,7 @@ public class StarSetQuadComponent {
         shaderProgram.begin();
         // Uniforms that rarely change
         shaderProgram.setUniformf("u_thAnglePoint", 1.0e-10f, 1.5e-8f);
-        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-10f, 1.2e-9f);
+        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-10f, 1.3e-9f);
         starParameterUniforms(shaderProgram);
         shaderProgram.end();
     }
