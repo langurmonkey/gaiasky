@@ -21,7 +21,6 @@ public class Ruler implements Component {
     public String name0, name1;
     public boolean rulerOk = false;
     public String dist;
-    public DecimalFormat nf = new DecimalFormat("0.#########E0");
 
     public String getName0() {
         return name0;

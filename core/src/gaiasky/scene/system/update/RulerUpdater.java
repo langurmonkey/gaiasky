@@ -21,11 +21,8 @@ import java.text.DecimalFormat;
 
 public class RulerUpdater extends AbstractUpdateSystem {
 
-    private final DecimalFormat nf;
-
     public RulerUpdater(Family family, int priority) {
         super(family, priority);
-        nf = new DecimalFormat("0.#########E0");
     }
 
     @Override
@@ -55,7 +52,7 @@ public class RulerUpdater extends AbstractUpdateSystem {
             // Distance in internal units
             double dst = ruler.p0.dst(ruler.p1);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst, Settings.settings.program.ui.distanceUnits);
-            ruler.dist = nf.format(d.getFirst()) + " " + d.getSecond();
+            ruler.dist = GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond();
 
             GaiaSky.postRunnable(() -> EventManager.publish(Event.RULER_DIST, entity, dst, ruler.dist));
         } else {

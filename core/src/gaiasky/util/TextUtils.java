@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.util.i18n.I18n;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -24,16 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TextUtils {
 
-    /**
-     * Decimal format
-     **/
-    private static final DecimalFormat nf;
-    private static final DecimalFormat nfSci;
-
-    static {
-        nf = new DecimalFormat("#########.###");
-        nfSci = new DecimalFormat("0.#E0");
-    }
 
     /**
      * Escape a give String to make it safe to be printed or stored.
@@ -251,15 +240,15 @@ public class TextUtils {
      * Concatenates the strings using the given split
      *
      * @param split The split
-     * @param strs  The strings
+     * @param strings  The strings
      * @return The concatenation
      */
     public static String concatenate(String split,
-                                     String... strs) {
-        if (strs == null || strs.length == 0)
+                                     String... strings) {
+        if (strings == null || strings.length == 0)
             return null;
         java.lang.StringBuilder out = new java.lang.StringBuilder();
-        for (String str : strs) {
+        for (String str : strings) {
             if (str != null && !str.isEmpty()) {
                 if (!out.isEmpty())
                     out.append(split);
@@ -362,11 +351,7 @@ public class TextUtils {
             // Round to 2 decimal places
             warp = Math.round(warp * 1000.0) / 1000.0;
         }
-        if (warp > 99999 || warp < -99999) {
-            return "x" + nfSci.format(warp);
-        } else {
-            return "x" + nf.format(warp);
-        }
+        return "x" + GlobalResources.formatNumber(warp);
     }
 
     public static String getFormattedTimeWarp() {
@@ -374,6 +359,8 @@ public class TextUtils {
     }
 
     public static String secondsToTimeUnit(double seconds) {
+        var nf = GlobalResources.nf;
+        var nfSci = GlobalResources.nfSci;
         if (seconds >= 0) {
             if (seconds < 60) {
                 // Seconds.

@@ -47,6 +47,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -70,6 +71,19 @@ public class GlobalResources {
     private Cursor emptyCursor;
     // The global skin
     private Skin skin;
+    /**
+     * Decimal format.
+     **/
+    public static final DecimalFormat nf;
+    /**
+     * Scientific format.
+     */
+    public static final DecimalFormat nfSci;
+
+    static {
+        nf = new DecimalFormat("#########.###");
+        nfSci = new DecimalFormat("0.###E0");
+    }
 
     public GlobalResources(AssetManager manager) {
         this.manager = manager;
@@ -99,6 +113,20 @@ public class GlobalResources {
     }
 
     public static void doneLoading(AssetManager manager) {
+    }
+
+    /**
+     * Formats a given double number. Uses scientific notation for numbers in [-9999,9999], and
+     * regular numbers elsewhere.
+     * @param number The number to format.
+     * @return The string representation.
+     */
+    public static String formatNumber(double number) {
+        if (number > 99999 || number < -99999) {
+            return nfSci.format(number);
+        } else {
+            return nf.format(number);
+        }
     }
 
     public static Pair<Double, String> doubleToDistanceString(Apfloat d, DistanceUnits du) {
