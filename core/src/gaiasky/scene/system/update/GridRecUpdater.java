@@ -33,7 +33,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
     private final Vector3 F31, F34;
     private final Vector3b B31;
 
-    private final Matrix4d mat4daux;
+    private final Matrix4d mat4;
 
     public GridRecUpdater(Family family, int priority) {
         super(family, priority);
@@ -43,7 +43,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         F31 = new Vector3();
         F34 = new Vector3();
         B31 = new Vector3b();
-        mat4daux = new Matrix4d();
+        mat4 = new Matrix4d();
     }
 
     @Override
@@ -167,7 +167,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
 
     private void getCFPos(Vector3d cPos, Vector3d fPos, ICamera camera, IFocus focus, RefSysTransform tr) {
         Matrix4d inv = tr.matrix;
-        Matrix4d trf = inv != null ? mat4daux.set(inv).inv() : mat4daux.idt();
+        Matrix4d trf = inv != null ? mat4.set(inv).inv() : mat4.idt();
         camera.getPos().put(cPos).mul(trf);
         Vector3b v3b = new Vector3b(fPos);
         focus.getPredictedPosition(v3b, GaiaSky.instance.time, camera, false).mul(trf);

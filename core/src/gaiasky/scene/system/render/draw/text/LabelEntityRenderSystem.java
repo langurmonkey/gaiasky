@@ -36,8 +36,6 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
-import java.text.DecimalFormat;
-
 public class LabelEntityRenderSystem {
 
     private final Vector3d D31 = new Vector3d();
@@ -47,10 +45,7 @@ public class LabelEntityRenderSystem {
     private final Vector3 F32 = new Vector3();
     private final Vector3b B31 = new Vector3b();
 
-    private final DecimalFormat nf;
-
     public LabelEntityRenderSystem() {
-        nf = new DecimalFormat("0.###E0");
     }
 
     public void renderLocation(LabelView view,
@@ -59,7 +54,6 @@ public class LabelEntityRenderSystem {
                                FontRenderSystem sys,
                                RenderingContext rc,
                                ICamera camera) {
-        var base = view.base;
         var body = view.body;
         var graph = view.graph;
 
@@ -82,7 +76,6 @@ public class LabelEntityRenderSystem {
                             RenderingContext rc,
                             ICamera camera) {
         var body = view.body;
-        var base = view.base;
         var sa = Mapper.sa.get(view.getEntity());
 
         Vector3d labelPosition = D31;
@@ -111,7 +104,7 @@ public class LabelEntityRenderSystem {
         batch.setProjectionMatrix(batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
 
         // Text
-        render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, camera, view.text(), 0, 96f, title.scale * 1.6f, title.align);
+        render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, view.text(), 0, 96f, title.scale * 1.6f, title.align);
 
         title.lineHeight = ((TextRenderer) sys).fontTitles.getLineHeight();
     }
@@ -168,12 +161,12 @@ public class LabelEntityRenderSystem {
             float min = 0.025f * ff;
             float max = 0.05f * ff;
             if (gr.d01 / body.distToCamera > 0.1f) {
-                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), gr.p01,
+                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond(), gr.p01,
                         body.distToCamera, view.textScale(), (float) (gr.d01 * 1e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
             }
             d = GlobalResources.doubleToDistanceString(gr.d02, du);
             if (gr.d02 / body.distToCamera > 0.1f) {
-                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), gr.p02,
+                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond(), gr.p02,
                         body.distToCamera, view.textScale(), (float) (gr.d02 * 1e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
             }
         }
@@ -362,7 +355,6 @@ public class LabelEntityRenderSystem {
         var active = set.active;
 
         Vector3b starPosition = B31;
-        Vector3d starPos = D31;
         int n = Math.min(pointData.size(), set.numLabels);
         for (int i = 0; i < n; i++) {
             int idx = active[i];
@@ -426,7 +418,7 @@ public class LabelEntityRenderSystem {
         var grid = Mapper.grid.get(entity);
 
         // Horizon
-        final float stepAngle = 360f / divisionsU;
+        final int stepAngle = Math.round(360f / divisionsU);
 
         // Labels at 1 parsec.
         float distToCamera = (float) (1 * Constants.PC_TO_U);
@@ -596,25 +588,6 @@ public class LabelEntityRenderSystem {
                                  ExtShaderProgram shader,
                                  RenderingContext rc,
                                  BitmapFont font,
-                                 ICamera camera,
-                                 String label,
-                                 Vector3d pos3d) {
-        Vector3 p = F31;
-        pos3d.setVector3(p);
-
-        camera.getCamera().project(p);
-        p.x += 15;
-        p.y -= 15;
-
-        shader.setUniformf("scale", 1f);
-        DecalUtils.drawFont2D(font, batch, label, p);
-    }
-
-    protected void render2DLabel(ExtSpriteBatch batch,
-                                 ExtShaderProgram shader,
-                                 RenderingContext rc,
-                                 BitmapFont font,
-                                 ICamera camera,
                                  String label,
                                  float x,
                                  float y,
@@ -622,29 +595,6 @@ public class LabelEntityRenderSystem {
                                  int align) {
         shader.setUniformf("u_scale", scale);
         DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
-    }
-
-    protected void render2DLabel(ExtSpriteBatch batch,
-                                 ExtShaderProgram shader,
-                                 RenderingContext rc,
-                                 BitmapFont font,
-                                 ICamera camera,
-                                 String label,
-                                 float x,
-                                 float y) {
-        render2DLabel(batch, shader, rc, font, camera, label, x, y, 1f);
-    }
-
-    protected void render2DLabel(ExtSpriteBatch batch,
-                                 ExtShaderProgram shader,
-                                 RenderingContext rc,
-                                 BitmapFont font,
-                                 ICamera camera,
-                                 String label,
-                                 float x,
-                                 float y,
-                                 float scale) {
-        render2DLabel(batch, shader, rc, font, camera, label, x, y, scale, -1);
     }
 
     protected void render3DLabel(LabelView view,

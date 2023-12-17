@@ -60,7 +60,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected OwnLabel focusIdExpand;
     protected HorizontalGroup focusActionsGroup;
     protected IFocus currentFocus;
-    DecimalFormat nf, sf;
+    DecimalFormat nf;
     float pad1, pad3, pad5, pad10, pad15, bw;
     private ExternalInformationUpdater externalInfoUpdater;
     private boolean maximized;
@@ -79,7 +79,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         float width = 300f;
 
         nf = new DecimalFormat("##0.##");
-        sf = new DecimalFormat("0.##E0");
 
         view = new FocusView();
 
@@ -605,7 +604,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 if (ComponentType.values()[view.getCt().getFirstOrdinal()] == ComponentType.Stars) {
                     focusRadius.setText("-");
                 } else {
-                    focusRadius.setText(sf.format(view.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
+                    focusRadius.setText(GlobalResources.formatNumber(view.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
                 }
 
                 // Update more info table
@@ -614,16 +613,16 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                     externalInfoUpdater.update(view);
             }
             case FOCUS_INFO_UPDATED -> {
-                focusAngle.setText(sf.format(Math.toDegrees((double) data[1]) % 360) + deg);
+                focusAngle.setText(GlobalResources.formatNumber(Math.toDegrees((double) data[1]) % 360) + deg);
 
                 // Dist to cam
                 Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], s.program.ui.distanceUnits);
-                focusDistCam.setText(sf.format(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
+                focusDistCam.setText(GlobalResources.formatNumber(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
 
                 // Dist to sol
                 if (data.length > 4) {
                     Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4], s.program.ui.distanceUnits);
-                    focusDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
+                    focusDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
                 }
 
                 // Apparent magnitude from camera
@@ -639,12 +638,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             case CAMERA_MOTION_UPDATE -> {
                 final Vector3b campos = (Vector3b) data[0];
-                Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x, s.program.ui.distanceUnits);
-                Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y, s.program.ui.distanceUnits);
-                Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z, s.program.ui.distanceUnits);
-                camVel.setText(sf.format((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
+                camVel.setText(GlobalResources.formatNumber((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
                 Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), s.program.ui.distanceUnits);
-                camDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
+                camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
             }
             case CAMERA_TRACKING_OBJECT_UPDATE -> {
                 final IFocus trackingObject = (IFocus) data[0];
@@ -670,12 +666,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 pointerLonLat.setText(nf.format(lat) + deg + "/" + nf.format(lon) + deg);
             }
             case RA_DEC_UPDATED -> {
-                Double pra = (Double) data[0];
-                Double pdec = (Double) data[1];
-                Double vra = (Double) data[2];
-                Double vdec = (Double) data[3];
-                pointerRADEC.setText(nf.format(pra) + deg + "/" + nf.format(pdec) + deg);
-                viewRADEC.setText(nf.format(vra) + deg + "/" + nf.format(vdec) + deg);
+                Double pmRa = (Double) data[0];
+                Double pmDec = (Double) data[1];
+                Double vRa = (Double) data[2];
+                Double vDec = (Double) data[3];
+                pointerRADEC.setText(nf.format(pmRa) + deg + "/" + nf.format(pmDec) + deg);
+                viewRADEC.setText(nf.format(vRa) + deg + "/" + nf.format(vDec) + deg);
             }
             case RULER_ATTACH_0 -> {
                 String n0 = (String) data[0];
@@ -699,8 +695,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             case PER_OBJECT_VISIBILITY_CMD -> {
                 if (source != objectVisibility) {
-                    if (data[0] instanceof IVisibilitySwitch) {
-                        IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
+                    if (data[0] instanceof IVisibilitySwitch vs) {
                         String name = (String) data[1];
                         if (vs == currentFocus && currentFocus.hasName(name)) {
                             boolean visible = (boolean) data[2];
@@ -708,8 +703,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                         }
                     }
 
-                    if (data[0] instanceof Entity) {
-                        var entity = (Entity) data[0];
+                    if (data[0] instanceof Entity entity) {
                         String name = (String) data[1];
                         if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
                             boolean visible = (boolean) data[2];
@@ -720,8 +714,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             case FORCE_OBJECT_LABEL_CMD -> {
                 if (source != labelVisibility) {
-                    if (data[0] instanceof Entity) {
-                        var entity = (Entity) data[0];
+                    if (data[0] instanceof Entity entity) {
                         String name = (String) data[1];
                         if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
                             boolean forceLabel = (boolean) data[2];
