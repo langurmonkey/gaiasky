@@ -71,7 +71,6 @@ public class AddShapeDialog extends GenericDialog {
             }
             return true;
         });
-        int i = 0;
         units = new OwnSelectBox<>(skin);
         units.setWidth(fieldWidth * 0.3f);
         units.setItems(DistanceUnitComboBoxBean.defaultBeans());

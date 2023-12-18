@@ -3737,7 +3737,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     Map<String, Object> params = new HashMap<>();
                     params.put("quality", 25L);
-                    params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 15L);
+                    params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 35L);
                     params.put("recursion", 3L);
                     params.put("diameter", 1.0);
                     params.put("width", 1.0);
@@ -3756,6 +3756,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     model.model.setStaticLight(true);
                     model.model.setUseColor(true);
                     model.model.setBlendMode(BlendMode.ADDITIVE);
+                    model.model.setCulling(false);
 
                     var rt = Mapper.renderType.get(newShape);
                     rt.renderGroup = RenderGroup.MODEL_VERT_ADDITIVE;
