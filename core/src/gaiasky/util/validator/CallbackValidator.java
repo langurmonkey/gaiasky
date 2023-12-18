@@ -21,12 +21,6 @@ public abstract class CallbackValidator implements IValidator {
         this.parent = parent;
     }
 
-    public CallbackValidator(Runnable correctCallback, Runnable incorrectCallback) {
-        super();
-        this.isValidCallback = correctCallback;
-        this.isInvalidCallback = incorrectCallback;
-    }
-
     public void setIsValidCallback(Runnable isValidCallback) {
         this.isValidCallback = isValidCallback;
     }
@@ -60,5 +54,6 @@ public abstract class CallbackValidator implements IValidator {
     }
 
     protected abstract boolean validateLocal(String value);
+
 
 }

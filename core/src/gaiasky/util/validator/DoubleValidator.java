@@ -7,34 +7,25 @@
 
 package gaiasky.util.validator;
 
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 
-public class DoubleValidator extends CallbackValidator {
+public class DoubleValidator extends NumberValidator<Double> {
 
-    private final double min;
-    private final double max;
-
-    public DoubleValidator(double min, double max) {
-        this(null, min, max);
+    public DoubleValidator(double min,
+                           double max) {
+        super(null, min, max);
     }
 
-    public DoubleValidator(IValidator parent, double min, double max) {
-        super(parent);
-        this.min = min;
-        this.max = max;
-    }
-
-    public double getMin() {
-        return min;
-    }
-
-    public double getMax() {
-        return max;
+    public DoubleValidator(IValidator parent,
+                           double min,
+                           double max) {
+        super(parent, min, max);
     }
 
     @Override
     protected boolean validateLocal(String value) {
-        Double val;
+        double val;
         try {
             val = Parser.parseDouble(value);
         } catch (NumberFormatException e) {
@@ -42,6 +33,16 @@ public class DoubleValidator extends CallbackValidator {
         }
 
         return val >= min && val <= max;
+    }
+
+    @Override
+    public String getMinString() {
+        return min == Double.MIN_VALUE ? I18n.msg("gui.infinity.minus") : Double.toString(min);
+    }
+
+    @Override
+    public String getMaxString() {
+        return max == Double.MAX_VALUE ? I18n.msg("gui.infinity") : Double.toString(max);
     }
 
 }

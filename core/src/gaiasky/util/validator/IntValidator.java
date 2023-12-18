@@ -7,35 +7,20 @@
 
 package gaiasky.util.validator;
 
-public class IntValidator extends CallbackValidator {
+import gaiasky.util.i18n.I18n;
 
-    private final int min;
-    private final int max;
+public class IntValidator extends NumberValidator<Integer> {
 
     public IntValidator() {
         this(null);
     }
 
     public IntValidator(IValidator parent) {
-        this(parent, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        super(parent, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public IntValidator(int min, int max) {
-        this(null, min, max);
-    }
-
-    public IntValidator(IValidator parent, int min, int max) {
-        super(parent);
-        this.min = min;
-        this.max = max;
-    }
-
-    public int getMin() {
-        return min;
-    }
-
-    public int getMax() {
-        return max;
+        super(null, min, max);
     }
 
     @Override
@@ -48,6 +33,16 @@ public class IntValidator extends CallbackValidator {
         }
 
         return val >= min && val <= max;
+    }
+
+    @Override
+    public String getMinString() {
+        return min == Integer.MIN_VALUE ? I18n.msg("gui.infinity.minus") : Integer.toString(min);
+    }
+
+    @Override
+    public String getMaxString() {
+        return max == Integer.MAX_VALUE ? I18n.msg("gui.infinity") : Integer.toString(max);
     }
 
 }
