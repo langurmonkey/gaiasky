@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.gui.beans.DistanceUnitComboBoxBean;
+import gaiasky.gui.beans.OrientationComboBoxBean;
 import gaiasky.gui.beans.PrimitiveComboBoxBean;
 import gaiasky.gui.beans.ShapeComboBoxBean;
 import gaiasky.scene.api.IFocus;
@@ -33,6 +34,7 @@ public class AddShapeDialog extends GenericDialog {
     public OwnSelectBox<DistanceUnitComboBoxBean> units;
     public OwnSelectBox<ShapeComboBoxBean> shape;
     public OwnSelectBox<PrimitiveComboBoxBean> primitive;
+    public OwnSelectBox<OrientationComboBoxBean> orientation;
     // We can recompute the name only when the filed
     // has not been manually edited
     private boolean canRecomputeName = true;
@@ -119,6 +121,15 @@ public class AddShapeDialog extends GenericDialog {
         primitive.setSelectedIndex(0);
         content.add(new OwnLabel(I18n.msg("gui.shape.primitive"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
         content.add(primitive).left().padBottom(pad18).row();
+
+        // Orientation
+        orientation = new OwnSelectBox<>(skin);
+        orientation.setWidth(fieldWidth);
+        orientation.setItems(OrientationComboBoxBean.defaultOrientations());
+        orientation.setSelectedIndex(0);
+        content.add(new OwnLabel(I18n.msg("gui.shape.orientation"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        content.add(orientation).left().padBottom(pad18).row();
+
 
     }
 

@@ -13,6 +13,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
@@ -29,6 +30,7 @@ import gaiasky.event.EventManager.TimeFrame;
 import gaiasky.event.IObserver;
 import gaiasky.gui.ColormapPicker;
 import gaiasky.gui.IGui;
+import gaiasky.gui.beans.OrientationComboBoxBean.ShapeOrientation;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
 import gaiasky.render.BlendMode;
@@ -4367,8 +4369,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                      float a,
                                      boolean showLabel,
                                      boolean trackObject) {
-        if (checkString(shapeName, "shapeName") && checkStringEnum(shapeType, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive")
-                && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
+        addShapeAroundObject(shapeName, shapeType, primitive, ShapeOrientation.EQUATORIAL.toString(), size, objectName, r, g, b, a, showLabel, trackObject);
+    }
+
+    @Override
+    public void addShapeAroundObject(String shapeName,
+                                     String shapeType,
+                                     String primitive,
+                                     String orientation,
+                                     double size,
+                                     String objectName,
+                                     float r,
+                                     float g,
+                                     float b,
+                                     float a,
+                                     boolean showLabel,
+                                     boolean trackObject) {
+        if (checkString(shapeName, "shapeName")
+                && checkStringEnum(shapeType, Shape.class, "shape")
+                && checkStringEnum(primitive, Primitive.class, "primitive")
+                && checkStringEnum(orientation, ShapeOrientation.class, "orientation")
+                && checkNum(size, 0, Double.MAX_VALUE, "size")
+                && checkObjectName(objectName)) {
             final var shapeLc = shapeType.toLowerCase();
             postRunnable(() -> {
                 Entity trackingObject = getFocusEntity(objectName);
@@ -4402,7 +4424,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 shape.trackName = objectName;
 
                 var trf = Mapper.transform.get(newShape);
-                trf.setTransformMatrix(GaiaSky.instance.cameraManager.getCamera().view);
+                var m = new Matrix4();
+                var orient = ShapeOrientation.valueOf(orientation.toUpperCase());
+                switch(orient) {
+                case CAMERA -> {
+                    var camera = GaiaSky.instance.cameraManager.getCamera();
+                    m.rotateTowardDirection(camera.direction, camera.up);
+                }
+                case EQUATORIAL -> m.idt();
+                case ECLIPTIC -> m.set(Coordinates.eclipticToEquatorialF());
+                case GALACTIC -> m.set(Coordinates.galacticToEquatorialF());
+                }
+                trf.setTransformMatrix(m);
 
                 Map<String, Object> params = new HashMap<>();
                 params.put("quality", 25L);

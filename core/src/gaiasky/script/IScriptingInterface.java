@@ -3235,7 +3235,7 @@ public interface IScriptingInterface {
                                        double multiplier);
 
     /**
-     * Creates a shape object of the given type with the given size around the object with the given name.
+     * Creates a shape object of the given type with the given size around the object with the given name and primitive.
      *
      * @param shapeName   The name of the shape object.
      * @param shape       The shape type, one of <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
@@ -3252,6 +3252,35 @@ public interface IScriptingInterface {
     void addShapeAroundObject(String shapeName,
                               String shape,
                               String primitive,
+                              double size,
+                              String objectName,
+                              float r,
+                              float g,
+                              float b,
+                              float a,
+                              boolean showLabel,
+                              boolean trackObject);
+
+    /**
+     * Creates a shape object of the given type with the given size around the object with the given name, primitive and orientation.
+     *
+     * @param shapeName   The name of the shape object.
+     * @param shape       The shape type, one of <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create a wireframe shape, use 'triangles' for a solid shape.
+     * @param orientation The orientation to use, one of <ul><li>camera</li><li>equatorial</li><li>ecliptic</li><li>galactic</li></ul>.
+     * @param size        The size of the object in kilometers.
+     * @param objectName  The name of the object to use as the position.
+     * @param r           The red component of the color in [0,1].
+     * @param g           The green component of the color in [0,1].
+     * @param b           The blue component of the color in [0,1].
+     * @param a           The alpha component of the color in [0,1].
+     * @param showLabel   Whether to show a label with the name of the shape.
+     * @param trackObject Whether to track the object if/when it moves.
+     */
+    void addShapeAroundObject(String shapeName,
+                              String shape,
+                              String primitive,
+                              String orientation,
                               double size,
                               String objectName,
                               float r,

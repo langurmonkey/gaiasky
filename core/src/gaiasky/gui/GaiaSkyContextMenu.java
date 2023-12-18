@@ -141,9 +141,10 @@ public class GaiaSkyContextMenu extends ContextMenu {
                         float[] color = dialog.color.getPickedColor();
                         String shape = dialog.shape.getSelected().shape.toString();
                         String primitive = dialog.primitive.getSelected().primitive.toString();
+                        String orientation = dialog.orientation.getSelected().orientation.toString();
                         boolean showLabel = dialog.showLabel.isChecked();
                         boolean trackObj = dialog.track.isChecked();
-                        GaiaSky.instance.scripting().addShapeAroundObject(dialog.name.getText().trim(), shape, primitive, size, candidateName, color[0], color[1], color[2], color[3], showLabel, trackObj);
+                        GaiaSky.instance.scripting().addShapeAroundObject(dialog.name.getText().trim(), shape, primitive, orientation, size, candidateName, color[0], color[1], color[2], color[3], showLabel, trackObj);
                     });
                     dialog.show(getStage());
                     return true;
