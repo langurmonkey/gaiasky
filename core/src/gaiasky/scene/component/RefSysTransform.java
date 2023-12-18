@@ -67,6 +67,16 @@ public class RefSysTransform implements Component {
         this.matrixf = this.matrix.putIn(new Matrix4());
     }
 
+    public void setTransformMatrix(Matrix4d m) {
+        this.matrix = new Matrix4d(m);
+        this.matrixf = m.putIn(new Matrix4());
+    }
+
+    public void setTransformMatrix(Matrix4 m) {
+        this.matrixf = new Matrix4(m);
+        this.matrix = new Matrix4d(m.val);
+    }
+
     /**
      * Constructs the transformation matrix from a double array containing
      * the values in a column-major order (first the four values of the first

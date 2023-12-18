@@ -81,7 +81,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-@SuppressWarnings({"unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue"})
+@SuppressWarnings({ "unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue" })
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
@@ -104,7 +104,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private int inputCode = -1;
     private int cTransSeq = 0;
 
-    public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
+    public EventScriptingInterface(final AssetManager manager,
+                                   final CatalogManager catalogManager) {
         this.em = EventManager.instance;
         this.manager = manager;
         this.catalogManager = catalogManager;
@@ -175,13 +176,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void displayPopupNotification(String message, float duration) {
+    public void displayPopupNotification(String message,
+                                         float duration) {
         if (checkString(message, "message")) {
             em.post(Event.POST_POPUP_NOTIFICATION, this, message, duration);
         }
     }
 
-    public void displayPopupNotification(String message, Double duration) {
+    public void displayPopupNotification(String message,
+                                         Double duration) {
         displayPopupNotification(message, duration.floatValue());
     }
 
@@ -231,7 +234,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
+    public void setCameraFocus(final String focusName,
+                               final float waitTimeSeconds) {
         if (checkString(focusName, "focusName") && checkFocusName(focusName)) {
             Entity entity = getEntity(focusName);
             if (Mapper.focus.has(entity)) {
@@ -247,7 +251,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void setCameraFocus(final String focusName, final int waitTimeSeconds) {
+    public void setCameraFocus(final String focusName,
+                               final int waitTimeSeconds) {
         setCameraFocus(focusName, (float) waitTimeSeconds);
     }
 
@@ -286,7 +291,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         setCameraFocusInstantAndGo(focusName, true);
     }
 
-    public void setCameraFocusInstantAndGo(final String focusName, final boolean sleep) {
+    public void setCameraFocusInstantAndGo(final String focusName,
+                                           final boolean sleep) {
         if (checkString(focusName, "focusName")) {
             Entity entity = getEntity(focusName);
             if (Mapper.focus.has(entity)) {
@@ -325,36 +331,52 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraPosition(double x, double y, double z) {
-        setCameraPosition(new double[]{x, y, z});
+    public void setCameraPosition(double x,
+                                  double y,
+                                  double z) {
+        setCameraPosition(new double[] { x, y, z });
     }
 
     @Override
-    public void setCameraPosition(double x, double y, double z, String units) {
-        setCameraPosition(new double[]{x, y, z}, units);
+    public void setCameraPosition(double x,
+                                  double y,
+                                  double z,
+                                  String units) {
+        setCameraPosition(new double[] { x, y, z }, units);
     }
 
     @Override
-    public void setCameraPosition(double x, double y, double z, boolean immediate) {
-        setCameraPosition(new double[]{x, y, z}, immediate);
+    public void setCameraPosition(double x,
+                                  double y,
+                                  double z,
+                                  boolean immediate) {
+        setCameraPosition(new double[] { x, y, z }, immediate);
     }
 
     @Override
-    public void setCameraPosition(double x, double y, double z, String units, boolean immediate) {
-        setCameraPosition(new double[]{x, y, z}, units, immediate);
+    public void setCameraPosition(double x,
+                                  double y,
+                                  double z,
+                                  String units,
+                                  boolean immediate) {
+        setCameraPosition(new double[] { x, y, z }, units, immediate);
     }
 
-    public void setCameraPosition(final List<?> vec, boolean immediate) {
+    public void setCameraPosition(final List<?> vec,
+                                  boolean immediate) {
         setCameraPosition(dArray(vec), immediate);
     }
 
     @Override
-    public void setCameraPosition(double[] position, boolean immediate) {
+    public void setCameraPosition(double[] position,
+                                  boolean immediate) {
         setCameraPosition(position, "km", immediate);
     }
 
     @Override
-    public void setCameraPosition(double[] position, String units, boolean immediate) {
+    public void setCameraPosition(double[] position,
+                                  String units,
+                                  boolean immediate) {
         if (checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
             if (immediate) {
@@ -366,7 +388,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     }
 
-    private void cameraPositionEvent(double[] position, DistanceUnits units) {
+    private void cameraPositionEvent(double[] position,
+                                     DistanceUnits units) {
         // Convert to km
         position[0] = units.toInternalUnits(position[0]);
         position[1] = units.toInternalUnits(position[1]);
@@ -385,7 +408,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkDistanceUnits(units, "units")) {
             var u = DistanceUnits.valueOf(units.toUpperCase());
             Vector3d campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
-            return new double[]{u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z)};
+            return new double[] { u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z) };
         }
         return null;
     }
@@ -396,7 +419,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraPosition(double[] position, String units) {
+    public void setCameraPosition(double[] position,
+                                  String units) {
         setCameraPosition(position, units, false);
     }
 
@@ -404,16 +428,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         setCameraPosition(vec, "km");
     }
 
-    public void setCameraPosition(final List<?> vec, String units) {
+    public void setCameraPosition(final List<?> vec,
+                                  String units) {
         setCameraPosition(dArray(vec), units);
     }
 
-    public void setCameraDirection(final List<?> dir, final boolean immediate) {
+    public void setCameraDirection(final List<?> dir,
+                                   final boolean immediate) {
         setCameraDirection(dArray(dir), immediate);
     }
 
     @Override
-    public void setCameraDirection(double[] direction, boolean immediate) {
+    public void setCameraDirection(double[] direction,
+                                   boolean immediate) {
         if (checkLength(direction, 3, "direction")) {
             if (immediate) {
                 cameraDirectionEvent(direction);
@@ -430,7 +457,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraDirection() {
         Vector3d camdir = GaiaSky.instance.cameraManager.getDirection();
-        return new double[]{camdir.x, camdir.y, camdir.z};
+        return new double[] { camdir.x, camdir.y, camdir.z };
     }
 
     @Override
@@ -442,12 +469,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         setCameraDirection(dArray(dir));
     }
 
-    public void setCameraUp(final List<?> up, final boolean immediate) {
+    public void setCameraUp(final List<?> up,
+                            final boolean immediate) {
         setCameraUp(dArray(up), immediate);
     }
 
     @Override
-    public void setCameraUp(final double[] up, final boolean immediate) {
+    public void setCameraUp(final double[] up,
+                            final boolean immediate) {
         if (checkLength(up, 3, "up")) {
             if (immediate) {
                 cameraUpEvent(up);
@@ -464,7 +493,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraUp() {
         Vector3d camUp = GaiaSky.instance.cameraManager.getUp();
-        return new double[]{camUp.x, camUp.y, camUp.z};
+        return new double[] { camUp.x, camUp.y, camUp.z };
     }
 
     @Override
@@ -477,7 +506,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraPositionAndFocus(String focus, String other, double rotation, double solidAngle) {
+    public void setCameraPositionAndFocus(String focus,
+                                          String other,
+                                          double rotation,
+                                          double solidAngle) {
         if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
             if (scene.index().containsEntity(focus) && scene.index().containsEntity(other)) {
@@ -496,20 +528,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void setCameraPositionAndFocus(String focus, String other, long rotation, long solidAngle) {
+    public void setCameraPositionAndFocus(String focus,
+                                          String other,
+                                          long rotation,
+                                          long solidAngle) {
         setCameraPositionAndFocus(focus, other, (double) rotation, (double) solidAngle);
     }
 
-    public void pointAtSkyCoordinate(double ra, double dec) {
+    public void pointAtSkyCoordinate(double ra,
+                                     double dec) {
         em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
         em.post(Event.FREE_MODE_COORD_CMD, this, ra, dec);
     }
 
-    public void pointAtSkyCoordinate(long ra, long dec) {
+    public void pointAtSkyCoordinate(long ra,
+                                     long dec) {
         pointAtSkyCoordinate((double) ra, (double) dec);
     }
 
-    private void setCameraPositionAndFocus(Entity focus, Entity other, double rotation, double solidAngle) {
+    private void setCameraPositionAndFocus(Entity focus,
+                                           Entity other,
+                                           double rotation,
+                                           double solidAngle) {
         if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
@@ -559,7 +599,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraSpeed(final float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this, MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED), false));
+            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this,
+                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED), false));
         }
     }
 
@@ -570,7 +611,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraRotationSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this, MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
+            postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this,
+                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
         }
     }
 
@@ -590,7 +632,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraTurningSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this, MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
+            postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this,
+                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED),
+                                       false));
         }
     }
 
@@ -649,16 +693,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void cameraRotate(final double deltaX, final double deltaY) {
+    public void cameraRotate(final double deltaX,
+                             final double deltaY) {
         if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY"))
             postRunnable(() -> em.post(Event.CAMERA_ROTATE, this, deltaX, deltaY));
     }
 
-    public void cameraRotate(final double deltaX, final long deltaY) {
+    public void cameraRotate(final double deltaX,
+                             final long deltaY) {
         cameraRotate(deltaX, (double) deltaY);
     }
 
-    public void cameraRotate(final long deltaX, final double deltaY) {
+    public void cameraRotate(final long deltaX,
+                             final double deltaY) {
         cameraRotate((double) deltaX, deltaY);
     }
 
@@ -673,21 +720,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void cameraTurn(final double deltaX, final double deltaY) {
+    public void cameraTurn(final double deltaX,
+                           final double deltaY) {
         if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY")) {
             postRunnable(() -> em.post(Event.CAMERA_TURN, this, deltaX, deltaY));
         }
     }
 
-    public void cameraTurn(final double deltaX, final long deltaY) {
+    public void cameraTurn(final double deltaX,
+                           final long deltaY) {
         cameraTurn(deltaX, (double) deltaY);
     }
 
-    public void cameraTurn(final long deltaX, final double deltaY) {
+    public void cameraTurn(final long deltaX,
+                           final double deltaY) {
         cameraTurn((double) deltaX, deltaY);
     }
 
-    public void cameraTurn(final long deltaX, final long deltaY) {
+    public void cameraTurn(final long deltaX,
+                           final long deltaY) {
         cameraTurn((double) deltaX, (double) deltaY);
     }
 
@@ -738,12 +789,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setVisibility(final String key, final boolean visible) {
+    public void setVisibility(final String key,
+                              final boolean visible) {
         setComponentTypeVisibility(key, visible);
     }
 
     @Override
-    public void setComponentTypeVisibility(String key, boolean visible) {
+    public void setComponentTypeVisibility(String key,
+                                           boolean visible) {
         if (checkCtKeyNull(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentType[] cts = ComponentType.values();
@@ -769,7 +822,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean setObjectVisibility(String name, boolean visible) {
+    public boolean setObjectVisibility(String name,
+                                       boolean visible) {
         if (checkObjectName(name)) {
             Entity obj = getEntity(name);
 
@@ -802,7 +856,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setForceDisplayLabel(String name, boolean forceLabel) {
+    public void setForceDisplayLabel(String name,
+                                     boolean forceLabel) {
         if (checkObjectName(name)) {
             Entity obj = getEntity(name);
             em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, name, forceLabel);
@@ -810,14 +865,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setLabelColor(String name, double[] color) {
+    public void setLabelColor(String name,
+                              double[] color) {
         if (checkObjectName(name)) {
             Entity obj = getEntity(name);
             em.post(Event.LABEL_COLOR_CMD, this, obj, name, GlobalResources.toFloatArray(color));
         }
     }
 
-    public void setLabelColor(String name, final List<?> color) {
+    public void setLabelColor(String name,
+                              final List<?> color) {
         setLabelColor(name, dArray(color));
     }
 
@@ -858,7 +915,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this, MathUtilsDouble.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR)));
+        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this,
+                                                MathUtilsDouble.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR,
+                                                                     Constants.MAX_PM_NUM_FACTOR)));
     }
 
     @Override
@@ -936,7 +995,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setSimulationTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
+    public void setSimulationTime(int year,
+                                  int month,
+                                  int day,
+                                  int hour,
+                                  int min,
+                                  int sec,
+                                  int millisec) {
         LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
         em.post(Event.TIME_CHANGE_CMD, this, date.toInstant(ZoneOffset.UTC));
     }
@@ -1008,7 +1073,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setTargetTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
+    public void setTargetTime(int year,
+                              int month,
+                              int day,
+                              int hour,
+                              int min,
+                              int sec,
+                              int millisec) {
         em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
     }
 
@@ -1033,13 +1104,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public float getStarBrightness() {
-        return (float) MathUtilsDouble.lint(Settings.settings.scene.star.brightness, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return (float) MathUtilsDouble.lint(Settings.settings.scene.star.brightness, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER,
+                                            Constants.MAX_SLIDER);
     }
 
     @Override
     public void setStarBrightness(final float brightness) {
         if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness"))
-            em.post(Event.STAR_BRIGHTNESS_CMD, this, MathUtilsDouble.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS));
+            em.post(Event.STAR_BRIGHTNESS_CMD, this,
+                    MathUtilsDouble.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS));
     }
 
     public void setStarBrightness(final int brightness) {
@@ -1048,7 +1121,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public float getStarSize() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER,
+                                    Constants.MAX_SLIDER);
     }
 
     @Override
@@ -1063,7 +1137,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public float getStarMinOpacity() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER,
+                                    Constants.MAX_SLIDER);
     }
 
     @Override
@@ -1162,8 +1237,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void configureScreenshots(int width, int height, String directory, String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkString(directory, "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
+    public void configureScreenshots(int width,
+                                     int height,
+                                     String directory,
+                                     String namePrefix) {
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkString(directory, "directory")
+                && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
             em.post(Event.SCREENSHOT_CMD, this, width, height, directory);
         }
     }
@@ -1192,20 +1271,34 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void configureFrameOutput(int width, int height, int fps, String directory, String namePrefix) {
+    public void configureFrameOutput(int width,
+                                     int height,
+                                     int fps,
+                                     String directory,
+                                     String namePrefix) {
         configureFrameOutput(width, height, (double) fps, directory, namePrefix);
     }
 
     @Override
-    public void configureFrameOutput(int width, int height, double fps, String directory, String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(directory, "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
+    public void configureFrameOutput(int width,
+                                     int height,
+                                     double fps,
+                                     String directory,
+                                     String namePrefix) {
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS,
+                                                                                                                           "FPS") && checkString(directory, "directory")
+                && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
             em.post(Event.FRAME_OUTPUT_MODE_CMD, this, Settings.ScreenshotMode.ADVANCED);
             em.post(Event.CONFIG_FRAME_OUTPUT_CMD, this, width, height, fps, directory, namePrefix);
         }
     }
 
     @Override
-    public void configureRenderOutput(int width, int height, int fps, String directory, String namePrefix) {
+    public void configureRenderOutput(int width,
+                                      int height,
+                                      int fps,
+                                      String directory,
+                                      String namePrefix) {
         configureFrameOutput(width, height, fps, directory, namePrefix);
     }
 
@@ -1250,7 +1343,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public FocusView getObject(String name, double timeOutSeconds) {
+    public FocusView getObject(String name,
+                               double timeOutSeconds) {
         if (checkObjectName(name, timeOutSeconds)) {
             Entity object = getEntity(name, timeOutSeconds);
             return new FocusView(object);
@@ -1264,7 +1358,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public VertsView getLineObject(String name, double timeOutSeconds) {
+    public VertsView getLineObject(String name,
+                                   double timeOutSeconds) {
         if (checkObjectName(name, timeOutSeconds)) {
             Entity object = getEntity(name, timeOutSeconds);
             if (Mapper.verts.has(object)) {
@@ -1281,7 +1376,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return getEntity(name, 0);
     }
 
-    public Entity getEntity(String name, double timeOutSeconds) {
+    public Entity getEntity(String name,
+                            double timeOutSeconds) {
         Entity obj = scene.getEntity(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -1315,14 +1411,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setObjectSizeScaling(String name, double scalingFactor) {
+    public void setObjectSizeScaling(String name,
+                                     double scalingFactor) {
         if (checkObjectName(name)) {
             Entity object = getEntity(name);
             setObjectSizeScaling(object, scalingFactor);
         }
     }
 
-    public void setObjectSizeScaling(Entity object, double scalingFactor) {
+    public void setObjectSizeScaling(Entity object,
+                                     double scalingFactor) {
         if (checkNotNull(object, "Entity")) {
             if (Mapper.modelScaffolding.has(object)) {
                 var scaffolding = Mapper.modelScaffolding.get(object);
@@ -1335,7 +1433,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setOrbitCoordinatesScaling(String name, double scalingFactor) {
+    public void setOrbitCoordinatesScaling(String name,
+                                           double scalingFactor) {
         int modified = 0;
         String className, objectName;
         if (name.contains(":")) {
@@ -1420,28 +1519,40 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void goToObject(String name, double angle) {
+    public void goToObject(String name,
+                           double angle) {
         goToObject(name, angle, -1);
     }
 
     @Override
-    public void goToObject(String name, double solidAngle, float waitTimeSeconds) {
+    public void goToObject(String name,
+                           double solidAngle,
+                           float waitTimeSeconds) {
         goToObject(name, solidAngle, waitTimeSeconds, null);
     }
 
-    public void goToObject(String name, double solidAngle, int waitTimeSeconds) {
+    public void goToObject(String name,
+                           double solidAngle,
+                           int waitTimeSeconds) {
         goToObject(name, solidAngle, (float) waitTimeSeconds);
     }
 
-    public void goToObject(String name, long solidAngle, int waitTimeSeconds) {
+    public void goToObject(String name,
+                           long solidAngle,
+                           int waitTimeSeconds) {
         goToObject(name, (double) solidAngle, (float) waitTimeSeconds);
     }
 
-    public void goToObject(String name, long solidAngle, float waitTimeSeconds) {
+    public void goToObject(String name,
+                           long solidAngle,
+                           float waitTimeSeconds) {
         goToObject(name, (double) solidAngle, waitTimeSeconds);
     }
 
-    private void goToObject(String name, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
+    private void goToObject(String name,
+                            double solidAngle,
+                            float waitTimeSeconds,
+                            AtomicBoolean stop) {
         if (checkString(name, "name") && checkObjectName(name)) {
             Entity focus = scene.findFocus(name);
             focusView.setEntity(focus);
@@ -1450,11 +1561,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void goToObject(String name, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
+    public void goToObject(String name,
+                           double solidAngle,
+                           int waitTimeSeconds,
+                           AtomicBoolean stop) {
         goToObject(name, solidAngle, (float) waitTimeSeconds, stop);
     }
 
-    void goToObject(Entity object, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
+    void goToObject(Entity object,
+                    double solidAngle,
+                    float waitTimeSeconds,
+                    AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(solidAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "solidAngle")) {
             stops.add(stop);
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
@@ -1503,7 +1620,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void goToObject(Entity object, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
+    public void goToObject(Entity object,
+                           double solidAngle,
+                           int waitTimeSeconds,
+                           AtomicBoolean stop) {
         goToObject(object, solidAngle, (float) waitTimeSeconds, stop);
     }
 
@@ -1526,7 +1646,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    void landOnObject(Entity object, AtomicBoolean stop) {
+    void landOnObject(Entity object,
+                      AtomicBoolean stop) {
         if (checkNotNull(object, "object")) {
 
             stops.add(stop);
@@ -1549,7 +1670,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+                    em.post(Event.TURNING_SPEED_CMD, this,
+                            (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
                     // Save cinematic
                     boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -1646,11 +1768,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void landAtObjectLocation(String name, String locationName) {
+    public void landAtObjectLocation(String name,
+                                     String locationName) {
         landAtObjectLocation(name, locationName, null);
     }
 
-    public void landAtObjectLocation(String name, String locationName, AtomicBoolean stop) {
+    public void landAtObjectLocation(String name,
+                                     String locationName,
+                                     AtomicBoolean stop) {
         if (checkString(name, "name")) {
             stops.add(stop);
             Entity entity = getEntity(name);
@@ -1664,7 +1789,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void landAtObjectLocation(Entity object, String locationName, AtomicBoolean stop) {
+    public void landAtObjectLocation(Entity object,
+                                     String locationName,
+                                     AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
 
             stops.add(stop);
@@ -1684,7 +1811,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void landAtObjectLocation(String name, double longitude, double latitude) {
+    public void landAtObjectLocation(String name,
+                                     double longitude,
+                                     double latitude) {
         if (checkString(name, "name")) {
             Entity entity = getEntity(name);
             if (Mapper.focus.has(entity)) {
@@ -1697,7 +1826,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    void landAtObjectLocation(Entity entity, double longitude, double latitude, AtomicBoolean stop) {
+    void landAtObjectLocation(Entity entity,
+                              double longitude,
+                              double latitude,
+                              AtomicBoolean stop) {
         if (checkNotNull(entity, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
             synchronized (focusView) {
                 focusView.setEntity(entity);
@@ -1742,11 +1874,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsDouble.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED));
+                    em.post(Event.TURNING_SPEED_CMD, this,
+                            (float) MathUtilsDouble.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED));
 
                     // Save rotation speed, set it to 20
                     double rotationSpeedBak = Settings.settings.scene.camera.rotate;
-                    em.post(Event.ROTATION_SPEED_CMD, this, (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED));
+                    em.post(Event.ROTATION_SPEED_CMD, this,
+                            (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED));
 
                     // Save cinematic
                     boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -1764,7 +1898,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     Vector3b objectPosition = focusView.getAbsolutePosition(aux3b2);
 
                     // Check intersection with object
-                    boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
+                    boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2),
+                                                                                       focusView.getRadius());
 
                     if (intersects) {
                         cameraRotate(5d, 5d);
@@ -1774,7 +1909,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         sleep(0.1f);
 
                         objectPosition = focusView.getAbsolutePosition(aux3b2);
-                        intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
+                        intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2),
+                                                                                   focusView.getRadius());
                     }
 
                     cameraStop();
@@ -1808,7 +1944,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3b camobj, AtomicBoolean stop) {
+    private void rollAndWait(double roll,
+                             double target,
+                             long sleep,
+                             NaturalCamera cam,
+                             Vector3b camobj,
+                             AtomicBoolean stop) {
         // Apply roll and wait
         double ang = cam.up.angle(camobj);
 
@@ -1854,7 +1995,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 IParticleRecord sb = set.getCandidateBean();
                 if (sb != null) {
                     double[] rgb = sb.rgb();
-                    return new double[]{sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appMag(), rgb[0], rgb[1], rgb[2]};
+                    return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appMag(), rgb[0], rgb[1], rgb[2] };
                 }
             }
         }
@@ -1867,14 +2008,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public double[] getObjectPosition(String name, String units) {
+    public double[] getObjectPosition(String name,
+                                      String units) {
         if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
             Entity entity = getEntity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getAbsolutePosition(name, aux3b1);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
+            return new double[] { u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue()) };
         }
         return null;
     }
@@ -1885,68 +2027,84 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public double[] getObjectPredictedPosition(String name, String units) {
+    public double[] getObjectPredictedPosition(String name,
+                                               String units) {
         if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
             Entity entity = getEntity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
+            return new double[] { u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue()) };
         }
         return null;
     }
 
     @Override
-    public void setObjectPosition(String name, double[] position) {
+    public void setObjectPosition(String name,
+                                  double[] position) {
         setObjectPosition(name, position, "internal");
     }
 
     @Override
-    public void setObjectPosition(String name, double[] position, String units) {
+    public void setObjectPosition(String name,
+                                  double[] position,
+                                  String units) {
         if (checkObjectName(name)) {
             setObjectPosition(getObject(name), position, units);
         }
 
     }
 
-    public void setObjectPosition(String name, List<?> position) {
+    public void setObjectPosition(String name,
+                                  List<?> position) {
         setObjectPosition(name, position, "internal");
     }
 
-    public void setObjectPosition(String name, List<?> position, String units) {
+    public void setObjectPosition(String name,
+                                  List<?> position,
+                                  String units) {
         setObjectPosition(name, dArray(position), units);
     }
 
     @Override
-    public void setObjectPosition(FocusView object, double[] position) {
+    public void setObjectPosition(FocusView object,
+                                  double[] position) {
         setObjectPosition(object, position, "internal");
     }
 
     @Override
-    public void setObjectPosition(FocusView object, double[] position, String units) {
+    public void setObjectPosition(FocusView object,
+                                  double[] position,
+                                  String units) {
         setObjectPosition(object.getEntity(), position, units);
     }
 
-    public void setObjectPosition(FocusView object, List<?> position) {
+    public void setObjectPosition(FocusView object,
+                                  List<?> position) {
         setObjectPosition(object, position, "internal");
     }
 
-    public void setObjectPosition(FocusView object, List<?> position, String units) {
+    public void setObjectPosition(FocusView object,
+                                  List<?> position,
+                                  String units) {
         setObjectPosition(object, dArray(position), units);
     }
 
     @Override
-    public void setObjectPosition(Entity object, double[] position) {
+    public void setObjectPosition(Entity object,
+                                  double[] position) {
         setObjectPosition(object, position, "internal");
     }
 
     @Override
-    public void setObjectPosition(Entity object, double[] position, String units) {
+    public void setObjectPosition(Entity object,
+                                  double[] position,
+                                  String units) {
         if (checkNotNull(object, "object") && checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
 
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            double[] posUnits = new double[]{u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2])};
+            double[] posUnits = new double[] { u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2]) };
 
             var body = Mapper.body.get(object);
             body.pos.set(posUnits);
@@ -1955,7 +2113,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setObjectCoordinatesProvider(String name, IPythonCoordinatesProvider provider) {
+    public void setObjectCoordinatesProvider(String name,
+                                             IPythonCoordinatesProvider provider) {
         if (checkObjectName(name) && checkNotNull(provider, "provider")) {
             var object = getObject(name);
             if (checkNotNull(object.getEntity(), "object")) {
@@ -1987,7 +2146,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     }
 
-    public void setObjectPosition(Entity object, List<?> position) {
+    public void setObjectPosition(Entity object,
+                                  List<?> position) {
         setObjectPosition(object, dArray(position));
     }
 
@@ -2017,37 +2177,90 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void displayMessageObject(final int id, final String message, final float x, final float y, final float r, final float g, final float b, final float a, final float fontSize) {
+    public void displayMessageObject(final int id,
+                                     final String message,
+                                     final float x,
+                                     final float y,
+                                     final float r,
+                                     final float g,
+                                     final float b,
+                                     final float a,
+                                     final float fontSize) {
         postRunnable(() -> em.post(Event.ADD_CUSTOM_MESSAGE, this, id, message, x, y, r, g, b, a, fontSize));
     }
 
     @Override
-    public void displayMessageObject(final int id, final String message, final double x, final double y, final double[] color, final double fontSize) {
+    public void displayMessageObject(final int id,
+                                     final String message,
+                                     final double x,
+                                     final double y,
+                                     final double[] color,
+                                     final double fontSize) {
         if (checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
             displayMessageObject(id, message, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a, (float) fontSize);
         }
     }
 
-    public void displayMessageObject(final int id, final String message, final double x, final double y, final List<?> color, final double fontSize) {
+    public void displayMessageObject(final int id,
+                                     final String message,
+                                     final double x,
+                                     final double y,
+                                     final List<?> color,
+                                     final double fontSize) {
         displayMessageObject(id, message, x, y, dArray(color), fontSize);
     }
 
-    public void displayMessageObject(final int id, final String message, final float x, final float y, final float r, final float g, final float b, final float a, final int fontSize) {
+    public void displayMessageObject(final int id,
+                                     final String message,
+                                     final float x,
+                                     final float y,
+                                     final float r,
+                                     final float g,
+                                     final float b,
+                                     final float a,
+                                     final int fontSize) {
         displayMessageObject(id, message, x, y, r, g, b, a, (float) fontSize);
     }
 
     @Override
-    public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth, final float maxHeight, final float r, final float g, final float b, final float a, final float fontSize) {
+    public void displayTextObject(final int id,
+                                  final String text,
+                                  final float x,
+                                  final float y,
+                                  final float maxWidth,
+                                  final float maxHeight,
+                                  final float r,
+                                  final float g,
+                                  final float b,
+                                  final float a,
+                                  final float fontSize) {
         postRunnable(() -> em.post(Event.ADD_CUSTOM_TEXT, this, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize));
     }
 
-    public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth, final float maxHeight, final float r, final float g, final float b, final float a, final int fontSize) {
+    public void displayTextObject(final int id,
+                                  final String text,
+                                  final float x,
+                                  final float y,
+                                  final float maxWidth,
+                                  final float maxHeight,
+                                  final float r,
+                                  final float g,
+                                  final float b,
+                                  final float a,
+                                  final int fontSize) {
         displayTextObject(id, text, x, y, maxWidth, maxHeight, r, g, b, a, (float) fontSize);
     }
 
     @Override
-    public void displayImageObject(final int id, final String path, final float x, final float y, final float r, final float g, final float b, final float a) {
+    public void displayImageObject(final int id,
+                                   final String path,
+                                   final float x,
+                                   final float y,
+                                   final float r,
+                                   final float g,
+                                   final float b,
+                                   final float a) {
         postRunnable(() -> {
             Texture tex = getTexture(path);
             em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y, r, g, b, a);
@@ -2055,19 +2268,30 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void displayImageObject(final int id, final String path, final double x, final double y, final double[] color) {
+    public void displayImageObject(final int id,
+                                   final String path,
+                                   final double x,
+                                   final double y,
+                                   final double[] color) {
         if (checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
             displayImageObject(id, path, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a);
         }
     }
 
-    public void displayImageObject(final int id, final String path, final double x, final double y, final List<?> color) {
+    public void displayImageObject(final int id,
+                                   final String path,
+                                   final double x,
+                                   final double y,
+                                   final List<?> color) {
         displayImageObject(id, path, x, y, dArray(color));
     }
 
     @Override
-    public void displayImageObject(final int id, final String path, final float x, final float y) {
+    public void displayImageObject(final int id,
+                                   final String path,
+                                   final float x,
+                                   final float y) {
         postRunnable(() -> {
             Texture tex = getTexture(path);
             em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y);
@@ -2081,7 +2305,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[]{id}));
+        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[] { id }));
     }
 
     @Override
@@ -2104,19 +2328,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setGuiPosition(final float x, final float y) {
+    public void setGuiPosition(final float x,
+                               final float y) {
         postRunnable(() -> em.post(Event.GUI_MOVE_CMD, this, x, y));
     }
 
-    public void setGuiPosition(final int x, final int y) {
+    public void setGuiPosition(final int x,
+                               final int y) {
         setGuiPosition((float) x, (float) y);
     }
 
-    public void setGuiPosition(final float x, final int y) {
+    public void setGuiPosition(final float x,
+                               final int y) {
         setGuiPosition(x, (float) y);
     }
 
-    public void setGuiPosition(final int x, final float y) {
+    public void setGuiPosition(final int x,
+                               final float y) {
         setGuiPosition((float) x, y);
     }
 
@@ -2173,7 +2401,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 y += parent.getY();
                 parent = parent.getParent();
             }
-            return new float[]{x, y, actor.getWidth(), actor.getHeight()};
+            return new float[] { x, y, actor.getWidth(), actor.getHeight() };
         } else {
             return null;
         }
@@ -2196,7 +2424,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean waitFocus(String name, long timeoutMs) {
+    public boolean waitFocus(String name,
+                             long timeoutMs) {
         long iniTime = TimeUtils.millis();
         NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
         while (cam.focus == null || !cam.focus.getName().equalsIgnoreCase(name)) {
@@ -2226,7 +2455,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void preloadTexture(String path) {
-        preloadTextures(new String[]{path});
+        preloadTextures(new String[] { path });
     }
 
     @Override
@@ -2264,12 +2493,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void playCameraPath(String file, boolean sync) {
+    public void playCameraPath(String file,
+                               boolean sync) {
         runCameraPath(file, sync);
     }
 
     @Override
-    public void runCameraPath(String file, boolean sync) {
+    public void runCameraPath(String file,
+                              boolean sync) {
         em.post(Event.PLAY_CAMERA_CMD, this, file);
 
         // Wait if needed
@@ -2277,16 +2508,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Object monitor = new Object();
             IObserver watcher = (event, source, data) -> {
                 switch (event) {
-                    case CAMERA_PLAY_INFO -> {
-                        Boolean status = (Boolean) data[0];
-                        if (!status) {
-                            synchronized (monitor) {
-                                monitor.notify();
-                            }
+                case CAMERA_PLAY_INFO -> {
+                    Boolean status = (Boolean) data[0];
+                    if (!status) {
+                        synchronized (monitor) {
+                            monitor.notify();
                         }
                     }
-                    default -> {
-                    }
+                }
+                default -> {
+                }
                 }
             };
             em.subscribe(watcher, Event.CAMERA_PLAY_INFO);
@@ -2317,59 +2548,105 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds) {
+    public void cameraTransitionKm(double[] camPos,
+                                   double[] camDir,
+                                   double[] camUp,
+                                   double seconds) {
         cameraTransition(camPos, "km", camDir, camUp, seconds, true);
     }
 
-    public void cameraTransitionKm(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
+    public void cameraTransitionKm(List<?> camPos,
+                                   List<?> camDir,
+                                   List<?> camUp,
+                                   double seconds) {
         cameraTransitionKm(dArray(camPos), dArray(camDir), dArray(camUp), seconds);
     }
 
-    public void cameraTransitionKm(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
+    public void cameraTransitionKm(List<?> camPos,
+                                   List<?> camDir,
+                                   List<?> camUp,
+                                   long seconds) {
         cameraTransitionKm(camPos, camDir, camUp, (double) seconds);
     }
 
     @Override
-    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds) {
+    public void cameraTransition(double[] camPos,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 double seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
     @Override
-    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds) {
+    public void cameraTransition(double[] camPos,
+                                 String units,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 double seconds) {
         cameraTransition(camPos, units, camDir, camUp, seconds, true);
     }
 
-    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, long seconds) {
+    public void cameraTransition(double[] camPos,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 long seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
-    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, long seconds) {
+    public void cameraTransition(double[] camPos,
+                                 String units,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 long seconds) {
         cameraTransition(camPos, units, camDir, camUp, (double) seconds);
     }
 
-    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
+    public void cameraTransition(List<?> camPos,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 double seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
-    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, double seconds) {
+    public void cameraTransition(List<?> camPos,
+                                 String units,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 double seconds) {
         cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds);
     }
 
-    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
+    public void cameraTransition(List<?> camPos,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 long seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
-    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, long seconds) {
+    public void cameraTransition(List<?> camPos,
+                                 String units,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 long seconds) {
         cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds);
     }
 
     @Override
-    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
+    public void cameraTransition(double[] camPos,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 double seconds,
+                                 boolean sync) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
     }
 
     @Override
-    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds, boolean sync) {
+    public void cameraTransition(double[] camPos,
+                                 String units,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 double seconds,
+                                 boolean sync) {
         if (checkDistanceUnits(units, "units")) {
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
@@ -2383,7 +2660,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 end = () -> unparkRunnable(name);
 
             var u = DistanceUnits.valueOf(units.toUpperCase());
-            double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
+            double[] posUnits = new double[] { u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2]) };
 
             // Create and park runnable
             CameraTransitionRunnable r = new CameraTransitionRunnable(cam, posUnits, camDir, camUp, seconds, end);
@@ -2405,19 +2682,37 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds, boolean sync) {
+    public void cameraTransition(List<?> camPos,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 double seconds,
+                                 boolean sync) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
     }
 
-    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, double seconds, boolean sync) {
+    public void cameraTransition(List<?> camPos,
+                                 String units,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 double seconds,
+                                 boolean sync) {
         cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds, sync);
     }
 
-    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds, boolean sync) {
+    public void cameraTransition(List<?> camPos,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 long seconds,
+                                 boolean sync) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
     }
 
-    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, long seconds, boolean sync) {
+    public void cameraTransition(List<?> camPos,
+                                 String units,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 long seconds,
+                                 boolean sync) {
         cameraTransition(camPos, units, camDir, camUp, (double) seconds, sync);
     }
 
@@ -2467,7 +2762,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
      * @param waitTimeSeconds Max time to wait for the camera to face the focus, in
      *                        seconds. If negative, we wait until the end.
      */
-    private void changeFocus(FocusView object, NaturalCamera cam, double waitTimeSeconds) {
+    private void changeFocus(FocusView object,
+                             NaturalCamera cam,
+                             double waitTimeSeconds) {
         // Post focus change and wait, if needed
         FocusView currentFocus = (FocusView) cam.getFocus();
         if (currentFocus == null || currentFocus.isSet() || currentFocus.getEntity() != object.getEntity()) {
@@ -2493,55 +2790,73 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public double[] galacticToInternalCartesian(double l, double b, double r) {
+    public double[] galacticToInternalCartesian(double l,
+                                                double b,
+                                                double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
-    public double[] galacticToInternalCartesian(int l, int b, int r) {
+    public double[] galacticToInternalCartesian(int l,
+                                                int b,
+                                                int r) {
         return galacticToInternalCartesian((double) l, (double) b, (double) r);
     }
 
     @Override
-    public double[] eclipticToInternalCartesian(double l, double b, double r) {
+    public double[] eclipticToInternalCartesian(double l,
+                                                double b,
+                                                double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
-    public double[] eclipticToInternalCartesian(int l, int b, int r) {
+    public double[] eclipticToInternalCartesian(int l,
+                                                int b,
+                                                int r) {
         return eclipticToInternalCartesian((double) l, (double) b, (double) r);
     }
 
     @Override
-    public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
+    public double[] equatorialToInternalCartesian(double ra,
+                                                  double dec,
+                                                  double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
-    public double[] equatorialToInternalCartesian(int ra, int dec, int r) {
+    public double[] equatorialToInternalCartesian(int ra,
+                                                  int dec,
+                                                  int r) {
         return equatorialToInternalCartesian((double) ra, (double) dec, (double) r);
     }
 
-    public double[] internalCartesianToEquatorial(double x, double y, double z) {
+    public double[] internalCartesianToEquatorial(double x,
+                                                  double y,
+                                                  double z) {
         Vector3b in = aux3b1.set(x, y, z);
         Vector3d out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
-        return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble()};
+        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble() };
     }
 
-    public double[] internalCartesianToEquatorial(int x, int y, int z) {
+    public double[] internalCartesianToEquatorial(int x,
+                                                  int y,
+                                                  int z) {
         return internalCartesianToEquatorial((double) x, (double) y, (double) z);
     }
 
     @Override
-    public double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor) {
+    public double[] equatorialCartesianToInternalCartesian(double[] eq,
+                                                           double kmFactor) {
         aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
-        return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
+        return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
     }
 
-    public double[] equatorialCartesianToInternalCartesian(final List<?> eq, double kmFactor) {
+    public double[] equatorialCartesianToInternalCartesian(final List<?> eq,
+                                                           double kmFactor) {
         return equatorialCartesianToInternalCartesian(dArray(eq), kmFactor);
     }
 
@@ -2637,7 +2952,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setHDRToneMappingType(String type) {
-        if (checkString(type, new String[]{"auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE"}, "tone mapping type"))
+        if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
             postRunnable(() -> em.post(Event.TONEMAPPING_TYPE_CMD, this, Settings.ToneMapping.valueOf(type.toUpperCase())));
     }
 
@@ -2652,7 +2967,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCubemapMode(boolean state, String projection) {
+    public void setCubemapMode(boolean state,
+                               String projection) {
         if (checkStringEnum(projection, CubemapProjection.class, "projection")) {
             CubmeapProjectionEffect.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
             postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
@@ -2776,112 +3092,172 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public double[] rotate3(double[] vector, double[] axis, double angle) {
+    public double[] rotate3(double[] vector,
+                            double[] axis,
+                            double angle) {
         Vector3d v = aux3d1.set(vector);
         Vector3d a = aux3d2.set(axis);
         return v.rotate(a, angle).values();
     }
 
-    public double[] rotate3(double[] vector, double[] axis, long angle) {
+    public double[] rotate3(double[] vector,
+                            double[] axis,
+                            long angle) {
         return rotate3(vector, axis, (double) angle);
     }
 
-    public double[] rotate3(List<?> vector, List<?> axis, double angle) {
+    public double[] rotate3(List<?> vector,
+                            List<?> axis,
+                            double angle) {
         return rotate3(dArray(vector), dArray(axis), angle);
     }
 
-    public double[] rotate3(List<?> vector, List<?> axis, long angle) {
+    public double[] rotate3(List<?> vector,
+                            List<?> axis,
+                            long angle) {
         return rotate3(vector, axis, (double) angle);
     }
 
     @Override
-    public double[] rotate2(double[] vector, double angle) {
+    public double[] rotate2(double[] vector,
+                            double angle) {
         Vector2d v = aux2d1.set(vector);
         return v.rotate(angle).values();
     }
 
-    public double[] rotate2(double[] vector, long angle) {
+    public double[] rotate2(double[] vector,
+                            long angle) {
         return rotate2(vector, (double) angle);
     }
 
-    public double[] rotate2(List<?> vector, double angle) {
+    public double[] rotate2(List<?> vector,
+                            double angle) {
         return rotate2(dArray(vector), angle);
     }
 
-    public double[] rotate2(List<?> vector, long angle) {
+    public double[] rotate2(List<?> vector,
+                            long angle) {
         return rotate2(vector, (double) angle);
     }
 
     @Override
-    public double[] cross3(double[] vec1, double[] vec2) {
+    public double[] cross3(double[] vec1,
+                           double[] vec2) {
         return aux3d1.set(vec1).crs(aux3d2.set(vec2)).values();
     }
 
-    public double[] cross3(List<?> vec1, List<?> vec2) {
+    public double[] cross3(List<?> vec1,
+                           List<?> vec2) {
         return cross3(dArray(vec1), dArray(vec2));
     }
 
     @Override
-    public double dot3(double[] vec1, double[] vec2) {
+    public double dot3(double[] vec1,
+                       double[] vec2) {
         return aux3d1.set(vec1).dot(aux3d2.set(vec2));
     }
 
-    public double dot3(List<?> vec1, List<?> vec2) {
+    public double dot3(List<?> vec1,
+                       List<?> vec2) {
         return dot3(dArray(vec1), dArray(vec2));
     }
 
     @Override
-    public void addTrajectoryLine(String name, double[] points, double[] color) {
+    public void addTrajectoryLine(String name,
+                                  double[] points,
+                                  double[] color) {
         addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
-    public void addTrajectoryLine(String name, List<?> points, List<?> color) {
+    public void addTrajectoryLine(String name,
+                                  List<?> points,
+                                  List<?> color) {
         addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
     @Override
-    public void addTrajectoryLine(String name, double[] points, double[] color, double trailMap) {
+    public void addTrajectoryLine(String name,
+                                  double[] points,
+                                  double[] color,
+                                  double trailMap) {
         var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trailMap, "Orbit");
     }
 
-    public void addTrajectoryLine(String name, List<?> points, List<?> color, double trailMap) {
+    public void addTrajectoryLine(String name,
+                                  List<?> points,
+                                  List<?> color,
+                                  double trailMap) {
         addTrajectoryLine(name, dArray(points), dArray(color), trailMap);
     }
 
     @Override
-    public void addPolyline(String name, double[] points, double[] color) {
+    public void addPolyline(String name,
+                            double[] points,
+                            double[] color) {
         addPolyline(name, points, color, 1f);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color) {
         addPolyline(name, points, color, 1f);
     }
 
     @Override
-    public void addPolyline(String name, double[] points, double[] color, double lineWidth) {
+    public void addPolyline(String name,
+                            double[] points,
+                            double[] color,
+                            double lineWidth) {
         addPolyline(name, points, color, lineWidth, false);
     }
 
     @Override
-    public void addPolyline(String name, double[] points, double[] color, double lineWidth, boolean arrowCaps) {
+    public void addPolyline(String name,
+                            double[] points,
+                            double[] color,
+                            double lineWidth,
+                            boolean arrowCaps) {
         addPolyline(name, points, color, lineWidth, GL20.GL_LINE_STRIP, arrowCaps);
     }
 
     @Override
-    public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive) {
+    public void addPolyline(String name,
+                            double[] points,
+                            double[] color,
+                            double lineWidth,
+                            int primitive) {
         addPolyline(name, points, color, lineWidth, primitive, false);
     }
 
     @Override
-    public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
+    public void addPolyline(String name,
+                            double[] points,
+                            double[] color,
+                            double lineWidth,
+                            int primitive,
+                            boolean arrowCaps) {
         addLineObject(name, points, color, lineWidth, primitive, arrowCaps, -1f, "Polyline");
     }
 
-    public Entity addLineObject(String name, List<?> points, List<?> color, double lineWidth, int primitive, boolean arrowCaps, double trailMap, String archetypeName) {
+    public Entity addLineObject(String name,
+                                List<?> points,
+                                List<?> color,
+                                double lineWidth,
+                                int primitive,
+                                boolean arrowCaps,
+                                double trailMap,
+                                String archetypeName) {
         return addLineObject(name, dArray(points), dArray(color), lineWidth, primitive, arrowCaps, trailMap, archetypeName);
     }
 
-    public Entity addLineObject(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps, double trailMap, String archetypeName) {
+    public Entity addLineObject(String name,
+                                double[] points,
+                                double[] color,
+                                double lineWidth,
+                                int primitive,
+                                boolean arrowCaps,
+                                double trailMap,
+                                String archetypeName) {
         if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth") && checkNum(primitive, 1, 3, "primitive")) {
             var archetype = scene.archetypes().get(archetypeName);
             var entity = archetype.createEntity();
@@ -2937,43 +3313,82 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return null;
     }
 
-    public void addPolyline(String name, double[] points, double[] color, int lineWidth) {
+    public void addPolyline(String name,
+                            double[] points,
+                            double[] color,
+                            int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
     }
 
-    public void addPolyline(String name, double[] points, double[] color, int lineWidth, int primitive) {
+    public void addPolyline(String name,
+                            double[] points,
+                            double[] color,
+                            int lineWidth,
+                            int primitive) {
         addPolyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            float lineWidth) {
         addPolyline(name, dArray(points), dArray(color), lineWidth);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, boolean arrowCaps) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            float lineWidth,
+                            boolean arrowCaps) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, arrowCaps);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, int primitive) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            float lineWidth,
+                            int primitive) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, primitive);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, int primitive, boolean arrowCaps) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            float lineWidth,
+                            int primitive,
+                            boolean arrowCaps) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, primitive, arrowCaps);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, boolean arrowCaps) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            int lineWidth,
+                            boolean arrowCaps) {
         addPolyline(name, points, color, (float) lineWidth, arrowCaps);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, int primitive) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            int lineWidth,
+                            int primitive) {
         addPolyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, int primitive, boolean arrowCaps) {
+    public void addPolyline(String name,
+                            List<?> points,
+                            List<?> color,
+                            int lineWidth,
+                            int primitive,
+                            boolean arrowCaps) {
         addPolyline(name, points, color, (float) lineWidth, primitive, arrowCaps);
     }
 
@@ -2990,19 +3405,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void parkRunnable(String id, Runnable runnable) {
+    public void parkRunnable(String id,
+                             Runnable runnable) {
         parkSceneRunnable(id, runnable);
     }
 
     @Override
-    public void parkSceneRunnable(String id, Runnable runnable) {
+    public void parkSceneRunnable(String id,
+                                  Runnable runnable) {
         if (checkString(id, "id")) {
             em.post(Event.PARK_RUNNABLE, this, id, runnable);
         }
     }
 
     @Override
-    public void parkCameraRunnable(String id, Runnable runnable) {
+    public void parkCameraRunnable(String id,
+                                   Runnable runnable) {
         if (checkString(id, "id")) {
             em.post(Event.PARK_CAMERA_RUNNABLE, this, id, runnable);
         }
@@ -3020,7 +3438,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraState(double[] pos, double[] dir, double[] up) {
+    public void setCameraState(double[] pos,
+                               double[] dir,
+                               double[] up) {
         postRunnable(() -> {
             em.post(Event.CAMERA_POS_CMD, this, (Object) pos);
             em.post(Event.CAMERA_DIR_CMD, this, (Object) dir);
@@ -3028,19 +3448,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
-    public void setCameraState(List<?> pos, List<?> dir, List<?> up) {
+    public void setCameraState(List<?> pos,
+                               List<?> dir,
+                               List<?> up) {
         setCameraState(dArray(pos), dArray(dir), dArray(up));
     }
 
     @Override
-    public void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time) {
+    public void setCameraStateAndTime(double[] pos,
+                                      double[] dir,
+                                      double[] up,
+                                      long time) {
         postRunnable(() -> {
             em.post(Event.CAMERA_PROJECTION_CMD, this, pos, dir, up);
             em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
         });
     }
 
-    public void setCameraStateAndTime(List<?> pos, List<?> dir, List<?> up, long time) {
+    public void setCameraStateAndTime(List<?> pos,
+                                      List<?> dir,
+                                      List<?> up,
+                                      long time) {
         setCameraStateAndTime(dArray(pos), dArray(dir), dArray(up), time);
     }
 
@@ -3050,16 +3478,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean loadDataset(String dsName, String absolutePath) {
+    public boolean loadDataset(String dsName,
+                               String absolutePath) {
         return loadDataset(dsName, absolutePath, CatalogInfoSource.SCRIPT, true);
     }
 
     @Override
-    public boolean loadDataset(String dsName, String path, boolean sync) {
+    public boolean loadDataset(String dsName,
+                               String path,
+                               boolean sync) {
         return loadDataset(dsName, path, CatalogInfoSource.SCRIPT, sync);
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, boolean sync) {
+    public boolean loadDataset(String dsName,
+                               String path,
+                               CatalogInfoSource type,
+                               boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, true);
         } else {
@@ -3069,7 +3503,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean loadDataset(String dsName,
+                               String path,
+                               CatalogInfoSource type,
+                               DatasetOptions datasetOptions,
+                               boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, datasetOptions, true);
         } else {
@@ -3079,7 +3517,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean loadDataset(String dsName,
+                               DataSource ds,
+                               CatalogInfoSource type,
+                               DatasetOptions datasetOptions,
+                               boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, ds, type, datasetOptions, true);
         } else {
@@ -3090,130 +3532,316 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean loadStarDataset(String dsName, String path, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[]{0, 0, 0, 0}, null, null, sync);
+    public boolean loadStarDataset(String dsName,
+                                   String path,
+                                   boolean sync) {
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[] { 0, 0, 0, 0 }, null, null, sync);
     }
 
     @Override
-    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[]{0, 0, 0, 0}, null, null, sync);
+    public boolean loadStarDataset(String dsName,
+                                   String path,
+                                   double magnitudeScale,
+                                   boolean sync) {
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[] { 0, 0, 0, 0 }, null, null, sync);
     }
 
     @Override
-    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, boolean sync) {
+    public boolean loadStarDataset(String dsName,
+                                   String path,
+                                   double magnitudeScale,
+                                   double[] labelColor,
+                                   boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, labelColor, null, null, sync);
     }
 
-    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, boolean sync) {
+    public boolean loadStarDataset(String dsName,
+                                   String path,
+                                   double magnitudeScale,
+                                   final List<?> labelColor,
+                                   boolean sync) {
         return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), sync);
     }
 
     @Override
-    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarDataset(String dsName,
+                                   String path,
+                                   double magnitudeScale,
+                                   double[] labelColor,
+                                   double[] fadeIn,
+                                   double[] fadeOut,
+                                   boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
+    public boolean loadStarDataset(String dsName,
+                                   String path,
+                                   double magnitudeScale,
+                                   final List<?> labelColor,
+                                   final List<?> fadeIn,
+                                   final List<?> fadeOut,
+                                   boolean sync) {
         return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
-    public boolean loadStarDataset(String dsName, String path, CatalogInfoSource type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarDataset(String dsName,
+                                   String path,
+                                   CatalogInfoSource type,
+                                   double magnitudeScale,
+                                   double[] labelColor,
+                                   double[] fadeIn,
+                                   double[] fadeOut,
+                                   boolean sync) {
         DatasetOptions dops = DatasetOptions.getStarDatasetOptions(dsName, magnitudeScale, labelColor, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
     @Override
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{1.5d, 100d}, ct, null, null, sync);
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       double profileDecay,
+                                       double[] particleColor,
+                                       double colorNoise,
+                                       double[] labelColor,
+                                       double particleSize,
+                                       String ct,
+                                       boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, null, null, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, List<?> particleColor, double colorNoise, List<?> labelColor, double particleSize, String ct, boolean sync) {
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       double profileDecay,
+                                       List<?> particleColor,
+                                       double colorNoise,
+                                       List<?> labelColor,
+                                       double particleSize,
+                                       String ct,
+                                       boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, null, null, sync);
     }
 
     @Override
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0))}, ct, fadeIn, fadeOut, sync);
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       double profileDecay,
+                                       double[] particleColor,
+                                       double colorNoise,
+                                       double[] labelColor,
+                                       double particleSize,
+                                       String ct,
+                                       double[] fadeIn,
+                                       double[] fadeOut,
+                                       boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize,
+                                   new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) }, ct, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List<?> particleColor, double colorNoise, final List<?> labelColor, double particleSize, String ct, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut), sync);
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       double profileDecay,
+                                       final List<?> particleColor,
+                                       double colorNoise,
+                                       final List<?> labelColor,
+                                       double particleSize,
+                                       String ct,
+                                       final List<?> fadeIn,
+                                       final List<?> fadeOut,
+                                       boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut),
+                                   sync);
     }
 
     @Override
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       double profileDecay,
+                                       double[] particleColor,
+                                       double colorNoise,
+                                       double[] labelColor,
+                                       double particleSize,
+                                       double[] sizeLimits,
+                                       String ct,
+                                       double[] fadeIn,
+                                       double[] fadeOut,
+                                       boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, compType, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List<?> particleColor, double colorNoise, final List<?> labelColor, double particleSize, List<?> sizeLimits, String ct, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, dArray(sizeLimits), ct, dArray(fadeIn), dArray(fadeOut), sync);
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       double profileDecay,
+                                       final List<?> particleColor,
+                                       double colorNoise,
+                                       final List<?> labelColor,
+                                       double particleSize,
+                                       List<?> sizeLimits,
+                                       String ct,
+                                       final List<?> fadeIn,
+                                       final List<?> fadeOut,
+                                       boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, dArray(sizeLimits), ct,
+                                   dArray(fadeIn), dArray(fadeOut), sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, CatalogInfoSource.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut, sync);
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       double profileDecay,
+                                       double[] particleColor,
+                                       double colorNoise,
+                                       double[] labelColor,
+                                       double particleSize,
+                                       double[] sizeLimits,
+                                       ComponentType ct,
+                                       double[] fadeIn,
+                                       double[] fadeOut,
+                                       boolean sync) {
+        return loadParticleDataset(dsName, path, CatalogInfoSource.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn,
+                                   fadeOut, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, CatalogInfoSource type, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(dsName, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut);
+    public boolean loadParticleDataset(String dsName,
+                                       String path,
+                                       CatalogInfoSource type,
+                                       double profileDecay,
+                                       double[] particleColor,
+                                       double colorNoise,
+                                       double[] labelColor,
+                                       double particleSize,
+                                       double[] sizeLimits,
+                                       ComponentType ct,
+                                       double[] fadeIn,
+                                       double[] fadeOut,
+                                       boolean sync) {
+        DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(dsName, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn,
+                                                                       fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
     @Override
-    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          double[] particleColor,
+                                          double[] fadeIn,
+                                          double[] fadeOut,
+                                          boolean sync) {
         return loadStarClusterDataset(dsName, path, particleColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> fadeIn, List<?> fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          List<?> particleColor,
+                                          List<?> fadeIn,
+                                          List<?> fadeOut,
+                                          boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     @Override
-    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          double[] particleColor,
+                                          double[] labelColor,
+                                          double[] fadeIn,
+                                          double[] fadeOut,
+                                          boolean sync) {
         return loadStarClusterDataset(dsName, path, particleColor, labelColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> labelColor, List<?> fadeIn, List<?> fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          List<?> particleColor,
+                                          List<?> labelColor,
+                                          List<?> fadeIn,
+                                          List<?> fadeOut,
+                                          boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     @Override
-    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          double[] particleColor,
+                                          String ct,
+                                          double[] fadeIn,
+                                          double[] fadeOut,
+                                          boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, particleColor.clone(), compType, fadeIn, fadeOut);
         return loadDataset(dsName, path, CatalogInfoSource.SCRIPT, dops, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, String ct, List<?> fadeIn, List<?> fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          List<?> particleColor,
+                                          String ct,
+                                          List<?> fadeIn,
+                                          List<?> fadeOut,
+                                          boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     @Override
-    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          double[] particleColor,
+                                          double[] labelColor,
+                                          String ct,
+                                          double[] fadeIn,
+                                          double[] fadeOut,
+                                          boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         DatasetOptions datasetOptions = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, labelColor, compType, fadeIn, fadeOut);
         return loadDataset(dsName, path, CatalogInfoSource.SCRIPT, datasetOptions, sync);
     }
 
     @Override
-    public boolean loadVariableStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadVariableStarDataset(String dsName,
+                                           String path,
+                                           double magnitudeScale,
+                                           double[] labelColor,
+                                           double[] fadeIn,
+                                           double[] fadeOut,
+                                           boolean sync) {
         return loadVariableStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadVariableStarDataset(String dsName, String path, CatalogInfoSource type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadVariableStarDataset(String dsName,
+                                           String path,
+                                           CatalogInfoSource type,
+                                           double magnitudeScale,
+                                           double[] labelColor,
+                                           double[] fadeIn,
+                                           double[] fadeOut,
+                                           boolean sync) {
         DatasetOptions dops = DatasetOptions.getVariableStarDatasetOptions(dsName, magnitudeScale, labelColor, ComponentType.Stars, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> labelColor, String ct, List<?> fadeIn, List<?> fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName,
+                                          String path,
+                                          List<?> particleColor,
+                                          List<?> labelColor,
+                                          String ct,
+                                          List<?> fadeIn,
+                                          List<?> fadeOut,
+                                          boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoSource type, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName,
+                                         String path,
+                                         CatalogInfoSource type,
+                                         boolean sync) {
         return loadDatasetImmediate(dsName, path, type, null, sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName,
+                                         String path,
+                                         CatalogInfoSource type,
+                                         DatasetOptions datasetOptions,
+                                         boolean sync) {
         Path p = Paths.get(path);
         if (Files.exists(p) && Files.isReadable(p)) {
             try {
@@ -3227,7 +3855,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions datasetOptions) {
+    private List<IParticleRecord> loadParticleBeans(DataSource ds,
+                                                    DatasetOptions datasetOptions) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(datasetOptions);
         String catalogName = datasetOptions != null && datasetOptions.catalogName != null ? datasetOptions.catalogName : ds.getName();
@@ -3245,16 +3874,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
-    public boolean loadJsonCatalog(String dsName, String path) {
+    public boolean loadJsonCatalog(String dsName,
+                                   String path) {
         return loadJsonDataset(dsName, path, true);
     }
 
     @Override
-    public boolean loadJsonDataset(String dsName, String path) {
+    public boolean loadJsonDataset(String dsName,
+                                   String path) {
         return loadJsonDataset(dsName, path, true);
     }
 
-    public boolean loadJsonDataset(String dsName, String pathString, boolean sync) {
+    public boolean loadJsonDataset(String dsName,
+                                   String pathString,
+                                   boolean sync) {
         // Load internal JSON dataset file.
         try {
             logger.info(I18n.msg("notif.catalog.loading", pathString));
@@ -3302,7 +3935,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         notifyErrorPopup(message, null);
     }
 
-    private void notifyErrorPopup(String message, Exception e) {
+    private void notifyErrorPopup(String message,
+                                  Exception e) {
         if (e != null) {
             logger.error(message, e);
         } else {
@@ -3311,7 +3945,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, message);
     }
 
-    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName,
+                                         DataSource ds,
+                                         CatalogInfoSource type,
+                                         DatasetOptions datasetOptions,
+                                         boolean sync) {
         try {
             logger.info(I18n.msg("notif.catalog.loading", dsName));
 
@@ -3357,7 +3995,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             // Add to catalog manager -> setUp.
                             scene.setUpEntity(starGroup.get());
 
-                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.msg("gui.dsload.stars.name") : I18n.msg("gui.dsload.variablestars.name");
+                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ?
+                                    I18n.msg("gui.dsload.stars.name") :
+                                    I18n.msg("gui.dsload.variablestars.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
@@ -3428,7 +4068,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     var body = Mapper.body.get(entity);
                     body.setColor(datasetOptions.particleColor);
                     body.setLabelColor(datasetOptions.labelColor);
-                    body.setPosition(new double[]{0, 0, 0});
+                    body.setPosition(new double[] { 0, 0, 0 });
 
                     var fade = Mapper.fade.get(entity);
                     fade.setFadeIn(datasetOptions.fadeIn);
@@ -3548,7 +4188,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean highlightDataset(String dsName, boolean highlight) {
+    public boolean highlightDataset(String dsName,
+                                    boolean highlight) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
@@ -3563,13 +4204,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
+    public boolean highlightDataset(String dsName,
+                                    int colorIndex,
+                                    boolean highlight) {
         float[] color = ColorUtils.getColorFromIndex(colorIndex);
         return highlightDataset(dsName, color[0], color[1], color[2], color[3], highlight);
     }
 
     @Override
-    public boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight) {
+    public boolean highlightDataset(String dsName,
+                                    float r,
+                                    float g,
+                                    float b,
+                                    float a,
+                                    boolean highlight) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
@@ -3589,7 +4237,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean highlightDataset(String dsName, String attributeName, String colorMap, double minMap, double maxMap, boolean highlight) {
+    public boolean highlightDataset(String dsName,
+                                    String attributeName,
+                                    String colorMap,
+                                    double minMap,
+                                    double maxMap,
+                                    boolean highlight) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
@@ -3625,7 +4278,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return -1;
     }
 
-    private IAttribute getAttributeByName(String name, CatalogInfo ci) {
+    private IAttribute getAttributeByName(String name,
+                                          CatalogInfo ci) {
         try {
             // One of the default attributes
             Class<?> clazz = Class.forName("gaiasky.util.filter.attrib.Attribute" + name);
@@ -3655,7 +4309,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor) {
+    public boolean setDatasetHighlightSizeFactor(String dsName,
+                                                 float sizeFactor) {
         if (checkString(dsName, "datasetName") && checkNum(sizeFactor, Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR, "sizeFactor")) {
 
             boolean exists = this.catalogManager.contains(dsName);
@@ -3671,7 +4326,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible) {
+    public boolean setDatasetHighlightAllVisible(String dsName,
+                                                 boolean allVisible) {
         if (checkString(dsName, "datasetName")) {
 
             boolean exists = this.catalogManager.contains(dsName);
@@ -3687,7 +4343,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setDatasetPointSizeMultiplier(String dsName, double multiplier) {
+    public void setDatasetPointSizeMultiplier(String dsName,
+                                              double multiplier) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
@@ -3699,75 +4356,86 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void addShapeAroundObject(String shapeName, String shapeType, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject) {
-        if (checkString(shapeName, "shapeName") && checkStringEnum(shapeType, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
+    public void addShapeAroundObject(String shapeName,
+                                     String shapeType,
+                                     String primitive,
+                                     double size,
+                                     String objectName,
+                                     float r,
+                                     float g,
+                                     float b,
+                                     float a,
+                                     boolean showLabel,
+                                     boolean trackObject) {
+        if (checkString(shapeName, "shapeName") && checkStringEnum(shapeType, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive")
+                && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
             final var shapeLc = shapeType.toLowerCase();
             postRunnable(() -> {
-                // NEW
-                {
-                    Entity trackingObject = getFocusEntity(objectName);
-                    float[] color = new float[]{r, g, b, a};
-                    int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
-                    // Create shape
-                    Archetype at = scene.archetypes().get("ShapeObject");
-                    Entity newShape = at.createEntity();
+                Entity trackingObject = getFocusEntity(objectName);
+                float[] color = new float[] { r, g, b, a };
+                int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                // Create shape
+                Archetype at = scene.archetypes().get("ShapeObject");
+                Entity newShape = at.createEntity();
 
-                    var base = Mapper.base.get(newShape);
-                    base.setName(shapeName.trim());
-                    base.ct = new ComponentTypes(ComponentType.Others.ordinal());
+                var base = Mapper.base.get(newShape);
+                base.setName(shapeName.trim());
+                base.ct = new ComponentTypes(ComponentType.Others.ordinal());
 
-                    var body = Mapper.body.get(newShape);
-                    body.setColor(color);
-                    body.setLabelColor(new float[]{r, g, b, a});
-                    body.size = (float) (size * Constants.KM_TO_U);
+                var body = Mapper.body.get(newShape);
+                body.setColor(color);
+                body.setLabelColor(new float[] { r, g, b, a });
+                body.size = (float) (size * Constants.KM_TO_U);
 
-                    var graph = Mapper.graph.get(newShape);
-                    graph.setParent(Scene.ROOT_NAME);
+                var graph = Mapper.graph.get(newShape);
+                graph.setParent(Scene.ROOT_NAME);
 
-                    var focus = Mapper.focus.get(newShape);
-                    focus.focusable = false;
+                var focus = Mapper.focus.get(newShape);
+                focus.focusable = false;
 
-                    var shape = Mapper.shape.get(newShape);
-                    if (trackObject) {
-                        shape.track = new FocusView(trackingObject);
-                    } else {
-                        body.setPos(EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3b()));
-                    }
-                    shape.trackName = objectName;
-
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("quality", 25L);
-                    params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 35L);
-                    params.put("recursion", 3L);
-                    params.put("diameter", 1.0);
-                    params.put("width", 1.0);
-                    params.put("height", 1.0);
-                    params.put("depth", 1.0);
-                    params.put("innerradius", 0.6);
-                    params.put("outerradius", 1.0);
-                    params.put("sphere-in-ring", false);
-                    params.put("flip", false);
-
-                    var model = Mapper.model.get(newShape);
-                    model.model = new ModelComponent();
-                    model.model.type = shapeLc;
-                    model.model.setPrimitiveType(primitiveInt);
-                    model.model.setParams(params);
-                    model.model.setStaticLight(true);
-                    model.model.setUseColor(true);
-                    model.model.setBlendMode(BlendMode.ADDITIVE);
-                    model.model.setCulling(false);
-
-                    var rt = Mapper.renderType.get(newShape);
-                    rt.renderGroup = RenderGroup.MODEL_VERT_ADDITIVE;
-
-                    // Initialize shape.
-                    scene.initializeEntity(newShape);
-                    scene.setUpEntity(newShape);
-
-                    // Add to scene.
-                    EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, newShape, false);
+                var shape = Mapper.shape.get(newShape);
+                if (trackObject) {
+                    shape.track = new FocusView(trackingObject);
+                } else {
+                    body.setPos(EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3b()));
                 }
+                shape.trackName = objectName;
+
+                var trf = Mapper.transform.get(newShape);
+                trf.setTransformMatrix(GaiaSky.instance.cameraManager.getCamera().view);
+
+                Map<String, Object> params = new HashMap<>();
+                params.put("quality", 25L);
+                params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 35L);
+                params.put("recursion", 3L);
+                params.put("diameter", 1.0);
+                params.put("width", 1.0);
+                params.put("height", 1.0);
+                params.put("depth", 1.0);
+                params.put("innerradius", 0.6);
+                params.put("outerradius", 1.0);
+                params.put("sphere-in-ring", false);
+                params.put("flip", false);
+
+                var model = Mapper.model.get(newShape);
+                model.model = new ModelComponent();
+                model.model.type = shapeLc;
+                model.model.setPrimitiveType(primitiveInt);
+                model.model.setParams(params);
+                model.model.setStaticLight(true);
+                model.model.setUseColor(true);
+                model.model.setBlendMode(BlendMode.ADDITIVE);
+                model.model.setCulling(false);
+
+                var rt = Mapper.renderType.get(newShape);
+                rt.renderGroup = RenderGroup.MODEL_VERT_ADDITIVE;
+
+                // Initialize shape.
+                scene.initializeEntity(newShape);
+                scene.setUpEntity(newShape);
+
+                // Add to scene.
+                EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, newShape, false);
             });
         }
     }
@@ -3944,27 +4612,32 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
-            case INPUT_EVENT -> inputCode = (Integer) data[0];
-            case DISPOSE -> {
-                // Stop all
-                for (AtomicBoolean stop : stops) {
-                    if (stop != null)
-                        stop.set(true);
-                }
-            }
-            case SCENE_LOADED -> {
-                this.scene = (Scene) data[0];
-                this.focusView.setScene(this.scene);
-            }
-            default -> {
+        case INPUT_EVENT -> inputCode = (Integer) data[0];
+        case DISPOSE -> {
+            // Stop all
+            for (AtomicBoolean stop : stops) {
+                if (stop != null)
+                    stop.set(true);
             }
         }
+        case SCENE_LOADED -> {
+            this.scene = (Scene) data[0];
+            this.focusView.setScene(this.scene);
+        }
+        default -> {
+        }
+        }
 
     }
 
-    private boolean checkNum(int value, int min, int max, String name) {
+    private boolean checkNum(int value,
+                             int min,
+                             int max,
+                             String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -3972,7 +4645,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkNum(long value, long min, long max, String name) {
+    private boolean checkNum(long value,
+                             long min,
+                             long max,
+                             String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -3980,7 +4656,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkNum(float value, float min, float max, String name) {
+    private boolean checkNum(float value,
+                             float min,
+                             float max,
+                             String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -3988,7 +4667,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkNum(double value, double min, double max, String name) {
+    private boolean checkNum(double value,
+                             double min,
+                             double max,
+                             String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -3996,7 +4678,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkFinite(float value, String name) {
+    private boolean checkFinite(float value,
+                                String name) {
         if (!Float.isFinite(value)) {
             logger.error(name + " must be finite: " + value);
             return false;
@@ -4004,7 +4687,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkFinite(double value, String name) {
+    private boolean checkFinite(double value,
+                                String name) {
         if (!Double.isFinite(value)) {
             logger.error(name + " must be finite: " + value);
             return false;
@@ -4012,7 +4696,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkLengths(double[] array, int length1, int length2, String name) {
+    private boolean checkLengths(double[] array,
+                                 int length1,
+                                 int length2,
+                                 String name) {
         if (array.length != length1 && array.length != length2) {
             logger.error(name + " must have a length of " + length1 + " or " + length2 + ". Current length is " + array.length);
             return false;
@@ -4020,7 +4707,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkLength(double[] array, int length, String name) {
+    private boolean checkLength(double[] array,
+                                int length,
+                                String name) {
         if (array.length != length) {
             logger.error(name + " must have a length of " + length + ". Current length is " + array.length);
             return false;
@@ -4028,7 +4717,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkString(String value, String name) {
+    private boolean checkString(String value,
+                                String name) {
         if (value == null || value.isEmpty()) {
             logger.error(name + " can't be null nor empty");
             return false;
@@ -4036,7 +4726,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkString(String value, String[] possibleValues, String name) {
+    private boolean checkString(String value,
+                                String[] possibleValues,
+                                String name) {
         if (checkString(value, name)) {
             for (String v : possibleValues) {
                 if (value.equals(v))
@@ -4049,7 +4741,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private boolean checkDirectoryExists(String location, String name) {
+    private boolean checkDirectoryExists(String location,
+                                         String name) {
         if (location == null) {
             logger.error(name + ": location can't be null");
             return false;
@@ -4070,7 +4763,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkObjectName(String name, double timeOutSeconds) {
+    private boolean checkObjectName(String name,
+                                    double timeOutSeconds) {
         if (getEntity(name, timeOutSeconds) == null) {
             logger.error(name + ": object with this name does not exist");
             return false;
@@ -4086,13 +4780,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return entity != null;
     }
 
-    private void logPossibleValues(String value, String[] possibleValues, String name) {
+    private void logPossibleValues(String value,
+                                   String[] possibleValues,
+                                   String name) {
         logger.error(name + " value not valid: " + value + ". Possible values are:");
         for (String v : possibleValues)
             logger.error(v);
     }
 
-    private <T extends Enum<T>> boolean checkStringEnum(String value, Class<T> clazz, String name) {
+    private <T extends Enum<T>> boolean checkStringEnum(String value,
+                                                        Class<T> clazz,
+                                                        String name) {
         if (checkString(value, name)) {
             for (Enum<T> en : EnumSet.allOf(clazz)) {
                 if (value.equalsIgnoreCase(en.toString()) || value.equalsIgnoreCase(en.name())) {
@@ -4107,7 +4805,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private boolean checkNotNull(Object o, String name) {
+    private boolean checkNotNull(Object o,
+                                 String name) {
         if (o == null) {
             logger.error(name + " can't be null");
             return false;
@@ -4115,7 +4814,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkDistanceUnits(String units, String name) {
+    private boolean checkDistanceUnits(String units,
+                                       String name) {
         try {
             DistanceUnits.valueOf(units.toUpperCase());
             return true;
@@ -4146,7 +4846,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
          * @param seconds The number of seconds to complete the transition.
          * @param end     An optional runnable that is executed when the transition has completed.
          */
-        public CameraTransitionRunnable(NaturalCamera cam, double[] pos, double[] dir, double[] up, double seconds, Runnable end) {
+        public CameraTransitionRunnable(NaturalCamera cam,
+                                        double[] pos,
+                                        double[] dir,
+                                        double[] up,
+                                        double seconds,
+                                        Runnable end) {
             this.cam = cam;
             this.targetDir = new Vector3d(dir).nor();
             this.targetUp = new Vector3d(up).nor();
@@ -4172,8 +4877,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             qd = new QuaternionDouble();
         }
 
-        private PathDouble<Vector3d> getPath(Vector3d p0, double[] p1) {
-            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
+        private PathDouble<Vector3d> getPath(Vector3d p0,
+                                             double[] p1) {
+            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
             return new LinearDouble<>(points);
         }
 
