@@ -179,7 +179,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setLightGlowTexture(glow);
         lightGlow.setTextureScale(getGlowTextureScale(ss.brightness, ss.glowFactor, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), settings.program.modeCubemap.active));
         lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
-        lightGlow.setBackbufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
+        lightGlow.setBackBufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
         lightGlow.setEnabledOptions(false, true);
         ppb.set(lightGlow);
@@ -743,9 +743,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightglow != null) {
-                            lightglow.setEnabled(lightGlowActive);
+                        LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightGlow != null) {
+                            lightGlow.setEnabled(lightGlowActive);
                         }
                     }
                 }
@@ -762,7 +762,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                 lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
                                 lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
                             }
-                            // Reprojection.
+                            // Re-projection.
                             Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
                             if (reprojection != null)
                                 reprojection.setFov(newFov);

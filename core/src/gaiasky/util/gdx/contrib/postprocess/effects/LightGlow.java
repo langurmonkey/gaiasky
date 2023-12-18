@@ -24,12 +24,16 @@ public final class LightGlow extends PostProcessorEffect {
         disposables.add(glow);
     }
 
-    public void setBackbufferScale(float bbs) {
+    public void setBackBufferScale(float bbs) {
         glow.setBackbufferScale(bbs);
     }
 
     public void setLightPositions(int nLights, float[] vec) {
         glow.setLightPositions(nLights, vec);
+    }
+
+    public void setNLights(int nLights) {
+        glow.setNLights(nLights);
     }
 
     public void setLightSolidAngles(float[] vec) {
@@ -56,10 +60,10 @@ public final class LightGlow extends PostProcessorEffect {
         glow.setOrientation(o);
     }
 
-    public void enableBlending(int sfactor, int dfactor) {
+    public void enableBlending(int sFactor, int dFactor) {
         this.blending = true;
-        this.sFactor = sfactor;
-        this.dFactor = dfactor;
+        this.sFactor = sFactor;
+        this.dFactor = dFactor;
     }
 
     public void disableBlending() {

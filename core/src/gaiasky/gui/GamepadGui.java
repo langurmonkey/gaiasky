@@ -862,7 +862,6 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Magnitude multiplier
-        var nf = new DecimalFormat("####0.##");
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
         graphicsModel[0][1] = magnitudeMultiplier;
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));

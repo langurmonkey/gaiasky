@@ -47,7 +47,7 @@ vec4 starImage(vec2 tc) {
 
 void main() {
     float ar = u_viewport.x / u_viewport.y;
-    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    vec3 effectColor = vec3(0.0, 0.0, 0.0);
 
     for (int li = 0; li < u_nLights; li++){
         float lum = v_lums[li];
@@ -65,7 +65,8 @@ void main() {
 
         float color_glow = brightness(starImage(glow_tc));
         float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
-        fragColor.rgb += vec3(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc);
+        effectColor += vec3(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc);
     }
-    fragColor.rgb = saturate(fragColor.rgb + texture(u_texture0, v_texCoords).rgb);
+    fragColor.rgb = saturate(effectColor + texture(u_texture0, v_texCoords).rgb);
+    fragColor.a = 1.0;
 }
