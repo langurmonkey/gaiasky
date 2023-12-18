@@ -160,9 +160,9 @@ public class GaiaSkyContextMenu extends ContextMenu {
                         for (Entity entity : shapes) {
                             var shape = Mapper.shape.get(entity);
                             if (shape.track != null && shape.track.getEntity() == candidate.getEntity()) {
-                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesObj, entity, false);
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, removeShapesObj, entity, false);
                             } else if (shape.trackName != null && shape.trackName.equalsIgnoreCase(candidateName)) {
-                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesObj, entity, false);
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, removeShapesObj, entity, false);
                             }
                         }
                     });
@@ -179,7 +179,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                         for (Entity entity : shapes) {
                             var shape = Mapper.shape.get(entity);
                             if (shape.track != null || shape.trackName != null) {
-                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesAll, entity, false);
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, removeShapesAll, entity, false);
                             }
                         }
                     });
