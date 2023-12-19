@@ -21,7 +21,7 @@ public class BoundariesInitializer extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
         var line = Mapper.line.get(entity);
         // Lines.
-        line.lineWidth = 1;
+        line.lineWidth = 1.5f;
         line.renderConsumer = LineEntityRenderSystem::renderConstellationBoundaries;
     }
 
