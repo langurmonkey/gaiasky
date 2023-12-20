@@ -509,6 +509,10 @@ public enum Event {
      **/
     GRAPHICS_QUALITY_UPDATED,
     /**
+     * New command to update the graphics quality. Contains the new {@link GraphicsQuality} object.
+     */
+    GRAPHICS_QUALITY_UPDATE_CMD,
+    /**
      * Contains the x and the y in pixels of the position of the mass.
      **/
     GRAVITATIONAL_LENSING_PARAMS,

@@ -59,7 +59,8 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
         }
     }
 
-    public float[] initializeList(final float[] list, int size) {
+    public float[] initializeList(final float[] list,
+                                  int size) {
         if (list == null) {
             return new float[size];
         } else {
@@ -83,7 +84,9 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     }
 
     @Override
-    public void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera) {
+    public void run(AbstractRenderSystem renderSystem,
+                    List<IRenderable> renderables,
+                    ICamera camera) {
         synchronized (lock) {
             int size = renderables.size();
             Settings settings = Settings.settings;
@@ -129,12 +132,12 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                                 colors[lightIndex * 3 + 2] = body.color[2];
                                 lightIndex++;
                             }
-                        } else if(Mapper.starSet.has(entity)) {
+                        } else if (Mapper.starSet.has(entity)) {
                             // Star set.
                             var starSet = Mapper.starSet.get(entity);
                             var proximityArray = starSet.proximity.updating;
-                            for(var record : proximityArray) {
-                                if(record != null) {
+                            for (var record : proximityArray) {
+                                if (record != null) {
 
                                     Vector3d pos3d = auxD.set(record.absolutePos).sub(camera.getPos());
                                     double angle = GaiaSky.instance.cameraManager.getDirection().angle(pos3d);
@@ -177,10 +180,12 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (event == Event.GRAPHICS_QUALITY_UPDATED) {// Update graphics quality
             GraphicsQuality gq = (GraphicsQuality) data[0];
-            reinitialize(gq.getGlowNLights());
+            GaiaSky.postRunnable(() -> reinitialize(gq.getGlowNLights()));
         }
     }
 }

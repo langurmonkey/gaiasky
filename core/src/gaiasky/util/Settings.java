@@ -348,7 +348,10 @@ public class Settings {
         public final int texWidthTarget;
         public final int texHeightTarget;
 
-        GraphicsQuality(String key, String suffix, int texWidthTarget, int texHeightTarget) {
+        GraphicsQuality(String key,
+                        String suffix,
+                        int texWidthTarget,
+                        int texHeightTarget) {
             this.key = key;
             this.suffix = suffix;
             this.texWidthTarget = texWidthTarget;
@@ -400,7 +403,8 @@ public class Settings {
 
         public final TextureFilter minification, magnification;
 
-        UpscaleFilter(TextureFilter min, TextureFilter mag) {
+        UpscaleFilter(TextureFilter min,
+                      TextureFilter mag) {
             this.minification = min;
             this.magnification = mag;
         }
@@ -494,7 +498,9 @@ public class Settings {
         public final double fromKm;
         private final String unitString;
 
-        DistanceUnits(double toKm, double fromKm, String unitString) {
+        DistanceUnits(double toKm,
+                      double fromKm,
+                      String unitString) {
             this.toKm = toKm;
             this.fromKm = fromKm;
             this.unitString = unitString;
@@ -509,6 +515,7 @@ public class Settings {
          * internal units.
          *
          * @param value The value in the units represented by this object.
+         *
          * @return The value in internal units.
          */
         public double toInternalUnits(double value) {
@@ -519,6 +526,7 @@ public class Settings {
          * Returns the given value, given in internal units, in the units represented by this object.
          *
          * @param internal The value in internal units.
+         *
          * @return The value in the units represented by this object.
          */
         public double fromInternalUnits(double internal) {
@@ -537,7 +545,11 @@ public class Settings {
         public String build;
         private DateTimeFormatter dateFormatter;
 
-        public void initialize(String version, Instant buildTime, String builder, String system, String build) {
+        public void initialize(String version,
+                               Instant buildTime,
+                               String builder,
+                               String system,
+                               String build) {
             this.version = version;
             this.versionNumber = VersionChecker.stringToVersionNumber(version);
             this.buildTime = buildTime;
@@ -580,7 +592,8 @@ public class Settings {
             this.reflectionSkyboxLocation = location;
         }
 
-        public Path dataPath(String pathStr, String dsLocation) {
+        public Path dataPath(String pathStr,
+                             String dsLocation) {
             // Windows does not allow asterisks in paths
             String resolvedPathStr = pathStr.replaceAll("\\*", Constants.STAR_SUBSTITUTE);
 
@@ -616,7 +629,8 @@ public class Settings {
             return dataPath(path, Constants.DEFAULT_DATASET_KEY);
         }
 
-        public String dataFile(String path, String dsLocation) {
+        public String dataFile(String path,
+                               String dsLocation) {
             return dataPath(path, dsLocation).toString().replaceAll("\\\\", "/");
         }
 
@@ -624,7 +638,8 @@ public class Settings {
             return dataFile(path, Constants.DEFAULT_DATASET_KEY);
         }
 
-        public FileHandle dataFileHandle(String path, String dsLocation) {
+        public FileHandle dataFileHandle(String path,
+                                         String dsLocation) {
             return new FileHandle(dataFile(path, dsLocation));
         }
 
@@ -636,6 +651,7 @@ public class Settings {
          * Adds the given catalog descriptor file to the list of JSON selected files.
          *
          * @param catalog The catalog descriptor file pointer.
+         *
          * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not readable, or it is already in the list.
          */
         public boolean addSelectedCatalog(Path catalog) {
@@ -685,8 +701,7 @@ public class Settings {
          * This controls the dynamic resolution levels available as back buffer scales.
          * Add more items to add more levels.
          **/
-        @JsonIgnore
-        final public double[] dynamicResolutionScale = new double[]{1f, 0.85f, 0.75f};
+        @JsonIgnore final public double[] dynamicResolutionScale = new double[] { 1f, 0.85f, 0.75f };
         public GraphicsQuality quality;
         public int[] resolution;
         public boolean resizable;
@@ -710,7 +725,10 @@ public class Settings {
         public boolean useSRGB = false;
 
         public GraphicsSettings() {
-            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD, Event.BACKBUFFER_SCALE_CMD, Event.INDEXOFREFRACTION_CMD);
+            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD,
+                                            Event.BACKBUFFER_SCALE_CMD,
+                                            Event.INDEXOFREFRACTION_CMD,
+                                            Event.GRAPHICS_QUALITY_UPDATE_CMD);
         }
 
         public void setQuality(final String qualityString) {
@@ -727,7 +745,8 @@ public class Settings {
             return fullScreen.active ? fullScreen.resolution[1] : resolution[1];
         }
 
-        public void resize(int w, int h) {
+        public void resize(int w,
+                           int h) {
             if (fullScreen.active) {
                 fullScreen.resolution[0] = w;
                 fullScreen.resolution[1] = h;
@@ -738,7 +757,9 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Event event, Object source, final Object... data) {
+        public void notify(final Event event,
+                           Object source,
+                           final Object... data) {
             if (event == Event.LIMIT_FPS_CMD) {
                 fpsLimit = (Double) data[0];
                 if (fpsLimit > 0) {
@@ -749,6 +770,8 @@ public class Settings {
                 backBufferScale = (Float) data[0];
             } else if (event == Event.INDEXOFREFRACTION_CMD) {
                 celestialSphereIndexOfRefraction = (Float) data[0];
+            } else if (event == Event.GRAPHICS_QUALITY_UPDATE_CMD) {
+                quality = (GraphicsQuality) data[0];
             }
         }
 
@@ -799,23 +822,24 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Event event, Object source, final Object... data) {
+        public void notify(final Event event,
+                           Object source,
+                           final Object... data) {
             switch (event) {
-                case TOGGLE_VISIBILITY_CMD -> {
-                    String key = (String) data[0];
-                    Boolean state = null;
-                    if (data.length == 2) {
-                        state = (Boolean) data[1];
-                    }
-                    ComponentType ct = ComponentType.getFromKey(key);
-                    if (ct != null) {
-                        visibility.put(ct.name(), (state != null ? state : !visibility.get(ct.name())));
-                    }
+            case TOGGLE_VISIBILITY_CMD -> {
+                String key = (String) data[0];
+                Boolean state = null;
+                if (data.length == 2) {
+                    state = (Boolean) data[1];
                 }
-                case LINE_WIDTH_CMD ->
-                        lineWidth = MathUtilsDouble.clamp((float) data[0], Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH);
-                default -> {
+                ComponentType ct = ComponentType.getFromKey(key);
+                if (ct != null) {
+                    visibility.put(ct.name(), (state != null ? state : !visibility.get(ct.name())));
                 }
+            }
+            case LINE_WIDTH_CMD -> lineWidth = MathUtilsDouble.clamp((float) data[0], Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH);
+            default -> {
+            }
             }
         }
 
@@ -833,7 +857,8 @@ public class Settings {
             public FocusSettings focusLock;
 
             public CameraSettings() {
-                EventManager.instance.subscribe(this, Event.CAMERA_CINEMATIC_CMD, Event.FOCUS_LOCK_CMD, Event.ORIENTATION_LOCK_CMD, Event.FOV_CHANGED_CMD, Event.CAMERA_SPEED_CMD, Event.ROTATION_SPEED_CMD, Event.TURNING_SPEED_CMD, Event.SPEED_LIMIT_CMD);
+                EventManager.instance.subscribe(this, Event.CAMERA_CINEMATIC_CMD, Event.FOCUS_LOCK_CMD, Event.ORIENTATION_LOCK_CMD, Event.FOV_CHANGED_CMD,
+                                                Event.CAMERA_SPEED_CMD, Event.ROTATION_SPEED_CMD, Event.TURNING_SPEED_CMD, Event.SPEED_LIMIT_CMD);
             }
 
             @JsonProperty("speedLimitIndex")
@@ -843,83 +868,85 @@ public class Settings {
             }
 
             @Override
-            public void notify(final Event event, Object source, final Object... data) {
+            public void notify(final Event event,
+                               Object source,
+                               final Object... data) {
                 switch (event) {
-                    case FOCUS_LOCK_CMD -> focusLock.position = (boolean) data[1];
-                    case ORIENTATION_LOCK_CMD -> focusLock.orientation = (boolean) data[1];
-                    case FOV_CHANGED_CMD -> {
-                        if (!SlaveManager.projectionActive()) {
-                            boolean checkMax = source instanceof Actor;
-                            fov = MathUtilsDouble.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
-                        }
+                case FOCUS_LOCK_CMD -> focusLock.position = (boolean) data[1];
+                case ORIENTATION_LOCK_CMD -> focusLock.orientation = (boolean) data[1];
+                case FOV_CHANGED_CMD -> {
+                    if (!SlaveManager.projectionActive()) {
+                        boolean checkMax = source instanceof Actor;
+                        fov = MathUtilsDouble.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
                     }
-                    case CAMERA_SPEED_CMD -> speed = (float) data[0];
-                    case ROTATION_SPEED_CMD -> rotate = (float) data[0];
-                    case TURNING_SPEED_CMD -> turn = (float) data[0];
-                    case SPEED_LIMIT_CMD -> {
-                        speedLimitIndex = (Integer) data[0];
-                        updateSpeedLimit();
-                    }
-                    case CAMERA_CINEMATIC_CMD -> cinematic = (boolean) data[0];
+                }
+                case CAMERA_SPEED_CMD -> speed = (float) data[0];
+                case ROTATION_SPEED_CMD -> rotate = (float) data[0];
+                case TURNING_SPEED_CMD -> turn = (float) data[0];
+                case SPEED_LIMIT_CMD -> {
+                    speedLimitIndex = (Integer) data[0];
+                    updateSpeedLimit();
+                }
+                case CAMERA_CINEMATIC_CMD -> cinematic = (boolean) data[0];
                 }
             }
 
             public void updateSpeedLimit() {
                 switch (speedLimitIndex) {
-                    case 0 ->
-                        // 1 km/h is 0.00027 km/s
-                            speedLimit = 0.000277777778 * Constants.KM_TO_U;
-                    case 1 ->
-                        // 10 km/h is 0.0027 km/s
-                            speedLimit = 0.00277777778 * Constants.KM_TO_U;
-                    case 2 ->
-                        // 100 km/h is 0.027 km/s
-                            speedLimit = 0.0277777778 * Constants.KM_TO_U;
-                    case 3 ->
-                        // 1000 km/h is 0.27 km/s
-                            speedLimit = 0.277777778 * Constants.KM_TO_U;
-                    case 4 ->
-                        // 1 km/s
-                            speedLimit = Constants.KM_TO_U;
-                    case 5 ->
-                        // 10 km/s
-                            speedLimit = Constants.KM_TO_U;
-                    case 6 ->
-                        // 100 km/s
-                            speedLimit = Constants.KM_TO_U;
-                    case 7 ->
-                        // 1000 km/h
-                            speedLimit = 0.277777778 * Constants.KM_TO_U;
-                    case 8 -> speedLimit = 0.01 * Nature.C * Constants.M_TO_U;
-                    case 9 -> speedLimit = 0.1 * Nature.C * Constants.M_TO_U;
-                    case 10 -> speedLimit = 0.5 * Nature.C * Constants.M_TO_U;
-                    case 11 -> speedLimit = 0.8 * Nature.C * Constants.M_TO_U;
-                    case 12 -> speedLimit = 0.9 * Nature.C * Constants.M_TO_U;
-                    case 13 -> speedLimit = 0.99 * Nature.C * Constants.M_TO_U;
-                    case 14 -> speedLimit = 0.99999 * Nature.C * Constants.M_TO_U;
-                    case 15 -> speedLimit = Nature.C * Constants.M_TO_U;
-                    case 16 -> speedLimit = 2.0 * Nature.C * Constants.M_TO_U;
-                    case 17 ->
-                        // 10 c
-                            speedLimit = 10.0 * Nature.C * Constants.M_TO_U;
-                    case 18 ->
-                        // 1000 c
-                            speedLimit = 1000.0 * Nature.C * Constants.M_TO_U;
-                    case 19 -> speedLimit = Constants.AU_TO_U;
-                    case 20 -> speedLimit = 10.0 * Constants.AU_TO_U;
-                    case 21 -> speedLimit = 1000.0 * Constants.AU_TO_U;
-                    case 22 -> speedLimit = 10000.0 * Constants.AU_TO_U;
-                    case 23 -> speedLimit = Constants.PC_TO_U;
-                    case 24 -> speedLimit = 2.0 * Constants.PC_TO_U;
-                    case 25 ->
-                        // 10 pc/s
-                            speedLimit = 10.0 * Constants.PC_TO_U;
-                    case 26 ->
-                        // 1000 pc/s
-                            speedLimit = 1000.0 * Constants.PC_TO_U;
-                    case 27 ->
-                        // No limit
-                            speedLimit = -1;
+                case 0 ->
+                    // 1 km/h is 0.00027 km/s
+                        speedLimit = 0.000277777778 * Constants.KM_TO_U;
+                case 1 ->
+                    // 10 km/h is 0.0027 km/s
+                        speedLimit = 0.00277777778 * Constants.KM_TO_U;
+                case 2 ->
+                    // 100 km/h is 0.027 km/s
+                        speedLimit = 0.0277777778 * Constants.KM_TO_U;
+                case 3 ->
+                    // 1000 km/h is 0.27 km/s
+                        speedLimit = 0.277777778 * Constants.KM_TO_U;
+                case 4 ->
+                    // 1 km/s
+                        speedLimit = Constants.KM_TO_U;
+                case 5 ->
+                    // 10 km/s
+                        speedLimit = Constants.KM_TO_U;
+                case 6 ->
+                    // 100 km/s
+                        speedLimit = Constants.KM_TO_U;
+                case 7 ->
+                    // 1000 km/h
+                        speedLimit = 0.277777778 * Constants.KM_TO_U;
+                case 8 -> speedLimit = 0.01 * Nature.C * Constants.M_TO_U;
+                case 9 -> speedLimit = 0.1 * Nature.C * Constants.M_TO_U;
+                case 10 -> speedLimit = 0.5 * Nature.C * Constants.M_TO_U;
+                case 11 -> speedLimit = 0.8 * Nature.C * Constants.M_TO_U;
+                case 12 -> speedLimit = 0.9 * Nature.C * Constants.M_TO_U;
+                case 13 -> speedLimit = 0.99 * Nature.C * Constants.M_TO_U;
+                case 14 -> speedLimit = 0.99999 * Nature.C * Constants.M_TO_U;
+                case 15 -> speedLimit = Nature.C * Constants.M_TO_U;
+                case 16 -> speedLimit = 2.0 * Nature.C * Constants.M_TO_U;
+                case 17 ->
+                    // 10 c
+                        speedLimit = 10.0 * Nature.C * Constants.M_TO_U;
+                case 18 ->
+                    // 1000 c
+                        speedLimit = 1000.0 * Nature.C * Constants.M_TO_U;
+                case 19 -> speedLimit = Constants.AU_TO_U;
+                case 20 -> speedLimit = 10.0 * Constants.AU_TO_U;
+                case 21 -> speedLimit = 1000.0 * Constants.AU_TO_U;
+                case 22 -> speedLimit = 10000.0 * Constants.AU_TO_U;
+                case 23 -> speedLimit = Constants.PC_TO_U;
+                case 24 -> speedLimit = 2.0 * Constants.PC_TO_U;
+                case 25 ->
+                    // 10 pc/s
+                        speedLimit = 10.0 * Constants.PC_TO_U;
+                case 26 ->
+                    // 1000 pc/s
+                        speedLimit = 1000.0 * Constants.PC_TO_U;
+                case 27 ->
+                    // No limit
+                        speedLimit = -1;
                 }
             }
 
@@ -937,7 +964,6 @@ public class Settings {
              **/
             public int numLabels = 0;
         }
-
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class StarSettings implements IObserver {
@@ -965,7 +991,9 @@ public class Settings {
             private float pointSizeBak;
 
             public StarSettings() {
-                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD, Event.STAR_BASE_LEVEL_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
+                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD,
+                                                Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD,
+                                                Event.STAR_BASE_LEVEL_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
             }
 
             /**
@@ -983,7 +1011,8 @@ public class Settings {
                     } else {
                         pointSize = MathUtilsDouble.lint(cubemapRes, 2000f, 3000f, 8f, 4f);
                     }
-                    return MathUtils.clamp(pointSize, 0f, 50f) * (settings.scene.star.pointSize / 3.75f) * (MathUtilsDouble.lint(screenArea, 500000f, 8000000f, 1.8f, 4.8f) / 3.75f);
+                    return MathUtils.clamp(pointSize, 0f, 50f) * (settings.scene.star.pointSize / 3.75f) * (
+                            MathUtilsDouble.lint(screenArea, 500000f, 8000000f, 1.8f, 4.8f) / 3.75f);
                 } else {
                     return settings.scene.star.pointSize;
                 }
@@ -992,12 +1021,14 @@ public class Settings {
             @JsonIgnore
             public String getStarTexture(int textureIndex) {
                 String starTexIdx = String.format("%02d", textureIndex);
-                String texture = settings.data.dataFile(GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
+                String texture = settings.data.dataFile(
+                        GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                 if (!Files.exists(Path.of(texture))) {
                     // Fall back to whatever available
                     for (int i = 1; i < 9; i++) {
                         starTexIdx = String.format("%02d", i);
-                        texture = settings.data.dataFile(GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
+                        texture = settings.data.dataFile(
+                                GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                         if (Files.exists(Path.of(texture)))
                             return texture;
                     }
@@ -1022,30 +1053,31 @@ public class Settings {
                 this.pointSizeBak = pointSize;
             }
 
-            public void notify(final Event event, Object source, final Object... data) {
+            public void notify(final Event event,
+                               Object source,
+                               final Object... data) {
                 switch (event) {
-                    case STAR_POINT_SIZE_CMD -> pointSize = (float) data[0];
-                    case STAR_POINT_SIZE_INCREASE_CMD -> {
-                        float size = Math.min(this.pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
-                        EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
-                    }
-                    case STAR_POINT_SIZE_DECREASE_CMD -> {
-                        float size = Math.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
-                        EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
-                    }
-                    case STAR_POINT_SIZE_RESET_CMD -> this.pointSize = pointSizeBak;
-                    case STAR_BASE_LEVEL_CMD -> opacity[0] = (float) data[0];
-                    case STAR_GROUP_BILLBOARD_CMD -> group.billboard = (boolean) data[0];
-                    case STAR_GROUP_NEAREST_CMD -> {
-                        group.numBillboard = (int) data[0];
-                        group.numLabels = (int) data[0];
-                        group.numVelocityVector = (int) data[0];
-                    }
-                    case BILLBOARD_TEXTURE_IDX_CMD -> textureIndex = (int) data[0];
-                    case STAR_BRIGHTNESS_CMD ->
-                            brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS);
-                    case STAR_BRIGHTNESS_POW_CMD -> power = (float) data[0];
-                    case STAR_GLOW_FACTOR_CMD -> glowFactor = (float) data[0];
+                case STAR_POINT_SIZE_CMD -> pointSize = (float) data[0];
+                case STAR_POINT_SIZE_INCREASE_CMD -> {
+                    float size = Math.min(this.pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
+                    EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
+                }
+                case STAR_POINT_SIZE_DECREASE_CMD -> {
+                    float size = Math.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
+                    EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
+                }
+                case STAR_POINT_SIZE_RESET_CMD -> this.pointSize = pointSizeBak;
+                case STAR_BASE_LEVEL_CMD -> opacity[0] = (float) data[0];
+                case STAR_GROUP_BILLBOARD_CMD -> group.billboard = (boolean) data[0];
+                case STAR_GROUP_NEAREST_CMD -> {
+                    group.numBillboard = (int) data[0];
+                    group.numLabels = (int) data[0];
+                    group.numVelocityVector = (int) data[0];
+                }
+                case BILLBOARD_TEXTURE_IDX_CMD -> textureIndex = (int) data[0];
+                case STAR_BRIGHTNESS_CMD -> brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS);
+                case STAR_BRIGHTNESS_POW_CMD -> power = (float) data[0];
+                case STAR_GLOW_FACTOR_CMD -> glowFactor = (float) data[0];
                 }
             }
 
@@ -1058,6 +1090,7 @@ public class Settings {
 
                 /**
                  * Compatibility with old 'numLabel' property, renamed to 'numLabels'.
+                 *
                  * @param numLabels The number of labels to render for each star group.
                  */
                 public void setNumLabel(int numLabels) {
@@ -1083,7 +1116,9 @@ public class Settings {
             }
 
             @Override
-            public void notify(final Event event, Object source, final Object... data) {
+            public void notify(final Event event,
+                               Object source,
+                               final Object... data) {
                 if (event == Event.LABEL_SIZE_CMD) {
                     size = MathUtilsDouble.clamp((float) data[0], Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
                 }
@@ -1113,14 +1148,14 @@ public class Settings {
             }
 
             @Override
-            public void notify(final Event event, Object source, final Object... data) {
+            public void notify(final Event event,
+                               Object source,
+                               final Object... data) {
                 switch (event) {
-                    case PM_NUM_FACTOR_CMD ->
-                            number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
-                    case PM_LEN_FACTOR_CMD ->
-                            length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
-                    case PM_COLOR_MODE_CMD -> colorMode = MathUtilsDouble.clamp((int) data[0], 0, 5);
-                    case PM_ARROWHEADS_CMD -> arrowHeads = (boolean) data[0];
+                case PM_NUM_FACTOR_CMD -> number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
+                case PM_LEN_FACTOR_CMD -> length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
+                case PM_COLOR_MODE_CMD -> colorMode = MathUtilsDouble.clamp((int) data[0], 0, 5);
+                case PM_ARROWHEADS_CMD -> arrowHeads = (boolean) data[0];
                 }
             }
         }
@@ -1136,7 +1171,9 @@ public class Settings {
             }
 
             @Override
-            public void notify(Event event, Object source, Object... data) {
+            public void notify(Event event,
+                               Object source,
+                               Object... data) {
                 if (event == Event.OCTREE_PARTICLE_FADE_CMD) {
                     fade = (boolean) data[1];
                 }
@@ -1156,7 +1193,8 @@ public class Settings {
             public double orbitSolidAngleThreshold = Math.toRadians(1.5);
 
             public RendererSettings() {
-                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD, Event.SVT_CACHE_SIZE_CMD);
+                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD,
+                                                Event.ORBIT_SOLID_ANGLE_TH_CMD, Event.SVT_CACHE_SIZE_CMD);
             }
 
             @JsonProperty("pointCloud")
@@ -1185,15 +1223,17 @@ public class Settings {
             }
 
             @Override
-            public void notify(final Event event, Object source, final Object... data) {
+            public void notify(final Event event,
+                               Object source,
+                               final Object... data) {
                 switch (event) {
-                    case AMBIENT_LIGHT_CMD -> ambient = (float) data[0];
-                    case ELEVATION_MULTIPLIER_CMD ->
-                            elevation.multiplier = MathUtilsDouble.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
-                    case ELEVATION_TYPE_CMD -> elevation.type = (ElevationType) data[0];
-                    case TESSELLATION_QUALITY_CMD -> elevation.quality = (float) data[0];
-                    case ORBIT_SOLID_ANGLE_TH_CMD -> orbitSolidAngleThreshold = (double) data[0];
-                    case SVT_CACHE_SIZE_CMD -> virtualTextures.cacheSize = (int) data[0];
+                case AMBIENT_LIGHT_CMD -> ambient = (float) data[0];
+                case ELEVATION_MULTIPLIER_CMD ->
+                        elevation.multiplier = MathUtilsDouble.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
+                case ELEVATION_TYPE_CMD -> elevation.type = (ElevationType) data[0];
+                case TESSELLATION_QUALITY_CMD -> elevation.quality = (float) data[0];
+                case ORBIT_SOLID_ANGLE_TH_CMD -> orbitSolidAngleThreshold = (double) data[0];
+                case SVT_CACHE_SIZE_CMD -> virtualTextures.cacheSize = (int) data[0];
                 }
             }
 
@@ -1254,13 +1294,15 @@ public class Settings {
             }
 
             @Override
-            public void notify(final Event event, Object source, final Object... data) {
+            public void notify(final Event event,
+                               Object source,
+                               final Object... data) {
                 switch (event) {
-                    case CROSSHAIR_FOCUS_CMD -> focus = (boolean) data[0];
-                    case CROSSHAIR_CLOSEST_CMD -> closest = (boolean) data[0];
-                    case CROSSHAIR_HOME_CMD -> home = (boolean) data[0];
-                    default -> {
-                    }
+                case CROSSHAIR_FOCUS_CMD -> focus = (boolean) data[0];
+                case CROSSHAIR_CLOSEST_CMD -> closest = (boolean) data[0];
+                case CROSSHAIR_HOME_CMD -> home = (boolean) data[0];
+                default -> {
+                }
                 }
             }
         }
@@ -1299,11 +1341,11 @@ public class Settings {
 
         public ProgramSettings() {
             EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD,
-                    Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
-                    Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
-                    Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
-                    Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
-                    Event.UI_SCALE_CMD, Event.RECURSIVE_GRID_ANIMATE_CMD);
+                                            Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
+                                            Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
+                                            Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
+                                            Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
+                                            Event.UI_SCALE_CMD, Event.RECURSIVE_GRID_ANIMATE_CMD);
         }
 
         @JsonIgnore
@@ -1336,96 +1378,98 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Event event, Object source, final Object... data) {
+        public void notify(final Event event,
+                           Object source,
+                           final Object... data) {
             switch (event) {
-                case STEREOSCOPIC_CMD -> {
-                    modeStereo.active = (boolean) (Boolean) data[0];
-                    if (modeStereo.active && modeCubemap.active) {
-                        modeStereo.active = false;
-                        EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
-                    }
+            case STEREOSCOPIC_CMD -> {
+                modeStereo.active = (boolean) (Boolean) data[0];
+                if (modeStereo.active && modeCubemap.active) {
+                    modeStereo.active = false;
+                    EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                 }
-                case STEREO_PROFILE_CMD -> modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
-                case CUBEMAP_CMD -> {
-                    modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openXr;
-                    if (modeCubemap.active) {
-                        modeCubemap.projection = (CubemapProjection) data[1];
+            }
+            case STEREO_PROFILE_CMD -> modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
+            case CUBEMAP_CMD -> {
+                modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openXr;
+                if (modeCubemap.active) {
+                    modeCubemap.projection = (CubemapProjection) data[1];
 
-                        // Post a message to the screen
-                        ModePopupInfo mpi = new ModePopupInfo();
-                        if (modeCubemap.projection.isPanorama()) {
-                            String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.360");
-                            String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.projection");
-                            mpi.title = I18n.msg("gui.360.title");
-                            mpi.header = I18n.msg("gui.360.notice.header");
-                            mpi.addMapping(I18n.msg("gui.360.notice.back"), keysStrToggle);
-                            mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
-                            if (settings.scene.renderer.pointCloud.isPoints()) {
-                                mpi.warn = I18n.msg("gui.360.notice.renderer");
-                            }
-                        } else if (modeCubemap.projection.isPlanetarium()) {
-                            String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
-                            String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium.projection");
-                            mpi.title = I18n.msg("gui.planetarium.title");
-                            mpi.header = I18n.msg("gui.planetarium.notice.header");
-                            mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
-                            mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
-                            if (settings.scene.renderer.pointCloud.isPoints()) {
-                                mpi.warn = I18n.msg("gui.360.notice.renderer");
-                            }
-                        } else if (modeCubemap.projection.isOrthosphere()) {
-                            String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere");
-                            String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere.profile");
-                            mpi.title = I18n.msg("gui.orthosphere.title");
-                            mpi.header = I18n.msg("gui.orthosphere.notice.header");
-                            mpi.addMapping(I18n.msg("gui.orthosphere.notice.back"), keysStrToggle);
-                            mpi.addMapping(I18n.msg("gui.orthosphere.notice.profile"), keysStrProfile);
+                    // Post a message to the screen
+                    ModePopupInfo mpi = new ModePopupInfo();
+                    if (modeCubemap.projection.isPanorama()) {
+                        String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.360");
+                        String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.projection");
+                        mpi.title = I18n.msg("gui.360.title");
+                        mpi.header = I18n.msg("gui.360.notice.header");
+                        mpi.addMapping(I18n.msg("gui.360.notice.back"), keysStrToggle);
+                        mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
+                        if (settings.scene.renderer.pointCloud.isPoints()) {
+                            mpi.warn = I18n.msg("gui.360.notice.renderer");
                         }
-
-                        EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 10f);
-                    } else {
-                        EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
+                    } else if (modeCubemap.projection.isPlanetarium()) {
+                        String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
+                        String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium.projection");
+                        mpi.title = I18n.msg("gui.planetarium.title");
+                        mpi.header = I18n.msg("gui.planetarium.notice.header");
+                        mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
+                        mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
+                        if (settings.scene.renderer.pointCloud.isPoints()) {
+                            mpi.warn = I18n.msg("gui.360.notice.renderer");
+                        }
+                    } else if (modeCubemap.projection.isOrthosphere()) {
+                        String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere");
+                        String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere.profile");
+                        mpi.title = I18n.msg("gui.orthosphere.title");
+                        mpi.header = I18n.msg("gui.orthosphere.notice.header");
+                        mpi.addMapping(I18n.msg("gui.orthosphere.notice.back"), keysStrToggle);
+                        mpi.addMapping(I18n.msg("gui.orthosphere.notice.profile"), keysStrProfile);
                     }
+
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 10f);
+                } else {
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                 }
-                case CUBEMAP_PROJECTION_CMD -> {
-                    modeCubemap.projection = (CubemapProjection) data[0];
+            }
+            case CUBEMAP_PROJECTION_CMD -> {
+                modeCubemap.projection = (CubemapProjection) data[0];
+                logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
+            }
+            case PLANETARIUM_PROJECTION_CMD -> {
+                modeCubemap.projection = (CubemapProjection) data[0];
+                if (modeCubemap.projection.isSphericalMirror() && modeCubemap.planetarium.sphericalMirrorWarp == null) {
+                    modeCubemap.projection = CubemapProjection.AZIMUTHAL_EQUIDISTANT;
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.planetarium.sphericalmirror.nowarpfile"), 10f);
+                } else {
                     logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
                 }
-                case PLANETARIUM_PROJECTION_CMD -> {
-                    modeCubemap.projection = (CubemapProjection) data[0];
-                    if (modeCubemap.projection.isSphericalMirror() && modeCubemap.planetarium.sphericalMirrorWarp == null) {
-                        modeCubemap.projection = CubemapProjection.AZIMUTHAL_EQUIDISTANT;
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.planetarium.sphericalmirror.nowarpfile"), 10f);
-                    } else {
-                        logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
-                    }
-                }
-                case INDEXOFREFRACTION_CMD -> modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
-                case CUBEMAP_RESOLUTION_CMD -> modeCubemap.faceResolution = (int) data[0];
-                case SHOW_MINIMAP_ACTION -> minimap.active = (boolean) (Boolean) data[0];
-                case TOGGLE_MINIMAP -> minimap.active = !minimap.active;
-                case PLANETARIUM_APERTURE_CMD -> modeCubemap.planetarium.aperture = (float) data[0];
-                case PLANETARIUM_ANGLE_CMD -> modeCubemap.planetarium.angle = (float) data[0];
-                case PLANETARIUM_GEOMETRYWARP_FILE_CMD -> modeCubemap.planetarium.sphericalMirrorWarp = (Path) data[0];
-                case POINTER_GUIDES_CMD -> {
-                    if (data.length > 0 && data[0] != null) {
-                        pointer.guides.active = (boolean) data[0];
-                        if (data.length > 1 && data[1] != null) {
-                            pointer.guides.color = (float[]) data[1];
-                            if (data.length > 2 && data[2] != null) {
-                                pointer.guides.width = (float) data[2];
-                            }
+            }
+            case INDEXOFREFRACTION_CMD -> modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
+            case CUBEMAP_RESOLUTION_CMD -> modeCubemap.faceResolution = (int) data[0];
+            case SHOW_MINIMAP_ACTION -> minimap.active = (boolean) (Boolean) data[0];
+            case TOGGLE_MINIMAP -> minimap.active = !minimap.active;
+            case PLANETARIUM_APERTURE_CMD -> modeCubemap.planetarium.aperture = (float) data[0];
+            case PLANETARIUM_ANGLE_CMD -> modeCubemap.planetarium.angle = (float) data[0];
+            case PLANETARIUM_GEOMETRYWARP_FILE_CMD -> modeCubemap.planetarium.sphericalMirrorWarp = (Path) data[0];
+            case POINTER_GUIDES_CMD -> {
+                if (data.length > 0 && data[0] != null) {
+                    pointer.guides.active = (boolean) data[0];
+                    if (data.length > 1 && data[1] != null) {
+                        pointer.guides.color = (float[]) data[1];
+                        if (data.length > 2 && data[2] != null) {
+                            pointer.guides.width = (float) data[2];
                         }
                     }
                 }
-                case RECURSIVE_GRID_ANIMATE_CMD -> {
-                    if (data.length > 0 && data[0] != null) {
-                        recursiveGrid.animate = (boolean) data[0];
-                    }
+            }
+            case RECURSIVE_GRID_ANIMATE_CMD -> {
+                if (data.length > 0 && data[0] != null) {
+                    recursiveGrid.animate = (boolean) data[0];
                 }
-                case UI_SCALE_CMD -> ui.scale = (Float) data[0];
-                default -> {
-                }
+            }
+            case UI_SCALE_CMD -> ui.scale = (Float) data[0];
+            default -> {
+            }
             }
         }
 
@@ -1773,7 +1817,8 @@ public class Settings {
              * @param controller         The controller.
              * @param controllerListener The listener.
              */
-            private void addListener(Controller controller, ControllerListener controllerListener) {
+            private void addListener(Controller controller,
+                                     ControllerListener controllerListener) {
                 if (!controllerListenersMap.containsKey(controller)) {
                     Set<ControllerListener> cs = new HashSet<>();
                     cs.add(controllerListener);
@@ -1797,7 +1842,8 @@ public class Settings {
              * @param controller         The controller.
              * @param controllerListener The listener.
              */
-            private void removeListener(Controller controller, ControllerListener controllerListener) {
+            private void removeListener(Controller controller,
+                                        ControllerListener controllerListener) {
                 if (controllerListenersMap.containsKey(controller)) {
                     Set<ControllerListener> cs = controllerListenersMap.get(controller);
                     cs.remove(controllerListener);
@@ -1836,7 +1882,8 @@ public class Settings {
              * @param listener       The controller listener.
              * @param controllerName The controller name.
              */
-            public void addControllerListener(ControllerListener listener, String controllerName) {
+            public void addControllerListener(ControllerListener listener,
+                                              String controllerName) {
                 Array<Controller> controllers = Controllers.getControllers();
                 for (Controller controller : controllers) {
                     if (!isControllerBlacklisted(controller.getName()) && controllerName.equals(controller.getName())) {
@@ -1917,10 +1964,12 @@ public class Settings {
             }
 
             @Override
-            public void notify(Event event, Object source, Object... data) {
+            public void notify(Event event,
+                               Object source,
+                               Object... data) {
                 switch (event) {
-                    case INVERT_X_CMD -> this.invertX = (Boolean) data[0];
-                    case INVERT_Y_CMD -> this.invertY = (Boolean) data[0];
+                case INVERT_X_CMD -> this.invertX = (Boolean) data[0];
+                case INVERT_Y_CMD -> this.invertY = (Boolean) data[0];
                 }
             }
         }
@@ -1960,29 +2009,31 @@ public class Settings {
         }
 
         @Override
-        public void notify(Event event, Object source, Object... data) {
+        public void notify(Event event,
+                           Object source,
+                           Object... data) {
             switch (event) {
-                case CONFIG_SCREENSHOT_CMD -> {
-                    resolution[0] = (int) data[0];
-                    resolution[1] = (int) data[1];
-                    location = (String) data[3];
-                }
-                case SCREENSHOT_MODE_CMD -> {
-                    Object newMode = data[0];
-                    ScreenshotMode mode = null;
-                    if (newMode instanceof String) {
-                        try {
-                            mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
-                        } catch (IllegalArgumentException e) {
-                            logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
-                        }
-                    } else {
-                        mode = (ScreenshotMode) newMode;
+            case CONFIG_SCREENSHOT_CMD -> {
+                resolution[0] = (int) data[0];
+                resolution[1] = (int) data[1];
+                location = (String) data[3];
+            }
+            case SCREENSHOT_MODE_CMD -> {
+                Object newMode = data[0];
+                ScreenshotMode mode = null;
+                if (newMode instanceof String) {
+                    try {
+                        mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
                     }
-                    if (mode != null) {
-                        this.mode = mode;
-                    }
+                } else {
+                    mode = (ScreenshotMode) newMode;
                 }
+                if (mode != null) {
+                    this.mode = mode;
+                }
+            }
             }
 
         }
@@ -2001,44 +2052,46 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Event event, Object source, final Object... data) {
+        public void notify(final Event event,
+                           Object source,
+                           final Object... data) {
             switch (event) {
-                case CONFIG_FRAME_OUTPUT_CMD -> {
-                    boolean updateFrameSize = resolution[0] != (int) data[0] || resolution[1] != (int) data[1];
-                    resolution[0] = (int) data[0];
-                    resolution[1] = (int) data[1];
-                    targetFps = (double) data[2];
-                    location = (String) data[3];
-                    prefix = (String) data[4];
-                    if (updateFrameSize) {
-                        EventManager.publish(Event.FRAME_SIZE_UPDATE, this, resolution[0], resolution[1]);
-                    }
+            case CONFIG_FRAME_OUTPUT_CMD -> {
+                boolean updateFrameSize = resolution[0] != (int) data[0] || resolution[1] != (int) data[1];
+                resolution[0] = (int) data[0];
+                resolution[1] = (int) data[1];
+                targetFps = (double) data[2];
+                location = (String) data[3];
+                prefix = (String) data[4];
+                if (updateFrameSize) {
+                    EventManager.publish(Event.FRAME_SIZE_UPDATE, this, resolution[0], resolution[1]);
                 }
-                case FRAME_OUTPUT_MODE_CMD -> {
-                    Object newMode = data[0];
-                    ScreenshotMode mode = null;
-                    if (newMode instanceof String) {
-                        try {
-                            mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
-                        } catch (IllegalArgumentException e) {
-                            logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
-                        }
-                    } else {
-                        mode = (ScreenshotMode) newMode;
+            }
+            case FRAME_OUTPUT_MODE_CMD -> {
+                Object newMode = data[0];
+                ScreenshotMode mode = null;
+                if (newMode instanceof String) {
+                    try {
+                        mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
                     }
-                    if (mode != null) {
-                        this.mode = mode;
-                    }
+                } else {
+                    mode = (ScreenshotMode) newMode;
                 }
-                case FRAME_OUTPUT_CMD -> {
-                    active = (Boolean) data[0];
-                    // Flush buffer if needed
-                    if (!active && GaiaSky.instance != null) {
-                        EventManager.publish(Event.FLUSH_FRAMES, this);
-                    }
+                if (mode != null) {
+                    this.mode = mode;
                 }
-                default -> {
+            }
+            case FRAME_OUTPUT_CMD -> {
+                active = (Boolean) data[0];
+                // Flush buffer if needed
+                if (!active && GaiaSky.instance != null) {
+                    EventManager.publish(Event.FLUSH_FRAMES, this);
                 }
+            }
+            default -> {
+            }
             }
         }
     }
@@ -2054,7 +2107,9 @@ public class Settings {
         }
 
         @Override
-        public void notify(Event event, Object source, Object... data) {
+        public void notify(Event event,
+                           Object source,
+                           Object... data) {
             if (event == Event.CAMRECORDER_FPS_CMD) {
                 targetFps = (Double) data[0];
             }
@@ -2106,9 +2161,9 @@ public class Settings {
 
         public PostprocessSettings() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD,
-                    Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
-                    Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
-                    Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD);
+                                            Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
+                                            Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
+                                            Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
@@ -2129,47 +2184,44 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Event event, Object source, final Object... data) {
+        public void notify(final Event event,
+                           Object source,
+                           final Object... data) {
             switch (event) {
-                case BLOOM_CMD -> bloom.intensity = (float) data[0];
-                case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
-                case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
-                case FILM_GRAIN_CMD -> filmGrain.intensity = (float) data[0];
-                case LENS_FLARE_CMD -> {
-                    float strength = (Float) data[0];
-                    lensFlare.active = strength > 0;
-                    lensFlare.strength = strength;
+            case BLOOM_CMD -> bloom.intensity = (float) data[0];
+            case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
+            case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
+            case FILM_GRAIN_CMD -> filmGrain.intensity = (float) data[0];
+            case LENS_FLARE_CMD -> {
+                float strength = (Float) data[0];
+                lensFlare.active = strength > 0;
+                lensFlare.strength = strength;
+            }
+            case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
+            case SSR_CMD -> ssr.active = (Boolean) data[0];
+            case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
+            case REPROJECTION_CMD -> {
+                reprojection.active = (Boolean) data[0];
+                reprojection.mode = (ReprojectionMode) data[1];
+            }
+            case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
+            case CONTRAST_CMD -> levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
+            case HUE_CMD -> levels.hue = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
+            case SATURATION_CMD -> levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
+            case GAMMA_CMD -> levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
+            case TONEMAPPING_TYPE_CMD -> {
+                ToneMapping newTM;
+                if (data[0] instanceof String) {
+                    newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
+                } else {
+                    newTM = (ToneMapping) data[0];
                 }
-                case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
-                case SSR_CMD -> ssr.active = (Boolean) data[0];
-                case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
-                case REPROJECTION_CMD -> {
-                    reprojection.active = (Boolean) data[0];
-                    reprojection.mode = (ReprojectionMode) data[1];
-                }
-                case BRIGHTNESS_CMD ->
-                        levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
-                case CONTRAST_CMD ->
-                        levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
-                case HUE_CMD -> levels.hue = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
-                case SATURATION_CMD ->
-                        levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
-                case GAMMA_CMD ->
-                        levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
-                case TONEMAPPING_TYPE_CMD -> {
-                    ToneMapping newTM;
-                    if (data[0] instanceof String) {
-                        newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
-                    } else {
-                        newTM = (ToneMapping) data[0];
-                    }
-                    toneMapping.type = newTM;
-                }
-                case EXPOSURE_CMD ->
-                        toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
-                case UPSCALE_FILTER_CMD -> upscaleFilter = (UpscaleFilter) data[0];
-                default -> {
-                }
+                toneMapping.type = newTM;
+            }
+            case EXPOSURE_CMD -> toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+            case UPSCALE_FILTER_CMD -> upscaleFilter = (UpscaleFilter) data[0];
+            default -> {
+            }
             }
         }
 
@@ -2304,7 +2356,8 @@ public class Settings {
         private double backupLimitFps = 0;
 
         public RuntimeSettings() {
-            EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD, Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD, Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP, Event.DISPLAY_VR_GUI_CMD);
+            EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD, Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD,
+                                            Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP, Event.DISPLAY_VR_GUI_CMD);
         }
 
         public void setMaxTime(long years) {
@@ -2319,7 +2372,8 @@ public class Settings {
             this.timeOn = Objects.requireNonNullElseGet(timeOn, () -> !this.timeOn);
         }
 
-        public void toggleRecord(Boolean rec, Settings settings) {
+        public void toggleRecord(Boolean rec,
+                                 Settings settings) {
             recordCamera = Objects.requireNonNullElseGet(rec, () -> !recordCamera);
 
             if (recordCamera) {
@@ -2333,28 +2387,30 @@ public class Settings {
         }
 
         @Override
-        public void notify(Event event, Object source, Object... data) {
+        public void notify(Event event,
+                           Object source,
+                           Object... data) {
 
             switch (event) {
-                case INPUT_ENABLED_CMD -> inputEnabled = (boolean) data[0];
-                case DISPLAY_GUI_CMD -> displayGui = (boolean) data[0];
-                case DISPLAY_VR_GUI_CMD -> {
-                    if (data.length > 1) {
-                        displayVrGui = (Boolean) data[1];
-                    } else {
-                        displayVrGui = !displayVrGui;
-                    }
+            case INPUT_ENABLED_CMD -> inputEnabled = (boolean) data[0];
+            case DISPLAY_GUI_CMD -> displayGui = (boolean) data[0];
+            case DISPLAY_VR_GUI_CMD -> {
+                if (data.length > 1) {
+                    displayVrGui = (Boolean) data[1];
+                } else {
+                    displayVrGui = !displayVrGui;
                 }
-                case TOGGLE_UPDATEPAUSE -> {
-                    updatePause = !updatePause;
-                    EventManager.publish(Event.UPDATEPAUSE_CHANGED, this, updatePause);
-                }
-                case TIME_STATE_CMD -> toggleTimeOn((Boolean) data[0]);
-                case RECORD_CAMERA_CMD -> toggleRecord((Boolean) data[0], settings);
-                case GRAV_WAVE_START -> gravitationalWaves = true;
-                case GRAV_WAVE_STOP -> gravitationalWaves = false;
-                default -> {
-                }
+            }
+            case TOGGLE_UPDATEPAUSE -> {
+                updatePause = !updatePause;
+                EventManager.publish(Event.UPDATEPAUSE_CHANGED, this, updatePause);
+            }
+            case TIME_STATE_CMD -> toggleTimeOn((Boolean) data[0]);
+            case RECORD_CAMERA_CMD -> toggleRecord((Boolean) data[0], settings);
+            case GRAV_WAVE_START -> gravitationalWaves = true;
+            case GRAV_WAVE_STOP -> gravitationalWaves = false;
+            default -> {
+            }
             }
         }
     }

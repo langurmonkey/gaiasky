@@ -29,17 +29,19 @@ public class BillboardSetRadio extends EntityRadio {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         if (event == Event.GRAPHICS_QUALITY_UPDATED) {
             // Reload data files with new graphics setting
-            boolean reloaded = initializer.reloadData(billboardSet);
-            if (reloaded) {
-                GaiaSky.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
+                boolean reloaded = initializer.reloadData(billboardSet);
+                if (reloaded) {
                     initializer.transformData(entity);
                     EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, entity);
                     billboardSet.status.set(LoadStatus.NOT_LOADED);
-                });
-            }
+                }
+            });
         }
     }
 }
