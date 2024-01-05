@@ -38,13 +38,13 @@ public class DataDescriptor {
     /**
      * Finds the dataset with the given name in the dataset descriptor list.
      *
-     * @param name The name of the dataset
+     * @param name The name of the dataset.
      *
-     * @return The dataset descriptor or null if it was not found
+     * @return The dataset descriptor or null if it was not found.
      */
-    public DatasetDesc findDataset(String name) {
+    public DatasetDesc findDatasetByName(String name) {
         for (DatasetDesc dd : datasets) {
-            if (dd.name.equals(name))
+            if (dd.name.equalsIgnoreCase(name))
                 return dd;
         }
         return null;
@@ -53,13 +53,13 @@ public class DataDescriptor {
     /**
      * Finds the dataset with the given key in the dataset descriptor list.
      *
-     * @param key The key of the dataset
+     * @param key The key of the dataset.
      *
-     * @return The dataset descriptor or null if it was not found
+     * @return The dataset descriptor or null if it was not found.
      */
     public DatasetDesc findDatasetByKey(String key) {
         for (DatasetDesc dd : datasets) {
-            if (dd.key.equals(key))
+            if (dd.key.equalsIgnoreCase(key))
                 return dd;
         }
         return null;
@@ -69,12 +69,12 @@ public class DataDescriptor {
      * Checks whether the dataset with the given name is present in the
      * data folder.
      *
-     * @param name The dataset name.
+     * @param key The dataset key.
      *
      * @return True if the dataset is present, false otherwise.
      */
-    public boolean datasetPresent(String name) {
-        DatasetDesc dd = findDataset(name);
+    public boolean datasetPresent(String key) {
+        DatasetDesc dd = findDatasetByKey(key);
         if (dd != null) {
             return dd.exists;
         }

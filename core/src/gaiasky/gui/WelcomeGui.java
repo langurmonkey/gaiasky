@@ -507,7 +507,7 @@ public class WelcomeGui extends AbstractGui {
         if (baseDataPresent) {
             // Check if there is an update for the base data, and show a notice if so
             if (serverDatasets != null && serverDatasets.updatesAvailable) {
-                DatasetDesc baseData = serverDatasets.findDataset(Constants.DEFAULT_DATASET_KEY);
+                DatasetDesc baseData = serverDatasets.findDatasetByKey(Constants.DEFAULT_DATASET_KEY);
                 if (baseData != null && baseData.myVersion < baseData.serverVersion) {
                     // We have a base data update, show notice
                     GenericDialog baseDataNotice = new GenericDialog(I18n.msg("gui.basedata.title"), skin, stage) {

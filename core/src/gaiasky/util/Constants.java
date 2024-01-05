@@ -205,6 +205,7 @@ public class Constants {
     public static final String STAR_SUBSTITUTE = "%#QUAL#%";
     public static final String DATA_LOCATION_TOKEN = "$data/";
     public static final String DEFAULT_DATASET_KEY = "default-data";
+    public static final String HI_RES_TEXTURES_DATASET_KEY = "hi-res-textures";
     /** Generated height keyword. **/
     public static final String GEN_KEYWORD = "generate";
     // URLS for external queries

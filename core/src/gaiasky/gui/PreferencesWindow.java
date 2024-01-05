@@ -368,7 +368,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 ComboBoxBean s = graphicsQuality.getSelected();
                 GraphicsQuality gq = GraphicsQuality.values()[s.value];
-                if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent("hi-res-textures")) && (gq.isHigh()
+                if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent(Constants.HI_RES_TEXTURES_DATASET_KEY)) && (gq.isHigh()
                         || gq.isUltra())) {
                     // Show notice
                     // Hi resolution textures notice
