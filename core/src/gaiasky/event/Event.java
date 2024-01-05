@@ -463,17 +463,17 @@ public enum Event {
     FOCUS_LOCK_CMD,
 
     /**
-     * Informs that the given focus is not available any more (not visible or unloaded).
+     * Informs that the given focus is not available anymore (not visible or unloaded).
      */
     FOCUS_NOT_AVAILABLE,
 
     /**
-     * Contains the a float with the new fov value and an optional boolean to indicate whether to cap the value to 95 degrees or not.
+     * Contains the float with the new FOV value and an optional boolean to indicate whether to cap the value to 95 degrees or not.
      **/
     FOV_CHANGED_CMD,
 
     /**
-     * Notifies a fov update in the camera. Contains the new fov value (float)
+     * Notifies a FOV update in the camera. Contains the new fov value (float)
      * and the new fovFactor (float).
      **/
     FOV_CHANGE_NOTIFICATION,

@@ -57,7 +57,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         aux1 = new Vector3();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD,
+        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD,
+                Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CHANGE_NOTIFICATION,
                 Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
@@ -259,6 +260,10 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 triComponent.updateStarPointSize((float) data[0]);
                 triComponent.touchStarParameters(getShaderProgram());
             }
+            case BACKBUFFER_SCALE_CMD, FOV_CHANGE_NOTIFICATION -> {
+                triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
+                triComponent.touchStarParameters(getShaderProgram());
+            }
             case GPU_DISPOSE_VARIABLE_GROUP -> {
                 IRenderable renderable = (IRenderable) source;
                 int offset = getOffset(renderable);
@@ -273,6 +278,12 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
             default -> {
             }
         }
+    }
+
+    @Override
+    public void resize(int w, int h) {
+        triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
+        triComponent.touchStarParameters(getShaderProgram());
     }
 
 }

@@ -102,9 +102,9 @@ public class Constants {
     public static final float MIN_UNSHARP_MASK_FACTOR = 0f;
     public static final float MAX_UNSHARP_MASK_FACTOR = 3f;
     /** Minimum star brightness power. **/
-    public static final float MIN_STAR_BRIGHTNESS_POW = 0.1f;
+    public static final float MIN_STAR_BRIGHTNESS_POW = 0.9f;
     /** Maximum star brightness power. **/
-    public static final float MAX_STAR_BRIGHTNESS_POW = 1.2f;
+    public static final float MAX_STAR_BRIGHTNESS_POW = 1.1f;
     /** Minimum star glow factor. **/
     public static final float MIN_STAR_GLOW_FACTOR = 0.01f;
     /** Maximum star glow factor. **/

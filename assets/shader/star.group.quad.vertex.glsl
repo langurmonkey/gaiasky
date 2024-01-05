@@ -3,6 +3,7 @@
 #include <shader/lib/math.glsl>
 #include <shader/lib/geometry.glsl>
 #include <shader/lib/doublefloat.glsl>
+#include <shader/lib/angles.glsl>
 
 // UNIFORMS
 // time in julian days since epoch, as a 64-bit double encoded with two floats
@@ -19,6 +20,8 @@ uniform float u_vrScale;
 uniform vec3 u_alphaSizeBr;
 // Brightness power
 uniform float u_brightnessPower;
+// Minimum quad solid angle
+uniform float u_minQuadSolidAngle;
 uniform vec2 u_opacityLimits;
 // Fixed angular size
 uniform float u_fixedAngularSize;
@@ -85,14 +88,18 @@ void main() {
     float opacity;
     float quadSize;
     if (u_fixedAngularSize <= 0.0) {
-        solidAngle = atan(a_size / dist);
+        // We omit the arctangent and tangent, as per the small-angle approximation.
+        solidAngle = a_size / dist;
         opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
-        quadSize = clamp(a_size * pow(solidAngle * 5.0e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.003 * dist, 0.5 * dist);
+        // Clamp solid angle, and back to physical quad size.
+        solidAngle = clamp(radians12(pow(degrees12(solidAngle), u_brightnessPower)), u_minQuadSolidAngle, 3.0e-8);
+        quadSize = solidAngle * dist * u_alphaSizeBr.y;
     } else {
         solidAngle = u_fixedAngularSize;
         opacity = 1.0;
         quadSize = 0.25e-5 * (tan(solidAngle) * dist) * u_alphaSizeBr.y;
     }
+
     float boundaryFade = smoothstep(l0, l1, dist);
     v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
 
@@ -105,6 +112,7 @@ void main() {
     #include <shader/snippet/billboard.glsl>
 
     gl_Position = gpos;
+
     v_uv = a_texCoord0;
 
     #ifdef velocityBufferFlag

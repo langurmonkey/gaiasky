@@ -36,6 +36,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.entity.LightingUtils;
 import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -48,6 +49,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
@@ -865,9 +867,9 @@ public class GamepadGui extends AbstractGui {
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
-        magnitudeMultiplier.setMappedValue(Settings.settings.scene.star.power);
+        magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
         magnitudeMultiplier.addListener(event -> {
-            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+            if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, magnitudeMultiplier.getValue());
                 return true;
             }

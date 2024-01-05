@@ -1766,4 +1766,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
         return vr;
     }
 
+    public float getEffectiveFovFactor() {
+        if (sceneRenderer.isCubemapRenderMode()) {
+            return 90f / 40f;
+        } else {
+            return cameraManager.getFovFactor();
+        }
+    }
+
 }

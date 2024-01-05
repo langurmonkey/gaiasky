@@ -26,10 +26,8 @@ import java.util.function.Function;
 public class OwnSliderPlus extends Slider {
 
     private final Skin skin;
-    private final float padX = 4.8f;
-    private final float padY = 3.2f;
     private OwnSliderPlus me;
-    private float ownwidth = 0f, ownheight = 0f;
+    private float ownWidth = 0f, ownHeight = 0f;
     private float mapMin, mapMax;
     private boolean map = false;
     private OwnLabel titleLabel, valueLabel;
@@ -178,27 +176,27 @@ public class OwnSliderPlus extends Slider {
 
     @Override
     public void setWidth(float width) {
-        ownwidth = width;
+        ownWidth = width;
         super.setWidth(width);
     }
 
     @Override
     public void setHeight(float height) {
-        ownheight = height;
+        ownHeight = height;
         super.setHeight(height);
     }
 
     @Override
     public void setSize(float width, float height) {
-        ownwidth = width;
-        ownheight = height;
+        ownWidth = width;
+        ownHeight = height;
         super.setSize(width, height);
     }
 
     @Override
     public float getPrefWidth() {
-        if (ownwidth != 0) {
-            return ownwidth;
+        if (ownWidth != 0) {
+            return ownWidth;
         } else {
             return super.getPrefWidth();
         }
@@ -206,8 +204,8 @@ public class OwnSliderPlus extends Slider {
 
     @Override
     public float getPrefHeight() {
-        if (ownheight != 0) {
-            return ownheight;
+        if (ownHeight != 0) {
+            return ownHeight;
         } else {
             return super.getPrefHeight();
         }
@@ -216,6 +214,8 @@ public class OwnSliderPlus extends Slider {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
+        float padX = 4.8f;
+        float padY = 3.2f;
         if (titleLabel != null) {
             titleLabel.setPosition(getX() + padX, getY() + getHeight() - titleLabel.getHeight() - padY);
             titleLabel.draw(batch, parentAlpha);

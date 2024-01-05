@@ -54,7 +54,7 @@ public class ConstellationInitializer extends AbstractInitSystem {
         label.labelPosition = new Vector3b();
 
         // Lines.
-        line.lineWidth = 1;
+        line.lineWidth = 1.5f;
         line.renderConsumer = LineEntityRenderSystem::renderConstellation;
 
         EventManager.instance.subscribe(new ConstellationRadio(entity), Event.CONSTELLATION_UPDATE_CMD);

@@ -45,10 +45,14 @@ public final class GlowFilter extends Filter<GlowFilter> {
     }
 
     public void setLightPositions(int nLights, float[] vec) {
-        this.nLights = nLights;
+        setNLights(nLights);
         this.lightPositions = vec;
-        setParam(Param.NLights, this.nLights);
         setParamv(Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
+    }
+
+    public void setNLights(int nLights) {
+        this.nLights = nLights;
+        setParam(Param.NLights, this.nLights);
     }
 
     public void setLightViewAngles(float[] ang) {
