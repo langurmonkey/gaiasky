@@ -72,9 +72,9 @@ public class GamepadGui extends AbstractGui {
     private final FocusView view;
     private final FilterView filterView;
     boolean hackProgrammaticChangeEvents = true;
-    private Table infoT, searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
+    private Table infoT, searchT, bookmarksT, camT, timeT, graphicsT, typesT, controlsT, sysT;
     private Cell<?> contentCell, infoCell;
-    private OwnTextButton vrInfoButton, searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
+    private OwnTextButton vrInfoButton, searchButton, bookmarksButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonGoHome;
 
     private TopInfoInterface topLine;
@@ -328,6 +328,19 @@ public class GamepadGui extends AbstractGui {
 
         tabContents.add(container(searchT, w, h));
         updatePads(searchT);
+
+        // BOOKMARKS
+        Actor[][] bookmarksModel = new Actor[1][1];
+        model.add(bookmarksModel);
+
+        bookmarksT = new Table(skin);
+        bookmarksT.setSize(w, h);
+
+        // TODO fill up with bookmarks list
+        bookmarksT.add(new OwnLabel("Bookmarks here", skin, "default-blue"));
+
+        tabContents.add(container(bookmarksT, w, h));
+        updatePads(bookmarksT);
 
         // CAMERA
         var camera = GaiaSky.instance.getICamera();
@@ -1112,6 +1125,16 @@ public class GamepadGui extends AbstractGui {
             return false;
         });
 
+        bookmarksButton = new OwnTextButton(I18n.msg("gui.bookmarks"), skin, "toggle-big");
+        tabButtons.add(bookmarksButton);
+        bookmarksButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(bookmarksButton);
+                updateTabs();
+            }
+            return false;
+        });
+
         cameraButton = new OwnTextButton(I18n.msg("gui.camera"), skin, "toggle-big");
         tabButtons.add(cameraButton);
         cameraButton.addListener((event) -> {
@@ -1201,6 +1224,7 @@ public class GamepadGui extends AbstractGui {
             menu.add(vrInfoButton).left().row();
         }
         menu.add(searchButton).left().row();
+        menu.add(bookmarksButton).left().row();
         menu.add(cameraButton).left().row();
         menu.add(timeButton).left().row();
         menu.add(typesButton).left().row();
