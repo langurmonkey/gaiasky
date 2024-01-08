@@ -120,7 +120,7 @@ public class GamepadGui extends AbstractGui {
         pad40 = 98;
 
         // Bookmarks size.
-        bw = 310;
+        bw = 300;
         bh = 60;
 
         view = new FocusView();
@@ -1306,6 +1306,19 @@ public class GamepadGui extends AbstractGui {
         for (var node : bookmarks) {
             var button = new BookmarkButton(node, skin);
             button.setSize(w, h);
+
+            // Add listener to folders.
+            if (node.folder) {
+                final int rowIndex = row;
+                button.addListener((event) -> {
+                    if (event instanceof ChangeEvent ce) {
+                        selectInRow(columnIndex, rowIndex, true);
+                        updateFocused();
+                    }
+                    return false;
+                });
+            }
+
             group.add(button).left().row();
 
             model[columnIndex][row++] = button;
@@ -1517,7 +1530,7 @@ public class GamepadGui extends AbstractGui {
                 }
             }
             return true;
-        } else if(currentModel[fi] == null) {
+        } else if (currentModel[fi] == null) {
             // Go back.
             fi = bi;
         }
