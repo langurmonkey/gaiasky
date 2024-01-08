@@ -16,6 +16,7 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -28,6 +29,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.BookmarksManager.BookmarkNode;
 import gaiasky.gui.beans.CameraComboBoxBean;
 import gaiasky.gui.vr.MainVRGui;
 import gaiasky.input.GuiGamepadListener;
@@ -36,7 +38,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
-import gaiasky.scene.entity.LightingUtils;
 import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -49,7 +50,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
@@ -69,6 +69,9 @@ public class GamepadGui extends AbstractGui {
     private final float pad20;
     private final float pad30;
     private final float pad40;
+    private float tw, th;
+    private final float bw;
+    private final float bh;
     private final FocusView view;
     private final FilterView filterView;
     boolean hackProgrammaticChangeEvents = true;
@@ -92,6 +95,8 @@ public class GamepadGui extends AbstractGui {
     private Set<ControllerListener> backupGamepadListeners;
     private String currentInputText = "";
     private final Map<String, Button> visibilityButtonMap;
+    private Cell<Container>[] bookmarkColumns;
+    private final int maxBookmarkDepth = 4;
 
     private static int selectedTab = 0;
     private int fi = 0, fj = 0;
@@ -113,6 +118,11 @@ public class GamepadGui extends AbstractGui {
         pad20 = 32f;
         pad30 = 48;
         pad40 = 98;
+
+        // Bookmarks size.
+        bw = 310;
+        bh = 60;
+
         view = new FocusView();
         filterView = new FilterView();
     }
@@ -163,8 +173,8 @@ public class GamepadGui extends AbstractGui {
         tabContents.clear();
         model.clear();
 
-        float w = vr ? MainVRGui.WIDTH : Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
-        float h = vr ? MainVRGui.HEIGHT : Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
+        tw = vr ? MainVRGui.WIDTH : Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
+        th = vr ? MainVRGui.HEIGHT : Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
         // Widget width
         float ww = 400f;
         float wh = 64f;
@@ -194,10 +204,10 @@ public class GamepadGui extends AbstractGui {
             model.add(null);
 
             infoT = new Table(skin);
-            infoT.setSize(w, h);
+            infoT.setSize(this.tw, th);
 
             var vrInfoT = new Table(skin);
-            vrInfoT.setSize(w, h);
+            vrInfoT.setSize(this.tw, th);
 
             // Title
             OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "header-large");
@@ -224,7 +234,7 @@ public class GamepadGui extends AbstractGui {
             focusInterface = new FocusInfoInterface(skin, vr);
             infoT.add(focusInterface).left().center();
 
-            tabContents.add(container(infoT, w, h));
+            tabContents.add(container(infoT, this.tw, th));
             updatePads(infoT);
         }
 
@@ -233,7 +243,7 @@ public class GamepadGui extends AbstractGui {
         model.add(searchModel);
 
         searchT = new Table(skin);
-        searchT.setSize(w, h);
+        searchT.setSize(this.tw, th);
 
         searchField = new OwnTextField("", skin, "big");
         searchField.setProgrammaticChangeEvents(true);
@@ -326,20 +336,28 @@ public class GamepadGui extends AbstractGui {
             return false;
         }, searchModel, 5, 3, false, tfw * 2f, 6);
 
-        tabContents.add(container(searchT, w, h));
+        tabContents.add(container(searchT, this.tw, th));
         updatePads(searchT);
 
         // BOOKMARKS
-        Actor[][] bookmarksModel = new Actor[1][1];
+        BookmarksManager bm = GaiaSky.instance.getBookmarksManager();
+        var bookmarks = bm.getBookmarks();
+
+        Actor[][] bookmarksModel = new Actor[maxBookmarkDepth][bookmarks.size()];
         model.add(bookmarksModel);
 
         bookmarksT = new Table(skin);
-        bookmarksT.setSize(w, h);
+        bookmarksT.setSize(this.tw, th);
+        bookmarksT.align(Align.topLeft);
+        bookmarksT.pad(pad10);
+        bookmarksT.top().left();
 
-        // TODO fill up with bookmarks list
-        bookmarksT.add(new OwnLabel("Bookmarks here", skin, "default-blue"));
+        bookmarkColumns = new Cell[maxBookmarkDepth];
+        for (int l = 0; l < maxBookmarkDepth; l++) bookmarkColumns[l] = bookmarksT.add().left().width(bw);
 
-        tabContents.add(container(bookmarksT, w, h));
+        fillBookmarksColumn(bookmarkColumns, 0, bookmarks, bookmarksModel, bw, bh);
+
+        tabContents.add(container(bookmarksT, this.tw, th));
         updatePads(bookmarksT);
 
         // CAMERA
@@ -348,7 +366,7 @@ public class GamepadGui extends AbstractGui {
         model.add(cameraModel);
 
         camT = new Table(skin);
-        camT.setSize(w, h);
+        camT.setSize(this.tw, th);
         CameraManager cm = GaiaSky.instance.getCameraManager();
 
         final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
@@ -633,7 +651,7 @@ public class GamepadGui extends AbstractGui {
             camT.add(modeButtons).colspan(2).center().padTop(pad40);
         }
 
-        tabContents.add(container(camT, w, h));
+        tabContents.add(container(camT, this.tw, th));
         updatePads(camT);
 
         // TIME
@@ -690,7 +708,7 @@ public class GamepadGui extends AbstractGui {
         timeT.add(timeStartStop).padBottom(pad30).padRight(pad10);
         timeT.add(timeUp).padBottom(pad30).row();
         timeT.add(timeReset).padRight(pad10).padLeft(pad10).colspan(3).padBottom(pad10).row();
-        tabContents.add(container(timeT, w, h));
+        tabContents.add(container(timeT, this.tw, th));
         updatePads(timeT);
 
         // TYPE VISIBILITY
@@ -751,8 +769,8 @@ public class GamepadGui extends AbstractGui {
             }
         }
 
-        typesT.setSize(w, h);
-        tabContents.add(container(typesT, w, h));
+        typesT.setSize(this.tw, th);
+        tabContents.add(container(typesT, this.tw, th));
         updatePads(typesT);
 
         // CONTROLS
@@ -850,8 +868,8 @@ public class GamepadGui extends AbstractGui {
             controlsT.add(invertYButton);
         }
 
-        controlsT.setSize(w, h);
-        tabContents.add(container(controlsT, w, h));
+        controlsT.setSize(this.tw, th);
+        tabContents.add(container(controlsT, this.tw, th));
         updatePads(controlsT);
 
         // GRAPHICS
@@ -1078,7 +1096,7 @@ public class GamepadGui extends AbstractGui {
             graphicsT.add(resetDefaults).padBottom(pad10).row();
         }
 
-        tabContents.add(container(graphicsT, w, h));
+        tabContents.add(container(graphicsT, this.tw, th));
         updatePads(graphicsT);
 
         // SYSTEM
@@ -1099,7 +1117,7 @@ public class GamepadGui extends AbstractGui {
         });
         sysT.add(quit);
 
-        tabContents.add(container(sysT, w, h));
+        tabContents.add(container(sysT, this.tw, th));
         updatePads(sysT);
 
         // Create tab buttons
@@ -1264,6 +1282,76 @@ public class GamepadGui extends AbstractGui {
         initialized = true;
     }
 
+    private void fillBookmarksColumn(Cell<Container>[] columns, int columnIndex, List<BookmarkNode> bookmarks, Actor[][] model, float w, float h) {
+        fillBookmarksColumn(columns, columnIndex, bookmarks, model, w, h, true);
+    }
+
+    private void fillBookmarksColumn(Cell<Container>[] columns, int columnIndex, List<BookmarkNode> bookmarks, Actor[][] model, float w, float h, boolean select) {
+        assert columns != null : "Column list can't be null";
+        assert columnIndex < columns.length && columnIndex >= 0 : "Column index out of bounds";
+
+        Cell<Container> column = columns[columnIndex];
+        column.clearActor();
+        column.left().top().padRight(pad5);
+        column.width(w + 20f);
+
+        Table group = new Table(skin);
+        group.top();
+
+        var folder = skin.getDrawable("iconic-folder");
+        OwnTextIconButton firstButton = null;
+        BookmarkNode firstBookmark = null;
+        int row = 0;
+        model[columnIndex] = new Actor[bookmarks.size()];
+        for (var node : bookmarks) {
+            var button = new BookmarkButton(node, skin);
+            button.setSize(w, h);
+            group.add(button).left().row();
+
+            model[columnIndex][row++] = button;
+        }
+        OwnScrollPane scroll = new OwnScrollPane(group, skin, "minimalist-nobg");
+        scroll.setFadeScrollBars(false);
+        scroll.setScrollbarsVisible(true);
+        scroll.setScrollingDisabled(true, false);
+        scroll.setWidth(w + 20f);
+        scroll.setHeight(th - 30f);
+
+        column.setActor(scroll);
+        column.top();
+
+        if (select) {
+            selectInCol(columnIndex, 0, true);
+            updateFocused();
+        }
+    }
+
+    private void updateFocusedBookmark() {
+        if (selectedTab == 1 && fi < maxBookmarkDepth - 1) {
+            // Bookmarks.
+            var selectedBookmark = (BookmarkButton) currentModel[fi][fj];
+
+            // Move scroll position.
+            var scroll = GuiUtils.getScrollPaneAncestor(selectedBookmark);
+            if (scroll != null) {
+                var coordinates = selectedBookmark.localToAscendantCoordinates(scroll.getActor(), new Vector2(selectedBookmark.getX(), selectedBookmark.getY()));
+                scroll.scrollTo(coordinates.x, coordinates.y, selectedBookmark.getWidth(), selectedBookmark.getHeight() + 250f);
+            }
+
+
+            if (selectedBookmark.bookmark.folder) {
+                // If it is a folder, we need to populate the next.
+                fillBookmarksColumn(bookmarkColumns, fi + 1, selectedBookmark.bookmark.children, currentModel, bw, bh, false);
+            } else {
+                // Clear all columns right of current.
+                for (int i = fi + 1; i < maxBookmarkDepth; i++) {
+                    bookmarkColumns[i].clearActor();
+                    currentModel[i] = null;
+                }
+            }
+        }
+    }
+
     private void addDeviceTypeInfo(Table table, String name, String text) {
         table.add(new OwnLabel(name, skin, "header")).top().left().padRight(pad40).padBottom(pad10);
         table.add(new OwnLabel(text, skin, "big")).top().left().padBottom(pad10).row();
@@ -1404,20 +1492,34 @@ public class GamepadGui extends AbstractGui {
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
+        int bi = fi;
         fi = i;
         fj = j;
-        if (currentModel != null && currentModel.length > 0) {
+        if (currentModel.length > 0 && currentModel[fi] != null) {
+            // Not all columns need to be the same length!
+            if (fj >= currentModel[fi].length) {
+                fj = currentModel[fi].length - 1;
+            }
+
             while (currentModel[fi][fj] == null) {
-                // Move to next column
+                // Move to next column.
                 fi = (fi + (right ? 1 : -1)) % currentModel.length;
                 if (fi < 0) {
                     fi = currentModel.length - 1;
                 }
-                if (fi == i) {
+                if (fi == i || currentModel[fi] == null) {
                     return false;
+                }
+
+                // Not all columns need to be the same length!
+                if (fj >= currentModel[fi].length) {
+                    fj = currentModel[fi].length - 1;
                 }
             }
             return true;
+        } else if(currentModel[fi] == null) {
+            // Go back.
+            fi = bi;
         }
         return false;
     }
@@ -1467,6 +1569,9 @@ public class GamepadGui extends AbstractGui {
             if (GuiUtils.isInputWidget(actor)) {
                 stage.setKeyboardFocus(actor);
             }
+
+            // In bookmarks, we populate next if we select a folder.
+            updateFocusedBookmark();
         }
     }
 
@@ -1485,13 +1590,13 @@ public class GamepadGui extends AbstractGui {
     }
 
     public void up() {
-        if (currentModel != null && selectInCol(fi, update(fj, -1, currentModel[fi].length), false)) {
+        if (currentModel != null && currentModel[fi] != null && selectInCol(fi, update(fj, -1, currentModel[fi].length), false)) {
             updateFocused();
         }
     }
 
     public void down() {
-        if (currentModel != null && selectInCol(fi, update(fj, 1, currentModel[fi].length), true)) {
+        if (currentModel != null && currentModel[fi] != null && selectInCol(fi, update(fj, 1, currentModel[fi].length), true)) {
             updateFocused();
         }
     }
@@ -1794,15 +1899,13 @@ public class GamepadGui extends AbstractGui {
             Actor target = stage.getKeyboardFocus();
 
             if (target != null) {
-                if (target instanceof CheckBox) {
+                if (target instanceof CheckBox cb) {
                     // Check or uncheck.
-                    CheckBox cb = (CheckBox) target;
                     if (!cb.isDisabled()) {
                         cb.setChecked(!cb.isChecked());
                     }
-                } else if (target instanceof Button) {
+                } else if (target instanceof Button b) {
                     // Touch-down event for buttons.
-                    final Button b = (Button) target;
                     InputEvent inputEvent = Pools.obtain(InputEvent.class);
                     inputEvent.setTarget(b);
                     inputEvent.setType(InputEvent.Type.touchDown);
