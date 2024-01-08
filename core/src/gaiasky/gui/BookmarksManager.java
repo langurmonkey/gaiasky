@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BookmarksManager implements IObserver {
@@ -87,7 +86,7 @@ public class BookmarksManager implements IObserver {
 
     private List<BookmarkNode> loadBookmarks(Path file) {
         try (Stream<String> lines = Files.lines(file)) {
-            List<String> bookmarks = lines.filter(line -> !line.strip().startsWith("#")).filter(line -> !line.isBlank()).map(String::strip).collect(Collectors.toList());
+            List<String> bookmarks = lines.filter(line -> !line.strip().startsWith("#")).filter(line -> !line.isBlank()).map(String::strip).toList();
 
             nodes = new HashMap<>();
             this.bookmarks = new ArrayList<>();
@@ -279,9 +278,8 @@ public class BookmarksManager implements IObserver {
         switch (event) {
             case BOOKMARKS_ADD -> {
                 Object d0 = data[0];
-                if (d0 instanceof String) {
+                if (d0 instanceof String name) {
                     // Simple object bookmark.
-                    String name = (String) d0;
                     boolean folder = (boolean) data[1];
                     if (addBookmark(name, folder)) {
                         logger.info("Bookmark added: " + name);

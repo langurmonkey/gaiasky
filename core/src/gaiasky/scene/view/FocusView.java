@@ -37,9 +37,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     private final Vector3d D31 = new Vector3d();

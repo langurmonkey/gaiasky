@@ -752,8 +752,7 @@ public class Scene {
          * default configurations.
          */
         for (Component component : entity.getComponents()) {
-            if (component instanceof ICopy) {
-                var iCopy = (ICopy) component;
+            if (component instanceof ICopy iCopy) {
                 Component componentCopy = iCopy.getCopy(engine);
                 copy.add(componentCopy);
             } else {
