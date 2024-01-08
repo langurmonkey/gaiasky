@@ -209,8 +209,7 @@ public class FullGui extends AbstractGui {
     private Timer.Task getVersionCheckTask() {
         VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
         vc.setListener(event -> {
-            if (event instanceof VersionCheckEvent) {
-                VersionCheckEvent vce = (VersionCheckEvent) event;
+            if (event instanceof VersionCheckEvent vce) {
                 if (!vce.isFailed()) {
                     // Check version
                     String tagVersion = vce.getTag();
@@ -304,11 +303,10 @@ public class FullGui extends AbstractGui {
 
                 @Override
                 public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
-                    if (event instanceof InputEvent) {
-                        InputEvent ie = (InputEvent) event;
+                    if (event instanceof InputEvent ie) {
 
                         if (ie.getType() == Type.mouseMoved) {
-                            Actor scrollPanelAncestor = getScrollPanelAncestor(ie.getTarget());
+                            Actor scrollPanelAncestor = GuiUtils.getScrollPaneAncestor(ie.getTarget());
                             stage.setScrollFocus(scrollPanelAncestor);
                         } else if (ie.getType() == Type.touchDown) {
                             if (ie.getTarget() instanceof TextField)
@@ -318,22 +316,11 @@ public class FullGui extends AbstractGui {
                     return false;
                 }
 
-                private Actor getScrollPanelAncestor(Actor actor) {
-                    if (actor == null) {
-                        return null;
-                    } else if (actor instanceof ScrollPane) {
-                        return actor;
-                    } else {
-                        return getScrollPanelAncestor(actor.getParent());
-                    }
-                }
-
             });
 
             /* KEYBOARD FOCUS */
             stage.addListener((event) -> {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
+                if (event instanceof InputEvent ie) {
                     if (ie.getType() == Type.touchDown && !ie.isHandled()) {
                         stage.setKeyboardFocus(null);
                     }

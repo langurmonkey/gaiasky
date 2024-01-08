@@ -73,8 +73,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         searchBox.setWidth(componentWidth);
         searchBox.setMessageText(I18n.msg("gui.objects.search"));
         searchBox.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyUp && !searchBox.getText().isEmpty()) {
                     String text = searchBox.getText().toLowerCase().trim();
                     if (scene.index().containsEntity(text)) {
@@ -128,8 +127,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         reloadBookmarksTree();
         bookmarksTree.addListener(event -> {
             if (events)
-                if (event instanceof ChangeEvent) {
-                    ChangeEvent ce = (ChangeEvent) event;
+                if (event instanceof ChangeEvent ce) {
                     Actor actor = ce.getTarget();
                     TreeNode selected = (TreeNode) ((Tree) actor).getSelectedNode();
                     if (selected != null && !selected.hasChildren()) {

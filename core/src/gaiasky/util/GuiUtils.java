@@ -298,6 +298,21 @@ public class GuiUtils {
     }
 
     /**
+     * Gets the first scroll pane ancestor of the given actor, if any.
+     * @param actor The actor.
+     * @return The first scroll pane ancestor. Null if it does not exist.
+     */
+    public static ScrollPane getScrollPaneAncestor(Actor actor) {
+        if (actor == null) {
+            return null;
+        } else if (actor instanceof ScrollPane scroll) {
+            return scroll;
+        } else {
+            return getScrollPaneAncestor(actor.getParent());
+        }
+    }
+
+    /**
      * If the given actor has a scroll pane ancestor, this method makes sure that
      * the actor is visible by moving the scroll position if required.
      *

@@ -352,6 +352,18 @@
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+    "bookmarks-folder": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-folder"
+    },
+    "bookmarks-bookmark": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-bookmark"
+    },
     "menu-time": {
       "down": "default-round-down",
       "checked": "default-round-down",
