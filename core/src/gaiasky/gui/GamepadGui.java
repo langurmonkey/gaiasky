@@ -1925,9 +1925,8 @@ public class GamepadGui extends AbstractGui {
             Actor target = stage.getKeyboardFocus();
 
             if (target != null) {
-                if (target instanceof Button) {
+                if (target instanceof Button b) {
                     // Touch-up event.
-                    final Button b = (Button) target;
                     InputEvent inputEvent = Pools.obtain(InputEvent.class);
                     inputEvent.setTarget(b);
                     inputEvent.setType(InputEvent.Type.touchUp);
