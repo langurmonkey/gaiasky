@@ -40,7 +40,7 @@ import java.util.Date;
 public class AboutWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(AboutWindow.class);
 
-    private final LabelStyle linkStyle;
+    private final LabelStyle linkStyle, linkLargeStyle;
     private Table checkTable;
     private OwnLabel checkLabel;
     private MemInfoWindow memInfoWindow;
@@ -48,6 +48,7 @@ public class AboutWindow extends GenericDialog {
     public AboutWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build), skin, stage);
         this.linkStyle = skin.get("link", LabelStyle.class);
+        this.linkLargeStyle = skin.get("link-large", LabelStyle.class);
 
         setCancelText(I18n.msg("gui.close"));
 
@@ -66,7 +67,7 @@ public class AboutWindow extends GenericDialog {
         final float tabWidth = 240f;
         final float buttonHeight = 40f;
 
-        // Only show update tab if not launched via install4j
+        // Only show update tab if not launched via install4j.
         boolean showUpdateTab = !SysUtils.launchedViaInstall4j();
 
         // Create the tab buttons
@@ -111,17 +112,19 @@ public class AboutWindow extends GenericDialog {
 
         var gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
 
-        // User manual
-        var homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
-        var homepageTxt = new OwnLabel(I18n.msg("gui.help.help1"), skin);
-        var homepageLink = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
+        // Home page.
+        var homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin, "header");
+        var homepageLink = new Link(Settings.HOMEPAGE, linkLargeStyle, Settings.HOMEPAGE);
 
-        // Wiki
-        var docsTitle = new OwnLabel(I18n.msg("gui.help.docs"), skin);
-        var docsTxt = new OwnLabel(I18n.msg("gui.help.help2"), skin);
-        var docsLink = new Link(Settings.DOCUMENTATION, linkStyle, Settings.DOCUMENTATION);
+        // Documentation.
+        var docsTitle = new OwnLabel(I18n.msg("gui.help.docs"), skin, "header");
+        var docsLink = new Link(Settings.DOCUMENTATION, linkLargeStyle, Settings.DOCUMENTATION);
 
-        // Icon
+        // Repository.
+        var repoTitle = new OwnLabel(I18n.msg("gui.help.repo"), skin, "header");
+        var repoLink = new Link(Settings.REPOSITORY, linkLargeStyle, Settings.REPOSITORY);
+
+        // Icon.
         var gsIcon = Gdx.files.internal(Settings.settings.runtime.openXr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
         var iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -133,17 +136,14 @@ public class AboutWindow extends GenericDialog {
         contentHelp.row();
         contentHelp.add(gaiasky).pad(pad18).padBottom(pad18 * 5f).colspan(2);
         contentHelp.row();
-        contentHelp.add(homepageTitle).align(Align.left).padRight(pad34);
-        contentHelp.add(homepageTxt).align(Align.left);
-        contentHelp.row();
-        contentHelp.add(new OwnLabel("", skin)).padBottom(pad18);
-        contentHelp.add(homepageLink).align(Align.left).padBottom(pad18);
-        contentHelp.row();
-        contentHelp.add(docsTitle).align(Align.left).padRight(pad34);
-        contentHelp.add(docsTxt).align(Align.left);
-        contentHelp.row();
-        contentHelp.add(new OwnLabel("", skin)).padBottom(pad18 * 4f);
+        contentHelp.add(docsTitle).align(Align.left).padBottom(pad34).row();
         contentHelp.add(docsLink).align(Align.left).padBottom(pad18 * 4f);
+        contentHelp.row();
+        contentHelp.add(repoTitle).align(Align.left).padBottom(pad34).row();
+        contentHelp.add(repoLink).align(Align.left).padBottom(pad18 * 4f);
+        contentHelp.row();
+        contentHelp.add(homepageTitle).align(Align.left).padBottom(pad34).row();
+        contentHelp.add(homepageLink).align(Align.left).padBottom(pad34 * 2f);
         contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
@@ -158,7 +158,7 @@ public class AboutWindow extends GenericDialog {
 
         // Home page
         var homePageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
-        var homepage = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
+        var homepage = new Link(Settings.HOMEPAGE, linkStyle, Settings.HOMEPAGE);
 
         // Twitter
         var devNewsTitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
@@ -592,14 +592,14 @@ public class AboutWindow extends GenericDialog {
             }
             // There's a new version!
             checkLabel.setText(I18n.msg("gui.newversion.available", Settings.settings.version, tagVersion + " [" + df.format(tagDate) + "]"));
-            final String uri = Settings.WEBPAGE_DOWNLOADS;
+            final String uri = Settings.HOMEPAGE_DOWNLOADS;
 
             OwnTextButton getNewVersion = new OwnTextButton(I18n.msg("gui.newversion.getit"), skin);
             getNewVersion.pad(0, pad18, 0, pad18);
             getNewVersion.setHeight(40f);
             getNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    Gdx.net.openURI(Settings.WEBPAGE_DOWNLOADS);
+                    Gdx.net.openURI(Settings.HOMEPAGE_DOWNLOADS);
                     return true;
                 }
                 return false;

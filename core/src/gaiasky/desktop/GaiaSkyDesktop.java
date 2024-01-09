@@ -233,7 +233,7 @@ public class GaiaSkyDesktop implements IObserver {
                 out.println(I18n.msg("gui.help.license"));
                 out.println(I18n.msg("gui.help.writtenby", Settings.AUTHOR_NAME, Settings.AUTHOR_EMAIL));
                 out.println();
-                out.println(I18n.msg("gui.help.homepage") + "\t<" + Settings.WEBPAGE + ">");
+                out.println(I18n.msg("gui.help.homepage") + "\t<" + Settings.HOMEPAGE + ">");
                 out.println(I18n.msg("gui.help.docs") + "\t\t<" + Settings.DOCUMENTATION + ">");
                 out.println(I18n.msg("gui.help.repo") + "\t<" + Settings.REPOSITORY + ">");
                 out.println();

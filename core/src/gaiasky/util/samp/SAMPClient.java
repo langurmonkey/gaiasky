@@ -74,7 +74,7 @@ public class SAMPClient implements IObserver {
         meta.put("author.name", Settings.AUTHOR_NAME_PLAIN);
         meta.put("author.email", Settings.AUTHOR_EMAIL);
         meta.put("author.affiliation", Settings.AUTHOR_AFFILIATION_PLAIN);
-        meta.put("home.page", Settings.WEBPAGE);
+        meta.put("home.page", Settings.HOMEPAGE);
         meta.put("gaiasky.version", Settings.settings.version.version);
 
         conn.declareMetadata(meta);

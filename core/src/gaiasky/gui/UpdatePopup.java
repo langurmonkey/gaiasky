@@ -42,7 +42,7 @@ public class UpdatePopup extends GenericDialog {
         content.add(new OwnLabel(tagVersion, skin, "header")).left().padBottom(padb * 2).row();
 
         Label.LabelStyle linkStyle = skin.get("link", Label.LabelStyle.class);
-        content.add(new Link(I18n.msg("gui.newversion.getit"), linkStyle, Settings.WEBPAGE_DOWNLOADS)).center().colspan(2);
+        content.add(new Link(I18n.msg("gui.newversion.getit"), linkStyle, Settings.HOMEPAGE_DOWNLOADS)).center().colspan(2);
     }
 
     @Override
