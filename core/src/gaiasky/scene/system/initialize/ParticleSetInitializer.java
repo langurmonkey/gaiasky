@@ -16,6 +16,7 @@ import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.api.IStarGroupDataProvider;
+import gaiasky.data.group.BinaryPointDataProvider;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
@@ -42,6 +43,7 @@ import gaiasky.util.math.Vector3b;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -118,6 +120,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 // Model comes from file (probably .obj or .g3db)
                 particleSet.model = manager.get(Settings.settings.data.dataFile(particleSet.modelFile), IntModel.class);
             }
+
         }
 
     }

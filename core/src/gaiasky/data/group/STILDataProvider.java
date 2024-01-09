@@ -342,13 +342,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 Pair<UCD, Double> appMagPair = getDoubleUcd(ucdParser.MAG, row);
                                 if (appMagPair == null) {
                                     // Default magnitude.
-                                    appMag = Constants.DEFUALT_MAG;
+                                    appMag = Constants.DEFAULT_MAG;
                                 } else {
                                     appMag = appMagPair.getSecond();
                                 }
                             } else {
                                 // Default magnitude.
-                                appMag = Constants.DEFUALT_MAG;
+                                appMag = Constants.DEFAULT_MAG;
                             }
                             // Scale magnitude if needed.
                             double magScl = isStars && datasetOptions != null ? datasetOptions.magnitudeScale : 0f;

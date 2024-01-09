@@ -16,6 +16,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                         double[] point = new double[tokensLength];
                         for (int j = 0; j < tokensLength; j++) {
                             // We use regular parser because of scientific notation
-                            point[j] = Double.parseDouble(tokens[j]) * factor;
+                            point[j] = Parser.parseDouble(tokens[j]) * factor;
                         }
                         if (transform != null) {
                             aux.set(point);

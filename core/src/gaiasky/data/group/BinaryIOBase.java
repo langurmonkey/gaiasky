@@ -33,18 +33,18 @@ public abstract class BinaryIOBase implements BinaryIO {
     @Override
     public ParticleRecord readParticleRecord(MappedByteBuffer mem,
                                              double factor) {
-        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
-        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+        double[] dataD = new double[ParticleRecordType.STAR.doubleArraySize];
+        float[] dataF = new float[ParticleRecordType.STAR.floatArraySize];
         int floatOffset = 0;
         // Double
         for (int i = 0; i < nDoubles; i++) {
-            if (i < ParticleRecord.STAR_SIZE_D) {
+            if (i < ParticleRecordType.STAR.doubleArraySize) {
                 // Goes to double array
                 dataD[i] = mem.getDouble();
                 dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array.
-                int idx = i - ParticleRecord.STAR_SIZE_D;
+                int idx = i - ParticleRecordType.STAR.doubleArraySize;
                 dataF[idx] = (float) mem.getDouble();
                 if (idx < 3) {
                     // Proper motions.
@@ -95,18 +95,18 @@ public abstract class BinaryIOBase implements BinaryIO {
     @Override
     public ParticleRecord readParticleRecord(DataInputStream in,
                                              double factor) throws IOException {
-        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
-        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+        double[] dataD = new double[ParticleRecordType.STAR.doubleArraySize];
+        float[] dataF = new float[ParticleRecordType.STAR.floatArraySize];
         int floatOffset = 0;
         // Double
         for (int i = 0; i < nDoubles; i++) {
-            if (i < ParticleRecord.STAR_SIZE_D) {
+            if (i < ParticleRecordType.STAR.doubleArraySize) {
                 // Goes to double array
                 dataD[i] = in.readDouble();
                 dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
-                int idx = i - ParticleRecord.STAR_SIZE_D;
+                int idx = i - ParticleRecordType.STAR.doubleArraySize;
                 dataF[idx] = (float) in.readDouble();
                 floatOffset = idx + 1;
             }

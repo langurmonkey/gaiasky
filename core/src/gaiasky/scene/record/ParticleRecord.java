@@ -51,9 +51,6 @@ public class ParticleRecord implements IParticleRecord {
         }
     }
 
-    public static final int STAR_SIZE_D = 3;
-    public static final int STAR_SIZE_F = 11;
-
     /* Double data type indices in double indirection table. */
     public static final int I_X = 0;
     public static final int I_Y = 1;
