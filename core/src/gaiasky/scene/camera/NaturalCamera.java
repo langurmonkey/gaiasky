@@ -546,7 +546,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         final double distFromFocus = camObj.lenDouble();
 
                         // Surface mode activates when we're at 1.8 radii from the focus object, and it is a planet. Camera can't be tracking an object.
-                        surfaceModeFlag.set(!vr && !isTracking() && focus.isPlanet() && distFromFocus < focus.getRadius() * 2.5 / fovFactor);
+                        surfaceModeFlag.set(!gamepadInput && !vr && !isTracking() && focus.isPlanet() && distFromFocus < focus.getRadius() * 2.5 / fovFactor);
 
                         if (!vr) {
                             if (!diverted && !surfaceModeFlag.get()) {
