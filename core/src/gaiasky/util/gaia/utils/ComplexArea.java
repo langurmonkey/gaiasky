@@ -19,8 +19,6 @@ public class ComplexArea implements Area {
     private final Collection<Area> listOfAreas;
     private String name;
 
-    private Place p;
-
     public ComplexArea() {
         listOfAreas = new ArrayList<Area>();
     }
@@ -93,7 +91,7 @@ public class ComplexArea implements Area {
         // First find an enclosing circular area:
         Place centre = new Place(this.getMidPoint());
         double radius = piHalf - this.altitude(centre);
-        p = new Place(rnd);
+        Place p = new Place(rnd);
         p.moveToRandom(rnd, centre, radius);
         while (!this.contains(p)) {
             p.moveToRandom(rnd, centre, radius);

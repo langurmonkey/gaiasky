@@ -7,6 +7,8 @@
 
 package gaiasky.util.elements;
 
+import java.io.Serial;
+
 /**
  * Solve the elliptical
  * <a href="http://en.wikipedia.org/wiki/Kepler_equation">Kepler Equation</a>
@@ -61,7 +63,6 @@ package gaiasky.util.elements;
  * @author <a href="mailto:gilles.sadowski@ulb.ac.be">Gilles Sadowski (GS)</a>
  *
  * @version $Id: KeplerSolver.java 563374 2017-05-23 11:21:17Z gsadowsk $
- * @req CU1-GaiaTools-T-FUN-340
  */
 public class KeplerSolver {
     // Numerical constants.
@@ -227,9 +228,9 @@ public class KeplerSolver {
      * @param ecc eccentricity.
      * @return the error.
      */
-    public static final double error(double eA,
-                                     double mA,
-                                     double ecc) {
+    public static double error(double eA,
+                               double mA,
+                               double ecc) {
         return meanAnomConstrained(eA, ecc) - mA;
     }
 
@@ -241,8 +242,8 @@ public class KeplerSolver {
      * @param ecc Eccentricity.
      * @return the mean anomaly.
      */
-    public static final double meanAnomConstrained(double eA,
-                                                   double ecc) {
+    public static double meanAnomConstrained(double eA,
+                                             double ecc) {
         return eA - ecc * Math.sin(eA);
     }
 
@@ -255,8 +256,8 @@ public class KeplerSolver {
      * @throws IllegalArgumentException if <code>ecc</code> is not in the
      * interval <i>[0, 1)</i>.
      */
-    public static final double meanAnom(double eA,
-                                        double ecc) {
+    public static double meanAnom(double eA,
+                                  double ecc) {
         if (ecc < 0 ||
                 ecc >= 1) {
             throw new IllegalArgumentException("Eccentricity out of range: " + ecc);
@@ -278,6 +279,7 @@ public class KeplerSolver {
         /**
          *
          */
+        @Serial
         private static final long serialVersionUID = 7109980448563098982L;
 
         /** Error message template. */

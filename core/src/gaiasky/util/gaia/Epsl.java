@@ -63,7 +63,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
         omega = getOmegaRef() + FOUR_PI * (double) tRemainder
                 / (double) twicePeriod;
 
-        /** SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
+        /* SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
          * 	GLOBAL	GAIASANDBOX
          * 	Z -> Y
          * 	X -> Z

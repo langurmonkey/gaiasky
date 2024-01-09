@@ -197,7 +197,7 @@ public class ModifiedScanningLaw {
 
         // derivative function for the integrator and its time unit:
         dn = new Derivm();
-        unit = (long) (1.0 * DAY_NS);
+        unit = (long) DAY_NS;
 
         // default maximum time step for Runge-Kutta integrator -
         // a step of 150 sec is needed for MSL (NSL can do with 1000 sec step):
@@ -375,8 +375,6 @@ public class ModifiedScanningLaw {
 
     /**
      * Get a list of high-density areas that have been set
-     *
-     * @return
      */
     public ComplexArea[] getHighDensityAreas() {
         return highDensityAreas;
@@ -824,7 +822,7 @@ public class ModifiedScanningLaw {
      *
      * @author llindegr
      */
-    class Derivm implements DiffnFunctionNs {
+    public class Derivm implements DiffnFunctionNs {
 
         @Override
         public double[] derivn(long t, double[] y) {

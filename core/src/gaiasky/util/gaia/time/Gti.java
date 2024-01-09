@@ -48,7 +48,6 @@ public class Gti implements Comparable<Gti> {
      *
      * @return boolean
      */
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(final Object t) {
         if (t == null) {
@@ -58,11 +57,9 @@ public class Gti implements Comparable<Gti> {
         // Generics do not allow us to check if we are passing in the right
         // type of time, so we could actually pass in (say) a EarthTime here
         // when comparing it to a GaiaTime.
-        if (!(t instanceof Gti)) {
+        if (!(t instanceof Gti t1)) {
             return false;
         }
-
-        final Gti t1 = (Gti) t;
 
         return (t1.getStart() == this.getStart() &&
                 t1.getEnd() == this.getEnd());
@@ -101,7 +98,7 @@ public class Gti implements Comparable<Gti> {
      *
      * @param end the time defining the end of the object validity
      *
-     * @throws RuntimeException
+     * @throws RuntimeException If end time is before start time.
      */
     public void setEnd(final long end) throws RuntimeException {
         if (end < this.start) {
@@ -126,7 +123,7 @@ public class Gti implements Comparable<Gti> {
      *
      * @param start the time defining the beginning of the object validity
      *
-     * @throws RuntimeException
+     * @throws RuntimeException If start time is after end time.
      */
     public void setStart(final long start) throws RuntimeException {
         if (start > this.end) {
@@ -182,9 +179,9 @@ public class Gti implements Comparable<Gti> {
     // Can re-enable this annotation once we go to Java 6
 
     /**
-     * @param o
+     * @param o The time to compare.
      *
-     * @return int
+     * @return Integer indicating the comparison result. See {@link java.lang.Comparable#compareTo(Object)}.
      */
     @Override
     public int compareTo(final Gti o) {

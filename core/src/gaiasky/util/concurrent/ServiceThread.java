@@ -94,9 +94,10 @@ public class ServiceThread extends Thread {
      * If no task is executed, this returns immediately.
      */
     public void waitCurrentTask() {
-        // Wait if needed
+        // Wait if needed.
+        //noinspection StatementWithEmptyBody
         while (this.awake.get()) {
-            // Busy wait
+            // Busy wait.
         }
     }
 

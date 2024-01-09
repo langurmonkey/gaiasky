@@ -63,7 +63,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
      * The times when the precession rate changes, calculated from
      * {@link #reducedPrecession}.
      */
-    protected long[] precessionRateChanges;
+    protected volatile long[] precessionRateChanges;
 
     /**
      * Quaterniond corresponding to extraOmega
@@ -257,8 +257,6 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
 
     /**
      * Returns the currently set extraOmega [rad]
-     *
-     * @return
      */
     private double getExtraOmega() {
         return this.extraOmega;
@@ -341,10 +339,6 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     /**
      * Returns true if the precession rate is reduced in the interpolation
      * interval containing t
-     *
-     * @param t
-     *
-     * @return
      */
     public boolean isModified(long t) {
         int left = AttitudeUtils.findLeftIndexVar(t, tNs, 0);

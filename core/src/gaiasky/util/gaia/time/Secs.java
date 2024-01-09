@@ -7,10 +7,7 @@
 
 package gaiasky.util.gaia.time;
 
-import java.io.Serializable;
-
-public class Secs extends ConcreteDuration implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Secs extends ConcreteDuration {
 
     /**
      * Default constructor

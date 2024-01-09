@@ -53,24 +53,24 @@ public class AttitudeConverter {
             double nu, double omega, double lSunDot, double nuDot,
             double omegaDot) {
 
-        /** SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
+        /* SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
          * 	GLOBAL ->	GAIASANDBOX
          * 	Z -> Y
          * 	X -> Z
          * 	Y -> X
          */
 
-        /** Calculate the attitude quaternion **/
+        /* Calculate the attitude quaternion */
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
         q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
         q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
         q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - xi)));
         q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
 
-        /**
+        /*
          * Calculate the time derivative of the attitude quaternion using (A.17)
          * in AGIS paper, based on the rates in the ICRS:
-         **/
+         */
         double sinLSun = Math.sin(lSun);
         double cosLSun = Math.cos(lSun);
         Vector3d zInSrs = aux1;
@@ -105,24 +105,24 @@ public class AttitudeConverter {
             double nu, double omega, double lSunDot, double nuDot,
             double omegaDot) {
 
-        /** SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
+        /* SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
          * 	GLOBAL	GAIASANDBOX
          * 	Z -> Y
          * 	X -> Z
          * 	Y -> X
          */
 
-        /** Calculate the attitude quaternion **/
+        /* Calculate the attitude quaternion */
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
         q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
         q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
         q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - xi)));
         q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
 
-        /**
+        /*
          * Calculate the inertial rate in SRS by adding the rotations around
          * k (ecliptic pole), s (solar direction), and z:
-         **/
+         */
         Vector3d k = new Vector3d(0, -sinObliquity, cosObliquity);
         k.mul(q);
         double sinLSun = Math.sin(lSun);
@@ -143,15 +143,13 @@ public class AttitudeConverter {
      * @param gt GaiaTime
      * @param h  heliotropic angles and their rates in [rad] and [rad/day]
      *
-     * @return
-     *
      * @return an array of two quaternions, q (the attitude quaternion) and qDot
      * (the time derivative of q, per day)
      */
     public static QuaternionDouble[] getQuaternionAndRate(long gt,
             HeliotropicAnglesRates h) {
 
-        /** SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
+        /* SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
          * 	GLOBAL	GAIASANDBOX
          * 	Z -> Y
          * 	X -> Z
@@ -163,17 +161,17 @@ public class AttitudeConverter {
         double lSun = sun.getSolarLongitude();
         double lSunDot = sun.getSolarLongitudeDot();
 
-        /** Calculate the attitude quaternion **/
+        /* Calculate the attitude quaternion */
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
         q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
         q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(h.getNu() - PI_HALF)));
         q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - h.getXi())));
         q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(h.getOmega())));
 
-        /**
+        /*
          * Calculate the time derivative of the attitude quaternion using (A.17)
          * in AGIS paper, based on the rates in the ICRS:
-         **/
+         */
         double sinLSun = Math.sin(lSun);
         double cosLSun = Math.cos(lSun);
         Vector3d zInSrs = aux1;
@@ -200,8 +198,6 @@ public class AttitudeConverter {
      *
      * @param gt  Time for the attitude
      * @param att attitude
-     *
-     * @return
      */
     public static HeliotropicAnglesRates getHeliotropicAnglesRates(long gt,
             IAttitude att) {

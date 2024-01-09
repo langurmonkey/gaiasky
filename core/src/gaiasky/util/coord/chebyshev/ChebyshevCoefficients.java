@@ -74,12 +74,8 @@ public class ChebyshevCoefficients {
 			if (this.nanosecondsTcbBegin != header.nanosecondsTcbBegin) {
 				return false;
 			}
-			if (this.nanosecondsTcbEnd != header.nanosecondsTcbEnd) {
-				return false;
-			}
-
-			return true;
-		}
+            return this.nanosecondsTcbEnd == header.nanosecondsTcbEnd;
+        }
 	}
 
 	/**

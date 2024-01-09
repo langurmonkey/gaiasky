@@ -43,8 +43,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     private final Vector3d D32 = new Vector3d();
     private final Vector3b B31 = new Vector3b();
     private final Vector3b B33 = new Vector3b();
-    private final Matrix4 mataux = new Matrix4();
-    private final Matrix4d matauxd = new Matrix4d();
+    private final Matrix4 matAux = new Matrix4();
+    private final Matrix4d matDAux = new Matrix4d();
     /**
      * Particle component, maybe.
      **/
@@ -682,10 +682,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                     // Object-camera normalised vector
                     cart.scl(-1).add(camPos).nor();
 
-                    updater.setToLocalTransform(entity, body, graph, 1, mataux, false);
-                    mataux.inv();
-                    matauxd.set(mataux.getValues());
-                    cart.mul(matauxd);
+                    updater.setToLocalTransform(entity, body, graph, 1, matAux, false);
+                    matAux.inv();
+                    matDAux.set(matAux.getValues());
+                    cart.mul(matDAux);
 
                     Vector3d sph = D32;
                     Coordinates.cartesianToSpherical(cart, sph);
@@ -1192,8 +1192,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                                            Array<Entity> list) {
         if (node != null && node.objects != null) {
             for (IOctreeObject object : node.objects) {
-                if (object instanceof OctreeObjectView) {
-                    var oov = (OctreeObjectView) object;
+                if (object instanceof OctreeObjectView oov) {
                     list.add(oov.getEntity());
                 }
             }

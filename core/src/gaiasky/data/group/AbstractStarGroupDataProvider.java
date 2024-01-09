@@ -317,8 +317,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @param is The input stream
      *
      * @return The number of lines
-     *
-     * @throws IOException
      */
     protected int countLines(InputStream is) throws IOException {
         byte[] c = new byte[1024];
@@ -430,7 +428,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         if (additionalFiles != null && !additionalFiles.isBlank()) {
             this.additionalFiles = additionalFiles.split(",");
             this.additional = new ArrayList<>();
-            if (additionalFiles != null && this.additionalFiles.length > 0)
+            if (this.additionalFiles.length > 0)
                 loadAdditional();
         }
     }
@@ -464,12 +462,13 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     private void loadAdditional(Path f, AdditionalCols addit) {
         if (Files.isDirectory(f, LinkOption.NOFOLLOW_LINKS)) {
             File[] files = f.toFile().listFiles();
-            int nfiles = files.length;
-            int mod = nfiles / 20;
+            assert files != null;
+            int nFiles = files.length;
+            int mod = nFiles / 20;
             int i = 1;
             for (File file : files) {
-                if (nfiles > 60 && i % mod == 0) {
-                    logger.info("Loading file " + i + "/" + nfiles);
+                if (nFiles > 60 && i % mod == 0) {
+                    logger.info("Loading file " + i + "/" + nFiles);
                 }
                 loadAdditional(file.toPath(), addit);
                 i++;
@@ -492,10 +491,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @throws RuntimeException If the format of <code>additionalCols</code> is not correct.
      */
     private void loadAdditionalFile(Path f, AdditionalCols additionalCols) throws RuntimeException {
-        FileChannel fc = null;
-        InputStream data = null;
-        try {
-            fc = new RandomAccessFile(f.toFile(), "r").getChannel();
+        InputStream data;
+        try (var raf = new RandomAccessFile(f.toFile(), "r")) {
+            FileChannel fc = raf.getChannel();
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             data = new ByteBufferInputStream(mem);
             if (f.toString().endsWith(".gz"))
@@ -525,7 +523,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 double[] vals = new double[nCols];
                 for (int j = 1; j <= nCols; j++) {
                     if (tokens[j] != null && !tokens[j].strip().isBlank()) {
-                        Double val = Parser.parseDouble(tokens[j].strip());
+                        double val = Parser.parseDouble(tokens[j].strip());
                         vals[j - 1] = val;
                     } else {
                         // No value
@@ -538,19 +536,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             br.close();
         } catch (Exception e) {
             logger.error(e);
-        } finally {
-            if (fc != null)
-                try {
-                    fc.close();
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            if (data != null)
-                try {
-                    data.close();
-                } catch (IOException e) {
-                    logger.error(e);
-                }
         }
     }
 

@@ -19,7 +19,7 @@ public class Anomalies {
      * @param x Angle (units: <code>rad</code>).
      * @return the angle in the range of <i>0</i> through <i>2pi</i>.
      */
-    public static final double reduce(double x) {
+    public static double reduce(double x) {
         return MathUtilsDouble.normalizeAngle(x, Math.PI);
     }
 
@@ -36,7 +36,7 @@ public class Anomalies {
      * @throws IllegalArgumentException
      *             if <code>ecc</code> is not in the interval <i>[0 1[</i>.
      */
-    public static final double true2ecc(final double v, final double ecc) {
+    public static double true2ecc(final double v, final double ecc) {
         if ((ecc < 0) || (ecc >= 1)) {
             throw new IllegalArgumentException(
                     "Eccentricity out of range (" + ecc + ")");
@@ -62,8 +62,8 @@ public class Anomalies {
      *
      * @return the eccentric anomaly in the range of <i>0</i> through <i>2pi</i>.
      */
-    public static final double true2eccConstrained(final double v,
-                                                   final double ecc) {
+    public static double true2eccConstrained(final double v,
+                                             final double ecc) {
         double eA = 2 * Math.atan(
                 Math.sqrt((1 - ecc) / (1 + ecc)) * Math.tan(v / 2));
 
@@ -94,9 +94,9 @@ public class Anomalies {
      * @throws IllegalArgumentException
      *             if <code>ecc</code> is not in the interval <i>[0 1[</i>.
      */
-    public static final double mean2ecc(final KeplerSolver kepler,
-                                        final double mA,
-                                        final double ecc) {
+    public static double mean2ecc(final KeplerSolver kepler,
+                                  final double mA,
+                                  final double ecc) {
         return kepler.eccAnom(mA, ecc);
     }
 }

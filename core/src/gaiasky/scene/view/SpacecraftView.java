@@ -227,8 +227,8 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
     }
 
     public void increaseThrustFactorIndex(boolean broadcast) {
-        engine.thrustFactorIndex = (engine.thrustFactorIndex + 1) % engine.thrustFactor.length;
-        logger.info("Thrust factor: " + engine.thrustFactor[engine.thrustFactorIndex]);
+        engine.thrustFactorIndex = (engine.thrustFactorIndex + 1) % MotorEngine.thrustFactor.length;
+        logger.info("Thrust factor: " + MotorEngine.thrustFactor[engine.thrustFactorIndex]);
         if (broadcast)
             EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
     }
@@ -236,16 +236,16 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
     public void decreaseThrustFactorIndex(boolean broadcast) {
         engine.thrustFactorIndex = engine.thrustFactorIndex - 1;
         if (engine.thrustFactorIndex < 0)
-            engine.thrustFactorIndex = engine.thrustFactor.length - 1;
-        logger.info("Thrust factor: " + engine.thrustFactor[engine.thrustFactorIndex]);
+            engine.thrustFactorIndex = MotorEngine.thrustFactor.length - 1;
+        logger.info("Thrust factor: " + MotorEngine.thrustFactor[engine.thrustFactorIndex]);
         if (broadcast)
             EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
     }
 
     public void setThrustFactorIndex(int i, boolean broadcast) {
-        assert i >= 0 && i < engine.thrustFactor.length : "Index " + i + " out of range of thrustFactor vector: [0.." + (engine.thrustFactor.length - 1);
+        assert i >= 0 && i < MotorEngine.thrustFactor.length : "Index " + i + " out of range of thrustFactor vector: [0.." + (MotorEngine.thrustFactor.length - 1);
         engine.thrustFactorIndex = i;
-        logger.info("Thrust factor: " + engine.thrustFactor[engine.thrustFactorIndex]);
+        logger.info("Thrust factor: " + MotorEngine.thrustFactor[engine.thrustFactorIndex]);
         if (broadcast)
             EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
     }

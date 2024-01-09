@@ -92,8 +92,7 @@ public class HiddenHelperUser implements IObserver {
                     body = ((FocusView) data[0]);
                 }
                 HelperTask landAtTask;
-                if (data[1] instanceof String) {
-                    String locName = (String) data[1];
+                if (data[1] instanceof String locName) {
                     landAtTask = new LandAtLocationTask(body.getEntity(), locName, currentTasks);
                 } else {
                     Double lon = (Double) data[1];

@@ -27,7 +27,7 @@ public class Archetypes {
     private Engine engine;
 
     /**
-     * Creates a new archetypes container.
+     * Creates a new arch-types container.
      */
     public Archetypes() {
     }
@@ -131,9 +131,7 @@ public class Archetypes {
                     String[] names = new String[numNames];
                     names[0] = archetypeElement.name;
                     if (aliases != null) {
-                        for (int i = 0; i < aliases.length; i++) {
-                            names[i + 1] = aliases[i];
-                        }
+                        System.arraycopy(aliases, 0, names, 1, aliases.length);
                     }
                     String parent = archetypeElement.getString("parent");
                     String[] componentsString = archetypeElement.get("components").asStringArray();

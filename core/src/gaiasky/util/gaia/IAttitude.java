@@ -17,7 +17,7 @@ public interface IAttitude {
      * that generated the attitude. Use #getGaiaTime() to get the time as an
      * absolute GaiaTime if needed.
      *
-     * @return time time that the attitude is valid for
+     * @return time that the attitude is valid for
      */
     long getTime();
 

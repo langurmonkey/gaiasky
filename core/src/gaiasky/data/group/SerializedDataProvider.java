@@ -35,7 +35,6 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     public List<IParticleRecord> loadData(InputStream is, double factor) {
         try {
             ObjectInputStream ois = new ObjectInputStream(is);
-            @SuppressWarnings("unchecked")
             List<IParticleRecord> l = (List<IParticleRecord>) ois.readObject(); // cast is needed.
             ois.close();
 

@@ -147,11 +147,6 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
     }
 
     @Override
-    public ComponentTypes getComponentType() {
-        return base.ct;
-    }
-
-    @Override
     public double getDistToCamera() {
         return body.distToCamera;
     }

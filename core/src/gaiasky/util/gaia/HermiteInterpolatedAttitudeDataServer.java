@@ -57,8 +57,7 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
 
         int left = AttitudeUtils.findLeftIndexVar(t, tNs, 0);
         if (left < 0 || left > nT - 2) {
-            long time = t;
-            String msg = "t < tBeg or >= tEnd, t = + " + time
+            String msg = "t < tBeg or >= tEnd, t = + " + t
                     + ", tBeg = " + getStartTime() + ", tEnd = "
                     + getStopTime();
             throw new RuntimeException(msg);

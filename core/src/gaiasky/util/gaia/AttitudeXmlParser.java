@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AttitudeXmlParser {
@@ -48,7 +47,7 @@ public class AttitudeXmlParser {
     public static BinarySearchTree parseFolder(String folder) {
         final Array<FileHandle> list;
         try (Stream<Path> paths = Files.walk(Paths.get(Settings.settings.data.dataFile(folder)))) {
-            List<Path> ps = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+            List<Path> ps = paths.filter(Files::isRegularFile).toList();
             list = new Array<>(false, ps.size());
             for (Path p : ps) {
                 if (p.toFile().getName().endsWith(".xml"))
@@ -82,6 +81,7 @@ public class AttitudeXmlParser {
                 lastFH = datesMap.get(date);
             }
             // Last element
+            assert lastDate != null;
             long elapsed = endOfMission.toEpochMilli() - lastDate.toEpochMilli();
             Duration d = new Hours(elapsed * Nature.MS_TO_H);
             durationMap.put(lastFH, d);
@@ -121,7 +121,7 @@ public class AttitudeXmlParser {
         XmlReader.Element element = reader.parse(fh);
         XmlReader.Element model = element.getChildByName("model");
 
-        /** MODEL ELEMENT **/
+        /* MODEL ELEMENT */
         String activTime = model.get("starttime");
         return getDate(activTime);
     }
@@ -133,12 +133,12 @@ public class AttitudeXmlParser {
         XmlReader.Element element = reader.parse(fh);
         XmlReader.Element model = element.getChildByName("model");
 
-        /** MODEL ELEMENT **/
+        /* MODEL ELEMENT */
         String name = model.get("name");
         String className = model.get("classname").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
         long startTimeNsSince2010 = (long) ((AstroUtils.getJulianDate(activationTime) - AstroUtils.JD_J2010) * Nature.D_TO_NS);
 
-        /** SCAN LAW ELEMENT **/
+        /* SCAN LAW ELEMENT */
         XmlReader.Element scanlaw = model.getChildByName("scanlaw");
         String epochRef = scanlaw.getAttribute("epochref");
         Instant refEpochDate = getDate(epochRef);
@@ -154,7 +154,7 @@ public class AttitudeXmlParser {
 
         // Precession rate - always in rev/yr
         XmlReader.Element precessrate = scanlaw.getChildByName("precessrate");
-        Double precessionRate = getDouble(precessrate, "value");
+        double precessionRate = getDouble(precessrate, "value");
 
         // Scan rate
         XmlReader.Element scanrate = scanlaw.getChildByName("scanrate");

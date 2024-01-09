@@ -35,7 +35,7 @@ public class Coordinates {
 
     /**
      * Some galactic system constants J2000 - see
-     * https://github.com/astropy/astropy/blob/master/cextern/erfa/icrs2g.c#L71
+     * <a href="https://github.com/astropy/astropy/blob/master/cextern/erfa/icrs2g.c#L71">this link</a>.
      * ICRS to galactic rotation matrix, obtained by computing R_3(-R)
      * R_1(pi/2-Q) R_3(pi/2+P)
      **/
@@ -144,8 +144,7 @@ public class Coordinates {
      * @return The rotation matrix.
      */
     public static Matrix4d getRotationMatrix(double alpha, double beta, double gamma) {
-        Matrix4d m = new Matrix4d().rotate(0, 1, 0, gamma).rotate(0, 0, 1, beta).rotate(0, 1, 0, alpha);
-        return m;
+        return new Matrix4d().rotate(0, 1, 0, gamma).rotate(0, 0, 1, beta).rotate(0, 1, 0, alpha);
     }
 
     /**
@@ -240,7 +239,7 @@ public class Coordinates {
 
     /**
      * Gets the rotation matrix to transform from the galactic system to the
-     * equatorial system. See {@link Coordinates#galToEq()} for more
+     * equatorial system. See {@link Coordinates#galacticToEquatorial()} for more
      * information, since this is the inverse transformation. Use this matrix if
      * you need to convert equatorial cartesian coordinates to galactic
      * cartesian coordinates.
@@ -429,7 +428,7 @@ public class Coordinates {
      * </ol>
      */
     public static Vector3d cartesianToSpherical(Vector3d vec, Vector3d out) {
-        /**
+        /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
          * math.sqrt(xsq + ysq + zsq)
@@ -479,7 +478,7 @@ public class Coordinates {
      * </ol>
      */
     public static Vector3d cartesianToSpherical(Vector3b vec, Vector3d out) {
-        /**
+        /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
          * math.sqrt(xsq + ysq + zsq)

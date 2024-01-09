@@ -11,7 +11,7 @@ import gaiasky.util.coord.AstroUtils;
 
 import java.io.Serializable;
 
-public interface Duration extends Serializable {
+public interface Duration {
     /**
      * A few obvious constants
      */

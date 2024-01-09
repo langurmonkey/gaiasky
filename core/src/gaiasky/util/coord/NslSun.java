@@ -14,7 +14,7 @@ import gaiasky.util.math.Vector3d;
 public class NslSun {
 
     // the zero point for mission reference
-    static final double missionReferenceEpoch = 0l;
+    static final double missionReferenceEpoch = 0L;
 
     static final double piHalf = Math.PI / 2.0;
     static final double NOMINALSUN_ORBITALECCENTRICITY_J2000 = 0.01671;
@@ -147,7 +147,7 @@ public class NslSun {
         setTime(t);
         double sLon = getSolarLongitude();
 
-        /** SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
+        /* SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
          * 	GLOBAL ->	GAIASANDBOX
          * 	Z -> Y
          * 	X -> Z

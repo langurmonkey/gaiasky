@@ -160,8 +160,6 @@ public class Interpolator {
     /**
      * Find left such that t[left] &lt;= ta &lt; t[left+1]
      *
-     * @param ta
-     * @param t
      * @param indx starting index
      *
      * @return The left index
@@ -179,8 +177,6 @@ public class Interpolator {
      * Find left such that t[left] &lt;= ta &lt; t[left+1] (but one less if ta
      * == t[left+1])
      *
-     * @param ta
-     * @param t
      * @param indx starting index
      *
      * @return The left index
@@ -195,8 +191,6 @@ public class Interpolator {
     /**
      * For normalized argument x (between 0 and 1), calculate the four
      * interpolating polynomials a0(x), a1(x), b0(x), b1(x) [DRO-012, Eq. (8)]
-     *
-     * @param x
      *
      * @return double array containing a0, a1, b0, b1 at x
      */

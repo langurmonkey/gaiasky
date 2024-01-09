@@ -32,7 +32,7 @@ public class TimeMediator {
      * @param nat native time context
      * @param req requested time context
      *
-     * @return
+     * @return The time mediator.
      */
     static public TimeMediator getTimeMediator(TimeContext nat, TimeContext req) {
         return mediators[nat.getIndex() * TimeContext.values().length + req.getIndex()];
@@ -61,31 +61,25 @@ public class TimeMediator {
         if (req == TimeContext.OBMT && nat == TimeContext.OBMT) {
             // OBMT->OBMT
             converter = new ObmtToObmt();
-        } else if (req == TimeContext.OBMT && nat == TimeContext.TCB) {
-            // OBMT->TCB
-            //			converter = new ObmtToTcb();
-        } else if (req == TimeContext.TCB && nat == TimeContext.OBMT) {
-            // TCB->OBMT
-            //			converter = new TcbToObmt();
         } else {
             // TCB->TCB
             converter = new TcbToTcb();
         }
     }
 
-    private interface TimeConverter {
+    public interface TimeConverter {
         long convert(long t);
     }
 
     // native OBMT - requested OBMT
-    private class ObmtToObmt implements TimeConverter {
+    private static class ObmtToObmt implements TimeConverter {
         public long convert(long t) {
             return t;
         }
     }
 
     // native: TCB - requested: TCB
-    private class TcbToTcb implements TimeConverter {
+    private static class TcbToTcb implements TimeConverter {
         public long convert(long t) {
             return t;
         }

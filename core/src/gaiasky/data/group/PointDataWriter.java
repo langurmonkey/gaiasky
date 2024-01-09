@@ -41,7 +41,9 @@ public class PointDataWriter {
             if (fh.isDirectory()) {
                 throw new RuntimeException(I18n.msg("error.file.isdir", filePath));
             }
-            f.createNewFile();
+            if (!f.createNewFile()) {
+                logger.debug(I18n.msg("error.file.exists", filePath));
+            }
 
             int lineLen = particles.get(0).rawDoubleData().length;
 

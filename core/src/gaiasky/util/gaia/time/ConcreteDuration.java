@@ -7,7 +7,10 @@
 
 package gaiasky.util.gaia.time;
 
+import java.io.Serial;
+
 public abstract class ConcreteDuration implements Duration {
+    @Serial
     private static final long serialVersionUID = 4887575731600869371L;
     protected double value;
     private TimeScale scale = TimeScale.UNKNOWN;

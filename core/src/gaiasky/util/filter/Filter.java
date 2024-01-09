@@ -17,7 +17,7 @@ public class Filter {
     /**
      * Creates a filter with only one rule
      *
-     * @param rule
+     * @param rule The filter rule.
      */
     public Filter(FilterRule rule) {
         this.rules = new Array<>();
@@ -46,8 +46,7 @@ public class Filter {
         for (int i = 0; i < rules.size; i++) {
             rulesCopy.add(rules.get(i).copy());
         }
-        Filter copy = new Filter(operation.getOperationString(), rulesCopy);
-        return copy;
+        return new Filter(operation.getOperationString(), rulesCopy);
     }
 
     public boolean evaluate(IParticleRecord pb) {
@@ -77,15 +76,11 @@ public class Filter {
     }
 
     public IOperation getOperationFromString(String op) {
-        switch (op.toLowerCase()) {
-        case "or":
-            return new OperationOr();
-        case "xor":
-            return new OperationXor();
-        case "and":
-        default:
-            return new OperationAnd();
-        }
+        return switch (op.toLowerCase()) {
+            case "or" -> new OperationOr();
+            case "xor" -> new OperationXor();
+            default -> new OperationAnd();
+        };
     }
 
     public void addRule(FilterRule rule) {
@@ -96,13 +91,13 @@ public class Filter {
         return rules.removeValue(rule, true);
     }
 
-    private interface IOperation {
+    public interface IOperation {
         boolean evaluate(Array<FilterRule> rules, IParticleRecord pb);
 
         String getOperationString();
     }
 
-    private class OperationAnd implements IOperation {
+    public static class OperationAnd implements IOperation {
         public String op;
 
         public OperationAnd() {
@@ -124,7 +119,7 @@ public class Filter {
         }
     }
 
-    private class OperationOr implements IOperation {
+    public static class OperationOr implements IOperation {
         public String op;
 
         public OperationOr() {
@@ -146,7 +141,7 @@ public class Filter {
         }
     }
 
-    private class OperationXor implements IOperation {
+    public static class OperationXor implements IOperation {
         public String op;
 
         public OperationXor() {

@@ -12,8 +12,6 @@ import java.util.Collections;
 
 public class GtiList extends ArrayList<Gti> {
 
-    private static final long serialVersionUID = 1L;
-
     private State state;
 
     /**
@@ -29,8 +27,6 @@ public class GtiList extends ArrayList<Gti> {
      *
      * @param start T
      * @param end   T
-     *
-     * @throws RuntimeException
      */
     public void add(final long start, final long end) throws RuntimeException {
         this.add(new Gti(start, end));
@@ -41,7 +37,7 @@ public class GtiList extends ArrayList<Gti> {
      *
      * @param time time to find
      *
-     * @return first GTI object in which the time the time is found, null
+     * @return first GTI object in which the time is found, null
      * otherwise
      */
     public Gti inside(final long time) {
@@ -77,8 +73,6 @@ public class GtiList extends ArrayList<Gti> {
      * </pre>
      *
      * @param list List to combine with
-     *
-     * @throws RuntimeException
      */
     public void or(final GtiList list) throws RuntimeException {
         this.addAll(list);
@@ -99,8 +93,6 @@ public class GtiList extends ArrayList<Gti> {
      * </pre>
      *
      * @param list List to combine with
-     *
-     * @throws RuntimeException
      */
     public void and(final GtiList list) throws RuntimeException {
         final GtiList l1 = this;
@@ -174,8 +166,6 @@ public class GtiList extends ArrayList<Gti> {
      * \/
      * +-------------------+ combined
      * </pre>
-     *
-     * @throws RuntimeException
      */
     public void reduce() throws RuntimeException {
         if (this.state == State.REDUCED) {
@@ -261,7 +251,7 @@ public class GtiList extends ArrayList<Gti> {
      */
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         for (final Gti i : this) {
             sb.append(i);

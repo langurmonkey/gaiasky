@@ -88,8 +88,6 @@ public class HeliotropicOrbitDataLoader {
      * </ul>
      *
      * @param data The input stream with the data to load
-     *
-     * @throws Exception
      */
     public PointCloudData load(InputStream data) throws Exception {
         PointCloudData orbitData = new PointCloudData();
@@ -147,15 +145,15 @@ public class HeliotropicOrbitDataLoader {
     }
 
     protected float parsef(String str) {
-        return Float.valueOf(str);
+        return Float.parseFloat(str);
     }
 
     protected double parsed(String str) {
-        return Double.valueOf(str);
+        return Double.parseDouble(str);
     }
 
     protected int parsei(String str) {
-        return Integer.valueOf(str);
+        return Integer.parseInt(str);
     }
 
     /**

@@ -32,8 +32,7 @@ public class SceneObserver implements IObserver {
     public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case PER_OBJECT_VISIBILITY_CMD -> {
-            if (data[0] instanceof FocusView) {
-                final var entity = (FocusView) data[0];
+            if (data[0] instanceof FocusView entity) {
                 final String name = (String) data[1];
                 final boolean state = (boolean) data[2];
 
@@ -42,8 +41,7 @@ public class SceneObserver implements IObserver {
             }
         }
         case FORCE_OBJECT_LABEL_CMD -> {
-            if (data[0] instanceof FocusView) {
-                final var entity = (FocusView) data[0];
+            if (data[0] instanceof FocusView entity) {
                 final String name = (String) data[1];
                 final boolean state = (boolean) data[2];
 

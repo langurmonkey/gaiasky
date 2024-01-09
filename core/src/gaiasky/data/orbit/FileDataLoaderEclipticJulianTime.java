@@ -67,19 +67,19 @@ public class FileDataLoaderEclipticJulianTime {
     }
 
     protected float parsef(String str) {
-        return Float.valueOf(str);
+        return Float.parseFloat(str);
     }
 
     protected double parsed(String str) {
-        return Double.valueOf(str);
+        return Double.parseDouble(str);
     }
 
     protected int parsei(String str) {
-        return Integer.valueOf(str);
+        return Integer.parseInt(str);
     }
 
     private long getTime(String jds) {
-        double jd = Double.valueOf(jds);
+        double jd = Double.parseDouble(jds);
         long[] dt = AstroUtils.getCalendarDay(jd);
         Calendar cld = Calendar.getInstance();
         cld.set((int) dt[0], (int) dt[1], (int) dt[2], (int) dt[3], (int) dt[4], (int) dt[5]);

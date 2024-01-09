@@ -67,18 +67,16 @@ public class CameraUtils {
         }
     }
 
-    public static Vector3 unproject (Camera camera, Vector3 screenCoords, float viewportX, float viewportY, float viewportWidth, float viewportHeight, int screenHeight) {
+    public static void unproject(Camera camera, Vector3 screenCoords, float viewportX, float viewportY, float viewportWidth, float viewportHeight, int screenHeight) {
         float x = screenCoords.x - viewportX, y = screenHeight - screenCoords.y - viewportY;
         screenCoords.x = (2 * x) / viewportWidth - 1;
         screenCoords.y = (2 * y) / viewportHeight - 1;
         screenCoords.z = 2 * screenCoords.z - 1;
         screenCoords.prj(camera.invProjectionView);
-        return screenCoords;
     }
 
-    public static Vector3 unproject (Camera camera, Vector3 screenCoords, int screenWidth, int screenHeight) {
+    public static void unproject(Camera camera, Vector3 screenCoords, int screenWidth, int screenHeight) {
         unproject(camera, screenCoords, 0, 0, screenWidth, screenHeight, screenHeight);
-        return screenCoords;
     }
 
 }

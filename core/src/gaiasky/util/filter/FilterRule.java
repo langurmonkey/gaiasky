@@ -35,8 +35,7 @@ public class FilterRule {
     }
 
     public FilterRule copy() {
-        FilterRule cpy = new FilterRule(comparator.toString(), attribute, value);
-        return cpy;
+        return new FilterRule(comparator.toString(), attribute, value);
     }
 
     public double getValue() {
@@ -64,21 +63,14 @@ public class FilterRule {
     }
 
     public IComparator getComparatorFromString(String c) {
-        switch (c) {
-        case ">":
-        default:
-            return new ComparatorG();
-        case ">=":
-            return new ComparatorGeq();
-        case "<":
-            return new ComparatorL();
-        case "<=":
-            return new ComparatorLeq();
-        case "==":
-            return new ComparatorEq();
-        case "!=":
-            return new ComparatorNeq();
-        }
+        return switch (c) {
+            default -> new ComparatorG();
+            case ">=" -> new ComparatorGeq();
+            case "<" -> new ComparatorL();
+            case "<=" -> new ComparatorLeq();
+            case "==" -> new ComparatorEq();
+            case "!=" -> new ComparatorNeq();
+        };
     }
 
     // COMPARATORS
@@ -90,7 +82,7 @@ public class FilterRule {
 
     }
 
-    public class ComparatorGeq implements IComparator {
+    public static class ComparatorGeq implements IComparator {
         @Override
         public boolean evaluate(double val1, double val2) {
             return val1 >= val2;
@@ -102,7 +94,7 @@ public class FilterRule {
         }
     }
 
-    public class ComparatorG implements IComparator {
+    public static class ComparatorG implements IComparator {
         @Override
         public boolean evaluate(double val1, double val2) {
             return val1 > val2;
@@ -114,7 +106,7 @@ public class FilterRule {
         }
     }
 
-    public class ComparatorLeq implements IComparator {
+    public static class ComparatorLeq implements IComparator {
         @Override
         public boolean evaluate(double val1, double val2) {
             return val1 <= val2;
@@ -126,7 +118,7 @@ public class FilterRule {
         }
     }
 
-    public class ComparatorL implements IComparator {
+    public static class ComparatorL implements IComparator {
         @Override
         public boolean evaluate(double val1, double val2) {
             return val1 < val2;
@@ -138,7 +130,7 @@ public class FilterRule {
         }
     }
 
-    public class ComparatorEq implements IComparator {
+    public static class ComparatorEq implements IComparator {
         @Override
         public boolean evaluate(double val1, double val2) {
             return val1 == val2;
@@ -150,7 +142,7 @@ public class FilterRule {
         }
     }
 
-    public class ComparatorNeq implements IComparator {
+    public static class ComparatorNeq implements IComparator {
         @Override
         public boolean evaluate(double val1, double val2) {
             return val1 != val2;

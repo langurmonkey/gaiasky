@@ -45,8 +45,7 @@ public class RungeKuttaNs {
         long dtNs = tNew - tOld;
         if (dtNs == 0L) {
             double[] ret = new double[y0.length];
-            for (int i = 0; i < y0.length; i++)
-                ret[i] = y0[i];
+            System.arraycopy(y0, 0, ret, 0, y0.length);
             return ret;
         }
 
@@ -63,8 +62,7 @@ public class RungeKuttaNs {
         double step = (double) stepNs / (double) tUnit;
 
         // initialize
-        for (int i = 0; i < nEqs; i++)
-            y[i] = y0[i];
+        System.arraycopy(y0, 0, y, 0, nEqs);
 
         // iteration over the allowed steps. In each step a sub-interval from
         // tBeg to tEnd is covered:

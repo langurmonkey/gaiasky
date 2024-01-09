@@ -39,10 +39,7 @@ public class Place {
     }
 
     /**
-     * Constructs a Place at given (alpha, delta)
-     *
-     * @param rightAscension
-     * @param declination
+     * Creates a new place at the given (alpha, delta)
      */
     public Place(double rightAscension, double declination) {
         dirICRS = new Vector3d();
@@ -64,8 +61,6 @@ public class Place {
 
     /**
      * Duplicates a Place
-     *
-     * @param p
      */
     public Place(Place p) {
         dirICRS = p.getDirection();
@@ -121,9 +116,6 @@ public class Place {
 
     /**
      * Sets the position of the Place to given (alpha, delta)
-     *
-     * @param rightAscension
-     * @param declination
      */
     public Place setAngles(double rightAscension, double declination) {
         Coordinates.sphericalToCartesian(rightAscension, declination, 1, dirICRS);

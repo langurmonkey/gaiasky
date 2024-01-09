@@ -691,14 +691,13 @@ public class Scene {
         return engine.getEntitiesFor(family);
     }
 
-    public Array<Entity> findEntitiesByComponentType(gaiasky.render.ComponentTypes.ComponentType componentType,
+    public void findEntitiesByComponentType(gaiasky.render.ComponentTypes.ComponentType componentType,
                                                      Array<Entity> list) {
         engine.getEntities().forEach((entity) -> {
             var base = Mapper.base.get(entity);
             if (base.ct != null && base.ct.isEnabled(componentType))
                 list.add(entity);
         });
-        return list;
     }
 
     /**

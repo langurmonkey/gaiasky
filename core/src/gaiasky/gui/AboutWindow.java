@@ -633,8 +633,7 @@ public class AboutWindow extends GenericDialog {
         // Start version check
         VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
         vc.setListener(event -> {
-            if (event instanceof VersionCheckEvent) {
-                VersionCheckEvent vce = (VersionCheckEvent) event;
+            if (event instanceof VersionCheckEvent vce) {
                 if (!vce.isFailed()) {
                     checkTable.clear();
                     checkTable.add(checkLabel).top().left().padBottom(pad10).row();

@@ -43,14 +43,13 @@ public abstract class NumericalAttitudeDataServer<A extends IAttitude> extends B
      * the input data; an implementation may censor time periods, for example
      * when the attitude uncertainty is higher than a defined threshold.
      *
-     * @return the set of attitude Good Time Intervals
+     * @return the list of attitude Good Time Intervals.
      */
     public GtiList getGtis() {
         // return a deep copy of gtis
         GtiList gtisCopy = new GtiList();
         int nGtis = gtis.size();
-        for (int n = 0; n < nGtis; n++) {
-            Gti gti = gtis.get(n);
+        for (Gti gti : gtis) {
             long tStart = gti.getStart();
             long tEnd = gti.getEnd();
             try {

@@ -71,8 +71,6 @@ public class StaticCoordinates implements IBodyCoordinates {
             } catch (ReflectionException e) {
                 Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
             }
-        } else {
-            // Equatorial, nothing
         }
     }
 

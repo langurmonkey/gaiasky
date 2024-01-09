@@ -19,7 +19,7 @@ public abstract class BaseAttitudeDataServer<A extends IAttitude> {
      * Some scanning laws have constants or tables for interpolation that need
      * to be computed before the first use and recomputed after changing certain
      * reference values. This flag indicates that the constants or tables
-     * (whatever applicable) are up to date.
+     * (whatever applicable) are up-to-date.
      */
     protected boolean initialized = false;
     /**

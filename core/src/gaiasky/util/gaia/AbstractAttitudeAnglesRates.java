@@ -20,51 +20,42 @@ public abstract class AbstractAttitudeAnglesRates {
     }
 
     /** Set first angle and/or rate */
-    @SuppressWarnings("javadoc")
     public void setFirstAngle(double angle) {
         setAngle(0, angle);
     }
 
-    @SuppressWarnings("javadoc")
     public void setFirstRate(double rate) {
         setRate(0, rate);
     }
 
-    @SuppressWarnings("javadoc")
     public void setFirstPair(final double angle, final double rate) {
         setFirstAngle(angle);
         setFirstRate(rate);
     }
 
     /** set second angle and/or rate value */
-    @SuppressWarnings("javadoc")
     public void setSecondAngle(double angle) {
         setAngle(1, angle);
     }
 
-    @SuppressWarnings("javadoc")
     public void setSecondRate(double rate) {
         setRate(1, rate);
     }
 
-    @SuppressWarnings("javadoc")
     public void setSecondPair(double angle, double rate) {
         setSecondAngle(angle);
         setSecondRate(rate);
     }
 
     /** set third angle and/or rate value */
-    @SuppressWarnings("javadoc")
     public void setThirdAngle(double angle) {
         setAngle(2, angle);
     }
 
-    @SuppressWarnings("javadoc")
     public void setThirdRate(double rate) {
         setRate(2, rate);
     }
 
-    @SuppressWarnings("javadoc")
     public void setThirdPair(double angle, double rate) {
         setThirdAngle(angle);
         setThirdRate(rate);

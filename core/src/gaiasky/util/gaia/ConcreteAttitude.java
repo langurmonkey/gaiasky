@@ -86,10 +86,8 @@ public class ConcreteAttitude implements IAttitude {
     }
 
     /**
-     * The the quaternion of the attitude. * Set the time of the attitude. This
+     * The quaternion of the attitude. * Set the time of the attitude. This
      * usually does not make sense as the time is set during construction of the
-     *
-     * @param q
      */
     public void setQuaternion(QuaternionDouble q) {
         this.q = q;

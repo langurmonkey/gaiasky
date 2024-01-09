@@ -124,8 +124,8 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadDataMapped(String file, double factor) {
-        try {
-            FileChannel fc = new RandomAccessFile(Settings.settings.data.dataFile(file), "r").getChannel();
+        try (var raf = new RandomAccessFile(Settings.settings.data.dataFile(file), "r")) {
+            FileChannel fc = raf.getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
@@ -163,11 +163,11 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
      * @param versionHint Data version number, in case of version 0 or 1, since these formats were
      *                    not annotated. If version >=2, the version number is read from the file header
      *
-     * @return
+     * @return The list of particle records.
      */
     public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
-        try {
-            FileChannel fc = new RandomAccessFile(Settings.settings.data.dataFile(file), "r").getChannel();
+        try (var raf = new RandomAccessFile(Settings.settings.data.dataFile(file), "r")) {
+            FileChannel fc = raf.getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
