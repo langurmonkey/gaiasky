@@ -33,113 +33,101 @@ public class Position {
         realPosition = new Vector3d();
 
         switch (type) {
-        case EQ_SPH_DIST:
+            case EQ_SPH_DIST -> {
+                Angle lon = new Angle(a, unitA);
+                Angle lat = new Angle(b, unitB);
+                Length dist = new Length(c, unitC);
 
-            Angle lon = new Angle(a, unitA);
-            Angle lat = new Angle(b, unitB);
-            Length dist = new Length(c, unitC);
+                if (dist.value_m <= 0) {
+                    throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+                }
 
-            if (dist.value_m <= 0) {
-                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+                Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
             }
+            case EQ_SPH_PLX -> {
+                Angle lon = new Angle(a, unitA);
+                Angle lat = new Angle(b, unitB);
+                Length dist = new Angle(c, unitC).getParallaxDistance();
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+                if (dist.value_m <= 0) {
+                    throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+                }
 
-            break;
-        case EQ_SPH_PLX:
-
-            lon = new Angle(a, unitA);
-            lat = new Angle(b, unitB);
-            dist = new Angle(c, unitC).getParallaxDistance();
-
-            if (dist.value_m <= 0) {
-                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+                Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
             }
+            case GAL_SPH_DIST -> {
+                Angle lon = new Angle(a, unitA);
+                Angle lat = new Angle(b, unitB);
+                Length dist = new Length(c, unitC);
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+                if (dist.value_m <= 0) {
+                    throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+                }
 
-            break;
-        case GAL_SPH_DIST:
-
-            lon = new Angle(a, unitA);
-            lat = new Angle(b, unitB);
-            dist = new Length(c, unitC);
-
-            if (dist.value_m <= 0) {
-                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+                Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+                realPosition.mul(Coordinates.galToEq());
             }
+            case GAL_SPH_PLX -> {
+                Angle lon = new Angle(a, unitA);
+                Angle lat = new Angle(b, unitB);
+                Length dist = new Angle(c, unitC).getParallaxDistance();
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
-            realPosition.mul(Coordinates.galToEq());
-            break;
-        case GAL_SPH_PLX:
+                if (dist.value_m <= 0) {
+                    throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+                }
 
-            lon = new Angle(a, unitA);
-            lat = new Angle(b, unitB);
-            dist = new Angle(c, unitC).getParallaxDistance();
-
-            if (dist.value_m <= 0) {
-                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+                Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+                realPosition.mul(Coordinates.galToEq());
             }
+            case ECL_SPH_DIST -> {
+                Angle lon = new Angle(a, unitA);
+                Angle lat = new Angle(b, unitB);
+                Length dist = new Length(c, unitC);
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
-            realPosition.mul(Coordinates.galToEq());
-            break;
-        case ECL_SPH_DIST:
+                if (dist.value_m <= 0) {
+                    throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+                }
 
-            lon = new Angle(a, unitA);
-            lat = new Angle(b, unitB);
-            dist = new Length(c, unitC);
-
-            if (dist.value_m <= 0) {
-                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+                Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+                realPosition.mul(Coordinates.eclToEq());
             }
+            case ECL_SPH_PLX -> {
+                Angle lon = new Angle(a, unitA);
+                Angle lat = new Angle(b, unitB);
+                Length dist = new Angle(c, unitC).getParallaxDistance();
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
-            realPosition.mul(Coordinates.eclToEq());
-            break;
-        case ECL_SPH_PLX:
+                if (dist.value_m <= 0) {
+                    throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+                }
 
-            lon = new Angle(a, unitA);
-            lat = new Angle(b, unitB);
-            dist = new Angle(c, unitC).getParallaxDistance();
-
-            if (dist.value_m <= 0) {
-                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+                Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+                realPosition.mul(Coordinates.eclToEq());
             }
+            case EQ_XYZ -> {
+                Length x = new Length(a, unitA);
+                Length y = new Length(b, unitB);
+                Length z = new Length(c, unitC);
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
-            realPosition.mul(Coordinates.eclToEq());
-            break;
-        case EQ_XYZ:
+                realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
+            }
+            case GAL_XYZ -> {
+                Length x = new Length(a, unitA);
+                Length y = new Length(b, unitB);
+                Length z = new Length(c, unitC);
 
-            Length x = new Length(a, unitA);
-            Length y = new Length(b, unitB);
-            Length z = new Length(c, unitC);
+                realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
+                realPosition.mul(Coordinates.galToEq());
+            }
+            case ECL_XYZ -> {
+                Length x = new Length(a, unitA);
+                Length y = new Length(b, unitB);
+                Length z = new Length(c, unitC);
 
-            realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
-
-            break;
-        case GAL_XYZ:
-
-            x = new Length(a, unitA);
-            y = new Length(b, unitB);
-            z = new Length(c, unitC);
-
-            realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
-            realPosition.mul(Coordinates.galToEq());
-            break;
-        case ECL_XYZ:
-
-            x = new Length(a, unitA);
-            y = new Length(b, unitB);
-            z = new Length(c, unitC);
-
-            realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
-            realPosition.mul(Coordinates.eclToEq());
-            break;
-        default:
-            break;
+                realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
+                realPosition.mul(Coordinates.eclToEq());
+            }
+            default -> {
+            }
         }
 
     }

@@ -8,6 +8,9 @@
 package gaiasky.data.group;
 
 import gaiasky.data.api.BinaryIO;
+import gaiasky.data.group.reader.IDataReader;
+import gaiasky.data.group.reader.InputStreamDataReader;
+import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.record.ParticleRecord;
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.util.Constants;
@@ -32,68 +35,17 @@ public abstract class BinaryIOBase implements BinaryIO {
 
     @Override
     public ParticleRecord readParticleRecord(MappedByteBuffer mem,
-                                             double factor) {
-        double[] dataD = new double[ParticleRecordType.STAR.doubleArraySize];
-        float[] dataF = new float[ParticleRecordType.STAR.floatArraySize];
-        int floatOffset = 0;
-        // Double
-        for (int i = 0; i < nDoubles; i++) {
-            if (i < ParticleRecordType.STAR.doubleArraySize) {
-                // Goes to double array
-                dataD[i] = mem.getDouble();
-                dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
-            } else {
-                // Goes to float array.
-                int idx = i - ParticleRecordType.STAR.doubleArraySize;
-                dataF[idx] = (float) mem.getDouble();
-                if (idx < 3) {
-                    // Proper motions.
-                    dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
-                }
-                floatOffset = idx + 1;
-            }
-        }
-        // Float
-        for (int i = 0; i < nFloats; i++) {
-            int idx = i + floatOffset;
-            dataF[idx] = mem.getFloat();
-            if (idx == ParticleRecord.I_FSIZE || (nFloats == 10  && idx < 3)) {
-                // 0-2 - Proper motions (only in version 2).
-                // 9 | 3 - Size (version 2 | 0-1).
-                dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
-            }
-        }
-        // HIP
-        dataF[ParticleRecord.I_FHIP] = mem.getInt();
-
-        // TYCHO
-        if (tychoIds) {
-            // Skip unused tycho numbers, 3 Integers
-            mem.getInt();
-            mem.getInt();
-            mem.getInt();
-        }
-
-        // ID
-        Long id = mem.getLong();
-
-        // NAME
-        int nameLength = mem.getInt();
-        String[] names;
-        if (nameLength == 0) {
-            names = new String[] { id.toString() };
-        } else {
-            StringBuilder namesConcat = new StringBuilder();
-            for (int i = 0; i < nameLength; i++)
-                namesConcat.append(mem.getChar());
-            names = namesConcat.toString().split(Constants.nameSeparatorRegex);
-        }
-
-        return new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names);
+                                             double factor) throws IOException {
+        return readParticleRecord(new MappedBufferDataReader(mem), factor);
     }
 
     @Override
     public ParticleRecord readParticleRecord(DataInputStream in,
+                                             double factor) throws IOException {
+        return readParticleRecord(new InputStreamDataReader(in), factor);
+    }
+
+    public ParticleRecord readParticleRecord(IDataReader in,
                                              double factor) throws IOException {
         double[] dataD = new double[ParticleRecordType.STAR.doubleArraySize];
         float[] dataF = new float[ParticleRecordType.STAR.floatArraySize];
@@ -146,5 +98,4 @@ public abstract class BinaryIOBase implements BinaryIO {
 
         return new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names);
     }
-
 }

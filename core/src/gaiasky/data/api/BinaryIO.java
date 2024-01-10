@@ -25,7 +25,7 @@ public interface BinaryIO {
      *
      * @return The star.
      */
-    ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor);
+    ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) throws IOException;
 
     /**
      * Read a star from the input stream.

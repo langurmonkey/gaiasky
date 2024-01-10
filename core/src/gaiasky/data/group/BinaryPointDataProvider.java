@@ -9,6 +9,9 @@ package gaiasky.data.group;
 
 import gaiasky.data.api.BinaryIO;
 import gaiasky.data.api.IParticleGroupDataProvider;
+import gaiasky.data.group.reader.IDataReader;
+import gaiasky.data.group.reader.InputStreamDataReader;
+import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleRecord;
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
@@ -16,7 +19,9 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
@@ -26,6 +31,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Loads and writes binary data into particle groups ({@link ParticleRecordType#PARTICLE_EXT}).
@@ -33,19 +39,25 @@ import java.util.Map;
  *
  * <ul>
  *     <li>int (4 bytes) -- number of records</li>
- *     <li>byte (1 byte [0|1]) -- has size</li>
- *     <li>byte (1 byte [0|1]) -- has packed color</li>
+ *     <li>byte (1 byte [0|1]) -- particle record type: true - PARTICLE_EXT, false - PARTICLE</li>
  *     <li>for each record:
  *     <ul>
  *         <li>long (8 bytes) -- id</li>
  *         <li>short (2 bytes) -- nameLength</li>
  *         <li>char (2 bytes) * nameLength -- name characters</li>
- *         <li>double (8 bytes) -- X</li>
- *         <li>double (8 bytes) -- Y</li>
- *         <li>double (8 bytes) -- Z</li>
- *         <li>float (4 bytes) -- size (if has size)</li>
- *         <li>float (4 bytes) -- packed color (if has color)</li>
- *
+ *         <li>double (8 bytes) -- alpha [deg]</li>
+ *         <li>double (8 bytes) -- delta [deg]</li>
+ *         <li>double (8 bytes) -- distance [pc]</li>
+ *         <li>if type == PARTICLE_EXT
+ *         <ul>
+ *             <li>float (4 bytes) -- mu alpha</li>
+ *             <li>float (4 bytes) -- mu delta</li>
+ *             <li>float (4 bytes) -- radial velocity</li>
+ *             <li>float (4 bytes) -- apparent magnitude</li>
+ *             <li>float (4 bytes) -- packed color</li>
+ *             <li>float (4 bytes) -- size</li>
+ *         </ul>
+ *         </li>
  *     </ul>
  *     </li>
  * </ul>
@@ -55,20 +67,17 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
     private int particleNumberCap = -1;
     protected List<IParticleRecord> list;
+    /** Whether to use PARTICLE_EXT or PARTICLE. **/
+    private final AtomicBoolean extra = new AtomicBoolean();
 
-    // State booleans used in loading and writing data.
-    private boolean hasSize, hasColor;
-    private boolean writeNames = true;
-
-    // Dataset options, may be null
-    private DatasetOptions datasetOptions;
+    private final Vector3d aux3d1 = new Vector3d();
+    private final Vector3d aux3d2 = new Vector3d();
 
 
     public BinaryPointDataProvider() {
     }
 
     public void setDatasetOptions(DatasetOptions datasetOptions) {
-        this.datasetOptions = datasetOptions;
     }
 
     @Override
@@ -98,8 +107,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         try {
             data_in.mark(0);
             int size = data_in.readInt();
-            hasSize = data_in.readBoolean();
-            hasColor = data_in.readBoolean();
+            boolean extra = data_in.readBoolean();
+            this.extra.set(extra);
 
             data = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
@@ -130,8 +139,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
             mem.mark();
             int size = mem.getInt();
-            hasSize = mem.get() == (byte) 1;
-            hasColor = mem.get() == (byte) 1;
+            boolean extra = mem.get() == (byte) 1;
+            this.extra.set(extra);
 
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
@@ -172,52 +181,84 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
     }
 
     @Override
-    public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) {
-        var pType = ((datasetOptions != null && datasetOptions.type != null) ?
-                (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES_EXT ? ParticleRecordType.PARTICLE_EXT : ParticleRecordType.PARTICLE)
-                : (hasColor || hasSize ? ParticleRecordType.PARTICLE_EXT : ParticleRecordType.PARTICLE));
+    public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) throws IOException {
+        return readParticleRecord(new MappedBufferDataReader(mem), factor);
+    }
+
+    @Override
+    public ParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException {
+        return readParticleRecord(new InputStreamDataReader(in), factor);
+    }
+
+    public ParticleRecord readParticleRecord(IDataReader in, double factor) throws IOException {
+        var pType = extra.get() ? ParticleRecordType.PARTICLE_EXT : ParticleRecordType.PARTICLE;
+
         double[] dataD = new double[pType.doubleArraySize];
         float[] dataF = new float[pType.floatArraySize];
 
         // ID
-        long id = mem.getLong();
+        long id = in.readLong();
 
         // NAME
-        int nameLength = mem.getInt();
+        int nameLength = in.readInt();
         String[] names;
         if (nameLength == 0) {
             names = new String[]{Long.toString(id)};
         } else {
             StringBuilder namesConcat = new StringBuilder();
             for (int i = 0; i < nameLength; i++)
-                namesConcat.append(mem.getChar());
+                namesConcat.append(in.readChar());
             names = namesConcat.toString().split(Constants.nameSeparatorRegex);
         }
 
         // XYZ
-        var pos = new Vector3d(mem.getDouble(), mem.getDouble(), mem.getDouble());
+        final double alphaDeg = in.readDouble();
+        final double deltaDeg = in.readDouble();
+        final double distPc = in.readDouble();
+        var pos = Coordinates.sphericalToCartesian(alphaDeg * MathUtilsDouble.degRad,
+                deltaDeg * MathUtilsDouble.degRad,
+                distPc * Constants.PC_TO_U,
+                aux3d1);
+
+        // PROPER MOTION
+        float muAlpha = 0;
+        float muDelta = 0;
+        float radVel = 0;
+        if (extra.get()) {
+            muAlpha = in.readFloat();
+            muDelta = in.readFloat();
+            radVel = in.readFloat();
+        }
+
+        // VELOCITY VECTOR
+        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, Math.toRadians(alphaDeg), Math.toRadians(deltaDeg), distPc, aux3d2);
 
         // MAGNITUDE
-        final double distPc = pos.len() * Constants.U_TO_PC;
-        final float appMag = (float) Constants.DEFAULT_MAG;
+        float appMag;
+        if (extra.get()) {
+            appMag = in.readFloat();
+        } else {
+            appMag = (float) Constants.DEFAULT_MAG;
+        }
         final float absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
+
+        // COLOR
+        float color;
+        if (extra.get()) {
+            color = in.readFloat();
+        } else {
+            color = Float.NaN;
+        }
 
         // SIZE
         float size;
-        if (hasSize) {
-            size = mem.getFloat();
+        if (extra.get()) {
+            size = in.readFloat();
         } else {
             double sizePc = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
             size = (float) sizePc;
         }
 
-        // COLOR
-        float color;
-        if (hasColor) {
-            color = mem.getFloat();
-        } else {
-            color = Float.NaN;
-        }
 
         ParticleRecord particle = null;
         switch (pType) {
@@ -228,7 +269,12 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
                 particle.setPos(pos.x, pos.y, pos.z);
             }
             case PARTICLE_EXT -> {
-                particle = new ParticleRecord(pType, dataD, dataF, id, names);
+                particle = new ParticleRecord(pType);
+                particle.setId(id);
+                particle.setNames(names);
+                particle.setPos(pos.x, pos.y, pos.z);
+                particle.setProperMotion(muAlpha, muDelta, radVel);
+                particle.setVelocityVector(velocityVector.x, velocityVector.y, velocityVector.z);
                 particle.setMag(appMag, absMag);
                 particle.setSize(size);
                 particle.setCol(color);
@@ -238,57 +284,15 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         return particle;
     }
 
-    @Override
-    public ParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException {
-        double[] dataD = new double[ParticleRecordType.PARTICLE_EXT.doubleArraySize];
-        float[] dataF = new float[ParticleRecordType.PARTICLE_EXT.floatArraySize];
 
-        // ID
-        Long id = in.readLong();
-
-        // NAME
-        int nameLength = in.readInt();
-        String[] names;
-        if (nameLength == 0) {
-            names = new String[]{id.toString()};
-        } else {
-            StringBuilder namesConcat = new StringBuilder();
-            for (int i = 0; i < nameLength; i++)
-                namesConcat.append(in.readChar());
-            names = namesConcat.toString().split(Constants.nameSeparatorRegex);
-        }
-
-        // XYZ
-        dataD[0] = in.readDouble();
-        dataD[1] = in.readDouble();
-        dataD[2] = in.readDouble();
-
-        var particle = new ParticleRecord(ParticleRecordType.PARTICLE_EXT, dataD, dataF, id, names);
-
-        // SIZE
-        if (hasSize) {
-            particle.setSize(in.readFloat());
-        }
-
-        // COLOR
-        if (hasColor) {
-            particle.setCol(in.readFloat());
-        }
-
-        return particle;
-    }
-
-    public void writeData(List<IParticleRecord> data, OutputStream out, boolean writeSizes, boolean writeColors, boolean writeNames) {
+    public void writeData(List<IParticleRecord> data, OutputStream out, boolean extra) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
             // Number of particles
             data_out.writeInt(data.size());
-            data_out.writeBoolean(writeSizes);
-            data_out.writeBoolean(writeColors);
-            this.hasSize = writeSizes;
-            this.hasColor = writeColors;
-            this.writeNames = writeNames;
+            data_out.writeBoolean(extra);
+            this.extra.set(extra);
             for (IParticleRecord sb : data) {
                 writeParticleRecord(sb, data_out);
             }
@@ -311,7 +315,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         out.writeLong(sb.id());
 
         // NAME.
-        if (!writeNames) {
+        if (sb.names().length == 1 && sb.names()[0].equals(Long.toString(sb.id()))) {
+            // If name equals ID, skip it.
             out.writeInt(0);
         } else {
             var namesConcat = sb.namesConcat();
@@ -323,19 +328,27 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
             }
         }
 
-        // XYZ
-        out.writeDouble(sb.x());
-        out.writeDouble(sb.y());
-        out.writeDouble(sb.z());
+        // POSITION.
+        Vector3d cartPos = sb.pos(aux3d1);
+        Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2);
+        out.writeDouble(sphPos.x * MathUtilsDouble.radDeg);
+        out.writeDouble(sphPos.y * MathUtilsDouble.radDeg);
+        out.writeDouble(sb.distance() * Constants.U_TO_PC);
 
-        // SIZE.
-        if (hasSize) {
-            out.writeFloat(sb.size());
-        }
+        if (extra.get()) {
+            // PROPER MOTION.
+            out.writeFloat(sb.mualpha());
+            out.writeFloat(sb.mudelta());
+            out.writeFloat(sb.radvel());
 
-        // COLOR.
-        if (hasColor) {
+            // MAGNITUDE.
+            out.writeFloat(sb.appMag());
+
+            // COLOR.
             out.writeFloat(sb.col());
+
+            // SIZE.
+            out.writeFloat(sb.size());
         }
 
     }
