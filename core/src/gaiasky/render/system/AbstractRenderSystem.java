@@ -41,8 +41,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     protected Array<RenderSystemRunnable> preRunners, postRunners;
     private boolean vrScaleFlag = false, depthBufferFlag = false;
 
-    protected final Vector3 auxf = new Vector3();
-    protected final Vector3d auxd = new Vector3d();
+    protected final Vector3 aux3f = new Vector3();
+    protected final Vector3d aux3d = new Vector3d();
 
     protected AbstractRenderSystem(SceneRenderer sceneRenderer,
                                    RenderGroup rg,
@@ -201,8 +201,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
                                             ICamera camera) {
         // Velocity buffer for motion blur effect.
         if (settings.postprocess.motionBlur.active) {
-            shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(auxf));
-            shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(auxf));
+            shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux3f));
+            shaderProgram.setUniformf("u_dCamPos", aux3d.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux3f));
             shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
         }
     }
@@ -220,10 +220,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         // TODO deactivate for now.
         if (settings.program.modeCubemap.active) {
             // Set NaN to first component.
-            shaderProgram.setUniformf("u_camUp", auxf.set(Float.NaN, 0, 0));
+            shaderProgram.setUniformf("u_camUp", aux3f.set(Float.NaN, 0, 0));
         } else {
             // Add real camera up.
-            shaderProgram.setUniformf("u_camUp", camera.getUp().put(auxf));
+            shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux3f));
         }
     }
 
@@ -244,7 +244,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         var program = programs[num];
         if (!program.isCompiled()) {
             // Compile shader
-            program.compile();
+            program.compile(program.getName());
             // Initialize
             initShaderProgram();
 

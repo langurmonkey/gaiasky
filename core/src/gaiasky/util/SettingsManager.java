@@ -337,9 +337,18 @@ public class SettingsManager {
 
     private void persist(final File settingsFile) {
         try {
+            boolean backup = settings.program.safeMode;
+            if (settings.program.safeModeFlag) {
+                settings.program.safeMode = false;
+            }
+
             FileOutputStream fos = new FileOutputStream(settingsFile);
             SequenceWriter sw = mapper.writerWithDefaultPrettyPrinter().writeValues(fos);
             sw.write(settings);
+
+            if (settings.program.safeModeFlag) {
+                settings.program.safeMode = backup;
+            }
             logger.info("Settings saved to " + settingsFile.getAbsolutePath());
         } catch (Exception e) {
             logger.error(e);

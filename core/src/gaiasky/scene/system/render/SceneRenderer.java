@@ -49,6 +49,7 @@ import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
@@ -133,6 +134,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     public void initialize(AssetManager manager) {
         // Frame buffer map
         frameBufferMap = new HashMap<>();
+
         // Initialize the render assets.
         renderAssets.initialize(manager);
 

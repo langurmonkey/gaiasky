@@ -101,7 +101,7 @@ public class GlobalResources {
         this.spriteBatch = new SpriteBatch(500, getSpriteShader());
 
         // ExtSprite shader
-        this.extSpriteShader = new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        this.extSpriteShader = new ExtShaderProgram("spritebatch", Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
         if (!extSpriteShader.isCompiled()) {
             logger.info("ExtSpriteBatch shader compilation failed: " + extSpriteShader.getLog());
         }
@@ -349,7 +349,7 @@ public class GlobalResources {
         Files.walk(path).sorted(Comparator.reverseOrder())
                 // It is not a .part file, or it is a .part file older than 6 hours, and it is not a directory.
                 .filter(p -> (!p.toString().endsWith(".part") ||
-                             (p.toString().endsWith(".part") && (TimeUtils.millis() - p.toFile().lastModified() > Constants.PART_FILE_MAX_AGE_MS)))
+                        (p.toString().endsWith(".part") && (TimeUtils.millis() - p.toFile().lastModified() > Constants.PART_FILE_MAX_AGE_MS)))
                         && !Files.isDirectory(p))
                 .map(Path::toFile)
                 .forEach(java.io.File::delete);
@@ -916,7 +916,7 @@ public class GlobalResources {
     }
 
     public void resize(int width, int height) {
-        if(spriteBatch != null) {
+        if (spriteBatch != null) {
             spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
         }
     }
