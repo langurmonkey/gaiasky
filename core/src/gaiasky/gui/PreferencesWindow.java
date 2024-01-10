@@ -29,7 +29,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.gui.beans.*;
-import gaiasky.input.InputUtils;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -42,6 +41,7 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.validator.*;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +66,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY,
             highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
-            crosshairHome, pointerGuides, newUI, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr, eclipses, eclipseOutlines, starSpheres;
+            crosshairHome, pointerGuides, newUI, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur,
+            ssr, eclipses, eclipseOutlines, starSpheres, shaderCache;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
@@ -400,8 +401,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel aaLabel = new OwnLabel(I18n.msg("gui.aa"), skin);
         aaLabel.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
-        ComboBoxBean[] aas = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.aa.no"), 0), new ComboBoxBean(I18n.msg("gui.aa.fxaa"), -1),
-                new ComboBoxBean(I18n.msg("gui.aa.nfaa"), -2) };
+        ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.aa.no"), 0), new ComboBoxBean(I18n.msg("gui.aa.fxaa"), -1),
+                new ComboBoxBean(I18n.msg("gui.aa.nfaa"), -2)};
         aa = new OwnSelectBox<>(skin);
         aa.setItems(aas);
         aa.setWidth(selectWidth);
@@ -412,9 +413,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Only if not VR, the triangles break in VR
         // POINT CLOUD
-        ComboBoxBean[] pointCloudItems = new ComboBoxBean[] {
+        ComboBoxBean[] pointCloudItems = new ComboBoxBean[]{
                 new ComboBoxBean(I18n.msg("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()),
-                new ComboBoxBean(I18n.msg("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
+                new ComboBoxBean(I18n.msg("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal())};
         pointCloudRenderer = new OwnSelectBox<>(skin);
         pointCloudRenderer.setItems(pointCloudItems);
         pointCloudRenderer.setWidth(selectWidth);
@@ -422,9 +423,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(I18n.msg("gui.linerenderer"), skin);
-        ComboBoxBean[] lineRenderers = new ComboBoxBean[] {
+        ComboBoxBean[] lineRenderers = new ComboBoxBean[]{
                 new ComboBoxBean(I18n.msg("gui.linerenderer.quads"), LineMode.POLYLINE_QUADSTRIP.ordinal()),
-                new ComboBoxBean(I18n.msg("gui.linerenderer.lines"), LineMode.GL_LINES.ordinal()) };
+                new ComboBoxBean(I18n.msg("gui.linerenderer.lines"), LineMode.GL_LINES.ordinal())};
         lineRenderer = new OwnSelectBox<>(skin);
         lineRenderer.setItems(lineRenderers);
         lineRenderer.setWidth(selectWidth);
@@ -464,7 +465,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // CHROMATIC ABERRATION
         OwnLabel chromaticAberrationLabel = new OwnLabel(I18n.msg("gui.chromaticaberration"), skin, "default");
         chromaticAberration = new OwnSliderPlus("", Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT,
-                                                Constants.SLIDER_STEP_TINY * 0.1f, skin);
+                Constants.SLIDER_STEP_TINY * 0.1f, skin);
         chromaticAberration.setName("chromatic aberration amount");
         chromaticAberration.setWidth(sliderWidth);
         chromaticAberration.setValue(settings.postprocess.chromaticAberration.amount);
@@ -479,7 +480,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // FILM GRAIN
         OwnLabel filmGrainLabel = new OwnLabel(I18n.msg("gui.filmgrain"), skin, "default");
         filmGrain = new OwnSliderPlus("", Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY,
-                                      Constants.SLIDER_STEP_TINY * 0.1f, skin);
+                Constants.SLIDER_STEP_TINY * 0.1f, skin);
         filmGrain.setName("film grain intensity");
         filmGrain.setWidth(sliderWidth);
         filmGrain.setValue(settings.postprocess.filmGrain.intensity);
@@ -679,12 +680,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         brightness.setName("brightness");
         brightness.setWidth(sliderWidth);
         brightness.setValue(MathUtilsDouble.lint(settings.postprocess.levels.brightness, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, Constants.MIN_SLIDER,
-                                                 Constants.MAX_SLIDER));
+                Constants.MAX_SLIDER));
         brightness.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.BRIGHTNESS_CMD, brightness,
-                                     MathUtilsDouble.lint(brightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_BRIGHTNESS,
-                                                          Constants.MAX_BRIGHTNESS), true);
+                        MathUtilsDouble.lint(brightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_BRIGHTNESS,
+                                Constants.MAX_BRIGHTNESS), true);
                 return true;
             }
             return false;
@@ -703,8 +704,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contrast.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CONTRAST_CMD, contrast,
-                                     MathUtilsDouble.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST,
-                                                          Constants.MAX_CONTRAST), true);
+                        MathUtilsDouble.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST,
+                                Constants.MAX_CONTRAST), true);
                 return true;
             }
             return false;
@@ -722,7 +723,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         hue.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.HUE_CMD, hue,
-                                     MathUtilsDouble.lint(hue.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_HUE, Constants.MAX_HUE), true);
+                        MathUtilsDouble.lint(hue.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_HUE, Constants.MAX_HUE), true);
                 return true;
             }
             return false;
@@ -737,12 +738,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         saturation.setName("saturation");
         saturation.setWidth(sliderWidth);
         saturation.setValue(MathUtilsDouble.lint(settings.postprocess.levels.saturation, Constants.MIN_SATURATION, Constants.MAX_SATURATION, Constants.MIN_SLIDER,
-                                                 Constants.MAX_SLIDER));
+                Constants.MAX_SLIDER));
         saturation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SATURATION_CMD, saturation,
-                                     MathUtilsDouble.lint(saturation.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SATURATION,
-                                                          Constants.MAX_SATURATION), true);
+                        MathUtilsDouble.lint(saturation.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SATURATION,
+                                Constants.MAX_SATURATION), true);
                 return true;
             }
             return false;
@@ -981,7 +982,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // ORIGIN
         OwnLabel originLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.origin"), skin);
-        String[] origins = new String[] { I18n.msg("gui.ui.recursivegrid.origin.refsys"), I18n.msg("gui.ui.recursivegrid.origin.focus") };
+        String[] origins = new String[]{I18n.msg("gui.ui.recursivegrid.origin.refsys"), I18n.msg("gui.ui.recursivegrid.origin.focus")};
         recGridOrigin = new OwnSelectBox<>(skin);
         recGridOrigin.setWidth(selectWidth);
         recGridOrigin.setItems(origins);
@@ -989,7 +990,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // STYLE
         OwnLabel styleLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.style"), skin);
-        String[] styles = new String[] { I18n.msg("gui.ui.recursivegrid.style.circular"), I18n.msg("gui.ui.recursivegrid.style.square") };
+        String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.circular"), I18n.msg("gui.ui.recursivegrid.style.square")};
         recGridStyle = new OwnSelectBox<>(skin);
         recGridStyle.setWidth(selectWidth);
         recGridStyle.setItems(styles);
@@ -1127,9 +1128,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
 
-        StrComboBoxBean[] themes = new StrComboBoxBean[] { new StrComboBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
+        StrComboBoxBean[] themes = new StrComboBoxBean[]{new StrComboBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
                 new StrComboBoxBean(I18n.msg("gui.theme.darkblue"), "dark-blue"), new StrComboBoxBean(I18n.msg("gui.theme.darkorange"), "dark-orange"),
-                new StrComboBoxBean(I18n.msg("gui.theme.nightred"), "night-red") };
+                new StrComboBoxBean(I18n.msg("gui.theme.nightred"), "night-red")};
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(selectWidth);
         theme.setItems(themes);
@@ -1148,7 +1149,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // SCALING
         OwnLabel uiScaleLabel = new OwnLabel(I18n.msg("gui.ui.theme.scale"), skin);
         uiScale = new OwnSliderPlus("", Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_SMALL, Constants.UI_SCALE_INTERNAL_MIN,
-                                    Constants.UI_SCALE_INTERNAL_MAX, skin);
+                Constants.UI_SCALE_INTERNAL_MAX, skin);
         uiScale.setWidth(sliderWidth);
         uiScale.setMappedValue(settings.program.ui.scale);
         OwnTextButton applyUiScale = new OwnTextButton(I18n.msg("gui.apply"), skin);
@@ -1382,7 +1383,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Draw distance
         OwnLabel ddLabel = new OwnLabel(I18n.msg("gui.lod.thresholds"), skin);
         lodTransitions = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 0.1f, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG,
-                                           skin);
+                skin);
         lodTransitions.setDisplayValueMapped(true);
         lodTransitions.setWidth(sliderWidth);
         lodTransitions.setMappedValue(settings.scene.octree.threshold[0] * MathUtilsDouble.radDeg);
@@ -1561,7 +1562,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.screenshots.directory.choose"), skin, stage, Paths.get(settings.screenshot.location),
-                                                 FileChooser.FileChooserTarget.DIRECTORIES);
+                        FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -1603,8 +1604,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Mode
         OwnLabel ssModeLabel = new OwnLabel(I18n.msg("gui.screenshots.mode"), skin);
-        ComboBoxBean[] screenshotModes = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.mode.simple"), 0),
-                new ComboBoxBean(I18n.msg("gui.screenshots.mode.redraw"), 1) };
+        ComboBoxBean[] screenshotModes = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.screenshots.mode.simple"), 0),
+                new ComboBoxBean(I18n.msg("gui.screenshots.mode.redraw"), 1)};
         screenshotMode = new OwnSelectBox<>(skin);
         screenshotMode.setItems(screenshotModes);
         screenshotMode.setWidth(selectWidth);
@@ -1629,8 +1630,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Format
         OwnLabel ssFormatLabel = new OwnLabel(I18n.msg("gui.screenshots.format"), skin);
-        ComboBoxBean[] screenshotFormats = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.format.png"), 0),
-                new ComboBoxBean(I18n.msg("gui.screenshots.format.jpg"), 1) };
+        ComboBoxBean[] screenshotFormats = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.screenshots.format.png"), 0),
+                new ComboBoxBean(I18n.msg("gui.screenshots.format.jpg"), 1)};
         screenshotFormat = new OwnSelectBox<>(skin);
         screenshotFormat.setItems(screenshotFormats);
         screenshotFormat.setWidth(selectWidth);
@@ -1701,7 +1702,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameOutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.frameoutput.directory.choose"), skin, stage, Paths.get(settings.frame.location),
-                                                 FileChooser.FileChooserTarget.DIRECTORIES);
+                        FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -1760,8 +1761,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Format
         OwnLabel foFormatLabel = new OwnLabel(I18n.msg("gui.screenshots.format"), skin);
-        ComboBoxBean[] frameFormats = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.format.png"), 0),
-                new ComboBoxBean(I18n.msg("gui.screenshots.format.jpg"), 1) };
+        ComboBoxBean[] frameFormats = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.screenshots.format.png"), 0),
+                new ComboBoxBean(I18n.msg("gui.screenshots.format.jpg"), 1)};
         frameOutputFormat = new OwnSelectBox<>(skin);
         frameOutputFormat.setItems(screenshotFormats);
         frameOutputFormat.setWidth(selectWidth);
@@ -1777,8 +1778,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Mode
         OwnLabel fomodeLabel = new OwnLabel(I18n.msg("gui.screenshots.mode"), skin);
-        ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.mode.simple"), 0),
-                new ComboBoxBean(I18n.msg("gui.screenshots.mode.redraw"), 1) };
+        ComboBoxBean[] frameoutputModes = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.screenshots.mode.simple"), 0),
+                new ComboBoxBean(I18n.msg("gui.screenshots.mode.redraw"), 1)};
         frameOutputMode = new OwnSelectBox<>(skin);
         frameOutputMode.setItems(frameoutputModes);
         frameOutputMode.setWidth(selectWidth);
@@ -2192,10 +2193,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentSystem.setWidth(contentWidth);
         contentSystem.align(Align.top | Align.left);
 
-        // STATS
-        OwnLabel titleStats = new OwnLabel(I18n.msg("gui.system.reporting"), skin, "header");
+        // SYSTEM PREFERENCES
+        OwnLabel titleSystemPrefs = new OwnLabel(I18n.msg("gui.system.reporting"), skin, "header");
         Table stats = new Table(skin);
 
+        // DEBUG INFO
         OwnLabel debugInfoLabel = new OwnLabel(I18n.msg("gui.system.debuginfo"), skin);
         debugInfo = new OwnCheckBox("", skin);
         debugInfo.setChecked(settings.program.debugInfo);
@@ -2207,12 +2209,38 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
+        // SHADER CACHE
+        OwnLabel cacheLabel = new OwnLabel(I18n.msg("gui.system.shader.cache"), skin);
+        shaderCache = new OwnCheckBox("", skin);
+        shaderCache.setChecked(settings.program.shaderCache);
+        OwnImageButton shaderCacheTooltip = new OwnImageButton(skin, "tooltip");
+        shaderCacheTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.system.shader.cache.info"), skin));
+
+        // CLEAR SHADER CACHE BUTTON
+        OwnTextButton clearCache = new OwnTextButton(I18n.msg("gui.system.shader.cache.clear"), skin);
+        clearCache.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                var path = SysUtils.getShaderCacheDir();
+                try {
+                    FileUtils.cleanDirectory(path.toFile());
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, clearCache, I18n.msg("gui.system.shader.cache.clean", path.toString()), 4f);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+                return true;
+            }
+
+            return false;
+        });
+        clearCache.pad(0, pad34, 0, pad34);
+        clearCache.setHeight(buttonHeight);
+
         // EXIT CONFIRMATION
         OwnLabel exitConfirmationLabel = new OwnLabel(I18n.msg("gui.quit.confirmation"), skin);
         exitConfirmation = new OwnCheckBox("", skin);
         exitConfirmation.setChecked(settings.program.exitConfirmation);
 
-        labels.addAll(debugInfoLabel, exitConfirmationLabel);
+        labels.addAll(debugInfoLabel, cacheLabel, exitConfirmationLabel);
 
         // RELOAD DEFAULTS
         OwnTextButton reloadDefaults = new OwnTextButton(I18n.msg("gui.system.reloaddefaults"), skin);
@@ -2228,7 +2256,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             return false;
         });
-        reloadDefaults.pad(0, pad18, 0, pad18);
+        reloadDefaults.pad(0, pad34, 0, pad34);
         reloadDefaults.setHeight(buttonHeight);
 
         OwnLabel warningLabel = new OwnLabel(I18n.msg("gui.system.reloaddefaults.warn"), skin, "default-red");
@@ -2236,13 +2264,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         stats.add(debugInfoLabel).left().padBottom(pad10);
         stats.add(debugInfo).left().padBottom(pad10).row();
-        stats.add(exitConfirmationLabel).left().padBottom(pad18);
-        stats.add(exitConfirmation).left().padBottom(pad18).row();
+        stats.add(exitConfirmationLabel).left().padBottom(pad10);
+        stats.add(exitConfirmation).left().padBottom(pad10).row();
+        stats.add(cacheLabel).left().padBottom(pad10);
+        stats.add(shaderCache).left().padBottom(pad10).padRight(pad18);
+        stats.add(shaderCacheTooltip).left().padBottom(pad10).row();
+        stats.add(clearCache).left().colspan(2).padBottom(pad34 * 3f).row();
         stats.add(warningLabel).left().colspan(2).padBottom(pad34).row();
         stats.add(reloadDefaults).left().colspan(2);
 
         // Add to content
-        addContentGroup(contentSystem, titleStats, stats, 0f);
+        addContentGroup(contentSystem, titleSystemPrefs, stats, 0f);
 
         /* COMPUTE LABEL WIDTH */
         float maxLabelWidth = inputSmallWidth * 2.5f;
@@ -2663,7 +2695,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.scene.octree.fade = lodFadeCb.isChecked();
         settings.scene.octree.threshold[0] =
                 MathUtilsDouble.lint(lodTransitions.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG,
-                                     Constants.MAX_LOD_TRANS_ANGLE_DEG) * (float) MathUtilsDouble.degRad;
+                        Constants.MAX_LOD_TRANS_ANGLE_DEG) * (float) MathUtilsDouble.degRad;
         // Here we use a 0.4 rad between the thresholds
         settings.scene.octree.threshold[1] = settings.scene.octree.fade ? settings.scene.octree.threshold[0] + 0.4f : settings.scene.octree.threshold[0];
         // Number of velocity vectors per star group.
@@ -2768,6 +2800,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (settings.program.debugInfo != debugInfoBak) {
             EventManager.publish(Event.SHOW_DEBUG_CMD, this, !debugInfoBak);
         }
+
+        // Shader cache
+        settings.program.shaderCache = shaderCache.isChecked();
+
+        // Exit confirmation
         settings.program.exitConfirmation = exitConfirmation.isChecked();
 
         // Save configuration
@@ -2928,9 +2965,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateGamepadsList(controllersTable);
-        default -> {
-        }
+            case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateGamepadsList(controllersTable);
+            default -> {
+            }
         }
     }
 

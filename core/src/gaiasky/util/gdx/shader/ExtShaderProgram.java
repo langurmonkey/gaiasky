@@ -18,16 +18,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.render.GaiaSkyShaderCompileException;
+import gaiasky.util.ChecksumRunnable;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
-import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL33;
 
 import java.lang.StringBuilder;
-import java.nio.*;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class ExtShaderProgram implements Disposable {
+    private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
+
     /**
      * Default name for position attributes.
      **/
@@ -45,7 +50,6 @@ public class ExtShaderProgram implements Disposable {
      **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
 
-    private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
     /**
      * The list of currently available shaders.
      **/
@@ -78,6 +82,22 @@ public class ExtShaderProgram implements Disposable {
      * Int buffer for types.
      **/
     protected IntBuffer type = BufferUtils.newIntBuffer(1);
+    /**
+     * Int for shader length.
+     */
+    protected IntBuffer len = BufferUtils.newIntBuffer(1);
+    /**
+     * Int for shader binary format.
+     */
+    protected IntBuffer format = BufferUtils.newIntBuffer(1);
+    /**
+     * Aux integer buffer.
+     */
+    protected IntBuffer intBuffer = BufferUtils.newIntBuffer(1);
+    /**
+     * Byte buffer to get binary shaders.
+     */
+    protected ByteBuffer byteBuffer = ByteBuffer.allocateDirect(50000);
     /**
      * The log.
      **/
@@ -267,7 +287,7 @@ public class ExtShaderProgram implements Disposable {
         this.fragmentShaderFile = fragmentFile;
 
         if (!lazyLoading) {
-            compile();
+            compile(name);
         }
     }
 
@@ -285,6 +305,12 @@ public class ExtShaderProgram implements Disposable {
     public ExtShaderProgram(FileHandle vertexShader,
                             FileHandle fragmentShader) {
         this(vertexShader.readString(), fragmentShader.readString());
+    }
+
+    public ExtShaderProgram(String name,
+                            FileHandle vertexShader,
+                            FileHandle fragmentShader) {
+        this(name, null, null, vertexShader.readString(), fragmentShader.readString());
     }
 
     /**
@@ -341,13 +367,9 @@ public class ExtShaderProgram implements Disposable {
         return name;
     }
 
-    public void compile() {
+    public void compile(String name) {
         if (!isCompiled) {
             initializeLocalAssets();
-
-            if (name != null) {
-                logger.info(I18n.msg("notif.shader.compile", name));
-            }
 
             if (vertexShaderFile != null || fragmentShaderFile != null) {
                 if (geometryShaderFile != null) {
@@ -358,9 +380,9 @@ public class ExtShaderProgram implements Disposable {
             }
 
             if (geometryShaderSource != null) {
-                compileShaders(vertexShaderSource, geometryShaderSource, fragmentShaderSource);
+                compileShaders(name, vertexShaderSource, geometryShaderSource, fragmentShaderSource);
             } else {
-                compileShaders(vertexShaderSource, fragmentShaderSource);
+                compileShaders(name, vertexShaderSource, fragmentShaderSource);
             }
             if (isCompiled()) {
                 fetchAttributes();
@@ -373,126 +395,50 @@ public class ExtShaderProgram implements Disposable {
         }
     }
 
+
     /**
      * Loads and compiles the shaders, creates a new program and links the shaders.
      *
+     * @param name           The name of the shader.
      * @param vertexShader   The vertex shader code.
      * @param geometryShader The geometry shader code.
      * @param fragmentShader The fragment shader code.
      */
-    private void compileShaders(String vertexShader,
+    private void compileShaders(String name,
+                                String vertexShader,
                                 String geometryShader,
                                 String fragmentShader) {
-        vertexShaderHandle = loadShader(GL20.GL_VERTEX_SHADER, vertexShader);
-        geometryShaderHandle = loadShader(GL32.GL_GEOMETRY_SHADER, geometryShader);
-        fragmentShaderHandle = loadShader(GL20.GL_FRAGMENT_SHADER, fragmentShader);
-        logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
 
-        if (vertexShaderHandle == -1 || geometryShaderHandle == -1 || fragmentShaderHandle == -1) {
-            isCompiled = false;
-            return;
-        }
+        var cache = ShaderCache.instance();
+        int[] handles = cache.compileShaders(name, vertexShader, geometryShader, fragmentShader);
+        program = handles[0];
+        vertexShaderHandle = handles[1];
+        geometryShaderHandle = handles[2];
+        fragmentShaderHandle = handles[3];
 
-        program = linkProgram(createProgram(), true);
-        if (program == -1) {
-            isCompiled = false;
-            return;
-        }
-
-        isCompiled = true;
+        isCompiled = cache.isCompiled();
+        log = cache.getLog();
     }
 
     /**
      * Loads and compiles the shaders, creates a new program and links the shaders.
      *
+     * @param name           The name of the shader.
      * @param vertexShader   The vertex shader code.
      * @param fragmentShader The fragment shader code.
      */
-    private void compileShaders(String vertexShader,
+    private void compileShaders(String name,
+                                String vertexShader,
                                 String fragmentShader) {
-        vertexShaderHandle = loadShader(GL20.GL_VERTEX_SHADER, vertexShader);
-        fragmentShaderHandle = loadShader(GL20.GL_FRAGMENT_SHADER, fragmentShader);
-        logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
 
-        if (vertexShaderHandle == -1 || fragmentShaderHandle == -1) {
-            isCompiled = false;
-            return;
-        }
+        var cache = ShaderCache.instance();
+        int[] handles = cache.compileShaders(name, vertexShader, fragmentShader);
+        program = handles[0];
+        vertexShaderHandle = handles[1];
+        fragmentShaderHandle = handles[2];
 
-        program = linkProgram(createProgram());
-        if (program == -1) {
-            isCompiled = false;
-            return;
-        }
-
-        isCompiled = true;
-    }
-
-    private int loadShader(int type,
-                           String source) {
-        IntBuffer intBuffer = BufferUtils.newIntBuffer(1);
-
-        int shader = GL33.glCreateShader(type);
-        if (shader == 0)
-            return -1;
-
-        GL33.glShaderSource(shader, source);
-        GL33.glCompileShader(shader);
-        GL33.glGetShaderiv(shader, GL20.GL_COMPILE_STATUS, intBuffer);
-
-        int compiled = intBuffer.get(0);
-        if (compiled == 0) {
-            String infoLog = GL33.glGetShaderInfoLog(shader);
-            log += type == GL33.GL_VERTEX_SHADER ? "Vertex shader\n" : type == GL33.GL_FRAGMENT_SHADER ? "Fragment shader:\n" : "Geometry shader:\n";
-            log += infoLog;
-            return -1;
-        }
-
-        return shader;
-    }
-
-    protected int createProgram() {
-        int program = GL33.glCreateProgram();
-        return program != 0 ? program : -1;
-    }
-
-    private int linkProgram(int program,
-                            boolean geometry) {
-        if (program == -1)
-            return -1;
-
-        if (geometry) {
-            GL33.glAttachShader(program, vertexShaderHandle);
-            GL33.glAttachShader(program, geometryShaderHandle);
-            GL33.glAttachShader(program, fragmentShaderHandle);
-            GL33.glLinkProgram(program);
-            GL33.glDetachShader(program, vertexShaderHandle);
-            GL33.glDetachShader(program, geometryShaderHandle);
-            GL33.glDetachShader(program, fragmentShaderHandle);
-        } else {
-            GL33.glAttachShader(program, vertexShaderHandle);
-            GL33.glAttachShader(program, fragmentShaderHandle);
-            GL33.glLinkProgram(program);
-            GL33.glDetachShader(program, vertexShaderHandle);
-            GL33.glDetachShader(program, fragmentShaderHandle);
-        }
-
-        ByteBuffer tmp = ByteBuffer.allocateDirect(4);
-        tmp.order(ByteOrder.nativeOrder());
-        IntBuffer intBuffer = tmp.asIntBuffer();
-
-        GL33.glGetProgramiv(program, GL33.GL_LINK_STATUS, intBuffer);
-        int linked = intBuffer.get(0);
-        if (linked == 0) {
-            log = GL33.glGetProgramInfoLog(program);
-            return -1;
-        }
-
-        return program;
-    }
-
-    private int linkProgram(int program) {
-        return linkProgram(program, false);
+        isCompiled = cache.isCompiled();
+        log = cache.getLog();
     }
 
     /**
@@ -1139,9 +1085,9 @@ public class ExtShaderProgram implements Disposable {
     private void checkManaged() {
         if (invalidated) {
             if (geometryShaderSource != null) {
-                compileShaders(vertexShaderSource, geometryShaderSource, fragmentShaderSource);
+                compileShaders(getName(), vertexShaderSource, geometryShaderSource, fragmentShaderSource);
             } else {
-                compileShaders(vertexShaderSource, fragmentShaderSource);
+                compileShaders(getName(), vertexShaderSource, fragmentShaderSource);
             }
             invalidated = false;
         }
@@ -1299,6 +1245,7 @@ public class ExtShaderProgram implements Disposable {
     public String getVertexShaderSource() {
         return vertexShaderSource;
     }
+
     public String getVertexShaderFileName() {
         return vertexShaderFile;
     }
@@ -1309,6 +1256,7 @@ public class ExtShaderProgram implements Disposable {
     public String getGeometryShaderSource() {
         return geometryShaderSource;
     }
+
     public String getGeometryShaderFileName() {
         return geometryShaderFile;
     }
@@ -1319,6 +1267,7 @@ public class ExtShaderProgram implements Disposable {
     public String getFragmentShaderSource() {
         return fragmentShaderSource;
     }
+
     public String getFragmentShaderFileName() {
         return fragmentShaderFile;
     }

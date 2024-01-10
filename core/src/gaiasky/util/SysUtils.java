@@ -49,7 +49,9 @@ public class SysUtils {
     private static final String TMP_DIR_NAME = "tmp";
     private static final String CRASHREPORTS_DIR_NAME = "crashreports";
     private static final String SHADER_OUT_DIR_NAME = "shaders";
+    private static final String SHADER_CACHE_DIR_NAME = "shadercache";
     private static final String LOG_DIR_NAME = "log";
+
 
     static {
         OS = System.getProperty("os.name").toLowerCase();
@@ -356,6 +358,20 @@ public class SysUtils {
             return getXdgCacheHome().resolve(GAIASKY_DIR_NAME);
         } else {
             return getDataDir();
+        }
+    }
+
+    /**
+     * Returns the default shader cache directory. This is ~/.gaiasky/shadercache/ in Windows and macOS, and
+     * ~/.cache/gaiasky/shadercache/ in Linux.
+     *
+     * @return The default shader cache directory.
+     */
+    public static Path getShaderCacheDir() {
+        if (isLinux()) {
+            return getXdgCacheHome().resolve(GAIASKY_DIR_NAME).resolve(SHADER_CACHE_DIR_NAME);
+        } else {
+            return getDataDir().resolve(SHADER_CACHE_DIR_NAME);
         }
     }
 

@@ -167,74 +167,16 @@ public class TessellationShaderProgram extends ExtShaderProgram {
      * Loads and compiles the shaders, creates a new program and links the shaders.
      */
     private void compileShaders(String vShader, String tcShader, String teShader, String fShader) {
-        vertexShaderHandle = loadShader(GL30.GL_VERTEX_SHADER, vShader);
-        controlShaderHandle = loadShader(GL41.GL_TESS_CONTROL_SHADER, tcShader);
-        evaluationShaderHandle = loadShader(GL41.GL_TESS_EVALUATION_SHADER, teShader);
-        fragmentShaderHandle = loadShader(GL30.GL_FRAGMENT_SHADER, fShader);
+        var cache = ShaderCache.instance();
+        int[] handles = cache.compileShaders(name, vShader, tcShader, teShader, fShader);
+        program = handles[0];
+        vertexShaderHandle = handles[1];
+        controlShaderHandle = handles[2];
+        evaluationShaderHandle = handles[3];
+        fragmentShaderHandle = handles[4];
 
-        if (vertexShaderHandle == -1 || controlShaderHandle == -1 || evaluationShaderHandle == -1 || fragmentShaderHandle == -1) {
-            isCompiled = false;
-            return;
-        }
-
-        program = linkProgram(createProgram());
-        if (program == -1) {
-            isCompiled = false;
-            return;
-        }
-
-        isCompiled = true;
-    }
-
-    private int loadShader(int type, String source) {
-        IntBuffer intBuffer = BufferUtils.newIntBuffer(1);
-
-        int shader = GL41.glCreateShader(type);
-        if (shader == 0) return -1;
-
-        GL41.glShaderSource(shader, source);
-        GL41.glCompileShader(shader);
-        GL41.glGetShaderiv(shader, GL20.GL_COMPILE_STATUS, intBuffer);
-
-        int compiled = intBuffer.get(0);
-        if (compiled == 0) {
-            String infoLog = GL41.glGetShaderInfoLog(shader);
-            switch (type) {
-                case GL41.GL_VERTEX_SHADER -> log += "Vertex shader\n";
-                case GL41.GL_FRAGMENT_SHADER -> log += "Fragment shader\n";
-                case GL41.GL_TESS_CONTROL_SHADER -> log += "Tessellation control shader\n";
-                case GL41.GL_TESS_EVALUATION_SHADER -> log += "Tessellation evaluation shader\n";
-            }
-            log += infoLog;
-            // }
-            return -1;
-        }
-
-        return shader;
-    }
-
-    private int linkProgram(int program) {
-        if (program == -1) return -1;
-
-        GL41.glAttachShader(program, vertexShaderHandle);
-        GL41.glAttachShader(program, controlShaderHandle);
-        GL41.glAttachShader(program, evaluationShaderHandle);
-        GL41.glAttachShader(program, fragmentShaderHandle);
-        GL41.glLinkProgram(program);
-
-        ByteBuffer tmp = ByteBuffer.allocateDirect(4);
-        tmp.order(ByteOrder.nativeOrder());
-        IntBuffer intBuffer = tmp.asIntBuffer();
-
-        GL41.glGetProgramiv(program, GL20.GL_LINK_STATUS, intBuffer);
-        int linked = intBuffer.get(0);
-        if (linked == 0) {
-            log = GL41.glGetProgramInfoLog(program);
-            // }
-            return -1;
-        }
-
-        return program;
+        isCompiled = cache.isCompiled();
+        log = cache.getLog();
     }
 
 

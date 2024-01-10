@@ -316,6 +316,9 @@ program:
   debugInfo: false
   # Offline mode: never attempt any connection - disables updates and dataset downloads.
   offlineMode: false
+  # Use a disk shader cache to speed up the application startup.
+  # Note: some GPUs already do this at driver level; in these cases, activating the application shader cache may not be desired.
+  shaderCache: false
   # Save all procedurally-generated textures to the data folder.
   # WARN: watch your disk space!
   saveProceduralTextures: false

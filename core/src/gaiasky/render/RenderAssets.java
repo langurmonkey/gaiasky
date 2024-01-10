@@ -29,6 +29,7 @@ import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader.Relativis
 import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader.TessellationShaderProviderParameter;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParameter;
+import gaiasky.util.i18n.I18n;
 
 /**
  * Loads and initializes shaders, fonts, batches and other resources used for rendering, especially
@@ -454,7 +455,7 @@ public class RenderAssets {
         for (int i = 0; i < n; i++) {
             shaders[i] = manager.get(descriptors[i]);
             if (!shaders[i].isLazy() && !shaders[i].isCompiled()) {
-                logger.error(names[i] + " shader compilation failed:\n" + shaders[i].getLog());
+                logger.error(I18n.msg("notif.shader.compile.fail.log", names[i], shaders[i].getLog()));
             }
         }
         return shaders;
@@ -465,7 +466,7 @@ public class RenderAssets {
                                                 final String name) {
         ExtShaderProgram shader = manager.get(descriptor);
         if (!shader.isLazy() && !shader.isCompiled()) {
-            logger.error(name + " shader compilation failed:\n" + shader.getLog());
+            logger.error(I18n.msg("notif.shader.compile.fail.log", name, shader.getLog()));
         }
         return shader;
     }

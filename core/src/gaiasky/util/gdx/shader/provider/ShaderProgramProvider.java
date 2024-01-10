@@ -121,9 +121,9 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
                 || (parameter.name.contains(RenderAssets.SUFFIX_SSR) && !Settings.settings.postprocess.ssr.active)
         );
 
-        ExtShaderProgram shaderProgram = null;
+        ExtShaderProgram shaderProgram;
         if (geometryCode != null) {
-            shaderProgram = new ExtShaderProgram(parameter != null ? parameter.name : null, vertFileName, geomFileName, fragFileName, vertexCode, geometryCode, fragmentCode, lazyLoad);
+            shaderProgram = new ExtShaderProgram(parameter.name, vertFileName, geomFileName, fragFileName, vertexCode, geometryCode, fragmentCode, lazyLoad);
         } else {
             shaderProgram = new ExtShaderProgram(parameter != null ? parameter.name : null, vertFileName, fragFileName, vertexCode, fragmentCode, lazyLoad);
         }

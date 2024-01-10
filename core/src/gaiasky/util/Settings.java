@@ -1325,6 +1325,7 @@ public class Settings {
         public boolean safeModeFlag;
         public boolean debugInfo;
         public boolean offlineMode;
+        public boolean shaderCache = false;
         public boolean saveProceduralTextures = false;
         public MinimapSettings minimap;
         public FileChooserSettings fileChooser;
