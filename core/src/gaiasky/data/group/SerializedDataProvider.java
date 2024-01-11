@@ -9,6 +9,7 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
@@ -17,6 +18,9 @@ import java.io.ObjectInputStream;
 import java.util.List;
 
 public class SerializedDataProvider extends AbstractStarGroupDataProvider {
+    static {
+        logger = Logger.getLogger(SerializedDataProvider.class);
+    }
 
     public SerializedDataProvider() {
         super();

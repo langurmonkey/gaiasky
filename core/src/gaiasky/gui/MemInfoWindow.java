@@ -47,6 +47,13 @@ public class MemInfoWindow extends GenericDialog {
             memInfoStr.append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n\n");
         }
 
+        final OwnScrollPane memInfoScroll = getOwnScrollPane(memInfoStr, taWidth);
+
+        content.add(memInfoScroll).padBottom(pad).row();
+
+    }
+
+    private OwnScrollPane getOwnScrollPane(StringBuilder memInfoStr, float taWidth) {
         OwnTextArea memInfo = new OwnTextArea(memInfoStr.toString(), skin, "disabled-nobg");
         memInfo.setDisabled(true);
         memInfo.setPrefRows(13);
@@ -61,9 +68,7 @@ public class MemInfoWindow extends GenericDialog {
         memInfoScroll.setForceScroll(false, false);
         memInfoScroll.setSmoothScrolling(true);
         memInfoScroll.setFadeScrollBars(false);
-
-        content.add(memInfoScroll).padBottom(pad).row();
-
+        return memInfoScroll;
     }
 
     @Override

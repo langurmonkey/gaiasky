@@ -9,6 +9,7 @@ package gaiasky.data.group;
 
 import gaiasky.data.api.BinaryIO;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
@@ -19,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
+    static {
+        logger = Logger.getLogger(BinaryDataProvider.class);
+    }
 
     /** The default output format version to use for writing **/
     public static int DEFAULT_OUTPUT_VERSION = 2;
@@ -62,15 +66,15 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public void writeData(List<IParticleRecord> data, OutputStream out, int version) {
-        // Wrap the FileOutputStream with a DataOutputStream
+        // Wrap the FileOutputStream with a DataOutputStream.
         DataOutputStream data_out = new DataOutputStream(out);
         try {
             if (version >= 2) {
-                // In new version, write token as negative int. Version afterwards
+                // In new version, write token as negative int. version afterward.
                 data_out.writeInt(-1);
                 data_out.writeInt(version);
             }
-            // Number of stars
+            // Number of stars.
             data_out.writeInt(data.size());
             for (IParticleRecord sb : data) {
                 binaryVersions[version].writeParticleRecord(sb, data_out);
@@ -99,10 +103,10 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             if (versionToken < 0) {
                 version = data_in.readInt();
             } else {
-                // Rewind
+                // Rewind.
                 data_in.reset();
             }
-            // Read size of stars
+            // Read size of stars.
             int size = data_in.readInt();
             data = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
@@ -135,10 +139,10 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             if (versionToken < 0) {
                 version = mem.getInt();
             } else {
-                // Rewind
+                // Rewind.
                 mem.reset();
             }
-            // Read size of stars
+            // Read size of stars.
             int size = mem.getInt();
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
@@ -177,10 +181,10 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             if (versionToken < 0) {
                 version = mem.getInt();
             } else {
-                // Rewind
+                // Rewind.
                 mem.reset();
             }
-            // Read size of stars
+            // Read size of stars.
             int size = mem.getInt();
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {

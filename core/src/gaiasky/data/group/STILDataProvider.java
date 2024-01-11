@@ -17,7 +17,6 @@ import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.scene.record.VariableRecord;
 import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
 import gaiasky.util.*;
-import gaiasky.util.Logger.Log;
 import gaiasky.util.color.BVToTeff_ballesteros;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
@@ -53,9 +52,12 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class STILDataProvider extends AbstractStarGroupDataProvider {
-    private static final Log logger = Logger.getLogger(STILDataProvider.class);
+    static {
+        logger = Logger.getLogger(STILDataProvider.class);
+    }
+
     // These names are not allowed
-    private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
+    private static final String[] forbiddenNameValues = {"-", "...", "nop", "nan", "?", "_", "x", "n/a"};
     // Store already visited colName:attribute pairs.
     private final Map<String, Integer> stringAttributesMap;
     // Store the last index for a given attribute.
@@ -535,9 +537,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Name from ID.
                                 if (idIsNotNumber) {
                                     Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
-                                    names = new String[] { idPair.getSecond() };
+                                    names = new String[]{idPair.getSecond()};
                                 } else {
-                                    names = new String[] { Long.toString(id) };
+                                    names = new String[]{Long.toString(id)};
                                 }
                             } else {
                                 // We have a name.
@@ -558,7 +560,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 }
                                 // Default to ID.
                                 if (names.length == 0) {
-                                    names = new String[] { Long.toString(id) };
+                                    names = new String[]{Long.toString(id)};
                                 }
                             }
 
@@ -566,7 +568,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (rgb != null) {
                                 colors.put(id, rgb);
                             }
-                            sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
+                            sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
 
                             if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS
                                     || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {

@@ -35,7 +35,7 @@ import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
-    protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
+    protected static Log logger;
     /**
      * Parallelism value
      */
