@@ -235,7 +235,7 @@ scene:
       # Enable eclipse representation.
       active: true
       # Add outlines for umbra (red) and penumbra (green).
-      outlines: false
+      outlines: true
     # Elevation representation settings.
     elevation:
       # Elevation type [REGULAR|TESSELLATION|NONE].
