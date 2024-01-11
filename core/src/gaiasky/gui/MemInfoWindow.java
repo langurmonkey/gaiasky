@@ -9,6 +9,8 @@ package gaiasky.gui;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.util.MemInfo;
+import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextArea;
@@ -33,8 +35,16 @@ public class MemInfoWindow extends GenericDialog {
         float taWidth = 1200f;
 
         StringBuilder memInfoStr = new StringBuilder();
+        memInfoStr.append(TextUtils.capitalise(I18n.msg("gui.debug.ram.used"))).append(": ")
+                .append(MemInfo.getUsedMemory()).append(" ").append(I18n.msg("gui.debug.ram.unit")).append("\n");
+        memInfoStr.append(TextUtils.capitalise(I18n.msg("gui.debug.ram.free"))).append(": ")
+                .append(MemInfo.getFreeMemory()).append(" ").append(I18n.msg("gui.debug.ram.unit")).append("\n");
+        memInfoStr.append(TextUtils.capitalise(I18n.msg("gui.debug.ram.alloc"))).append(": ")
+                .append(MemInfo.getTotalMemory()).append(" ").append(I18n.msg("gui.debug.ram.unit")).append("\n");
+        memInfoStr.append(TextUtils.capitalise(I18n.msg("gui.debug.ram.total"))).append(": ")
+                .append(MemInfo.getMaxMemory()).append(" ").append(I18n.msg("gui.debug.ram.unit")).append("\n\n");
         for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
-            memInfoStr.append(I18n.msg("gui.help.name")).append(": ").append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n");
+            memInfoStr.append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n\n");
         }
 
         OwnTextArea memInfo = new OwnTextArea(memInfoStr.toString(), skin, "disabled-nobg");
