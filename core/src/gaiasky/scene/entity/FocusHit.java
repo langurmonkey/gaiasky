@@ -8,7 +8,6 @@
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -403,7 +402,7 @@ public class FocusHit {
             var entity = view.getEntity();
 
             Vector3 pos = F31;
-            Vector3b posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.posinv);
+            Vector3b posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.posInv);
             pos.set(posb.valuesf());
 
             if (camera.direction.dot(posb) > 0) {

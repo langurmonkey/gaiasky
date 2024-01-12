@@ -502,7 +502,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 rgb = ColorUtils.BVtoRGB(colorIndex);
                                 colorPacked = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
                             } else if (Float.isFinite(tEff)) {
-                                rgb = ColorUtils.teffToRGB_harre(tEff);
+                                rgb = ColorUtils.tEffToRGB_harre(tEff);
                                 colorPacked = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
                             } else {
                                 colorPacked = Float.NaN;

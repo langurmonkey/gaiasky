@@ -24,9 +24,9 @@ import java.util.Objects;
 
 public class AtmosphereShader extends BaseIntShader {
     /** Material attributes which are not required but always supported. */
-    private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
+    private final static Bits optionalAttributes = Bits.indices(IntAttribute.CullFace, DepthTestAttribute.Type);
     private final static Attributes tmpAttributes = new Attributes();
-    protected static Bits implementedFlags = Bits.indexes(BlendingAttribute.Type, TextureAttribute.Diffuse, ColorAttribute.Diffuse, ColorAttribute.Specular,
+    protected static Bits implementedFlags = Bits.indices(BlendingAttribute.Type, TextureAttribute.Diffuse, ColorAttribute.Diffuse, ColorAttribute.Specular,
                                                           FloatAttribute.Shininess);
     private static String defaultVertexShader = null;
     private static String defaultFragmentShader = null;

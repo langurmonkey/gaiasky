@@ -7,6 +7,7 @@
 
 package gaiasky.util.validator;
 
+import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnTextField;
 
 public class TextFieldComparatorValidator extends CallbackValidator {
@@ -23,18 +24,18 @@ public class TextFieldComparatorValidator extends CallbackValidator {
     @Override
     protected boolean validateLocal(String value) {
         try {
-            float val = Float.valueOf(value);
+            float val = Parser.parseFloatException(value);
 
             if (lessThan != null) {
                 for (OwnTextField tf : lessThan) {
-                    float v = Float.valueOf(tf.getText());
+                    float v = Parser.parseFloatException(tf.getText());
                     if (val >= v)
                         return false;
                 }
             }
             if (greaterThan != null) {
                 for (OwnTextField tf : greaterThan) {
-                    float v = Float.valueOf(tf.getText());
+                    float v = Parser.parseFloatException(tf.getText());
                     if (val <= v)
                         return false;
                 }

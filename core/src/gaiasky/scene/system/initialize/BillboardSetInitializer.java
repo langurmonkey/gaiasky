@@ -91,9 +91,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         for (BillboardDataset bd : set.datasets) {
             List<IParticleRecord> a = bd.data;
             if (a != null) {
-                for (int i = 0; i < a.size(); i++) {
-                    IParticleRecord pr = a.get(i);
-
+                for (IParticleRecord pr : a) {
                     aux.set((float) pr.x(), (float) pr.z(), (float) pr.y());
                     aux.scl(body.size).rotate(-90, 0, 1, 0).mul(transform.matrix).add(pos3b);
                     pr.setPos(aux.x, aux.y, aux.z);

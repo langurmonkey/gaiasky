@@ -13,7 +13,7 @@ import gaiasky.scene.Mapper;
 
 public class MeshUpdater extends AbstractUpdateSystem {
 
-    private float[] auxArray;
+    private final float[] auxArray;
 
     public MeshUpdater(Family family, int priority) {
         super(family, priority);

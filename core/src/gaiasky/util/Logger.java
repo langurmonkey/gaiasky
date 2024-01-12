@@ -96,7 +96,7 @@ public class Logger {
     private static Object[] removeFirstN(Object[] arr, int n) {
         Object[] res = new Object[arr.length - n];
         if (arr.length - n >= 0)
-            System.arraycopy(arr, 0 + n, res, 0, arr.length - n);
+            System.arraycopy(arr, n, res, 0, arr.length - n);
         return res;
     }
 
@@ -164,7 +164,7 @@ public class Logger {
         INFO(2),
         DEBUG(3);
 
-        public int val;
+        public final int val;
 
         LoggerLevel(int val) {
             this.val = val;

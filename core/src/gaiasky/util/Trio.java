@@ -7,6 +7,8 @@
 
 package gaiasky.util;
 
+import java.util.Objects;
+
 /**
  * A simple data structure that holds three objects.
  *
@@ -36,11 +38,10 @@ public class Trio<A, B, C> {
     }
 
     public boolean equals(Object other) {
-        if (other instanceof Trio) {
-            Trio otherTrio = (Trio) other;
-            return ((this.first == null && otherTrio.first == null) || this.first.equals(otherTrio.first)) &&
-                    ((this.second == null && otherTrio.second == null) || this.second.equals(otherTrio.second)) &&
-                    ((this.third == null && otherTrio.third == null) || this.third.equals(otherTrio.third));
+        if (other instanceof Trio otherTrio) {
+            return ((this.first == null && otherTrio.first == null) || Objects.equals(this.first, otherTrio.first)) &&
+                    ((this.second == null && otherTrio.second == null) || Objects.equals(this.second, otherTrio.second)) &&
+                    ((this.third == null && otherTrio.third == null) || Objects.equals(this.third, otherTrio.third));
         }
 
         return false;

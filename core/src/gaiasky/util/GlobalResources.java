@@ -306,14 +306,11 @@ public class GlobalResources {
      * @param f          The directory to get all the files
      * @param l          The list with the results
      * @param extensions The allowed extensions
-     *
-     * @return The list l
      */
-    public static Array<Path> listRecursive(Path f, final Array<Path> l, String... extensions) {
+    public static void listRecursive(Path f, final Array<Path> l, String... extensions) {
         if (Files.exists(f)) {
             if (Files.isDirectory(f)) {
-                try {
-                    Stream<Path> partial = Files.list(f);
+                try (Stream<Path> partial = Files.list(f)) {
                     partial.forEachOrdered(p -> listRecursive(p, l, extensions));
                 } catch (IOException e) {
                     logger.error(e);
@@ -325,8 +322,6 @@ public class GlobalResources {
                 }
             }
         }
-
-        return l;
     }
 
     private static boolean endsWithAny(String str, String... extensions) {
@@ -346,25 +341,30 @@ public class GlobalResources {
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static void deleteRecursively(Path path) throws IOException {
-        Files.walk(path).sorted(Comparator.reverseOrder())
-                // It is not a .part file, or it is a .part file older than 6 hours, and it is not a directory.
-                .filter(p -> (!p.toString().endsWith(".part") ||
-                        (p.toString().endsWith(".part") && (TimeUtils.millis() - p.toFile().lastModified() > Constants.PART_FILE_MAX_AGE_MS)))
-                        && !Files.isDirectory(p))
-                .map(Path::toFile)
-                .forEach(java.io.File::delete);
+        try (var stream = Files.walk(path)) {
+            stream.sorted(Comparator.reverseOrder())
+                    // It is not a .part file, or it is a .part file older than 6 hours, and it is not a directory.
+                    .filter(p -> (!p.toString().endsWith(".part") ||
+                            (p.toString().endsWith(".part") && (TimeUtils.millis() - p.toFile().lastModified() > Constants.PART_FILE_MAX_AGE_MS)))
+                            && !Files.isDirectory(p))
+                    .map(Path::toFile)
+                    .forEach(f -> {
+                        if (!f.delete()) {
+                            logger.debug(I18n.msg("error.file.delete.fail", f));
+                        }
+                    });
+        }
     }
 
-    public static void copyFile(Path sourceFile, Path destFile, boolean ow) throws IOException {
-        if (!Files.exists(destFile) || ow)
-            Files.copy(sourceFile, destFile, StandardCopyOption.REPLACE_EXISTING);
+    public static void copyFile(Path sourceFile, Path destinationFile, boolean ow) throws IOException {
+        if (!Files.exists(destinationFile) || ow)
+            Files.copy(sourceFile, destinationFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static Array<Path> listRecursive(Path f, final Array<Path> l, DirectoryStream.Filter<Path> filter) {
+    public static void listRecursive(Path f, final Array<Path> l, DirectoryStream.Filter<Path> filter) {
         if (Files.exists(f)) {
             if (Files.isDirectory(f)) {
-                try {
-                    Stream<Path> partial = Files.list(f);
+                try (Stream<Path> partial = Files.list(f)) {
                     partial.forEachOrdered(p -> listRecursive(p, l, filter));
                 } catch (IOException e) {
                     logger.error(e);
@@ -379,7 +379,6 @@ public class GlobalResources {
                 }
             }
         }
-        return l;
     }
 
     /**
@@ -405,7 +404,9 @@ public class GlobalResources {
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static long fileCount(Path dir, String[] extensions) throws IOException {
-        return Files.walk(dir).parallel().filter(p -> (!p.toFile().isDirectory() && endsWith(p.toFile().getName(), extensions))).count();
+        try (var stream = Files.walk(dir)) {
+            return stream.parallel().filter(p -> (!p.toFile().isDirectory() && endsWith(p.toFile().getName(), extensions))).count();
+        }
     }
 
     /**
@@ -451,28 +452,27 @@ public class GlobalResources {
         return (float) (MathUtilsDouble.radiansToDegrees * FastMath.atan2(v2.y - v1.y, v2.x - v1.x));
     }
 
-    public static synchronized Vector3d applyRelativisticAberration(Vector3d pos, ICamera cam) {
+    public static synchronized void applyRelativisticAberration(Vector3d pos, ICamera cam) {
         // Relativistic aberration
         if (Settings.settings.runtime.relativisticAberration) {
-            Vector3d cdir = aux;
+            Vector3d camDir = aux;
             if (cam.getVelocity() != null)
-                cdir.set(cam.getVelocity()).nor();
+                camDir.set(cam.getVelocity()).nor();
             else
-                cdir.set(1, 0, 0);
+                camDir.set(1, 0, 0);
 
             double vc = cam.getSpeed() / Constants.C_KMH;
             if (vc > 0) {
-                cdir.scl(-1);
-                double cosThS = cdir.dot(pos) / pos.len();
+                camDir.scl(-1);
+                double cosThS = camDir.dot(pos) / pos.len();
                 double th_s = Math.acos(cosThS);
 
                 double cosThO = (cosThS - vc) / (1 - vc * cosThS);
                 double th_o = Math.acos(cosThO);
 
-                pos.rotate(cdir.crs(pos).nor(), Math.toDegrees(th_o - th_s));
+                pos.rotate(camDir.crs(pos).nor(), Math.toDegrees(th_o - th_s));
             }
         }
-        return pos;
     }
 
     /**

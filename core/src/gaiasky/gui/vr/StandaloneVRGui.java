@@ -127,7 +127,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         params.put("flip", true);
 
         ModelCache cache = new ModelCache();
-        Bits attributes = Bits.indexes(VertexAttributes.Usage.Position, VertexAttributes.Usage.Normal, VertexAttributes.Usage.Tangent, VertexAttributes.Usage.BiNormal, VertexAttributes.Usage.TextureCoordinates);
+        Bits attributes = Bits.indices(VertexAttributes.Usage.Position, VertexAttributes.Usage.Normal, VertexAttributes.Usage.Tangent, VertexAttributes.Usage.BiNormal, VertexAttributes.Usage.TextureCoordinates);
         var pair = cache.getModel("surface", params, attributes, GL20.GL_TRIANGLES);
         IntModel model = pair.getFirst();
         Map<String, Material> materials = pair.getSecond();

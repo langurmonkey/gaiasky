@@ -70,15 +70,15 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
         return attributes.size;
     }
 
-    private final void enable(final Bits mask) {
-        this.mask.or(mask);
+    private void enable(final Bits mask) {
+        var ignored = this.mask.or(mask);
     }
 
-    private final void disable(final Bits mask) {
-        this.mask.andNot(mask);
+    private void disable(final Bits mask) {
+        var ignored = this.mask.andNot(mask);
     }
 
-    /** Add a attribute to this material. If the material already contains an attribute of the same type it is overwritten. */
+    /** Add an attribute to this material. If the material already contains an attribute of the same type it is overwritten. */
     public final void set(final Attribute attribute) {
         final int idx = indexOf(attribute.index);
         if (idx < 0) {
@@ -88,7 +88,7 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
         } else {
             attributes.set(idx, attribute);
         }
-        sort(); //FIXME: See #4186
+        sort();
     }
 
     /** Add multiple attributes to this material. If the material already contains an attribute of the same type it is overwritten. */
@@ -144,7 +144,7 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
                 sorted = false;
             }
         }
-        sort(); //FIXME: See #4186
+        sort();
     }
 
     public final void remove(final int index) {
@@ -166,7 +166,7 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
             disable(type);
             sorted = false;
         }
-        sort(); //FIXME: See #4186
+        sort();
     }
 
     /**
@@ -245,7 +245,7 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
         long result = 71 + mask.hashCode();
         int m = 1;
         for (int i = 0; i < n; i++)
-            result += mask.hashCode() * attributes.get(i).hashCode() * (m = (m * 7) & 0xFFFF);
+            result += (long) mask.hashCode() * attributes.get(i).hashCode() * (m = (m * 7) & 0xFFFF);
         return (int) (result ^ (result >> 32));
     }
 

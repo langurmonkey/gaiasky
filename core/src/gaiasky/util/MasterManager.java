@@ -71,7 +71,7 @@ public class MasterManager implements IObserver {
             for (int i = 0; i < slaveStates.length; i++) {
                 slaveStates[i] = 0;
                 slaveFlags[i] = 0;
-                slavePingTimes[i] = 0l;
+                slavePingTimes[i] = 0L;
             }
         }
 
@@ -88,7 +88,7 @@ public class MasterManager implements IObserver {
         http = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 
         // Subscribe to events that need to be broadcast
-        EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BASE_LEVEL_CMD, Event.STAR_POINT_SIZE_CMD, Event.DISPOSE);
+        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BASE_LEVEL_CMD, Event.STAR_POINT_SIZE_CMD, Event.DISPOSE);
     }
 
     public static void initialize() {
@@ -238,19 +238,6 @@ public class MasterManager implements IObserver {
     public void notify(final Event event, Object source, final Object... data) {
         int i;
         switch (event) {
-        case FOV_CHANGED_CMD:
-            if (false) { // Each slave has its own fov configured via file/mpcdi
-                String sfov = Float.toString((float) data[0]);
-                for (String slave : slaves) {
-                    if (slaveStates[i] == 0) {
-                        HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setFov?arg0=" + sfov)).GET().
-                                build();
-                        http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
-                    }
-                    i++;
-                }
-            }
-            break;
         case TOGGLE_VISIBILITY_CMD:
             String key = (String) data[0];
             Boolean state;

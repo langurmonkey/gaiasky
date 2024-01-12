@@ -166,7 +166,7 @@ public class SpacecraftGui extends AbstractGui {
         aiAntivelDec = Decal.newDecal(new TextureRegion(aiAntivelTex));
 
         Material mat = new Material(new TextureAttribute(TextureAttribute.Diffuse, aiTexture), new ColorAttribute(ColorAttribute.Specular, 0.3f, 0.3f, 0.3f, 1f), new DepthTestAttribute(GL20.GL_LESS, aiCam.near, aiCam.far, true));
-        aiModel = new IntModelBuilder().createSphere(1.6f, 30, 30, false, mat, Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates));
+        aiModel = new IntModelBuilder().createSphere(1.6f, 30, 30, false, mat, Bits.indices(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates));
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
         aiViewport = new ExtendViewport(indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale, aiCam);

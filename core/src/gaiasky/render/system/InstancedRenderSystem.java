@@ -218,7 +218,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                     modelParams.put("diameter", (double) width);
                     modelParams.put("quality", (long) quality);
                 }
-                var modelPair = ModelCache.cache.getModel(modelType, modelParams, Bits.indexes(Usage.Position, Usage.TextureCoordinates), primitive);
+                var modelPair = ModelCache.cache.getModel(modelType, modelParams, Bits.indices(Usage.Position, Usage.TextureCoordinates), primitive);
                 var intModel = modelPair.getFirst();
                 var mesh = intModel.meshes.get(0);
                 model = new InstancedModel(mesh);
@@ -273,7 +273,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                     modelParams.put("recursion", recursion);
                     modelParams.put("diameter", diameter);
                 }
-                var modelPair = ModelCache.cache.getModel(modelType, modelParams, Bits.indexes(Usage.Position, Usage.TextureCoordinates), primitive);
+                var modelPair = ModelCache.cache.getModel(modelType, modelParams, Bits.indices(Usage.Position, Usage.TextureCoordinates), primitive);
                 var intModel = modelPair.getFirst();
                 var mesh = intModel.meshes.get(0);
                 model = new InstancedModel(mesh);
@@ -329,7 +329,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
 
         } else {
             // Load custom model.
-            var modelPair = ModelCache.cache.getModel(modelType, modelParams, Bits.indexes(Usage.Position, Usage.TextureCoordinates), primitive);
+            var modelPair = ModelCache.cache.getModel(modelType, modelParams, Bits.indices(Usage.Position, Usage.TextureCoordinates), primitive);
             var intModel = modelPair.getFirst();
             var mesh = intModel.meshes.get(0);
 

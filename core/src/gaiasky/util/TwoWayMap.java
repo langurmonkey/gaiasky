@@ -43,9 +43,9 @@ public class TwoWayMap<K, V> {
         return backward.containsKey(value);
     }
 
-    public synchronized boolean removeKey(K key) {
+    public synchronized void removeKey(K key) {
         V value = forward.get(key);
-        return remove(key, value);
+        remove(key, value);
     }
 
     public synchronized boolean removeValue(V value) {

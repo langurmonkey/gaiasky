@@ -27,6 +27,7 @@ public class Archetype {
     private final String name;
     private final Set<Class<? extends Component>> components;
 
+    @SafeVarargs
     public Archetype(final Engine engine, final Archetype parent, final String name, Class<? extends Component>... componentClasses) {
         this.engine = engine;
         this.parent = parent;
@@ -37,6 +38,7 @@ public class Archetype {
         this.family = Family.all(componentClasses).get();
     }
 
+    @SafeVarargs
     public Archetype(final Engine engine, final String name, Class<? extends Component>... componentClasses) {
         this(engine, null, name, componentClasses);
     }

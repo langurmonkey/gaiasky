@@ -693,7 +693,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         camera.up.set(up.valuesf());
         camera.update();
 
-        posinv.set(pos).scl(-1);
+        posInv.set(pos).scl(-1);
     }
 
     /**
@@ -1030,7 +1030,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             lastVel.set(vel);
             force.setZero();
         }
-        posinv.set(pos).scl(-1);
+        posInv.set(pos).scl(-1);
     }
 
     /**
@@ -1050,14 +1050,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (newDist < elevation) {
                 aux5b.nor().scl(elevation - newDist);
                 pos.add(aux5b);
-                posinv.set(pos).scl(-1);
+                posInv.set(pos).scl(-1);
             }
         }
 
         // Check maximum allowed distance: 50 Gpc from the Sun.
         if (pos.lenDouble() >= MAX_ALLOWED_DISTANCE) {
             pos.clamp(0, MAX_ALLOWED_DISTANCE);
-            posinv.set(pos).scl(-1);
+            posInv.set(pos).scl(-1);
         }
     }
 
@@ -1384,7 +1384,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             case CAMERA_POS_CMD -> {
                 synchronized (updateLock) {
                     pos.set((double[]) data[0]);
-                    posinv.set(pos).scl(-1d);
+                    posInv.set(pos).scl(-1d);
                 }
             }
             case CAMERA_DIR_CMD -> {
@@ -1401,7 +1401,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 synchronized (updateLock) {
                     // Position
                     pos.set((double[]) data[0]);
-                    posinv.set(pos).scl(-1d);
+                    posInv.set(pos).scl(-1d);
                     // Direction
                     direction.set((double[]) data[1]).nor();
                     // Up
@@ -1459,7 +1459,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         }
 
                         pos.add(dx, dy, dz);
-                        posinv.set(pos).scl(-1d);
+                        posInv.set(pos).scl(-1d);
                         direction.set(-dx, -dy, -dz).nor();
                         up.set(direction.x, direction.z, -direction.y).nor();
                         rotate(up, 0.01);
@@ -1696,7 +1696,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 pos.set(aux1b);
 
                 pos.add(0d, 0d, -this.focus.getSize() * 6d);
-                posinv.set(pos).scl(-1d);
+                posInv.set(pos).scl(-1d);
                 direction.set(0d, 0d, 1d);
             }
         } else if (!focus.isValid() && closest != null && closest.isValid()) {
@@ -1845,7 +1845,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             float chw2 = chw / 2;
             float chh2 = chh / 2;
 
-            aux1.set(gw.gw).nor().scl(1e12).add(posinv);
+            aux1.set(gw.gw).nor().scl(1e12).add(posInv);
 
             GlobalResources.applyRelativisticAberration(aux1, this);
             // GravitationalWavesManager.instance().gravitationalWavePos(aux1);
@@ -1873,9 +1873,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         sprite.setColor(r, g, b, a);
         Vector3b p;
         if (!focusMode) {
-            p = chFocus.getClosestAbsolutePos(aux1b).add(posinv);
+            p = chFocus.getClosestAbsolutePos(aux1b).add(posInv);
         } else {
-            p = chFocus.getAbsolutePosition(aux1b).add(posinv);
+            p = chFocus.getAbsolutePosition(aux1b).add(posInv);
         }
         Vector3d pos = aux5;
         p.put(pos);
@@ -1901,10 +1901,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 drawCrossHairDecal(batch, chFocus, focusMode, crosshairSprite, r, g, b, a);
             } else {
                 if (!focusMode) {
-                    drawCrossHair(chFocus.getClosestAbsolutePos(aux1b).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(),
+                    drawCrossHair(chFocus.getClosestAbsolutePos(aux1b).add(posInv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(),
                             arrowTex, rw, rh, r, g, b, a);
                 } else {
-                    drawCrossHair(chFocus.getAbsolutePosition(aux1b).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex,
+                    drawCrossHair(chFocus.getAbsolutePosition(aux1b).add(posInv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex,
                             rw, rh, r, g, b, a);
                 }
             }

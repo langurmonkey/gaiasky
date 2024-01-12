@@ -142,7 +142,7 @@ public class ParticleUtils {
         params.put("diameter", 1d);
         params.put("flip", false);
 
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indices(Usage.Position, Usage.Normal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
         IntModel intModel = pair.getFirst();
         Material mat = pair.getSecond().get("base");
         mat.clear();

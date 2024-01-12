@@ -99,7 +99,7 @@ public class ClusterInitializer extends AbstractInitSystem {
             IntModelBuilder modelBuilder = ModelCache.cache.mb;
             modelBuilder.begin();
             // create part
-            IntMeshPartBuilder bPartBuilder = modelBuilder.part("sph", GL20.GL_LINES, Bits.indexes(Usage.Position), mat);
+            IntMeshPartBuilder bPartBuilder = modelBuilder.part("sph", GL20.GL_LINES, Bits.indices(Usage.Position), mat);
             bPartBuilder.icosphere(1, 3, false, true);
 
             cluster.model = (modelBuilder.end());

@@ -18,9 +18,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntIntMap;
-import gaiasky.render.GaiaSkyShaderCompileException;
 import gaiasky.util.Bits;
-import gaiasky.util.Logger;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
@@ -186,10 +184,10 @@ public abstract class BaseIntShader implements IntShader {
     }
 
     /**
-     * If necessary, override
+     * If necessary, override.
      *
-     * @param program
-     * @param meshPart
+     * @param program The shader program.
+     * @param meshPart The mesh part.
      */
     public void renderMesh(ExtShaderProgram program, IntMeshPart meshPart) {
         meshPart.mesh.render(program, meshPart.primitiveType, meshPart.offset, meshPart.size, false);
@@ -373,7 +371,7 @@ public abstract class BaseIntShader implements IntShader {
         }
 
         public Uniform(final String alias, final int overallIndex) {
-            this(alias, Bits.empty(128), Bits.empty(128), Bits.indexes(overallIndex));
+            this(alias, Bits.empty(128), Bits.empty(128), Bits.indices(overallIndex));
         }
 
         public Uniform(final String alias) {

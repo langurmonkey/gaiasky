@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IGPUVertsRenderable;
 import gaiasky.scene.Mapper;

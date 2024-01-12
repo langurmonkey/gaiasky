@@ -40,10 +40,10 @@ public class Bits {
         return b;
     }
 
-    public static Bits indexes(int... idx) {
+    public static Bits indices(int... idx) {
         Bits b = empty();
-        for (int i = 0; i < idx.length; i++) {
-            b.set(idx[i]);
+        for (int j : idx) {
+            b.set(j);
         }
         return b;
     }
@@ -191,8 +191,8 @@ public class Bits {
     public boolean isEmpty() {
         long[] bits = this.bits;
         int length = bits.length;
-        for (int i = 0; i < length; i++) {
-            if (bits[i] != 0L) {
+        for (long bit : bits) {
+            if (bit != 0L) {
                 return false;
             }
         }
@@ -322,7 +322,7 @@ public class Bits {
      * <li>The bit initially has the value false, and the corresponding bit in the argument has the value true.</li>
      * </ul>
      *
-     * @param other
+     * @param other The other instance.
      */
     public Bits xor(Bits other) {
         int commonWords = Math.min(bits.length, other.bits.length);

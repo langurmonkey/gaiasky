@@ -20,9 +20,9 @@ public class HexColorValidator implements IValidator {
     public boolean validate(String value) {
         try {
             if (alpha) {
-                ColorUtils.hexToRgba(value);
+                var ignored = ColorUtils.hexToRgba(value);
             } else {
-                ColorUtils.hexToRgb(value);
+                var ignored = ColorUtils.hexToRgb(value);
             }
             return true;
         } catch (Exception e) {

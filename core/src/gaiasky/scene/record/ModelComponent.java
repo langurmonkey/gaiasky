@@ -329,9 +329,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             addReflectionCubemapAttribute(model.materials);
         } else if (type != null) {
             // We actually need to create the model.
-            Bits attributes = Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates);
+            Bits attributes = Bits.indices(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates);
             if (params.containsKey("attributes")) {
-                attributes = Bits.indexes(((Long) params.get("attributes")).intValue());
+                attributes = Bits.indices(((Long) params.get("attributes")).intValue());
             }
             Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, attributes, primitiveType);
             model = pair.getFirst();

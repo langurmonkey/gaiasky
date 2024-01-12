@@ -85,7 +85,7 @@ public class VRDeviceInitializer extends AbstractInitSystem {
             params.put("diameter", 1.0);
             params.put("quality", 20L);
             params.put("flip", false);
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indices(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
             IntModel sphere = pair.getFirst();
 
             // Create models

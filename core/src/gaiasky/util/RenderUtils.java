@@ -82,8 +82,8 @@ public class RenderUtils {
 
         // Output
         float x = 0, y = 0;
-        float w = tw, h = th;
-        int sx = 0, sy = 0;
+        float w = tw;
+        int sx, sy;
         int sw = (int) gw, sh = (int) gh;
 
         if (gw > tw && gh > th) {
@@ -128,7 +128,7 @@ public class RenderUtils {
             sy = (int) ((th - sh) / 2f);
         }
         sb.begin();
-        sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
+        sb.draw(tex, x, y, w, th, sx, sy, sw, sh, false, true);
         sb.end();
 
         if (lastSize != null)
@@ -158,8 +158,8 @@ public class RenderUtils {
 
         // Output
         float x = 0, y = 0;
-        float w = tw, h = th;
-        int sx = 0, sy = 0;
+        float w = tw;
+        int sx, sy;
         int sw = (int) gw, sh = (int) gh;
 
         if (gw > tw && gh > th) {
@@ -204,7 +204,7 @@ public class RenderUtils {
             sy = (int) ((th - sh) / 2f);
         }
         sb.begin();
-        sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
+        sb.draw(tex, x, y, w, th, sx, sy, sw, sh, false, true);
         sb.end();
 
         if (lastSize != null)

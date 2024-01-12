@@ -132,9 +132,10 @@ public class ColorUtils {
 
     /**
      * Converts a scalar value that is normalized to [0:1] into a grayscale
-     * color vector rgba. See: http://www.particleincell.com/blog/2014/colormap/
+     * color vector rgba. See: {@see http://www.particleincell.com/blog/2014/colormap/}.
      *
-     * @param value
+     * @param value The grayscale value to set to the color.
+     * @param rgba The out parameter containing the color.
      */
     public static void grayscale(float value, float[] rgba) {
         rgba[0] = value;
@@ -145,10 +146,10 @@ public class ColorUtils {
 
     /**
      * Converts a scalar normalized to the range [0:1] into a blue-white-red
-     * rgba color, with blue at 0, white at 0.5 and red at 1
+     * rgba color, with blue at 0, white at 0.5 and red at 1.
      *
-     * @param value The value
-     * @param rgba  The color
+     * @param value The value.
+     * @param rgba  The out parameter containing the color.
      */
     public static void colormap_blue_white_red(float value, float[] rgba) {
         // Make it in [-1:1]
@@ -164,9 +165,10 @@ public class ColorUtils {
 
     /**
      * Converts a scalar normalized to the range [0:1] into a short rainbow of
-     * rgba values. See: http://www.particleincell.com/blog/2014/colormap/
+     * rgba values. See: {@see http://www.particleincell.com/blog/2014/colormap/}.
      *
-     * @param value
+     * @param value The value.
+     * @param rgba  The out parameter containing the color.
      */
     public static void colormap_short_rainbow(float value, float[] rgba) {
         /* plot short rainbow RGB */
@@ -207,9 +209,10 @@ public class ColorUtils {
 
     /**
      * Converts a scalar in [0..1] to a long rainbow of rgba values. See
-     * <a href="http://www.particleincell.com/blog/2014/colormap/">here</a>
+     * <a href="http://www.particleincell.com/blog/2014/colormap/">here</a>.
      *
-     * @param value The value in [0..1]
+     * @param value The value in [0..1].
+     * @param rgba  The out parameter containing the color.
      */
     public static void colormap_long_rainbow(float value, float[] rgba) {
         if (rgba == null)
@@ -257,9 +260,10 @@ public class ColorUtils {
 
     /**
      * Converts a scalar in [0..1] to a yellow to red map. See
-     * <a href="http://www.particleincell.com/blog/2014/colormap/">here</a>
+     * <a href="http://www.particleincell.com/blog/2014/colormap/">here</a>.
      *
-     * @param value The value to convert
+     * @param value The value to convert.
+     * @param rgba  The out parameter containing the color.
      */
     public static void colormap_yellow_to_red(float value, float[] rgba) {
         rgba[0] = 1;
@@ -308,24 +312,24 @@ public class ColorUtils {
      * Convert effective temperature to RGB using the Harre and Heller 2021 (Digital Color of Stars)
      * method.
      *
-     * @param teff The effective temperature of the star.
+     * @param tEff The effective temperature of the star.
      *
      * @return The RGB color in a float array.
      *
      * @see <a href="https://ui.adsabs.harvard.edu/abs/2021arXiv210106254H/abstract">Paper at ADS</a>
      */
-    public static float[] teffToRGB_harre(double teff) {
+    public static float[] tEffToRGB_harre(double tEff) {
         initHarreData();
         float[] rgb = new float[3];
         int idx = 0;
         for (int i = 1; i < teffToRGB_harre.length; i++) {
-            float teff0 = teffToRGB_harre[i - 1][0];
-            float teff1 = teffToRGB_harre[i][0];
-            if (teff < teff0) {
+            float tEff0 = teffToRGB_harre[i - 1][0];
+            float tEff1 = teffToRGB_harre[i][0];
+            if (tEff < tEff0) {
                 break;
-            } else if (teff >= teff0 && teff < teff1) {
+            } else if (tEff >= tEff0 && tEff < tEff1) {
                 // Found
-                if (teff - teff0 < teff1 - teff) {
+                if (tEff - tEff0 < tEff1 - tEff) {
                     idx = i - 1;
                 } else {
                     idx = i;
@@ -346,17 +350,17 @@ public class ColorUtils {
     /**
      * Converts effective temperature in Kelvin (1000-40000) to RGB.
      *
-     * @param teff Effective temperature.
+     * @param tEff Effective temperature.
      *
      * @return The RGB color in a float array.
      *
      * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
      * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
      */
-    public static float[] teffToRGB_rough(double teff) {
+    public static float[] tEffToRGB_rough(double tEff) {
         double r, g, b;
 
-        double temp = teff / 100;
+        double temp = tEff / 100;
 
         // Red
         if (temp <= 66) {
@@ -481,13 +485,13 @@ public class ColorUtils {
         float max = Math.max(r, Math.max(g, b));
         float min = Math.min(r, Math.min(g, b));
         float avg = (max + min) / 2;
-        float h = avg, s = avg, l = avg;
+        float h = avg, s;
 
         if (max == min) {
             h = s = 0; // achromatic
         } else {
             float d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            s = avg > 0.5 ? d / (2 - max - min) : d / (max + min);
             if (max == r) {
                 h = (g - b) / d + (g < b ? 6 : 0);
             } else if (max == g) {
@@ -498,7 +502,7 @@ public class ColorUtils {
             h /= 6;
         }
 
-        return new float[] { h, s, l };
+        return new float[] { h, s, avg};
     }
 
     /**
@@ -537,9 +541,9 @@ public class ColorUtils {
             t -= 1;
         if (t < 1 / 6)
             return p + (q - p) * 6 * t;
-        if (t < 1 / 2)
+        if (t < 1f / 2f)
             return q;
-        if (t < 2 / 3)
+        if (t < 2f / 3f)
             return p + (q - p) * (2 / 3 - t) * 6;
         return p;
     }

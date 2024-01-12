@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.api.IStarGroupDataProvider;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
@@ -596,7 +595,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         geodist
     }
 
-    public class AdditionalCols {
+    public static class AdditionalCols {
         // Column name -> index
         Map<String, Integer> indices;
         // Sourceid -> values

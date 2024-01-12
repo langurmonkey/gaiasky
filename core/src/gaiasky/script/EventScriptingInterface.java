@@ -1692,7 +1692,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     double target = 100 * Constants.M_TO_U;
 
                     Vector3b camObj = aux3b1;
-                    focusView.getAbsolutePosition(camObj).add(cam.posinv).nor();
+                    focusView.getAbsolutePosition(camObj).add(cam.posInv).nor();
                     Vector3d dir = cam.direction;
 
                     // Add forward movement while distance > target distance

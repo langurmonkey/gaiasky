@@ -40,7 +40,7 @@ public abstract class AbstractCamera implements ICamera {
      * Camera near value
      **/
     public double CAM_NEAR;
-    public Vector3b pos, posinv, prevpos;
+    public Vector3b pos, posInv, prevPos;
     public Vector3d tmp, shift;
     /**
      * The main camera
@@ -73,7 +73,7 @@ public abstract class AbstractCamera implements ICamera {
      **/
     protected PerspectiveCamera[] cameras;
     protected Matrix4d projection, view, combined;
-    protected FrustumDouble frustumd;
+    protected FrustumDouble frustum;
     /**
      * Closest non-star body to the camera
      **/
@@ -98,8 +98,8 @@ public abstract class AbstractCamera implements ICamera {
 
         this.parent = parent;
         pos = new Vector3b();
-        prevpos = new Vector3b();
-        posinv = new Vector3b();
+        prevPos = new Vector3b();
+        posInv = new Vector3b();
         shift = new Vector3d();
         tmp = new Vector3d();
         prevCombined = new Matrix4();
@@ -115,7 +115,7 @@ public abstract class AbstractCamera implements ICamera {
         projection = new Matrix4d();
         view = new Matrix4d();
         combined = new Matrix4d();
-        frustumd = new FrustumDouble();
+        frustum = new FrustumDouble();
 
         closestBody = new FocusView();
         closestStarView = new FocusView();
@@ -162,22 +162,22 @@ public abstract class AbstractCamera implements ICamera {
 
     @Override
     public Vector3b getPreviousPos() {
-        return prevpos;
+        return prevPos;
     }
 
     @Override
     public void setPreviousPos(Vector3b pos) {
-        this.prevpos.set(pos);
+        this.prevPos.set(pos);
     }
 
     @Override
     public void setPreviousPos(Vector3d prevpos) {
-        this.prevpos.set(prevpos);
+        this.prevPos.set(prevpos);
     }
 
     @Override
     public Vector3b getInversePos() {
-        return posinv;
+        return posInv;
     }
 
     @Override
@@ -222,7 +222,7 @@ public abstract class AbstractCamera implements ICamera {
 
     public void copyParamsFrom(AbstractCamera other) {
         this.pos.set(other.pos);
-        this.posinv.set(other.posinv);
+        this.posInv.set(other.posInv);
         this.getDirection().set(other.getDirection());
         this.getUp().set(other.getUp());
         this.closestBody = other.closestBody;
@@ -279,13 +279,12 @@ public abstract class AbstractCamera implements ICamera {
 
         invProjectionView.set(combined);
         Matrix4d.inv(invProjectionView.val);
-        frustumd.update(invProjectionView);
+        frustum.update(invProjectionView);
     }
 
     @Override
     public synchronized void checkClosestBody(IFocus cb) {
-        if (cb instanceof FocusView) {
-            FocusView candidate = (FocusView) cb;
+        if (cb instanceof FocusView candidate) {
             // A copy can never be the closest
             if (!cb.isCopy() && !Mapper.tagNoClosest.has(((FocusView) cb).getEntity())) {
                 if (closestBody.getEntity() == null) {

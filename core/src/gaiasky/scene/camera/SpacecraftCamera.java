@@ -267,15 +267,14 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         camera.update();
 
-        posinv.set(pos).scl(new Apfloat(-1, Constants.PREC));
+        posInv.set(pos).scl(new Apfloat(-1, Constants.PREC));
 
     }
 
     @Override
     public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode mode, boolean centerFocus, boolean postEvent) {
         InputProcessor ip = Gdx.input.getInputProcessor();
-        if (ip instanceof InputMultiplexer) {
-            InputMultiplexer im = (InputMultiplexer) ip;
+        if (ip instanceof InputMultiplexer im) {
             if (mode == CameraMode.SPACECRAFT_MODE && sc != null && previousMode != CameraMode.SPACECRAFT_MODE) {
                 // Enter SC mode
                 GaiaSky.postRunnable(() -> {
@@ -371,8 +370,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     @Override
     public void checkClosestBody(IFocus cb) {
         super.checkClosestBody(cb);
-        if (sc != null && cb instanceof FocusView) {
-            FocusView fv = (FocusView) cb;
+        if (sc != null && cb instanceof FocusView fv) {
             if (fv.getEntity() != sc && cb.getDistToCamera() < secondClosest.getDistToCamera()) {
                 secondClosest.setEntity(fv.getEntity());
             }

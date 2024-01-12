@@ -40,7 +40,7 @@ public class DefaultIntShader extends BaseIntShader {
     /**
      * Attributes which are not required but always supported.
      */
-    private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
+    private final static Bits optionalAttributes = Bits.indices(IntAttribute.CullFace, DepthTestAttribute.Type);
     private final static Attributes tmpAttributes = new Attributes();
     private static String defaultVertexShader = null;
     private static String defaultFragmentShader = null;

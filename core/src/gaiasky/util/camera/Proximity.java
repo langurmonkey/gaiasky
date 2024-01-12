@@ -151,12 +151,12 @@ public class Proximity {
             } else if (record == object) {
                 // Already in
                 return false;
-            } else if (object.getName().equalsIgnoreCase(record.name)) {
-                // This should not happen!
-            } else if (object.getClosestDistToCamera() < record.distToCamera) {
-                // Insert
-                insert(i, object, camera);
-                return true;
+            } else if (!object.getName().equalsIgnoreCase(record.name)) {
+                if (object.getClosestDistToCamera() < record.distToCamera) {
+                    // Insert
+                    insert(i, object, camera);
+                    return true;
+                }
             }
             i++;
         }

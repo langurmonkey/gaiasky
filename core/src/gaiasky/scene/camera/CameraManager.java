@@ -208,13 +208,13 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void setPreviousPos(Vector3d prevpos) {
-        current.setPreviousPos(prevpos);
+    public void setPreviousPos(Vector3d prevPos) {
+        current.setPreviousPos(prevPos);
     }
 
     @Override
-    public void setPreviousPos(Vector3b prevpos) {
-        current.setPreviousPos(prevpos);
+    public void setPreviousPos(Vector3b prevPos) {
+        current.setPreviousPos(prevPos);
     }
 
     @Override

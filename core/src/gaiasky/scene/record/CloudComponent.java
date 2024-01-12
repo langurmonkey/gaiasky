@@ -137,7 +137,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
 
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indices(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
         IntModel cloudModel = pair.getFirst();
         Material material = pair.getSecond().get("base");
         material.clear();

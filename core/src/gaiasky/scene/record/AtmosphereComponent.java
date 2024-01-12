@@ -77,7 +77,7 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
 
         Material atmMat;
         if (mc.instance == null) {
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indices(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
             IntModel atmosphereModel = pair.getFirst();
             atmMat = pair.getSecond().get("base");
 

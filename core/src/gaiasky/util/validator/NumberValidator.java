@@ -1,7 +1,5 @@
 package gaiasky.util.validator;
 
-import org.apache.commons.compress.harmony.pack200.NewAttributeBands.Call;
-
 public abstract class NumberValidator<T extends Number> extends CallbackValidator {
 
     protected final T min;

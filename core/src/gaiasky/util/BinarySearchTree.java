@@ -6,6 +6,7 @@
  */
 
 package gaiasky.util;// BinarySearchTree class
+
 public class BinarySearchTree<T extends Comparable<T>> {
     /** The tree root. */
     protected BinaryNode<T> root;
@@ -270,21 +271,24 @@ public class BinarySearchTree<T extends Comparable<T>> {
 
         return lastPrev;         // The last node visited on the left
     }
-}
 
-// Basic node stored in unbalanced binary search trees
-// Note that this class is not accessible outside
-// of this package.
-class BinaryNode<T> {
-    // Friendly data; accessible by other package routines
-    T element;      // The data in the node
-    BinaryNode<T> left;         // Left child
-    BinaryNode<T> right;        // Right child
+    /**
+     * Basic node stored in unbalanced binary search trees
+     * Note that this class is not accessible outside
+     * of this package.
+     */
+    public static class BinaryNode<T> {
+        // Friendly data; accessible by other package routines
+        T element;      // The data in the node
+        BinaryNode<T> left;         // Left child
+        BinaryNode<T> right;        // Right child
 
-    // Constructors
-    BinaryNode(T theElement) {
-        element = theElement;
-        left = right = null;
+        // Constructors
+        BinaryNode(T theElement) {
+            element = theElement;
+            left = right = null;
+        }
     }
 }
- 
+
+

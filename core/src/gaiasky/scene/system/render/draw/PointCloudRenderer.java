@@ -108,7 +108,7 @@ public abstract class PointCloudRenderer extends ImmediateModeRenderSystem imple
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size() > 0) {
+        if (!renderables.isEmpty()) {
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
