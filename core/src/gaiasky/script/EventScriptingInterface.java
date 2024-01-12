@@ -3172,13 +3172,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void addTrajectoryLine(String name,
                                   double[] points,
                                   double[] color) {
-        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
+        var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
     public void addTrajectoryLine(String name,
                                   List<?> points,
                                   List<?> color) {
-        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
+        var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
     @Override

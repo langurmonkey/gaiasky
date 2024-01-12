@@ -22,6 +22,7 @@ import gaiasky.util.Settings;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * This input adapter binds the key mappings to the input system in Libgdx.
@@ -33,14 +34,14 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
     /**
      * Holds the pressed keys at any moment
      **/
-    public Set<Integer> pressedKeys;
+    public TreeSet<Integer> pressedKeys;
     private final KeyRegister register;
 
     public KeyboardInputController(Input input) {
         super();
         this.input = input;
         this.register = new KeyRegister();
-        pressedKeys = new HashSet<>();
+        pressedKeys = new TreeSet<>();
         KeyBindings.initialize();
         mappings = KeyBindings.instance;
         EventManager.instance.subscribe(this, Event.CLEAN_PRESSED_KEYS);

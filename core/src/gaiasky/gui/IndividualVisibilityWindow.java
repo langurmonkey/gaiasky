@@ -315,8 +315,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.PER_OBJECT_VISIBILITY_CMD) {
             // Old
-            if (data[0] instanceof IVisibilitySwitch) {
-                IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
+            if (data[0] instanceof IVisibilitySwitch obj) {
                 String name = (String) data[1];
                 boolean checked = (Boolean) data[2];
                 // Update checkbox if necessary
@@ -331,8 +330,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             }
 
             // New
-            if (data[0] instanceof Entity) {
-                var entity = (Entity) data[0];
+            if (data[0] instanceof Entity entity) {
                 var base = Mapper.base.get(entity);
                 String name = (String) data[1];
                 boolean checked = (Boolean) data[2];
