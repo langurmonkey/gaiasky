@@ -25,10 +25,8 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
-import org.eclipse.jetty.util.ConcurrentHashSet;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

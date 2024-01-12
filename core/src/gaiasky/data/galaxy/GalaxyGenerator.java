@@ -190,8 +190,6 @@ public class GalaxyGenerator {
      * normal with sigma^2 = 0.2 The normalisation factor is 1/30 units/Kpc
      *
      * @return The list of stars
-     *
-     * @throws RuntimeException
      */
     private static List<double[]> generateMilkyWay() {
         Vector3d aux = new Vector3d();

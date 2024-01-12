@@ -51,9 +51,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel pace;
     private final OwnLabel closest;
     private final OwnLabel focus;
-    private final OwnLabel home;
     private final OwnLabel s1;
-    private final OwnLabel s2;
     private final Scene scene;
     private final FocusView view;
     private String lastFocusName;
@@ -94,9 +92,9 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         closest.setName("closest tii");
         closest.setColor(0.3f, 0.5f, 1f, 1f);
 
-        s2 = new OwnLabel("|", skin, "mono");
+        OwnLabel s2 = new OwnLabel("|", skin, "mono");
 
-        home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(Settings.settings.scene.homeObject, maxNameLen)), skin, "mono");
+        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(Settings.settings.scene.homeObject, maxNameLen)), skin, "mono");
         home.setName("home tii");
         home.setColor(1f, 0.7f, 0.1f, 1f);
 

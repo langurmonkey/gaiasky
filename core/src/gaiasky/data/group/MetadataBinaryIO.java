@@ -131,8 +131,8 @@ public class MetadataBinaryIO {
     public OctreeNode readMetadataMapped(String file, LoadStatus status) {
         nodesMap = new HashMap<>();
 
-        try {
-            FileChannel fc = new RandomAccessFile(Settings.settings.data.dataFile(file), "r").getChannel();
+        try (var f = new RandomAccessFile(Settings.settings.data.dataFile(file), "r")) {
+            FileChannel fc = f.getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
@@ -170,10 +170,7 @@ public class MetadataBinaryIO {
                     float hsx = (float) ((mem.getFloat() / 2f) * Constants.DISTANCE_SCALE_FACTOR);
                     //float hsy = mem.getFloat() / 2f;
                     mem.position(mem.position() + 4); // skip hsy
-                    float hsy = hsx;
-                    //float hsz = mem.getFloat() / 2f;
                     mem.position(mem.position() + 4); // skip hsz
-                    float hsz = hsx;
                     long[] childrenIds = new long[8];
                     for (int i = 0; i < 8; i++) {
                         childrenIds[i] = version == 0 ? mem.getInt() : mem.getLong();
@@ -185,6 +182,8 @@ public class MetadataBinaryIO {
 
                     maxDepth = Math.max(maxDepth, depth);
 
+                    float hsy = hsx;
+                    float hsz = hsx;
                     OctreeNode node = new OctreeNode(pageId, x, y, z, hsx, hsy, hsz, childrenCount, nObjects, ownObjects, depth);
                     nodesMap.put(pageId, new Pair<>(node, childrenIds));
                     if (status != null)

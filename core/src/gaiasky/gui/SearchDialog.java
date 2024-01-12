@@ -43,6 +43,9 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/**
+ * Simple dialog to search for objects by name or ID.
+ */
 public class SearchDialog extends GenericDialog {
     private static final Log logger = Logger.getLogger(SearchDialog.class);
     private final Scene scene;
@@ -108,8 +111,7 @@ public class SearchDialog extends GenericDialog {
         searchInput.setWidth(480f);
         searchInput.setMessageText(I18n.msg("gui.objects.search"));
         searchInput.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 int matchingSize = matching.size();
                 int code = ie.getKeyCode();
                 if (ie.getType() == Type.keyUp) {
@@ -146,8 +148,7 @@ public class SearchDialog extends GenericDialog {
                                             matching.forEach(match -> {
                                                 OwnLabel m = new OwnLabel(match, skin);
                                                 m.addListener((evt) -> {
-                                                    if (evt instanceof InputEvent) {
-                                                        InputEvent iEvt = (InputEvent) evt;
+                                                    if (evt instanceof InputEvent iEvt) {
                                                         if (iEvt.getType() == Type.touchDown) {
                                                             checkString(match, scene);
                                                             searchInput.setText(match);

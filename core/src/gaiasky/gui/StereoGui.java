@@ -21,7 +21,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;

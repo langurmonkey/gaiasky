@@ -64,10 +64,35 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final Settings settings;
     // This flag is active when the dialog is called from the welcome screen.
     private final boolean welcomeScreen;
-    private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY,
-            highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
-            crosshairHome, pointerGuides, newUI, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur,
-            ssr, eclipses, eclipseOutlines, starSpheres, shaderCache;
+    private OwnCheckBox fullScreen;
+    private OwnCheckBox windowed;
+    private OwnCheckBox vsync;
+    private OwnCheckBox maxFps;
+    private OwnCheckBox multithreadCb;
+    private OwnCheckBox lodFadeCb;
+    private OwnCheckBox cbAutoCamrec;
+    private OwnCheckBox real;
+    private OwnCheckBox invertX;
+    private OwnCheckBox invertY;
+    private OwnCheckBox highAccuracyPositions;
+    private OwnCheckBox shadowsCb;
+    private OwnCheckBox pointerCoords;
+    private OwnCheckBox modeChangeInfo;
+    private OwnCheckBox debugInfo;
+    private OwnCheckBox crosshairFocus;
+    private OwnCheckBox crosshairClosest;
+    private OwnCheckBox crosshairHome;
+    private OwnCheckBox pointerGuides;
+    private OwnCheckBox newUI;
+    private OwnCheckBox exitConfirmation;
+    private OwnCheckBox recGridProjectionLines;
+    private OwnCheckBox dynamicResolution;
+    private OwnCheckBox motionBlur;
+    private OwnCheckBox ssr;
+    private OwnCheckBox eclipses;
+    private OwnCheckBox eclipseOutlines;
+    private OwnCheckBox starSpheres;
+    private OwnCheckBox shaderCache;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
@@ -938,8 +963,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // SSR
             OwnLabel ssrLabel = new OwnLabel(I18n.msg("gui.ssr"), skin);
             ssr = new OwnCheckBox("", skin);
-            ssr.setChecked(!safeMode && !vr && settings.postprocess.ssr.active);
-            ssr.setDisabled(safeMode || vr);
+            ssr.setChecked(!safeMode && settings.postprocess.ssr.active);
+            ssr.setDisabled(safeMode);
             OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
             ssrTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.ssr.info"), skin));
 
@@ -2136,7 +2161,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         real = new OwnCheckBox(I18n.msg("gui.gaia.real"), skin, "radio", pad10);
         real.setChecked(settings.data.realGaiaAttitude);
-        nsl = new OwnCheckBox(I18n.msg("gui.gaia.nsl"), skin, "radio", pad10);
+        OwnCheckBox nsl = new OwnCheckBox(I18n.msg("gui.gaia.nsl"), skin, "radio", pad10);
         nsl.setChecked(!settings.data.realGaiaAttitude);
 
         new ButtonGroup<>(real, nsl);
@@ -2219,7 +2244,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // CLEAR SHADER CACHE BUTTON
         OwnTextButton clearCache = new OwnTextButton(I18n.msg("gui.system.shader.cache.clear"), skin);
         clearCache.addListener(event -> {
-            if (event instanceof ChangeEvent) {
+            if (event instanceof ChangeEvent ce) {
                 var path = SysUtils.getShaderCacheDir();
                 try {
                     FileUtils.cleanDirectory(path.toFile());
@@ -2228,9 +2253,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     logger.error(e);
                 }
                 return true;
+            } else {
+                return false;
             }
-
-            return false;
         });
         clearCache.pad(0, pad34, 0, pad34);
         clearCache.setHeight(buttonHeight);

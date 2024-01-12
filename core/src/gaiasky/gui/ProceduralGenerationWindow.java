@@ -499,7 +499,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             Path dataPath = Settings.settings.data.dataPath("default-data/tex/base");
             Array<String> lookUpTables = new Array<>();
             try (var stream = Files.list(dataPath)){
-                java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
+                java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png")).toList();
                 for (Path p : l) {
                     String name = p.toString();
                     lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/base/")));
