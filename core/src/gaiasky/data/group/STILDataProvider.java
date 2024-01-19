@@ -51,6 +51,11 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
 
+/**
+ * Loads data in VOTable, CSV and FITS formats using the STIL library.
+ *
+ * @see <a href="https://www.star.bristol.ac.uk/~mbt/stil/">STIL Library homepage</a>
+ */
 public class STILDataProvider extends AbstractStarGroupDataProvider {
     static {
         logger = Logger.getLogger(STILDataProvider.class);
@@ -214,6 +219,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     /**
+     * Loads a dataset (from a data source object) into a list of particle records.
+     *
      * @param ds             The data source.
      * @param factor         Length factor.
      * @param preCallback    A function that runs before.

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.util.i18n.I18n;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -869,6 +870,92 @@ public class TextUtils {
         } else {
             return String.format("%1$" + length + "s", str).replace(' ', padChar);
         }
+    }
+
+    public static int hashFast(String str) {
+        return hashFast(str.toCharArray());
+    }
+
+    public static int hashFast(char[] val) {
+        int h = 0, i = 0;
+        int len = val.length;
+        for (; i + 3 < len; i += 4) {
+            h = 31 * 31 * 31 * 31 * h
+                    + 31 * 31 * 31 * val[i]
+                    + 31 * 31 * val[i + 1]
+                    + 31 * val[i + 2]
+                    + val[i + 3];
+        }
+        for (; i < len; i++) {
+            h = 31 * h + val[i];
+        }
+        return h;
+    }
+
+    public static int hashFNV1(String str) {
+        return hashFNV1(str.toCharArray(), 1);
+    }
+
+    public static int hashFNV1(char[] data, long seed) {
+        int len = data.length;
+        for (char datum : data) {
+            seed += (seed << 1) + (seed << 4) + (seed << 7) + (seed << 8) + (seed << 24);
+            seed ^= datum;
+        }
+        return (int) seed;
+    }
+
+    public static int hashMurmur(String str) {
+        return hashMurmur(str.toCharArray(), 1);
+    }
+
+    public static int hashMurmur(char[] data, int seed) {
+        int m = 0x5bd1e995;
+        int r = 24;
+
+        int h = seed ^ data.length;
+
+        int len = data.length;
+        int len_4 = len >> 2;
+
+        for (int i = 0; i < len_4; i++) {
+            int i_4 = i << 2;
+            int k = data[i_4 + 3];
+            k = k << 8;
+            k = k | (data[i_4 + 2] & 0xff);
+            k = k << 8;
+            k = k | (data[i_4 + 1] & 0xff);
+            k = k << 8;
+            k = k | (data[i_4] & 0xff);
+            k *= m;
+            k ^= k >>> r;
+            k *= m;
+            h *= m;
+            h ^= k;
+        }
+
+        int len_m = len_4 << 2;
+        int left = len - len_m;
+
+        if (left != 0) {
+            if (left >= 3) {
+                h ^= (int) data[len - 3] << 16;
+            }
+            if (left >= 2) {
+                h ^= (int) data[len - 2] << 8;
+            }
+            if (left >= 1) {
+                h ^= (int) data[len - 1];
+            }
+
+            h *= m;
+        }
+
+        h ^= h >>> 13;
+        h *= m;
+        h ^= h >>> 15;
+
+        return h;
     }
 
 }

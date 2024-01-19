@@ -18,28 +18,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-public class ParallelSortBenchmark {
-
-    /** Number of rounds for each test. **/
-    private static final int ROUNDS = 10;
-    /** Number of warm-up rounds. **/
-    private static final int ROUNDS_WARMUP = 10;
+public class ParallelSortBenchmark extends AbstractBenchmark {
 
     /**
      * Number of elements to use.
      */
     private static final int[] SIZES = new int[] { 100, 1_000, 10_000, 100_000, 1000_000, 10_000_000, 20_000_000 };
-    private final DecimalFormat df;
-    protected Logger log;
 
     public ParallelSortBenchmark() {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "[%4$-2s] %5$s %n");
-        log = Logger.getLogger(getClass().getSimpleName());
-        log.setLevel(Level.INFO);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
-
-        this.df = new DecimalFormat("0.0#");
+        super(10, 10, ParallelSortBenchmark.class.getSimpleName());
     }
 
     public static void main(String[] args) {
@@ -79,6 +66,7 @@ public class ParallelSortBenchmark {
             // Actual tests.
             test(size + " sequential ", ROUNDS, array, Arrays::sort, true);
             test(size + " parallel   ", ROUNDS, array, Arrays::parallelSort, true);
+
         }
     }
 
@@ -87,8 +75,8 @@ public class ParallelSortBenchmark {
                       int[] array,
                       Consumer<int[]> consumer,
                       boolean report) {
-        long[][] elapsed = new long[2][ROUNDS];
-        for (int round = 0; round < ROUNDS; round++) {
+        long[][] elapsed = new long[2][rounds];
+        for (int round = 0; round < rounds; round++) {
             // Use copy of array for each round.
             int[] testArray = Arrays.copyOf(array, array.length);
 
@@ -104,62 +92,14 @@ public class ParallelSortBenchmark {
 
         if (report) {
             double meanClockMs = mean(elapsed[0]) / 1_000_000d;
-            double stdevClock = stdev(elapsed[0], meanClockMs);
+            double stDevClock = stdev(elapsed[0], meanClockMs);
 
             double meanCpuMs = mean(elapsed[1]) / 1_000_000d;
-            double stdevCpu = stdev(elapsed[1], meanCpuMs);
+            double stDevCpu = stdev(elapsed[1], meanCpuMs);
 
-            log.info(pad(name, 20) + pad(meanClockMs + " (±" + format(stdevClock) + ") ms", 28) + pad(meanCpuMs + " (±" + format(stdevCpu) + ") ms", 28));
-        }
-
-    }
-
-    private double mean(long[] array) {
-        long total = 0;
-        for (long l : array) {
-            total += l;
-        }
-        return total / array.length;
-    }
-
-    private double stdev(long[] array,
-                         double mean) {
-        double sum = 0;
-        double n = array.length;
-        for (long l : array) {
-            sum += Math.pow(l / 1_000_000d - mean, 2.0);
-        }
-        return Math.sqrt(sum / n);
-    }
-
-    private String pad(String str,
-                       int len) {
-        StringBuilder strPad = new StringBuilder(str);
-        while (strPad.length() < len) {
-            strPad.append(" ");
-        }
-        return strPad.toString();
-    }
-
-    private String format(double num) {
-        return df.format(num);
-    }
-
-    private String formatNumber(int num,
-                                int pad) {
-        return pad(formatNumber(num), 22);
-    }
-
-    private String formatNumber(int num) {
-        if (num > 1e9) {
-            return df.format(num / 1_000_000_000d) + " G";
-        } else if (num > 1e6) {
-            return df.format(num / 1_000_000d) + " M";
-        } else if (num > 1e3) {
-            return df.format(num / 1_000d) + " k";
-        } else {
-            return Integer.toString(num);
+            log.info(pad(name, 20) + pad(meanClockMs + " (±" + format(stDevClock) + ") ms", 28) + pad(meanCpuMs + " (±" + format(stDevCpu) + ") ms", 28));
         }
     }
+
 
 }
