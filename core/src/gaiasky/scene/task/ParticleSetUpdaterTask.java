@@ -115,7 +115,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         updateConsumer.accept(time, camera);
 
         // Sort background list of indices.
-        Arrays.sort(particleSet.background, comp);
+        Arrays.parallelSort(particleSet.background, comp);
 
         // Synchronously with the render thread, update indices, lastSortTime and updating state.
         GaiaSky.postRunnable(() -> {

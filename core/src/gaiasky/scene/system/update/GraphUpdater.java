@@ -294,7 +294,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             }
             return update;
         } else {
-            if (entity.getComponent(TagNoProcess.class) == null) {
+            if (!Mapper.tagNoProcess.has(entity)) {
                 entity.add(getEngine().createComponent(TagNoProcess.class));
             }
             return false;
