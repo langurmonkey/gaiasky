@@ -534,19 +534,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // LIGHT GLOW
-        OwnLabel lightGlowLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
-        CheckBox lightGlow = new OwnCheckBox("", skin);
-        lightGlow.setName("light scattering");
-        lightGlow.setChecked(settings.postprocess.lightGlow.active);
-        lightGlow.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LIGHT_GLOW_CMD, lightGlow, lightGlow.isChecked());
-                return true;
-            }
-            return false;
-        });
-
         // FADE TIME
         OwnLabel fadeTimeLabel = new OwnLabel(I18n.msg("gui.fadetime"), skin, "default");
         IValidator fadeTimeValidator = new LongValidator(Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
@@ -576,8 +563,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(lrLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(lineRenderer).left().padBottom(pad10);
         graphics.add(lineTooltip).left().padRight(pad10).padBottom(pad10).row();
-        graphics.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(lightGlow).left().padBottom(pad10).row();
         graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(lensFlare).left().padBottom(pad10).row();
         graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
@@ -1094,8 +1079,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         starSpheres = new OwnCheckBox("", skin);
         starSpheres.setChecked(settings.scene.star.renderStarSpheres);
 
-        labels.add(starSpheresLabel);
 
+        // LIGHT GLOW
+        OwnLabel lightGlowLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
+        CheckBox lightGlow = new OwnCheckBox("", skin);
+        lightGlow.setName("light scattering");
+        lightGlow.setChecked(settings.postprocess.lightGlow.active);
+        lightGlow.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.LIGHT_GLOW_CMD, lightGlow, lightGlow.isChecked());
+                return true;
+            }
+            return false;
+        });
+
+        labels.add(starSpheresLabel, lightGlowLabel);
+
+        starsTable.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(lightGlow).left().padRight(pad18).padBottom(pad10).row();
         starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
 
