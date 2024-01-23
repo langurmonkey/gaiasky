@@ -185,7 +185,8 @@ scene:
   properMotion:
     # Length factor of proper motion vectors [500.0 - 50000.0].
     length: 25000.0
-    # Scale factor of proper motion vectors [1.0 - 10.0].
+    # Factor to compute how many proper motion vectors we render [1.0 - 10.0].
+    # Increase factor to render more vectors.
     number: 5.0
     # Color mode for velocity vectors.
     # 0 - direction
