@@ -219,7 +219,7 @@ public class Scene {
             int priority = 0;
 
             // Prepare systems.
-            initializers = new Array<>(21);
+            initializers = new Array<>(26);
             addInitializer(new BaseInitializer(this, setUp, families.graphNodes, priority++));
             addInitializer(new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++));
             addInitializer(new ParticleSetInitializer(setUp, families.particleSets, priority++));
@@ -306,7 +306,7 @@ public class Scene {
             int priority = 0;
 
             // Scene graph update system needs to run first.
-            updaters = new Array<>(18);
+            updaters = new Array<>(25);
             addUpdater(new ConstellationUpdater(families.constellations, priority++));
             GraphUpdater sceneGraphUpdateSystem = new GraphUpdater(families.roots, priority++, GaiaSky.instance.time);
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());

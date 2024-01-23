@@ -186,7 +186,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         // Relation between the particle size and actual star size (normalized for
         // the Sun, 695700 Km of radius)
         extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
-        dist.distance = 172.4643429 * extra.radius;
+        dist.distance = 17200.4643429 * extra.radius;
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateStar;
@@ -220,13 +220,15 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         // Color.
         setRGB(body, celestial);
 
-        // Calculate size - This contains arbitrary boundary values to make
-        // things nice on the render side
-        double flux = Math.pow(10, -mag.absMag / 2.5f);
-        if (isStar) {
-            body.size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / discFactor);
-        } else {
-            body.size = (float) (Math.log(Math.pow(flux, 10.0)) * Constants.PC_TO_U);
+        if (body.size <= 0) {
+            // Calculate size - This contains arbitrary boundary values to make
+            // things nice on the render side
+            double flux = Math.pow(10, -mag.absMag / 2.5f);
+            if (isStar) {
+                body.size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.22f), 1e9f) / discFactor);
+            } else {
+                body.size = (float) (Math.log(Math.pow(flux, 10.0)) * Constants.PC_TO_U);
+            }
         }
         extra.computedSize = 0;
     }
