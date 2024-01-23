@@ -21,7 +21,6 @@ import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.api.IUpdatable;
@@ -46,7 +45,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.scene.record.MaterialComponent.convertToComponent;
 
-public class CloudComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<CloudComponent> {
+public class CloudComponent extends NamedComponent implements IMaterialProvider, IUpdatable<CloudComponent> {
     /**
      * Default texture parameters
      **/
@@ -148,9 +147,6 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         if (!Settings.settings.scene.initialization.lazyTexture) {
             initMaterial(null);
         }
-
-        // Subscribe to new graphics quality setting event
-        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
 
         // Initialised
         texInitialised = !Settings.settings.scene.initialization.lazyTexture;
@@ -399,20 +395,6 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         return material;
     }
 
-    @Override
-    public void notify(final Event event, Object source, final Object... data) {
-        if (event == Event.GRAPHICS_QUALITY_UPDATED) {
-            GaiaSky.postRunnable(() -> {
-                if (texInitialised) {
-                    // Remove current textures
-                    this.disposeTextures(this.manager);
-                    // Set generated status to false
-                    this.generated.set(false);
-                }
-            });
-        }
-    }
-
     public boolean hasSVT() {
         return diffuseSvt != null;
     }
@@ -479,7 +461,6 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
     @Override
     public void dispose() {
         disposeTextures(manager);
-        EventManager.instance.removeAllSubscriptions(this);
     }
 
     @Override

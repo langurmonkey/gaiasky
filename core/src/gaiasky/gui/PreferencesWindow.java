@@ -2564,7 +2564,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ComboBoxBean bean = graphicsQuality.getSelected();
         boolean restartDialog = settings.graphics.quality.ordinal() != bean.value;
         if (settings.graphics.quality.ordinal() != bean.value) {
-            EventManager.publish(Event.GRAPHICS_QUALITY_UPDATE_CMD, this, GraphicsQuality.values()[bean.value]);
+            settings.graphics.quality = GraphicsQuality.values()[bean.value];
         }
 
         bean = aa.getSelected();

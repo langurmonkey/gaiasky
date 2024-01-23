@@ -289,7 +289,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             addColorToMaterial();
         }
         // Subscribe to new graphics quality setting event
-        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED, Event.SSR_CMD, Event.ECLIPSES_CMD);
+        EventManager.instance.subscribe(this, Event.SSR_CMD, Event.ECLIPSES_CMD);
 
         this.modelInitialised = this.modelInitialised || !Settings.settings.scene.initialization.lazyMesh;
         this.modelLoading = false;
@@ -940,16 +940,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void notify(final Event event,
                        Object source,
                        final Object... data) {
-        if (event == Event.GRAPHICS_QUALITY_UPDATED) {
-            GaiaSky.postRunnable(() -> {
-                if (mtc != null && mtc.texInitialised) {
-                    // Remove current textures
-                    mtc.disposeTextures(this.manager);
-                    // Set generated status to false
-                    mtc.setGenerated(false);
-                }
-            });
-        } else if (event == Event.ECLIPSES_CMD) {
+        if (event == Event.ECLIPSES_CMD) {
             boolean active = (Boolean) data[0];
             if (!active) {
                 removeEclipsingBodyUniforms();

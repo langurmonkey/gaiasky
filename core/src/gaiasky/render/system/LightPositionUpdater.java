@@ -13,7 +13,6 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scene.Mapper;
@@ -21,14 +20,13 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
+public class LightPositionUpdater implements RenderSystemRunnable {
 
     private final Object lock;
     private final Vector3 auxV;
@@ -46,8 +44,6 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
 
         this.auxV = new Vector3();
         this.auxD = new Vector3d();
-
-        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
     }
 
     public void reinitialize(int nLights) {
@@ -177,15 +173,5 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
             }
         }
 
-    }
-
-    @Override
-    public void notify(final Event event,
-                       Object source,
-                       final Object... data) {
-        if (event == Event.GRAPHICS_QUALITY_UPDATED) {// Update graphics quality
-            GraphicsQuality gq = (GraphicsQuality) data[0];
-            GaiaSky.postRunnable(() -> reinitialize(gq.getGlowNLights()));
-        }
     }
 }

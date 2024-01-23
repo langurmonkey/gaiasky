@@ -132,7 +132,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
                 Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION,
                 Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE,
-                Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
+                Event.CAMERA_ORIENTATION_UPDATE, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
                 Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
                 Event.FILM_GRAIN_CMD);
     }
@@ -1144,18 +1144,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         }
                     }
                 }
-            }
-            case GRAPHICS_QUALITY_UPDATED -> {
-                // Update graphics quality
-                var gq = (GraphicsQuality) data[0];
-                GaiaSky.postRunnable(() -> {
-                    for (int i = 0; i < RenderType.values().length; i++) {
-                        if (pps[i] != null) {
-                            PostProcessBean ppb = pps[i];
-                            updateGraphicsQuality(ppb, gq);
-                        }
-                    }
-                });
             }
             case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> {
                 var starTex = new Texture(Settings.settings.data.dataFileHandle(Settings.settings.scene.star.getStarTexture()), true);

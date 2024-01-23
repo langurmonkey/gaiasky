@@ -10,12 +10,9 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.data.group.PointDataProvider;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.BillboardSet;
-import gaiasky.scene.entity.BillboardSetRadio;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
@@ -55,8 +52,6 @@ public class BillboardSetInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
 
         transformData(entity);
-
-        EventManager.instance.subscribe(new BillboardSetRadio(entity), Event.GRAPHICS_QUALITY_UPDATED);
     }
 
     public boolean reloadData(BillboardSet billboard) {
