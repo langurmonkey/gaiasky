@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Generic data provider for point clouds that reads cartesian positions (XYZ) from a text file.
+ * Consider using {@link BinaryPointDataProvider} instead, which includes many more features and is more compact.
+ */
 public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
 

@@ -170,7 +170,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Color noise
         colorNoise = new OwnSliderPlus(I18n.msg("gui.dsload.color.noise"), Constants.MIN_COLOR_NOISE, Constants.MAX_COLOR_NOISE, Constants.SLIDER_STEP_TINY, false, skin);
-        colorNoise.setName("profile decay");
+        colorNoise.setName("color noise");
         colorNoise.setWidth(sliderWidth);
         colorNoise.setValue(0.2f);
         colorNoise.addListener(event -> {
@@ -186,8 +186,8 @@ public class DatasetLoadDialog extends GenericDialog {
         addLabelColor(container);
 
         // Particle size
-        particleSize = new OwnSliderPlus(I18n.msg("gui.dsload.size"), Constants.MIN_PARTICLE_SIZE, Constants.MAX_PARTICLE_SIZE, Constants.SLIDER_STEP_SMALL, false, skin);
-        particleSize.setName("profile decay");
+        particleSize = new OwnSliderPlus(I18n.msg("gui.dsload.size"), Constants.MIN_PARTICLE_SIZE, Constants.MAX_PARTICLE_SIZE, Constants.SLIDER_STEP_TINY, false, skin);
+        particleSize.setName("particle size");
         particleSize.setWidth(sliderWidth);
         particleSize.setValue(10f);
         particleSize.addListener(event -> {
@@ -440,7 +440,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
             datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0);
-            datasetOptions.particleSizeLimits = new double[] { 0.004d, 0.5d };
+            datasetOptions.particleSizeLimits = new double[] { 3.5e-4, 0.002 };
         } else if (clusters.isChecked()) {
             datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
             datasetOptions.ct = componentType.getSelected().ct;
@@ -448,7 +448,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise != null ? colorNoise.getValue() : 0.0;
             datasetOptions.particleSize = particleSize != null ? particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0) : 1.0;
-            datasetOptions.particleSizeLimits = new double[] { 0.0d, 90.0d };
+            datasetOptions.particleSizeLimits = new double[] { 0.0d, 1.57d };
             datasetOptions.numLabels = 50;
             datasetOptions.modelType = "icosphere";
             datasetOptions.modelPrimitive = "GL_LINES";

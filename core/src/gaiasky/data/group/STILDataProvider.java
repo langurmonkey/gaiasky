@@ -368,26 +368,35 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double sizePc = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
 
                             // SIZE (DIAMETER, not RADIUS!)
-                            if (!ucdParser.SIZE.isEmpty() && !isStars) {
-                                Pair<UCD, Double> sizePair = getDoubleUcd(ucdParser.SIZE, row);
-                                UCD sizeUcd = sizePair.getFirst();
-                                if (sizeUcd != null && sizeUcd.unit != null) {
-                                    if (Angle.isAngle(sizeUcd.unit)) {
-                                        // Solid angle in radians.
-                                        double sa = new Angle(sizePair.getSecond(), sizePair.getFirst().unit).get(AngleUnit.RAD);
-                                        // Size in parsecs = tan(sa) * distPc
-                                        sizePc = Math.tan(sa) * p.realPosition.len();
-                                    } else if (Length.isLength(sizeUcd.unit)) {
-                                        // Size in parsecs, directly.
-                                        sizePc = new Length(sizePair.getSecond(), sizePair.getFirst().unit).get(LengthUnit.PC);
+                            if (!ucdParser.SIZE.isEmpty()) {
+                                // We have a size in the dataset.
+                                if (!isStars) {
+                                    // Only particles, star datasets do not have a size.
+                                    Pair<UCD, Double> sizePair = getDoubleUcd(ucdParser.SIZE, row);
+                                    UCD sizeUcd = sizePair.getFirst();
+                                    if (sizeUcd != null && sizeUcd.unit != null) {
+                                        if (Angle.isAngle(sizeUcd.unit)) {
+                                            // Solid angle in radians.
+                                            double sa = new Angle(sizePair.getSecond(), sizePair.getFirst().unit).get(AngleUnit.RAD);
+                                            // Size in parsecs = tan(sa) * distPc
+                                            sizePc = Math.tan(sa) * p.realPosition.len();
+                                        } else if (Length.isLength(sizeUcd.unit)) {
+                                            // Size in parsecs, directly.
+                                            sizePc = new Length(sizePair.getSecond(), sizePair.getFirst().unit).get(LengthUnit.PC);
+                                        }
+                                    } else {
+                                        // We hope size is already in parsecs.
+                                        sizePc = sizePair.getSecond().floatValue();
                                     }
-                                } else {
-                                    // We hope size is already in parsecs.
-                                    sizePc = sizePair.getSecond().floatValue();
+                                    if (TextUtils.containsOrMatches(UCDParser.radiusColNames, sizeUcd.colName, true)) {
+                                        // Radius, need to multiply by 2 to get diameter.
+                                        sizePc *= 2.0;
+                                    }
                                 }
-                                if (TextUtils.containsOrMatches(UCDParser.radiusColNames, sizeUcd.colName, true)) {
-                                    // Radius, need to multiply by 2 to get diameter.
-                                    sizePc *= 2.0;
+                            } else {
+                                if (!isStars){
+                                    // We have particles without a size. We just clamp what we have.
+                                    sizePc = MathUtilsDouble.clamp(sizePc, 1e-8, 3.0);
                                 }
                             }
 
