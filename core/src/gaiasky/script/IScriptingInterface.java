@@ -20,6 +20,11 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
 
 import java.util.List;
 
+/**
+ * <p>Definition of the public API exposed to scripts via Py4j or the REST server.</p>
+ * <p>For more information on Gaia Sky scripting, see
+ * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Scripting-with-python.html">this page</a>.</p>
+ */
 @SuppressWarnings("unused")
 public interface IScriptingInterface {
 

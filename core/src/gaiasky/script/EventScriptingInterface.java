@@ -84,6 +84,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Implementation of the Gaia Sky scripting API located at {@link IScriptingInterface}. This implementation uses
+ * mainly the event manager to communicate with the rest of Gaia Sky.
+ */
 @SuppressWarnings({"unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue"})
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
