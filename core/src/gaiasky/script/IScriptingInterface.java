@@ -3292,6 +3292,40 @@ public interface IScriptingInterface {
                               boolean trackObject);
 
     /**
+     * <p>Creates a backup of the current settings state that can be restored later on.
+     * The settings are backed up in a stack, so multiple calls to this method put different copies of the settings
+     * on the stack in a LIFO fashion.</p>
+     * <p>This method, together with {@link IScriptingInterface#restoreSettings()}, are useful to back up and restore the
+     * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
+     * unmodified after your script ends.</p>
+     */
+    void backupSettings();
+
+    /**
+     * <p>Takes the settings object at the top of the settings stack and makes it effective.</p>
+     * <p>This method, together with {@link IScriptingInterface#backupSettings()}, are useful to back up and restore the
+     * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
+     * unmodified after your script ends.</p>
+     * <p>WARN: This function re-initializes the user interface of Gaia Sky, so be aware that the UI will be
+     * set to its default state after this call.</p>
+     *
+     * @return True if the stack was not empty and the settings were restored successfully. False otherwise.
+     */
+    boolean restoreSettings();
+
+    /**
+     * Clears the stack of settings objects. This will invalidate all previous calls to {@link IScriptingInterface#backupSettings()},
+     * effectively making the settings stack empty. Calling {@link IScriptingInterface#restoreSettings()} after this
+     * method will return false.
+     */
+    void clearSettingsStack();
+
+    /**
+     * Forces a re-initialization of the entire user interface of Gaia Sky on the fly.
+     */
+    void resetUserInterface();
+
+    /**
      * Sets the maximum simulation time allowed, in years. This sets the maximum time in the future (years)
      * and in the past (-years). This setting is not saved to the configuration and resets to 5 Myr after
      * restart.

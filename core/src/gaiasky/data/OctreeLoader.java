@@ -544,7 +544,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
         var sgOctant = Mapper.octant.get(sg);
 
-
         GaiaSky.postRunnable(() -> {
             synchronized (octant) {
                 sgOctant.octant = octant;
@@ -566,7 +565,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
                 octant.setStatus(LoadStatus.LOADED);
                 // Update counts
-                octant.touch(data.size());
+                octant.updateCountsWithNumber(data.size());
 
                 addLoadedInfo(octant.pageId, octant.countObjects());
             }
@@ -601,7 +600,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                         }
                         objects.clear();
                         octant.setStatus(LoadStatus.NOT_LOADED);
-                        octant.touch(unloaded);
+                        octant.updateCountsWithNumber(unloaded);
                     } catch (Exception e) {
                         logger.error("Error disposing octant's objects " + octant.pageId, e);
                         logger.info(Settings.APPLICATION_NAME + " will attempt to continue");

@@ -330,8 +330,6 @@ public class OctreeNode implements ILineRenderable {
                 OctreeNode child = map.get(childId).getFirst();
                 children[i] = child;
                 child.parent = this;
-            } else {
-                // No node in this position
             }
             i++;
         }
@@ -766,29 +764,29 @@ public class OctreeNode implements ILineRenderable {
      *
      * @param n The number of stars loaded or unloaded.
      **/
-    public synchronized void touch(int n) {
+    public synchronized void updateCountsWithNumber(int n) {
         if (status == LoadStatus.NOT_LOADED) {
             // We unloaded n stars
             this.numObjects = 0;
             this.numObjectsRec = 0;
             if (this.parent != null) {
                 this.parent.numChildren--;
-                this.parent.touchRec(-n);
+                this.parent.updateCountsWithNumberRecursive(-n);
             }
         } else if (status == LoadStatus.LOADED) {
             this.numObjects = n;
             this.numObjectsRec = n;
             if (this.parent != null) {
                 this.parent.numChildren++;
-                this.parent.touchRec(n);
+                this.parent.updateCountsWithNumberRecursive(n);
             }
         }
     }
 
-    private synchronized void touchRec(int n) {
+    private synchronized void updateCountsWithNumberRecursive(int n) {
         this.numObjectsRec += n;
         if (this.parent != null)
-            this.parent.touchRec(n);
+            this.parent.updateCountsWithNumberRecursive(n);
     }
 
     /**

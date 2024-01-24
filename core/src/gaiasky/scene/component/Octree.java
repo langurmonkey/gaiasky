@@ -15,6 +15,7 @@ import gaiasky.util.tree.OctreeNode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Octree implements Component {
 
@@ -29,7 +30,7 @@ public class Octree implements Component {
 
     /** Creates an empty octree. **/
     public Octree() {
-        this.parenthood = new HashMap<>();
+        this.parenthood = new ConcurrentHashMap<>();
     }
 
     public void removeParenthood(Entity child) {

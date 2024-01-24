@@ -226,10 +226,10 @@ public class GraphUpdater extends AbstractUpdateSystem {
     private void updateFadeOpacity(Base base,
                                    Fade fade) {
         if (fade.fadeIn != null) {
-            base.opacity *= MathUtilsDouble.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, fade.fadeInMap.x, fade.fadeInMap.y);
+            base.opacity *= (float) MathUtilsDouble.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, fade.fadeInMap.x, fade.fadeInMap.y);
         }
         if (fade.fadeOut != null) {
-            base.opacity *= MathUtilsDouble.lint(fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, fade.fadeOutMap.x, fade.fadeOutMap.y);
+            base.opacity *= (float) MathUtilsDouble.lint(fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, fade.fadeOutMap.x, fade.fadeOutMap.y);
         }
     }
 
