@@ -9,7 +9,7 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.data.galaxy.GalaxyGenerator;
+import gaiasky.desktop.util.GalaxyGenerator;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
