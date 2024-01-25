@@ -14,6 +14,7 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.entity.EntityRadio;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager implements IObserver {
 
@@ -24,7 +25,7 @@ public class EventManager implements IObserver {
     /** Telegram pool **/
     private final Pool<Telegram> pool;
     /** Subscriptions Event-Observers **/
-    private final Map<Integer, Set<IObserver>> subscriptions = new HashMap<>();
+    private final Map<Integer, Set<IObserver>> subscriptions = new ConcurrentHashMap<>();
     /** The time frame to use if none is specified **/
     private TimeFrame defaultTimeFrame;
 
@@ -91,11 +92,9 @@ public class EventManager implements IObserver {
      * @param listener the listener to add
      */
     public void subscribe(IObserver listener, Event msg) {
-        synchronized (subscriptions) {
-            Set<IObserver> listeners = subscriptions.computeIfAbsent(msg.ordinal(), k -> new LinkedHashSet<>());
-            // Associate an empty ordered array with the message code. Sometimes the order matters
-            listeners.add(listener);
-        }
+        Set<IObserver> listeners = subscriptions.computeIfAbsent(msg.ordinal(), k -> new LinkedHashSet<>());
+        // Associate an empty ordered array with the message code. Sometimes the order matters
+        listeners.add(listener);
     }
 
     public void unsubscribe(IObserver listener, Event... events) {
@@ -111,11 +110,21 @@ public class EventManager implements IObserver {
      * @param listener The listener to remove.
      **/
     public void unsubscribe(IObserver listener, Event event) {
-        synchronized (subscriptions) {
-            Set<IObserver> listeners = subscriptions.get(event.ordinal());
-            if (listeners != null) {
-                listeners.remove(listener);
-            }
+        Set<IObserver> listeners = subscriptions.get(event.ordinal());
+        if (listeners != null) {
+            listeners.remove(listener);
+        }
+    }
+
+    /**
+     * Unregister all the subscriptions of the given listener.
+     *
+     * @param listener The listener to remove.
+     */
+    public void removeAllSubscriptions(IObserver listener) {
+        Set<Integer> km = subscriptions.keySet();
+        for (int key : km) {
+            subscriptions.get(key).remove(listener);
         }
     }
 
@@ -125,12 +134,10 @@ public class EventManager implements IObserver {
      * @param listeners The listeners to remove.
      */
     public void removeAllSubscriptions(IObserver... listeners) {
-        synchronized (subscriptions) {
-            Set<Integer> km = subscriptions.keySet();
-            for (int key : km) {
-                for (IObserver listener : listeners) {
-                    subscriptions.get(key).remove(listener);
-                }
+        Set<Integer> km = subscriptions.keySet();
+        for (int key : km) {
+            for (IObserver listener : listeners) {
+                subscriptions.get(key).remove(listener);
             }
         }
     }
@@ -141,17 +148,15 @@ public class EventManager implements IObserver {
      * @param entity The entity.
      */
     public void removeRadioSubscriptions(Entity entity) {
-        synchronized (subscriptions) {
-            Set<Integer> km = subscriptions.keySet();
-            for (int key : km) {
-                Set<IObserver> set = subscriptions.get(key);
-                Iterator<IObserver> it = set.iterator();
-                while (it.hasNext()) {
-                    IObserver obs = it.next();
-                    if (obs instanceof EntityRadio radio) {
-                        if (radio.getEntity() == entity) {
-                            it.remove();
-                        }
+        Set<Integer> km = subscriptions.keySet();
+        for (int key : km) {
+            Set<IObserver> set = subscriptions.get(key);
+            Iterator<IObserver> it = set.iterator();
+            while (it.hasNext()) {
+                IObserver obs = it.next();
+                if (obs instanceof EntityRadio radio) {
+                    if (radio.getEntity() == entity) {
+                        it.remove();
                     }
                 }
             }
@@ -159,9 +164,7 @@ public class EventManager implements IObserver {
     }
 
     public void clearAllSubscriptions() {
-        synchronized (subscriptions) {
-            subscriptions.clear();
-        }
+        subscriptions.clear();
     }
 
     /**
@@ -182,12 +185,10 @@ public class EventManager implements IObserver {
      * @param data   The event data.
      */
     public void post(final Event event, Object source, final Object... data) {
-        synchronized (subscriptions) {
-            Set<IObserver> observers = subscriptions.get(event.ordinal());
-            if (observers != null && !observers.isEmpty()) {
-                for (IObserver observer : observers) {
-                    observer.notify(event, source, data);
-                }
+        Set<IObserver> observers = subscriptions.get(event.ordinal());
+        if (observers != null && !observers.isEmpty()) {
+            for (IObserver observer : observers) {
+                observer.notify(event, source, data);
             }
         }
     }
