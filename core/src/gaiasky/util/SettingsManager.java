@@ -171,6 +171,18 @@ public class SettingsManager {
             return "config.yaml";
     }
 
+    public static boolean setSettingsInstance(Settings settings) {
+        var result = Settings.setSettingsReference(settings);
+        if (instance != null)
+            instance.setSettingsReference(settings);
+        return result;
+    }
+
+    public void setSettingsReference(Settings settings) {
+        this.settings = settings;
+    }
+
+
     private void initializeMapper() {
         YAMLFactory yaml = new YAMLFactory();
         yaml.disable(Feature.WRITE_DOC_START_MARKER).enable(Feature.MINIMIZE_QUOTES).enable(Feature.INDENT_ARRAYS);

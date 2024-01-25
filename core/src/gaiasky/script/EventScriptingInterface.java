@@ -4496,7 +4496,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         }
 
-        var result = Settings.setSettingsReference(settingsStack.pop());
+        var result = SettingsManager.setSettingsInstance(settingsStack.pop());
         if (result) {
             postRunnable(() -> {
                 // Apply settings.
