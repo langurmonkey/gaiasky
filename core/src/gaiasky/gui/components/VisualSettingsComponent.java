@@ -38,14 +38,16 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     private OwnSliderPlus starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
     private OwnSliderPlus ambientLight, labelSize, lineWidth, elevMult;
 
-    public VisualSettingsComponent(Skin skin, Stage stage) {
+    public VisualSettingsComponent(Skin skin,
+                                   Stage stage) {
         super(skin, stage);
     }
 
     @Override
     public void initialize(float componentWidth) {
         /* Star brightness */
-        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
+        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY,
+                                           Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
         starBrightness.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.info"), skin));
         starBrightness.setWidth(componentWidth);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
@@ -59,7 +61,8 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Star brightness power */
         var nf = new DecimalFormat("####0.##");
-        magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
+        magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW,
+                                                Constants.SLIDER_STEP_TINY, skin);
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(componentWidth);
         magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
@@ -72,7 +75,8 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star glow factor */
-        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR, Constants.SLIDER_STEP_TINY * 0.1f, skin);
+        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR,
+                                           Constants.SLIDER_STEP_TINY * 0.1f, skin);
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
         starGlowFactor.setWidth(componentWidth);
         starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
@@ -136,7 +140,8 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Line width */
-        lineWidth = new OwnSliderPlus(I18n.msg("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
+        lineWidth = new OwnSliderPlus(I18n.msg("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY,
+                                      Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setWidth(componentWidth);
         lineWidth.setMappedValue(Settings.settings.scene.renderer.line.width);
         lineWidth.addListener(event -> {
@@ -149,7 +154,8 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Elevation multiplier */
-        elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, Constants.SLIDER_STEP_TINY, false, skin);
+        elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, Constants.SLIDER_STEP_TINY, false,
+                                     skin);
         elevMult.setWidth(componentWidth);
         elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
         elevMult.addListener(event -> {
@@ -179,11 +185,14 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                     float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
                     float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
                     float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
-                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(0)).floatValue();
+                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(
+                            0)).floatValue();
                     float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
                     float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
-                    float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("line")).get("width")).floatValue();
-                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get("multiplier")).floatValue();
+                    float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("line")).get(
+                            "width")).floatValue();
+                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get(
+                            "multiplier")).floatValue();
 
                     // Post events to reset all.
                     EventManager m = EventManager.instance;
@@ -222,78 +231,81 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         component = lightingGroup;
 
-        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD, Event.ELEVATION_MULTIPLIER_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD,
+                                        Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD, Event.ELEVATION_MULTIPLIER_CMD);
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
-            case STAR_POINT_SIZE_CMD -> {
-                if (source != pointSize) {
-                    float newSize = (float) data[0];
-                    pointSize.setProgrammaticChangeEvents(false);
-                    pointSize.setMappedValue(newSize);
-                    pointSize.setProgrammaticChangeEvents(true);
-                }
+        case STAR_POINT_SIZE_CMD -> {
+            if (source != pointSize) {
+                float newSize = (float) data[0];
+                pointSize.setProgrammaticChangeEvents(false);
+                pointSize.setMappedValue(newSize);
+                pointSize.setProgrammaticChangeEvents(true);
             }
-            case STAR_BRIGHTNESS_CMD -> {
-                if (source != starBrightness) {
-                    Float brightness = (Float) data[0];
-                    starBrightness.setProgrammaticChangeEvents(false);
-                    starBrightness.setMappedValue(brightness);
-                    starBrightness.setProgrammaticChangeEvents(true);
-                }
+        }
+        case STAR_BRIGHTNESS_CMD -> {
+            if (source != starBrightness) {
+                Float brightness = (Float) data[0];
+                starBrightness.setProgrammaticChangeEvents(false);
+                starBrightness.setMappedValue(brightness);
+                starBrightness.setProgrammaticChangeEvents(true);
             }
-            case STAR_BRIGHTNESS_POW_CMD -> {
-                if (source != magnitudeMultiplier) {
-                    Float pow = (Float) data[0];
-                    magnitudeMultiplier.setProgrammaticChangeEvents(false);
-                    magnitudeMultiplier.setMappedValue(pow);
-                    magnitudeMultiplier.setProgrammaticChangeEvents(true);
-                }
+        }
+        case STAR_BRIGHTNESS_POW_CMD -> {
+            if (source != magnitudeMultiplier) {
+                Float pow = (Float) data[0];
+                magnitudeMultiplier.setProgrammaticChangeEvents(false);
+                magnitudeMultiplier.setMappedValue(pow);
+                magnitudeMultiplier.setProgrammaticChangeEvents(true);
             }
-            case STAR_GLOW_FACTOR_CMD -> {
-                if (source != starGlowFactor) {
-                    Float glowFactor = (Float) data[0];
-                    starGlowFactor.setProgrammaticChangeEvents(false);
-                    starGlowFactor.setMappedValue(glowFactor);
-                    starGlowFactor.setProgrammaticChangeEvents(true);
-                }
+        }
+        case STAR_GLOW_FACTOR_CMD -> {
+            if (source != starGlowFactor) {
+                Float glowFactor = (Float) data[0];
+                starGlowFactor.setProgrammaticChangeEvents(false);
+                starGlowFactor.setMappedValue(glowFactor);
+                starGlowFactor.setProgrammaticChangeEvents(true);
             }
-            case STAR_BASE_LEVEL_CMD -> {
-                if (source != starBaseLevel) {
-                    Float baseLevel = (Float) data[0];
-                    starBaseLevel.setProgrammaticChangeEvents(false);
-                    starBaseLevel.setMappedValue(baseLevel);
-                    starBaseLevel.setProgrammaticChangeEvents(true);
-                }
+        }
+        case STAR_BASE_LEVEL_CMD -> {
+            if (source != starBaseLevel) {
+                Float baseLevel = (Float) data[0];
+                starBaseLevel.setProgrammaticChangeEvents(false);
+                starBaseLevel.setMappedValue(baseLevel);
+                starBaseLevel.setProgrammaticChangeEvents(true);
             }
-            case LABEL_SIZE_CMD -> {
-                if (source != labelSize) {
-                    Float newLabelSize = (Float) data[0];
-                    labelSize.setProgrammaticChangeEvents(false);
-                    labelSize.setMappedValue(newLabelSize);
-                    labelSize.setProgrammaticChangeEvents(true);
-                }
+        }
+        case LABEL_SIZE_CMD -> {
+            if (source != labelSize) {
+                Float newLabelSize = (Float) data[0];
+                labelSize.setProgrammaticChangeEvents(false);
+                labelSize.setMappedValue(newLabelSize);
+                labelSize.setProgrammaticChangeEvents(true);
             }
-            case LINE_WIDTH_CMD -> {
-                if (source != lineWidth) {
-                    Float newWidth = (Float) data[0];
-                    lineWidth.setProgrammaticChangeEvents(false);
-                    lineWidth.setMappedValue(newWidth);
-                    lineWidth.setProgrammaticChangeEvents(true);
-                }
+        }
+        case LINE_WIDTH_CMD -> {
+            if (source != lineWidth) {
+                Float newWidth = (Float) data[0];
+                lineWidth.setProgrammaticChangeEvents(false);
+                lineWidth.setMappedValue(newWidth);
+                lineWidth.setProgrammaticChangeEvents(true);
             }
-            case ELEVATION_MULTIPLIER_CMD -> {
-                if (source != elevMult) {
-                    Float newElevationMultiplier = (Float) data[0];
-                    elevMult.setProgrammaticChangeEvents(false);
-                    elevMult.setMappedValue(newElevationMultiplier);
-                    elevMult.setProgrammaticChangeEvents(true);
-                }
+        }
+        case ELEVATION_MULTIPLIER_CMD -> {
+            if (source != elevMult) {
+                Float newElevationMultiplier = (Float) data[0];
+                elevMult.setProgrammaticChangeEvents(false);
+                elevMult.setMappedValue(newElevationMultiplier);
+                elevMult.setProgrammaticChangeEvents(true);
             }
-            default -> {
-            }
+        }
+        default -> {
+        }
 
         }
     }
