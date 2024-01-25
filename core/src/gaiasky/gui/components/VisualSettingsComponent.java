@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.scene.entity.LightingUtils;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -30,7 +29,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
 import java.util.Map;
 
 public class VisualSettingsComponent extends GuiComponent implements IObserver {
@@ -60,7 +58,6 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star brightness power */
-        var nf = new DecimalFormat("####0.##");
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW,
                                                 Constants.SLIDER_STEP_TINY, skin);
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
