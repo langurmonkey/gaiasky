@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 3050800
+configVersion: 3050801
 
 #
 # Data configuration
@@ -179,8 +179,6 @@ scene:
     # Controls the number of labels to render. The threshold solid angle is divided by this number, effectively
     # lowering it (when number > 1) or raising it (when label < 0).
     number: 1.3
-  # Line width factor.
-  lineWidth: 1.0
   # Proper motion arrow settings.
   properMotion:
     # Length factor of proper motion vectors [500.0 - 50000.0].
@@ -218,11 +216,19 @@ scene:
     # TRIANGLES is the default mode. Triangles are sent to the GPU in VBOs with VAOs, using instancing. Faster on newer hardware and geometrically correct.
     # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes.
     pointCloud: TRIANGLES
-    # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]. POLYLINE_QUADSTRIP uses geometry shaders to render nicer lines,
-    # while GL_LINES just uses the line renderer provided by the driver.
-    line: POLYLINE_QUADSTRIP
     # Ambient light value.
     ambient: 0.0
+    # Line settings.
+    line:
+      # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]. POLYLINE_QUADSTRIP uses geometry shaders to render nicer lines,
+      # while GL_LINES just uses the line renderer provided by the driver.
+      mode: POLYLINE_QUADSTRIP
+      # Line width factor.
+      width: 1.0
+      # Additive bias to add to the line width when rendering lines using the driver GL_LINES method.
+      # This is useful because the implementation of GL_LINES depends on the driver, and different implementations
+      # may interpret the line width differently.
+      glWidthBias: 0.0
     # Shadow settings.
     shadow:
       # Enable shadows.

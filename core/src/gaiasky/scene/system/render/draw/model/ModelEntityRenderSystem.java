@@ -202,7 +202,7 @@ public class ModelEntityRenderSystem {
 
         mc.update(graph.localTransform, alpha * base.opacity * body.color[3]);
         mc.updateDepthTest();
-        Gdx.gl20.glLineWidth(1.5f);
+        Gdx.gl20.glLineWidth(1.5f + Settings.settings.scene.renderer.line.glWidthBias);
         batch.render(mc.instance, mc.env);
 
         model.model.update(alpha * base.opacity, relativistic);
@@ -250,7 +250,7 @@ public class ModelEntityRenderSystem {
         // Grid style in u_elevationMultiplier.
         mc.setFloatExtAttribute(FloatAttribute.ElevationMultiplier, (float) Settings.settings.program.recursiveGrid.style.ordinal());
         // FovFactor.
-        mc.setFloatExtAttribute(FloatAttribute.Ts, gr.fovFactor * 0.5f * Settings.settings.scene.lineWidth);
+        mc.setFloatExtAttribute(FloatAttribute.Ts, gr.fovFactor * 0.5f * Settings.settings.scene.renderer.line.width);
         // Time.
         mc.setFloatExtAttribute(FloatAttribute.Time, (float) GaiaSky.instance.getRunTimeSeconds());
         // Animation goes into generic1 (>0 yes, <0 no).

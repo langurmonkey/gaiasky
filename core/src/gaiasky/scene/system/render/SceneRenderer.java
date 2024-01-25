@@ -842,7 +842,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem sys;
         // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
         ExtShaderProgram[] lineGpuShaders;
-        if (Settings.settings.scene.renderer.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
             lineGpuShaders = renderAssets.primitiveGpuShaders;
         } else {
             lineGpuShaders = renderAssets.lineQuadGpuShaders;
@@ -855,7 +855,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private AbstractRenderSystem getLineCPURenderSystem() {
         AbstractRenderSystem sys;
         // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
-        if (Settings.settings.scene.renderer.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
             // Normal line renderer.
             sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineCpuShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);

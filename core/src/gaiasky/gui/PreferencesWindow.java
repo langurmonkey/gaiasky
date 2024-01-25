@@ -454,7 +454,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lineRenderer = new OwnSelectBox<>(skin);
         lineRenderer.setItems(lineRenderers);
         lineRenderer.setWidth(selectWidth);
-        lineRenderer.setSelected(lineRenderers[settings.scene.renderer.line.ordinal()]);
+        lineRenderer.setSelected(lineRenderers[settings.scene.renderer.line.mode.ordinal()]);
         // Disable in safe mode
         lrLabel.setDisabled(safeMode);
         lineRenderer.setDisabled(safeMode);
@@ -2597,9 +2597,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         restartDialog = restartDialog || Settings.settings.data.realGaiaAttitude != real.isChecked();
 
         // Line renderer
-        boolean reloadLineRenderer = settings.scene.renderer.line != LineMode.values()[lineRenderer.getSelected().value];
+        boolean reloadLineRenderer = settings.scene.renderer.line.mode != LineMode.values()[lineRenderer.getSelected().value];
         bean = lineRenderer.getSelected();
-        settings.scene.renderer.line = LineMode.values()[bean.value];
+        settings.scene.renderer.line.mode = LineMode.values()[bean.value];
 
         // Elevation representation
         ElevationType newType = elevationSb.getSelected().type;

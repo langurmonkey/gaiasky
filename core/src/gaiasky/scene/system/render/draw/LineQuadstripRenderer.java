@@ -54,7 +54,7 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
                 octant.render(this, camera, getAlpha(octant));
             }
 
-            shaderProgram.setUniformf("u_lineWidthTan", (float) (view.getLineWidth() * 0.8f * baseWidthAngleTan * Settings.settings.scene.lineWidth * camera.getFovFactor()));
+            shaderProgram.setUniformf("u_lineWidthTan", (float) (view.getLineWidth() * 0.8f * baseWidthAngleTan * Settings.settings.scene.renderer.line.width * camera.getFovFactor()));
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);

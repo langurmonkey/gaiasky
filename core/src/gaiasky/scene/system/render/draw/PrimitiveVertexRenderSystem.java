@@ -193,7 +193,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
 
             // Regular.
             if (isLine()) {
-                float lw = vertsView.getPrimitiveSize() * Settings.settings.scene.lineWidth * camera.getFovFactor();
+                float lw = vertsView.getPrimitiveSize() * Settings.settings.scene.renderer.line.width * camera.getFovFactor() + Settings.settings.scene.renderer.line.glWidthBias;
                 shaderProgram.setUniformf("u_lineWidthTan", (float) (lw * 0.8f * baseWidthAngleTan));
                 Gdx.gl.glLineWidth(lw * 1.5f);
             } else {

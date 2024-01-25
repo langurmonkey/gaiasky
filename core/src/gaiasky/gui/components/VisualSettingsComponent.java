@@ -138,7 +138,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         /* Line width */
         lineWidth = new OwnSliderPlus(I18n.msg("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setWidth(componentWidth);
-        lineWidth.setMappedValue(Settings.settings.scene.lineWidth);
+        lineWidth.setMappedValue(Settings.settings.scene.renderer.line.width);
         lineWidth.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 float val = lineWidth.getMappedValue();

@@ -203,7 +203,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
             updatePositions(camera);
 
             // Regular
-            Gdx.gl.glLineWidth(2f);
+            Gdx.gl.glLineWidth(2f + Settings.settings.scene.renderer.line.glWidthBias);
 
             if (curr != null) {
                 curr.vertexIdx = 0;

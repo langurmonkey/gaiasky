@@ -77,13 +77,13 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        Array<VertexAttribute> attributes = new Array<>();
+        attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
 
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
+        VertexAttribute[] array = new VertexAttribute[attributes.size];
+        for (int i = 0; i < attributes.size; i++)
+            array[i] = attributes.get(i);
         return array;
     }
 
@@ -102,7 +102,7 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
             ILineRenderable renderable = (ILineRenderable) r;
             renderable.render(this, camera, getAlpha(renderable));
 
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * Settings.settings.scene.lineWidth);
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * Settings.settings.scene.renderer.line.width + Settings.settings.scene.renderer.line.glWidthBias);
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);
