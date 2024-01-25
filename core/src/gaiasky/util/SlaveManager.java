@@ -44,9 +44,14 @@ public class SlaveManager {
     public float yaw, pitch, roll, upAngle, downAngle, rightAngle, leftAngle;
     public float cameraFov;
     private boolean initialized = false;
+
     public SlaveManager() {
         super();
         Settings settings = Settings.settings;
+        if (settings.program.net.slave.active && settings.program.net.master.active) {
+            logger.error("Can't be master and slave at the same time!");
+            return;
+        }
         if (settings.program.net.slave.active) {
             if (settings.program.net.isSlaveMPCDIPresent()) {
                 logger.info("Using slave configuration file: " + settings.program.net.slave.configFile);

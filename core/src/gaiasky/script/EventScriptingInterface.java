@@ -322,7 +322,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraLock(final boolean lock) {
-        postRunnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, I18n.msg("gui.camera.lock"), lock));
+        postRunnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, lock));
     }
 
     @Override
@@ -689,7 +689,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraOrientationLock(boolean lock) {
-        postRunnable(() -> em.post(Event.ORIENTATION_LOCK_CMD, this, I18n.msg("gui.camera.lock.orientation"), lock));
+        postRunnable(() -> em.post(Event.ORIENTATION_LOCK_CMD, this, lock));
     }
 
     @Override
@@ -3102,7 +3102,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setSmoothLodTransitions(boolean value) {
-        postRunnable(() -> em.post(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.msg("element.octreeparticlefade"), value));
+        postRunnable(() -> em.post(Event.OCTREE_PARTICLE_FADE_CMD, this, value));
     }
 
     @Override
@@ -4498,7 +4498,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
         var result = Settings.setSettingsReference(settingsStack.pop());
         if (result) {
-            resetUserInterface();
+            postRunnable(() -> {
+                // Apply settings.
+                Settings.settings.apply();
+                // Reload UI.
+                em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
+            });
         }
         return result;
     }

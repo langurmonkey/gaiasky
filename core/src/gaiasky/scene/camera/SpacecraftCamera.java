@@ -272,7 +272,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode mode, boolean centerFocus) {
         InputProcessor ip = Gdx.input.getInputProcessor();
         if (ip instanceof InputMultiplexer im) {
             if (mode == CameraMode.SPACECRAFT_MODE && sc != null && previousMode != CameraMode.SPACECRAFT_MODE) {

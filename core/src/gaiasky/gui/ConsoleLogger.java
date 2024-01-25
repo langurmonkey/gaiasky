@@ -59,7 +59,7 @@ public class ConsoleLogger implements IObserver {
     }
 
     public void subscribe() {
-        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.FOV_CHANGE_NOTIFICATION, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD);
+        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD);
     }
 
     public void unsubscribe() {
@@ -157,17 +157,24 @@ public class ConsoleLogger implements IObserver {
                 else
                     addMessage(I18n.msg("notif.visibility.toggle", I18n.msg((String) data[0])));
             }
-            case FOCUS_LOCK_CMD, ORIENTATION_LOCK_CMD, OCTREE_PARTICLE_FADE_CMD ->
-                    addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
+            case OCTREE_PARTICLE_FADE_CMD -> {
+                var key = (Boolean) data[0] ? "notif.activated" : "notif.deactivated";
+                addMessage(I18n.msg(key, I18n.msg("element.octreeparticlefade")));
+            }
+            case FOCUS_LOCK_CMD -> {
+                var key = (Boolean) data[0] ? "notif.activated" : "notif.deactivated";
+                addMessage(I18n.msg(key, I18n.msg("gui.camera.lock")));
+            }
+            case ORIENTATION_LOCK_CMD -> {
+                var key = (Boolean) data[0] ? "notif.activated" : "notif.deactivated";
+                addMessage(I18n.msg(key, I18n.msg("gui.camera.lock.orientation")));
+            }
             case CAMERA_MODE_CMD -> {
                 CameraMode cm = (CameraMode) data[0];
                 if (cm != CameraMode.FOCUS_MODE)
                     addMessage(I18n.msg("notif.cameramode.change", data[0]));
             }
             case TIME_WARP_CHANGED_INFO -> addMessage(I18n.msg("notif.timepace.change", data[0]));
-            case FOV_CHANGE_NOTIFICATION -> {
-            }
-            // addMessage("Field of view changed to " + (float) data[0]);
             case JAVA_EXCEPTION -> {
                 Throwable t = (Throwable) data[0];
                 StringWriter sw = new StringWriter();

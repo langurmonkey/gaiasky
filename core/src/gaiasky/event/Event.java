@@ -473,12 +473,6 @@ public enum Event {
     FOV_CHANGED_CMD,
 
     /**
-     * Notifies a FOV update in the camera. Contains the new fov value (float)
-     * and the new fovFactor (float).
-     **/
-    FOV_CHANGE_NOTIFICATION,
-
-    /**
      * Frames per second info.
      **/
     FPS_INFO,

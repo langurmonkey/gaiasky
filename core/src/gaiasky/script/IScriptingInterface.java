@@ -3311,8 +3311,8 @@ public interface IScriptingInterface {
      * <p>This method, together with {@link IScriptingInterface#backupSettings()}, are useful to back up and restore the
      * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
      * unmodified after your script ends.</p>
-     * <p>WARN: This function re-initializes the user interface of Gaia Sky, so be aware that the UI will be
-     * set to its default state after this call.</p>
+     * <p>WARN: This function applies all settings immediately, and the user interface may be re-initialized.
+     * Be aware that the UI may be set to its default state after this call.</p>
      *
      * @return True if the stack was not empty and the settings were restored successfully. False otherwise.
      */

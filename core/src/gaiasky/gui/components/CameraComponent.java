@@ -351,7 +351,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         focusLock.setChecked(Settings.settings.scene.camera.focusLock.position);
         focusLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.FOCUS_LOCK_CMD, focusLock, I18n.msg("gui.camera.lock"), focusLock.isChecked());
+                EventManager.publish(Event.FOCUS_LOCK_CMD, focusLock, focusLock.isChecked());
                 orientationLock.setVisible(focusLock.isChecked());
                 return true;
             }
@@ -365,7 +365,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         orientationLock.setVisible(Settings.settings.scene.camera.focusLock.position);
         orientationLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.ORIENTATION_LOCK_CMD, orientationLock, I18n.msg("gui.camera.lock.orientation"), orientationLock.isChecked());
+                EventManager.publish(Event.ORIENTATION_LOCK_CMD, orientationLock, orientationLock.isChecked());
                 return true;
             }
             return false;
@@ -403,8 +403,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraGroup.pack();
         EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.ROTATION_SPEED_CMD,
-                Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD,
-                Event.FOV_CHANGE_NOTIFICATION, Event.CUBEMAP_CMD, Event.CAMERA_CINEMATIC_CMD, Event.ORIENTATION_LOCK_CMD,
+                Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CHANGED_CMD,
+                Event.CUBEMAP_CMD, Event.CAMERA_CINEMATIC_CMD, Event.ORIENTATION_LOCK_CMD,
                 Event.RECORD_CAMERA_CMD);
     }
 
@@ -472,16 +472,18 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             case ORIENTATION_LOCK_CMD -> {
                 if (source != orientationLock) {
-                    final boolean lock = (Boolean) data[1];
+                    final boolean lock = (Boolean) data[0];
                     orientationLock.setProgrammaticChangeEvents(false);
                     orientationLock.setChecked(lock);
                     orientationLock.setProgrammaticChangeEvents(true);
                 }
             }
-            case FOV_CHANGE_NOTIFICATION -> {
-                fovFlag = false;
-                fieldOfView.setValue(Settings.settings.scene.camera.fov);
-                fovFlag = true;
+            case FOV_CHANGED_CMD -> {
+                if(source != fieldOfView) {
+                    fovFlag = false;
+                    fieldOfView.setValue((Float) data[0]);
+                    fovFlag = true;
+                }
             }
             case STEREOSCOPIC_CMD -> {
                 if (source != button3d && !Settings.settings.runtime.openXr) {

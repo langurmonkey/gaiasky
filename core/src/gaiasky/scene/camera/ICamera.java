@@ -93,7 +93,7 @@ public interface ICamera {
      */
     void update(double dt, ITimeFrameProvider time);
 
-    void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent);
+    void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus);
 
     CameraMode getMode();
 

@@ -383,7 +383,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // Toggle particle fade
-        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.msg("element.octreeparticlefade"), !Settings.settings.scene.octree.fade)));
+        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, !Settings.settings.scene.octree.fade)));
 
         // Toggle stereoscopic mode
         addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active)));

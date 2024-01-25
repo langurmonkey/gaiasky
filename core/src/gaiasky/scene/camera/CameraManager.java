@@ -83,7 +83,7 @@ public class CameraManager implements ICamera, IObserver {
 
         updateCurrentCamera();
 
-        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.FOV_CHANGE_NOTIFICATION);
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.FOV_CHANGED_CMD);
     }
 
     /**
@@ -402,17 +402,13 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Runs on each camera after a mode change.
      */
-    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus) {
         previousMode = this.mode;
         previousCam = this.current;
         this.mode = newMode;
         updateCurrentCamera();
         for (ICamera cam : cameras) {
-            cam.updateMode(previousCam, previousMode, newMode, centerFocus, postEvent);
-        }
-
-        if (postEvent) {
-            EventManager.publish(Event.FOV_CHANGE_NOTIFICATION, this, this.getCamera().fieldOfView, getFovFactor());
+            cam.updateMode(previousCam, previousMode, newMode, centerFocus);
         }
     }
 
@@ -424,9 +420,9 @@ public class CameraManager implements ICamera, IObserver {
                 boolean centerFocus = true;
                 if (data.length > 1)
                     centerFocus = (Boolean) data[1];
-                updateMode(current, this.mode, newCameraMode, centerFocus, true);
+                updateMode(current, this.mode, newCameraMode, centerFocus);
             }
-            case FOV_CHANGE_NOTIFICATION -> updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            case FOV_CHANGED_CMD -> updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             default -> {
             }
         }

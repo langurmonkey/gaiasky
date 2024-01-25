@@ -19,6 +19,7 @@ import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.SceneSettings.ParticleSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.EclipseSettings;
+import gaiasky.util.Settings.SceneSettings.RendererSettings.LineSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.VirtualTextureSettings;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsDouble;
@@ -332,7 +333,16 @@ public class SettingsManager {
             settings.program.recursiveGrid.style = Settings.GridStyle.CIRCULAR;
         }
 
-        settings.initialized = true;
+        // Line settings.
+        if (settings.scene.renderer.line == null) {
+            var ls = new LineSettings();
+            ls.mode = Settings.LineMode.POLYLINE_QUADSTRIP;
+            ls.width = 1;
+            ls.glWidthBias = 0;
+            settings.scene.renderer.line = ls;
+        }
+
+        settings.initialize();
     }
 
     private void persist(final File settingsFile) {

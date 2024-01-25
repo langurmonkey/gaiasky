@@ -92,8 +92,13 @@ public class MasterManager implements IObserver {
     }
 
     public static void initialize() {
-        if (Settings.settings.program.net.master.active)
+        if (Settings.settings.program.net.slave.active && Settings.settings.program.net.master.active) {
+            logger.error("Can't be master and slave at the same time!");
+            return;
+        }
+        if (Settings.settings.program.net.master.active) {
             MasterManager.instance = new MasterManager();
+        }
     }
 
     public static boolean hasSlaves() {

@@ -1222,8 +1222,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void updateMode(ICamera previousCam,
                            CameraMode previousMode,
                            CameraMode newMode,
-                           boolean centerFocus,
-                           boolean postEvent) {
+                           boolean centerFocus) {
         InputProcessor ip = Gdx.input.getInputProcessor();
         if (ip instanceof InputMultiplexer im) {
             switch (newMode) {
@@ -1370,9 +1369,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     cam.fieldOfView = fov;
                 }
                 fovFactor = camera.fieldOfView / 40f;
-                if (parent.current == this) {
-                    EventManager.publish(Event.FOV_CHANGE_NOTIFICATION, this, fov, fovFactor);
-                }
             }
             case CUBEMAP_CMD -> {
                 boolean state = (boolean) data[0];

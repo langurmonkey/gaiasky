@@ -58,7 +58,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD,
-                Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CHANGE_NOTIFICATION,
+                Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CHANGED_CMD,
                 Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
@@ -260,7 +260,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 triComponent.updateStarPointSize((float) data[0]);
                 triComponent.touchStarParameters(getShaderProgram());
             }
-            case BACKBUFFER_SCALE_CMD, FOV_CHANGE_NOTIFICATION -> {
+            case BACKBUFFER_SCALE_CMD, FOV_CHANGED_CMD -> {
                 triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
                 triComponent.touchStarParameters(getShaderProgram());
             }
