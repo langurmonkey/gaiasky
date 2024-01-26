@@ -486,6 +486,38 @@ public final class MathUtilsDouble {
         Apfloat bf = new Apfloat(b, precision);
         return af.mod(bf).doubleValue() == 0;
     }
+
+    /**
+     * Implements a low-pass filter to smooth the input values.
+     * @param newValue The new value.
+     * @param smoothedValue The previous smoothed value.
+     * @param smoothing The smoothing factor.
+     * @return The new value with a low-pass filter applied.
+     */
+    public static double lowPass(double newValue, double smoothedValue, double smoothing) {
+        if (smoothing > 0) {
+            smoothedValue += (newValue - smoothedValue) / smoothing;
+            return smoothedValue;
+        } else {
+            return newValue;
+        }
+    }
+
+    /**
+     * Implements a low-pass filter to smooth the input values.
+     * @param newValue The new value.
+     * @param smoothedValue The previous smoothed value.
+     * @param smoothing The smoothing factor.
+     * @return The new value with a low-pass filter applied.
+     */
+    public static float lowPass(float newValue, float smoothedValue, float smoothing) {
+        if (smoothing > 0) {
+            smoothedValue += (newValue - smoothedValue) / smoothing;
+            return smoothedValue;
+        } else {
+            return newValue;
+        }
+    }
 }
 
 

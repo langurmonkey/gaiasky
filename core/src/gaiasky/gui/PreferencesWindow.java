@@ -61,7 +61,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final DecimalFormat nf3;
     private final GlobalResources globalResources;
-    private final Settings settings;
     // This flag is active when the dialog is called from the welcome screen.
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen;
@@ -136,7 +135,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                              final boolean welcomeScreen) {
         super(I18n.msg("gui.settings") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build), skin, stage);
 
-        this.settings = Settings.settings;
         this.tabContents = new Array<>();
         this.labels = new Array<>();
         this.globalResources = globalResources;
@@ -207,6 +205,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final float sliderWidth = 500f;
         final float buttonHeight = 40f;
 
+        final var settings = Settings.settings;
         boolean safeMode = settings.program.safeMode;
         boolean vr = settings.runtime.openXr;
 
@@ -2360,6 +2359,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     @Override
     public void touch() {
+        final var settings = Settings.settings;
         // Effects
         setSlider(bloomEffect, settings.postprocess.bloom.intensity);
         setSlider(unsharpMask, settings.postprocess.unsharpMask.factor);
@@ -2389,6 +2389,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private void updateBackupValues() {
+        final var settings = Settings.settings;
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         aberrationBak = settings.postprocess.chromaticAberration.amount;
@@ -2419,7 +2420,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (Path path : mappingFiles) {
             FileComboBoxBean fileBean = new MappingFileComboBoxBean(path);
             gamepadMappingsFile.add(fileBean);
-            if (selectedFile == null && settings.controls.gamepad.mappingsFile.endsWith(path.getFileName().toString())) {
+            if (selectedFile == null && Settings.settings.controls.gamepad.mappingsFile.endsWith(path.getFileName().toString())) {
                 selected = fileBean;
             } else if (selectedFile != null && selectedFile.toAbsolutePath().toString().endsWith(path.getFileName().toString())) {
                 selected = fileBean;
@@ -2438,7 +2439,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (Controller c : controllers) {
             OwnLabel cl = new OwnLabel(c.getName(), skin, "default-blue");
             cl.setName(c.getName());
-            if (settings.controls.gamepad.isControllerBlacklisted(c.getName())) {
+            if (Settings.settings.controls.gamepad.isControllerBlacklisted(c.getName())) {
                 cl.setText(cl.getText() + " [*]");
                 cl.setColor(1, 0, 0, 1);
                 cl.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.controller.blacklist"), skin));
@@ -2456,7 +2457,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (OwnLabel cn : controllerNames) {
             String controllerName = cn.getName();
             table.add(cn).left().padBottom(i == controllerNames.size - 1 ? 0f : pad18).padRight(pad34);
-            if (controllerName != null && !settings.controls.gamepad.isControllerBlacklisted(controllerName)) {
+            if (controllerName != null && !Settings.settings.controls.gamepad.isControllerBlacklisted(controllerName)) {
                 OwnTextButton config = new OwnTextButton(I18n.msg("gui.controller.configure"), skin);
                 config.pad(pad10, pad18, pad10, pad18);
                 config.addListener(event -> {
@@ -2538,6 +2539,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private void saveCurrentPreferences() {
         // Add all properties to settings.instance
+        final var settings = Settings.settings;
 
         final boolean reloadFullScreenMode = fullScreen.isChecked() != settings.graphics.fullScreen.active;
         final var selected = fullScreenResolutions.getSelected();
@@ -2923,6 +2925,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                   OwnTextField heightField,
                                   SelectBox<DisplayMode> fullScreenResolutions,
                                   OwnLabel xLabel) {
+        final var settings = Settings.settings;
         if (fullscreen) {
             settings.graphics.resolution[0] = fullScreenResolutions.getSelected().width;
             settings.graphics.resolution[1] = fullScreenResolutions.getSelected().height;

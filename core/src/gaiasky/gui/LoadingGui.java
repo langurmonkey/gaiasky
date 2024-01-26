@@ -61,7 +61,7 @@ public class LoadingGui extends AbstractGui {
         interfaces = new Array<>();
         float pad30 = 48f;
         float pad10 = 16f;
-        final Settings settings = Settings.settings;
+        final var settings = Settings.settings;
         // User interface.
         Viewport vp;
         if (vr) {

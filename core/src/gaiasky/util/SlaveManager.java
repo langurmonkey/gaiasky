@@ -47,7 +47,7 @@ public class SlaveManager {
 
     public SlaveManager() {
         super();
-        Settings settings = Settings.settings;
+        final var settings = Settings.settings;
         if (settings.program.net.slave.active && settings.program.net.master.active) {
             logger.error("Can't be master and slave at the same time!");
             return;

@@ -426,7 +426,7 @@ public class GaiaSkyDesktop implements IObserver {
     public void launchMainApp() {
         ConsoleLogger consoleLogger = new ConsoleLogger();
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
-        Settings s = Settings.settings;
+        final var s = Settings.settings;
         cfg.setTitle(Settings.APPLICATION_NAME);
         if (!cliArgs.vr) {
             // We also default to full screen in small displays (around 720p, or a bit larger).

@@ -38,7 +38,7 @@ public class VersionLineTable extends Table {
         content.pad(2f, pad16, 2f, pad16);
         content.top().left();
 
-        final Settings settings = Settings.settings;
+        final var settings = Settings.settings;
 
         String style = vr ? "hud" : "hud-med";
 

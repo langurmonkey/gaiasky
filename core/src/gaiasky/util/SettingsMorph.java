@@ -66,7 +66,7 @@ public class SettingsMorph {
         p.load(new FileInputStream(propertiesFile.toFile()));
 
         // Create settings
-        Settings s = new Settings();
+        final var s = new Settings();
 
         // Configuration version
         s.configVersion = i32("properties.version", p);

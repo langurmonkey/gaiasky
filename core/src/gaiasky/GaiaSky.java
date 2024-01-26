@@ -75,6 +75,7 @@ import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.screenshot.ScreenshotsManager;
 import gaiasky.util.time.GlobalClock;
@@ -215,6 +216,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     private long startTime;
     /**
+     * The time when Gaia Sky has finished loading and is ready to display the scene.
+     */
+    private long startTimeScene;
+    /**
      * Holds the session run time in seconds.
      */
     private double t;
@@ -226,7 +231,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * 2 - level 2
      */
     private int dynamicResolutionLevel = 0;
+    /** Time of the last dynamic resolution change. **/
     private long lastDynamicResolutionChange = 0;
+    /** Dynamic resolution (smoothed) FPS. **/
+    private float fps;
     /**
      * Provisional console logger.
      */
@@ -237,10 +245,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private List<IGui> guis;
     // The sprite batch to render the back buffer to screen
     private SpriteBatch renderBatch;
-    /**
-     * Settings reference.
-     **/
-    private Settings settings;
     /**
      * Camera recording or not?
      */
@@ -279,7 +283,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Displays the initial GUI.
      **/
     private final Runnable runnableInitialGui = () -> {
-        if (settings.runtime.openXr) {
+        if (Settings.settings.runtime.openXr) {
             // Render to UI to frame buffer.
             renderGui(welcomeGuiVR);
         }
@@ -291,6 +295,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Updates and renders the scene.
      **/
     private final Runnable mainUpdaterRenderer = () -> {
+
+        final var settings = Settings.settings;
 
         // Asynchronous load of textures and resources.
         assetManager.update();
@@ -358,10 +364,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (settings.graphics.fpsLimit > 0.0) {
             // If FPS limit is on, dynamic resolution is off.
             sleep(settings.graphics.fpsLimit);
-        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.timeSinceMillis(startTime) > 10000
-                && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openXr) {
+        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.timeSinceMillis(startTimeScene) > 10000
+                && TimeUtils.millis() - lastDynamicResolutionChange > 1000 && !settings.runtime.openXr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate.
-            var fps = 1f / graphics.getDeltaTime();
+            // Use a low-pass filter.
+            fps = MathUtilsDouble.lowPass(1f / graphics.getDeltaTime(), fps, 10f);
 
             if (fps < 30 && dynamicResolutionLevel < settings.graphics.dynamicResolutionScale.length - 1) {
                 // Downscale.
@@ -394,7 +401,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             doneLoading();
             updateRenderProcess = mainUpdaterRenderer;
         } else {
-            if (settings.runtime.openXr) {
+            if (Settings.settings.runtime.openXr) {
                 // Render to UI to frame buffer.
                 renderGui(loadingGuiVR);
             }
@@ -430,7 +437,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Instance and settings.
         instance = this;
-        this.settings = Settings.settings;
 
         // Set flags.
         this.skipWelcome = skipWelcome;
@@ -443,6 +449,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Set update-render process to initial GUI.
         this.updateRenderProcess = runnableInitialGui;
     }
+
 
     /**
      * Posts a runnable that will run once after the current frame.
@@ -459,6 +466,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     @Override
     public void create() {
         startTime = TimeUtils.millis();
+        final var settings = Settings.settings;
         // Set log level.
         Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
         Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
@@ -657,9 +665,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     private void initializeConstants() {
         if (vr) {
-            Constants.initialize(settings.scene.distanceScaleVr);
+            Constants.initialize(Settings.settings.scene.distanceScaleVr);
         } else {
-            Constants.initialize(settings.scene.distanceScaleDesktop);
+            Constants.initialize(Settings.settings.scene.distanceScaleDesktop);
         }
     }
 
@@ -672,6 +680,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * </ul>
      **/
     private XrLoadStatus createVR() {
+        final var settings = Settings.settings;
         if (vr) {
             // Initializing the VRContext may fail if no HMD is connected or no OpenXR runtime is found.
             try {
@@ -734,6 +743,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * to their classes and removes the Loading message.
      */
     private void doneLoading() {
+        final var settings = Settings.settings;
         // Get assets.
         final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
 
@@ -939,6 +949,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Restore VSync to user setting.
         graphics.setVSync(settings.graphics.vsync);
 
+        startTimeScene = TimeUtils.millis();
         initialized = true;
     }
 
@@ -948,6 +959,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * the re-computation of all entities.
      */
     public void touchSceneGraph() {
+        final var settings = Settings.settings;
         // Update whole tree to initialize positions.
         settings.runtime.octreeLoadActive = false;
         var timeOnBak = settings.runtime.timeOn;
@@ -969,6 +981,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun.
      */
     private void goHome() {
+        final var settings = Settings.settings;
         final var homeObject = scene.findFocus(settings.scene.homeObject);
         var isOn = true;
         if (homeObject != null && (isOn = isOn(Mapper.base.get(homeObject).ct)) && !settings.program.net.slave.active) {
@@ -1003,6 +1016,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Re-initialises all the GUI (step 1).
      */
     public void reinitialiseGUI1() {
+        final var settings = Settings.settings;
         if (guis != null && !guis.isEmpty()) {
             for (IGui gui : guis)
                 gui.dispose();
@@ -1037,6 +1051,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Second step in GUI initialisation.
      */
     public void reinitialiseGUI2() {
+        final var settings = Settings.settings;
         // Reinitialise registry to listen to relevant events.
         if (guiRegistry != null)
             guiRegistry.dispose();
@@ -1078,6 +1093,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     @Override
     public void dispose() {
+        final var settings = Settings.settings;
         // Stop
         running.set(false);
 
@@ -1146,7 +1162,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     public void resetDynamicResolution() {
         dynamicResolutionLevel = 0;
-        settings.graphics.backBufferScale = 1f;
+        Settings.settings.graphics.backBufferScale = 1f;
         postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
         lastDynamicResolutionChange = 0;
     }
@@ -1175,7 +1191,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             // Report the crash.
             CrashReporter.reportCrash(t, logger);
             // Set up crash window.
-            crashGui = new CrashGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, t);
+            crashGui = new CrashGui(globalResources.getSkin(), graphics, 1f / Settings.settings.program.ui.scale, t);
             crashGui.initialize(assetManager, globalResources.getSpriteBatch());
             Gdx.input.setInputProcessor(crashGui.getGuiStage());
             // Flag up.
@@ -1289,6 +1305,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     private double getDtGs(double dt) {
         double dtGs;
+        final var settings = Settings.settings;
         if (settings.frame.active) {
             // If frame output is active, we need to set our delta t according to
             // the configured frame rate of the frame output system.
@@ -1349,6 +1366,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
         if (currResizeTime - lastResizeTime > 100L) {
+            final var settings = Settings.settings;
             resizeImmediate(resizeWidth, resizeHeight, !settings.runtime.openXr, !settings.runtime.openXr, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
@@ -1361,6 +1379,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                                 boolean resizeGuis,
                                 boolean resizeScreenConf) {
         try {
+            final var settings = Settings.settings;
             final var renderWidth = (int) Math.round(width * settings.graphics.backBufferScale);
             final var renderHeight = (int) Math.round(height * settings.graphics.backBufferScale);
 
@@ -1478,6 +1497,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     public void notify(final Event event,
                        Object source,
                        final Object... data) {
+        final var settings = Settings.settings;
         switch (event) {
             case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
                 reinitialiseGUI1();
@@ -1668,7 +1688,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             }
             case SCENE_FORCE_UPDATE -> touchSceneGraph();
         }
-
     }
 
     public boolean isInitialised() {

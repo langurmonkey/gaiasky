@@ -60,7 +60,7 @@ public class ScreenshotsManager implements IObserver {
 
     public void renderFrame() {
         gaiaSky.getCameraManager().backupCamera();
-        final Settings settings = Settings.settings;
+        final var settings = Settings.settings;
         if (settings.frame.active) {
             switch (settings.frame.mode) {
             case SIMPLE -> frameRenderer.saveScreenshot(settings.frame.location, settings.frame.prefix, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true, settings.frame.format, settings.frame.quality);
@@ -77,7 +77,7 @@ public class ScreenshotsManager implements IObserver {
 
     private void renderScreenshot(final int width, final int height, final String directory) {
         gaiaSky.getCameraManager().backupCamera();
-        final Settings settings = Settings.settings;
+        final var settings = Settings.settings;
         String file = null;
         String filename = getCurrentTimeStamp() + "_" + SCREENSHOT_FILENAME;
         switch (settings.screenshot.mode) {

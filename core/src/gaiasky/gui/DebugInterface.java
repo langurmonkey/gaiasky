@@ -138,7 +138,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         add(toggleSize).right().row();
 
         /* GRAPHICS DEVICE */
-        final Settings settings = Settings.settings;
+        final var settings = Settings.settings;
         HorizontalGroup deviceGroup = new HorizontalGroup();
         deviceGroup.space(pad05);
         String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);

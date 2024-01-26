@@ -408,7 +408,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         final String deg = I18n.msg("gui.unit.deg");
-        final Settings s = Settings.settings;
+        final var settings = Settings.settings;
         switch (event) {
             case FOCUS_CHANGED -> {
                 if (data[0] instanceof String) {
@@ -616,12 +616,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 focusAngle.setText(GlobalResources.formatNumber(Math.toDegrees((double) data[1]) % 360) + deg);
 
                 // Dist to cam
-                Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], s.program.ui.distanceUnits);
+                Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], settings.program.ui.distanceUnits);
                 focusDistCam.setText(GlobalResources.formatNumber(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
 
                 // Dist to sol
                 if (data.length > 4) {
-                    Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4], s.program.ui.distanceUnits);
+                    Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4], settings.program.ui.distanceUnits);
                     focusDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
                 }
 
@@ -639,7 +639,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             case CAMERA_MOTION_UPDATE -> {
                 final Vector3b campos = (Vector3b) data[0];
                 camVel.setText(GlobalResources.formatNumber((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
-                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), s.program.ui.distanceUnits);
+                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), settings.program.ui.distanceUnits);
                 camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
             }
             case CAMERA_TRACKING_OBJECT_UPDATE -> {

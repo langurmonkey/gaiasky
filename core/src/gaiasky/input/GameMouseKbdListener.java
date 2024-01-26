@@ -18,6 +18,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.ModePopupInfo;
 import gaiasky.scene.camera.NaturalCamera;
+import gaiasky.util.math.MathUtilsDouble;
 import org.lwjgl.glfw.GLFW;
 
 public class GameMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
@@ -143,14 +144,6 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
         prevY = y;
     }
 
-    private float lowPass(float newValue, float smoothedValue, float smoothing) {
-        if (smoothing > 0) {
-            smoothedValue += (newValue - smoothedValue) / smoothing;
-            return smoothedValue;
-        } else {
-            return newValue;
-        }
-    }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
@@ -163,8 +156,8 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
                 prevValid = true;
             }
             float limit = 17f;
-            dx = MathUtils.clamp(lowPass(mouseXSensitivity * ((float) screenX - prevX), dx, 14f), -limit, limit);
-            dy = MathUtils.clamp(lowPass(mouseYSensitivity * ((float) screenY - prevY), dy, 14f), -limit, limit);
+            dx = MathUtils.clamp(MathUtilsDouble.lowPass(mouseXSensitivity * ((float) screenX - prevX), dx, 14f), -limit, limit);
+            dy = MathUtils.clamp(MathUtilsDouble.lowPass(mouseYSensitivity * ((float) screenY - prevY), dy, 14f), -limit, limit);
             camera.addYaw(dx, true);
             camera.addPitch(dy, true);
 
@@ -211,7 +204,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
         }
     }
 
-    private static class GameGestureListener extends GestureAdapter {
+    public static class GameGestureListener extends GestureAdapter {
         private GameGestureListener() {
         }
     }

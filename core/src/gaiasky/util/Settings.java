@@ -1003,7 +1003,7 @@ public class Settings extends SettingsObject {
          * Add more items to add more levels.
          **/
         @JsonIgnore
-        final public double[] dynamicResolutionScale = new double[]{1f, 0.85f, 0.75f};
+        final public double[] dynamicResolutionScale = new double[]{1f, 0.85f, 0.75f, 0.5f};
         public GraphicsQuality quality;
         public int[] resolution;
         public boolean resizable;

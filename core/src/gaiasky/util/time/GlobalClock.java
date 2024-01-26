@@ -145,7 +145,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
      */
     public void update(double dt) {
         this.dt = dt;
-        Settings settings = Settings.settings;
+        final var settings = Settings.settings;
         dt = settings.runtime.timeOn ? this.dt : 0;
 
         if (dt != 0) {
@@ -243,7 +243,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 Instant newinstant = ((Instant) data[0]);
                 long newt = newinstant.toEpochMilli();
                 boolean updt = false;
-                Settings settings = Settings.settings;
+                final var settings = Settings.settings;
                 if (newt > settings.runtime.maxTimeMs) {
                     newt = settings.runtime.maxTimeMs;
                     logger.info("Time overflow, set to maximum (" + (settings.runtime.maxTimeMs * Nature.MS_TO_Y) + " years)");

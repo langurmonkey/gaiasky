@@ -221,7 +221,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     }
 
     private void saveFrameBufferToImage(FrameBuffer fb, Path location, String filename) {
-        Settings settings = Settings.settings;
+        final var settings = Settings.settings;
         fb.begin();
         ImageRenderer.renderToImageGl20(location.toString(), filename, fb.getWidth(), fb.getHeight(), settings.screenshot.format, settings.screenshot.quality);
         fb.end();

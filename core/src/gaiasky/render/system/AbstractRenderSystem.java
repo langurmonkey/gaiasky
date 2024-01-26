@@ -30,7 +30,6 @@ import java.util.List;
 public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<IRenderSystem> {
 
     private final RenderGroup renderGroup;
-    private final Settings settings;
     protected final SceneRenderer sceneRenderer;
     protected final ExtShaderProgram[] programs;
     protected final float[] alphas;
@@ -50,7 +49,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
                                    ExtShaderProgram[] programs) {
         super();
         this.sceneRenderer = sceneRenderer;
-        this.settings = Settings.settings;
         this.renderGroup = rg;
         this.alphas = alphas;
         this.programs = programs;
@@ -153,7 +151,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
 
     protected void addRelativisticUniforms(ExtShaderProgram shaderProgram,
                                            ICamera camera) {
-        if (settings.runtime.relativisticAberration) {
+        if (Settings.settings.runtime.relativisticAberration) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             shaderProgram.setUniformf("u_velDir", rem.velDir);
             shaderProgram.setUniformf("u_vc", rem.vc);
@@ -161,7 +159,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     protected void addGravWaveUniforms(ExtShaderProgram shaderProgram) {
-        if (settings.runtime.gravitationalWaves) {
+        if (Settings.settings.runtime.gravitationalWaves) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             // Time in seconds - use simulation time
             shaderProgram.setUniformf("u_ts", rem.gwtime);
@@ -200,7 +198,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram,
                                             ICamera camera) {
         // Velocity buffer for motion blur effect.
-        if (settings.postprocess.motionBlur.active) {
+        if (Settings.settings.postprocess.motionBlur.active) {
             shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux3f));
             shaderProgram.setUniformf("u_dCamPos", aux3d.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux3f));
             shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
@@ -218,7 +216,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     protected void addCameraUpCubemapMode(ExtShaderProgram shaderProgram,
                                           ICamera camera) {
         // TODO deactivate for now.
-        if (settings.program.modeCubemap.active) {
+        if (Settings.settings.program.modeCubemap.active) {
             // Set NaN to first component.
             shaderProgram.setUniformf("u_camUp", aux3f.set(Float.NaN, 0, 0));
         } else {
@@ -232,10 +230,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     protected ExtShaderProgram getShaderProgram(ExtShaderProgram[] programs) {
-        boolean gw = settings.runtime.gravitationalWaves;
-        boolean ra = settings.runtime.relativisticAberration;
-        boolean vb = settings.postprocess.motionBlur.active;
-        boolean ssr = settings.postprocess.ssr.active;
+        boolean gw = Settings.settings.runtime.gravitationalWaves;
+        boolean ra = Settings.settings.runtime.relativisticAberration;
+        boolean vb = Settings.settings.postprocess.motionBlur.active;
+        boolean ssr = Settings.settings.postprocess.ssr.active;
         int num = (gw ? 8 : 0) + (ra ? 4 : 0) + (vb ? 2 : 0) + (ssr ? 1 : 0);
         if (SysUtils.isMac() && num == 0) {
             // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
