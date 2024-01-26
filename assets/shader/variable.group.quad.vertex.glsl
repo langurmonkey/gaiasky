@@ -156,6 +156,14 @@ void main() {
     float boundaryFade = smoothstep(l0, l1, dist);
     v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
 
+    // Performance trick: If the star is not seen, set it very small so that there is only one fragment, and
+    // set the color to 0 to discard it in the fragment shader.
+    if (v_col.a <= 0.0 || dist < l0) {
+        // Set size very small.
+        quadSize = 0.0;
+        // The pixels of this star will be discarded in the fragment shader
+        v_col = vec4(0.0, 0.0, 0.0, 0.0);
+    }
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
@@ -171,9 +179,4 @@ void main() {
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, a_starPos, s_size, a_position, s_quat, s_quat_conj);
     #endif // velocityBufferFlag
-
-    if (dist < l0) {
-        // The pixels of this star will be discarded in the fragment shader
-        v_col = vec4(0.0, 0.0, 0.0, 0.0);
-    }
 }
