@@ -29,6 +29,6 @@
     "git tag -a &tag& -m &tag_annotation&",
     "git remote | xargs -L1 git push --all",
     "core/scripts/release/generate-changelog",
-    "gradlew core:pack -PwinKeystorePassword=&keystore_pwd&"
+    "./gradlew core:pack -PwinKeystorePassword=&keystore_pwd&"
   ]
 }

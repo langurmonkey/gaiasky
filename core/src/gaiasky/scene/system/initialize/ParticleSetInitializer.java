@@ -111,16 +111,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             // Load model in main thread
             GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
 
-
-            if (base.getName().contains("Hipparcos")) {
-                BinaryDataProvider p = new BinaryDataProvider();
-                try {
-                    var os = new FileOutputStream("/home/tsagrista/temp/hipparcos.bin");
-                    p.writeData(starSet.pointData, os);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
         } else {
             // Particles.
             if (particleSet.numLabels > 0) {

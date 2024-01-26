@@ -105,7 +105,7 @@ void main() {
 
     // Performance trick: If the star is not seen, set it very small so that there is only one fragment, and
     // set the color to 0 to discard it in the fragment shader.
-    if (v_col.a <= 0.0 || dist < l0) {
+    if (v_col.a <= 1.0e-3 || dist < l0) {
         // Set size very small.
         quadSize = 0.0;
         // The pixels of this star will be discarded in the fragment shader
