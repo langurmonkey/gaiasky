@@ -1,3 +1,11 @@
+<a name="3.5.8-2"></a>
+## [3.5.8-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.8) (2024-01-29)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.8...3.5.8-2)
+
+### Bug Fixes
+- visual settings reset operation implemented in one place only. 
+- number of reported layers by OpenXR driver can be 0, otherwise app does not start. Fixes [#763](https://codeberg.org/gaiasky/gaiasky/issues/763).
+
 <a name="3.5.8"></a>
 ## [3.5.8](https://codeberg.org/gaiasky/gaiasky/tree/3.5.7-3) (2024-01-26)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.7-3...3.5.8)
