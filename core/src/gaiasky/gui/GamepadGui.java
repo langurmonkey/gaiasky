@@ -1515,6 +1515,9 @@ public class GamepadGui extends AbstractGui {
         int bi = fi;
         fi = i;
         fj = j;
+        if (currentModel == null) {
+            return false;
+        }
         if (currentModel.length > 0 && currentModel[fi] != null) {
             // Not all columns need to be the same length!
             if (fj >= currentModel[fi].length) {

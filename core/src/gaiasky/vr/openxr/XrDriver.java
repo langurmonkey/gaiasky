@@ -160,21 +160,19 @@ public class XrDriver implements Disposable {
                 wantedLayers = null;
             }
 
-            if (wantedLayers != null) {
-                XrInstanceCreateInfo createInfo = XrInstanceCreateInfo.malloc(stack)
-                        .type$Default()
-                        .next(NULL)
-                        .createFlags(0)
-                        .applicationInfo(XrApplicationInfo.calloc(stack)
-                                .applicationName(stack.UTF8(Settings.getApplicationName(false)))
-                                .apiVersion(XR_CURRENT_API_VERSION))
-                        .enabledApiLayerNames(wantedLayers)
-                        .enabledExtensionNames(wantedExtensions);
+            XrInstanceCreateInfo createInfo = XrInstanceCreateInfo.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .createFlags(0)
+                    .applicationInfo(XrApplicationInfo.calloc(stack)
+                            .applicationName(stack.UTF8(Settings.getApplicationName(false)))
+                            .apiVersion(XR_CURRENT_API_VERSION))
+                    .enabledApiLayerNames(wantedLayers)
+                    .enabledExtensionNames(wantedExtensions);
 
-                PointerBuffer pp = stack.mallocPointer(1);
-                check(xrCreateInstance(createInfo, pp));
-                xrInstance = new XrInstance(pp.get(0), createInfo);
-            }
+            PointerBuffer pp = stack.mallocPointer(1);
+            check(xrCreateInstance(createInfo, pp));
+            xrInstance = new XrInstance(pp.get(0), createInfo);
         }
     }
 
