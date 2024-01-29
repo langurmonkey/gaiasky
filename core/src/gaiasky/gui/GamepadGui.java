@@ -1037,41 +1037,7 @@ public class GamepadGui extends AbstractGui {
         resetDefaults.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Read defaults from internal settings file
-                try {
-                    Path confFolder = Settings.assetsPath("conf");
-                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openXr));
-                    Yaml yaml = new Yaml();
-                    Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
-
-                    float br = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
-                    float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
-                    float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
-                    float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
-                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(
-                            0)).floatValue();
-                    float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
-                    float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
-                    float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("line")).get(
-                            "width")).floatValue();
-                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get(
-                            "multiplier")).floatValue();
-
-                    // Events
-                    EventManager m = EventManager.instance;
-                    m.post(Event.STAR_BRIGHTNESS_CMD, resetDefaults, br);
-                    m.post(Event.STAR_BRIGHTNESS_POW_CMD, resetDefaults, pow);
-                    m.post(Event.STAR_GLOW_FACTOR_CMD, resetDefaults, glo);
-                    m.post(Event.STAR_POINT_SIZE_CMD, resetDefaults, ss);
-                    m.post(Event.STAR_BASE_LEVEL_CMD, resetDefaults, pam);
-                    m.post(Event.AMBIENT_LIGHT_CMD, resetDefaults, amb);
-                    m.post(Event.LABEL_SIZE_CMD, resetDefaults, ls);
-                    m.post(Event.LINE_WIDTH_CMD, resetDefaults, lw);
-                    m.post(Event.ELEVATION_MULTIPLIER_CMD, resetDefaults, em);
-
-                } catch (IOException e) {
-                    logger.error(e, "Error loading default configuration file");
-                }
-
+                EventManager.publish(Event.RESET_VISUAL_SETTINGS_DEFAULTS, resetDefaults);
                 return true;
             }
             return false;

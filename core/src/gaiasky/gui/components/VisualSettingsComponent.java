@@ -45,7 +45,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     public void initialize(float componentWidth) {
         /* Star brightness */
         starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY,
-                                           Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
+                Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
         starBrightness.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.info"), skin));
         starBrightness.setWidth(componentWidth);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
@@ -59,7 +59,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Star brightness power */
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW,
-                                                Constants.SLIDER_STEP_TINY, skin);
+                Constants.SLIDER_STEP_TINY, skin);
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(componentWidth);
         magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
@@ -73,7 +73,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Star glow factor */
         starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR,
-                                           Constants.SLIDER_STEP_TINY * 0.1f, skin);
+                Constants.SLIDER_STEP_TINY * 0.1f, skin);
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
         starGlowFactor.setWidth(componentWidth);
         starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
@@ -138,7 +138,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Line width */
         lineWidth = new OwnSliderPlus(I18n.msg("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY,
-                                      Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
+                Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setWidth(componentWidth);
         lineWidth.setMappedValue(Settings.settings.scene.renderer.line.width);
         lineWidth.addListener(event -> {
@@ -152,7 +152,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Elevation multiplier */
         elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, Constants.SLIDER_STEP_TINY, false,
-                                     skin);
+                skin);
         elevMult.setWidth(componentWidth);
         elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
         elevMult.addListener(event -> {
@@ -164,7 +164,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /* Reset defaults */
+        /* Reset visual settings defaults */
         OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
         resetDefaults.align(Align.center);
         resetDefaults.setWidth(componentWidth);
@@ -172,41 +172,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         resetDefaults.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Read defaults from internal settings file.
-                try {
-                    Path confFolder = Settings.assetsPath("conf");
-                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openXr));
-                    Yaml yaml = new Yaml();
-                    Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
-
-                    float br = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
-                    float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
-                    float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
-                    float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
-                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(
-                            0)).floatValue();
-                    float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
-                    float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
-                    float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("line")).get(
-                            "width")).floatValue();
-                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get(
-                            "multiplier")).floatValue();
-
-                    // Post events to reset all.
-                    EventManager m = EventManager.instance;
-                    m.post(Event.STAR_BRIGHTNESS_CMD, resetDefaults, br);
-                    m.post(Event.STAR_BRIGHTNESS_POW_CMD, resetDefaults, pow);
-                    m.post(Event.STAR_GLOW_FACTOR_CMD, resetDefaults, glo);
-                    m.post(Event.STAR_POINT_SIZE_CMD, resetDefaults, ss);
-                    m.post(Event.STAR_BASE_LEVEL_CMD, resetDefaults, pam);
-                    m.post(Event.AMBIENT_LIGHT_CMD, resetDefaults, amb);
-                    m.post(Event.LABEL_SIZE_CMD, resetDefaults, ls);
-                    m.post(Event.LINE_WIDTH_CMD, resetDefaults, lw);
-                    m.post(Event.ELEVATION_MULTIPLIER_CMD, resetDefaults, em);
-
-                } catch (IOException e) {
-                    logger.error(e, "Error loading default configuration file");
-                }
-
+                EventManager.publish(Event.RESET_VISUAL_SETTINGS_DEFAULTS, resetDefaults);
                 return true;
             }
             return false;
@@ -229,7 +195,44 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         component = lightingGroup;
 
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD,
-                                        Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD, Event.ELEVATION_MULTIPLIER_CMD);
+                Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.RESET_VISUAL_SETTINGS_DEFAULTS);
+    }
+
+    private void resetVisualSettingsDefaults(Object source) {
+        try {
+            Path confFolder = Settings.assetsPath("conf");
+            Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openXr));
+            Yaml yaml = new Yaml();
+            Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
+
+            float br = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
+            float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
+            float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
+            float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
+            float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(
+                    0)).floatValue();
+            float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
+            float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
+            float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("line")).get(
+                    "width")).floatValue();
+            float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get(
+                    "multiplier")).floatValue();
+
+            // Post events to reset all.
+            EventManager m = EventManager.instance;
+            m.post(Event.STAR_BRIGHTNESS_CMD, source, br);
+            m.post(Event.STAR_BRIGHTNESS_POW_CMD, source, pow);
+            m.post(Event.STAR_GLOW_FACTOR_CMD, source, glo);
+            m.post(Event.STAR_POINT_SIZE_CMD, source, ss);
+            m.post(Event.STAR_BASE_LEVEL_CMD, source, pam);
+            m.post(Event.AMBIENT_LIGHT_CMD, source, amb);
+            m.post(Event.LABEL_SIZE_CMD, source, ls);
+            m.post(Event.LINE_WIDTH_CMD, source, lw);
+            m.post(Event.ELEVATION_MULTIPLIER_CMD, source, em);
+
+        } catch (IOException e) {
+            logger.error(e, "Error loading default configuration file");
+        }
     }
 
     @Override
@@ -237,72 +240,75 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case STAR_POINT_SIZE_CMD -> {
-            if (source != pointSize) {
-                float newSize = (float) data[0];
-                pointSize.setProgrammaticChangeEvents(false);
-                pointSize.setMappedValue(newSize);
-                pointSize.setProgrammaticChangeEvents(true);
+            case RESET_VISUAL_SETTINGS_DEFAULTS -> {
+                resetVisualSettingsDefaults(source);
             }
-        }
-        case STAR_BRIGHTNESS_CMD -> {
-            if (source != starBrightness) {
-                Float brightness = (Float) data[0];
-                starBrightness.setProgrammaticChangeEvents(false);
-                starBrightness.setMappedValue(brightness);
-                starBrightness.setProgrammaticChangeEvents(true);
+            case STAR_POINT_SIZE_CMD -> {
+                if (source != pointSize) {
+                    float newSize = (float) data[0];
+                    pointSize.setProgrammaticChangeEvents(false);
+                    pointSize.setMappedValue(newSize);
+                    pointSize.setProgrammaticChangeEvents(true);
+                }
             }
-        }
-        case STAR_BRIGHTNESS_POW_CMD -> {
-            if (source != magnitudeMultiplier) {
-                Float pow = (Float) data[0];
-                magnitudeMultiplier.setProgrammaticChangeEvents(false);
-                magnitudeMultiplier.setMappedValue(pow);
-                magnitudeMultiplier.setProgrammaticChangeEvents(true);
+            case STAR_BRIGHTNESS_CMD -> {
+                if (source != starBrightness) {
+                    Float brightness = (Float) data[0];
+                    starBrightness.setProgrammaticChangeEvents(false);
+                    starBrightness.setMappedValue(brightness);
+                    starBrightness.setProgrammaticChangeEvents(true);
+                }
             }
-        }
-        case STAR_GLOW_FACTOR_CMD -> {
-            if (source != starGlowFactor) {
-                Float glowFactor = (Float) data[0];
-                starGlowFactor.setProgrammaticChangeEvents(false);
-                starGlowFactor.setMappedValue(glowFactor);
-                starGlowFactor.setProgrammaticChangeEvents(true);
+            case STAR_BRIGHTNESS_POW_CMD -> {
+                if (source != magnitudeMultiplier) {
+                    Float pow = (Float) data[0];
+                    magnitudeMultiplier.setProgrammaticChangeEvents(false);
+                    magnitudeMultiplier.setMappedValue(pow);
+                    magnitudeMultiplier.setProgrammaticChangeEvents(true);
+                }
             }
-        }
-        case STAR_BASE_LEVEL_CMD -> {
-            if (source != starBaseLevel) {
-                Float baseLevel = (Float) data[0];
-                starBaseLevel.setProgrammaticChangeEvents(false);
-                starBaseLevel.setMappedValue(baseLevel);
-                starBaseLevel.setProgrammaticChangeEvents(true);
+            case STAR_GLOW_FACTOR_CMD -> {
+                if (source != starGlowFactor) {
+                    Float glowFactor = (Float) data[0];
+                    starGlowFactor.setProgrammaticChangeEvents(false);
+                    starGlowFactor.setMappedValue(glowFactor);
+                    starGlowFactor.setProgrammaticChangeEvents(true);
+                }
             }
-        }
-        case LABEL_SIZE_CMD -> {
-            if (source != labelSize) {
-                Float newLabelSize = (Float) data[0];
-                labelSize.setProgrammaticChangeEvents(false);
-                labelSize.setMappedValue(newLabelSize);
-                labelSize.setProgrammaticChangeEvents(true);
+            case STAR_BASE_LEVEL_CMD -> {
+                if (source != starBaseLevel) {
+                    Float baseLevel = (Float) data[0];
+                    starBaseLevel.setProgrammaticChangeEvents(false);
+                    starBaseLevel.setMappedValue(baseLevel);
+                    starBaseLevel.setProgrammaticChangeEvents(true);
+                }
             }
-        }
-        case LINE_WIDTH_CMD -> {
-            if (source != lineWidth) {
-                Float newWidth = (Float) data[0];
-                lineWidth.setProgrammaticChangeEvents(false);
-                lineWidth.setMappedValue(newWidth);
-                lineWidth.setProgrammaticChangeEvents(true);
+            case LABEL_SIZE_CMD -> {
+                if (source != labelSize) {
+                    Float newLabelSize = (Float) data[0];
+                    labelSize.setProgrammaticChangeEvents(false);
+                    labelSize.setMappedValue(newLabelSize);
+                    labelSize.setProgrammaticChangeEvents(true);
+                }
             }
-        }
-        case ELEVATION_MULTIPLIER_CMD -> {
-            if (source != elevMult) {
-                Float newElevationMultiplier = (Float) data[0];
-                elevMult.setProgrammaticChangeEvents(false);
-                elevMult.setMappedValue(newElevationMultiplier);
-                elevMult.setProgrammaticChangeEvents(true);
+            case LINE_WIDTH_CMD -> {
+                if (source != lineWidth) {
+                    Float newWidth = (Float) data[0];
+                    lineWidth.setProgrammaticChangeEvents(false);
+                    lineWidth.setMappedValue(newWidth);
+                    lineWidth.setProgrammaticChangeEvents(true);
+                }
             }
-        }
-        default -> {
-        }
+            case ELEVATION_MULTIPLIER_CMD -> {
+                if (source != elevMult) {
+                    Float newElevationMultiplier = (Float) data[0];
+                    elevMult.setProgrammaticChangeEvents(false);
+                    elevMult.setMappedValue(newElevationMultiplier);
+                    elevMult.setProgrammaticChangeEvents(true);
+                }
+            }
+            default -> {
+            }
 
         }
     }

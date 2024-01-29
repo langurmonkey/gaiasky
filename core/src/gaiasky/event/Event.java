@@ -1226,6 +1226,10 @@ public enum Event {
      **/
     SPEED_LIMIT_CMD,
     /**
+     * Reset the default visual settings in Gaia Sky.
+     */
+    RESET_VISUAL_SETTINGS_DEFAULTS,
+    /**
      * Contains the star brightness multiplier.
      **/
     STAR_BRIGHTNESS_CMD,
