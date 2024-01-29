@@ -1047,11 +1047,14 @@ public class GamepadGui extends AbstractGui {
                     float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
                     float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
                     float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
-                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(0)).floatValue();
+                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(
+                            0)).floatValue();
                     float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
                     float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
-                    float lw = ((Double) ((Map<String, Object>) conf.get("scene")).get("lineWidth")).floatValue();
-                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get("multiplier")).floatValue();
+                    float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("line")).get(
+                            "width")).floatValue();
+                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get(
+                            "multiplier")).floatValue();
 
                     // Events
                     EventManager m = EventManager.instance;
@@ -1344,7 +1347,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     private void updateFocusedBookmark() {
-        if (selectedTab == 1 && fi < maxBookmarkDepth - 1) {
+        if (((vr && selectedTab == 2) || selectedTab == 1) && fi < maxBookmarkDepth - 1) {
             // Bookmarks.
             var selectedBookmark = (BookmarkButton) currentModel[fi][fj];
 
@@ -1583,7 +1586,7 @@ public class GamepadGui extends AbstractGui {
     public void updateFocused(boolean force) {
         if ((force || content.getParent() != null) && currentModel != null && currentModel.length != 0) {
             Actor actor = currentModel[fi][fj];
-            if (GuiUtils.isInputWidget(actor)) {
+            if (!vr && GuiUtils.isInputWidget(actor)) {
                 stage.setKeyboardFocus(actor);
             }
 
@@ -1722,6 +1725,9 @@ public class GamepadGui extends AbstractGui {
                         String focusName;
                         if (data[0] instanceof String) {
                             focusName = (String) data[0];
+                        } else if (data[0] instanceof FocusView focusView) {
+                            view.setEntity(focusView.getEntity());
+                            focusName = view.getLocalizedName();
                         } else {
                             var entity = (Entity) data[0];
                             view.setEntity(entity);
