@@ -1305,9 +1305,6 @@ public class GamepadGui extends AbstractGui {
         Table group = new Table(skin);
         group.top();
 
-        var folder = skin.getDrawable("iconic-folder");
-        OwnTextIconButton firstButton = null;
-        BookmarkNode firstBookmark = null;
         int row = 0;
         model[columnIndex] = new Actor[bookmarks.size()];
         for (var node : bookmarks) {
@@ -1318,7 +1315,7 @@ public class GamepadGui extends AbstractGui {
             if (node.folder) {
                 final int rowIndex = row;
                 button.addListener((event) -> {
-                    if (event instanceof ChangeEvent ce) {
+                    if (event instanceof ChangeEvent) {
                         selectInRow(columnIndex, rowIndex, true);
                         updateFocused();
                     }
@@ -1584,9 +1581,6 @@ public class GamepadGui extends AbstractGui {
     }
 
     public void updateFocused(boolean force) {
-        if (vr) {
-            return;
-        }
         if ((force || content.getParent() != null) && currentModel != null && currentModel.length != 0) {
             Actor actor = currentModel[fi][fj];
             if (GuiUtils.isInputWidget(actor)) {
@@ -2031,3 +2025,4 @@ public class GamepadGui extends AbstractGui {
     }
 
 }
+
