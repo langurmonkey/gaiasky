@@ -68,23 +68,19 @@ public class OctreeUpdater extends AbstractUpdateSystem {
 
                 // Update focus, just in case
                 if (camera.hasFocus()) {
-                    IFocus focus = camera.getFocus();
-                    Entity star = focus.getFirstStarAncestorEntity();
-                    OctreeNode parent = octree.parenthood.get(star);
-                    if (parent != null && !parent.isObserved()) {
-                        var starGraph = Mapper.graph.get(star);
-                        Vector3b starParentTranslation = starGraph.translation;
+                    var focus = camera.getFocus();
+                    var star = focus.getFirstStarAncestorEntity();
+                    if (star != null) {
+                        OctreeNode parent = octree.parenthood.get(star);
+                        if (parent != null && !parent.isObserved()) {
+                            var starGraph = Mapper.graph.get(star);
+                            Vector3b starParentTranslation = starGraph.translation;
 
-                        scene.updateEntityGraph(star, GaiaSky.instance.time, starParentTranslation, 1);
-                        scene.updateEntity(star, (float) GaiaSky.instance.time.getDt());
+                            scene.updateEntityGraph(star, GaiaSky.instance.time, starParentTranslation, 1);
+                            scene.updateEntity(star, (float) GaiaSky.instance.time.getDt());
+                        }
                     }
                 }
-            } else {
-                // TODO what is this for?
-                // Just update children
-                //for (SceneGraphNode node : children) {
-                //    node.update(time, translation, camera);
-                //}
             }
         }
     }
