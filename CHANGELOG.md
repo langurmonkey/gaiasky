@@ -1,3 +1,10 @@
+<a name="3.5.8-3"></a>
+## [3.5.8-3](https://codeberg.org/gaiasky/gaiasky/tree/3.5.8-2) (2024-01-29)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.8-2...3.5.8-3)
+
+### Bug Fixes
+- make sure a focus' star ancestor exists before trying to get its parenthood in the octree.
+
 <a name="3.5.8-2"></a>
 ## [3.5.8-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.8) (2024-01-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.8...3.5.8-2)
