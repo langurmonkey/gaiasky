@@ -333,10 +333,10 @@ tasks.register('createTar') {
 }
 
 tasks.register('downloadJRE', Download) {
-    src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.6%2B10/OpenJDK17U-jre_x64_linux_hotspot_17.0.6_10.tar.gz"
+    src "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jre_x64_linux_hotspot_21.0.2_13.tar.gz"
     dest new File("$tmpDir", "$jreArchive")
     onlyIfModified true
-    overwrite false
+    overwrite true
 }
 tasks.register('downloadAndExtractJRE') {
     dependsOn downloadJRE
@@ -351,6 +351,9 @@ tasks.register('downloadAndExtractJRE') {
             from tarTree(resources.gzip(jreArchivePath))
             into project.tmpDir
         }
+        
+        // Delete package
+        delete "$jreArchivePath"
 
         // Set location
         String[] tmpfiles = project.tmpDir.listFiles()
