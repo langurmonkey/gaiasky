@@ -123,7 +123,7 @@ public class HashBenchmark extends AbstractBenchmark {
     public String genRandomAlphanumericString(Random random) {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
-        int targetStringLength = random.nextInt(5, 20);
+        int targetStringLength = 5 + random.nextInt(15);
 
         return random.ints(leftLimit, rightLimit + 1)
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
