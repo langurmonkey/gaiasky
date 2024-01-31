@@ -203,7 +203,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             if (list.length > 4) {
                 // u_texture2
                 try {
-                    Texture tex = new Texture((String) list[4]);
+                    Texture tex = (Texture) list[4];
                     rm.setAdditionalTexture(tex);
                 } catch (Exception e) {
                     logger.error(e);
@@ -226,25 +226,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
         ssrEffect.setEnabled(settings.postprocess.ssr.active && !vr && !safeMode);
         ppb.set(ssrEffect);
-
-        // CAMERA MOTION BLUR
-        //CameraMotion cameraBlur = new CameraMotion(width, height);
-        //cameraBlur.setBlurScale(.8f);
-        //cameraBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
-        //cameraBlur.setEnabledOptions(false, false);
-        //ppb.set(cameraBlur);
-        //updateCameraBlur(ppb, gq);
-        //
-        // Add to scene graph
-        //initializeBlurObject();
-        //if (blurObject != null && !blurObjectAdded) {
-        //    GaiaSky.postRunnable(() -> {
-        //        scene.engine.addEntity(blurObject);
-        //        EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, blurObject, false);
-        //    });
-        //    blurObjectView = new BaseView(blurObject);
-        //    blurObjectAdded = true;
-        //}
 
         /*
          TODO
@@ -610,8 +591,21 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 if (data.length > 3) {
                     // Add effect description for later initialization.
                     String shader = (String) data[3];
-                    float[] additional = data[4] != null ? (float[]) data[4] : null;
-                    Object[] l = new Object[]{shader, false, entity, additional};
+                    Object[] l;
+                    if (data.length > 4) {
+                        float[] additional = data[4] != null ? (float[]) data[4] : null;
+                        if (data.length > 5) {
+                            Texture rmTexture = (Texture) data[5];
+                            // Contains texture.
+                            l = new Object[]{shader, false, entity, additional, rmTexture};
+                        } else {
+                            // No texture.
+                            l = new Object[]{shader, false, entity, additional};
+                        }
+                    } else {
+                        // No additional data.
+                        l = new Object[]{shader, false, entity};
+                    }
                     addRayMarchingDef(name, l);
                     logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
                 } else {

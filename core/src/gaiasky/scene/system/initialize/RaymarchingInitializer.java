@@ -9,6 +9,8 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.graphics.Texture;
+import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
@@ -16,7 +18,10 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.FocusActive;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.loader.OwnTextureLoader;
+import gaiasky.util.i18n.I18n;
 
 public class RaymarchingInitializer extends AbstractInitSystem {
 
@@ -30,6 +35,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var focus = Mapper.focus.get(entity);
+        var rm = Mapper.raymarching.get(entity);
 
         // Focus active
         focus.activeFunction = FocusActive::isFocusActiveTrue;
@@ -47,6 +53,33 @@ public class RaymarchingInitializer extends AbstractInitSystem {
             base.ct = new ComponentTypes(ComponentType.Invisible);
         }
 
+        if (rm.additionalTexture != null) {
+            var tp = new OwnTextureLoader.OwnTextureParameter();
+            tp.genMipMaps = false;
+            rm.additionalTextureUnpacked = addToLoad(rm.additionalTexture, tp);
+        } else {
+            rm.additionalTextureUnpacked = null;
+        }
+
+    }
+
+    /**
+     * Adds the texture to load and unpacks any star (*) with the current
+     * quality setting.
+     *
+     * @param tex The texture file to load.
+     * @return The actual loaded texture path
+     */
+    private String addToLoad(String tex,
+                             OwnTextureLoader.OwnTextureParameter texParams) {
+        if (tex == null)
+            return null;
+
+        tex = GlobalResources.unpackAssetPath(tex);
+        logger.info(I18n.msg("notif.loading", tex));
+        AssetBean.addAsset(tex, Texture.class, texParams);
+
+        return tex;
     }
 
     @Override
@@ -55,10 +88,21 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         var raymarching = Mapper.raymarching.get(entity);
 
         if (raymarching != null) {
-            if (raymarching.raymarchingShader != null && !raymarching.raymarchingShader.isBlank() && !Settings.settings.program.safeMode)
-                EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
-            else
+            if (raymarching.raymarchingShader != null && !raymarching.raymarchingShader.isBlank() && !Settings.settings.program.safeMode) {
+                if (raymarching.additionalTextureUnpacked != null) {
+                    if (AssetBean.manager().isLoaded(raymarching.additionalTextureUnpacked)) {
+                        raymarching.additional = AssetBean.manager().get(raymarching.additionalTextureUnpacked);
+                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[]{1f, 0f, 0f, 0f}, raymarching.additional);
+                    } else {
+                        logger.warn("Could not load texture: " + raymarching.additionalTexture);
+                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[]{1f, 0f, 0f, 0f});
+                    }
+                } else {
+                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[]{1f, 0f, 0f, 0f});
+                }
+            } else {
                 raymarching.raymarchingShader = null;
+            }
         }
     }
 }

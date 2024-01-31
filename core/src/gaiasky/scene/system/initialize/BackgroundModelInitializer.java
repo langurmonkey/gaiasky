@@ -42,7 +42,7 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
         var renderType = Mapper.renderType.get(entity);
 
         // Size
-        body.size *= Constants.DISTANCE_SCALE_FACTOR;
+        body.size *= (float) Constants.DISTANCE_SCALE_FACTOR;
 
         // Force texture loading
         model.renderConsumer = ModelEntityRenderSystem::renderGenericModel;

@@ -29,10 +29,11 @@ layout (location = 0) out vec4 fragColor;
  described in http://www.blog.sirenix.net/blog/realtime-volumetric-clouds-in-unity
 **/
 #define PI 3.14159265359
-#define ITERATIONS 100.0
+#define ITERATIONS 70.0
 
-#define CLOUD_DENSITY 0.4
-#define CLOUD_COLOR vec3(1.0, 1.0, 1.0)
+#define RADIUS 1.0
+#define CLOUD_DENSITY 0.6
+#define CLOUD_COLOR vec3(0.6, 0.6, 0.6)
 
 
 float rand(vec3 p) {
@@ -58,23 +59,23 @@ float valueNoise(vec3 p) {
     s.z);
 }
 
-float fbm(vec3 p) {
-    vec3 q = p - vec3(0.1, 0.0, 0.0);
+float fbm(vec3 p, vec3 center) {
+    vec3 q = (p - vec3(0.5, 0.5, 0.0) * u_time) * 3.0 / RADIUS;
     // fbm
     float ret = 0.5 * valueNoise(q); q *= 2.0;
     ret += 0.25 * valueNoise(q); q *= 2.0;
     ret += 0.125 * valueNoise(q);
-    return clamp(ret - p.y, 0.0, 1.0);
+    return ret - (length(p - center) - RADIUS);
 }
 
-vec4 raymarch(vec3 ray, vec3 pos, float s) {
+vec4 raymarch(vec3 camPos, vec3 rayDir, vec3 objPos, float s) {
     float depth = 0.0;
     vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
 
     for (int i = 0; i < ITERATIONS; i++)
     {
-        vec3 p = pos + depth * ray;
-        float density = fbm(p);
+        vec3 p = camPos + depth * rayDir;
+        float density = fbm(p, objPos);
 
         // If density is unignorable...
         if (density > 1e-2)
@@ -82,7 +83,7 @@ vec4 raymarch(vec3 ray, vec3 pos, float s) {
             // We estimate the color with w.r.t. density
             vec4 c = vec4(mix(CLOUD_COLOR, vec3(0.0, 0.0, 0.0), density), density);
             // Multiply it by a factor so that it becomes softer
-            float dif = clamp(density - fbm(p) / 0.3, 0.0, 1.0);
+            float dif = clamp(density - fbm(p, objPos) / 0.3, 0.0, 1.0);
             vec3 lig = vec3(1.0) + vec3(0.9, 0.7, 0.0) * dif;
             c.rgb *= lig;
 
@@ -92,13 +93,12 @@ vec4 raymarch(vec3 ray, vec3 pos, float s) {
         }
 
         // March forward a fixed distance
-        depth += max(0.1, 0.03 * depth);
+        depth += max(RADIUS * 0.05, (RADIUS * 0.01) * depth);
 
         // Depth test
         if (depth >= s) {
-            return vec4(0.0, 0.0, 0.0, 0.0);
+          return vec4(0.0, 0.0, 0.0, 0.0);
         }
-
     }
 
     return vec4(clamp(color.rgb, 0.0, 1.0), color.a);
@@ -110,16 +110,18 @@ float luma(vec4 color) {
 
 void main() {
     // ray direction
-    vec3 ray = normalize(v_ray);
-    // floating position (camPos - pos)
-    vec3 pos = u_pos * 1.0;
+    vec3 rayDir = normalize(v_ray);
+    // camera position
+    vec3 camPos = u_pos * 5.0e5;
+    // position of object in floating camera refsys objPos = camPos - objPosAbsolute
+    vec3 objPos = vec3(0.0, 0.0, 0.0);
     // depth buffer
     float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y);
-    depth *= length(ray);
+    depth *= length(rayDir);
     // color of pre-existing scene
     vec3 col = texture(u_texture0, v_texCoords).rgb;
     // ray marching
-    vec4 rmcol = raymarch(ray, pos, depth);
+    vec4 rmcol = raymarch(camPos, rayDir, objPos, depth);
 
     // return final color using alpha blending
     fragColor = vec4(col * (1.0 - rmcol.a) + rmcol.rgb * rmcol.a, 1.0);

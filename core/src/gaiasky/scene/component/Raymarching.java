@@ -8,10 +8,15 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.graphics.Texture;
+import gaiasky.util.Settings;
 
 public class Raymarching implements Component {
 
     public String raymarchingShader;
+    public String additionalTexture;
+    public String additionalTextureUnpacked;
+    public Texture additional;
     public boolean isOn = false;
 
     public void setShader(String shader) {
@@ -21,4 +26,13 @@ public class Raymarching implements Component {
     public void setRaymarchingShader(String shader) {
         this.raymarchingShader = shader;
     }
+
+    public void setAdditionalTexture(String texture) {
+        this.additionalTexture = Settings.settings.data.dataFile(texture);
+    }
+
+    public void setRaymarchingTexture(String texture) {
+        setAdditionalTexture(texture);
+    }
+
 }
