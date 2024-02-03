@@ -39,22 +39,23 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
-    private final Map<String, DatasetPreferencesWindow> prefsMap;
     private final Map<String, OwnSliderPlus> scalingMap;
     private final CatalogManager catalogManager;
     private VerticalGroup group;
     private OwnLabel noDatasetsLabel = null;
     private float componentWidth;
 
-    public DatasetsComponent(final Skin skin, final Stage stage, final CatalogManager catalogManager) {
+    public DatasetsComponent(final Skin skin,
+                             final Stage stage,
+                             final CatalogManager catalogManager) {
         super(skin, stage);
         this.catalogManager = catalogManager;
         groupMap = new HashMap<>();
         imageMap = new HashMap<>();
         colorMap = new HashMap<>();
-        prefsMap = new HashMap<>();
         scalingMap = new HashMap<>();
-        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT, Event.CATALOG_POINT_SIZE_SCALING_CMD);
+        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT,
+                                        Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
     @Override
@@ -76,7 +77,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         addNoDatasets();
     }
 
-    private void setDatasetVisibility(CatalogInfo ci, OwnImageButton eye, boolean visible, Actor source) {
+    private void setDatasetVisibility(CatalogInfo ci,
+                                      OwnImageButton eye,
+                                      boolean visible,
+                                      Actor source) {
         if (ci.entity != null) {
             if (source != eye) {
                 eye.setCheckedNoFire(!visible);
@@ -89,7 +93,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private void setDatasetHighlight(CatalogInfo ci, OwnImageButton mark, boolean highlight, Actor source) {
+    private void setDatasetHighlight(CatalogInfo ci,
+                                     OwnImageButton mark,
+                                     boolean highlight,
+                                     Actor source) {
         if (ci.entity != null) {
             if (source != mark) {
                 mark.setCheckedNoFire(highlight);
@@ -99,17 +106,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     private void showDatasetPreferences(CatalogInfo ci) {
-        DatasetPreferencesWindow dpw;
-        if (prefsMap.containsKey(ci.name)) {
-            dpw = prefsMap.get(ci.name);
-        } else {
-            dpw = new DatasetPreferencesWindow(ci, skin, stage);
-            prefsMap.put(ci.name, dpw);
-        }
-        if (!dpw.isVisible() || !dpw.hasParent()) {
-            dpw.setVisible(true);
-            dpw.show(stage);
-        }
+        var dpw = new DatasetPreferencesWindow(ci, skin, stage);
+        dpw.setVisible(true);
+        dpw.show(stage);
     }
 
     private void addCatalogInfo(CatalogInfo ci) {
@@ -159,7 +158,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        imageMap.put(ci.name, new OwnImageButton[]{eye, mark});
+        imageMap.put(ci.name, new OwnImageButton[] { eye, mark });
         controls.addActor(eye);
         if (ci.isHighlightable()) {
             controls.addActor(mark);
@@ -218,7 +217,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
 
         if (ci.isHighlightable()) {
-            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
+            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE,
+                                                          Constants.SLIDER_STEP_TINY, skin);
             sizeScaling.setWidth(320f);
             if (ci.entity != null) {
                 var graph = Mapper.graph.get(ci.entity);
@@ -280,10 +280,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 ContextMenu datasetContext = new ContextMenu(skin, "default");
                                 // Visibility
                                 boolean currentVisibility = ci.isVisible(true);
-                                MenuItem visibility = new MenuItem(I18n.msg(currentVisibility ? "gui.hide" : "gui.show"), skin, skin.getDrawable(currentVisibility ? "eye-s-off" : "eye-s-on"));
+                                MenuItem visibility = new MenuItem(I18n.msg(currentVisibility ? "gui.hide" : "gui.show"), skin,
+                                                                   skin.getDrawable(currentVisibility ? "eye-s-off" : "eye-s-on"));
                                 visibility.addListener(new ChangeListener() {
                                     @Override
-                                    public void changed(ChangeEvent event, Actor actor) {
+                                    public void changed(ChangeEvent event,
+                                                        Actor actor) {
                                         setDatasetVisibility(ci, eye, !currentVisibility, catalogWidget);
                                     }
                                 });
@@ -291,10 +293,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 if (ci.isHighlightable()) {
                                     // Highlight
                                     boolean currentHighlight = ci.highlighted;
-                                    MenuItem highlight = new MenuItem(I18n.msg(currentHighlight ? "gui.deemphasize" : "gui.highlight"), skin, skin.getDrawable(currentHighlight ? "highlight-s-off" : "highlight-s-on"));
+                                    MenuItem highlight = new MenuItem(I18n.msg(currentHighlight ? "gui.deemphasize" : "gui.highlight"), skin,
+                                                                      skin.getDrawable(currentHighlight ? "highlight-s-off" : "highlight-s-on"));
                                     highlight.addListener(new ChangeListener() {
                                         @Override
-                                        public void changed(ChangeEvent event, Actor actor) {
+                                        public void changed(ChangeEvent event,
+                                                            Actor actor) {
                                             setDatasetHighlight(ci, mark, !currentHighlight, catalogWidget);
                                         }
                                     });
@@ -303,7 +307,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                     MenuItem settings = new MenuItem(I18n.msg("gui.settings.dataset"), skin, skin.getDrawable("prefs-icon"));
                                     settings.addListener(new ChangeListener() {
                                         @Override
-                                        public void changed(ChangeEvent event, Actor actor) {
+                                        public void changed(ChangeEvent event,
+                                                            Actor actor) {
                                             showDatasetPreferences(ci);
                                         }
                                     });
@@ -313,12 +318,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 MenuItem delete = new MenuItem(I18n.msg("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
                                 delete.addListener(new ChangeListener() {
                                     @Override
-                                    public void changed(ChangeEvent event, Actor actor) {
+                                    public void changed(ChangeEvent event,
+                                                        Actor actor) {
                                         EventManager.publish(Event.CATALOG_REMOVE, this, ci.name);
                                     }
                                 });
                                 datasetContext.addItem(delete);
-                                datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
+                                datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale,
+                                                        stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
                             });
                             // Set to processed
                             event.setBubbles(false);
@@ -360,72 +367,74 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
+    public void notify(final gaiasky.event.Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
-            case CATALOG_ADD -> {
-                removeNoDatasets();
-                addCatalogInfo((CatalogInfo) data[0]);
+        case CATALOG_ADD -> {
+            removeNoDatasets();
+            addCatalogInfo((CatalogInfo) data[0]);
+        }
+        case CATALOG_REMOVE -> {
+            String datasetName = (String) data[0];
+            if (groupMap.containsKey(datasetName)) {
+                groupMap.get(datasetName).remove();
+                groupMap.remove(datasetName);
+                imageMap.remove(datasetName);
+                colorMap.remove(datasetName);
+                EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
             }
-            case CATALOG_REMOVE -> {
+            addNoDatasets();
+        }
+        case CATALOG_VISIBLE -> {
+            if (source != this) {
                 String datasetName = (String) data[0];
-                if (groupMap.containsKey(datasetName)) {
-                    groupMap.get(datasetName).remove();
-                    groupMap.remove(datasetName);
-                    imageMap.remove(datasetName);
-                    colorMap.remove(datasetName);
-                    EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
-                }
-                addNoDatasets();
+                boolean visible = (Boolean) data[1];
+                OwnImageButton eye = imageMap.get(datasetName)[0];
+                eye.setCheckedNoFire(!visible);
             }
-            case CATALOG_VISIBLE -> {
-                if (source != this) {
-                    String datasetName = (String) data[0];
-                    boolean visible = (Boolean) data[1];
+        }
+        case PER_OBJECT_VISIBILITY_CMD -> {
+            if (source != this) {
+                FocusView obj = (FocusView) data[0];
+                String datasetName = (String) data[1];
+                boolean checked = (Boolean) data[2];
+                if (Mapper.mesh.has(obj.getEntity())) {
                     OwnImageButton eye = imageMap.get(datasetName)[0];
-                    eye.setCheckedNoFire(!visible);
+                    eye.setCheckedNoFire(!checked);
                 }
             }
-            case PER_OBJECT_VISIBILITY_CMD -> {
-                if (source != this) {
-                    FocusView obj = (FocusView) data[0];
-                    String datasetName = (String) data[1];
-                    boolean checked = (Boolean) data[2];
-                    if (Mapper.mesh.has(obj.getEntity())) {
-                        OwnImageButton eye = imageMap.get(datasetName)[0];
-                        eye.setCheckedNoFire(!checked);
-                    }
+        }
+        case CATALOG_HIGHLIGHT -> {
+            if (source != this) {
+                CatalogInfo ci = (CatalogInfo) data[0];
+                float[] col = ci.hlColor;
+                if (colorMap.containsKey(ci.name) && col != null) {
+                    colorMap.get(ci.name).setPickedColor(col);
                 }
-            }
-            case CATALOG_HIGHLIGHT -> {
-                if (source != this) {
-                    CatalogInfo ci = (CatalogInfo) data[0];
-                    float[] col = ci.hlColor;
-                    if (colorMap.containsKey(ci.name) && col != null) {
-                        colorMap.get(ci.name).setPickedColor(col);
-                    }
 
-                    if (imageMap.containsKey(ci.name)) {
-                        boolean hl = (Boolean) data[1];
-                        OwnImageButton hig = imageMap.get(ci.name)[1];
-                        hig.setCheckedNoFire(hl);
-                    }
+                if (imageMap.containsKey(ci.name)) {
+                    boolean hl = (Boolean) data[1];
+                    OwnImageButton hig = imageMap.get(ci.name)[1];
+                    hig.setCheckedNoFire(hl);
                 }
             }
-            case CATALOG_POINT_SIZE_SCALING_CMD -> {
-                if (source != this) {
-                    String datasetName = (String) data[0];
-                    double val = (Double) data[1];
-                    if (scalingMap.containsKey(datasetName)) {
-                        OwnSliderPlus slider = scalingMap.get(datasetName);
-                        slider.setProgrammaticChangeEvents(false);
-                        slider.setMappedValue(val);
-                        slider.setProgrammaticChangeEvents(true);
-                    }
+        }
+        case CATALOG_POINT_SIZE_SCALING_CMD -> {
+            if (source != this) {
+                String datasetName = (String) data[0];
+                double val = (Double) data[1];
+                if (scalingMap.containsKey(datasetName)) {
+                    OwnSliderPlus slider = scalingMap.get(datasetName);
+                    slider.setProgrammaticChangeEvents(false);
+                    slider.setMappedValue(val);
+                    slider.setProgrammaticChangeEvents(true);
+                }
 
-                }
             }
-            default -> {
-            }
+        }
+        default -> {
+        }
         }
 
     }

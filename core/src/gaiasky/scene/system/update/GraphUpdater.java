@@ -218,7 +218,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
         } else if (fade.fadePosition != null) {
             fade.currentDistance = D31.set(fade.fadePosition).sub(camera.getPos()).len() * camera.getFovFactor();
         } else {
-            fade.currentDistance = D31.set(body.pos).sub(camera.getPos()).len() * camera.getFovFactor();
+            // Here we only use the camera position!
+            fade.currentDistance = D31.set(camera.getPos()).len() * camera.getFovFactor();
         }
         body.distToCamera = fade.fadePositionObject == null ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.fadePositionObject).distToCamera;
     }

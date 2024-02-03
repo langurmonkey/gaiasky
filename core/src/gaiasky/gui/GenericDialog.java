@@ -527,7 +527,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public void hide() {
         hide(Actions.sequence(
                 Actions.alpha(1f),
-                Actions.fadeOut(0.6f)));
+                Actions.fadeOut(0.6f),
+                Actions.removeActor(this)));
     }
 
     /**

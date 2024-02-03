@@ -45,7 +45,9 @@ public class DatasetPreferencesWindow extends GenericDialog {
     private boolean filterEdited;
     private final float taWidth;
 
-    public DatasetPreferencesWindow(CatalogInfo ci, Skin skin, Stage stage) {
+    public DatasetPreferencesWindow(CatalogInfo ci,
+                                    Skin skin,
+                                    Stage stage) {
         super(I18n.msg("gui.preferences") + " - " + ci.name, skin, stage);
         this.ci = ci;
         this.dpw = this;
@@ -377,7 +379,8 @@ public class DatasetPreferencesWindow extends GenericDialog {
         pack();
     }
 
-    private void deleteRule(Filter filter, FilterRule rule) {
+    private void deleteRule(Filter filter,
+                            FilterRule rule) {
         if (filter != null && rule != null) {
             boolean removed = filter.removeRule(rule);
             if (removed) {
@@ -403,7 +406,8 @@ public class DatasetPreferencesWindow extends GenericDialog {
         GaiaSky.postRunnable(() -> generateFilterTable(filter));
     }
 
-    private AttributeComboBoxBean getAttributeBean(IAttribute attr, Array<AttributeComboBoxBean> attrs) {
+    private AttributeComboBoxBean getAttributeBean(IAttribute attr,
+                                                   Array<AttributeComboBoxBean> attrs) {
         for (AttributeComboBoxBean attribute : attrs) {
             if (attr.toString().contains(attribute.name)) {
                 return attribute;
@@ -431,11 +435,17 @@ public class DatasetPreferencesWindow extends GenericDialog {
             var fade = Mapper.fade.get(ci.entity);
             if (fadeIn.isChecked()) {
                 fade.setFadein(new double[] { fadeInMin.getDoubleValue(0), fadeInMax.getDoubleValue(1e1) });
+                if (fade.fadeInMap == null) {
+                    fade.setFadeInMap(new double[]{0, 1});
+                }
             } else {
                 fade.setFadein(null);
             }
             if (fadeOut.isChecked()) {
                 fade.setFadeout(new double[] { fadeOutMin.getDoubleValue(1e5), fadeOutMax.getDoubleValue(1e6) });
+                if (fade.fadeOutMap == null) {
+                    fade.setFadeOutMap(new double[]{1, 0});
+                }
             } else {
                 fade.setFadeout(null);
             }
@@ -443,10 +453,8 @@ public class DatasetPreferencesWindow extends GenericDialog {
         // Filter
         if (filterEdited) {
             if (ci.filter != null) {
-                synchronized (ci.filter) {
-                    ci.filter = filter.hasRules() ? filter : null;
-                    ci.highlight(ci.highlighted);
-                }
+                ci.filter = filter.hasRules() ? filter : null;
+                ci.highlight(ci.highlighted);
             } else {
                 ci.filter = filter.hasRules() ? filter : null;
                 ci.highlight(ci.highlighted);
