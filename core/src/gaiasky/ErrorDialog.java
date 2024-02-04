@@ -57,21 +57,31 @@ public class ErrorDialog implements ApplicationListener {
         // Title
         OwnLabel title = new OwnLabel(I18n.msg("error.crash.title"), skin, "header-large");
         // Subtitle
-        OwnLabel subtitle = new OwnLabel(I18n.msg("notif.error", TextUtils.breakCharacters(cause.getLocalizedMessage(), 40)), skin, "default");
+        String msg;
+        if(cause != null) {
+            if (cause.getLocalizedMessage() != null) {
+                msg = cause.getLocalizedMessage();
+            } else if (cause.getMessage() != null){
+                msg = cause.getMessage();
+            } else {
+                msg = cause.getClass().getSimpleName();
+            }
+        } else {
+            msg = "-";
+        }
+        OwnLabel subtitle = new OwnLabel(I18n.msg("notif.error", TextUtils.breakCharacters(msg, 40)), skin, "default");
         // Notification
         OwnLabel urlLabel = new OwnLabel(I18n.msg("error.crash.exception.1"), skin, "header-s");
         Link url = new Link(Settings.REPO_ISSUES, skin, Settings.REPO_ISSUES);
         OwnLabel applicationMessageLabel = new OwnLabel(I18n.msg("error.crash.applicationmessage"), skin, "header-s");
-        OwnLabel applicationMessage = new OwnLabel(message, skin, "default");
+        OwnLabel applicationMessage = new OwnLabel(message != null ? message : "-", skin, "default");
 
         // Stack trace
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        Throwable stack = cause;
-        if (cause.getCause() != null) {
-            stack = cause.getCause();
+        if (cause != null && cause.getCause() != null) {
+            cause.getCause().printStackTrace(pw);
         }
-        stack.printStackTrace(pw);
         String stackStr = sw.toString();
         long lines = TextUtils.countLines(stackStr);
         OwnTextArea stackTraceTextArea = new OwnTextArea(stackStr, skin, "default");
