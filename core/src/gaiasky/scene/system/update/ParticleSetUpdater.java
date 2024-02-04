@@ -71,7 +71,7 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                                StarSet starSet,
                                DatasetDescription datasetDesc) {
         // Fade node visibility
-        if (starSet.active != null && starSet.active.length > 0) {
+        if (starSet.active != null && starSet.active.length > 0 && starSet.pointData != null) {
             updateParticleSet(camera, starSet);
 
             // Update close stars
