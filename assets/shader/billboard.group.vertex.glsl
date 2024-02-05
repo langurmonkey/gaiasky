@@ -14,6 +14,10 @@ uniform vec2 u_edges;
 uniform float u_maxPointSize;
 uniform float u_vrScale;
 
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
+// View matrix
 uniform mat4 u_view;
 
 #ifdef relativisticEffects
@@ -49,7 +53,13 @@ flat out int v_layer;
 #endif // velocityBufferFlag
 
 void main() {
-    vec3 pos = (a_particlePos - u_camPos) / u_vrScale;
+    vec3 particlePos = a_particlePos;
+    if (u_transformFlag) {
+        vec4 aux = u_transform * vec4(particlePos, 1.0);
+        particlePos.xyz = aux.xyz;
+    }
+
+    vec3 pos = (particlePos - u_camPos) / u_vrScale;
     float dist = length(pos * 1e-8) * 1e8;
 
     #ifdef relativisticEffects

@@ -27,6 +27,9 @@ uniform float u_vrScale;
 uniform vec4 u_alphaSizeBrRc;
 // Fixed angular size
 uniform float u_fixedAngularSize;
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
 
 // INPUT
 layout (location=0) in vec3 a_position;
@@ -75,7 +78,12 @@ void main() {
 	float l0 = LEN0 * u_vrScale;
 	float l1 = l0 * 1e3;
 
-    vec3 pos = a_position - u_camPos;
+    vec3 particlePos = a_position.xyz;
+    if (u_transformFlag) {
+        vec4 aux = u_transform * vec4(particlePos, 1.0);
+        particlePos.xyz = aux.xyz;
+    }
+    vec3 pos = particlePos - u_camPos;
 
     // Proper motion using 64-bit emulated arithmetics:
     // pm = a_pm * t * DAY_TO_YEAR

@@ -29,6 +29,9 @@ uniform float u_minQuadSolidAngle;
 uniform vec2 u_opacityLimits;
 // Fixed angular size
 uniform float u_fixedAngularSize;
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
 
 // INPUT
 // Regular attributes
@@ -82,7 +85,12 @@ void main() {
 	float l0 = LEN0 * u_vrScale;
 	float l1 = l0 * 1e3;
 
-    vec3 pos = a_starPos - u_camPos;
+    vec3 particlePos = a_starPos.xyz;
+    if (u_transformFlag) {
+        vec4 aux = u_transform * vec4(particlePos, 1.0);
+        particlePos.xyz = aux.xyz;
+    }
+    vec3 pos = particlePos - u_camPos;
 
     // Proper motion using 64-bit emulated arithmetics:
     // pm = a_pm * t * DAY_TO_YEAR

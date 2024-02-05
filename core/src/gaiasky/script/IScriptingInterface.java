@@ -3140,6 +3140,15 @@ public interface IScriptingInterface {
     boolean showDataset(String dsName);
 
     /**
+     * Sets the given 4x4 matrix (in column-major order) as the transformation matrix to apply
+     * to all the data points in the dataset identified by the given name.
+     * @param dsName The name of the dataset.
+     * @param matrix The 16 values of the 4x4 transformation matrix in column-major order.
+     * @return True if the dataset was found and the transformation matrix could be applied. False otherwise.
+     */
+    boolean setDatasetTransformationMatrix(String dsName, double[] matrix);
+
+    /**
      * Enables or disables the dataset highlight, using a plain color given by the color index:
      * <ul>
      *     <li>0 - blue</li>
@@ -3338,6 +3347,22 @@ public interface IScriptingInterface {
      * @param years The maximum year number to allow.
      */
     void setMaximumSimulationTime(long years);
+
+    /**
+     * Returns the column-major matrix representing the given reference system transformation.
+     * @param name <p>The name of the reference system transformation:
+     *             <ul>
+     *             <li>'equatorialtoecliptic', 'eqtoecl'</li>
+     *             <li>'ecliptictoequatorial', 'ecltoeq'</li>
+     *             <li>'galactictoequatorial', 'galtoeq'</li>
+     *             <li>'equatorialtogalactic', 'eqtogal'</li>
+     *             <li>'ecliptictogalactic', 'ecltogal</li>
+     *             <li>'galactictoecliptic', 'galtoecl</li>
+     *             </ul>
+     *             </p>
+     * @return The transformation matrix in column-major order.
+     */
+    double[] getRefSysTransform(String name);
 
     /**
      * Returns the meter to internal unit conversion factor. Use this factor to multiply

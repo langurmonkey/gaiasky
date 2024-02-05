@@ -11,6 +11,9 @@ uniform float u_sizeFactor;
 uniform int u_cubemap;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
 
 // INPUT
 in vec4 a_position;
@@ -38,7 +41,12 @@ out float v_textureIndex;
 #endif // velocityBufferFlag
 
 void main() {
-    vec3 pos = a_position.xyz - u_camPos;
+    vec3 particlePos = a_position.xyz;
+    if (u_transformFlag) {
+        vec4 aux = u_transform * vec4(particlePos, 1.0);
+        particlePos.xyz = aux.xyz;
+    }
+    vec3 pos = particlePos.xyz - u_camPos;
 
     // Distance to point - watch out, if position contains large values, this produces overflow!
     // Downscale before computing length()

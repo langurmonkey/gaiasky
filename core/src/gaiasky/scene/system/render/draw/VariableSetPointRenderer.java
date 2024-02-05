@@ -218,17 +218,20 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                             alphaSizeBrRc[1] = ((Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
                             shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
-                            // Fixed size
+                            // Fixed size.
                             shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
 
-                            // Days since epoch
-                            // Emulate double with floats, for compatibility
+                            // Days since epoch.
+                            // Emulate double with floats, for compatibility.
                             double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
                             float curRt2 = (float) (curRt - (double) ((float) curRt));
                             shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
                             curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
                             shaderProgram.setUniformf("u_s", (float) curRt);
+
+                            // Affine transformations.
+                            addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
                             try {
                                 curr.mesh.render(shaderProgram, GL20.GL_POINTS);

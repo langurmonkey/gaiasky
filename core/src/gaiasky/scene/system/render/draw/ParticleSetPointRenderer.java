@@ -192,6 +192,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                 shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()),
                                           (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
 
+                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
             }

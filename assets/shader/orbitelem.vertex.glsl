@@ -15,6 +15,9 @@ uniform vec2 u_sizeLimits;
 uniform vec2 u_t;
 // VR scale factor
 uniform float u_vrScale;
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
 
 // INPUT
 in vec4 a_position;
@@ -111,7 +114,12 @@ vec4 keplerToCartesian() {
 
 void main() {
     // Compute position for current time from orbital elements
-    vec4 pos4 = keplerToCartesian() * u_refSysTransform;
+    vec4 pos4;
+    if (u_transformFlag) {
+        pos4 = u_transform * (keplerToCartesian() * u_refSysTransform);
+    } else {
+        pos4 = keplerToCartesian() * u_refSysTransform;
+    }
     vec3 pos = pos4.xyz - u_camPos;
 
     // Distance to point

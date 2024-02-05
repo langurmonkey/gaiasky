@@ -180,17 +180,20 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                 triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                 shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
-                // Fixed size
+                // Fixed size.
                 shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
 
-                // Days since epoch
-                // Emulate double with floats, for compatibility
+                // Days since epoch.
+                // Emulate double with floats, for compatibility.
                 double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
                 float curRt2 = (float) (curRt - (double) ((float) curRt));
                 shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
-                // Opacity limits
+                // Opacity limits.
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
+
+                // Affine transformation.
+                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
                 try {
                     curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numVertices, getCount(render));

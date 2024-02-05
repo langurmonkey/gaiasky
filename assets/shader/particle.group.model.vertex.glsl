@@ -17,6 +17,9 @@ uniform float u_vrScale;
 // time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
 #endif // extendedParticlesFlag
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
 
 // INPUT
 // Regular attributes

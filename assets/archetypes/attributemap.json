@@ -393,6 +393,13 @@
     },
     "AffineTransformations": {
       "description": "Defines arbitrary affine transformations, applied in the order they are defined. See :ref:`affine-transformations` for more information.",
+      "matrix:GenericCatalog": {
+        "description": "A generic 4x4 matrix transform that will be applied to the sequence of affine transformations. The matrix values need to be in column-major order. See :ref:`affine-transformations` for more information.",
+        "units": "Double[16]",
+        "aliases": [
+          "transformMatrix:GenericCatalog"
+        ]
+      },
       "translate": {
         "description": "A translation vector, in internal units (see aliases for other units). See :ref:`affine-transformations` for more information.",
         "units": "Double[3]",

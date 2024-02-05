@@ -199,11 +199,11 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                 shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
-                // Fixed size
+                // Fixed size.
                 shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
 
-                // Days since epoch
-                // Emulate double with floats, for compatibility
+                // Days since epoch.
+                // Emulate double with floats, for compatibility.
                 double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
                 float curRt2 = (float) (curRt - (double) ((float) curRt));
                 shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
@@ -211,7 +211,10 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
                 shaderProgram.setUniformf("u_s", (float) curRt);
 
-                // Opacity limits
+                // Affine transformations.
+                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
+                // Opacity limits.
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
                 try {

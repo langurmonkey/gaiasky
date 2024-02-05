@@ -17,6 +17,9 @@ uniform float u_vrScale;
 // time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
 #endif // extendedParticlesFlag
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
 
 // INPUT
 // Regular attributes
@@ -55,7 +58,12 @@ out float v_textureIndex;
 #endif // velocityBufferFlag
 
 void main() {
-    vec3 pos = (a_particlePos - u_camPos) / u_vrScale;
+    vec3 particlePos = a_particlePos.xyz;
+    if (u_transformFlag) {
+        vec4 aux = u_transform * vec4(particlePos, 1.0);
+        particlePos.xyz = aux.xyz;
+    }
+    vec3 pos = (particlePos - u_camPos) / u_vrScale;
 
     #ifdef extendedParticlesFlag
     // Apply proper motion if it is not zero.

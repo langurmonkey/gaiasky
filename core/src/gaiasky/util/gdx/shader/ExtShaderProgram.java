@@ -23,6 +23,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengl.GL42;
 
 import java.lang.StringBuilder;
 import java.nio.Buffer;

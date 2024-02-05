@@ -201,7 +201,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 if (graph.children != null && graph.children.size > 0) {
                     refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
                 }
-                if (Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
+                if (graph.children != null && graph.children.size > 0 && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
                     refSysTransform.putIn(aux).inv();
                     refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
                 } else if (refSysTransform != null) {
@@ -211,7 +211,11 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 }
                 shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
 
-                // Relativistic effects
+
+                // Affine transformations.
+                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
+                // Relativistic effects.
                 addEffectsUniforms(shaderProgram, camera);
 
                 try {

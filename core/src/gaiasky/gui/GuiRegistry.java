@@ -736,8 +736,7 @@ public class GuiRegistry implements IObserver {
             flipY = (Boolean) data[4];
         }
         TextureWindow textureWindow;
-        if (data[1] instanceof FrameBuffer) {
-            var frameBuffer = (FrameBuffer) data[1];
+        if (data[1] instanceof FrameBuffer frameBuffer) {
             textureWindow = new TextureWindow(title, skin, stage, frameBuffer, scale);
         } else {
             var texture = (Texture) data[1];

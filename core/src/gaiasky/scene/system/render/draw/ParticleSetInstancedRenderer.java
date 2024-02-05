@@ -273,6 +273,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                               (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                 }
 
+                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
                 try {
                     Gdx.gl30.glEnable(GL30.GL_CULL_FACE);
                     Gdx.gl30.glCullFace(GL30.GL_BACK);

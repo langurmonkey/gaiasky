@@ -208,7 +208,8 @@
             "components": [
                 "DatasetDescription",
                 "Highlight*",
-                "RefSysTransform"
+                "RefSysTransform",
+                "AffineTransformations"
             ],
             "aliases": [
                 "gaiasky.scenegraph.GenericCatalog"
@@ -266,12 +267,9 @@
             ]
         },
         "BillboardGroup": {
-            "parent": "SceneGraphNode",
+            "parent": "GenericCatalog",
             "components": [
                 "BillboardSet",
-                "RefSysTransform",
-                "Label",
-                "Fade",
                 "Coordinates"
             ],
             "aliases": [

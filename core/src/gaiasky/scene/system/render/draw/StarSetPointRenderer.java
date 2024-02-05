@@ -219,6 +219,9 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                         float curRt2 = (float) (curRt - (double) ((float) curRt));
                         shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
+                        // Affine transformation.
+                        addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
                         try {
                             curr.mesh.render(shaderProgram, GL20.GL_POINTS);
                         } catch (IllegalArgumentException e) {

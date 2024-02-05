@@ -3968,7 +3968,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             logger.info(I18n.msg("notif.catalog.loading", dsName));
 
             // Create star/particle group or star clusters
-            if (checkString(dsName, "datasetName")) {
+            if (checkString(dsName, "datasetName") && !checkDatasetName(dsName)) {
                 // Only local files checked.
                 Path path = null;
                 if (ds instanceof FileDataSource) {
@@ -4142,7 +4142,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 sleepFrames(1);
                 return true;
             } else {
-                // No data has been loaded
+                logger.error(dsName + ": invalid or already existing dataset name");
                 return false;
             }
         } catch (Exception e) {
@@ -4154,49 +4154,48 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean hasDataset(String dsName) {
-        if (checkString(dsName, "datasetName")) {
-            return this.catalogManager.contains(dsName);
+        return checkString(dsName, "datasetName") && checkDatasetName(dsName);
+    }
+
+    @Override
+    public boolean setDatasetTransformationMatrix(String dsName, double[] matrix) {
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName) && checkNotNull(matrix, "matrix")) {
+            var ci = catalogManager.get(dsName);
+            if (ci != null && ci.entity != null) {
+                var affine = Mapper.affine.get(ci.entity);
+                if (affine != null) {
+                    affine.clear();
+                    affine.setMatrix(matrix);
+                }
+                return true;
+            }
         }
         return false;
     }
 
     @Override
     public boolean removeDataset(String dsName) {
-        if (checkString(dsName, "datasetName")) {
-            boolean exists = this.catalogManager.contains(dsName);
-            if (exists)
-                postRunnable(() -> EventManager.publish(Event.CATALOG_REMOVE, this, dsName));
-            else
-                logger.warn("Dataset with name " + dsName + " does not exist");
-            return exists;
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
+            postRunnable(() -> EventManager.publish(Event.CATALOG_REMOVE, this, dsName));
+            return true;
         }
         return false;
     }
 
     @Override
     public boolean hideDataset(String dsName) {
-        if (checkString(dsName, "datasetName")) {
-            boolean exists = this.catalogManager.contains(dsName);
-            if (exists) {
-                postRunnable(() -> EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, false));
-            } else {
-                logger.warn("Dataset with name " + dsName + " does not exist");
-            }
-            return exists;
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
+            postRunnable(() -> EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, false));
+            return true;
         }
         return false;
     }
 
     @Override
     public boolean showDataset(String dsName) {
-        if (checkString(dsName, "datasetName")) {
-            boolean exists = this.catalogManager.contains(dsName);
-            if (exists) {
-                postRunnable(() -> EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, true));
-            } else {
-                logger.warn("Dataset with name " + dsName + " does not exist");
-            }
-            return exists;
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
+            postRunnable(() -> EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, true));
+            return true;
         }
         return false;
     }
@@ -4204,15 +4203,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean highlightDataset(String dsName,
                                     boolean highlight) {
-        if (checkString(dsName, "datasetName")) {
-            boolean exists = this.catalogManager.contains(dsName);
-            if (exists) {
-                CatalogInfo ci = this.catalogManager.get(dsName);
-                postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
-            } else {
-                logger.warn("Dataset with name " + dsName + " does not exist");
-            }
-            return exists;
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
+            CatalogInfo ci = this.catalogManager.get(dsName);
+            postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
+            return true;
         }
         return false;
     }
@@ -4232,20 +4226,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                     float b,
                                     float a,
                                     boolean highlight) {
-        if (checkString(dsName, "datasetName")) {
-            boolean exists = this.catalogManager.contains(dsName);
-            if (exists) {
-                CatalogInfo ci = this.catalogManager.get(dsName);
-                ci.plainColor = true;
-                ci.hlColor[0] = r;
-                ci.hlColor[1] = g;
-                ci.hlColor[2] = b;
-                ci.hlColor[3] = a;
-                postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
-            } else {
-                logger.warn("Dataset with name " + dsName + " does not exist");
-            }
-            return exists;
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
+            CatalogInfo ci = this.catalogManager.get(dsName);
+            ci.plainColor = true;
+            ci.hlColor[0] = r;
+            ci.hlColor[1] = g;
+            ci.hlColor[2] = b;
+            ci.hlColor[3] = a;
+            postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
+            return true;
         }
         return false;
     }
@@ -4257,29 +4246,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                     double minMap,
                                     double maxMap,
                                     boolean highlight) {
-        if (checkString(dsName, "datasetName")) {
-            boolean exists = this.catalogManager.contains(dsName);
-            if (exists) {
-                CatalogInfo ci = this.catalogManager.get(dsName);
-                IAttribute attribute = getAttributeByName(attributeName, ci);
-                int cmapIndex = getCmapIndexByName(colorMap);
-                if (attribute != null && cmapIndex >= 0) {
-                    ci.plainColor = false;
-                    ci.hlCmapIndex = cmapIndex;
-                    ci.hlCmapMin = minMap;
-                    ci.hlCmapMax = maxMap;
-                    ci.hlCmapAttribute = attribute;
-                    postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
-                } else {
-                    if (attribute == null)
-                        logger.error("Could not find attribute with name '" + attributeName + "'");
-                    if (cmapIndex < 0)
-                        logger.error("Could not find color map with name '" + colorMap + "'");
-                }
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
+            CatalogInfo ci = this.catalogManager.get(dsName);
+            IAttribute attribute = getAttributeByName(attributeName, ci);
+            int cmapIndex = getCmapIndexByName(colorMap);
+            if (attribute != null && cmapIndex >= 0) {
+                ci.plainColor = false;
+                ci.hlCmapIndex = cmapIndex;
+                ci.hlCmapMin = minMap;
+                ci.hlCmapMax = maxMap;
+                ci.hlCmapAttribute = attribute;
+                postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
             } else {
-                logger.warn("Dataset with name " + dsName + " does not exist");
+                if (attribute == null)
+                    logger.error("Could not find attribute with name '" + attributeName + "'");
+                if (cmapIndex < 0)
+                    logger.error("Could not find color map with name '" + colorMap + "'");
             }
-            return exists;
+            return true;
         }
         return false;
     }
@@ -4502,7 +4486,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Apply settings.
                 Settings.settings.apply();
                 // Reload UI.
-                em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
+                // em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
             });
         }
         return result;
@@ -4521,6 +4505,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setMaximumSimulationTime(long years) {
         Settings.settings.runtime.setMaxTime(Math.abs(years));
+    }
+
+    @Override
+    public double[] getRefSysTransform(String name) {
+        var mat = Coordinates.getTransformD(name);
+        if (mat != null) {
+            return mat.val;
+        } else {
+            logger.error(name + ": no transformation found with the given name");
+            return null;
+        }
     }
 
     public void setMaximumSimulationTime(double years) {
@@ -4845,6 +4840,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                     double timeOutSeconds) {
         if (getEntity(name, timeOutSeconds) == null) {
             logger.error(name + ": object with this name does not exist");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkDatasetName(String name) {
+        if (!this.catalogManager.contains(name)) {
+            logger.error(name + ": no dataset found with the given name");
             return false;
         }
         return true;

@@ -9,39 +9,67 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.record.*;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 
+import java.util.Vector;
+
+/**
+ * Represents an arbitrarily large sequence of affine transformations as a list of 4x4 matrices.
+ */
 public class AffineTransformations implements Component {
 
     /** Affine transformations, applied each cycle **/
-    public Array<ITransform> transformations;
+    public Vector<ITransform> transformations;
 
-    public void setTransformations(Object[] transformations) {
+    public synchronized void setTransformations(Object[] transformations) {
         initialize();
         for (Object transformation : transformations) {
             this.transformations.add((ITransform) transformation);
         }
     }
 
-    public void initialize() {
+    public synchronized void initialize() {
         if (this.transformations == null) {
-            this.transformations = new Array<>(3);
+            this.transformations = new Vector<>(3, 2);
         }
     }
 
-    public void setTranslate(double[] translation) {
+    public synchronized void clear() {
+        if (this.transformations != null) {
+            this.transformations.clear();
+        }
+    }
+
+    public boolean isEmpty() {
+        return transformations == null || transformations.isEmpty();
+    }
+
+    /**
+     * Sets a generic 4x4 transformation matrix in the chain.
+     * @param matrix The matrix values in column-major order.
+     */
+    public synchronized void setMatrix(double[] matrix) {
+        initialize();
+        MatrixTransform mt = new MatrixTransform(matrix);
+        this.transformations.add(mt);
+    }
+
+    public synchronized void setTransformMatrix(double[] matrix) {
+        setMatrix(matrix);
+    }
+
+    public synchronized void setTranslate(double[] translation) {
         initialize();
         TranslateTransform tt = new TranslateTransform();
         tt.setVector(translation);
         this.transformations.add(tt);
     }
 
-    public void setTranslatePc(double[] translation) {
+    public synchronized void setTranslatePc(double[] translation) {
         double[] iu = new double[3];
         iu[0] = translation[0] * Constants.PC_TO_U;
         iu[1] = translation[1] * Constants.PC_TO_U;
@@ -49,7 +77,7 @@ public class AffineTransformations implements Component {
         setTranslate(iu);
     }
 
-    public void setTranslateKm(double[] translation) {
+    public synchronized void setTranslateKm(double[] translation) {
         double[] iu = new double[3];
         iu[0] = translation[0] * Constants.KM_TO_U;
         iu[1] = translation[1] * Constants.KM_TO_U;
@@ -57,43 +85,43 @@ public class AffineTransformations implements Component {
         setTranslate(iu);
     }
 
-    public void setQuaternion(double[] axis, double angle) {
+    public synchronized void setQuaternion(double[] axis, double angle) {
         initialize();
         QuaternionTransform qt = new QuaternionTransform();
         qt.setQuaternion(new Vector3d(axis), angle);
         this.transformations.add(qt);
     }
 
-    public void setQuaternion(QuaternionDouble q) {
+    public synchronized void setQuaternion(QuaternionDouble q) {
         initialize();
         QuaternionTransform qt = new QuaternionTransform();
         qt.setQuaternion(q);
         this.transformations.add(qt);
     }
 
-    public void setRotate(double[] axisDegrees) {
+    public synchronized void setRotate(double[] axisDegrees) {
         initialize();
         RotateTransform rt = new RotateTransform();
-        rt.setAxis(new double[] { axisDegrees[0], axisDegrees[1], axisDegrees[2] });
+        rt.setAxis(new double[]{axisDegrees[0], axisDegrees[1], axisDegrees[2]});
         rt.setAngle(axisDegrees[3]);
         this.transformations.add(rt);
     }
 
-    public void setScale(double[] sc) {
+    public synchronized void setScale(double[] sc) {
         initialize();
         ScaleTransform st = new ScaleTransform();
         st.setScale(sc);
         this.transformations.add(st);
     }
 
-    public void setScale(Double sc) {
+    public synchronized void setScale(Double sc) {
         initialize();
         ScaleTransform st = new ScaleTransform();
-        st.setScale(new double[] { sc, sc, sc });
+        st.setScale(new double[]{sc, sc, sc});
         this.transformations.add(st);
     }
 
-    public Matrix4 apply(Matrix4 mat) {
+    public synchronized Matrix4 apply(Matrix4 mat) {
         if (transformations != null) {
             for (ITransform tr : transformations) {
                 tr.apply(mat);
@@ -102,7 +130,7 @@ public class AffineTransformations implements Component {
         return mat;
     }
 
-    public Matrix4d apply(Matrix4d mat) {
+    public synchronized Matrix4d apply(Matrix4d mat) {
         if (transformations != null) {
             for (ITransform tr : transformations) {
                 tr.apply(mat);
@@ -111,7 +139,7 @@ public class AffineTransformations implements Component {
         return mat;
     }
 
-    public ScaleTransform getScaleTransform() {
+    public synchronized ScaleTransform getScaleTransform() {
         if (this.transformations != null) {
             for (ITransform t : transformations) {
                 if (t instanceof ScaleTransform) {
@@ -122,7 +150,7 @@ public class AffineTransformations implements Component {
         return null;
     }
 
-    public RotateTransform getRotateTransform() {
+    public synchronized RotateTransform getRotateTransform() {
         if (this.transformations != null) {
             for (ITransform t : transformations) {
                 if (t instanceof RotateTransform) {
@@ -133,7 +161,7 @@ public class AffineTransformations implements Component {
         return null;
     }
 
-    public TranslateTransform getTranslateTransform() {
+    public synchronized TranslateTransform getTranslateTransform() {
         if (this.transformations != null) {
             for (ITransform t : transformations) {
                 if (t instanceof TranslateTransform) {

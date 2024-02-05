@@ -121,6 +121,11 @@ public class Coordinates {
         mapf.put("ecliptictogalactic", eclipticToGalacticF);
         mapf.put("ecltogal", eclipticToGalacticF);
 
+        mapd.put("galactictoecliptic", galacticToEcliptic);
+        mapd.put("galtoecl", galacticToEcliptic);
+        mapf.put("galactictoecliptic", galacticToEclipticF);
+        mapf.put("galtoecl", galacticToEclipticF);
+
     }
 
     /**

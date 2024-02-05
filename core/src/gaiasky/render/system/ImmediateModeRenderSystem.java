@@ -8,9 +8,11 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.scene.component.AffineTransformations;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -22,18 +24,20 @@ import java.util.Set;
 
 public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
-    // Offset and count per renderable, if needed
+    // Offset and count per renderable, if needed.
     private final Map<IRenderable, Integer> offsets;
     private final Map<IRenderable, Integer> counts;
     protected int meshIdx;
     protected Array<MeshData> meshes;
     protected MeshData curr;
-    // Auxiliary array that holds vertices temporarily
+    // Auxiliary array that holds vertices temporarily.
     protected float[] tempVerts;
-    // Auxiliary array that holds indices temporarily
+    // Auxiliary array that holds indices temporarily.
     protected int[] tempIndices;
-    // Renderables that are already in the GPU
+    // Render objects that are already in the GPU.
     protected Set<IRenderable> inGpu;
+    // Auxiliary matrix.
+    protected final Matrix4 auxMat = new Matrix4();
 
     protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer,
                                         RenderGroup rg,
@@ -278,6 +282,19 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         public static final int Additional = 20000;
         public static final int OrbitElems1 = 21000;
         public static final int OrbitElems2 = 22000;
+    }
+
+
+
+    protected void addAffineTransformUniforms(ExtShaderProgram program, AffineTransformations affine) {
+        // Arbitrary affine transformations.
+        if (affine != null && !affine.isEmpty()) {
+            program.setUniformi("u_transformFlag", 1);
+            affine.apply(auxMat.idt());
+            program.setUniformMatrix("u_transform", auxMat);
+        } else {
+            program.setUniformi("u_transformFlag", 0);
+        }
     }
 
 }

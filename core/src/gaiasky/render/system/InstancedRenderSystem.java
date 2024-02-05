@@ -16,6 +16,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.AffineTransformations;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Bits;
@@ -456,7 +457,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         curr = meshes.get(mdi);
 
         VertexAttribute[] attributes0 = buildAttributesDivisor0(modelFile == null && modelType.equalsIgnoreCase("quad") ? 2 : 3, modelFile != null,
-                                                                !isWireframe(primitive));
+                !isWireframe(primitive));
         VertexAttribute[] attributes1 = buildAttributesDivisor1(primitive);
         curr.mesh = new IntMesh(true, maxVerts, maxInstances, maxIndices, attributes0, attributes1);
 
@@ -488,7 +489,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     public void renderStud(List<IRenderable> renderables,
                            ICamera camera,
                            double t) {
-        if (renderables.size() > 0) {
+        if (!renderables.isEmpty()) {
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();

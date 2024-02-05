@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -40,6 +41,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -356,6 +358,10 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         }
     }
 
+    private final Matrix4 auxMat = new Matrix4();
+
+    float deg = 0;
+
     private void render(IRenderable renderable,
                         Render render,
                         ICamera camera) {
@@ -363,6 +369,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         float alpha = getAlpha(renderable);
         if (alpha > 0) {
             var fade = Mapper.fade.get(render.entity);
+            var affine = Mapper.affine.get(render.entity);
 
             ExtShaderProgram shaderProgram = getShaderProgram();
 
@@ -377,7 +384,9 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
             addCameraUpCubemapMode(shaderProgram, camera);
             shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha * 1.5f);
             shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
-            double pointScaleFactor = 1.8e7;
+
+            // Arbitrary affine transformations.
+            addAffineTransformUniforms(shaderProgram, affine);
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
@@ -402,6 +411,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     Gdx.gl20.glDepthMask(dataset.depthMask);
 
                     // Specific uniforms
+                    double pointScaleFactor = 1.8e7;
                     shaderProgram.setUniformf("u_maxPointSize", (float) dataset.maxSizes[qualityIndex]);
                     shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", dataset.intensity);
