@@ -25,6 +25,8 @@ import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 import gaiasky.util.validator.TextFieldComparatorValidator;
 
+import java.text.DecimalFormat;
+
 public class DatasetLoadDialog extends GenericDialog {
 
     private final String fileName;
@@ -35,7 +37,7 @@ public class DatasetLoadDialog extends GenericDialog {
     private final float taWidth;
     public OwnCheckBox particles, stars, clusters, variables, fadeIn, fadeOut;
     public OwnTextField dsName, magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
-    public OwnSliderPlus particleSize, colorNoise;
+    public OwnSliderPlus particleSize, colorNoise, minSolidAngle, maxSolidAngle, numLabels;
     public ColorPicker particleColor, labelColor;
     public OwnSelectBox<ComponentTypeBean> componentType;
 
@@ -199,6 +201,12 @@ public class DatasetLoadDialog extends GenericDialog {
         });
         container.add(particleSize).colspan(2).left().padBottom(pad18).row();
 
+        // Min/max solid angle
+        addMinMaxSolidAngle(container);
+
+        // Number of labels
+        addNumberLabels(container);
+
         // Profile falloff
         FloatValidator falloffVal = new FloatValidator(0.3f, 200f);
         profileDecay = new OwnTextField("5.0", skin, falloffVal);
@@ -246,6 +254,9 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Particle color
         addParticleColor(container);
+
+        // Number of labels
+        addNumberLabels(container);
 
         // Label color
         addLabelColor(container);
@@ -327,6 +338,55 @@ public class DatasetLoadDialog extends GenericDialog {
         Table lc = new Table(skin);
         lc.add(labelColor).size(cpSize);
         container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad10).row();
+    }
+
+    private void addNumberLabels(Table container) {
+        // Number of labels
+        numLabels = new OwnSliderPlus(I18n.msg("gui.dsload.numlabels"), Constants.MIN_NUM_LABELS, Constants.MAX_NUM_LABELS, Constants.SLIDER_STEP, false, skin);
+        numLabels.setName("number labels");
+        numLabels.setWidth(sliderWidth);
+        numLabels.setValue(80);
+        numLabels.setNumberFormatter( new DecimalFormat("####0"));
+        numLabels.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                updateFrameBuffer();
+                return true;
+            }
+            return false;
+        });
+        container.add(numLabels).colspan(2).left().padBottom(pad18).row();
+    }
+
+    private void addMinMaxSolidAngle(Table container) {
+        // Min solid angle
+        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        minSolidAngle.setName("min solid angle");
+        minSolidAngle.setWidth(sliderWidth);
+        minSolidAngle.setValue(0.0015f);
+        minSolidAngle.setNumberFormatter( new DecimalFormat("####0.####"));
+        minSolidAngle.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                updateFrameBuffer();
+                return true;
+            }
+            return false;
+        });
+        container.add(minSolidAngle).colspan(2).left().padBottom(pad18).row();
+
+        // Max solid angle
+        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        maxSolidAngle.setName("max solid angle");
+        maxSolidAngle.setWidth(sliderWidth);
+        maxSolidAngle.setValue(0.02f);
+        maxSolidAngle.setNumberFormatter( new DecimalFormat("####0.####"));
+        maxSolidAngle.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                updateFrameBuffer();
+                return true;
+            }
+            return false;
+        });
+        container.add(maxSolidAngle).colspan(2).left().padBottom(pad18).row();
     }
 
     private void addFadeAttributes(Table container) {
@@ -440,7 +500,8 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
             datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0);
-            datasetOptions.particleSizeLimits = new double[] { 3.5e-4, 0.002 };
+            datasetOptions.particleSizeLimits = new double[] { minSolidAngle.getValue(), maxSolidAngle.getValue() };
+            datasetOptions.numLabels = (int) numLabels.getValue();
         } else if (clusters.isChecked()) {
             datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
             datasetOptions.ct = componentType.getSelected().ct;
@@ -449,7 +510,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.particleColorNoise = colorNoise != null ? colorNoise.getValue() : 0.0;
             datasetOptions.particleSize = particleSize != null ? particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0) : 1.0;
             datasetOptions.particleSizeLimits = new double[] { 0.0d, 1.57d };
-            datasetOptions.numLabels = 50;
+            datasetOptions.numLabels = 100;
             datasetOptions.modelType = "icosphere";
             datasetOptions.modelPrimitive = "GL_LINES";
         } else if (variables.isChecked()) {

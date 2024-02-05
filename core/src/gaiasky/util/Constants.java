@@ -56,6 +56,8 @@ public class Constants {
     public static final float SLIDER_STEP = 1f;
     /** Default step value for sliders (small). **/
     public static final float SLIDER_STEP_SMALL = 0.1f;
+    /** Default step value for sliders (weeny). **/
+    public static final float SLIDER_STEP_WEENY = 0.0001f;
     /** Default step value for sliders (tiny). **/
     public static final float SLIDER_STEP_TINY = 0.01f;
     public static final float MIN_POINT_SIZE_SCALE = 0.1f;
@@ -167,6 +169,12 @@ public class Constants {
     public final static float MAX_SCREENSHOT_QUALITY = 100f;
     public final static float MIN_PARTICLE_SIZE = 0.5f;
     public final static float MAX_PARTICLE_SIZE = 50f;
+    public final static float MIN_MIN_SOLID_ANGLE = 0.0f;
+    public final static float MAX_MIN_SOLID_ANGLE = 0.005f;
+    public final static float MIN_MAX_SOLID_ANGLE = 0.01f;
+    public final static float MAX_MAX_SOLID_ANGLE = 0.1f;
+    public final static int MIN_NUM_LABELS = 0;
+    public final static int MAX_NUM_LABELS = 300;
     public final static float MIN_COLOR_NOISE = 0.0f;
     public final static float MAX_COLOR_NOISE = 1.0f;
     public final static float MIN_POINTER_GUIDES_WIDTH = 0.5f;

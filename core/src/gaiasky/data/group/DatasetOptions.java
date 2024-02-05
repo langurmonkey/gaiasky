@@ -17,6 +17,7 @@ public class DatasetOptions {
     public double[] particleColor;
     public double particleColorNoise;
     public double particleSize;
+    /** Minimum and maximum solid angle (in radians) to represent each particle. **/
     public double[] particleSizeLimits;
     public String modelType = "quad";
     public String modelPrimitive = "GL_TRIANGLES";
@@ -86,7 +87,7 @@ public class DatasetOptions {
         datasetOptions.particleColor = particleColor;
         datasetOptions.labelColor = labelColor;
         datasetOptions.ct = ct;
-        datasetOptions.particleSizeLimits = new double[] { 0.0, 90.0 };
+        datasetOptions.particleSizeLimits = new double[] { 0.0, 1.57 };
         datasetOptions.fadeIn = fadeIn;
         datasetOptions.fadeOut = fadeOut;
         datasetOptions.modelType = "icosphere";

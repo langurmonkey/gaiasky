@@ -144,7 +144,7 @@ public class EntityUtils {
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
         double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
         double[] particleSizeLimits =
-                datasetOptions == null || datasetOptions.particleSizeLimits == null ? new double[] { 0.1, 6.0 } : datasetOptions.particleSizeLimits;
+                datasetOptions == null || datasetOptions.particleSizeLimits == null ? new double[] { 0.00474, 0.2047 } : datasetOptions.particleSizeLimits;
         double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
         String modelType = datasetOptions == null ? "quad" : datasetOptions.modelType;
         String modelPrimitive = datasetOptions == null ? "GL_TRIANGLES" : datasetOptions.modelPrimitive;
