@@ -45,10 +45,7 @@ import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
@@ -825,7 +822,7 @@ public class GamepadGui extends AbstractGui {
                         // Get currently selected mappings
                         GamepadMappings mappings = new GamepadMappings(controllerName, Path.of(Settings.settings.controls.gamepad.mappingsFile));
                         GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, mappings, stage, skin);
-                        ccw.setAcceptRunnable(() -> {
+                        ccw.setAcceptListener(() -> {
                             if (ccw.savedFile != null) {
                                 // File was saved, reload, select
                                 EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, ccw.savedFile.toAbsolutePath().toString());

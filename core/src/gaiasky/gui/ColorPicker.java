@@ -63,7 +63,7 @@ public class ColorPicker extends ColorPickerAbstract {
                 if ((type == Type.touchDown) && (ie.getButton() == Buttons.LEFT)) {
                     // Launch color picker window
                     ColorPickerDialog cpd = new ColorPickerDialog(name, color, stage, skin);
-                    cpd.setAcceptRunnable(() -> {
+                    cpd.setAcceptListener(() -> {
                         // Set color and run runnable, if any
                         setPickedColor(cpd.color);
                         if (newColorRunnable != null) {

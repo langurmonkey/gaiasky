@@ -1900,7 +1900,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         keyframePrefs.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
-                kpw.setAcceptRunnable(() -> {
+                kpw.setAcceptListener(() -> {
                     if (kpw.camrecFps != null && kpw.camrecFps.isValid()) {
                         camRecFps.setText(kpw.camrecFps.getText());
                     }
@@ -2465,7 +2465,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                         // Get currently selected mappings
                         GamepadMappings cm = new GamepadMappings(controllerName, Path.of(gamepadMappings.getSelected().file));
                         GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, cm, stage, skin);
-                        ccw.setAcceptRunnable(() -> {
+                        ccw.setAcceptListener(() -> {
                             if (ccw.savedFile != null) {
                                 // File was saved, reload, select
                                 reloadGamepadMappings(ccw.savedFile);

@@ -190,7 +190,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 newDirectory.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
                                         NewBookmarkFolderDialog newBookmarkFolderDialog = new NewBookmarkFolderDialog(parent != null ? parent.path.toString() : "/", skin, stage);
-                                        newBookmarkFolderDialog.setAcceptRunnable(() -> {
+                                        newBookmarkFolderDialog.setAcceptListener(() -> {
                                             String folderName = newBookmarkFolderDialog.input.getText();
                                             EventManager.publish(Event.BOOKMARKS_ADD, newDirectory, parent != null ? parent.path.resolve(folderName).toString() : folderName, true);
                                             reloadBookmarksTree();
@@ -279,7 +279,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 newDirectory.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
                                         NewBookmarkFolderDialog nbfd = new NewBookmarkFolderDialog("/", skin, stage);
-                                        nbfd.setAcceptRunnable(() -> {
+                                        nbfd.setAcceptListener(() -> {
                                             String folderName = nbfd.input.getText();
                                             EventManager.publish(Event.BOOKMARKS_ADD, newDirectory, folderName, true);
                                             reloadBookmarksTree();

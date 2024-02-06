@@ -32,28 +32,31 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
     private final Map<String, OwnSliderPlus> scalingMap;
+    private final Map<String, DatasetPreferencesWindow> preferencesMap;
     private final CatalogManager catalogManager;
     private VerticalGroup group;
     private OwnLabel noDatasetsLabel = null;
     private float componentWidth;
+
 
     public DatasetsComponent(final Skin skin,
                              final Stage stage,
                              final CatalogManager catalogManager) {
         super(skin, stage);
         this.catalogManager = catalogManager;
-        groupMap = new HashMap<>();
-        imageMap = new HashMap<>();
-        colorMap = new HashMap<>();
-        scalingMap = new HashMap<>();
+        groupMap = new ConcurrentHashMap<>();
+        imageMap = new ConcurrentHashMap<>();
+        colorMap = new ConcurrentHashMap<>();
+        scalingMap = new ConcurrentHashMap<>();
+        preferencesMap = new ConcurrentHashMap<>();
         EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT,
                 Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
@@ -106,40 +109,46 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     private void showDatasetPreferences(CatalogInfo ci) {
-        var dpw = new DatasetPreferencesWindow(ci, skin, stage);
-        dpw.setVisible(true);
-        dpw.show(stage);
+        if (!preferencesMap.containsKey(ci.name)) {
+            var dpw = new DatasetPreferencesWindow(ci, skin, stage);
+            dpw.setVisible(true);
+            dpw.show(stage);
+            // Add close listener to remove from map.
+            dpw.setCloseListener(() -> {
+                preferencesMap.remove(ci.name, dpw);
+            });
+            preferencesMap.put(ci.name, dpw);
+        }
     }
 
     private void addCatalogInfo(CatalogInfo ci) {
         // Controls
-        HorizontalGroup controls = new HorizontalGroup();
-        controls.space(pad6);
-        OwnImageButton eye = new OwnImageButton(skin, "eye-toggle");
-        eye.setCheckedNoFire(!ci.isVisible(true));
-        eye.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.toggle"), skin));
-        eye.addListener(event -> {
+        Table controls = new Table(skin);
+        OwnImageButton visibilityButton = new OwnImageButton(skin, "eye-toggle");
+        visibilityButton.setCheckedNoFire(!ci.isVisible(true));
+        visibilityButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.toggle"), skin));
+        visibilityButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                setDatasetVisibility(ci, eye, !ci.isVisible(true), eye);
+                setDatasetVisibility(ci, visibilityButton, !ci.isVisible(true), visibilityButton);
                 return true;
             }
             return false;
         });
 
-        OwnImageButton mark = new OwnImageButton(skin, "highlight-ds-s");
-        mark.setCheckedNoFire(ci.highlighted);
-        mark.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight"), skin));
-        mark.addListener(event -> {
+        OwnImageButton highlightButton = new OwnImageButton(skin, "highlight-ds-s");
+        highlightButton.setCheckedNoFire(ci.highlighted);
+        highlightButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight"), skin));
+        highlightButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                setDatasetHighlight(ci, mark, mark.isChecked(), mark);
+                setDatasetHighlight(ci, highlightButton, highlightButton.isChecked(), highlightButton);
                 return true;
             }
             return false;
         });
 
-        OwnImageButton prefs = new OwnImageButton(skin, "prefs");
-        prefs.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.preferences"), skin));
-        prefs.addListener(event -> {
+        OwnImageButton preferencesButton = new OwnImageButton(skin, "prefs");
+        preferencesButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.preferences"), skin));
+        preferencesButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 showDatasetPreferences(ci);
                 return true;
@@ -147,9 +156,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin");
-        rubbish.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.remove"), skin));
-        rubbish.addListener(event -> {
+        ImageButton rubbishButton = new OwnImageButton(skin, "rubbish-bin");
+        rubbishButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.remove"), skin));
+        rubbishButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Remove dataset
                 EventManager.publish(Event.CATALOG_REMOVE, this, ci.name);
@@ -158,13 +167,16 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        imageMap.put(ci.name, new OwnImageButton[]{eye, mark});
-        controls.addActor(eye);
+        imageMap.put(ci.name, new OwnImageButton[]{visibilityButton, highlightButton});
         if (ci.isHighlightable()) {
-            controls.addActor(mark);
-            controls.addActor(prefs);
+            controls.add(visibilityButton).padRight(pad6);
+            controls.add(highlightButton).padRight(pad20);
+            controls.add(preferencesButton).padRight(pad6);
+            controls.add(rubbishButton);
+        } else {
+            controls.add(visibilityButton).padRight(pad20);
+            controls.add(rubbishButton);
         }
-        controls.addActor(rubbish);
 
         // Dataset table
         Table t = new Table(skin);
@@ -197,7 +209,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
         int cap = 20;
         String types = ci.type.toString() + " / " + ci.getCt();
-        OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin);
+        OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin, "grey-large");
         typesLabel.addListener(new OwnTextTooltip(types, skin));
         t.add(typesLabel).colspan(2).left().row();
         String description = ci.description != null ? ci.description : "";
@@ -212,7 +224,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         if (ci.nParticles > 0) {
             t.row();
-            OwnLabel nObjects = new OwnLabel(I18n.msg("gui.objects") + ": " + ci.nParticles, skin);
+            OwnLabel nObjects = new OwnLabel(I18n.msg("gui.objects") + ": " + ci.nParticles, skin, "default-blue");
             String bytes = ci.sizeBytes > 0 ? I18n.msg("gui.size") + ": " + GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "";
             nObjects.addListener(new OwnTextTooltip(nObjects.getText() + ", " + bytes, skin));
             t.add(nObjects).left();
@@ -287,7 +299,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                     @Override
                                     public void changed(ChangeEvent event,
                                                         Actor actor) {
-                                        setDatasetVisibility(ci, eye, !currentVisibility, catalogWidget);
+                                        setDatasetVisibility(ci, visibilityButton, !currentVisibility, catalogWidget);
                                     }
                                 });
                                 datasetContext.addItem(visibility);
@@ -300,7 +312,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                         @Override
                                         public void changed(ChangeEvent event,
                                                             Actor actor) {
-                                            setDatasetHighlight(ci, mark, !currentHighlight, catalogWidget);
+                                            setDatasetHighlight(ci, highlightButton, !currentHighlight, catalogWidget);
                                         }
                                     });
                                     datasetContext.addItem(highlight);

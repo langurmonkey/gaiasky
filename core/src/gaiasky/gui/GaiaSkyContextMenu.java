@@ -136,7 +136,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addShape.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     AddShapeDialog dialog = new AddShapeDialog(I18n.msg("context.shape.new", candidateNameShort), candidate, candidateName, skin, getStage());
-                    dialog.setAcceptRunnable(() -> {
+                    dialog.setAcceptListener(() -> {
                         double size = dialog.units.getSelected().unit.toKm(dialog.size.getDoubleValue(1)) * 2.0;
                         float[] color = dialog.color.getPickedColor();
                         String shape = dialog.shape.getSelected().shape.toString();

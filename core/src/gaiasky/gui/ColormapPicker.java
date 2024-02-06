@@ -132,7 +132,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 if (event.getButton() == Buttons.LEFT) {
                     // Launch color picker window
                     ColorPickerColormapDialog cpd = new ColorPickerColormapDialog(name, color, stage, skin);
-                    cpd.setAcceptRunnable(() -> {
+                    cpd.setAcceptListener(() -> {
                         if (cpd.plainColor.isChecked()) {
                             setPickedColor(cpd.color);
                             if (newColorRunnable != null) {

@@ -63,7 +63,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected float lastPosX = -1, lastPosY = -1;
     protected HorizontalGroup buttonGroup;
     protected boolean enterExit = true, escExit = true;
-    protected Runnable acceptRunnable, cancelRunnable;
+    protected Runnable acceptListener, cancelListener, closeListener;
     // Specific mouse/keyboard listener, if any.
     protected AbstractMouseKbdListener mouseKbdListener;
     // The gamepad listener for this window, if any.
@@ -277,29 +277,29 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 if (ie.getType() == Type.keyUp) {
                     int key = ie.getKeyCode();
                     switch (key) {
-                    case Keys.ESCAPE -> {
-                        if (escExit) {
-                            closeCancel();
+                        case Keys.ESCAPE -> {
+                            if (escExit) {
+                                closeCancel();
+                            }
+                            // Do not propagate to parents
+                            event.stop();
+                            return true;
                         }
-                        // Do not propagate to parents
-                        event.stop();
-                        return true;
-                    }
-                    case Keys.ENTER -> {
-                        if (enterExit) {
-                            closeAccept();
+                        case Keys.ENTER -> {
+                            if (enterExit) {
+                                closeAccept();
+                            }
+                            // Do not propagate to parents
+                            event.stop();
+                            return true;
                         }
-                        // Do not propagate to parents
-                        event.stop();
-                        return true;
-                    }
-                    case Keys.TAB -> {
-                        // Next focus, do nothing
-                        return true;
-                    }
-                    default -> {
-                    }
-                    // Nothing
+                        case Keys.TAB -> {
+                            // Next focus, do nothing
+                            return true;
+                        }
+                        default -> {
+                        }
+                        // Nothing
                     }
                 }
             }
@@ -348,8 +348,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public boolean closeAccept() {
         // Exit
         boolean close = accept();
-        if (acceptRunnable != null) {
-            acceptRunnable.run();
+        if (acceptListener != null) {
+            acceptListener.run();
+        }
+        if (closeListener != null) {
+            closeListener.run();
         }
         if (close) {
             me.hide();
@@ -362,8 +365,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public boolean closeCancel() {
         cancel();
-        if (cancelRunnable != null) {
-            cancelRunnable.run();
+        if (cancelListener != null) {
+            cancelListener.run();
+        }
+        if (closeListener != null) {
+            closeListener.run();
         }
         me.hide();
         return true;
@@ -541,37 +547,51 @@ public abstract class GenericDialog extends CollapsibleWindow {
     /**
      * Adds a horizontal separator to the main content table with the given colspan.
      *
-     * @param colspan The colspan to use.
+     * @param colSpan The column span to use.
      */
-    public void addSeparator(int colspan) {
+    public void addSeparator(int colSpan) {
         if (content != null)
-            content.add(new Separator(skin, "gray")).colspan(colspan).center().growX().padTop(pad18).padBottom(pad18).row();
+            content.add(new Separator(skin, "gray")).colspan(colSpan).center().growX().padTop(pad18).padBottom(pad18).row();
     }
 
     /**
-     * Sets the runnable which runs when accept is clicked.
+     * Sets a listener that runs when accept is clicked.
      *
-     * @param r The runnable.
+     * @param r The listener.
      */
-    public void setAcceptRunnable(Runnable r) {
-        this.acceptRunnable = r;
+    public void setAcceptListener(Runnable r) {
+        this.acceptListener = r;
     }
 
     public boolean hasAcceptRunnable() {
-        return acceptRunnable != null;
+        return acceptListener != null;
     }
 
     /**
-     * Sets the runnable which runs when cancel is clicked.
+     * Sets a listener that runs when cancel is clicked.
      *
-     * @param r The runnable.
+     * @param r The listener.
      */
-    public void setCancelRunnable(Runnable r) {
-        this.cancelRunnable = r;
+    public void setCancelListener(Runnable r) {
+        this.cancelListener = r;
     }
 
     public boolean hasCancelRunnable() {
-        return cancelRunnable != null;
+        return cancelListener != null;
+    }
+
+    /**
+     * Sets a listener that runs when the dialog is closed. It runs when either the accept or the cancel button is
+     * clicked.
+     *
+     * @param r The listener.
+     */
+    public void setCloseListener(Runnable r) {
+        this.closeListener = r;
+    }
+
+    public boolean hasCloseRunnable() {
+        return closeListener != null;
     }
 
     /**

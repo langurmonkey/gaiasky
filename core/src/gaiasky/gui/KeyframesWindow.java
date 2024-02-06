@@ -411,7 +411,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 String suggestedName = lastKeyframeFileName == null ? df.format(new Date()) + "_keyframes.gkf" : lastKeyframeFileName;
                 FileNameWindow fnw = new FileNameWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
-                fnw.setAcceptRunnable(() -> {
+                fnw.setAcceptListener(() -> {
                     if (textField.isValid()) {
                         EventManager.publish(Event.KEYFRAMES_FILE_SAVE, fnw, manager.keyframes, textField.getText());
                         lastKeyframeFileName = textField.getText();
@@ -438,7 +438,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 String suggestedName = df.format(new Date()) + ".gsc";
                 FileNameWindow fnw = new FileNameWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
-                fnw.setAcceptRunnable(() -> {
+                fnw.setAcceptListener(() -> {
                     if (textField.isValid()) {
                         EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, manager.keyframes, textField.getText());
                         notice.clearActor();
@@ -462,7 +462,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         preferences.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
-                kpw.setAcceptRunnable(() -> {
+                kpw.setAcceptListener(() -> {
                     // Resample
                     GaiaSky.postRunnable(() -> {
                         synchronized (view) {
@@ -473,7 +473,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     });
 
                 });
-                kpw.setCancelRunnable(() -> {
+                kpw.setCancelListener(() -> {
 
                 });
                 kpw.show(stage, me.getWidth(), 0);

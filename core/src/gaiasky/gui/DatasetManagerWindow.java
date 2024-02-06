@@ -1297,8 +1297,8 @@ public class DatasetManagerWindow extends GenericDialog {
                         Net.HttpRequest request = copy.get(key).getSecond();
                         Gdx.net.cancelHttpRequest(request);
                     }
-                    if (this.acceptRunnable != null) {
-                        this.acceptRunnable.run();
+                    if (this.acceptListener != null) {
+                        this.acceptListener.run();
                     }
                     return true;
                 }

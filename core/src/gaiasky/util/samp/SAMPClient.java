@@ -262,7 +262,7 @@ public class SAMPClient implements IObserver {
                     logger.error(I18n.msg("notif.error", fileName), e);
                 }
             };
-            dld.setAcceptRunnable(() -> {
+            dld.setAcceptListener(() -> {
                 Thread t = new Thread(doLoad);
                 t.start();
             });

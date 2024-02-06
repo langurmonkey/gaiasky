@@ -115,13 +115,13 @@ public class WelcomeGui extends AbstractGui {
 
         if (DataDescriptorUtils.dataLocationOldVersionDatasetsCheck()) {
             var fsCheck = new DataLocationCheckWindow(I18n.msg("gui.dscheck.title"), skin, stage);
-            fsCheck.setAcceptRunnable(() -> {
+            fsCheck.setAcceptListener(() -> {
                 // Clean old datasets in a thread in the background.
                 GaiaSky.instance.getExecutorService().execute(DataDescriptorUtils::cleanDataLocationOldDatasets);
                 // Continue immediately.
                 continueWelcomeGui();
             });
-            fsCheck.setCancelRunnable(this::continueWelcomeGui);
+            fsCheck.setCancelListener(this::continueWelcomeGui);
             fsCheck.show(stage);
         } else {
             continueWelcomeGui();
@@ -713,7 +713,7 @@ public class WelcomeGui extends AbstractGui {
     private void addDatasetManagerWindow(DataDescriptor dd) {
         if (datasetManager == null) {
             datasetManager = new DatasetManagerWindow(stage, skin, dd);
-            datasetManager.setAcceptRunnable(() -> {
+            datasetManager.setAcceptListener(() -> {
                 if (datasetManager != null) {
                     // Run with slight delay to wait for hide animation.
                     Timer.schedule(new Task() {

@@ -215,7 +215,7 @@ public class FileChooser extends GenericDialog {
             newDirectory.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     NewDirectoryDialog newDirectoryDialog = new NewDirectoryDialog(skin, stage);
-                    newDirectoryDialog.setAcceptRunnable(() -> {
+                    newDirectoryDialog.setAcceptListener(() -> {
                         if (newDirectoryDialog.name.isValid()) {
                             String newName = newDirectoryDialog.getNewDirectoryName();
                             Path newDir = currentDir.resolve(newName);

@@ -340,7 +340,7 @@ public class GuiRegistry implements IObserver {
                             if (Settings.settings.program.exitConfirmation) {
                                 QuitWindow quit = new QuitWindow(stage, skin);
                                 if (data.length > 0) {
-                                    quit.setAcceptRunnable(quitRunnable);
+                                    quit.setAcceptListener(quitRunnable);
                                 }
                                 quit.show(stage);
                             } else {
@@ -462,7 +462,7 @@ public class GuiRegistry implements IObserver {
                                                 }
                                             });
                                         };
-                                        dld.setAcceptRunnable(doLoad);
+                                        dld.setAcceptListener(doLoad);
                                         dld.show(stage);
                                     }
 
