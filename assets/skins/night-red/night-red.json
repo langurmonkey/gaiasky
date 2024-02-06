@@ -796,6 +796,9 @@
     "clear": {
       "imageUp": "clear",
       "imageChecked": "clear-down"
+    },
+    "filter": {
+      "imageUp": "iconic-crop"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {

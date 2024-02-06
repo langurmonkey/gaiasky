@@ -21,10 +21,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.ColorPicker;
-import gaiasky.gui.ColorPickerAbstract;
-import gaiasky.gui.ColormapPicker;
-import gaiasky.gui.DatasetPreferencesWindow;
+import gaiasky.gui.*;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -41,6 +38,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, ColorPickerAbstract> colorMap;
     private final Map<String, OwnSliderPlus> scalingMap;
     private final Map<String, DatasetPreferencesWindow> preferencesMap;
+    private final Map<String, DatasetFiltersWindow> filtersMap;
     private final CatalogManager catalogManager;
     private VerticalGroup group;
     private OwnLabel noDatasetsLabel = null;
@@ -57,6 +55,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         colorMap = new ConcurrentHashMap<>();
         scalingMap = new ConcurrentHashMap<>();
         preferencesMap = new ConcurrentHashMap<>();
+        filtersMap = new ConcurrentHashMap<>();
         EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT,
                 Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
@@ -108,6 +107,19 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
+    private void showDatasetFilters(CatalogInfo ci) {
+        if (!filtersMap.containsKey(ci.name)) {
+            var dfw = new DatasetFiltersWindow(ci, skin, stage);
+            dfw.setVisible(true);
+            dfw.show(stage);
+            // Add close listener to remove from map.
+            dfw.setCloseListener(() -> {
+                filtersMap.remove(ci.name, dfw);
+            });
+            filtersMap.put(ci.name, dfw);
+        }
+    }
+
     private void showDatasetPreferences(CatalogInfo ci) {
         if (!preferencesMap.containsKey(ci.name)) {
             var dpw = new DatasetPreferencesWindow(ci, skin, stage);
@@ -146,6 +158,16 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        OwnImageButton filtersButton = new OwnImageButton(skin, "filter");
+        filtersButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.filter"), skin));
+        filtersButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                showDatasetFilters(ci);
+                return true;
+            }
+            return false;
+        });
+
         OwnImageButton preferencesButton = new OwnImageButton(skin, "prefs");
         preferencesButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.preferences"), skin));
         preferencesButton.addListener(event -> {
@@ -170,7 +192,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         imageMap.put(ci.name, new OwnImageButton[]{visibilityButton, highlightButton});
         if (ci.isHighlightable()) {
             controls.add(visibilityButton).padRight(pad6);
-            controls.add(highlightButton).padRight(pad20);
+            if (ci.hasParticleAttributes()) {
+                controls.add(highlightButton).padRight(pad6);
+                controls.add(filtersButton).padRight(pad20);
+            } else {
+                controls.add(highlightButton).padRight(pad20);
+            }
             controls.add(preferencesButton).padRight(pad6);
             controls.add(rubbishButton);
         } else {
