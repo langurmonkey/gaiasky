@@ -100,7 +100,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
             // Min/max solid angle only for particles.
             addMinMaxSolidAngle(content);
         }
-        content.row();
+        content.padBottom(pad20).row();
 
         // HIGHLIGHT
         content.add(new OwnLabel(I18n.msg("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad18).row();

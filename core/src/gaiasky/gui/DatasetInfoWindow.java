@@ -7,25 +7,14 @@
 
 package gaiasky.gui;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import gaiasky.scene.Mapper;
-import gaiasky.util.*;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.parse.Parser;
-import gaiasky.util.scene2d.OwnCheckBox;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextArea;
-import gaiasky.util.scene2d.OwnTextField;
-import gaiasky.util.validator.FloatValidator;
-import gaiasky.util.validator.IValidator;
-import gaiasky.util.validator.TextFieldComparatorValidator;
+import gaiasky.util.scene2d.*;
 
 /**
  * Dataset preferences dialog.
@@ -70,14 +59,20 @@ public class DatasetInfoWindow extends GenericDialog {
         // Added
         content.add(new OwnLabel(I18n.msg("gui.dataset.loaded"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18);
         content.add(new OwnLabel(ci.loadDateUTC.atZone(Settings.settings.program.timeZone.getTimeZone()).toString(), skin)).top().left().padRight(pad18).padBottom(pad18).row();
-        // Desc.
+        // Description
         String descriptionString = ci.description != null ? ci.description : ci.name;
         OwnTextArea descriptionTextArea = new OwnTextArea(descriptionString, skin, "no-disabled");
-        descriptionTextArea.setWidth(500f);
-        descriptionTextArea.setHeight(200f);
+        descriptionTextArea.setWidth(600f);
         descriptionTextArea.setDisabled(true);
+        float fontHeight = descriptionTextArea.getStyle().font.getLineHeight();
+        descriptionTextArea.offsets();
+        descriptionTextArea.setHeight((descriptionTextArea.getLines() + 3) * fontHeight);
+        descriptionTextArea.clearListeners();
+        OwnScrollPane scroll = new OwnScrollPane(descriptionTextArea, skin, "default-nobg");
+        scroll.setWidth(640f);
+        scroll.setHeight(300f);
         content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18 * 2f);
-        content.add(descriptionTextArea).top().left().padRight(pad18).padBottom(pad18 * 2f).row();
+        content.add(scroll).top().left().padRight(pad18).padBottom(pad18 * 2f).row();
 
     }
 

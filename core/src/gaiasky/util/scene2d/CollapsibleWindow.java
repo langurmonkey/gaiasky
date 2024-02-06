@@ -162,7 +162,7 @@ public class CollapsibleWindow extends OwnWindow {
             float ih = icon.getMinHeight();
 
             x += width - iw - getPadRight();
-            y += height - getPadTop() / 2f;
+            y += height - getPadTop() / 2f + 5f;
             y -= (padTop - ih) / 2f;
 
             icon.draw(batch, x, y, iw, ih);

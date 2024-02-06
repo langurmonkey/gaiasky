@@ -798,7 +798,7 @@
       "imageChecked": "clear-down"
     },
     "filter": {
-      "imageUp": "iconic-crop"
+      "imageUp": "iconic-code"
     },
     "info": {
       "imageUp": "iconic-info"
@@ -808,6 +808,15 @@
     },
     "flash": {
       "imageUp": "iconic-flash"
+    },
+    "bolt": {
+      "imageUp": "iconic-bolt"
+    },
+    "resize": {
+      "imageUp": "iconic-resize-both"
+    },
+    "matrix": {
+      "imageUp": "icon-matrix"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
