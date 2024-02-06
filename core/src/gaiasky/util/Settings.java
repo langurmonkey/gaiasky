@@ -67,7 +67,8 @@ public class Settings extends SettingsObject {
     public static final int SOURCE_VERSION = 3050801;
     /**
      * Assets location for this instance of Gaia Sky.
-     * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the {@link File#getAbsolutePath()} call.
+     * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the
+     * {@link File#getAbsolutePath()} call.
      **/
     public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
@@ -109,6 +110,7 @@ public class Settings extends SettingsObject {
     /**
      * Sets the static reference to {@link Settings} to the given object.
      * This method deactivates and disposes the old settings object, and activates the new one.
+     *
      * @param s The settings object.
      * @return True if the given object is not null, false otherwise.
      */
@@ -213,6 +215,8 @@ public class Settings extends SettingsObject {
     @Override
     public Settings clone() {
         var c = (Settings) super.clone();
+        // Deactivated by default.
+        c.enabled = new AtomicBoolean(false);
 
         if (this.camrecorder != null) {
             c.camrecorder = this.camrecorder.clone();
@@ -256,8 +260,6 @@ public class Settings extends SettingsObject {
         if (this.version != null) {
             c.version = this.version.clone();
         }
-        // Deactivated by default.
-        c.enabled = new AtomicBoolean(false);
         c.initialize();
 
         return c;
@@ -749,7 +751,6 @@ public class Settings extends SettingsObject {
          * internal units.
          *
          * @param value The value in the units represented by this object.
-         *
          * @return The value in internal units.
          */
         public double toInternalUnits(double value) {
@@ -760,7 +761,6 @@ public class Settings extends SettingsObject {
          * Returns the given value, given in internal units, in the units represented by this object.
          *
          * @param internal The value in internal units.
-         *
          * @return The value in the units represented by this object.
          */
         public double fromInternalUnits(double internal) {
@@ -908,8 +908,8 @@ public class Settings extends SettingsObject {
          * Adds the given catalog descriptor file to the list of JSON selected files.
          *
          * @param catalog The catalog descriptor file pointer.
-         *
-         * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not readable, or it is already in the list.
+         * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not
+         * readable, or it is already in the list.
          */
         public boolean addSelectedCatalog(Path catalog) {
             // Look for catalog already existing
@@ -1103,7 +1103,7 @@ public class Settings extends SettingsObject {
         @Override
         public void apply() {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, fpsLimit);
-            EventManager.publish(Event.BACKBUFFER_SCALE_CMD, this, (float) backBufferScale);
+            // EventManager.publish(Event.BACKBUFFER_SCALE_CMD, this, (float) backBufferScale);
 
             fullScreen.apply();
         }
@@ -2423,18 +2423,23 @@ public class Settings extends SettingsObject {
 
         @Override
         public void apply() {
-            EventManager.publish(Event.STEREOSCOPIC_CMD, this, modeStereo.active);
-            EventManager.publish(Event.STEREO_PROFILE_CMD, this, modeStereo.profile.ordinal());
-            EventManager.publish(Event.CUBEMAP_CMD, this, modeCubemap.active, modeCubemap.projection);
             EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, modeCubemap.celestialSphereIndexOfRefraction);
             EventManager.publish(Event.CUBEMAP_RESOLUTION_CMD, this, modeCubemap.faceResolution);
-            EventManager.publish(Event.SHOW_MINIMAP_ACTION, this, minimap.active);
             EventManager.publish(Event.PLANETARIUM_APERTURE_CMD, this, modeCubemap.planetarium.aperture);
-            EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, modeCubemap.planetarium.angle);
             EventManager.publish(Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, this, modeCubemap.planetarium.sphericalMirrorWarp);
+            EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, modeCubemap.planetarium.angle);
             EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointer.guides.active, pointer.guides.color, pointer.guides.width);
             EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, this, recursiveGrid.animate);
-            EventManager.publish(Event.UI_SCALE_CMD, this, ui.scale);
+
+            // Those need to run in the main thread, as they may need the OpenGL context.
+            GaiaSky.postRunnable(() -> {
+                //     EventManager.publish(Event.STEREOSCOPIC_CMD, this, modeStereo.active);
+                //     EventManager.publish(Event.STEREO_PROFILE_CMD, this, modeStereo.profile.ordinal());
+                //     EventManager.publish(Event.CUBEMAP_CMD, this, modeCubemap.active, modeCubemap.projection);
+                EventManager.publish(Event.SHOW_MINIMAP_ACTION, this, minimap.active);
+
+                EventManager.publish(Event.UI_SCALE_CMD, this, ui.scale);
+            });
 
             minimap.apply();
             fileChooser.apply();
@@ -3733,35 +3738,38 @@ public class Settings extends SettingsObject {
 
         @Override
         public void apply() {
-            EventManager.publish(Event.BLOOM_CMD, this, bloom.intensity);
-            EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMask.factor);
-            EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, this, chromaticAberration.amount);
-            EventManager.publish(Event.FILM_GRAIN_CMD, this, filmGrain.intensity);
-            EventManager.publish(Event.LENS_FLARE_CMD, this, lensFlare.strength);
-            EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlow.active);
-            EventManager.publish(Event.SSR_CMD, this, ssr.active);
-            EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.active);
-            EventManager.publish(Event.REPROJECTION_CMD, this, reprojection.active, reprojection.mode);
-            EventManager.publish(Event.BRIGHTNESS_CMD, this, levels.brightness);
-            EventManager.publish(Event.CONTRAST_CMD, this, levels.contrast);
-            EventManager.publish(Event.SATURATION_CMD, this, levels.saturation);
-            EventManager.publish(Event.GAMMA_CMD, this, levels.gamma);
-            EventManager.publish(Event.TONEMAPPING_TYPE_CMD, this, toneMapping.type);
-            EventManager.publish(Event.EXPOSURE_CMD, this, toneMapping.exposure);
-            EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilter);
+            // This needs to run in the main thread because it accesses the OpenGL context.
+            GaiaSky.postRunnable(() -> {
+                EventManager.publish(Event.BLOOM_CMD, this, bloom.intensity);
+                EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMask.factor);
+                EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, this, chromaticAberration.amount);
+                EventManager.publish(Event.FILM_GRAIN_CMD, this, filmGrain.intensity);
+                EventManager.publish(Event.LENS_FLARE_CMD, this, lensFlare.strength);
+                EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlow.active);
+                EventManager.publish(Event.SSR_CMD, this, ssr.active);
+                EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.active);
+                EventManager.publish(Event.REPROJECTION_CMD, this, reprojection.active, reprojection.mode);
+                EventManager.publish(Event.BRIGHTNESS_CMD, this, levels.brightness);
+                EventManager.publish(Event.CONTRAST_CMD, this, levels.contrast);
+                EventManager.publish(Event.SATURATION_CMD, this, levels.saturation);
+                EventManager.publish(Event.GAMMA_CMD, this, levels.gamma);
+                EventManager.publish(Event.TONEMAPPING_TYPE_CMD, this, toneMapping.type);
+                EventManager.publish(Event.EXPOSURE_CMD, this, toneMapping.exposure);
+                EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilter);
 
-            bloom.apply();
-            unsharpMask.apply();
-            chromaticAberration.apply();
-            filmGrain.apply();
-            lensFlare.apply();
-            lightGlow.apply();
-            levels.apply();
-            toneMapping.apply();
-            ssr.apply();
-            motionBlur.apply();
-            reprojection.apply();
-            warpingMesh.apply();
+                bloom.apply();
+                unsharpMask.apply();
+                chromaticAberration.apply();
+                filmGrain.apply();
+                lensFlare.apply();
+                lightGlow.apply();
+                levels.apply();
+                toneMapping.apply();
+                ssr.apply();
+                motionBlur.apply();
+                reprojection.apply();
+                warpingMesh.apply();
+            });
         }
 
 

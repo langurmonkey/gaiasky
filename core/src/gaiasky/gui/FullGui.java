@@ -18,7 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -576,7 +579,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void showMinimapInterface(Stage ui, boolean show) {
-        if (minimapInterface == null) {
+        if (show && minimapInterface == null) {
             minimapInterface = new MinimapInterface(skin, globalResources.getShapeShader(), globalResources.getSpriteShader());
             minimapInterface.setFillParent(true);
             minimapInterface.right().top();
@@ -593,7 +596,7 @@ public class FullGui extends AbstractGui {
                                 Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())));
 
             }
-        } else {
+        } else if (minimapInterface != null) {
             // Remove from ui.
             minimapInterface.addAction(
                     Actions.sequence(
@@ -616,11 +619,11 @@ public class FullGui extends AbstractGui {
     }
 
     public void showMinimapWindow(Stage stage, boolean show) {
-        if (minimapWindow == null)
+        if (show && minimapWindow == null)
             minimapWindow = new MinimapWindow(stage, skin, globalResources.getShapeShader(), globalResources.getSpriteShader());
         if (show)
             minimapWindow.show(stage, graphics.getWidth() - minimapWindow.getWidth(), graphics.getHeight() - minimapWindow.getHeight());
-        else
+        else if (minimapWindow != null)
             minimapWindow.hide();
     }
 

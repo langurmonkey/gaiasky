@@ -175,9 +175,11 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
                 });
             }
             case PLANETARIUM_APERTURE_CMD -> {
-                setPlanetariumAperture((float) data[0]);
                 // Update projection, we may not need -Z anymore!
-                GaiaSky.postRunnable(() -> setProjection(Settings.settings.program.modeCubemap.projection));
+                GaiaSky.postRunnable(() -> {
+                    setPlanetariumAperture((float) data[0]);
+                    setProjection(Settings.settings.program.modeCubemap.projection);
+                });
             }
             case PLANETARIUM_ANGLE_CMD -> setPlanetariumAngle((float) data[0]);
             case INDEXOFREFRACTION_CMD -> GaiaSky.postRunnable(() -> setCelestialSphereIndexOfRefraction((float) data[0]));

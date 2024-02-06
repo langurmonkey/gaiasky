@@ -13,9 +13,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import gaiasky.desktop.GaiaSkyDesktop;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
@@ -43,7 +40,7 @@ import java.util.Properties;
 /**
  * Contains utilities to initialize and manage the Gaia Sky {@link Settings} objects.
  */
-public class SettingsManager implements IObserver {
+public class SettingsManager {
     private static final Logger.Log logger = Logger.getLogger(SettingsManager.class);
 
     public static SettingsManager instance;
@@ -74,8 +71,6 @@ public class SettingsManager implements IObserver {
             initializeMapper();
             settings = mapper.readValue(fis, Settings.class);
 
-            EventManager.instance.subscribe(this, Event.SETTINGS_CHANGE_CMD);
-
         } catch (Exception e) {
             logger.error(e);
         }
@@ -90,8 +85,6 @@ public class SettingsManager implements IObserver {
 
             initializeMapper();
             settings = mapper.readValue(fis, Settings.class);
-
-            EventManager.instance.subscribe(this, Event.SETTINGS_CHANGE_CMD);
 
         } catch (Exception e) {
             logger.error(e);
@@ -179,11 +172,7 @@ public class SettingsManager implements IObserver {
     }
 
     public static boolean setSettingsInstance(Settings settings) {
-        var settingsChanged = Settings.setSettingsReference(settings);
-        if (settingsChanged) {
-            EventManager.publish(Event.SETTINGS_CHANGE_CMD, instance, settings);
-        }
-        return settingsChanged;
+        return Settings.setSettingsReference(settings);
     }
 
     public void setSettingsReference(Settings settings) {
@@ -397,12 +386,5 @@ public class SettingsManager implements IObserver {
         String props = userFolderConfFile.toAbsolutePath().toString();
         System.setProperty("properties.file", props);
         return props;
-    }
-
-    @Override
-    public void notify(Event event, Object source, Object... data) {
-        if (event == Event.SETTINGS_CHANGE_CMD) {
-            settings = (Settings) data[0];
-        }
     }
 }

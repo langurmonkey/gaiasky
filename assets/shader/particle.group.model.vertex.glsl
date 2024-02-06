@@ -62,7 +62,12 @@ out float v_textureIndex;
 #endif // PI
 
 void main() {
-    vec3 pos = (a_particlePos - u_camPos) / u_vrScale;
+    vec3 particlePos = a_particlePos.xyz;
+    if (u_transformFlag) {
+        vec4 aux = u_transform * vec4(particlePos, 1.0);
+        particlePos.xyz = aux.xyz;
+    }
+    vec3 pos = (particlePos - u_camPos) / u_vrScale;
 
     #ifdef extendedParticlesFlag
     // Apply proper motion if it is not zero.

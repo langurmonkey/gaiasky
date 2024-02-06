@@ -4173,6 +4173,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
+    public boolean clearDatasetTransformationMatrix(String dsName) {
+        if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
+            var ci = catalogManager.get(dsName);
+            if (ci != null && ci.entity != null) {
+                var affine = Mapper.affine.get(ci.entity);
+                if (affine != null) {
+                    affine.clear();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean removeDataset(String dsName) {
         if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
@@ -4482,12 +4496,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
         var result = SettingsManager.setSettingsInstance(settingsStack.pop());
         if (result) {
-            postRunnable(() -> {
-                // Apply settings.
-                Settings.settings.apply();
-                // Reload UI.
+            // Apply settings.
+            Settings.settings.apply();
+            // Reload UI.
+            // postRunnable(()->{
                 // em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
-            });
+            // });
         }
         return result;
     }

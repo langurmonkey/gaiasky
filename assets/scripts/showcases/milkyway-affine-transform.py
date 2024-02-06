@@ -14,10 +14,6 @@ gs = gateway.entry_point
 
 duration = 15.0 # in seconds
 
-# Back up current settings to settings stack
-gs.clearSettingsStack()
-gs.backupSettings()
-
 class AngleUpdater(object):
     def __init__(self, gateway, gs):
         self.gateway = gateway
@@ -93,8 +89,6 @@ mat = gateway.jvm.gaiasky.util.math.Matrix4d()
 mat.idt()
 gs.setDatasetTransformationMatrix("Milky Way", mat.getValues())
 
-# Restore settings from stack
-gs.restoreSettings()
 # Exit
 gateway.close()
 gateway.shutdown()

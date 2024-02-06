@@ -27,10 +27,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 
 import java.time.Instant;
 import java.util.*;
@@ -86,7 +83,8 @@ public class ParticleSet implements Component, IDisposable {
 
     /**
      * Model file to use (obj, g3db, g3dj, gltf, glb). If present, modelType and modelParams are ignored.
-     * The model should have only positions (vector-3), normals (vector-3) and texture coordinates (vector-2) as vertex attributes.
+     * The model should have only positions (vector-3), normals (vector-3) and texture coordinates (vector-2) as vertex
+     * attributes.
      * Only the first mesh of the model is used. Textures, lighting and material are ignored.
      */
     public String modelFile;
@@ -225,6 +223,9 @@ public class ParticleSet implements Component, IDisposable {
     // Visibility array with 1 (visible) or 0 (hidden) for each particle.
     public byte[] visibilityArray;
 
+    // Reference to the entity.
+    public Entity entity;
+
     // Is it updating?
     public final AtomicBoolean updating = new AtomicBoolean(false);
 
@@ -233,6 +234,8 @@ public class ParticleSet implements Component, IDisposable {
 
     // Last sort position.
     public Vector3b lastSortCameraPos, cPosD;
+    // Auxiliary matrix.
+    protected final Matrix4d mat = new Matrix4d();
     // Comparator.
     private Comparator<Integer> comp;
 
@@ -635,8 +638,10 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Returns the position of the given object at the given date, if any, in the out vector.
      *
-     * @param date The date at which to get the position. If null, the position is given at the current simulation date.
-     * @param out  The out vector.
+     * @param object The particle record object.
+     * @param date   The date at which to get the position. If null, the position is given at the current simulation
+     *               date.
+     * @param out    The out vector.
      **/
     public Vector3b getAbsolutePosition(IParticleRecord object,
                                         Instant date,
@@ -666,7 +671,12 @@ public class ParticleSet implements Component, IDisposable {
      * Returns the current focus position, if any, in the out vector.
      **/
     public Vector3b getAbsolutePosition(Vector3b out) {
-        return out.set(focusPosition);
+        if(entity != null && Mapper.affine.has(entity)) {
+            IParticleRecord focus = pointData.get(focusIndex);
+            return fetchPosition(focus, null, out, currDeltaYears);
+        } else {
+            return out.set(focusPosition);
+        }
     }
 
     /**
@@ -729,6 +739,16 @@ public class ParticleSet implements Component, IDisposable {
             pm.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
         }
         Vector3d destination = out.set(pb.x(), pb.y(), pb.z());
+        // Apply affine transformations, if any.
+        if (entity != null) {
+            var affine = Mapper.affine.get(entity);
+            if (affine != null && !affine.isEmpty()) {
+                synchronized (mat) {
+                    affine.apply(mat.idt());
+                    destination.mul(mat);
+                }
+            }
+        }
         if (camPos != null && !camPos.hasNaN())
             destination.sub(camPos).add(pm);
         else
@@ -741,13 +761,13 @@ public class ParticleSet implements Component, IDisposable {
      * Fetches the real position of the particle. It will apply the necessary
      * integrations (i.e. proper motion). Arbitrary-precision version.
      *
-     * @param pb         The particle bean
+     * @param pb         The particle bean.
      * @param camPos     The position of the camera. If null, the camera position is
      *                   not subtracted so that the coordinates are given in the global
      *                   reference system instead of the camera reference system.
-     * @param out        The output vector
-     * @param deltaYears The delta years
-     * @return The vector for chaining
+     * @param out        The output vector.
+     * @param deltaYears The delta years.
+     * @return The vector for chaining.
      */
     public Vector3b fetchPosition(IParticleRecord pb,
                                   Vector3b camPos,
@@ -758,6 +778,16 @@ public class ParticleSet implements Component, IDisposable {
             pm.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
         }
         Vector3b destination = out.set(pb.x(), pb.y(), pb.z());
+        // Apply affine transformations, if any.
+        if (entity != null) {
+            var affine = Mapper.affine.get(entity);
+            if (affine != null && !affine.isEmpty()) {
+                synchronized (mat) {
+                    affine.apply(mat.idt());
+                    destination.mul(mat);
+                }
+            }
+        }
         if (camPos != null && !camPos.hasNaN())
             destination.sub(camPos).add(pm);
         else

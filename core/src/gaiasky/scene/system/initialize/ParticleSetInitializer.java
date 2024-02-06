@@ -16,7 +16,6 @@ import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.api.IStarGroupDataProvider;
-import gaiasky.data.group.BinaryDataProvider;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
@@ -43,8 +42,6 @@ import gaiasky.util.math.Vector3b;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -74,12 +71,13 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateParticleSet;
         focus.hitRayConsumer = FocusHit::addHitRayParticleSet;
 
+
         // Initialize particle set
         if (starSet == null) {
-            initializeCommon(base, particleSet, label);
+            initializeCommon(entity, base, particleSet, label);
             initializeParticleSet(entity, particleSet, label, transform);
         } else {
-            initializeCommon(base, starSet, label);
+            initializeCommon(entity, base, starSet, label);
             initializeStarSet(entity, starSet, label, transform);
         }
     }
@@ -134,7 +132,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      * @param set   The set.
      * @param label The label component.
      */
-    private void initializeCommon(Base base,
+    private void initializeCommon(Entity entity,
+                                  Base base,
                                   ParticleSet set,
                                   Label label) {
         if (base.id < 0) {
@@ -149,6 +148,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.proximity = new Proximity(Constants.N_DIR_LIGHTS);
         set.focusPosition = new Vector3b();
         set.focusPositionSph = new Vector2d();
+        set.entity = entity;
 
         // Default epochs, if not set
         if (set.epochJd <= 0) {

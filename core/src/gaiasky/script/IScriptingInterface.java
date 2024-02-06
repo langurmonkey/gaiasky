@@ -3149,6 +3149,13 @@ public interface IScriptingInterface {
     boolean setDatasetTransformationMatrix(String dsName, double[] matrix);
 
     /**
+     * Clears the transformation matrix (if any) in the dataset identified by the given name.
+     * @param dsName The name of the dataset.
+     * @return True if the dataset was found and the transformations cleared.
+     */
+    boolean clearDatasetTransformationMatrix(String dsName);
+
+    /**
      * Enables or disables the dataset highlight, using a plain color given by the color index:
      * <ul>
      *     <li>0 - blue</li>

@@ -218,20 +218,16 @@ public class GuiRegistry implements IObserver {
      * Unregisters a GUI.
      *
      * @param gui The GUI to unregister.
-     * @return True if the GUI was unregistered.
      */
-    public boolean unregisterGui(IGui gui) {
-        return guis.removeValue(gui, true);
+    public void unregisterGui(IGui gui) {
+        guis.removeValue(gui, true);
     }
 
     /**
      * Unregisters all GUIs.
-     *
-     * @return True if operation succeeded.
      */
-    public boolean unregisterAll() {
+    public void unregisterAll() {
         guis.clear();
-        return true;
     }
 
     /**
@@ -630,7 +626,8 @@ public class GuiRegistry implements IObserver {
                         // Remove processor.
                         inputMultiplexer.removeProcessor(current.getGuiStage());
                     } else {
-                        // Add processor.
+                        // Add processor if needed.
+                        inputMultiplexer.removeProcessor(current.getGuiStage());
                         inputMultiplexer.addProcessor(0, current.getGuiStage());
                     }
                 }
@@ -769,8 +766,7 @@ public class GuiRegistry implements IObserver {
     public boolean removeGamepadGui() {
         for (int i = 0; i < guis.size; i++) {
             IGui gui = guis.get(i);
-            if (gui instanceof GamepadGui) {
-                GamepadGui gamepadGui = (GamepadGui) gui;
+            if (gui instanceof GamepadGui gamepadGui) {
                 return gamepadGui.removeGamepadGui();
             }
         }
@@ -780,15 +776,11 @@ public class GuiRegistry implements IObserver {
     /**
      * Cancels the task that removes the information pop-up if it is
      * scheduled.
-     *
-     * @return True if the task was canceled, false if it was not scheduled.
      */
-    private boolean cancelRemovePopupTask() {
+    private void cancelRemovePopupTask() {
         if (removePopup != null && removePopup.isScheduled()) {
             removePopup.cancel();
-            return true;
         }
-        return false;
     }
 
     public boolean removeModeChangePopup() {

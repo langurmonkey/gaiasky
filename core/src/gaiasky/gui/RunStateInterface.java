@@ -102,8 +102,8 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
         switch (event) {
         case INPUT_ENABLED_CMD:
             GaiaSky.postRunnable(() -> {
-                boolean visible = !(boolean) data[0];
-                if (visible) {
+                boolean disabled = !(boolean) data[0];
+                if (disabled) {
                     if (keyboardImgCell.getActor() == null)
                         keyboardImgCell.setActor(keyboardImg);
                 } else {

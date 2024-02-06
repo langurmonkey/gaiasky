@@ -1513,7 +1513,4 @@ public enum Event {
     /** Set the new upscale filter. Contains the new {@link UpscaleFilter} object. **/
     UPSCALE_FILTER_CMD,
 
-    /** Change the settings object. Contains the new settings object. **/
-    SETTINGS_CHANGE_CMD
-
 }
