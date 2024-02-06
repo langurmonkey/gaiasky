@@ -799,6 +799,15 @@
     },
     "filter": {
       "imageUp": "iconic-crop"
+    },
+    "info": {
+      "imageUp": "iconic-info"
+    },
+    "sun": {
+      "imageUp": "iconic-sun"
+    },
+    "flash": {
+      "imageUp": "iconic-flash"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
@@ -998,6 +1007,10 @@
     "default-blue": {
       "font": "ui-23",
       "fontColor": "blue"
+    },
+    "default-scblue": {
+      "font": "ui-23",
+      "fontColor": "sc-blue"
     },
     "default-red": {
       "font": "ui-23",

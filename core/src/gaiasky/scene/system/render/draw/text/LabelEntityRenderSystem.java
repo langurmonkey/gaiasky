@@ -325,7 +325,7 @@ public class LabelEntityRenderSystem {
                     if (view.particleSet.isWireframe()) {
                         textPosition(camera, labelPosition, distToCamera, solidAngle * 0.3e-6, 0);
                     } else {
-                        textPosition(camera, labelPosition, distToCamera, solidAngle * 1e-6, 0);
+                        textPosition(camera, labelPosition, distToCamera, Math.min(view.particleSet.particleSizeLimits[1], solidAngle) * 1e-6, 0);
                     }
 
                     shader.setUniformf("u_viewAngle", solidAngle);

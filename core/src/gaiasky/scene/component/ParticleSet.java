@@ -420,9 +420,20 @@ public class ParticleSet implements Component, IDisposable {
         setFixedAngularSizeRad(Math.toRadians(fixedAngularSizeDeg));
     }
 
+    public void setParticleSizeLimitsDeg(double[] sizeLimits) {
+        sizeLimits[0] = MathUtilsDouble.clamp(sizeLimits[0], 0, 90.0);
+        sizeLimits[1] = MathUtilsDouble.clamp(sizeLimits[1], 0, 90.0);
+        if (sizeLimits[0] > sizeLimits[1])
+            sizeLimits[0] = sizeLimits[1];
+
+        sizeLimits[0] = Math.toRadians(sizeLimits[0]);
+        sizeLimits[1] = Math.toRadians(sizeLimits[1]);
+        this.particleSizeLimits = sizeLimits;
+    }
+
     public void setParticleSizeLimits(double[] sizeLimits) {
-        sizeLimits[0] = MathUtilsDouble.clamp(sizeLimits[0], 0, 90);
-        sizeLimits[1] = MathUtilsDouble.clamp(sizeLimits[1], 0, 90);
+        sizeLimits[0] = MathUtilsDouble.clamp(sizeLimits[0], 0, 1.57);
+        sizeLimits[1] = MathUtilsDouble.clamp(sizeLimits[1], 0, 1.57);
         if (sizeLimits[0] > sizeLimits[1])
             sizeLimits[0] = sizeLimits[1];
         this.particleSizeLimits = sizeLimits;
@@ -671,7 +682,7 @@ public class ParticleSet implements Component, IDisposable {
      * Returns the current focus position, if any, in the out vector.
      **/
     public Vector3b getAbsolutePosition(Vector3b out) {
-        if(entity != null && Mapper.affine.has(entity)) {
+        if (entity != null && Mapper.affine.has(entity)) {
             IParticleRecord focus = pointData.get(focusIndex);
             return fetchPosition(focus, null, out, currDeltaYears);
         } else {

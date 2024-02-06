@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 
 public class OwnTextArea extends TextArea {
-    private float ownwidth = 0f, ownheight = 0f;
+    private float ownWidth = 0f, ownHeight = 0f;
 
     public OwnTextArea(String text, Skin skin) {
         super(text, skin);
@@ -27,27 +27,27 @@ public class OwnTextArea extends TextArea {
 
     @Override
     public void setWidth(float width) {
-        ownwidth = width;
+        ownWidth = width;
         super.setWidth(width);
     }
 
     @Override
     public void setHeight(float height) {
-        ownheight = height;
+        ownHeight = height;
         super.setHeight(height);
     }
 
     @Override
     public void setSize(float width, float height) {
-        ownwidth = width;
-        ownheight = height;
+        ownWidth = width;
+        ownHeight = height;
         super.setSize(width, height);
     }
 
     @Override
     public float getPrefWidth() {
-        if (ownwidth != 0) {
-            return ownwidth;
+        if (ownWidth != 0) {
+            return ownWidth;
         } else {
             return super.getPrefWidth();
         }
@@ -55,8 +55,8 @@ public class OwnTextArea extends TextArea {
 
     @Override
     public float getPrefHeight() {
-        if (ownheight != 0) {
-            return ownheight;
+        if (ownHeight != 0) {
+            return ownHeight;
         } else {
             return super.getPrefHeight();
         }

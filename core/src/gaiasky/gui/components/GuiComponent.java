@@ -19,12 +19,13 @@ public abstract class GuiComponent {
     protected Skin skin;
     protected Stage stage;
 
-    protected float pad20, pad12, pad9, pad8, pad6, pad4, pad3, pad1;
+    protected float pad30, pad20, pad12, pad9, pad8, pad6, pad4, pad3, pad1;
 
     public GuiComponent(Skin skin, Stage stage) {
         this.skin = skin;
         this.stage = stage;
         pad8 = 8f;
+        pad30 = 30.0f;
         pad20 = 20.0f;
         pad12 = 12.8f;
         pad9 = 9.6f;

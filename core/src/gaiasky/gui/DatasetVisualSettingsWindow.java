@@ -14,36 +14,45 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
-import gaiasky.util.*;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.parse.Parser;
-import gaiasky.util.scene2d.OwnCheckBox;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextArea;
-import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 import gaiasky.util.validator.TextFieldComparatorValidator;
 
+import java.text.DecimalFormat;
+
 /**
- * Dataset preferences dialog.
+ * Dataset visual settings dialog.
  */
-public class DatasetPreferencesWindow extends GenericDialog {
-    private static final Logger.Log logger = Logger.getLogger(DatasetPreferencesWindow.class);
+public class DatasetVisualSettingsWindow extends GenericDialog implements IObserver {
+    private static final Logger.Log logger = Logger.getLogger(DatasetVisualSettingsWindow.class);
 
     private final CatalogInfo ci;
     private OwnTextField highlightSizeFactor, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
     private OwnCheckBox allVisible, fadeIn, fadeOut;
-    private final float taWidth;
+    private OwnSliderPlus pointSize, minSolidAngle, maxSolidAngle;
+    private final float taWidth, sliderWidth;
 
-    public DatasetPreferencesWindow(CatalogInfo ci,
-                                    Skin skin,
-                                    Stage stage) {
-        super(I18n.msg("gui.preferences") + " - " + ci.name, skin, stage);
+    private double backupMinSolidAngle, backupMaxSolidAngle;
+
+    public DatasetVisualSettingsWindow(CatalogInfo ci,
+                                       Skin skin,
+                                       Stage stage) {
+        super(I18n.msg("gui.dataset.visuals") + " - " + ci.name, skin, stage);
         this.ci = ci;
         this.taWidth = 800f;
+        this.sliderWidth = 800f;
 
         setAcceptText(I18n.msg("gui.ok"));
         setCancelText(I18n.msg("gui.cancel"));
@@ -51,25 +60,51 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
         // Build
         buildSuper();
+
+        EventManager.instance.subscribe(this, Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
     @Override
     protected void build() {
-        // Name
-        content.add(new OwnLabel(I18n.msg("gui.dataset.name"), skin, "hud-subheader")).right().padRight(pad18).padBottom(pad18);
-        content.add(new OwnLabel(ci.name, skin)).left().padRight(pad18).padBottom(pad18).row();
-        // Type
-        content.add(new OwnLabel(I18n.msg("gui.dataset.type"), skin, "hud-subheader")).right().padRight(pad18).padBottom(pad18);
-        content.add(new OwnLabel(ci.type.toString(), skin)).left().padRight(pad18).padBottom(pad18).row();
-        // Added
-        content.add(new OwnLabel(I18n.msg("gui.dataset.loaded"), skin, "hud-subheader")).right().padRight(pad18).padBottom(pad18);
-        content.add(new OwnLabel(ci.loadDateUTC.atZone(Settings.settings.program.timeZone.getTimeZone()).toString(), skin)).left().padRight(pad18).padBottom(pad18).row();
-        // Desc
-        content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).right().padRight(pad18).padBottom(pad18 * 2f);
-        content.add(new OwnLabel(TextUtils.capString(ci.description != null ? ci.description : ci.name, 55), skin)).left().padRight(pad18).padBottom(pad18 * 2f).row();
+        // PARTICLE ASPECT
+        content.add(new OwnLabel(I18n.msg("gui.dataset.particleaspect"), skin, "hud-header")).left().colspan(2).padBottom(pad18).row();
 
-        // Highlight
+        // Particle size
+        pointSize = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE,
+                Constants.SLIDER_STEP_TINY, skin);
+        pointSize.setWidth(sliderWidth);
+        if (ci.entity != null) {
+            var graph = Mapper.graph.get(ci.entity);
+            var hl = Mapper.highlight.get(ci.entity);
+            if (hl != null) {
+                float pointScaling;
+                if (graph.parent != null && Mapper.octree.has(graph.parent)) {
+                    pointScaling = Mapper.highlight.get(graph.parent).pointscaling * hl.pointscaling;
+                } else {
+                    pointScaling = hl.pointscaling;
+                }
+                pointSize.setMappedValue(pointScaling);
+            }
+        }
+        pointSize.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                double val = pointSize.getMappedValue();
+                EventManager.publish(Event.CATALOG_POINT_SIZE_SCALING_CMD, pointSize, ci.name, val);
+                return true;
+            }
+            return false;
+        });
+        content.add(pointSize).colspan(2).left().top().padBottom(pad18).row();
+
+        if (ci.isParticleSet() && !ci.isStarSet()) {
+            // Min/max solid angle only for particles.
+            addMinMaxSolidAngle(content);
+        }
+        content.row();
+
+        // HIGHLIGHT
         content.add(new OwnLabel(I18n.msg("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad18).row();
+        content.add(new OwnLabel("These settings apply when the dataset is highlighted", skin, "default-scblue")).left().colspan(2).padTop(pad20).padBottom(pad18 * 2f).row();
 
         // Highlight size factor
         IValidator pointSizeValidator = new FloatValidator(Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR);
@@ -82,9 +117,45 @@ public class DatasetPreferencesWindow extends GenericDialog {
         allVisible.setChecked(ci.hlAllVisible);
         content.add(allVisible).left().colspan(2).padBottom(pad18 * 2f).row();
 
-        // Fade
+        // FADE
         addFadeAttributes(content);
 
+    }
+
+    private void addMinMaxSolidAngle(Table container) {
+        var set = Mapper.particleSet.get(ci.entity);
+        backupMinSolidAngle = set.particleSizeLimits[0];
+        backupMaxSolidAngle = set.particleSizeLimits[1];
+
+        // Min solid angle
+        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        minSolidAngle.setName("min solid angle");
+        minSolidAngle.setWidth(sliderWidth);
+        minSolidAngle.setValue((float) set.particleSizeLimits[0]);
+        minSolidAngle.setNumberFormatter(new DecimalFormat("####0.####"));
+        minSolidAngle.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                set.particleSizeLimits[0] = minSolidAngle.getValue();
+                return true;
+            }
+            return false;
+        });
+        container.add(minSolidAngle).top().left().colspan(2).left().padBottom(pad18).row();
+
+        // Max solid angle
+        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        maxSolidAngle.setName("max solid angle");
+        maxSolidAngle.setWidth(sliderWidth);
+        maxSolidAngle.setValue((float) set.particleSizeLimits[1]);
+        maxSolidAngle.setNumberFormatter(new DecimalFormat("####0.####"));
+        maxSolidAngle.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                set.particleSizeLimits[1] = maxSolidAngle.getValue();
+                return true;
+            }
+            return false;
+        });
+        container.add(maxSolidAngle).top().left().colspan(2).left().padBottom(pad18).row();
     }
 
     private void addFadeAttributes(Table container) {
@@ -178,10 +249,10 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
         // Validators
         FloatValidator fadeVal = new FloatValidator(0f, 1e10f);
-        IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeInMax, fadeOutMin, fadeOutMax }, null);
-        IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeOutMin, fadeOutMax }, new OwnTextField[] { fadeInMin });
-        IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeOutMax }, new OwnTextField[] { fadeInMin, fadeInMax });
-        IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal, null, new OwnTextField[] { fadeInMin, fadeInMax, fadeOutMin });
+        IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeInMax, fadeOutMin, fadeOutMax}, null);
+        IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeOutMin, fadeOutMax}, new OwnTextField[]{fadeInMin});
+        IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeOutMax}, new OwnTextField[]{fadeInMin, fadeInMax});
+        IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal, null, new OwnTextField[]{fadeInMin, fadeInMax, fadeOutMin});
 
         // Set them
         fadeInMin.setValidator(fadeInMinVal);
@@ -210,7 +281,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
         if (ci.entity != null) {
             var fade = Mapper.fade.get(ci.entity);
             if (fadeIn.isChecked()) {
-                fade.setFadein(new double[] { fadeInMin.getDoubleValue(0), fadeInMax.getDoubleValue(1e1) });
+                fade.setFadein(new double[]{fadeInMin.getDoubleValue(0), fadeInMax.getDoubleValue(1e1)});
                 if (fade.fadeInMap == null) {
                     fade.setFadeInMap(new double[]{0, 1});
                 }
@@ -218,7 +289,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 fade.setFadein(null);
             }
             if (fadeOut.isChecked()) {
-                fade.setFadeout(new double[] { fadeOutMin.getDoubleValue(1e5), fadeOutMax.getDoubleValue(1e6) });
+                fade.setFadeout(new double[]{fadeOutMin.getDoubleValue(1e5), fadeOutMax.getDoubleValue(1e6)});
                 if (fade.fadeOutMap == null) {
                     fade.setFadeOutMap(new double[]{1, 0});
                 }
@@ -231,10 +302,29 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
     @Override
     protected void cancel() {
+        if (ci.isParticleSet() && !ci.isStarSet()) {
+            // Roll back min/max solid angle only for particles.
+            var set = Mapper.particleSet.get(ci.entity);
+            set.particleSizeLimits[0] = backupMinSolidAngle;
+            set.particleSizeLimits[1] = backupMaxSolidAngle;
+        }
     }
 
     @Override
     public void dispose() {
+
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (isVisible() && pointSize != null && source != pointSize && event == Event.CATALOG_POINT_SIZE_SCALING_CMD) {
+            String datasetName = (String) data[0];
+            double val = (Double) data[1];
+            OwnSliderPlus slider = pointSize;
+            slider.setProgrammaticChangeEvents(false);
+            slider.setMappedValue(val);
+            slider.setProgrammaticChangeEvents(true);
+        }
 
     }
 }

@@ -213,6 +213,20 @@ public class CatalogInfo {
         return false;
     }
 
+    public boolean isParticleSet() {
+        if (this.entity != null) {
+            return Mapper.particleSet.has(entity);
+        }
+        return false;
+    }
+
+    public boolean isStarSet() {
+        if (this.entity != null) {
+            return Mapper.starSet.has(entity);
+        }
+        return false;
+    }
+
     /**
      * Gets the component type of the model object linked to this catalog.
      *

@@ -635,10 +635,11 @@
         ]
       },
       "particleSizeLimits": {
-        "description": "Minimum and maximum solid angle limits of the particles in degrees. They are used as :math:`(dist * tan(\\alpha_{min}), dist * tan(\\alpha_{max}))`. The minimum and maximum values must be in [0,90].",
+        "description": "Minimum and maximum solid angle limits of the particles in radians. They are used as :math:`(dist * tan(\\alpha_{min}), dist * tan(\\alpha_{max}))`. The minimum and maximum values must be in [0,1.57].",
         "units": "Double[2]",
         "aliases": [
-          "particlesizelimits"
+          "particlesizelimits",
+          "particleSizeLimitsDeg"
         ]
       },
       "colorMin": {
@@ -741,10 +742,11 @@
         ]
       },
       "particleSizeLimits:StarGroup": {
-        "description": "Minimum and maximum solid angle limits of the particles, as :math:`(tan(\\alpha_{min}), tan(\\alpha_{max}))`.",
+        "description": "Minimum and maximum solid angle limits of the particles in radians. They are used as :math:`(dist * tan(\\alpha_{min}), dist * tan(\\alpha_{max}))`. The minimum and maximum values must be in [0,1.57].",
         "units": "Double[2]",
         "aliases": [
-          "particlesizelimits:StarGroup"
+          "particlesizelimits:StarGroup",
+          "particleSizeLimitsDeg:StarGroup"
         ]
       },
       "colorMin:StarGroup": {
