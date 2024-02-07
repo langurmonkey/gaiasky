@@ -50,4 +50,15 @@ public class QuaternionTransform implements ITransform {
     public void setQuaternion(double[] xyzw) {
         this.quaternion = new QuaternionDouble(xyzw[0], xyzw[1], xyzw[2], xyzw[3]);
     }
+
+    @Override
+    public ITransform copy() {
+        var c = new QuaternionTransform();
+        if (this.quaternion != null)
+            c.quaternion = new QuaternionDouble(this.quaternion);
+        if (this.quatFloat != null)
+            c.quatFloat = new Quaternion(this.quatFloat);
+
+        return c;
+    }
 }

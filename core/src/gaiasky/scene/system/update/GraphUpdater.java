@@ -25,6 +25,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;

@@ -128,6 +128,10 @@ public class Coordinates {
 
     }
 
+    public static Map<String, Matrix4d> getMap() {
+        return mapd;
+    }
+
     /**
      * Gets the rotation matrix to apply for the given Euler angles &alpha;,
      * &beta; and &gamma;. It applies Ry(&gamma;)*Rz(&beta;)*Ry(&alpha;), so

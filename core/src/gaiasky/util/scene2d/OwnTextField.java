@@ -19,10 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
 import com.badlogic.gdx.utils.Null;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
-import gaiasky.util.validator.CallbackValidator;
-import gaiasky.util.validator.FloatValidator;
-import gaiasky.util.validator.IValidator;
-import gaiasky.util.validator.IntValidator;
+import gaiasky.util.validator.*;
 
 /**
  * Extension of libgdx's text field that incorporates some QOL improvements like built-in validation
@@ -186,8 +183,12 @@ public class OwnTextField extends TextField {
         if (validator != null) {
             if (validator instanceof FloatValidator fv) {
                 addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMinString(), fv.getMaxString()), skin));
+            } else if (validator instanceof DoubleValidator dv) {
+                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", dv.getMinString(), dv.getMaxString()), skin));
             } else if (validator instanceof IntValidator iv) {
                 addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMinString(), iv.getMaxString()), skin));
+            } else if (validator instanceof LongValidator lv) {
+                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", lv.getMinString(), lv.getMaxString()), skin));
             }
             if (validator instanceof CallbackValidator cv) {
                 addValidatorTooltip(cv.getParent());

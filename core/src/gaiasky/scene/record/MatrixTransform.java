@@ -15,36 +15,57 @@ import gaiasky.util.math.Matrix4d;
  */
 public class MatrixTransform implements ITransform {
 
-    private final Matrix4 matFloat;
-    private final Matrix4d matDouble;
+    private Matrix4 matFloat;
+    private Matrix4d matDouble;
+
+    public MatrixTransform() {
+    }
 
     /**
      * Constructs a matrix transform.
+     *
      * @param mat The matrix values in column-major order.
      */
     public MatrixTransform(double[] mat) {
-        this.matDouble = new Matrix4d(mat);
-        this.matFloat = this.matDouble.putIn(new Matrix4());
-
+        setMatrix(mat);
     }
 
     /**
      * Constructs a matrix transform.
+     *
      * @param mat The matrix values in column-major order.
      */
     public MatrixTransform(float[] mat) {
-        this.matDouble = new Matrix4d(mat);
-        this.matFloat = this.matDouble.putIn(new Matrix4());
+        setMatrix(mat);
     }
 
     public MatrixTransform(Matrix4d mat) {
-        this.matDouble = new Matrix4d(mat);
-        this.matFloat = this.matDouble.putIn(new Matrix4());
+        setMatrix(mat);
     }
 
     public MatrixTransform(Matrix4 mat) {
         this.matFloat = new Matrix4(mat);
         this.matDouble = new Matrix4d(this.matFloat.val);
+    }
+
+    public void setMatrix(float[] mat) {
+        this.matDouble = new Matrix4d(mat);
+        this.matFloat = this.matDouble.putIn(new Matrix4());
+    }
+
+    public void setMatrix(Matrix4 mat) {
+        this.matFloat = new Matrix4(mat);
+        this.matDouble = new Matrix4d(this.matFloat.val);
+    }
+
+    public void setMatrix(double[] mat) {
+        this.matDouble = new Matrix4d(mat);
+        this.matFloat = this.matDouble.putIn(new Matrix4());
+    }
+
+    public void setMatrix(Matrix4d mat) {
+        this.matDouble = new Matrix4d(mat);
+        this.matFloat = this.matDouble.putIn(new Matrix4());
     }
 
 
@@ -57,4 +78,28 @@ public class MatrixTransform implements ITransform {
     public void apply(Matrix4d mat) {
         mat.mul(matDouble);
     }
+
+    public boolean isEmpty() {
+        return this.matFloat == null || this.matDouble == null;
+    }
+
+    public Matrix4d getMatDouble() {
+        return matDouble;
+    }
+
+    public Matrix4 getMatFloat() {
+        return matFloat;
+    }
+
+    @Override
+    public ITransform copy() {
+        if (this.matDouble != null) {
+            return new MatrixTransform(this.matDouble.val);
+        } else if (this.matFloat != null) {
+            return new MatrixTransform(this.matFloat.val);
+        } else {
+            return new MatrixTransform();
+        }
+    }
+
 }

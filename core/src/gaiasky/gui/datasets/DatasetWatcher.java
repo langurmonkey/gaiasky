@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.gui.datasets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -24,6 +24,9 @@ import gaiasky.util.scene2d.OwnProgressBar;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.OwnTextIconButton;
 
+/**
+ * This watcher controls and manages the progress and events produced by the download of a dataset.
+ */
 public class DatasetWatcher implements IObserver {
     private final DatasetDesc dataset;
     private final OwnProgressBar progress;
@@ -50,8 +53,7 @@ public class DatasetWatcher implements IObserver {
     @Override
     public void notify(Event event, Object source, Object... data) {
         if (data.length > 0) {
-            if (data[0] instanceof String) {
-                String key = (String) data[0];
+            if (data[0] instanceof String key) {
                 if (dataset.key != null && dataset.key.equals(key)) {
                     // Only respond to my key
                     switch (event) {

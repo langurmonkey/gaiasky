@@ -405,7 +405,8 @@
                 "Highlight*",
                 "Octree*",
                 "Octant*",
-                "TagNoProcessChildren*"
+                "TagNoProcessChildren*",
+                "AffineTransformations"
             ],
             "aliases": [
                 "gaiasky.scenegraph.OctreeWrapper",

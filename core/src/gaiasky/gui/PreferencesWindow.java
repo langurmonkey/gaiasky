@@ -29,6 +29,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.gui.beans.*;
+import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -98,7 +99,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin, recGridStyle;
-    private OwnSelectBox<StrComboBoxBean> theme;
+    private OwnSelectBox<StringComobBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnSelectBox<UpscaleFilter> upscaleFilter;
@@ -1153,9 +1154,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
 
-        StrComboBoxBean[] themes = new StrComboBoxBean[]{new StrComboBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
-                new StrComboBoxBean(I18n.msg("gui.theme.darkblue"), "dark-blue"), new StrComboBoxBean(I18n.msg("gui.theme.darkorange"), "dark-orange"),
-                new StrComboBoxBean(I18n.msg("gui.theme.nightred"), "night-red")};
+        StringComobBoxBean[] themes = new StringComobBoxBean[]{new StringComobBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
+                new StringComobBoxBean(I18n.msg("gui.theme.darkblue"), "dark-blue"), new StringComobBoxBean(I18n.msg("gui.theme.darkorange"), "dark-orange"),
+                new StringComobBoxBean(I18n.msg("gui.theme.nightred"), "night-red")};
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(selectWidth);
         theme.setItems(themes);
@@ -2670,7 +2671,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Interface
         LangComboBoxBean languageBean = lang.getSelected();
-        StrComboBoxBean newTheme = theme.getSelected();
+        StringComobBoxBean newTheme = theme.getSelected();
         // UI scale
         float factor = uiScale.getMappedValue();
         EventManager.publish(Event.UI_SCALE_CMD, this, factor);

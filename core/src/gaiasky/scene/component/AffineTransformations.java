@@ -32,6 +32,10 @@ public class AffineTransformations implements Component {
         }
     }
 
+    public synchronized void setTransformations(Vector<ITransform> transformations) {
+        this.transformations = new Vector<>(transformations);
+    }
+
     public synchronized void initialize() {
         if (this.transformations == null) {
             this.transformations = new Vector<>(3, 2);
@@ -49,7 +53,19 @@ public class AffineTransformations implements Component {
     }
 
     /**
+     * Replace the transformation at the current index with the given one.
+     * @param newTransform The new transformation.
+     * @param index The index.
+     */
+    public void replace(ITransform newTransform, int index) {
+        if(transformations != null && !transformations.isEmpty() && index >= 0 && index < transformations.size()) {
+            transformations.set(index, newTransform);
+        }
+    }
+
+    /**
      * Sets a generic 4x4 transformation matrix in the chain.
+     *
      * @param matrix The matrix values in column-major order.
      */
     public synchronized void setMatrix(double[] matrix) {
@@ -170,5 +186,21 @@ public class AffineTransformations implements Component {
             }
         }
         return null;
+    }
+
+    /**
+     * Produces a deep copy of the current affine transformations object.
+     *
+     * @return A deep copy of this object.
+     */
+    public synchronized AffineTransformations deepCopy() {
+        var copy = new AffineTransformations();
+        if (this.transformations != null) {
+            copy.transformations = new Vector<>(this.transformations.size(), 2);
+            for (var trf : this.transformations) {
+                copy.transformations.add(trf.copy());
+            }
+        }
+        return copy;
     }
 }

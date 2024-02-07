@@ -72,39 +72,44 @@ public class MeshInitializer extends AbstractInitSystem {
         if (mc != null) {
             if (mesh.coordinateSystem == null)
                 mesh.coordinateSystem = new Matrix4();
-            else
-                mesh.coordinateSystem.idt();
 
-            // Put reference system transformation in mesh.coordinateSystem.
-            var transform = Mapper.transform.get(entity);
-            if (transform.matrix != null) {
-                Matrix4 m = new Matrix4();
-                transform.matrix.putIn(m);
-                mesh.coordinateSystem.mul(m);
-            }
-
-            // Apply affine transformations in specific order.
-            var body = Mapper.body.get(entity);
-            var affine = Mapper.affine.get(entity);
-            if (affine != null) {
-                var rotate = affine.getRotateTransform();
-                var scale = affine.getScaleTransform();
-                var translate = affine.getTranslateTransform();
-
-                if (rotate != null) {
-                    rotate.apply(mesh.coordinateSystem);
-                }
-
-                if (translate != null) {
-                    body.pos.set(translate.getVector());
-                    translate.apply(mesh.coordinateSystem);
-                }
-
-                if (scale != null) {
-                    scale.apply(mesh.coordinateSystem);
-                }
-            }
-
+            initializeCoordinateSystem(entity, mesh);
         }
     }
+
+    public static void initializeCoordinateSystem(Entity entity, Mesh mesh) {
+        mesh.coordinateSystem.idt();
+
+        // Put reference system transformation in mesh.coordinateSystem.
+        var transform = Mapper.transform.get(entity);
+        if (transform.matrix != null) {
+            Matrix4 m = new Matrix4();
+            transform.matrix.putIn(m);
+            mesh.coordinateSystem.mul(m);
+        }
+
+        // Apply affine transformations in specific order.
+        var body = Mapper.body.get(entity);
+        var affine = Mapper.affine.get(entity);
+        if (affine != null) {
+            var rotate = affine.getRotateTransform();
+            var scale = affine.getScaleTransform();
+            var translate = affine.getTranslateTransform();
+
+            if (rotate != null) {
+                rotate.apply(mesh.coordinateSystem);
+            }
+
+            if (translate != null) {
+                body.pos.set(translate.getVector());
+                translate.apply(mesh.coordinateSystem);
+            }
+
+            if (scale != null) {
+                scale.apply(mesh.coordinateSystem);
+            }
+        }
+    }
+
+
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.gui.datasets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -31,6 +31,7 @@ import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.GenericDialog;
 import gaiasky.input.WindowGamepadListener;
 import gaiasky.input.WindowKbdListener;
 import gaiasky.util.*;
@@ -68,6 +69,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * The dataset manager. Download, enable, disable and remove datasets.
+ */
 public class DatasetManagerWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(DatasetManagerWindow.class);
 

@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.gui.datasets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.GenericDialog;
 import gaiasky.scene.Mapper;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
@@ -33,7 +34,7 @@ import gaiasky.util.validator.TextFieldComparatorValidator;
 import java.text.DecimalFormat;
 
 /**
- * Dataset visual settings dialog.
+ * Visual settings of a particular dataset.
  */
 public class DatasetVisualSettingsWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(DatasetVisualSettingsWindow.class);
@@ -103,8 +104,8 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         content.padBottom(pad20).row();
 
         // HIGHLIGHT
-        content.add(new OwnLabel(I18n.msg("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad18).row();
-        content.add(new OwnLabel("These settings apply when the dataset is highlighted", skin, "default-scblue")).left().colspan(2).padTop(pad20).padBottom(pad18 * 2f).row();
+        content.add(new OwnLabel(I18n.msg("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padTop(pad34).row();
+        content.add(new OwnLabel(I18n.msg("gui.dataset.highlight.info"), skin, "default-scblue")).left().colspan(2).padTop(pad20).padBottom(pad18 * 2f).row();
 
         // Highlight size factor
         IValidator pointSizeValidator = new FloatValidator(Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR);
@@ -162,7 +163,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         float tfw = 220f;
 
         OwnLabel fadeLabel = new OwnLabel(I18n.msg("gui.dsload.fade"), skin, "hud-header");
-        container.add(fadeLabel).colspan(2).left().padTop(pad20).padBottom(pad18).row();
+        container.add(fadeLabel).colspan(2).left().padTop(pad20).padBottom(pad20).row();
 
         // Info
         String ssInfoStr = I18n.msg("gui.dsload.fade.info") + '\n';
@@ -173,7 +174,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         fadeInfo.setWidth(taWidth);
         fadeInfo.clearListeners();
 
-        container.add(fadeInfo).colspan(2).left().padTop(pad10).padBottom(pad18).row();
+        container.add(fadeInfo).colspan(2).left().padBottom(pad18).row();
 
         // Fade in
         fadeIn = new OwnCheckBox(I18n.msg("gui.dsload.fade.in"), skin, pad10);

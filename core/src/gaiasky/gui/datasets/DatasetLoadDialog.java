@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.gui.datasets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
+import gaiasky.gui.ColorPicker;
+import gaiasky.gui.GenericDialog;
 import gaiasky.gui.beans.ComponentTypeBean;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
@@ -27,6 +29,9 @@ import gaiasky.util.validator.TextFieldComparatorValidator;
 
 import java.text.DecimalFormat;
 
+/**
+ * A dialog that enables the loading of different types of datasets.
+ */
 public class DatasetLoadDialog extends GenericDialog {
 
     private final String fileName;

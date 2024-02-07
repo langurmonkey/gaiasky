@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.gui.DatasetManagerWindow;
+import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 

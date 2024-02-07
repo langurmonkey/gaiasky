@@ -29,4 +29,13 @@ public class TranslateTransform implements ITransform {
     public void setVector(double[] vector) {
         this.vector = vector;
     }
+
+    @Override
+    public ITransform copy() {
+        var c = new TranslateTransform();
+        if (this.vector != null)
+            c.vector = this.vector.clone();
+
+        return c;
+    }
 }

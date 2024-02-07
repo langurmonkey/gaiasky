@@ -7,11 +7,11 @@
 
 package gaiasky.gui.beans;
 
-public class StrComboBoxBean {
+public class StringComobBoxBean {
     public String name;
     public String value;
 
-    public StrComboBoxBean(String name, String value) {
+    public StringComobBoxBean(String name, String value) {
         super();
         this.name = name;
         this.value = value;

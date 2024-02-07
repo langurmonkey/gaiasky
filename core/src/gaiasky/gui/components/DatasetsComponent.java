@@ -22,6 +22,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
+import gaiasky.gui.datasets.DatasetFiltersWindow;
+import gaiasky.gui.datasets.DatasetInfoWindow;
+import gaiasky.gui.datasets.DatasetTransformsWindow;
+import gaiasky.gui.datasets.DatasetVisualSettingsWindow;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -40,6 +44,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, DatasetVisualSettingsWindow> visualSettingsMap;
     private final Map<String, DatasetFiltersWindow> filtersMap;
     private final Map<String, DatasetInfoWindow> infoMap;
+    private final Map<String, DatasetTransformsWindow> transformsMap;
     private final CatalogManager catalogManager;
     private VerticalGroup group;
     private OwnLabel noDatasetsLabel = null;
@@ -58,6 +63,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         visualSettingsMap = new ConcurrentHashMap<>();
         filtersMap = new ConcurrentHashMap<>();
         infoMap = new ConcurrentHashMap<>();
+        transformsMap = new ConcurrentHashMap<>();
         EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT,
                 Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
@@ -148,6 +154,19 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
+    private void showDatasetTransforms(CatalogInfo ci) {
+        if (!transformsMap.containsKey(ci.name)) {
+            var dtw = new DatasetTransformsWindow(ci, skin, stage);
+            dtw.setVisible(true);
+            dtw.show(stage);
+            // Add close listener to remove from map.
+            dtw.setCloseListener(() -> {
+                transformsMap.remove(ci.name, dtw);
+            });
+            transformsMap.put(ci.name, dtw);
+        }
+    }
+
     private void addCatalogInfo(CatalogInfo ci) {
         // Controls
         Table controls = new Table(skin);
@@ -183,21 +202,31 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        OwnImageButton infoButton = new OwnImageButton(skin, "info");
-        infoButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.info"), skin));
-        infoButton.addListener(event -> {
+        OwnImageButton visualSettingsButton = new OwnImageButton(skin, "bolt");
+        visualSettingsButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.visuals"), skin));
+        visualSettingsButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                showDatasetInfo(ci);
+                showDatasetVisualSettings(ci);
                 return true;
             }
             return false;
         });
 
-        OwnImageButton visualSettingsButton = new OwnImageButton(skin, "flash");
-        visualSettingsButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.visuals"), skin));
-        visualSettingsButton.addListener(event -> {
+        OwnImageButton transformsButton = new OwnImageButton(skin, "matrix");
+        transformsButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.transforms"), skin));
+        transformsButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                showDatasetVisualSettings(ci);
+                showDatasetTransforms(ci);
+                return true;
+            }
+            return false;
+        });
+
+        OwnImageButton infoButton = new OwnImageButton(skin, "info");
+        infoButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.info"), skin));
+        infoButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                showDatasetInfo(ci);
                 return true;
             }
             return false;
@@ -218,16 +247,18 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         if (ci.isHighlightable()) {
             controls.add(visibilityButton).padRight(pad6);
             controls.add(highlightButton).padRight(pad30);
+
+            controls.add(visualSettingsButton).padRight(pad6);
             if (ci.hasParticleAttributes()) {
-                controls.add(visualSettingsButton).padRight(pad6);
-                controls.add(filtersButton).padRight(pad30);
-            } else {
-                controls.add(visualSettingsButton).padRight(pad30);
+                controls.add(filtersButton).padRight(pad6);
             }
+            controls.add(transformsButton).padRight(pad30);
+
             controls.add(infoButton).padRight(pad6);
             controls.add(rubbishButton);
         } else {
             controls.add(visibilityButton).padRight(pad30);
+            controls.add(transformsButton).padRight(pad30);
             controls.add(infoButton).padRight(pad6);
             controls.add(rubbishButton);
         }

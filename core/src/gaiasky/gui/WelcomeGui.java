@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.input.GuiKbdListener;
 import gaiasky.util.Logger;

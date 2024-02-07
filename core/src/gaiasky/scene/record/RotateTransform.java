@@ -24,11 +24,30 @@ public class RotateTransform implements ITransform {
         mat.rotate(axis[0], axis[1], axis[2], angle);
     }
 
+
+    public double[] getAxis() {
+        return axis;
+    }
+
     public void setAxis(double[] axis) {
         this.axis = axis;
     }
 
+    public double getAngle() {
+        return angle;
+    }
+
     public void setAngle(Double angle) {
         this.angle = angle;
+    }
+
+    @Override
+    public ITransform copy() {
+        var c = new RotateTransform();
+        if (this.axis != null)
+            c.axis = this.axis.clone();
+        c.angle = this.angle;
+
+        return c;
     }
 }

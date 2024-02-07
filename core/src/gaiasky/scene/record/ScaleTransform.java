@@ -22,7 +22,20 @@ public class ScaleTransform implements ITransform {
         mat.scale(scale[0], scale[1], scale[2]);
     }
 
+    public double[] getScale() {
+        return scale;
+    }
+
     public void setScale(double[] scale) {
         this.scale = scale;
+    }
+
+    @Override
+    public ITransform copy() {
+        var c = new ScaleTransform();
+        if (this.scale != null)
+            c.scale = this.scale.clone();
+
+        return c;
     }
 }

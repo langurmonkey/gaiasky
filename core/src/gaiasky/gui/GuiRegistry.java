@@ -24,6 +24,7 @@ import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.datasets.DatasetLoadDialog;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;

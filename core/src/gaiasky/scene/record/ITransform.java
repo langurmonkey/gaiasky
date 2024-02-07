@@ -14,4 +14,6 @@ public interface ITransform {
     void apply(Matrix4 mat);
 
     void apply(Matrix4d mat);
+
+    ITransform copy();
 }
