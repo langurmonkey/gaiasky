@@ -490,7 +490,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
             CollapsiblePane groupPane = new CollapsiblePane(stage, I18n.msg("gui.download.type." + type.typeStr),
                     contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
-                    null, true, null, buttons);
+                    null, filter != null && !filter.isBlank(), null, buttons);
             leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
             selectionOrder.add(new Pair<>(null, groupPane.getExpandCollapseActor()));
 
