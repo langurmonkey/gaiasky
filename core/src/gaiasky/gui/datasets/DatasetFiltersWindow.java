@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.gui.datasets;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.gui.GenericDialog;
 import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
@@ -29,7 +30,7 @@ import gaiasky.util.ucd.UCD;
 import gaiasky.util.validator.FloatValidator;
 
 /**
- * Dataset filters.
+ * Window to define filters for a dataset.
  */
 public class DatasetFiltersWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetFiltersWindow.class);
@@ -37,6 +38,7 @@ public class DatasetFiltersWindow extends GenericDialog {
     private final CatalogInfo ci;
     private Table filterTable;
     private Filter filter;
+    private OwnTextIconButton addFilterOrRule;
     private boolean filterEdited;
 
     public DatasetFiltersWindow(CatalogInfo ci,
@@ -57,13 +59,56 @@ public class DatasetFiltersWindow extends GenericDialog {
         buildSuper();
     }
 
+    private boolean hasRules() {
+        return filter != null && filter.hasRules();
+    }
+
+    private void updateButtonTextAndTooltip(OwnTextIconButton button) {
+        boolean hasRules = hasRules();
+        button.removeTooltipListeners();
+
+        button.setText(I18n.msg(hasRules ? "gui.dataset.filter.rule.add" : "gui.dataset.filter.add"));
+        button.addListener(new OwnTextTooltip(I18n.msg(hasRules ? "gui.tooltip.dataset.filter.rule.add" : "gui.tooltip.dataset.filter.add"), skin));
+    }
+
     @Override
     protected void build() {
         if (ci.hasParticleAttributes()) {
-            // Filters
+            // Title
             content.add(new OwnLabel(I18n.msg("gui.dataset.filter"), skin, "hud-header")).left().colspan(2).padBottom(pad18).padTop(pad20).row();
+
+            // Button
+            addFilterOrRule = new OwnTextIconButton("", skin, "add");
+            addFilterOrRule.pad(pad18);
+            updateButtonTextAndTooltip(addFilterOrRule);
+            addFilterOrRule.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (hasRules()) {
+                        ((DatasetFiltersWindow) me).addRule(filter);
+                        updateButtonTextAndTooltip(addFilterOrRule);
+                        filterEdited = true;
+                        return true;
+                    } else {
+                        ((DatasetFiltersWindow) me).addFilter();
+                        updateButtonTextAndTooltip(addFilterOrRule);
+                        filterEdited = true;
+                        return true;
+                    }
+                }
+                return false;
+            });
+            content.add(addFilterOrRule).left().padBottom(pad34).row();
+
+            // Filters table
             filterTable = new Table(skin);
-            content.add(filterTable).left().colspan(2).row();
+            filterTable.top().left();
+            var scrollPane = new OwnScrollPane(filterTable, skin, "minimalist-nobg");
+            scrollPane.setScrollbarsVisible(true);
+            scrollPane.setFadeScrollBars(false);
+            scrollPane.setScrollingDisabled(true, false);
+            scrollPane.setWidth(770f);
+            scrollPane.setHeight(500f);
+            content.add(scrollPane).left().colspan(2).row();
 
             filter = ci.filter != null ? ci.filter.deepCopy() : null;
             generateFilterTable(filter);
@@ -207,34 +252,9 @@ public class DatasetFiltersWindow extends GenericDialog {
                 rulesTable.add(rubbish).left().padBottom(pad10).row();
             }
 
-            // New rule button
-            OwnTextIconButton addRule = new OwnTextIconButton(I18n.msg("gui.dataset.filter.rule.add"), skin, "add");
-            addRule.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.filter.rule.add"), skin));
-            addRule.pad(pad18);
-            rulesTable.add(addRule).left().padTop(pad18).row();
-            addRule.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    ((DatasetFiltersWindow) me).addRule(filter);
-                    filterEdited = true;
-                    return true;
-                }
-                return false;
-            });
         } else {
             // Add
             filterTable.add(new OwnLabel(I18n.msg("gui.dataset.filter.nofilters"), skin)).left().padBottom(pad18).row();
-            OwnTextIconButton addFilter = new OwnTextIconButton(I18n.msg("gui.dataset.filter.add"), skin, "add");
-            addFilter.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.filter.add"), skin));
-            addFilter.pad(pad18);
-            filterTable.add(addFilter).left().padBottom(pad10).row();
-            addFilter.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    ((DatasetFiltersWindow) me).addFilter();
-                    filterEdited = true;
-                    return true;
-                }
-                return false;
-            });
         }
         pack();
     }
@@ -245,7 +265,10 @@ public class DatasetFiltersWindow extends GenericDialog {
             boolean removed = filter.removeRule(rule);
             if (removed) {
                 // Reload table
-                GaiaSky.postRunnable(() -> generateFilterTable(filter));
+                GaiaSky.postRunnable(() -> {
+                    generateFilterTable(filter);
+                    updateButtonTextAndTooltip(addFilterOrRule);
+                });
             }
         }
     }

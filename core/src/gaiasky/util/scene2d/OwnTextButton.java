@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Tooltip;
 
 public class OwnTextButton extends TextButton {
 
@@ -102,6 +103,17 @@ public class OwnTextButton extends TextButton {
         this.setProgrammaticChangeEvents(false);
         this.setChecked(isChecked);
         this.setProgrammaticChangeEvents(true);
+    }
+
+    public void removeTooltipListeners() {
+        var listeners = getListeners();
+        listeners.begin();
+        for (int i = 0, n = listeners.size; i < n; i++) {
+            if (listeners.get(i) instanceof Tooltip) {
+                listeners.removeValue(listeners.get(i), true);
+            }
+        }
+        listeners.end();
     }
 
 }
