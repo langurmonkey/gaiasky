@@ -75,11 +75,14 @@ public class DatasetFiltersWindow extends GenericDialog {
     @Override
     protected void build() {
         if (ci.hasParticleAttributes()) {
+            filter = ci.filter != null ? ci.filter.deepCopy() : null;
+
             // Title
             content.add(new OwnLabel(I18n.msg("gui.dataset.filter"), skin, "hud-header")).left().colspan(2).padBottom(pad18).padTop(pad20).row();
 
             // Button
             addFilterOrRule = new OwnTextIconButton("", skin, "add");
+            addFilterOrRule.setSpace(pad18);
             addFilterOrRule.pad(pad18);
             updateButtonTextAndTooltip(addFilterOrRule);
             addFilterOrRule.addListener(event -> {
@@ -111,7 +114,6 @@ public class DatasetFiltersWindow extends GenericDialog {
             scrollPane.setHeight(500f);
             content.add(scrollPane).left().colspan(2).row();
 
-            filter = ci.filter != null ? ci.filter.deepCopy() : null;
             generateFilterTable(filter);
         }
 
