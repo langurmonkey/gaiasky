@@ -20,6 +20,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Logger;
 import gaiasky.util.ObjectDoubleMap;
+import gaiasky.util.TextUtils;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.FilterRule;
 import gaiasky.util.filter.FilterRule.IComparator;
@@ -106,7 +107,7 @@ public class DatasetFiltersWindow extends GenericDialog {
             scrollPane.setScrollbarsVisible(true);
             scrollPane.setFadeScrollBars(false);
             scrollPane.setScrollingDisabled(true, false);
-            scrollPane.setWidth(770f);
+            scrollPane.setWidth(880f);
             scrollPane.setHeight(500f);
             content.add(scrollPane).left().colspan(2).row();
 
@@ -144,7 +145,14 @@ public class DatasetFiltersWindow extends GenericDialog {
 
             for (FilterRule rule : rules) {
                 // UNIT
-                OwnLabel unit = new OwnLabel(rule.getAttribute().getUnit(), skin);
+                var unitStr = rule.getAttribute().getUnit();
+                var unitStrCapped = TextUtils.capString(unitStr, 12);
+
+                OwnLabel unit = new OwnLabel(unitStrCapped, skin);
+                unit.setWidth(120f);
+                if (unitStr.length() > unitStrCapped.length()) {
+                    unit.addListener(new OwnTextTooltip(unitStr, skin));
+                }
 
                 // ATTRIBUTE
                 boolean stars = Mapper.starSet.has(ci.entity) || Mapper.octree.has(ci.entity);
@@ -181,6 +189,13 @@ public class DatasetFiltersWindow extends GenericDialog {
                         }
                     }
                 }
+
+                // Value text field and validator
+                FloatValidator defaultValidator = new FloatValidator(-Float.MAX_VALUE, Float.MAX_VALUE);
+                FloatValidator colorValidator = new FloatValidator(0, 1);
+                boolean useColorVal = rule.getAttribute() instanceof AttributeColorRed || rule.getAttribute() instanceof AttributeColorBlue || rule.getAttribute() instanceof AttributeColorGreen;
+                OwnTextField value = new OwnTextField(Double.toString(rule.getValue()), skin, useColorVal ? colorValidator : defaultValidator);
+
                 OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
                 attribute.setItems(attrs);
                 attribute.setSelected(getAttributeBean(rule.getAttribute(), attrs));
@@ -188,6 +203,12 @@ public class DatasetFiltersWindow extends GenericDialog {
                     if (event instanceof ChangeEvent) {
                         IAttribute newAttr = attribute.getSelected().attr;
                         rule.setAttribute(newAttr);
+                        // Update validator for colors
+                        if (newAttr instanceof AttributeColorRed || newAttr instanceof AttributeColorBlue || newAttr instanceof AttributeColorGreen) {
+                            value.setValidator(colorValidator);
+                        } else {
+                            value.setValidator(defaultValidator);
+                        }
                         // Update unit
                         unit.setText(newAttr.getUnit());
                         filterEdited = true;
@@ -215,8 +236,7 @@ public class DatasetFiltersWindow extends GenericDialog {
                 rulesTable.add(comparator).left().padRight(pad18).padBottom(pad10);
 
                 // VALUE
-                FloatValidator fval = new FloatValidator(-Float.MAX_VALUE, Float.MAX_VALUE);
-                OwnTextField value = new OwnTextField(Double.toString(rule.getValue()), skin, fval);
+                value.setWidth(180f);
                 value.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         if (value.isValid()) {
