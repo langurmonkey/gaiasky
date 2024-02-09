@@ -27,13 +27,11 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
     private final VerticalGroup stack;
     private final float width;
     private final Object lock = new Object();
-    private final Stage stage;
 
-    public LoadProgressInterface(float width, Skin skin, Stage stage) {
+    public LoadProgressInterface(float width, Skin skin) {
         super(skin);
         progress = new ObjectMap<>(10);
         this.skin = skin;
-        this.stage = stage;
         this.stack = new VerticalGroup();
         this.width = width;
         add(this.stack).center();
