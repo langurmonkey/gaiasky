@@ -471,6 +471,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
         Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
 
+        // Initialize array pool.
+        Pools.get(Array.class, 200);
+
         // Initialize timer.
         // Doing this preemptively helps prevent some macOS errors.
         Timer.instance();
