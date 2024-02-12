@@ -7,7 +7,6 @@
 
 package gaiasky.gui;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -15,9 +14,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.scene2d.OwnProgressBar;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class LoadProgressInterface extends TableGuiInterface implements IObserver {
     private static final int MAX_PROGRESS_BARS = 5;
