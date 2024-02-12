@@ -440,6 +440,9 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
         this.size = other.size;
         this.diffuse = other.diffuse;
         this.params = other.params;
+        this.diffuseCubemap = other.diffuseCubemap;
+        this.diffuseSvt = other.diffuseSvt;
+        this.svtParams = other.svtParams;
         this.nc = new NoiseComponent();
         if (other.color != null) {
             this.color = Arrays.copyOf(other.color, other.color.length);
@@ -480,6 +483,9 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
         // SVT.
         if (object.diffuseSvt != null) {
             this.diffuseSvt = object.diffuseSvt;
+        }
+        if (object.svtParams != null) {
+            this.svtParams = object.svtParams;
         }
     }
 }

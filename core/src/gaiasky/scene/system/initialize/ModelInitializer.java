@@ -311,14 +311,19 @@ public class ModelInitializer extends AbstractInitSystem {
         if (Mapper.cloud.has(entity)) {
             var cloud = Mapper.cloud.get(entity);
             if (model.model != null && model.model.mtc != null && cloud.cloud != null) {
-                if (cloud.cloud.diffuse != null && !cloud.cloud.diffuse.endsWith(Constants.GEN_KEYWORD)) {
+                if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
+                    // Cloud shadows unsupported with SVT.
+                    // This is because we can't ensure that the cloud SVT is exactly the same (levels, size, etc.) as the
+                    // main diffuse SVT, and the visibility determination happens only once per layer.
+                    cloud.cloud.diffuse = null;
+                    cloud.cloud.diffuseCubemap = null;
+                    //model.model.mtc.setAoSVT(cloud.cloud.svtParams);
+                    //model.model.mtc.setOcclusionClouds(true);
+                } else if (cloud.cloud.diffuse != null && !cloud.cloud.diffuse.endsWith(Constants.GEN_KEYWORD)) {
                     model.model.mtc.ao = cloud.cloud.diffuse;
                     model.model.mtc.setOcclusionClouds(true);
                 } else if (cloud.cloud.diffuseCubemap != null) {
                     model.model.mtc.setAmbientOcclusionCubemap(cloud.cloud.diffuseCubemap.location);
-                    model.model.mtc.setOcclusionClouds(true);
-                } else if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
-                    model.model.mtc.setAoSVT(cloud.cloud.svtParams);
                     model.model.mtc.setOcclusionClouds(true);
                 }
             }
@@ -346,7 +351,8 @@ public class ModelInitializer extends AbstractInitSystem {
         scaffolding.billboardSizeFactor = 0.6e-3f;
     }
 
-    private void initializePlanet(Base base, Body body, Model model, ModelScaffolding scaffolding, SolidAngle sa, Label label, Atmosphere atmosphere, Cloud cloud) {
+    private void initializePlanet(Base base, Body body, Model model, ModelScaffolding scaffolding, SolidAngle
+            sa, Label label, Atmosphere atmosphere, Cloud cloud) {
         model.renderConsumer = ModelEntityRenderSystem::renderPlanet;
 
         double thPoint = sa.thresholdPoint;
@@ -408,7 +414,8 @@ public class ModelInitializer extends AbstractInitSystem {
      *
      * @param machine The machine definition.
      */
-    private void setToMachine(final MachineDefinition machine, final boolean initialize, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
+    private void setToMachine(final MachineDefinition machine, final boolean initialize, Body body, Model
+            model, ModelScaffolding scaffolding, MotorEngine engine) {
         model.model = machine.getModel();
         engine.thrustMagnitude = machine.getPower() * MotorEngine.thrustBase;
         engine.fullPowerTime = machine.getFullpowertime();
@@ -427,7 +434,8 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    private void initializeAtmosphere(AssetManager manager, AtmosphereComponent atmosphereComponent, ModelComponent modelComponent, float size) {
+    private void initializeAtmosphere(AssetManager manager, AtmosphereComponent atmosphereComponent, ModelComponent
+            modelComponent, float size) {
         if (atmosphereComponent != null) {
             // Initialize atmosphere model
             atmosphereComponent.doneLoading(modelComponent.instance.materials.first(), size);
