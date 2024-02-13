@@ -60,6 +60,10 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * The user interface panel that welcomes the user to Gaia Sky. Contains buttons to access the dataset manager and to
+ * launch Gaia Sky, amongst other controls.
+ */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
 

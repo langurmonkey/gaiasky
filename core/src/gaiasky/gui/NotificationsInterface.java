@@ -34,6 +34,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Displays notifications received via the event system.
+ */
 public class NotificationsInterface extends TableGuiInterface implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";

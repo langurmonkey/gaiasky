@@ -15,6 +15,11 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.scene2d.OwnProgressBar;
 
+/**
+ * This interface includes a number of progress bars to display the progress of arbitrary operations like catalog
+ * loading or procedural asset generation. The communication (creation, update) of the progress bars is done
+ * through the {@link Event#UPDATE_LOAD_PROGRESS} event.
+ */
 public class LoadProgressInterface extends TableGuiInterface implements IObserver {
     private static final int MAX_PROGRESS_BARS = 5;
 

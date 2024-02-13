@@ -16,6 +16,14 @@ import gaiasky.scene.entity.EntityRadio;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * <p>
+ * This is the main manager of events within Gaia Sky. It enables the subscription of {@link IObserver} objects to
+ * specific events, and also the submission of events (optionally delayed).
+ * </p><p>
+ * See {@link Event} for information on the events.
+ * </p>
+ */
 public class EventManager implements IObserver {
 
     /** Singleton pattern **/

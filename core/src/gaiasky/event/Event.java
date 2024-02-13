@@ -15,6 +15,11 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.Cube
 
 import static gaiasky.util.Settings.*;
 
+/**
+ * This enum defines all the events in Gaia Sky. Each event may have data associated with it, which is typically required by
+ * the event listeners. The entry point to the event system functionality (subscription,
+ * posting, etc.) is {@link EventManager}.
+ */
 public enum Event {
 
     /**
@@ -1368,8 +1373,9 @@ public enum Event {
     TOGGLE_VISIBILITY_CMD,
 
     /**
-     * Updates the progress bar with the given name, contains a name and a float value in (0,1)
-     * The progress bar is removed when the value is >= 1.
+     * Updates the progress bar with the given name. Contains the progress bar name and a float value in (0,1)
+     * The progress bar is removed when the value is >= 1, and it is created if the name does not exist and the current
+     * number of progress bars is below the maximum.
      */
     UPDATE_LOAD_PROGRESS,
 
