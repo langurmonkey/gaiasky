@@ -204,8 +204,8 @@ public class GaiaSkyDesktop implements IObserver {
             // Initialize i18n (only for global config logging).
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"));
 
-            // Safe mode active if specified in CLI arg, or in config. Force safe mode for Apple Silicon macOS.
-            if (SysUtils.isAppleSiliconMac() || (cliArgs.safeMode && !Settings.settings.program.safeMode)) {
+            // Safe mode active if specified in CLI arg, or in config.
+            if (cliArgs.safeMode && !Settings.settings.program.safeMode) {
                 Settings.settings.program.safeMode = true;
                 Settings.settings.program.safeModeFlag = true;
             }
