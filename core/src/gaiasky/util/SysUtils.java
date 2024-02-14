@@ -186,7 +186,7 @@ public class SysUtils {
         return mac;
     }
 
-    public static boolean isM1Mac() {
+    public static boolean isAppleSiliconMac() {
         return isMac() && aArch64;
     }
 
