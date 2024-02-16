@@ -17,7 +17,13 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.util.Constants;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL20;
+
+import java.util.Arrays;
 
 public class TrajectoryInitializer extends AbstractInitSystem {
 
@@ -50,6 +56,24 @@ public class TrajectoryInitializer extends AbstractInitSystem {
                         trajectory.providerInstance.initialize(entity, trajectory);
                         trajectory.providerInstance.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, trajectory.numSamples), trajectory.newMethod);
                         verts.pointCloudData = trajectory.providerInstance.getData();
+
+                        // Transform data using affine transformations.
+                        var affine = Mapper.affine.get(entity);
+                        if (affine != null && !affine.isEmpty()) {
+                            var data = verts.pointCloudData;
+                            var v = new Vector3d();
+                            var mat = new Matrix4d();
+                            affine.apply(mat);
+                            for (int i = 0; i < data.getNumPoints(); i++) {
+                                // Get.
+                                data.loadPoint(v, i);
+                                // Transform.
+                                v.mul(mat);
+                                // Set.
+                                data.setPoint(v, i);
+                            }
+
+                        }
                     } catch (Exception e) {
                         logger.error(e);
                     }

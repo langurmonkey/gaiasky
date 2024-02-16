@@ -174,12 +174,17 @@ public class Trajectory implements Component {
         setOrbitProvider(provider);
     }
 
+
     public void setOrbit(OrbitComponent oc) {
         this.oc = oc;
     }
 
-    public void setMultiplier(Double multiplier) {
-        this.multiplier = multiplier;
+    public void setOrbitScaleFactor(Double scaleFactor) {
+        this.multiplier = scaleFactor;
+    }
+
+    public void setMultiplier(Double scaleFactor) {
+        this.setOrbitScaleFactor(scaleFactor);
     }
 
     /**

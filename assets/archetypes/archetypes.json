@@ -178,6 +178,7 @@
             "components": [
                 "Trajectory",
                 "RefSysTransform",
+                "AffineTransformations",
                 "Label"
             ],
             "aliases": [

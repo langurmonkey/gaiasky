@@ -164,6 +164,18 @@ public class PointCloudData {
         z.set(index, value);
     }
 
+    public void setPoint(Vector3d v, int index) {
+        x.set(index, v.x);
+        y.set(index, v.y);
+        z.set(index, v.z);
+    }
+
+    public void setPoint(Vector3b v, int index) {
+        x.set(index, v.x.doubleValue());
+        y.set(index, v.y.doubleValue());
+        z.set(index, v.z.doubleValue());
+    }
+
     public Instant getDate(int index) {
         return time.get(index);
     }
@@ -207,7 +219,6 @@ public class PointCloudData {
      *
      * @param v       The vector to store the result.
      * @param instant The time as an instant.
-     *
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, Instant instant) {
@@ -224,7 +235,6 @@ public class PointCloudData {
      *
      * @param v      The vector
      * @param timeMs The time in milliseconds
-     *
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, long timeMs) {
@@ -287,7 +297,7 @@ public class PointCloudData {
 
         long ep = e - s;
         long cp = c - s;
-        long  wrapCurrentTime = ep > 0 ? ((cp % ep) + ep) % ep : 0;
+        long wrapCurrentTime = ep > 0 ? ((cp % ep) + ep) % ep : 0;
         return wrapCurrentTime + s;
     }
 
@@ -295,7 +305,6 @@ public class PointCloudData {
      * Gets the bounding indices for the given date. If the date is out of range, it wraps.
      *
      * @param instant The date
-     *
      * @return The two indices
      */
     public int getIndex(Instant instant) {

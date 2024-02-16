@@ -279,6 +279,13 @@
         "description": "Override the number of samples to be used for this orbit. Gaia Sky computes the number of samples internally, but in some cases it may be necessary to override it to give orbits more detail.",
         "units": "Integer"
       },
+      "orbitScaleFactor": {
+        "description": "Multiplicative factor to scale the orbit data points when they are being loaded.",
+        "units": "Double",
+        "aliases": [
+          "multiplier"
+        ]
+      },
       "fadeDistanceUp": {
         "description": "Override the distance at which the orbit becomes totally invisible. In internal units. If not overridden, this is computed internally from the radius of the attached body.",
         "units": "Double"

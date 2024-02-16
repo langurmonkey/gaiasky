@@ -145,11 +145,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                                Label label) {
         return base.names != null
                 && renderer.isOn(ComponentTypes.ComponentType.Labels)
-                && (label.forceLabel || FastMath.pow(body.solidAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
-    }
-
-    private float getViewAnglePow() {
-        return 1f;
+                && (label.forceLabel || body.solidAngleApparent >= sa.thresholdLabel);
     }
 
     private boolean isValidPosition(Coordinates coord) {

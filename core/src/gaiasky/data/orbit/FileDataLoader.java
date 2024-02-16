@@ -9,6 +9,7 @@ package gaiasky.data.orbit;
 
 import gaiasky.data.util.PointCloudData;
 import gaiasky.util.Constants;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -17,11 +18,29 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 public class FileDataLoader {
 
     public FileDataLoader() {
         super();
+    }
+
+    /**
+     * Parses the given time and returns the number of milliseconds from the epoch of 1970-01-01T00:00:00Z.
+     *
+     * @param token The token to parse.
+     * @return time as milliseconds from the epoch of 1970-01-01T00:00:00Z
+     */
+    public long parseTime(String token) {
+        try {
+            Timestamp t = Timestamp.valueOf(token.replace('_', ' '));
+            return t.getTime();
+        } catch (Exception e) {
+            // Not a timestamp. Possibly a julian date.
+            double jd = Parser.parseDouble(token);
+            return AstroUtils.julianDateToInstant(jd).toEpochMilli();
+        }
     }
 
     /**
@@ -33,31 +52,27 @@ public class FileDataLoader {
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;
 
-        Timestamp last = new Timestamp(0);
+        long last = 0L;
         while ((line = br.readLine()) != null) {
             line = line.trim();
             if (!line.isBlank() && !line.startsWith("#")) {
                 // Read line
                 String[] tokens = line.split("\\s+");
                 if (tokens.length >= 4) {
-                    // Valid data line
-                    Timestamp t = Timestamp.valueOf(tokens[0].trim().replace('_', ' '));
-                    Matrix4d transform = new Matrix4d();
-                    transform.scl(Constants.KM_TO_U);
-                    if (!t.equals(last)) {
-                        orbitData.time.add(t.toInstant());
+                    // Valid data line.
+                    long t = parseTime(tokens[0].trim());
+                    if (t != last) {
+                        orbitData.time.add(Instant.ofEpochMilli(t));
 
-                        /* From Data coordinates to OpenGL world coordinates
-                         * Z -> -X
-                         * X -> Y
-                         * Y -> Z
-                         */
                         Vector3d pos = new Vector3d(parsed(tokens[1]), parsed(tokens[2]), parsed(tokens[3]));
-                        pos.mul(transform);
+                        // Kilometers to internal units.
+                        pos.scl(Constants.KM_TO_U);
+
                         orbitData.x.add(pos.x);
                         orbitData.y.add(pos.y);
                         orbitData.z.add(pos.z);
-                        last.setTime(t.getTime());
+
+                        last = t;
                     }
                 }
             }

@@ -18,6 +18,9 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
@@ -100,9 +103,22 @@ public class RaymarchingInitializer extends AbstractInitSystem {
                 } else {
                     EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[]{1f, 0f, 0f, 0f});
                 }
+
+                // Set up label
+                var label = Mapper.label.get(entity);
+                var sa = Mapper.sa.get(entity);
+                sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * 60.0;
+                label.textScale = 0.2f;
+                label.labelMax = 1f;
+                if (label.labelFactor == 0)
+                    label.labelFactor = (float) (0.5e-3f * Constants.DISTANCE_SCALE_FACTOR);
+                label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
+                label.renderFunction = LabelView::renderTextBase;
             } else {
                 raymarching.raymarchingShader = null;
             }
+
         }
+
     }
 }

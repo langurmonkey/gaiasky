@@ -9,7 +9,14 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Body;
+import gaiasky.scene.component.Label;
+import gaiasky.scene.component.SolidAngle;
+import net.jafama.FastMath;
 
 public class RaymarchingExtractor extends AbstractExtractSystem {
 
@@ -20,8 +27,26 @@ public class RaymarchingExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var rm = Mapper.raymarching.get(entity);
-
-        if (rm != null && rm.raymarchingShader != null)
+        if (rm != null && rm.raymarchingShader != null) {
             camera.checkClosestBody(entity);
+        }
+        // Label rendering.
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var sa = Mapper.sa.get(entity);
+        var render = Mapper.render.get(entity);
+        var label = Mapper.label.get(entity);
+        if (renderText(base, body, sa, label)) {
+            addToRender(render, RenderGroup.FONT_LABEL);
+        }
+    }
+
+    private boolean renderText(Base base,
+                               Body body,
+                               SolidAngle sa,
+                               Label label) {
+        return base.names != null
+                && mustRender(base)
+                && (label.forceLabel || body.solidAngleApparent >= sa.thresholdLabel);
     }
 }
