@@ -40,7 +40,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         label.label = true;
         label.textScale = 3;
         label.labelMax = (float) (2e-3 / Constants.DISTANCE_SCALE_FACTOR);
-        label.labelFactor = 1;
+        label.labelFactor = 0.6f;
         label.renderConsumer = LabelEntityRenderSystem::renderBillboardSet;
         label.renderFunction = LabelView::renderTextBase;
         label.depthBufferConsumer = LabelView::noTextDepthBuffer;
