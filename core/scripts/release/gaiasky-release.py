@@ -111,13 +111,13 @@ def gen_downloads_table(gsfolder):
     for line in fin:
         # Substitute version and revision.
         line = line.replace('${VERSION_FLAT}', version_underscore).replace('${VERSION_REVISION}', version_rev)
-        line = line.replace('${SHA256_DEB}', shamap['deb'])
-        line = line.replace('${SHA256_RPM}', shamap['rpm'])
-        line = line.replace('${SHA256_SH}', shamap['sh'])
-        line = line.replace('${SHA256_APPIMAGE}', shamap['appimage'])
-        line = line.replace('${SHA256_WIN}', shamap['exe'])
-        line = line.replace('${SHA256_DMG}', shamap['dmg'])
-        line = line.replace('${SHA256_TAR}', shamap['gz'])
+        #line = line.replace('${SHA256_DEB}', shamap['deb'])
+        #line = line.replace('${SHA256_RPM}', shamap['rpm'])
+        #line = line.replace('${SHA256_SH}', shamap['sh'])
+        #line = line.replace('${SHA256_APPIMAGE}', shamap['appimage'])
+        #line = line.replace('${SHA256_WIN}', shamap['exe'])
+        #line = line.replace('${SHA256_DMG}', shamap['dmg'])
+        #line = line.replace('${SHA256_TAR}', shamap['gz'])
         fout.write(line)
 
     print("Generated downloads table file: %s" % fout.name)

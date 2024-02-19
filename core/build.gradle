@@ -556,15 +556,20 @@ tasks.register('install4jMedia', Install4jTask) {
     release = project.tag
 
     doLast {
-
         println("Install4j script location:")
         println("$packageDir/" + project.distName + ".install4j")
     }
 }
 
+tasks.register('genGPGSignatures', Exec) {
+    dependsOn install4jMedia
+    println("Generating GPG signature files: $packageDir")
+    workingDir "$baseDir/core/scripts/release/"
+    commandLine "/bin/bash", "sign-packages.sh", "$packageDir"
+}
 
 tasks.register('pack') {
-    dependsOn 'install4jMedia', 'createAppImage', 'createArch', 'createDebian'
+    dependsOn 'genGPGSignatures', 'createAppImage', 'createArch', 'createDebian'
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz and gaiasky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
@@ -603,6 +608,7 @@ tasks.register('pack') {
         } else {
             println("sha256 file not found: " + sha256File)
         }
+
     }
 }
 
