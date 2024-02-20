@@ -140,17 +140,15 @@ tasks.register('copyToLib') {
         mkdir distLib
         project.ext.distLib = distLib.getPath()
 
-        // Copy deps to dist lib folder
-        ['runtimeClasspath'].each { mode ->
-            copy {
-                duplicatesStrategy = DuplicatesStrategy.INCLUDE
-                from configurations.getByName(mode).files
-                into project.distLib
-                exclude "**/data"
-                exclude "**/assets-bak"
-                exclude "**/core-" + version + ".jar"
-                exclude "dummyversion"
-            }
+        // Copy dependencies to dist lib folder
+        copy {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+            from configurations.runtimeClasspath
+            into project.distLib
+            exclude "**/data"
+            exclude "**/assets-bak"
+            exclude "**/core-" + version + ".jar"
+            exclude "dummyversion"
         }
 
         // Remove folders
@@ -183,15 +181,6 @@ tasks.register('gaiaskyJar') {
         }
         file("$distLib/core-" + version + ".jar").renameTo(file("$distLib/gaiasky-core.jar"))
     }
-}
-
-tasks.register('execPermission', Exec) {
-    commandLine "chmod", "ugo+x", "$distDir/gaiasky"
-}
-
-tasks.register('manGen', Exec) {
-    workingDir "$distDir"
-    commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
 }
 
 tasks.register('genReleaseNotes', Exec) {
@@ -290,12 +279,17 @@ tasks.register('dist') {
 
         if (!DefaultNativePlatform.currentOperatingSystem.windows) {
             // Give execute
-            execPermission.exec()
+            exec {
+                commandLine "chmod", "ugo+x", "$distDir/gaiasky"
+            }
 
             if (DefaultNativePlatform.currentOperatingSystem.linux) {
                 // Generate man
                 println("Generate man: $distDir/gaiasky.6.gz")
-                manGen.exec()
+                exec {
+                    workingDir "$distDir"
+                    commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
+                }
                 exec {
                     commandLine "gzip", "$distDir/gaiasky.6"
                 }
@@ -370,10 +364,14 @@ tasks.register('createAppImage') {
         delete "$appimgDir"
         mkdir "$appimgDir"
 
-        // Copy all from dist to appimage
+        // Copy all from dist to AppImage
         copy {
             from "$distDir"
             into "$appimgDir"
+            exclude "**/*-natives-macos.jar"
+            exclude "**/*-natives-macos-arm64.jar"
+            exclude "**/*-natives-windows.jar"
+            exclude "**/*-natives-windows-x86.jar"
         }
 
         // Package JRE
@@ -507,12 +505,7 @@ static def buildTime() {
     return new Date()
 }
 
-def distDirSize() {
-    File dist = new File(project.distDir as String)
-    return Math.round(dist.directorySize() / 1024)
-}
-
-def getVersionRevision(String tagRev) {
+static def getVersionRevision(String tagRev) {
     String tagVersion = tagRev.substring(0, tagRev.lastIndexOf("."))
     String tagRevision = "1"
     if (tagVersion.contains("-")) {

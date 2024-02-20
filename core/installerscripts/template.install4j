@@ -1,25 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.6" transformSequenceNumber="10">
-  <directoryPresets config="../../assets/cert/cert.pfx" />
+<install4j version="10.0.7" transformSequenceNumber="10">
+  <directoryPresets config="@gs-git-folder@/assets/cert/cert.pfx" />
   <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="15" allowBetaVM="true">
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
     <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" />
   </application>
   <files defaultOverwriteMode="1" defaultUninstallMode="2">
+    <filesets>
+      <fileset name="Windows libraries" id="967" />
+      <fileset name="macOS libraries" id="970" />
+      <fileset name="Linux libraries" id="972" />
+    </filesets>
+    <roots>
+      <root id="968" fileset="967" />
+      <root id="971" fileset="970" />
+      <root id="973" fileset="972" />
+    </roots>
     <mountPoints>
       <mountPoint id="24" />
+      <mountPoint id="969" root="968" />
+      <mountPoint id="974" root="971" />
+      <mountPoint id="975" root="973" />
     </mountPoints>
     <entries>
-      <dirEntry mountPoint="24" file="@gs-release-folder@" />
+      <dirEntry mountPoint="24" file="@gs-release-folder@">
+        <exclude>
+          <entry location="lib" />
+        </exclude>
+      </dirEntry>
+      <dirEntry mountPoint="969" file="@gs-release-folder@/lib" entryMode="subdir" subDirectory="lib" excludeSuffixes="*-natives-macos.jar,*-natives-macos-arm64.jar,*-natives-linux.jar,*-natives-linux-arm32.jar,*-natives-linux-arm64.jar" />
+      <dirEntry mountPoint="974" file="@gs-release-folder@/lib" entryMode="subdir" subDirectory="lib" excludeSuffixes="*-natives-windows.jar,*-natives-windows-x86.jar,*-natives-linux.jar,*-natives-linux-arm32.jar,*-natives-linux-arm64.jar" />
+      <dirEntry mountPoint="975" file="@gs-release-folder@/lib" entryMode="subdir" subDirectory="lib" excludeSuffixes="*-natives-windows.jar,*-natives-windows-x86.jar,*-natives-macos.jar,*-natives-macos-arm64.jar" />
     </entries>
   </files>
   <launchers>
     <launcher name="gaiasky" id="22" menuName="${compiler:sys.fullName}/${compiler:sys.fullName}">
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" dpiAware="false">
-        <versionInfo include="true" fileDescription="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -Dpython.console.encoding=UTF-8 -Dassets.location=./">
         <classPath>
@@ -35,7 +55,7 @@
     </launcher>
     <launcher name="gaiasky macos" id="573" excludeFromMenu="true" menuName="${compiler:sys.fullName}">
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
         <classPath>
@@ -51,7 +71,7 @@
     </launcher>
     <launcher name="gaiasky vr" id="683" menuName="${compiler:sys.fullName}/${compiler:sys.fullName} VR">
       <executable name="${compiler:sys.shortName}vr" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gsvr_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
         <classPath>
@@ -1294,42 +1314,45 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="gsvr_icon.png" />
-        <entry location="rest-static" />
-        <entry location="AppRun" />
-        <entry location="gs_icon.svg" />
-        <entry location="gsvr_icon.svg" />
-        <entry location="gaiasky.6.gz" />
         <entry location="gaiasky" />
         <entry location="gaiasky-appimage.desktop" />
         <entry location="gaiasky.6.gz" />
-        <entry location="gs_icon.png" />
+        <entry location="gs_icon.svg" />
+        <entry location="AppRun" />
         <entry location="gsvr_icon.png" />
+        <entry location="gs_icon.png" />
+        <entry location="rest-static" />
+        <entry filesetId="970" />
+        <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" usePack200="false" overrideJdkRelease="true" />
     </windows>
     <macosArchive name="macOS Archive" id="966" includeAllDownloadableComponents="false" architecture="universal" launcherId="573">
       <exclude>
-        <entry location="gaiasky.6.gz" />
         <entry location="gaiasky-appimage.desktop" />
+        <entry location="gaiasky.6.gz" />
+        <entry location="gaiasky.desktop" />
         <entry location="AppRun" />
         <entry location="gaiasky.cmd" />
-        <entry location="gaiasky.desktop" />
         <entry location="rest-static" />
+        <entry filesetId="967" />
+        <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
     </macosArchive>
     <unixInstaller name="Unix Installer" id="28" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="rest-static" />
-        <entry location="AppRun" />
         <entry location="gaiasky-appimage.desktop" />
-        <entry location="gsvr_icon.ico" />
-        <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
+        <entry location="gsvr_icon.ico" />
+        <entry location="AppRun" />
+        <entry location="gaiasky.cmd" />
+        <entry location="rest-static" />
+        <entry filesetId="967" />
+        <entry filesetId="970" />
       </exclude>
       <jreBundle jreBundleSource="none" />
     </unixInstaller>
@@ -1338,14 +1361,16 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="rest-static" />
-        <entry location="AppRun" />
         <entry location="gaiasky-appimage.desktop" />
-        <entry location="gsvr_icon.ico" />
-        <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
+        <entry location="gsvr_icon.ico" />
+        <entry location="AppRun" />
+        <entry location="gaiasky.cmd" />
+        <entry location="rest-static" />
+        <entry filesetId="967" />
+        <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxDeb>
@@ -1354,14 +1379,16 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="rest-static" />
-        <entry location="AppRun" />
         <entry location="gaiasky-appimage.desktop" />
-        <entry location="gsvr_icon.ico" />
-        <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
+        <entry location="gsvr_icon.ico" />
+        <entry location="AppRun" />
+        <entry location="gaiasky.cmd" />
+        <entry location="rest-static" />
+        <entry filesetId="967" />
+        <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
@@ -1370,26 +1397,32 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="gaiasky.6.gz" />
-        <entry location="gs_icon.svg" />
+        <entry location="gaiasky" />
         <entry location="gaiasky-appimage.desktop" />
+        <entry location="gaiasky.6.gz" />
+        <entry location="gaiasky.desktop" />
+        <entry location="gs_icon.svg" />
         <entry location="AppRun" />
         <entry location="gs_icon.png" />
-        <entry location="gaiasky.desktop" />
         <entry location="rest-static" />
-        <entry location="gaiasky" />
+        <entry filesetId="970" />
+        <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
     </windowsArchive>
     <unixArchive name="Unix Archive" id="952" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
+        <entry location="gaiasky-appimage.desktop" />
         <entry location="AppRun" />
         <entry location="gaiasky.cmd" />
+        <entry location="rest-static" />
+        <entry filesetId="967" />
+        <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.8.1+1" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
     </unixArchive>
   </mediaSets>
   <buildIds>
