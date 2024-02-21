@@ -36,14 +36,14 @@ public class SceneObserver implements IObserver {
                 final String name = (String) data[1];
                 final boolean state = (boolean) data[2];
 
-                focusView.setVisible(state, name.toLowerCase());
+                focusView.setVisible(state, name.toLowerCase().strip());
                 logger.info(I18n.msg("notif.visibility.object.set", focusView.getName(), I18n.msg("gui." + state)));
             } else if (data[0] instanceof Entity entity) {
                 view.setEntity(entity);
                 final String name = (String) data[1];
                 final boolean state = (boolean) data[2];
 
-                view.setVisible(state, name.toLowerCase());
+                view.setVisible(state, name.toLowerCase().strip());
                 logger.info(I18n.msg("notif.visibility.object.set", view.getName(), I18n.msg("gui." + state)));
             } else {
                 logger.warn("PER_OBJECT_VISIBILITY_CMD needs a FocusView or an Entity, got " + data[0].getClass().getSimpleName());

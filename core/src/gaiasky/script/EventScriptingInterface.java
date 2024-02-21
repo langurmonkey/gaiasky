@@ -851,7 +851,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean visible;
             synchronized (focusView) {
                 focusView.setEntity(obj);
-                visible = focusView.isVisible(true);
+                visible = focusView.isVisible(name.toLowerCase().strip());
             }
             return visible;
         }
@@ -4500,7 +4500,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Settings.settings.apply();
             // Reload UI.
             // postRunnable(()->{
-                // em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
+            // em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
             // });
         }
         return result;
