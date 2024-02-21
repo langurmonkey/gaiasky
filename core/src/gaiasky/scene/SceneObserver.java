@@ -32,12 +32,21 @@ public class SceneObserver implements IObserver {
     public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case PER_OBJECT_VISIBILITY_CMD -> {
-            if (data[0] instanceof FocusView entity) {
+            if (data[0] instanceof FocusView focusView) {
                 final String name = (String) data[1];
                 final boolean state = (boolean) data[2];
 
-                entity.setVisible(state, name.toLowerCase());
-                logger.info(I18n.msg("notif.visibility.object.set", entity.getName(), I18n.msg("gui." + state)));
+                focusView.setVisible(state, name.toLowerCase());
+                logger.info(I18n.msg("notif.visibility.object.set", focusView.getName(), I18n.msg("gui." + state)));
+            } else if (data[0] instanceof Entity entity) {
+                view.setEntity(entity);
+                final String name = (String) data[1];
+                final boolean state = (boolean) data[2];
+
+                view.setVisible(state, name.toLowerCase());
+                logger.info(I18n.msg("notif.visibility.object.set", view.getName(), I18n.msg("gui." + state)));
+            } else {
+                logger.warn("PER_OBJECT_VISIBILITY_CMD needs a FocusView or an Entity, got " + data[0].getClass().getSimpleName());
             }
         }
         case FORCE_OBJECT_LABEL_CMD -> {

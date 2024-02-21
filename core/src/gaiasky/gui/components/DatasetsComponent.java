@@ -7,6 +7,7 @@
 
 package gaiasky.gui.components;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -21,7 +22,9 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.*;
+import gaiasky.gui.ColorPicker;
+import gaiasky.gui.ColorPickerAbstract;
+import gaiasky.gui.ColormapPicker;
 import gaiasky.gui.datasets.DatasetFiltersWindow;
 import gaiasky.gui.datasets.DatasetInfoWindow;
 import gaiasky.gui.datasets.DatasetTransformsWindow;
@@ -494,12 +497,19 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
             case PER_OBJECT_VISIBILITY_CMD -> {
                 if (source != this) {
-                    FocusView obj = (FocusView) data[0];
-                    String datasetName = (String) data[1];
-                    boolean checked = (Boolean) data[2];
-                    if (Mapper.mesh.has(obj.getEntity())) {
-                        OwnImageButton eye = imageMap.get(datasetName)[0];
-                        eye.setCheckedNoFire(!checked);
+                    Entity e = null;
+                    if (data[0] instanceof FocusView view) {
+                        e = view.getEntity();
+                    } else if (data[0] instanceof Entity entity) {
+                        e = entity;
+                    }
+                    if(e != null) {
+                        String datasetName = (String) data[1];
+                        boolean checked = (Boolean) data[2];
+                        if (Mapper.mesh.has(e)) {
+                            OwnImageButton eye = imageMap.get(datasetName)[0];
+                            eye.setCheckedNoFire(!checked);
+                        }
                     }
                 }
             }

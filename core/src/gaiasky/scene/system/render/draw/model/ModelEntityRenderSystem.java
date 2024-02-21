@@ -162,7 +162,7 @@ public class ModelEntityRenderSystem {
 
             float alphaFactor;
             if (scaffolding != null) {
-                alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity;
+                alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity * base.opacity;
             } else {
                 alphaFactor = body.color[3] * base.opacity;
             }
