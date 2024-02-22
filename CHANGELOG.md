@@ -1,3 +1,13 @@
+<a name="3.5.9-2"></a>
+## [3.5.9-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.9) (2024-02-22)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.9...3.5.9-2)
+
+### Bug Fixes
+- individual object visibility API calls, and generic model alpha interpolation. 
+
+### Build System
+- only add natives for the specific target platform in built packages.
+
 <a name="3.5.9"></a>
 ## [3.5.9](https://codeberg.org/gaiasky/gaiasky/tree/3.5.8-3) (2024-02-19)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.8-3...3.5.9)
