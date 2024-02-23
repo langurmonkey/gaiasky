@@ -2676,7 +2676,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  double[] camUp,
                                  double seconds,
                                  boolean sync) {
-        cameraTransition(camPos, units, camDir, camUp, seconds, "none", 0, "none", 0, sync);
+        cameraTransition(camPos, units, camDir, camUp, seconds, "none", 0, seconds, "none", 0, sync);
     }
 
     public void cameraTransition(List<?> camPos,
@@ -2687,19 +2687,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  double positionSmoothFactor,
                                  String orientationSmoothType,
                                  double orientationSmoothFactor) {
-        cameraTransition(dArray(camPos), "internal", dArray(camDir), dArray(camUp), seconds, positionSmoothType, positionSmoothFactor, orientationSmoothType, orientationSmoothFactor, true);
+        cameraTransition(dArray(camPos), "internal", dArray(camDir), dArray(camUp), seconds, positionSmoothType, positionSmoothFactor, seconds, orientationSmoothType, orientationSmoothFactor, true);
     }
 
     @Override
     public void cameraTransition(double[] camPos,
                                  double[] camDir,
                                  double[] camUp,
-                                 double seconds,
+                                 double positionDurationSeconds,
                                  String positionSmoothType,
                                  double positionSmoothFactor,
+                                 double orientationDurationSeconds,
                                  String orientationSmoothType,
                                  double orientationSmoothFactor) {
-        cameraTransition(camPos, "internal", camDir, camUp, seconds, positionSmoothType, positionSmoothFactor, orientationSmoothType, orientationSmoothFactor, true);
+        cameraTransition(camPos, "internal", camDir, camUp, positionDurationSeconds, positionSmoothType, positionSmoothFactor, orientationDurationSeconds, orientationSmoothType, orientationSmoothFactor, true);
     }
 
 
@@ -2707,13 +2708,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  String units,
                                  List<?> camDir,
                                  List<?> camUp,
-                                 double seconds,
+                                 double positionDurationSeconds,
                                  String positionSmoothType,
                                  double positionSmoothFactor,
+                                 double orientationDurationSeconds,
                                  String orientationSmoothType,
                                  double orientationSmoothFactor,
                                  boolean sync) {
-        cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds, positionSmoothType, positionSmoothFactor, orientationSmoothType, orientationSmoothFactor, sync);
+        cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), positionDurationSeconds, positionSmoothType, positionSmoothFactor, orientationDurationSeconds, orientationSmoothType, orientationSmoothFactor, sync);
     }
 
     @Override
@@ -2721,9 +2723,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  String units,
                                  double[] camDir,
                                  double[] camUp,
-                                 double seconds,
+                                 double positionDurationSeconds,
                                  String positionSmoothType,
                                  double positionSmoothFactor,
+                                 double orientationDurationSeconds,
                                  String orientationSmoothType,
                                  double orientationSmoothFactor,
                                  boolean sync) {
@@ -2749,9 +2752,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     posUnits,
                     camDir,
                     camUp,
-                    seconds,
+                    positionDurationSeconds,
                     positionSmoothType,
                     positionSmoothFactor,
+                    orientationDurationSeconds,
                     orientationSmoothType,
                     orientationSmoothFactor,
                     end);
@@ -5005,7 +5009,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         final Object lock;
         final Vector3d v3d1, v3d2, v3d3;
         NaturalCamera cam;
-        double seconds;
+        /** Duration of the position interpolation, in seconds. **/
+        double posDuration;
+        /** Duration of the orientation interpolation, in seconds. **/
+        double orientationDuration;
         double elapsed, start;
         Vector3d targetDir, targetUp;
         PathDouble<Vector3d> posInterpolator;
@@ -5033,7 +5040,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                         double[] up,
                                         double seconds,
                                         Runnable end) {
-            this(cam, pos, dir, up, seconds, "", 0, "", 0, end);
+            this(cam, pos, dir, up, seconds, "", 0, seconds, "", 0, end);
         }
 
         /**
@@ -5041,31 +5048,34 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
          * in the specified number of seconds. This method accepts smoothing factors and types for the
          * position and orientation.
          *
-         * @param cam                     The camera to use.
-         * @param pos                     The final position.
-         * @param dir                     The final direction.
-         * @param up                      The final up vector.
-         * @param seconds                 The number of seconds to complete the transition.
-         * @param positionSmoothType      Position smooth type.
-         * @param positionSmoothFactor    Position smooth factor (depends on type).
-         * @param orientationSmoothType   Orientation smooth type.
-         * @param orientationSmoothFactor Orientation smooth factor (depends on type).
-         * @param end                     An optional runnable that is executed when the transition has completed.
+         * @param cam                        The camera to use.
+         * @param pos                        The final position.
+         * @param dir                        The final direction.
+         * @param up                         The final up vector.
+         * @param positionDurationSeconds    The duration of the position interpolation, in seconds.
+         * @param positionSmoothType         Position smooth type.
+         * @param positionSmoothFactor       Position smooth factor (depends on type).
+         * @param orientationDurationSeconds The duration of the orientation interpolation, in seconds.
+         * @param orientationSmoothType      Orientation smooth type.
+         * @param orientationSmoothFactor    Orientation smooth factor (depends on type).
+         * @param end                        An optional runnable that is executed when the transition has completed.
          */
         public CameraTransitionRunnable(NaturalCamera cam,
                                         double[] pos,
                                         double[] dir,
                                         double[] up,
-                                        double seconds,
+                                        double positionDurationSeconds,
                                         String positionSmoothType,
                                         double positionSmoothFactor,
+                                        double orientationDurationSeconds,
                                         String orientationSmoothType,
                                         double orientationSmoothFactor,
                                         Runnable end) {
             this.cam = cam;
             this.targetDir = new Vector3d(dir).nor();
             this.targetUp = new Vector3d(up).nor();
-            this.seconds = seconds;
+            this.posDuration = positionDurationSeconds;
+            this.orientationDuration = orientationDurationSeconds;
             this.start = GaiaSky.instance.getT();
             this.elapsed = 0;
             this.end = end;
@@ -5126,21 +5136,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Update elapsed time
             elapsed = GaiaSky.instance.getT() - start;
 
-            // Interpolation variable
-            double alpha = MathUtilsDouble.clamp(elapsed / seconds, 0.0, 0.99999999999999);
+            // Interpolation variables
+            double alphaPos = MathUtilsDouble.clamp(elapsed / posDuration, 0.0, 0.999999999999999999);
+            double alphaOrientation = MathUtilsDouble.clamp(elapsed / orientationDuration, 0.0, 0.999999999999999999);
 
             // Interpolate camera position.
-            cam.setPos(posInterpolator.valueAt(v3d1, positionMapper.apply(alpha)));
+            cam.setPos(posInterpolator.valueAt(v3d1, positionMapper.apply(alphaPos)));
 
             // Interpolate camera orientation using quaternions.
-            qd.set(startOrientation).slerp(endOrientation, orientationMapper.apply(alpha));
+            qd.set(startOrientation).slerp(endOrientation, orientationMapper.apply(alphaOrientation));
             var up = qd.getUp(v3d3);
             cam.setUp(up);
             var direction = qd.getDirection(v3d3);
             cam.setDirection(v3d3);
 
             // Finish if needed
-            if (elapsed >= seconds) {
+            if (elapsed >= posDuration && elapsed >= orientationDuration) {
                 // On end, run runnable if present, otherwise notify lock
                 if (end != null) {
                     end.run();

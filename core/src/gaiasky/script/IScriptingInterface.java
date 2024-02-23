@@ -1960,7 +1960,7 @@ public interface IScriptingInterface {
     /**
      * Maximizes the interface window.
      *
-     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#expandUIPanel(String)} instead.
+     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#expandUIPane(String)} instead.
      */
     @Deprecated
     void maximizeInterfaceWindow();
@@ -1968,7 +1968,7 @@ public interface IScriptingInterface {
     /**
      * Minimizes the interface window.
      *
-     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#collapseUIPanel(String)} instead.
+     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#collapseUIPane(String)} instead.
      */
     @Deprecated
     void minimizeInterfaceWindow();
@@ -2288,38 +2288,41 @@ public interface IScriptingInterface {
      * this only works with the natural camera.
      * </p>
      *
-     * @param camPos                  The target camera position in the internal reference system and the given distance
-     *                                units.
-     * @param camDir                  The target camera direction in the internal reference system.
-     * @param camUp                   The target camera up in the internal reference system.
-     * @param seconds                 The duration of the transition in seconds.
-     * @param positionSmoothType      The function type to use for the smoothing of positions. Either "logit",
-     *                                "logisticsigmoid" or "none".
-     *                                <ul>
-     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
-     *                                an effect, otherwise, linear interpolation is used.</li>
-     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
-     *                                0.09 and 0.01.</li>
-     *                                <li>"none": no smoothing is applied.</li>
-     *                                </ul>
-     * @param positionSmoothFactor    Smooth factor for the positions (depends on type).
-     * @param orientationSmoothType   The function type to use for the smoothing of orientations. Either "logit",
-     *                                "logisticsigmoid" or "none".
-     *                                <ul>
-     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
-     *                                an effect, otherwise, linear interpolation is used.</li>
-     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
-     *                                0.09 and 0.01.</li>
-     *                                <li>"none": no smoothing is applied.</li>
-     *                                </ul>
-     * @param orientationSmoothFactor Smooth factor for the orientations (depends on type).
+     * @param camPos                     The target camera position in the internal reference system and the given
+     *                                   distance
+     *                                   units.
+     * @param camDir                     The target camera direction in the internal reference system.
+     * @param camUp                      The target camera up in the internal reference system.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param positionSmoothType         The function type to use for the smoothing of positions. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param positionSmoothFactor       Smooth factor for the positions (depends on type).
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param orientationSmoothType      The function type to use for the smoothing of orientations. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param orientationSmoothFactor    Smooth factor for the orientations (depends on type).
      */
     void cameraTransition(double[] camPos,
                           double[] camDir,
                           double[] camUp,
-                          double seconds,
+                          double positionDurationSeconds,
                           String positionSmoothType,
                           double positionSmoothFactor,
+                          double orientationDurationSeconds,
                           String orientationSmoothType,
                           double orientationSmoothFactor);
 
@@ -2339,43 +2342,47 @@ public interface IScriptingInterface {
      * this only works with the natural camera.
      * </p>
      *
-     * @param camPos                  The target camera position in the internal reference system and the given distance
-     *                                units.
-     * @param units                   The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
-     * @param camDir                  The target camera direction in the internal reference system.
-     * @param camUp                   The target camera up in the internal reference system.
-     * @param seconds                 The duration of the transition in seconds.
-     * @param positionSmoothType      The function type to use for the smoothing of positions. Either "logit",
-     *                                "logisticsigmoid" or "none".
-     *                                <ul>
-     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
-     *                                an effect, otherwise, linear interpolation is used.</li>
-     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
-     *                                0.09 and 0.01.</li>
-     *                                <li>"none": no smoothing is applied.</li>
-     *                                </ul>
-     * @param positionSmoothFactor    Smooth factor for the positions (depends on type).
-     * @param orientationSmoothType   The function type to use for the smoothing of orientations. Either "logit",
-     *                                "logisticsigmoid" or "none".
-     *                                <ul>
-     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
-     *                                an effect, otherwise, linear interpolation is used.</li>
-     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
-     *                                0.09 and 0.01.</li>
-     *                                <li>"none": no smoothing is applied.</li>
-     *                                </ul>
-     * @param orientationSmoothFactor Smooth factor for the orientations (depends on type).
-     * @param sync                    If true, the call waits for the transition to finish before returning, otherwise
-     *                                it
-     *                                returns immediately
+     * @param camPos                     The target camera position in the internal reference system and the given
+     *                                   distance
+     *                                   units.
+     * @param units                      The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param camDir                     The target camera direction in the internal reference system.
+     * @param camUp                      The target camera up in the internal reference system.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param positionSmoothType         The function type to use for the smoothing of positions. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param positionSmoothFactor       Smooth factor for the positions (depends on type).
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param orientationSmoothType      The function type to use for the smoothing of orientations. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param orientationSmoothFactor    Smooth factor for the orientations (depends on type).
+     * @param sync                       If true, the call waits for the transition to finish before returning,
+     *                                   otherwise
+     *                                   it
+     *                                   returns immediately
      */
     void cameraTransition(double[] camPos,
                           String units,
                           double[] camDir,
                           double[] camUp,
-                          double seconds,
+                          double positionDurationSeconds,
                           String positionSmoothType,
                           double positionSmoothFactor,
+                          double orientationDurationSeconds,
                           String orientationSmoothType,
                           double orientationSmoothFactor,
                           boolean sync);

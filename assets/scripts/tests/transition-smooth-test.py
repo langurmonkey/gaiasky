@@ -53,8 +53,7 @@ gs.sleep(2)
 gs.setCameraFree()
 
 lprint("Now, we do a smooth transition.")
-lprint("We use the logistic sigmoid method for the positions (starts and ends slow).")
-lprint("We use the logit method for the orientations (starts and ends fast).")
+lprint("The transition in position lasts 10 seconds, while the transition in orientation lasts 7 seconds.")
 steps = gen_expit(200, 25.0)
 gs.cameraTransition([-5593.0417731364, 13008.1430225486, 1542.9688571213], 
                     "internal",
@@ -63,8 +62,9 @@ gs.cameraTransition([-5593.0417731364, 13008.1430225486, 1542.9688571213],
                     10.0,
                     "logisticsigmoid",
                     60.0,
-                    "logit",
-                    0.1,
+                    7.0,
+                    "logisticsigmoid",
+                    12.0,
                     True)
 
 lprint("Script ended")
