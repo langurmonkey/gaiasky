@@ -16,7 +16,6 @@ def printall(string):
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 fname = os.path.abspath("./camera-path-test.gsc")
 printall("(1/2) Starting synchronous camera file execution: %s" % fname)
@@ -36,7 +35,6 @@ t1 = time.time()
 
 printall("Async exec: script regained control after %.4f seconds" % (t1 - t0))
 
-gs.maximizeInterfaceWindow()
 gs.enableInput()
 
 printall("Script finishes")

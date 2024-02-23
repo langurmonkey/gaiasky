@@ -83,6 +83,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 /**
  * Implementation of the Gaia Sky scripting API located at {@link IScriptingInterface}. This implementation uses
@@ -2342,6 +2343,30 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void expandUIPane(String panelName) {
+        if (checkString(panelName, new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"}, "panelName")) {
+            postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", true));
+        }
+    }
+
+    @Override
+    public void collapseUIPane(String panelName) {
+        if (checkString(panelName, new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"}, "panelName")) {
+            postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", false));
+        }
+    }
+
+    @Override
+    public void expandGuiComponent(String name) {
+        expandUIPane(name);
+    }
+
+    @Override
+    public void collapseGuiComponent(String name) {
+        collapseUIPane(name);
+    }
+
+    @Override
     public void setGuiPosition(final float x,
                                final float y) {
         postRunnable(() -> em.post(Event.GUI_MOVE_CMD, this, x, y));
@@ -2420,16 +2445,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return null;
         }
 
-    }
-
-    @Override
-    public void expandGuiComponent(String name) {
-        em.post(Event.EXPAND_PANE_CMD, this, name);
-    }
-
-    @Override
-    public void collapseGuiComponent(String name) {
-        em.post(Event.COLLAPSE_PANE_CMD, this, name);
     }
 
     @Override
@@ -2661,7 +2676,60 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  double[] camUp,
                                  double seconds,
                                  boolean sync) {
-        if (checkDistanceUnits(units, "units")) {
+        cameraTransition(camPos, units, camDir, camUp, seconds, "none", 0, "none", 0, sync);
+    }
+
+    public void cameraTransition(List<?> camPos,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 double seconds,
+                                 String positionSmoothType,
+                                 double positionSmoothFactor,
+                                 String orientationSmoothType,
+                                 double orientationSmoothFactor) {
+        cameraTransition(dArray(camPos), "internal", dArray(camDir), dArray(camUp), seconds, positionSmoothType, positionSmoothFactor, orientationSmoothType, orientationSmoothFactor, true);
+    }
+
+    @Override
+    public void cameraTransition(double[] camPos,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 double seconds,
+                                 String positionSmoothType,
+                                 double positionSmoothFactor,
+                                 String orientationSmoothType,
+                                 double orientationSmoothFactor) {
+        cameraTransition(camPos, "internal", camDir, camUp, seconds, positionSmoothType, positionSmoothFactor, orientationSmoothType, orientationSmoothFactor, true);
+    }
+
+
+    public void cameraTransition(List<?> camPos,
+                                 String units,
+                                 List<?> camDir,
+                                 List<?> camUp,
+                                 double seconds,
+                                 String positionSmoothType,
+                                 double positionSmoothFactor,
+                                 String orientationSmoothType,
+                                 double orientationSmoothFactor,
+                                 boolean sync) {
+        cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds, positionSmoothType, positionSmoothFactor, orientationSmoothType, orientationSmoothFactor, sync);
+    }
+
+    @Override
+    public void cameraTransition(double[] camPos,
+                                 String units,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 double seconds,
+                                 String positionSmoothType,
+                                 double positionSmoothFactor,
+                                 String orientationSmoothType,
+                                 double orientationSmoothFactor,
+                                 boolean sync) {
+        if (checkDistanceUnits(units, "units") &&
+                checkSmoothType(positionSmoothType, "positionSmoothType") &&
+                checkSmoothType(orientationSmoothType, "orientationSmoothType")) {
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
             // Put camera in free mode.
@@ -2677,7 +2745,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
 
             // Create and park runnable
-            CameraTransitionRunnable r = new CameraTransitionRunnable(cam, posUnits, camDir, camUp, seconds, end);
+            CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
+                    posUnits,
+                    camDir,
+                    camUp,
+                    seconds,
+                    positionSmoothType,
+                    positionSmoothFactor,
+                    orientationSmoothType,
+                    orientationSmoothFactor,
+                    end);
             parkRunnable(name, r);
 
             if (sync) {
@@ -4919,6 +4996,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    private boolean checkSmoothType(String type,
+                                    String name) {
+        return type.equalsIgnoreCase("logit") || type.equalsIgnoreCase("logisticsigmoid") || type.equalsIgnoreCase("none");
+    }
+
     class CameraTransitionRunnable implements Runnable {
         final Object lock;
         final Vector3d v3d1, v3d2, v3d3;
@@ -4929,10 +5011,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         PathDouble<Vector3d> posInterpolator;
         QuaternionDouble startOrientation, endOrientation, qd;
         Runnable end;
+        /** Maps input x to output x for positions. **/
+        Function<Double, Double> positionMapper;
+        /** Maps input x to output x for orientations. **/
+        Function<Double, Double> orientationMapper;
 
         /**
          * A runnable that interpolates the camera state (position, direction, up) to the new given state
-         * in the specified number of seconds.
+         * in the specified number of seconds. This method uses a pure linear interpolation.
          *
          * @param cam     The camera to use.
          * @param pos     The final position.
@@ -4947,6 +5033,35 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                         double[] up,
                                         double seconds,
                                         Runnable end) {
+            this(cam, pos, dir, up, seconds, "", 0, "", 0, end);
+        }
+
+        /**
+         * A runnable that interpolates the camera state (position, direction, up) to the new given state
+         * in the specified number of seconds. This method accepts smoothing factors and types for the
+         * position and orientation.
+         *
+         * @param cam                     The camera to use.
+         * @param pos                     The final position.
+         * @param dir                     The final direction.
+         * @param up                      The final up vector.
+         * @param seconds                 The number of seconds to complete the transition.
+         * @param positionSmoothType      Position smooth type.
+         * @param positionSmoothFactor    Position smooth factor (depends on type).
+         * @param orientationSmoothType   Orientation smooth type.
+         * @param orientationSmoothFactor Orientation smooth factor (depends on type).
+         * @param end                     An optional runnable that is executed when the transition has completed.
+         */
+        public CameraTransitionRunnable(NaturalCamera cam,
+                                        double[] pos,
+                                        double[] dir,
+                                        double[] up,
+                                        double seconds,
+                                        String positionSmoothType,
+                                        double positionSmoothFactor,
+                                        String orientationSmoothType,
+                                        double orientationSmoothFactor,
+                                        Runnable end) {
             this.cam = cam;
             this.targetDir = new Vector3d(dir).nor();
             this.targetUp = new Vector3d(up).nor();
@@ -4955,6 +5070,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             this.elapsed = 0;
             this.end = end;
             this.lock = new Object();
+
+            // Mappers.
+            String posType = positionSmoothType.toLowerCase().strip();
+            positionMapper = getMapper(posType, positionSmoothFactor);
+
+            String orientationType = orientationSmoothType.toLowerCase().strip();
+            orientationMapper = getMapper(orientationType, orientationSmoothFactor);
 
             // Set up interpolation.
             posInterpolator = getPath(cam.getPos().tov3d(aux3d3), pos);
@@ -4972,9 +5094,30 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             qd = new QuaternionDouble();
         }
 
+        private Function<Double, Double> getMapper(String smoothingType, double smoothingFactor) {
+            Function<Double, Double> mapper;
+            if (Objects.equals(smoothingType, "logisticsigmoid")) {
+                final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
+                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logisticSigmoid(x, fac), 0.0, 1.0);
+            } else if (Objects.equals(smoothingType, "logit")) {
+                final double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
+                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logit(x) * fac + 0.5, 0.0, 1.0);
+            } else {
+                mapper = (x) -> x;
+            }
+            return mapper;
+        }
+
+        /**
+         * Gets a path from p0 to p1.
+         *
+         * @param p0 The initial position.
+         * @param p1 The final position.
+         * @return The linear interpolation path.
+         */
         private PathDouble<Vector3d> getPath(Vector3d p0,
                                              double[] p1) {
-            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
+            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1)};
             return new LinearDouble<>(points);
         }
 
@@ -4987,10 +5130,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             double alpha = MathUtilsDouble.clamp(elapsed / seconds, 0.0, 0.99999999999999);
 
             // Interpolate camera position.
-            cam.setPos(posInterpolator.valueAt(v3d1, alpha));
+            cam.setPos(posInterpolator.valueAt(v3d1, positionMapper.apply(alpha)));
 
             // Interpolate camera orientation using quaternions.
-            qd.set(startOrientation).slerp(endOrientation, alpha);
+            qd.set(startOrientation).slerp(endOrientation, orientationMapper.apply(alpha));
             var up = qd.getUp(v3d3);
             cam.setUp(up);
             var direction = qd.getDirection(v3d3);

@@ -13,7 +13,6 @@ gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 gs.setSmoothLodTransitions(True)
 gs.setFov(60)
@@ -145,7 +144,6 @@ gs.sleep(2)
 gs.setFrameOutput(False)
 
 gs.enableInput()
-gs.maximizeInterfaceWindow()
 gs.setSimulationPace(1)
 gs.setStarBrightness(27.0)
 gs.setStarSize(8.0)

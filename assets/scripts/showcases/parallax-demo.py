@@ -105,7 +105,6 @@ class LineUpdaterRunnable(object):
         implements = ["java.lang.Runnable"]
 
 
-gs.minimizeInterfaceWindow()
 gs.cameraStop()
 gs.setFov(70)
 framerate=60
@@ -240,8 +239,6 @@ gs.setFrameOutput(False)
 
 gs.unparkRunnable("line-updater")
 
-# Restore.
-gs.maximizeInterfaceWindow()
 # clean up and finish.
 print("Cleaning up and ending")
 

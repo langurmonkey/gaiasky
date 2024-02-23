@@ -29,11 +29,11 @@ public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     @Override
     public T valueAt(T out,
                      double t) {
-        if (MathUtilsDouble.fuzzyEquals(t, 0d, 0.0000001d)) {
+        if (MathUtilsDouble.fuzzyEquals(t, 0d, 0.000000001d)) {
             out.set(controlPoints[0]);
             return controlPoints[0];
         }
-        if (MathUtilsDouble.fuzzyEquals(t, 1d, 0.0000001d)) {
+        if (MathUtilsDouble.fuzzyEquals(t, 1d, 0.000000001d)) {
             out.set(controlPoints[controlPoints.length - 1]);
             return controlPoints[controlPoints.length - 1];
         }

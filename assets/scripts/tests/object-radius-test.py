@@ -8,7 +8,6 @@ gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 radEarth = gs.getObjectRadius("Earth")
 print("The radius of the Earth is %f Km" % radEarth)

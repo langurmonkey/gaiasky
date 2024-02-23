@@ -10,7 +10,6 @@ gs = gateway.entry_point
 # Minimize interface, disable input, stop camera
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 # Add messages
 gs.displayMessageObject(0, "This is the zero message", 0.2, 0.0, 1.0, 0.0, 0.0, 1.0, 8)
@@ -48,7 +47,6 @@ gs.removeObject(10)
 gs.sleep(1.5)
 
 # Maximize interface and enable input
-gs.maximizeInterfaceWindow()
 gs.enableInput()
 
 gateway.shutdown()

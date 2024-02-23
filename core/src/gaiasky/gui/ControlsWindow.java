@@ -75,7 +75,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(separatorTextureRegion);
 
-        EventManager.instance.subscribe(this, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP);
     }
 
     /**
@@ -369,15 +369,17 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 setPosition(Math.round(x), Math.round(y));
             }
             case RECALCULATE_CONTROLS_WINDOW_SIZE -> recalculateSize();
-            case EXPAND_PANE_CMD -> {
+            case EXPAND_COLLAPSE_PANE_CMD ->  {
                 String name = (String) data[0];
-                CollapsiblePane pane = panes.get(name);
-                pane.expandPane();
-            }
-            case COLLAPSE_PANE_CMD -> {
-                String name = (String) data[0];
-                CollapsiblePane pane = panes.get(name);
-                pane.collapsePane();
+                if(panes.containsKey(name)) {
+                    boolean expand = (Boolean) data[1];
+                    CollapsiblePane pane = panes.get(name);
+                    if(expand) {
+                        pane.expandPane();
+                    } else {
+                        pane.collapsePane();
+                    }
+                }
             }
             case TOGGLE_EXPANDCOLLAPSE_PANE_CMD -> {
                 String name = (String) data[0];

@@ -36,7 +36,6 @@ def typewriter(id, text, x, y, width, height, r, g, b, a, delay):
 # Minimize interface, disable input, stop camera
 gs.enableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 gs.setVisibility("element.labels", False)
 
 textSize = 13
@@ -52,7 +51,5 @@ gs.displayMessageObject(1, "Typewriter test", 0.1, 0.9, 1.0, 0.7, 0.0, 1.0, 22)
 typewriter(2, text, 0.1, 0.4, 0.8, 0.25, 1.0, 1.0, 1.0, 1.0, 0.01)
 
 wait_input(0.0, [1, 2])
-
-gs.maximizeInterfaceWindow()
 
 gateway.shutdown()

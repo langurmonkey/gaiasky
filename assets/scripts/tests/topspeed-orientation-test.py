@@ -8,8 +8,7 @@ gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.maximizeInterfaceWindow()
-gs.expandGuiComponent("CameraComponent")
+gs.expandUIPane("Camera")
 
 # Camera speed limit
 

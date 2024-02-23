@@ -8,7 +8,6 @@ gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 # Camera looks at sunny side of Earth
 gs.setCameraPositionAndFocus("Earth", "Sun", 0, 30)
@@ -29,7 +28,6 @@ gs.sleep(3)
 # Camera looks at shady side of Mars
 gs.setCameraPositionAndFocus("Mars", "Sun", 180, 30)
 gs.sleep(3)
-
 
 gs.enableInput()
 

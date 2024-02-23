@@ -223,7 +223,8 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
 
         lastActiveButton = buttonTime;
 
-        EventManager.instance.subscribe(this, Event.GUI_FOLD_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Event.GUI_FOLD_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
+                Event.EXPAND_COLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP);
     }
 
     private OwnTextIconButton createComponentButton(Skin skin, float pad, String buttonStyle, String title, GuiComponent component) {
@@ -317,6 +318,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         switch (event) {
             case GUI_FOLD_CMD -> {
                 // We try to keep compatibility with the old window.
+                // Only implement collapse.
                 boolean collapse;
                 if (data.length >= 1) {
                     collapse = (boolean) data[0];
@@ -326,8 +328,6 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                                 b.setChecked(false);
                             }
                         }
-                    } else if (lastActiveButton != null) {
-                        lastActiveButton.setChecked(true);
                     }
                 } else {
                     // Toggle.
@@ -340,16 +340,23 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                     }
                     if (open != null) {
                         open.setChecked(false);
-                    } else if (lastActiveButton != null) {
-                        lastActiveButton.setChecked(true);
                     }
-
                 }
             }
             case TOGGLE_EXPANDCOLLAPSE_PANE_CMD -> {
                 String name = (String) data[0];
-                Button button = buttonMap.get(name);
-                button.setChecked(!button.isChecked());
+                if (buttonMap.containsKey(name)) {
+                    Button button = buttonMap.get(name);
+                    button.setChecked(!button.isChecked());
+                }
+            }
+            case EXPAND_COLLAPSE_PANE_CMD -> {
+                String name = (String) data[0];
+                Boolean expand = (Boolean) data[1];
+                if (buttonMap.containsKey(name)) {
+                    Button button = buttonMap.get(name);
+                    button.setChecked(expand);
+                }
             }
             case SHOW_MINIMAP_ACTION -> {
                 boolean show = (Boolean) data[0];

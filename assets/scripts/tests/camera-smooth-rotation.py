@@ -9,7 +9,6 @@ gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 gs.setCinematicCamera(True)
 gs.setRotationCameraSpeed(3.0)
@@ -20,11 +19,6 @@ gs.sleep(1)
 for dxy in np.arange(0.0, 0.3, 0.01):
     gs.cameraRotate(dxy, dxy)
     gs.sleep(0.4)
-
-
-
-
-
 
 gs.enableInput()
 

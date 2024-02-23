@@ -56,7 +56,8 @@ public final class MathUtilsDouble {
     }
 
     /**
-     * Returns atan2 in radians, faster but less accurate than Math.atan2. Average error of 0.00231 radians (0.1323 degrees),
+     * Returns atan2 in radians, faster but less accurate than Math.atan2. Average error of 0.00231 radians (0.1323
+     * degrees),
      * largest error of 0.00488 radians (0.2796 degrees).
      */
     static public double atan2(double y,
@@ -200,7 +201,6 @@ public final class MathUtilsDouble {
      * Fast sqrt method. Default passes it through one round of Newton's method
      *
      * @param value The value
-     *
      * @return The square root value
      */
     static public double sqrt(double value) {
@@ -216,7 +216,6 @@ public final class MathUtilsDouble {
      * @param x1 Superior limit to the independent value
      * @param y0 Inferior limit to the dependent value
      * @param y1 Superior limit to the dependent value
-     *
      * @return The interpolated value
      */
     public static double lint(double x,
@@ -249,7 +248,6 @@ public final class MathUtilsDouble {
      * @param x1 Superior limit to the independent value
      * @param y0 Inferior limit to the dependent value
      * @param y1 Superior limit to the dependent value
-     *
      * @return The interpolated value
      */
     public static float lint(float x,
@@ -282,7 +280,6 @@ public final class MathUtilsDouble {
      * @param x1 Superior limit to the independent value
      * @param y0 Inferior limit to the dependent value
      * @param y1 Superior limit to the dependent value
-     *
      * @return The interpolated value
      */
     public static float lint(long x,
@@ -316,7 +313,6 @@ public final class MathUtilsDouble {
      * @param x1 The first segment delimiter.
      * @param x2 The second segment delimiter.
      * @param x0 The point.
-     *
      * @return The Euclidean distance between the segment (x1, x2)
      */
     public static double distancePointSegment(double x1,
@@ -381,7 +377,6 @@ public final class MathUtilsDouble {
      *
      * @param value  The value to round
      * @param places The number of decimal places
-     *
      * @return The rounded value
      */
     public static double roundAvoid(double value,
@@ -419,9 +414,7 @@ public final class MathUtilsDouble {
      *
      * @param a      angle to normalize
      * @param center center of the desired 2&pi; interval for the result
-     *
      * @return a-2k&pi; with integer k and center-&pi; &lt;= a-2k&pi; &lt;= center+&pi;
-     *
      * @since 1.2
      */
     public static double normalizeAngle(double a,
@@ -462,7 +455,6 @@ public final class MathUtilsDouble {
      *
      * @param a First decimal number, represented by a string.
      * @param b Second decimal number, represented by a string.
-     *
      * @return Whether a % b == 0 at the default precision.
      */
     public static boolean divisible(String a,
@@ -476,7 +468,6 @@ public final class MathUtilsDouble {
      * @param a         First decimal number, represented by a string.
      * @param b         Second decimal number, represented by a string.
      * @param precision The precision.
-     *
      * @return Whether a % b == 0 at the given precision.
      */
     public static boolean divisible(String a,
@@ -489,9 +480,10 @@ public final class MathUtilsDouble {
 
     /**
      * Implements a low-pass filter to smooth the input values.
-     * @param newValue The new value.
+     *
+     * @param newValue      The new value.
      * @param smoothedValue The previous smoothed value.
-     * @param smoothing The smoothing factor.
+     * @param smoothing     The smoothing factor.
      * @return The new value with a low-pass filter applied.
      */
     public static double lowPass(double newValue, double smoothedValue, double smoothing) {
@@ -505,9 +497,10 @@ public final class MathUtilsDouble {
 
     /**
      * Implements a low-pass filter to smooth the input values.
-     * @param newValue The new value.
+     *
+     * @param newValue      The new value.
      * @param smoothedValue The previous smoothed value.
-     * @param smoothing The smoothing factor.
+     * @param smoothing     The smoothing factor.
      * @return The new value with a low-pass filter applied.
      */
     public static float lowPass(float newValue, float smoothedValue, float smoothing) {
@@ -518,6 +511,28 @@ public final class MathUtilsDouble {
             return newValue;
         }
     }
+
+    /**
+     * Implements the logit function, defined as <code>logit(x) = log(x/(1-x))</code>. Note that logit(0) = -Infinity,
+     * and logit(1) = Infinity.
+     * @param x The value to sample.
+     */
+    public static double logit(double x) {
+        return Math.log(x / (1.0 - x));
+    }
+
+    /**
+     * Implements the logistic sigmoid, defined as <code>expit(x) = 1/(1+exp(-x))</code>. It is the inverse of logit.
+     *
+     * @param x    The value to sample, in [0, 1].
+     * @param span The span of the function. The value gets re-mapped using this span.
+     * @return The logistic sigmoid function.
+     */
+    public static double logisticSigmoid(double x, double span) {
+        x = x * span - (span * 0.5);
+        return Math.exp(x) / (1.0 + Math.exp(x));
+    }
+
 }
 
 

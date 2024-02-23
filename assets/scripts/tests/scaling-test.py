@@ -11,7 +11,6 @@ gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
 gs.disableInput()
-gs.minimizeInterfaceWindow()
 gs.cameraStop()
 
 # Orbits and labels off
@@ -98,6 +97,5 @@ gs.setVisibility("element.labels", False)
 
 # Restore
 gs.enableInput()
-gs.maximizeInterfaceWindow()
 
 gateway.shutdown()

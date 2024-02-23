@@ -8,7 +8,6 @@ gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 gs.setCinematicCamera(True)
 gs.setRotationCameraSpeed(30.)
@@ -35,7 +34,6 @@ gs.print("Lines removed")
 
 gs.cameraStop()
 
-gs.maximizeInterfaceWindow()
 gs.enableInput()
 
 gateway.shutdown()

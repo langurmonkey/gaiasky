@@ -11,7 +11,6 @@ def current_time_ms():
 gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
-gs.minimizeInterfaceWindow()
 gs.cameraStop()
 
 # Orbits and labels off
@@ -73,8 +72,5 @@ gs.refreshAllOrbits()
 # Orbits and labels off
 gs.setVisibility("element.orbits", False)
 gs.setVisibility("element.labels", False)
-
-# Restore
-gs.maximizeInterfaceWindow()
 
 gateway.shutdown()

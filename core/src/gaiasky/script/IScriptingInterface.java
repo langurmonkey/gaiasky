@@ -145,7 +145,8 @@ public interface IScriptingInterface {
                               float fontSize);
 
     /**
-     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but using an array for the color
+     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but
+     * using an array for the color
      * instead of giving each component separately.
      *
      * @param id       A unique identifier, used to identify this message when you
@@ -261,7 +262,8 @@ public interface IScriptingInterface {
                             float a);
 
     /**
-     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but using a
+     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but
+     * using a
      * double array for the color instead of each component separately.
      *
      * @param id    A unique identifier, used to identify this message when you
@@ -517,8 +519,10 @@ public interface IScriptingInterface {
 
     /**
      * Sets the camera direction vector to the given vector, in the internal reference system.
-     * You can convert from spherical coordinates using {@link IScriptingInterface#equatorialCartesianToInternalCartesian(double[], double)},
-     * {@link IScriptingInterface#galacticToInternalCartesian(double, double, double)} and {@link IScriptingInterface#eclipticToInternalCartesian(double, double, double)}.
+     * You can convert from spherical coordinates using
+     * {@link IScriptingInterface#equatorialCartesianToInternalCartesian(double[], double)},
+     * {@link IScriptingInterface#galacticToInternalCartesian(double, double, double)} and
+     * {@link IScriptingInterface#eclipticToInternalCartesian(double, double, double)}.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
      * within a parked runnable, use {@link IScriptingInterface#setCameraDirection(double[], boolean)},
@@ -767,7 +771,8 @@ public interface IScriptingInterface {
     /**
      * Changes the field of view of the camera.
      *
-     * @param newFov The new field of view value in degrees, between {@link gaiasky.util.Constants#MIN_FOV} and {@link gaiasky.util.Constants#MAX_FOV}.
+     * @param newFov The new field of view value in degrees, between {@link gaiasky.util.Constants#MIN_FOV} and
+     *               {@link gaiasky.util.Constants#MAX_FOV}.
      */
     void setFov(float newFov);
 
@@ -1127,7 +1132,8 @@ public interface IScriptingInterface {
 
     /**
      * Sets the star glow factor level value. This controls the amount of glow light
-     * when the camera is close to stars. Must be between {@link Constants#MIN_STAR_GLOW_FACTOR} and {@link Constants#MAX_STAR_GLOW_FACTOR}.
+     * when the camera is close to stars. Must be between {@link Constants#MIN_STAR_GLOW_FACTOR} and
+     * {@link Constants#MAX_STAR_GLOW_FACTOR}.
      * Default is 0.06.
      *
      * @param glowFactor The new glow factor value.
@@ -1144,7 +1150,8 @@ public interface IScriptingInterface {
     /**
      * Sets the size of the rasterized stars, in pixels.
      *
-     * @param size The size value in pixels, between {@link Constants#MIN_STAR_POINT_SIZE} and {@link Constants#MAX_STAR_POINT_SIZE}.
+     * @param size The size value in pixels, between {@link Constants#MIN_STAR_POINT_SIZE} and
+     *             {@link Constants#MAX_STAR_POINT_SIZE}.
      */
     void setStarSize(float size);
 
@@ -1158,7 +1165,8 @@ public interface IScriptingInterface {
     /**
      * Sets the minimum star opacity.
      *
-     * @param opacity The minimum opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and {@link Constants#MAX_STAR_MIN_OPACITY}.
+     * @param opacity The minimum opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and
+     *                {@link Constants#MAX_STAR_MIN_OPACITY}.
      */
     void setStarMinOpacity(float opacity);
 
@@ -1239,7 +1247,8 @@ public interface IScriptingInterface {
     /**
      * Limits the frame rate of Gaia Sky.
      *
-     * @param limitFps The new maximum frame rate as a double-precision floating point number. Set zero or negative to unlimited.
+     * @param limitFps The new maximum frame rate as a double-precision floating point number. Set zero or negative to
+     *                 unlimited.
      */
     void setLimitFps(double limitFps);
 
@@ -1268,7 +1277,8 @@ public interface IScriptingInterface {
      * Sets the screenshot mode. Possible values are 'simple' and 'advanced'.
      * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
      * resolution and containing the UI elements.
-     * The <b>advanced</b> mode redraws the last frame using the resolution configured using {@link #configureScreenshots(int, int, String, String)} and
+     * The <b>advanced</b> mode redraws the last frame using the resolution configured using
+     * {@link #configureScreenshots(int, int, String, String)} and
      * it does not draw the UI.
      *
      * @param screenshotMode The screenshot mode. 'simple' or 'advanced'.
@@ -1343,7 +1353,8 @@ public interface IScriptingInterface {
      * Sets the frame output mode. Possible values are 'simple' and 'advanced'.
      * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
      * resolution and containing the UI elements.
-     * The <b>advanced</b> mode redraws the last frame using the resolution configured using {@link #configureFrameOutput(int, int, int, String, String)} and
+     * The <b>advanced</b> mode redraws the last frame using the resolution configured using
+     * {@link #configureFrameOutput(int, int, int, String, String)} and
      * it does not draw the UI.
      *
      * @param screenshotMode The screenshot mode. 'simple' or 'advanced'.
@@ -1462,9 +1473,13 @@ public interface IScriptingInterface {
      * this call in order to immediately refresh the scaled orbits.
      * </p>
      *
-     * @param name          The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87, UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates, HeliotropicOribtCoordinates, MoonAACoordinates).
-     *                      Optionally, you can append ':objectName' to select a single object. For instance, both Gaia and JWST have
-     *                      heliotropic orbit coordinates. To only select the Gaia orbit provider, use "HeliotropicOrbitCoordinates:Gaia".
+     * @param name          The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87,
+     *                      UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates,
+     *                      HeliotropicOribtCoordinates, MoonAACoordinates).
+     *                      Optionally, you can append ':objectName' to select a single object. For instance, both Gaia
+     *                      and JWST have
+     *                      heliotropic orbit coordinates. To only select the Gaia orbit provider, use
+     *                      "HeliotropicOrbitCoordinates:Gaia".
      * @param scalingFactor The scaling factor.
      */
     void setOrbitCoordinatesScaling(String name,
@@ -1500,8 +1515,13 @@ public interface IScriptingInterface {
     double getObjectRadius(String name);
 
     /**
+     * <p>
      * Runs a seamless trip to the object with the name <code>focusName</code>
      * until the object view angle is <code>20 degrees</code>.
+     * </p>
+     * <p>Warning: This method is not deterministic. It is implemented as a loop that sends 'camera forward' events
+     * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
+     * look into the {@link IScriptingInterface#parkRunnable(String, Runnable)} family of calls.</p>
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      */
@@ -1511,6 +1531,10 @@ public interface IScriptingInterface {
      * Runs a seamless trip to the object with the name <code>focusName</code>
      * until the object view angle <code>viewAngle</code> is met. If angle is
      * negative, the default angle is <code>20 degrees</code>.
+     *
+     * <p>Warning: This method is not deterministic. It is implemented as a loop that sends 'camera forward' events
+     * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
+     * look into the {@link IScriptingInterface#parkRunnable(String, Runnable)} family of calls.</p>
      *
      * @param name       The name or id (HIP, TYC, sourceId) of the object.
      * @param solidAngle The target solid angle of the object, in degrees. The angle
@@ -1528,6 +1552,10 @@ public interface IScriptingInterface {
      * before starting the forward movement. This very much depends on the
      * <code>turn velocity</code> of the camera. See
      * {@link #setTurningCameraSpeed(float)}.
+     *
+     * <p>Warning: This method is not deterministic. It is implemented as a loop that sends 'camera forward' events
+     * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
+     * look into the {@link IScriptingInterface#parkRunnable(String, Runnable)} family of calls.</p>
      *
      * @param name            The name or id (HIP, TYC, sourceId) of the object.
      * @param solidAngle      The target solid angle of the object, in degrees. The angle
@@ -1597,7 +1625,8 @@ public interface IScriptingInterface {
      * and it is loaded.
      *
      * @param starId The star identifier or name.
-     * @return An array with (ra [deg], dec [deg], parallax [mas], pmra [mas/yr], pmdec [mas/yr], radvel [km/s], appmag [mag], red [0,1], green [0,1], blue [0,1]) if the
+     * @return An array with (ra [deg], dec [deg], parallax [mas], pmra [mas/yr], pmdec [mas/yr], radvel [km/s], appmag
+     * [mag], red [0,1], green [0,1], blue [0,1]) if the
      * star exists and is loaded, null otherwise.
      */
     double[] getStarParameters(String starId);
@@ -1772,7 +1801,8 @@ public interface IScriptingInterface {
      *                 points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
      * @param color    The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param trailMap The bottom mapping position for the trail. The orbit trail assigns an opacity value to
-     *                 each point of the orbit, where 1 is the location of the last point in the points list, and 0 is the first one.
+     *                 each point of the orbit, where 1 is the location of the last point in the points list, and 0 is
+     *                 the first one.
      *                 This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity
      *                 value of 0. Set to 0 to have a full trail. Set to 0.5 to have a trail that spans half the orbit.
      *                 Set to 1 to have no orbit at all. Set to negative to disable the trail.
@@ -1819,7 +1849,8 @@ public interface IScriptingInterface {
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it. The default primitive type of GL_LINE_STRIP
      * is used. This version enables the addition of arrow caps. In the case arrow caps
-     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with many points.
+     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with
+     * many points.
      * The arrow cap is added at the first point in the series.
      *
      * @param name      The name to identify the polyline, to possibly remove it later.
@@ -1856,8 +1887,10 @@ public interface IScriptingInterface {
     /**
      * Adds a new polyline with the given name, points, color, line width, primitive and arrow caps. The polyline will
      * be created with the 'Others' component type, so you need to enable the
-     * visibility of 'Others' in order to see it. This version enables the addition of arrow caps. In the case arrow caps
-     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with many points.
+     * visibility of 'Others' in order to see it. This version enables the addition of arrow caps. In the case arrow
+     * caps
+     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with
+     * many points.
      * The arrow cap is added at the first point in the series.
      *
      * @param name      The name to identify the polyline, to possibly remove it later.
@@ -1926,13 +1959,65 @@ public interface IScriptingInterface {
 
     /**
      * Maximizes the interface window.
+     *
+     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#expandUIPanel(String)} instead.
      */
+    @Deprecated
     void maximizeInterfaceWindow();
 
     /**
      * Minimizes the interface window.
+     *
+     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#collapseUIPanel(String)} instead.
      */
+    @Deprecated
     void minimizeInterfaceWindow();
+
+    /**
+     * Expands the UI pane with the given name. Possible names are:
+     *
+     * <ul>
+     *     <li>Time</li>
+     *     <li>Camera</li>
+     *     <li>Visibility</li>
+     *     <li>VisualSettings</li>
+     *     <li>Datasets</li>
+     *     <li>Bookmarks</li>
+     *     <li>LocationLog</li>
+     * </ul>
+     * <p>
+     * Please, mind the case!
+     */
+    void expandUIPane(String panelName);
+
+    /**
+     * @deprecated Use {@link IScriptingInterface#expandUIPane(String)}.
+     */
+    @Deprecated
+    void expandGuiComponent(String name);
+
+    /**
+     * Collapses the UI pane with the given name. Possible names are:
+     *
+     * <ul>
+     *     <li>Time</li>
+     *     <li>Camera</li>
+     *     <li>Visibility</li>
+     *     <li>VisualSettings</li>
+     *     <li>Datasets</li>
+     *     <li>Bookmarks</li>
+     *     <li>LocationLog</li>
+     * </ul>
+     * <p>
+     * Please, mind the case!
+     */
+    void collapseUIPane(String panelName);
+
+    /**
+     * @deprecated Use {@link IScriptingInterface#collapseUIPane(String)}.
+     */
+    @Deprecated
+    void collapseGuiComponent(String name);
 
     /**
      * Moves the interface window to a new position.
@@ -1941,7 +2026,9 @@ public interface IScriptingInterface {
      *          in [0,1] from left to right.
      * @param y The new y coordinate of the new top-left corner of the window,
      *          in [0,1] from bottom to top.
+     * @deprecated The controls window is now deprecated in favour of the new UI.
      */
+    @Deprecated
     void setGuiPosition(float x,
                         float y);
 
@@ -2081,11 +2168,15 @@ public interface IScriptingInterface {
                         boolean sync);
 
     /**
+     * <p>
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. This function waits for the transition to finish and then returns control
      * to the script.
-     * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
+     * </p>
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
      * this only works with the natural camera.
+     * </p>
      *
      * @param camPos  The target camera position in the internal reference system.
      * @param camDir  The target camera direction in the internal reference system.
@@ -2098,11 +2189,15 @@ public interface IScriptingInterface {
                           double seconds);
 
     /**
+     * <p>
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. This function waits for the transition to finish and then returns control
      * to the script.
+     * <p>
+     * </p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
      * this only works with the natural camera.
+     * </p>
      *
      * @param camPos  The target camera position in the internal reference system and the given distance units.
      * @param units   The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
@@ -2131,17 +2226,22 @@ public interface IScriptingInterface {
                             double seconds);
 
     /**
+     * <p>
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
+     * </p>
+     * <p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
      * this only works with the natural camera.
+     * </p>
      *
      * @param camPos  The target camera position in the internal reference system.
      * @param camDir  The target camera direction in the internal reference system.
      * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
-     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
+     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns
+     *                immediately
      */
     void cameraTransition(double[] camPos,
                           double[] camDir,
@@ -2150,24 +2250,134 @@ public interface IScriptingInterface {
                           boolean sync);
 
     /**
+     * <p>
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
+     * </p>
+     * <p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
      * this only works with the natural camera.
+     * </p>
      *
      * @param camPos  The target camera position in the internal reference system and the given distance units.
      * @param units   The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      * @param camDir  The target camera direction in the internal reference system.
      * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
-     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
+     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns
+     *                immediately
      */
     void cameraTransition(double[] camPos,
                           String units,
                           double[] camDir,
                           double[] camUp,
                           double seconds,
+                          boolean sync);
+
+    /**
+     * <p>
+     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds.
+     * </p>
+     * <p>
+     * This function accepts smoothing types and factors for the position and orientation.
+     * </p>
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     * </p>
+     *
+     * @param camPos                  The target camera position in the internal reference system and the given distance
+     *                                units.
+     * @param camDir                  The target camera direction in the internal reference system.
+     * @param camUp                   The target camera up in the internal reference system.
+     * @param seconds                 The duration of the transition in seconds.
+     * @param positionSmoothType      The function type to use for the smoothing of positions. Either "logit",
+     *                                "logisticsigmoid" or "none".
+     *                                <ul>
+     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                an effect, otherwise, linear interpolation is used.</li>
+     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                0.09 and 0.01.</li>
+     *                                <li>"none": no smoothing is applied.</li>
+     *                                </ul>
+     * @param positionSmoothFactor    Smooth factor for the positions (depends on type).
+     * @param orientationSmoothType   The function type to use for the smoothing of orientations. Either "logit",
+     *                                "logisticsigmoid" or "none".
+     *                                <ul>
+     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                an effect, otherwise, linear interpolation is used.</li>
+     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                0.09 and 0.01.</li>
+     *                                <li>"none": no smoothing is applied.</li>
+     *                                </ul>
+     * @param orientationSmoothFactor Smooth factor for the orientations (depends on type).
+     */
+    void cameraTransition(double[] camPos,
+                          double[] camDir,
+                          double[] camUp,
+                          double seconds,
+                          String positionSmoothType,
+                          double positionSmoothFactor,
+                          String orientationSmoothType,
+                          double orientationSmoothFactor);
+
+    /**
+     * <p>
+     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds.
+     * </p>
+     * <p>
+     * This function accepts smoothing types and factors for the position and orientation.
+     * </p>
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     * </p>
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     * </p>
+     *
+     * @param camPos                  The target camera position in the internal reference system and the given distance
+     *                                units.
+     * @param units                   The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param camDir                  The target camera direction in the internal reference system.
+     * @param camUp                   The target camera up in the internal reference system.
+     * @param seconds                 The duration of the transition in seconds.
+     * @param positionSmoothType      The function type to use for the smoothing of positions. Either "logit",
+     *                                "logisticsigmoid" or "none".
+     *                                <ul>
+     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                an effect, otherwise, linear interpolation is used.</li>
+     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                0.09 and 0.01.</li>
+     *                                <li>"none": no smoothing is applied.</li>
+     *                                </ul>
+     * @param positionSmoothFactor    Smooth factor for the positions (depends on type).
+     * @param orientationSmoothType   The function type to use for the smoothing of orientations. Either "logit",
+     *                                "logisticsigmoid" or "none".
+     *                                <ul>
+     *                                <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                an effect, otherwise, linear interpolation is used.</li>
+     *                                <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                0.09 and 0.01.</li>
+     *                                <li>"none": no smoothing is applied.</li>
+     *                                </ul>
+     * @param orientationSmoothFactor Smooth factor for the orientations (depends on type).
+     * @param sync                    If true, the call waits for the transition to finish before returning, otherwise
+     *                                it
+     *                                returns immediately
+     */
+    void cameraTransition(double[] camPos,
+                          String units,
+                          double[] camDir,
+                          double[] camUp,
+                          double seconds,
+                          String positionSmoothType,
+                          double positionSmoothFactor,
+                          String orientationSmoothType,
+                          double orientationSmoothFactor,
                           boolean sync);
 
     /**
@@ -2187,20 +2397,6 @@ public interface IScriptingInterface {
      * @param frames The number of frames to wait.
      */
     void sleepFrames(long frames);
-
-    /**
-     * Expands the component with the given name.
-     *
-     * @param name The name, as in `CameraComponent` or `ObjectsComponent`
-     */
-    void expandGuiComponent(String name);
-
-    /**
-     * Collapses the component with the given name.
-     *
-     * @param name The name, as in `CameraComponent` or `ObjectsComponent`
-     */
-    void collapseGuiComponent(String name);
 
     /**
      * Converts galactic coordinates to the internal cartesian coordinate
@@ -2266,7 +2462,8 @@ public interface IScriptingInterface {
      * to internal cartesian coordinates with internal units.
      *
      * @param eq       Equatorial cartesian coordinates (X->[ra=0,dec=0], Y->[ra=90,dec=0], Z->[ra=0,dec=90])
-     * @param kmFactor Factor used to bring the input coordinate units to Kilometers, so that <code>eq * factor = Km</code>
+     * @param kmFactor Factor used to bring the input coordinate units to Kilometers, so that <code>eq * factor =
+     *                 Km</code>
      * @return Internal coordinates ready to be fed in other scripting functions
      */
     double[] equatorialCartesianToInternalCartesian(double[] eq,
@@ -2420,7 +2617,8 @@ public interface IScriptingInterface {
      * See {@link CubmeapProjectionEffect} for possible
      * values.
      *
-     * @param projection The projection, in ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"orthosphere_crossye"|"azimuthal_equidistant"].
+     * @param projection The projection, in
+     *                   ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"orthosphere_crossye"|"azimuthal_equidistant"].
      */
     void setCubemapProjection(String projection);
 
@@ -2658,7 +2856,8 @@ public interface IScriptingInterface {
      * <p>
      * Parks a camera update {@link Runnable} to the main loop thread, and keeps it running every frame
      * until it finishes or it is unparked by {@link #unparkRunnable(String)}.
-     * This object runs after the update-camera stage and before the update-scene, so it is intended for updating the camera only.
+     * This object runs after the update-camera stage and before the update-scene, so it is intended for updating the
+     * camera only.
      * </p>
      * <p>
      * Be careful with this function, as it probably needs a cleanup before the script is finished. Otherwise,
@@ -2673,7 +2872,8 @@ public interface IScriptingInterface {
                             Runnable runnable);
 
     /**
-     * Removes the runnable with the given id, if any. Use this method to remove previously parked scene and camera runnables.
+     * Removes the runnable with the given id, if any. Use this method to remove previously parked scene and camera
+     * runnables.
      *
      * @param id The id of the runnable to remove.
      */
@@ -2711,7 +2911,8 @@ public interface IScriptingInterface {
      * If <code>sync</code> is true, the call acts exactly like
      * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
      * If <code>sync</code> is false, the loading happens
-     * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
+     * in a new thread and the call returns immediately. In this case, you can use
+     * {@link IScriptingInterface#hasDataset(String)}
      * to check whether the dataset is already loaded and available.
      * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
      * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
@@ -2721,7 +2922,8 @@ public interface IScriptingInterface {
      *               dataset.
      * @param path   Absolute path (or relative to the working path of Gaia Sky) to the file to load.
      * @param sync   Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadDataset(final String dsName,
                         final String path,
@@ -2733,7 +2935,8 @@ public interface IScriptingInterface {
      * If <code>sync</code> is true, the call acts exactly like
      * {@link IScriptingInterface#loadDataset(String, String, boolean)}.<br/>
      * If <code>sync</code> is false, the loading happens
-     * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
+     * in a new thread and the call returns immediately. In this case, you can use
+     * {@link IScriptingInterface#hasDataset(String)}
      * to check whether the dataset is already loaded and available.
      * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
      * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
@@ -2746,7 +2949,8 @@ public interface IScriptingInterface {
      * @param type    The {@link CatalogInfoSource} object to use as the dataset type.
      * @param options The {@link DatasetOptions} object holding the options for this dataset.
      * @param sync    Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadDataset(final String dsName,
                         final String path,
@@ -2763,9 +2967,11 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName The name of the dataset.
-     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *               <code>.csv</code> or <code>.fits</code> file to load.
      * @param sync   Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -2780,10 +2986,13 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                       <code>.csv</code> or <code>.fits</code> file to load.
+     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag -
+     *                       magnitudeScale</code>.
      * @param sync           Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -2798,11 +3007,14 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                       <code>.csv</code> or <code>.fits</code> file to load.
+     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag -
+     *                       magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param sync           Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -2818,13 +3030,18 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                       <code>.csv</code> or <code>.fits</code> file to load.
+     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag -
+     *                       magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                       camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                       camera to the Sun) of this dataset. Set to null to disable.
      * @param sync           Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -2842,15 +3059,20 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                      <code>.csv</code> or <code>.fits</code> file to load.
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
-     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
+     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in
+     *                      [0,1].
+     * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different
+     *                      tone. Set to 0 so that all particles get the same color.
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize  The size of the particles in pixels.
-     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see
+     *                      {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param sync          Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName,
                                 String path,
@@ -2870,17 +3092,24 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                      <code>.csv</code> or <code>.fits</code> file to load.
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
-     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
+     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in
+     *                      [0,1].
+     * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different
+     *                      tone. Set to 0 so that all particles get the same color.
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize  The size of the particles in pixels.
-     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see
+     *                      {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName,
                                 String path,
@@ -2902,18 +3131,25 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName             The name of the dataset.
-     * @param path               Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
+     * @param path               Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                           <code>.csv</code> or <code>.fits</code> file to load.
      * @param profileDecay       The profile decay of the particles as in 1 - distCentre^decay.
-     * @param particleColor      The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param colorNoise         In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
+     * @param particleColor      The base color of the particles, as an array of RGBA (red, green, blue, alpha) values
+     *                           in [0,1].
+     * @param colorNoise         In [0,1], the noise to apply to the color so that each particle gets a slightly
+     *                           different tone. Set to 0 so that all particles get the same color.
      * @param labelColor         The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize       The size of the particles in pixels.
      * @param particleSizeLimits The minimum and maximum size of the particles in pixels.
-     * @param ct                 The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param ct                 The name of the component type to use like "Stars", "Galaxies", etc. (see
+     *                           {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                           camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                           camera to the Sun) of this dataset. Set to null to disable.
      * @param sync               Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName,
                                 String path,
@@ -2938,12 +3174,17 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                      <code>.csv</code> or <code>.fits</code> file to load.
+     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha)
+     *                      values in [0,1].
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -2961,13 +3202,18 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                      <code>.csv</code> or <code>.fits</code> file to load.
+     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in
+     *                      [0,1].
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -2987,13 +3233,19 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                      <code>.csv</code> or <code>.fits</code> file to load.
+     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha)
+     *                      values in [0,1].
+     * @param ct            The name of the component type to use (see
+     *                      {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -3012,14 +3264,20 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                      <code>.csv</code> or <code>.fits</code> file to load.
+     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha)
+     *                      values in [0,1].
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param ct            The name of the component type to use (see
+     *                      {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -3044,13 +3302,18 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
-     * @param magnitudeScale Scaling additive factor to apply to the magnitudes in the light curve, as in <code>appmag = appmag - magnitudeScale</code>.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
+     *                       <code>.csv</code> or <code>.fits</code> file to load.
+     * @param magnitudeScale Scaling additive factor to apply to the magnitudes in the light curve, as in <code>appmag =
+     *                       appmag - magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
-     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from
+     *                       camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from
+     *                       camera to the Sun) of this dataset. Set to null to disable.
      * @param sync           Whether the load must happen synchronously or asynchronously.
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
+     * <code>sync</code> is false.
      */
     boolean loadVariableStarDataset(String dsName,
                                     String path,
@@ -3142,6 +3405,7 @@ public interface IScriptingInterface {
     /**
      * Sets the given 4x4 matrix (in column-major order) as the transformation matrix to apply
      * to all the data points in the dataset identified by the given name.
+     *
      * @param dsName The name of the dataset.
      * @param matrix The 16 values of the 4x4 transformation matrix in column-major order.
      * @return True if the dataset was found and the transformation matrix could be applied. False otherwise.
@@ -3150,6 +3414,7 @@ public interface IScriptingInterface {
 
     /**
      * Clears the transformation matrix (if any) in the dataset identified by the given name.
+     *
      * @param dsName The name of the dataset.
      * @return True if the dataset was found and the transformations cleared.
      */
@@ -3213,7 +3478,8 @@ public interface IScriptingInterface {
      *                       Or star-only attributes (if your dataset contains stars, mind the case!):
      *                       <ul><li>Mualpha</li><li>Mudelta</li><li>Radvel</li><li>Absmag</li><li>Appmag</li></ul>
      *                       Or even extra attributes (if you loaded the dataset yourself), matching by column name.
-     * @param colorMap      The color map to use, in ["reds"|"greens"|"blues"|"rainbow18"|"rainbow"|"seismic"|"carnation"|"hotmeal"|"cool"].
+     * @param colorMap      The color map to use, in
+     *                      ["reds"|"greens"|"blues"|"rainbow18"|"rainbow"|"seismic"|"carnation"|"hotmeal"|"cool"].
      * @param minMap        The minimum mapping value.
      * @param maxMap        The maximum mapping value.
      * @param highlight     State.
@@ -3230,15 +3496,19 @@ public interface IScriptingInterface {
      * Sets the size increase factor of this dataset when highlighted.
      *
      * @param dsName     The dataset name.
-     * @param sizeFactor The size factor to apply to the particles when highlighted, must be in [{@link gaiasky.util.Constants#MIN_DATASET_SIZE_FACTOR}, {@link gaiasky.util.Constants#MAX_DATASET_SIZE_FACTOR}].
+     * @param sizeFactor The size factor to apply to the particles when highlighted, must be in
+     *                   [{@link gaiasky.util.Constants#MIN_DATASET_SIZE_FACTOR},
+     *                   {@link gaiasky.util.Constants#MAX_DATASET_SIZE_FACTOR}].
      * @return False if the dataset could not be found.
      */
     boolean setDatasetHighlightSizeFactor(String dsName,
                                           float sizeFactor);
 
     /**
-     * Sets the 'all visible' property of datasets when highlighted. If set to true, all stars in the dataset have an increased minimum
-     * opacity when highlighted, so that they are all visible. Otherwise, stars retain their minimum opacity and base brightness.
+     * Sets the 'all visible' property of datasets when highlighted. If set to true, all stars in the dataset have an
+     * increased minimum
+     * opacity when highlighted, so that they are all visible. Otherwise, stars retain their minimum opacity and base
+     * brightness.
      *
      * @param dsName     The dataset name.
      * @param allVisible Whether all stars in the dataset should be visible when highlighted or not.
@@ -3260,8 +3530,10 @@ public interface IScriptingInterface {
      * Creates a shape object of the given type with the given size around the object with the given name and primitive.
      *
      * @param shapeName   The name of the shape object.
-     * @param shape       The shape type, one of <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
-     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create a wireframe shape, use 'triangles' for a solid shape.
+     * @param shape       The shape type, one of
+     *                    <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
+     *                    a wireframe shape, use 'triangles' for a solid shape.
      * @param size        The size of the object in kilometers.
      * @param objectName  The name of the object to use as the position.
      * @param r           The red component of the color in [0,1].
@@ -3284,12 +3556,16 @@ public interface IScriptingInterface {
                               boolean trackObject);
 
     /**
-     * Creates a shape object of the given type with the given size around the object with the given name, primitive and orientation.
+     * Creates a shape object of the given type with the given size around the object with the given name, primitive and
+     * orientation.
      *
      * @param shapeName   The name of the shape object.
-     * @param shape       The shape type, one of <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
-     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create a wireframe shape, use 'triangles' for a solid shape.
-     * @param orientation The orientation to use, one of <ul><li>camera</li><li>equatorial</li><li>ecliptic</li><li>galactic</li></ul>.
+     * @param shape       The shape type, one of
+     *                    <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
+     *                    a wireframe shape, use 'triangles' for a solid shape.
+     * @param orientation The orientation to use, one of
+     *                    <ul><li>camera</li><li>equatorial</li><li>ecliptic</li><li>galactic</li></ul>.
      * @param size        The size of the object in kilometers.
      * @param objectName  The name of the object to use as the position.
      * @param r           The red component of the color in [0,1].
@@ -3316,7 +3592,8 @@ public interface IScriptingInterface {
      * <p>Creates a backup of the current settings state that can be restored later on.
      * The settings are backed up in a stack, so multiple calls to this method put different copies of the settings
      * on the stack in a LIFO fashion.</p>
-     * <p>This method, together with {@link IScriptingInterface#restoreSettings()}, are useful to back up and restore the
+     * <p>This method, together with {@link IScriptingInterface#restoreSettings()}, are useful to back up and restore
+     * the
      * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
      * unmodified after your script ends.</p>
      */
@@ -3335,7 +3612,8 @@ public interface IScriptingInterface {
     boolean restoreSettings();
 
     /**
-     * Clears the stack of settings objects. This will invalidate all previous calls to {@link IScriptingInterface#backupSettings()},
+     * Clears the stack of settings objects. This will invalidate all previous calls to
+     * {@link IScriptingInterface#backupSettings()},
      * effectively making the settings stack empty. Calling {@link IScriptingInterface#restoreSettings()} after this
      * method will return false.
      */
@@ -3357,6 +3635,7 @@ public interface IScriptingInterface {
 
     /**
      * Returns the column-major matrix representing the given reference system transformation.
+     *
      * @param name <p>The name of the reference system transformation:
      *             <ul>
      *             <li>'equatorialtoecliptic', 'eqtoecl'</li>

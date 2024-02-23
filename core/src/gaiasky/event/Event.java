@@ -282,10 +282,6 @@ public enum Event {
     CLEAR_SUBHEAD_MESSAGE,
 
     /**
-     * Collapses a GUI pane. Contains its name.
-     */
-    COLLAPSE_PANE_CMD,
-    /**
      * Contains the contrast level (float) in [0,2].
      **/
     CONTRAST_CMD,
@@ -410,10 +406,6 @@ public enum Event {
      * Contains the new time frame object.
      **/
     EVENT_TIME_FRAME_CMD,
-    /**
-     * Expands a GUI pane. Contains its name.
-     */
-    EXPAND_PANE_CMD,
     /**
      * Contains the exposure tone mapping level (float) in [0,n] (0 for disabled).
      */
@@ -1352,9 +1344,13 @@ public enum Event {
     TIME_WARP_CHANGED_INFO,
 
     /**
-     * Toggles the collapsed state of a GUI pane. Contains its name
+     * Toggles the collapsed state of a GUI pane. Contains its name.
      */
     TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
+    /**
+     * Expands or collapses a GUI pane. Contains its name and the boolean with the state (True: expand, False: collapse).
+     */
+    EXPAND_COLLAPSE_PANE_CMD,
 
     /**
      * Toggles minimap visibility

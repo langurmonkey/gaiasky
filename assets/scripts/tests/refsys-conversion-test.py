@@ -8,7 +8,6 @@ gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
 
 gs.setRotationCameraSpeed(80)
 gs.setTurningCameraSpeed(100)
