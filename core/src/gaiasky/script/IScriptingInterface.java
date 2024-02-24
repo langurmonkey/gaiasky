@@ -831,6 +831,20 @@ public interface IScriptingInterface {
     boolean getComponentTypeVisibility(String key);
 
     /**
+     * <p>
+     * Projects the world space position of the given object to screen coordinates. It's the same as GLU gluProject with one small deviation: The viewport is assumed to span the
+     * whole screen. The screen coordinate system has its origin in the bottom left, with the y-axis pointing upwards and the x-axis pointing to the right. This
+     * makes it easily usable in conjunction with Batch and similar classes.
+     * </p>
+     * <p>This call only works if Gaia Sky is using the simple perspective projection mode. It does not work with any of the following modes: panorama (with any of
+     * the projections), planetarium, orthosphere, stereoscopic, or any of the re-projection modes.</p>
+     * @param name The name of the object to get the screen coordinates for.
+     * @return An array with the x and y screen coordinates, in pixels, with the origin at the bottom-left. If the object with the given name does not exist, or it falls
+     * off-screen, it returns null.
+     */
+    double[] getObjectScreenCoordinates(String name);
+
+    /**
      * Sets the visibility of a particular object. Use this method to hide individual objects.
      * Changes to the individual object visibility are not persisted on restart.
      *
