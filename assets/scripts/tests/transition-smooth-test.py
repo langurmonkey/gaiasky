@@ -12,23 +12,6 @@ def lprint(string):
     gs.print(string)
     print(string)
 
-""" Logistic sigmoid """
-def expit(x, span):
-    if x == 0.0:
-        return 0.0
-    if x == 1.0:
-        return 1.0
-    x = x * span - (span / 2.0)
-    return math.exp(x) / (1.0 + math.exp(x))
-
-def gen_expit(n, span):
-    v = [0.0]
-    for x in np.arange(0.0, 1.0, 1.0 / n):
-        v.append(expit(x, span))
-
-    v.append(1.0)
-    return v
-
 gs.cameraStop()
 
 # Go to Earth
@@ -54,7 +37,6 @@ gs.setCameraFree()
 
 lprint("Now, we do a smooth transition.")
 lprint("The transition in position lasts 10 seconds, while the transition in orientation lasts 7 seconds.")
-steps = gen_expit(200, 25.0)
 gs.cameraTransition([-5593.0417731364, 13008.1430225486, 1542.9688571213], 
                     "internal",
                     [0.3965101844, -0.9104556836, -0.1176865406],
