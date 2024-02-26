@@ -1902,8 +1902,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeListener.ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
                 kpw.setAcceptListener(() -> {
-                    if (kpw.camrecFps != null && kpw.camrecFps.isValid()) {
-                        camRecFps.setText(kpw.camrecFps.getText());
+                    if (kpw.camcorderFps != null && kpw.camcorderFps.isValid()) {
+                        camRecFps.setText(kpw.camcorderFps.getText());
                     }
                 });
                 kpw.show(stage);

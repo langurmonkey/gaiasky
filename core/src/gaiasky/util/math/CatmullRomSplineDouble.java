@@ -9,32 +9,38 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.math.MathUtils;
 
-public class CatmullRomSplined<T extends VectorDouble<T>> implements PathDouble<T> {
+/**
+ * Double precision counterpart to the Catmull-Rom spline path.
+ *
+ * @param <T> Type to interpolate.
+ */
+public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     public T[] controlPoints;
     public boolean continuous;
     public int spanCount;
     private T tmp;
     private T tmp2;
     private T tmp3;
-    public CatmullRomSplined() {
+
+    public CatmullRomSplineDouble() {
     }
-    public CatmullRomSplined(final T[] controlPoints, final boolean continuous) {
+
+    public CatmullRomSplineDouble(final T[] controlPoints, final boolean continuous) {
         set(controlPoints, continuous);
     }
 
     /**
-     * Calculates the catmullrom value for the given position (t).
+     * Calculates the Catmull-Rom spline value for the given position (t).
      *
-     * @param out        The Vectord to set to the result.
+     * @param out        The {@link VectorDouble} to set to the result.
      * @param t          The position (0<=t<=1) on the spline
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
-     *
      * @return The value of out
      */
     public static <T extends VectorDouble<T>> T calculate(final T out, final double t, final T[] points, final boolean continuous,
-            final T tmp) {
+                                                          final T tmp) {
         final int n = continuous ? points.length : points.length - 3;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
@@ -43,19 +49,18 @@ public class CatmullRomSplined<T extends VectorDouble<T>> implements PathDouble<
     }
 
     /**
-     * Calculates the catmullrom value for the given span (i) at the given position (u).
+     * Calculates the Catmull-Rom value for the given span (i) at the given position (u).
      *
-     * @param out        The Vectord to set to the result.
+     * @param out        The {@link VectorDouble} to set to the result.
      * @param i          The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree
      * @param u          The position (0<=u<=1) on the span
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
-     *
      * @return The value of out
      */
     public static <T extends VectorDouble<T>> T calculate(final T out, final int i, final double u, final T[] points,
-            final boolean continuous, final T tmp) {
+                                                          final boolean continuous, final T tmp) {
         final int n = points.length;
         final double u2 = u * u;
         final double u3 = u2 * u;
@@ -70,18 +75,17 @@ public class CatmullRomSplined<T extends VectorDouble<T>> implements PathDouble<
     }
 
     /**
-     * Calculates the derivative of the catmullrom spline for the given position (t).
+     * Calculates the derivative of the Catmull-Rom spline for the given position (t).
      *
-     * @param out        The Vectord to set to the result.
+     * @param out        The {@link VectorDouble} to set to the result.
      * @param t          The position (0<=t<=1) on the spline
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
-     *
      * @return The value of out
      */
     public static <T extends VectorDouble<T>> T derivative(final T out, final double t, final T[] points, final boolean continuous,
-            final T tmp) {
+                                                           final T tmp) {
         final int n = continuous ? points.length : points.length - 3;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
@@ -90,19 +94,18 @@ public class CatmullRomSplined<T extends VectorDouble<T>> implements PathDouble<
     }
 
     /**
-     * Calculates the derivative of the catmullrom spline for the given span (i) at the given position (u).
+     * Calculates the derivative of the Catmull-Rom spline for the given span (i) at the given position (u).
      *
-     * @param out        The Vectord to set to the result.
+     * @param out        The {@link VectorDouble} to set to the result.
      * @param i          The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree
      * @param u          The position (0<=u<=1) on the span
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
-     *
      * @return The value of out
      */
     public static <T extends VectorDouble<T>> T derivative(final T out, final int i, final double u, final T[] points,
-            final boolean continuous, final T tmp) {
+                                                           final boolean continuous, final T tmp) {
         /*
          * catmull'(u) = 0.5 *((-p0 + p2) + 2 * (2*p0 - 5*p1 + 4*p2 - p3) * u + 3 * (-p0 + 3*p1 - 3*p2 + p3) * u * u)
          */
@@ -119,7 +122,7 @@ public class CatmullRomSplined<T extends VectorDouble<T>> implements PathDouble<
         return out;
     }
 
-    public CatmullRomSplined set(final T[] controlPoints, final boolean continuous) {
+    public CatmullRomSplineDouble set(final T[] controlPoints, final boolean continuous) {
         if (tmp == null)
             tmp = controlPoints[0].cpy();
         if (tmp2 == null)

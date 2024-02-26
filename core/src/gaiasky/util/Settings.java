@@ -3565,6 +3565,10 @@ public class Settings extends SettingsObject {
             }
 
             private KeyframesManager.PathType getPathType(String str) {
+                // Keep compatibility with old path types.
+                if (str.equalsIgnoreCase("SPLINE")) {
+                    str = KeyframesManager.PathType.CATMULL_ROM_SPLINE.toString();
+                }
                 return KeyframesManager.PathType.valueOf(str.toUpperCase());
             }
 

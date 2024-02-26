@@ -118,13 +118,20 @@ public class KeyframesManager implements IObserver {
                                          PathType pathType) {
         if (pathType == PathType.LINEAR) {
             return new LinearDouble<>(data);
-        } else if (pathType == PathType.SPLINE) {
-            // Needs extra points at beginning and end
+        } else if (pathType == PathType.CATMULL_ROM_SPLINE) {
+            // Needs extra points at beginning and end.
             Vector3d[] extData = new Vector3d[data.length + 2];
             System.arraycopy(data, 0, extData, 1, data.length);
             extData[0] = data[0];
             extData[data.length + 1] = data[data.length - 1];
-            return new CatmullRomSplined<>(extData, false);
+            return new CatmullRomSplineDouble<>(extData, false);
+        } else if(pathType == PathType.B_SPLINE) {
+            // Needs extra points at beginning and end.
+            Vector3d[] extData = new Vector3d[data.length + 2];
+            System.arraycopy(data, 0, extData, 1, data.length);
+            extData[0] = data[0];
+            extData[data.length + 1] = data[data.length - 1];
+            return new BSplineDouble<>(extData, false);
         }
         // Default
         return new LinearDouble<>(data);
@@ -271,7 +278,7 @@ public class KeyframesManager implements IObserver {
         for (Keyframe kf : keyframes) {
 
             // Fill positions
-            if (kf.seam && pathType == PathType.SPLINE) {
+            if (kf.seam && pathType == PathType.CATMULL_ROM_SPLINE) {
                 if (i > 0 && i < keyframes.size - 1) {
                     current.add(kf.pos);
                     positionsSep.add(current);
@@ -454,7 +461,8 @@ public class KeyframesManager implements IObserver {
 
     public enum PathType {
         LINEAR,
-        SPLINE
+        CATMULL_ROM_SPLINE,
+        B_SPLINE
     }
 
     public static class PathPart {

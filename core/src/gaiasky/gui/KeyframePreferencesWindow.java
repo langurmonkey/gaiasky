@@ -27,7 +27,7 @@ import java.text.DecimalFormat;
 public class KeyframePreferencesWindow extends GenericDialog {
 
     private final DecimalFormat nf3;
-    public OwnTextField camrecFps;
+    public OwnTextField camcorderFps;
     private OwnSelectBox<ComboBoxBean> posMethod;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
@@ -44,14 +44,14 @@ public class KeyframePreferencesWindow extends GenericDialog {
     @Override
     protected void build() {
 
-        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.interpolation.linear"), KeyframesManager.PathType.LINEAR.ordinal()), new ComboBoxBean(I18n.msg("gui.interpolation.catmull"), KeyframesManager.PathType.SPLINE.ordinal()) };
+        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.interpolation.linear"), KeyframesManager.PathType.LINEAR.ordinal()), new ComboBoxBean(I18n.msg("gui.interpolation.catmull"), KeyframesManager.PathType.CATMULL_ROM_SPLINE.ordinal()) , new ComboBoxBean(I18n.msg("gui.interpolation.bspline"), KeyframesManager.PathType.B_SPLINE.ordinal()) };
 
         OwnLabel generalTitle = new OwnLabel(I18n.msg("gui.general"), skin, "hud-header");
 
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.msg("gui.target.fps"), skin);
-        camrecFps = new OwnTextField(nf3.format(Settings.settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
-        camrecFps.setWidth(240f);
+        camcorderFps = new OwnTextField(nf3.format(Settings.settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
+        camcorderFps.setWidth(240f);
 
         OwnLabel interpTitle = new OwnLabel(I18n.msg("gui.keyframes.interp"), skin, "hud-header");
 
@@ -74,7 +74,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         content.add(generalTitle).left().top().colspan(2).padBottom(pad18).row();
 
         content.add(camfpsLabel).left().padRight(pad18).padBottom(pad18 * 3f);
-        content.add(camrecFps).left().padBottom(pad18 * 3f).row();
+        content.add(camcorderFps).left().padBottom(pad18 * 3f).row();
 
         content.add(interpTitle).left().top().colspan(2).padBottom(pad18).row();
 
@@ -91,7 +91,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
     @Override
     protected boolean accept() {
-        EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camrecFps.getText()));
+        EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camcorderFps.getText()));
         Settings.settings.camrecorder.keyframe.position = KeyframesManager.PathType.values()[posMethod.getSelectedIndex()];
         return true;
     }

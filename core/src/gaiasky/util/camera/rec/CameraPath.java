@@ -154,7 +154,7 @@ public class CameraPath {
             splinePosIdx += splinePosStep;
 
             // If k1 is seam and not last, and we're doing splines, jump to next spline
-            if (k1.seam && i < keyframes.size - 1 && Settings.settings.camrecorder.keyframe.position == PathType.SPLINE) {
+            if (k1.seam && i < keyframes.size - 1 && Settings.settings.camrecorder.keyframe.position == PathType.CATMULL_ROM_SPLINE) {
                 currentPosSpline = posSplines[++k];
                 splinePosIdx = 0;
                 splinePosStep = 1d / (currentPosSpline.nPoints - 1);
