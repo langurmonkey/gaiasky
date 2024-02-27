@@ -1133,7 +1133,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             aux1.clamp(0, Settings.settings.scene.camera.speedLimit);
         }
 
-        translate(aux1.scl(dt));
+        if (dt > 0) {
+            translate(aux1.scl(dt));
+        }
 
     }
 
@@ -1569,8 +1571,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public void rotate(Vector3d axis,
                        double angle) {
-        direction.rotate(axis, angle);
-        up.rotate(axis, angle);
+        if (!axis.hasNaN() && Double.isFinite(angle)) {
+            direction.rotate(axis, angle);
+            up.rotate(axis, angle);
+        }
     }
 
     /**
@@ -1583,8 +1587,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void translate(double x,
                           double y,
                           double z) {
-        pos.add(x, y, z);
-        posDistanceCheck();
+        if (Double.isFinite(x) && Double.isFinite(y) && Double.isFinite(z)) {
+            pos.add(x, y, z);
+            posDistanceCheck();
+        }
     }
 
     /**
@@ -1593,8 +1599,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param vec the displacement vector
      */
     public void translate(Vector3d vec) {
-        pos.add(vec);
-        posDistanceCheck();
+        if (vec != null && !vec.hasNaN()) {
+            pos.add(vec);
+            posDistanceCheck();
+        }
     }
 
     /**
@@ -1603,7 +1611,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param force The force.
      */
     protected void applyForce(Vector3b force) {
-        if (force != null) {
+        if (force != null && !force.hasNaN()) {
             accel.add(force);
         }
     }
