@@ -1,4 +1,5 @@
-# Test script. Tests getCameraPosition(units) with different units. 
+# Test script. Tests getCameraPosition(units) with different units,
+# getCameraDirection() and getCameraUp(). 
 # Created by Toni Sagrista
 
 import math

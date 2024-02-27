@@ -1,4 +1,4 @@
-# This script tests the cameraTransition command using steps.
+# This script tests the cameraTransition command using the smoothing functions.
 # Created by Toni Sagrista
 
 from py4j.clientserver import ClientServer, JavaParameters
