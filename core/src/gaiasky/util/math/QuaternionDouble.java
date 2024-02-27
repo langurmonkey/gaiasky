@@ -284,9 +284,9 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Normalizes this quaternion to unit length
+     * Normalizes this quaternion to unit length.
      *
-     * @return the quaternion for chaining
+     * @return the quaternion for chaining.
      */
     public QuaternionDouble nor() {
         double len = len2();
@@ -299,8 +299,6 @@ public class QuaternionDouble implements Serializable {
         }
         return this;
     }
-
-    // TODO : this would better fit into the vector3 class
 
     /**
      * Conjugate the quaternion.
@@ -818,14 +816,40 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Spherical linear interpolation between this quaternion and the other quaternion, based on the alpha value in the range
-     * [0,1]. Taken from. Taken from Bones framework for JPCT, see http://www.aptalkarga.com/bones/
+     * Normalized linear interpolation between the current instance and {@code q2} using
+     * nlerp, and stores the result in the current instance.
      *
-     * @param end   the end quaternion
-     * @param alpha alpha in the range [0,1]
-     * @return this quaternion for chaining
+     * <p>This method is often faster than
+     * {@link QuaternionDouble#slerp(QuaternionDouble, double)}, but less accurate.
+     *
+     * @param q2 the desired value when blend=1 (not null, unaffected).
+     * @param blend the fractional change amount.
      */
-    public QuaternionDouble slerp(QuaternionDouble end, double alpha) {
+    public void nlerp(QuaternionDouble q2, float blend) {
+        double dot = dot(q2);
+        double blendI = 1.0 - blend;
+        if (dot < 0.0) {
+            x = blendI * x - blend * q2.x;
+            y = blendI * y - blend * q2.y;
+            z = blendI * z - blend * q2.z;
+            w = blendI * w - blend * q2.w;
+        } else {
+            x = blendI * x + blend * q2.x;
+            y = blendI * y + blend * q2.y;
+            z = blendI * z + blend * q2.z;
+            w = blendI * w + blend * q2.w;
+        }
+        nor();
+    }
+
+    /**
+     * Spherical linear interpolation between this quaternion and the {@code end} quaternion, based on the alpha value in the range
+     * [0,1]. Taken from. Taken from Bones framework for JPCT, see <a href="http://www.aptalkarga.com/bones/">here</a>.
+     *
+     * @param end   the end quaternion.
+     * @param alpha alpha in the range [0,1].
+     */
+    public void slerp(QuaternionDouble end, double alpha) {
         final double dot = dot(end);
         double absDot = dot < 0.f ? -dot : dot;
 
@@ -855,10 +879,56 @@ public class QuaternionDouble implements Serializable {
         y = (scale0 * y) + (scale1 * end.y);
         z = (scale0 * z) + (scale1 * end.z);
         w = (scale0 * w) + (scale1 * end.w);
-
-        // Return the interpolated quaternion
-        return this;
     }
+
+    /**
+     * Second implementation of slerp, slightly different from the default one.
+     * @param end The end quaternion.
+     * @param alpha The fractional change amount in [0,1].
+     */
+    public void slerp2(QuaternionDouble end, double alpha) {
+        if (x == end.x && y == end.y && z == end.z && w == end.w) {
+            return;
+        }
+
+        double result = (x * end.x) + (y * end.y) + (z * end.z) + (w * end.w);
+
+        if (result < 0.0) {
+            // Negate the second quaternion and the result of the dot product
+            end.x = -end.x;
+            end.y = -end.y;
+            end.z = -end.z;
+            end.w = -end.w;
+            result = -result;
+        }
+
+        // Set the first and second scale for the interpolation
+        double scale0 = 1.0 - alpha;
+        double scale1 = alpha;
+
+        // Check if the angle between the 2 quaternions was big enough to
+        // warrant such calculations
+        if ((1 - result) > 0.1) {
+            // Get the angle between the 2 quaternions, and then store the sin()
+            // of that angle
+            double theta = FastMath.acos(result);
+            double invSinTheta = 1.0 / FastMath.sin(theta);
+
+            // Calculate the scale for q1 and q2, according to the angle and
+            // its sine
+            scale0 = FastMath.sin((1 - alpha) * theta) * invSinTheta;
+            scale1 = FastMath.sin((alpha * theta)) * invSinTheta;
+        }
+
+        // Calculate the x, y, z and w values for the quaternion by using a
+        // special
+        // form of linear interpolation for quaternions.
+        x = (scale0 * x) + (scale1 * end.x);
+        y = (scale0 * y) + (scale1 * end.y);
+        z = (scale0 * z) + (scale1 * end.z);
+        w = (scale0 * w) + (scale1 * end.w);
+    }
+
 
     @Override
     public int hashCode() {

@@ -1,6 +1,5 @@
 package gaiasky.util.camera.rec;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import gaiasky.util.DoubleArray;
 import gaiasky.util.Settings;
@@ -14,6 +13,7 @@ import gaiasky.util.parse.Parser;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Contains the in-memory data for a specific camera path.
@@ -92,7 +92,7 @@ public class CameraPath {
      * @param keyframes  Array of keyframes.
      * @param posSplines Array of path parts.
      */
-    public CameraPath(Array<Keyframe> keyframes,
+    public CameraPath(List<Keyframe> keyframes,
                       PathPart[] posSplines) {
         times = new LongArray();
         data = new DoubleArray();
@@ -113,7 +113,7 @@ public class CameraPath {
         /* Step length in between control positions */
         double splinePosStep = 1d / (currentPosSpline.nPoints - 1);
 
-        for (int i = 1; i < keyframes.size; i++) {
+        for (int i = 1; i < keyframes.size(); i++) {
             Keyframe k0 = keyframes.get(i - 1);
             Keyframe k1 = keyframes.get(i);
 
@@ -154,7 +154,7 @@ public class CameraPath {
             splinePosIdx += splinePosStep;
 
             // If k1 is seam and not last, and we're doing splines, jump to next spline
-            if (k1.seam && i < keyframes.size - 1 && Settings.settings.camrecorder.keyframe.position == PathType.CATMULL_ROM_SPLINE) {
+            if (k1.seam && i < keyframes.size() - 1 && Settings.settings.camrecorder.keyframe.position == PathType.CATMULL_ROM_SPLINE) {
                 currentPosSpline = posSplines[++k];
                 splinePosIdx = 0;
                 splinePosStep = 1d / (currentPosSpline.nPoints - 1);
@@ -162,7 +162,7 @@ public class CameraPath {
         }
 
         // Add final point.
-        Keyframe kf = keyframes.get(keyframes.size - 1);
+        Keyframe kf = keyframes.get(keyframes.size() - 1);
         times.add(kf.time);
         data.add(kf.pos.x, kf.pos.y, kf.pos.z);
         data.add(kf.dir.x, kf.dir.y, kf.dir.z);

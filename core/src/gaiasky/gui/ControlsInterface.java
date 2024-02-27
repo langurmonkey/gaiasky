@@ -252,7 +252,11 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         // Add button tooltip.
         if (action != null && !action.isBlank()) {
             String shortcutKeys = KeyBindings.instance.getStringKeys(action);
-            button.addListener(new OwnTextHotkeyTooltip(title, shortcutKeys, skin));
+            if(shortcutKeys != null) {
+                button.addListener(new OwnTextHotkeyTooltip(title, shortcutKeys, skin));
+            } else {
+                button.addListener(new OwnTextTooltip(title, skin));
+            }
         } else {
             button.addListener(new OwnTextTooltip(title, skin));
         }

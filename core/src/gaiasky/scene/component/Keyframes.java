@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Scene;
 import gaiasky.util.camera.rec.Keyframe;
 
+import java.util.List;
+
 public class Keyframes implements Component {
 
     /**
@@ -22,7 +24,7 @@ public class Keyframes implements Component {
     /**
      * Keyframe objects.
      */
-    public Array<Keyframe> keyframes;
+    public List<Keyframe> keyframes;
     /**
      * Selected keyframe.
      **/

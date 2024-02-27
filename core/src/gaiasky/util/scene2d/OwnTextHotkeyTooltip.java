@@ -61,7 +61,7 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
         getContainer().pack();
         getContainer().width(new Value() {
             public float get(Actor context) {
-                return Math.min(manager.maxWidth, label.getGlyphLayout().width + 10f + (labelHotkey != null ? labelHotkey.getGlyphLayout().width + 20f : 0f));
+                return Math.min(manager.maxWidth, label.getGlyphLayout().width + 10f + (labelHotkey != null ? labelHotkey.getGlyphLayout().width + 60f : 0f));
             }
         });
 

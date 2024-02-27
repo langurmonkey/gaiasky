@@ -17,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -27,6 +26,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.KeyframesView;
@@ -40,6 +40,8 @@ import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.InterpolationDouble;
+import gaiasky.util.math.QuaternionDouble;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
@@ -54,10 +56,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
@@ -157,8 +156,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         super(I18n.msg("gui.keyframes.title"), skin, stage);
 
         this.manager = KeyframesManager.instance;
-        buttonSize = 26f;
-        buttonSizeL = 28f;
+        buttonSize = 36f;
+        buttonSizeL = 38f;
 
         this.view = new KeyframesView(scene);
         this.vertsView = new VertsView();
@@ -203,6 +202,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     @Override
     protected void build() {
         /*
+         * Top table
+         */
+        Table top = new Table(skin);
+
+        /*
          * Right and left tables
          */
         Table left = new Table(skin);
@@ -215,7 +219,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // ADD
         OwnTextIconButton addKeyframe = new OwnTextIconButton(I18n.msg("gui.keyframes.add.end"), skin, "add");
-        addKeyframe.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.add.end"), skin));
+        String tooltip = I18n.msg("gui.tooltip.kf.add.end");
+        String action = "action.keyframe";
+        String shortcutKeys = KeyBindings.instance.getStringKeys(action);
+        if (shortcutKeys != null) {
+            addKeyframe.addListener(new OwnTextHotkeyTooltip(tooltip, shortcutKeys, skin));
+        } else {
+            addKeyframe.addListener(new OwnTextTooltip(tooltip, skin));
+        }
         addKeyframe.pad(pad10);
         left.add(addKeyframe).left().pad(pad10, pad10, 0, pad10).colspan(2).padBottom(pad34).row();
         addKeyframe.addListener(event -> {
@@ -289,25 +300,28 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setExpand(true);
         rightScroll.setScrollingDisabled(true, false);
-        rightScroll.setHeight(250f);
+        rightScroll.setHeight(350f);
         rightScroll.setWidth(820f);
         rightScroll.setFadeScrollBars(false);
 
         right.add(keyframesTitle).top().left().padBottom(pad18).row();
         right.add(rightScroll).width(820f).height(250f).center().left().row();
-        right.add(mediaTable).center().padTop(pad10);
 
         right.pack();
 
-        /* RE-NORMALIZE TIME */
-        OwnTextButton normalizeTime = new OwnTextButton(I18n.msg("gui.keyframes.normalize"), skin);
+        /* ACTION BUTTONS */
+        float buttonSize = 56f;
+
+        // Re-normalize time.
+        OwnTextIconButton normalizeTime = new OwnTextIconButton(I18n.msg("gui.keyframes.normalize"), skin, "project");
+        normalizeTime.setHeight(buttonSize);
         normalizeTime.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.normalize"), skin));
         normalizeTime.pad(pad18);
         normalizeTime.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                if (manager.keyframes != null && manager.keyframes.size > 2) {
+                if (manager.keyframes != null && manager.keyframes.size() > 2) {
                     Vector3d aux = new Vector3d();
-                    int n = manager.keyframes.size;
+                    int n = manager.keyframes.size();
                     double totalTime = 0;
                     double totalDist = 0;
                     for (int i = 1; i < n; i++) {
@@ -346,12 +360,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
 
 
-        /* ACTION BUTTONS */
-        HorizontalGroup buttons = new HorizontalGroup();
-        buttons.space(pad18);
-
         // Open keyframes.
         OwnTextIconButton open = new OwnTextIconButton(I18n.msg("gui.keyframes.load"), skin, "open");
+        open.setHeight(buttonSize);
         open.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.load"), skin));
         open.pad(pad10);
         open.addListener((event) -> {
@@ -366,7 +377,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         if (Files.exists(result) && Files.isRegularFile(result)) {
                             // Load selected file.
                             try {
-                                Array<Keyframe> kfs = manager.loadKeyframesFile(result);
+                                java.util.List<Keyframe> kfs = manager.loadKeyframesFile(result);
                                 // Update current instance.
                                 reinitialiseKeyframes(kfs, null);
                                 synchronized (view) {
@@ -374,7 +385,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                     view.unselect();
                                 }
                                 lastKeyframeFileName = result.getFileName().toString();
-                                logger.info(I18n.msg("gui.keyframes.load.success", manager.keyframes.size, result.getFileName()));
+                                logger.info(I18n.msg("gui.keyframes.load.success", manager.keyframes.size(), result.getFileName()));
                             } catch (RuntimeException e) {
                                 logger.error(I18n.msg("gui.keyframes.load.error", result.getFileName()), e);
                                 Label warn = new OwnLabel(I18n.msg("error.loading.format", result.getFileName()), skin);
@@ -404,6 +415,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Save keyframes.
         OwnTextIconButton save = new OwnTextIconButton(I18n.msg("gui.keyframes.save"), skin, "save");
+        save.setHeight(buttonSize);
         save.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.save"), skin));
         save.pad(pad10);
         save.addListener((event) -> {
@@ -431,6 +443,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Export to camera path.
         OwnTextIconButton export = new OwnTextIconButton(I18n.msg("gui.keyframes.export"), skin, "export");
+        export.setHeight(buttonSize);
         export.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.export"), skin));
         export.pad(pad10);
         export.addListener((event) -> {
@@ -456,7 +469,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Keyframe preferences.
         Button preferences = new OwnTextIconButton(I18n.msg("gui.preferences"), skin, "preferences");
-        preferences.setName("keyframe preferences");
+        preferences.setHeight(buttonSize);
         preferences.pad(pad10);
         preferences.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.editprefs"), skin));
         preferences.addListener((event) -> {
@@ -482,18 +495,19 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        buttons.addActor(open);
-        buttons.addActor(save);
-        buttons.addActor(export);
-        buttons.addActor(preferences);
+        top.add(open).padRight(pad10);
+        top.add(save).padRight(pad10);
+        top.add(export).padRight(pad34 * 2f);
+        top.add(normalizeTime).padRight(pad34 * 2f);
+        top.add(preferences).padRight(pad10);
 
         /* FINAL LAYOUT */
+        content.add(top).colspan(2).top().left().padBottom(pad34).row();
         content.add(left).top().left().padRight(pad18 * 2f).padBottom(pad18 * 3f);
         content.add(right).width(830f).top().left().padBottom(pad18).row();
+        content.add(mediaTable).colspan(2).expandX().top().center().padBottom(pad10).row();
         notice = content.add();
-        notice.padBottom(pad18 * 2f).expandY().center().colspan(2).row();
-        content.add(normalizeTime).colspan(2).bottom().center().padBottom(pad18).row();
-        content.add(buttons).colspan(2).bottom().right().row();
+        notice.padBottom(pad10).colspan(2).expandY().center().colspan(2);
 
         // CLEAR
         OwnTextButton clear = new OwnTextButton(I18n.msg("gui.clear"), skin);
@@ -524,19 +538,21 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     /**
-     * Adds a new keyframe at the given index position using the given camera position, orientation and time
+     * Adds a new keyframe at the given index position using the given camera position, orientation and time.
      *
-     * @param index The position of the keyframe, negative to add at the end
-     * @param cPos  The position
-     * @param cDir  The direction
-     * @param cUp   The up
-     * @param cTime The time
-     * @return True if the keyframe was added, false otherwise
+     * @param index   The position of the keyframe, negative to add at the end.
+     * @param cPos    The position.
+     * @param cDir    The direction vector.
+     * @param cUp     The up vector.
+     * @param cTarget The location of the point of interest (focus), if any.
+     * @param cTime   The time.
+     * @return True if the keyframe was added, false otherwise.
      */
     private boolean addKeyframe(int index,
                                 Vector3d cPos,
                                 Vector3d cDir,
                                 Vector3d cUp,
+                                Vector3d cTarget,
                                 long cTime) {
 
         try {
@@ -544,7 +560,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             boolean nameOk = nameInput.isValid();
             if (secOk && nameOk) {
                 // Seconds after - first keyframe at zero
-                double secsAfter = manager.keyframes.size == 0 ? 0 : Double.parseDouble(secondsInput.getText());
+                double secsAfter = manager.keyframes.isEmpty() ? 0 : Double.parseDouble(secondsInput.getText());
 
                 // Name
                 String name;
@@ -552,11 +568,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 if (ni != null && !ni.isEmpty()) {
                     name = ni;
                 } else {
-                    name = I18n.msg("gui.keyframes.name.default", (manager.keyframes.size + 1));
+                    name = I18n.msg("gui.keyframes.name.default", (manager.keyframes.size() + 1));
                 }
 
-                Keyframe kf = new Keyframe(name, cPos, cDir, cUp, cTime, secsAfter, false);
-                final boolean insert = index >= 0 && index != manager.keyframes.size;
+                Keyframe kf = new Keyframe(name, cPos, cDir, cUp, cTarget, cTime, secsAfter, false);
+                final boolean insert = index >= 0 && index != manager.keyframes.size();
                 if (!insert) {
                     synchronized (manager.keyframes) {
                         manager.keyframes.add(kf);
@@ -568,10 +584,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         prevT += kfr.seconds;
                     }
 
-                    addKeyframeToTable(kf, prevT, manager.keyframes.size - 1, keyframesTable, true);
+                    addKeyframeToTable(kf, prevT, manager.keyframes.size() - 1, keyframesTable, true);
                 } else {
                     synchronized (manager.keyframes) {
-                        manager.keyframes.insert(index, kf);
+                        manager.keyframes.add(index, kf);
                     }
                 }
                 GaiaSky.postRunnable(() -> {
@@ -606,6 +622,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         Vector3d cPos = new Vector3d();
         Vector3d cDir = new Vector3d();
         Vector3d cUp = new Vector3d();
+        Vector3d cTarget = null;
+        ICamera cam = GaiaSky.instance.getICamera();
         long cTime;
         // Freeze the camera info
         synchronized (windowLock) {
@@ -613,8 +631,15 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             cPos.set(manager.pos);
             cDir.set(manager.dir);
             cUp.set(manager.up);
+            if (cam.hasFocus()) {
+                var focusPos = new Vector3b();
+                cam.getFocus().getAbsolutePosition(focusPos);
+                cTarget = new Vector3d();
+                focusPos.put(cTarget);
+            }
+
         }
-        boolean result = addKeyframe(index, cPos, cDir, cUp, cTime);
+        boolean result = addKeyframe(index, cPos, cDir, cUp, cTarget, cTime);
         updateCurrentPathAndTimeline();
         checkKeyframeTimings();
         return result;
@@ -633,7 +658,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void addMediaControlsToTable(Table table) {
-        table.setWidth(800f);
+        table.setWidth(1250f);
 
         // Skip back.
         skipBack = new OwnImageButton(skin, "media-skip-backward");
@@ -719,14 +744,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void updateCurrentPathAndTimeline() {
-        if (timelineCell != null && manager.keyframes != null && manager.keyframes.size > 1) {
+        if (timelineCell != null && manager.keyframes != null && manager.keyframes.size() > 1) {
 
             // Generate new current camera path.
             manager.regenerateCameraPath();
 
             // Update timeline slider.
             timelineSlider = new OwnSlider(0f, manager.currentPath.n - 1, 1f, skin);
-            timelineSlider.setWidth(800f);
+            timelineSlider.setWidth(1250f);
             timelineSlider.setValuePrefix(I18n.msg("gui.keyframes.frame").strip() + " ");
             timelineSlider.setValueFormatter(new DecimalFormat("######0"));
             timelineSlider.addListener((event) -> {
@@ -745,13 +770,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void checkKeyframesTableBeforeAdd() {
-        if (manager.keyframes.size == 0) {
+        if (manager.keyframes.isEmpty()) {
             keyframesTable.clear();
         }
     }
 
     private void checkKeyframesTable() {
-        if (manager.keyframes.size == 0) {
+        if (manager.keyframes.isEmpty()) {
             if (mediaTable != null) {
                 mediaTable.setVisible(false);
             }
@@ -759,7 +784,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 OwnLabel emptyList = new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.keyframes.empty"), 65), skin, "default-pink");
                 keyframesTable.add(emptyList).center();
             }
-        } else if (manager.keyframes.size == 1) {
+        } else if (manager.keyframes.size() == 1) {
             if (mediaTable != null) {
                 mediaTable.setVisible(false);
             }
@@ -784,9 +809,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         pack();
     }
 
-    private void addKeyframesToTable(Array<Keyframe> keyframes,
+    private void addKeyframesToTable(java.util.List<Keyframe> keyframes,
                                      Table table) {
-        if (keyframes.size > 0) {
+        if (!keyframes.isEmpty()) {
             int i = 0;
             double prevT = 0;
             for (Keyframe kf : keyframes) {
@@ -825,7 +850,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                  Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-subheader");
-        secondsL.setWidth(126f);
+        secondsL.setWidth(95f);
         Cell<?> secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -895,7 +920,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                               Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth(360f);
+        nameL.setWidth(240f);
         Cell<?> nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -953,6 +978,47 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                     Table table,
                                     boolean addToModel) {
 
+        // Up
+        OwnTextIconButton moveUp = new OwnTextIconButton("", skin, "caret-up");
+        moveUp.setSize(buttonSizeL * 0.8f, buttonSize * 0.8f);
+        moveUp.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.up"), skin));
+        moveUp.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                int idx = manager.keyframes.indexOf(kf);
+                if (idx > 0) {
+                    // We can move up.
+                    manager.keyframes.remove(kf);
+                    manager.keyframes.add(idx - 1, kf);
+                    reinitialiseKeyframes(manager.keyframes, null);
+                }
+                return true;
+            }
+            return false;
+        });
+        addHighlightListener(moveUp, kf);
+        table.add(moveUp).left().padRight(pad10).padBottom(pad10);
+
+        // Down
+        OwnTextIconButton moveDown = new OwnTextIconButton("", skin, "caret-down");
+        moveDown.setSize(buttonSizeL * 0.8f, buttonSize * 0.8f);
+        moveDown.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.down"), skin));
+        moveDown.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                int idx = manager.keyframes.indexOf(kf);
+                if (idx < manager.keyframes.size() - 1) {
+                    // We can move down.
+                    manager.keyframes.remove(kf);
+                    manager.keyframes.add(idx + 1, kf);
+                    reinitialiseKeyframes(manager.keyframes, null);
+                }
+                return true;
+            }
+            return false;
+        });
+        addHighlightListener(moveDown, kf);
+        table.add(moveDown).left().padRight(pad10).padBottom(pad10);
+
+
         // Seconds
         addFrameSeconds(kf, prevT, index, table);
 
@@ -976,7 +1042,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Frame name
         addFrameName(kf, index, table);
 
-        // Go to
+        // Go to.
         OwnTextIconButton goTo = new OwnTextIconButton("", skin, "go-to");
         goTo.setSize(buttonSize, buttonSize);
         goTo.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.goto"), skin));
@@ -991,7 +1057,37 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addHighlightListener(goTo, kf);
         table.add(goTo).left().padRight(pad10).padBottom(pad10);
 
-        // Seam
+        // Set to current camera.
+        OwnTextIconButton setCurrent = new OwnTextIconButton("", skin, "camera-slr");
+        setCurrent.setSize(buttonSize, buttonSize);
+        setCurrent.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.setcurrent"), skin));
+        setCurrent.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                // Keyframe to current camera.
+                kf.pos.set(manager.pos);
+                kf.dir.set(manager.dir);
+                kf.up.set(manager.up);
+                var cam = GaiaSky.instance.getICamera();
+                if (cam.hasFocus()) {
+                    var focusPos = new Vector3b();
+                    cam.getFocus().getAbsolutePosition(focusPos);
+                    if (kf.target == null) {
+                        kf.target = new Vector3d();
+                    }
+                    focusPos.put(kf.target);
+                } else {
+                    kf.target = null;
+                }
+                reinitialiseKeyframes(manager.keyframes, null);
+
+                return true;
+            }
+            return false;
+        });
+        addHighlightListener(setCurrent, kf);
+        table.add(setCurrent).left().padRight(pad10).padBottom(pad10);
+
+        // Seam.
         OwnTextIconButton seam = new OwnTextIconButton("", skin, "seam", "toggle");
         seam.setSize(buttonSize, buttonSize);
         seam.setChecked(kf.seam);
@@ -1031,27 +1127,61 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 // Work out keyframe properties
                 Keyframe k0, k1;
-                Vector3d pos, dir, up;
+                Vector3d pos, dir, up, target;
                 long time;
-                if (index < manager.keyframes.size - 1) {
-                    // We can interpolate
+                if (index < manager.keyframes.size() - 1) {
+                    // We can interpolate.
                     k0 = manager.keyframes.get(index);
                     k1 = manager.keyframes.get(index + 1);
+
+                    // Target.
+                    if (k0.target != null && k1.target != null) {
+                        // Compute mean position.
+                        target = new Vector3d().set(k0.target).interpolate(k1.target, 0.5, InterpolationDouble.linear);
+                    } else {
+                        // No target.
+                        target = null;
+                    }
+
+                    // Interpolate position.
                     pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 0.5, InterpolationDouble.linear);
-                    dir = new Vector3d().set(k0.dir).interpolate(k1.dir, 0.5, InterpolationDouble.linear);
-                    up = new Vector3d().set(k0.up).interpolate(k1.up, 0.5, InterpolationDouble.linear);
+
+                    // Interpolate direction.
+                    QuaternionDouble q0 = new QuaternionDouble();
+                    q0.setFromCamera(k0.dir, k0.up);
+                    QuaternionDouble q1 = new QuaternionDouble();
+                    q1.setFromCamera(k1.dir, k1.up);
+                    q0.slerp(q1, 0.5);
+                    dir = q0.getDirection(new Vector3d());
+                    up = q0.getUp(new Vector3d());
+
+                    // Time.
                     time = k0.time + (long) ((k1.time - k0.time) / 2d);
                 } else {
-                    // Last keyframe
+                    // Last keyframe.
                     k0 = manager.keyframes.get(index - 1);
                     k1 = manager.keyframes.get(index);
+
+                    // Target.
+                    if (k0.target != null && k1.target != null) {
+                        // Compute mean position.
+                        target = new Vector3d().set(k0.target).interpolate(k1.target, 1.5, InterpolationDouble.linear);
+                    } else {
+                        // No target.
+                        target = null;
+                    }
+
+                    // Interpolate position.
                     pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 1.5, InterpolationDouble.linear);
-                    dir = new Vector3d().set(k0.dir).interpolate(k1.dir, 1.5, InterpolationDouble.linear);
-                    up = new Vector3d().set(k0.up).interpolate(k1.up, 1.5, InterpolationDouble.linear);
+
+                    // Use direction and up from previous frame.
+                    dir = new Vector3d(k1.dir);
+                    up = new Vector3d(k1.up);
+
+                    // Time.
                     time = k1.time + (long) ((k1.time - k0.time) / 2d);
                 }
-                // Add at end
-                return addKeyframe(index + 1, pos, dir, up, time);
+                return addKeyframe(index + 1, pos, dir, up, target, time);
             }
             return false;
         });
@@ -1065,7 +1195,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Remove keyframe
-                Array<Keyframe> newKfs = new Array<>(false, manager.keyframes.size - 1);
+                java.util.List<Keyframe> newKfs = Collections.synchronizedList(new ArrayList<>(manager.keyframes.size() - 1));
                 for (Keyframe k : manager.keyframes) {
                     if (k != kf)
                         newKfs.add(k);
@@ -1102,7 +1232,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     vertsView.setEntity(keyframesComponent.segments);
                     vertsView.addPoint(kf.pos);
                 }
-                if (manager.keyframes.size > 1)
+                if (manager.keyframes.size() > 1)
                     synchronized (view) {
                         view.setEntity(keyframesPathEntity);
                         view.resamplePath();
@@ -1146,7 +1276,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         reinitialiseKeyframes(manager.keyframes, null);
     }
 
-    private void reinitialiseKeyframes(Array<Keyframe> kfs,
+    private void reinitialiseKeyframes(java.util.List<Keyframe> kfs,
                                        Keyframe moveTo) {
         synchronized (manager.keyframes) {
             // Clean.
@@ -1209,8 +1339,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private void scrollToKeyframe(Keyframe kf) {
         // Scroll to keyframe.
         if (rightScroll != null && kf != null) {
-            int i = manager.keyframes.indexOf(kf, true);
-            int n = manager.keyframes.size;
+            int i = manager.keyframes.indexOf(kf);
+            int n = manager.keyframes.size();
             if (i >= 0) {
                 rightScroll.setScrollPercentY((float) i / (n - 5f));
             }

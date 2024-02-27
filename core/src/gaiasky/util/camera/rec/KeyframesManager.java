@@ -25,6 +25,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class KeyframesManager implements IObserver {
@@ -41,7 +44,7 @@ public class KeyframesManager implements IObserver {
     /**
      * Current keyframes
      **/
-    public final Array<Keyframe> keyframes;
+    public final List<Keyframe> keyframes;
     /**
      * Reference to current camera position.
      */
@@ -66,7 +69,7 @@ public class KeyframesManager implements IObserver {
     public KeyframesManager() {
         super();
 
-        this.keyframes = new Array<>();
+        this.keyframes = Collections.synchronizedList(new ArrayList<>());
 
         EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT, Event.UPDATE_CAM_RECORDER, Event.KEYFRAME_PLAY_FRAME);
     }
@@ -95,11 +98,12 @@ public class KeyframesManager implements IObserver {
      * Gets the frame number of the given keyframe using the current target frame rate setting.
      *
      * @param kf The keyframe.
-     * @return The frame number corresponding to exactly this keyframe if the keyframe is valid and in the keyframes list, otherwise -1.
+     * @return The frame number corresponding to exactly this keyframe if the keyframe is valid and in the keyframes
+     * list, otherwise -1.
      * The frame number is in [0,n-1].
      */
     public long getFrameNumber(Keyframe kf) {
-        if (kf == null || keyframes.isEmpty() || !keyframes.contains(kf, true)) {
+        if (kf == null || keyframes.isEmpty() || !keyframes.contains(kf)) {
             return -1;
         }
 
@@ -125,7 +129,7 @@ public class KeyframesManager implements IObserver {
             extData[0] = data[0];
             extData[data.length + 1] = data[data.length - 1];
             return new CatmullRomSplineDouble<>(extData, false);
-        } else if(pathType == PathType.B_SPLINE) {
+        } else if (pathType == PathType.B_SPLINE) {
             // Needs extra points at beginning and end.
             Vector3d[] extData = new Vector3d[data.length + 2];
             System.arraycopy(data, 0, extData, 1, data.length);
@@ -137,21 +141,37 @@ public class KeyframesManager implements IObserver {
         return new LinearDouble<>(data);
     }
 
-    public Array<Keyframe> loadKeyframesFile(Path file) throws RuntimeException {
+    public List<Keyframe> loadKeyframesFile(Path file) throws RuntimeException {
         try (BufferedReader br = new BufferedReader(new FileReader(file.toFile()))) {
-            Array<Keyframe> result = new Array<>();
+            List<Keyframe> result = Collections.synchronizedList(new ArrayList<>());
             String line;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(keyframeSeparator);
-                double secs = Parser.parseDouble(tokens[0]);
-                long time = Parser.parseLong(tokens[1]);
-                Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
-                Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
-                Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
-                boolean seam = Parser.parseInt(tokens[11]) == 1;
-                String name = tokens[12];
-                Keyframe kf = new Keyframe(name, pos, dir, up, time, secs, seam);
-                result.add(kf);
+                if (tokens.length == 13) {
+                    // Keyframe has no target.
+                    double secs = Parser.parseDouble(tokens[0]);
+                    long time = Parser.parseLong(tokens[1]);
+                    Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
+                    Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
+                    Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
+                    boolean seam = Parser.parseInt(tokens[11]) == 1;
+                    String name = tokens[12];
+                    Keyframe kf = new Keyframe(name, pos, dir, up, time, secs, seam);
+                    result.add(kf);
+                } else if (tokens.length == 16) {
+                    // Keyframe has target.
+                    double secs = Parser.parseDouble(tokens[0]);
+                    long time = Parser.parseLong(tokens[1]);
+                    Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
+                    Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
+                    Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
+                    Vector3d target = new Vector3d(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
+                    boolean seam = Parser.parseInt(tokens[14]) == 1;
+                    String name = tokens[15];
+                    Keyframe kf = new Keyframe(name, pos, dir, up, target, time, secs, seam);
+                    result.add(kf);
+
+                }
             }
 
             return result;
@@ -160,7 +180,7 @@ public class KeyframesManager implements IObserver {
         }
     }
 
-    public void saveKeyframesFile(Array<Keyframe> keyframes,
+    public void saveKeyframesFile(List<Keyframe> keyframes,
                                   String fileName) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
@@ -179,6 +199,10 @@ public class KeyframesManager implements IObserver {
                         Double.toString(kf.dir.z)).append(keyframeSeparator);
                 os.append(Double.toString(kf.up.x)).append(keyframeSeparator).append(Double.toString(kf.up.y)).append(keyframeSeparator).append(
                         Double.toString(kf.up.z)).append(keyframeSeparator);
+                if (kf.target != null) {
+                    os.append(Double.toString(kf.target.x)).append(keyframeSeparator).append(Double.toString(kf.target.y)).append(keyframeSeparator).append(
+                            Double.toString(kf.target.z)).append(keyframeSeparator);
+                }
                 os.append(Integer.toString(kf.seam ? 1 : 0)).append(keyframeSeparator);
                 os.append(kf.name).append("\n");
             }
@@ -187,7 +211,7 @@ public class KeyframesManager implements IObserver {
             logger.error(e);
             return;
         }
-        logger.info(keyframes.size + " keyframes saved to file " + f);
+        logger.info(keyframes.size() + " keyframes saved to file " + f);
 
     }
 
@@ -238,7 +262,7 @@ public class KeyframesManager implements IObserver {
         return out;
     }
 
-    public void exportKeyframesFile(Array<Keyframe> keyframes,
+    public void exportKeyframesFile(List<Keyframe> keyframes,
                                     String fileName) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
@@ -257,7 +281,7 @@ public class KeyframesManager implements IObserver {
             return;
         }
         double frameRate = Settings.settings.camrecorder.targetFps;
-        logger.info(keyframes.size + " keyframes (" + cameraPath.n + " frames, " + frameRate + " FPS) exported to camera file " + f);
+        logger.info(keyframes.size() + " keyframes (" + cameraPath.n + " frames, " + frameRate + " FPS) exported to camera file " + f);
     }
 
     /**
@@ -267,7 +291,7 @@ public class KeyframesManager implements IObserver {
      * @param pathType  The path type.
      * @return Array of path parts.
      */
-    private PathPart[] positionsToPathParts(Array<Keyframe> keyframes,
+    private PathPart[] positionsToPathParts(List<Keyframe> keyframes,
                                             PathType pathType) {
         double frameRate = Settings.settings.camrecorder.targetFps;
         Array<Array<Vector3d>> positionsSep = new Array<>();
@@ -279,7 +303,7 @@ public class KeyframesManager implements IObserver {
 
             // Fill positions
             if (kf.seam && pathType == PathType.CATMULL_ROM_SPLINE) {
-                if (i > 0 && i < keyframes.size - 1) {
+                if (i > 0 && i < keyframes.size() - 1) {
                     current.add(kf.pos);
                     positionsSep.add(current);
                     times.add(secs + kf.seconds);
@@ -404,12 +428,12 @@ public class KeyframesManager implements IObserver {
 
         switch (event) {
             case KEYFRAMES_FILE_SAVE -> {
-                Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
+                List<Keyframe> keyframes = (List<Keyframe>) data[0];
                 String fileName = (String) data[1];
                 saveKeyframesFile(keyframes, fileName);
             }
             case KEYFRAMES_EXPORT -> {
-                var keyframes = (Array<Keyframe>) data[0];
+                var keyframes = (List<Keyframe>) data[0];
                 var fileName = (String) data[1];
                 exportKeyframesFile(keyframes, fileName);
             }

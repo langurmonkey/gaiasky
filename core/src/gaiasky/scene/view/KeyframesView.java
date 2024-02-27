@@ -29,6 +29,8 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
+import java.util.List;
+
 public class KeyframesView extends BaseView {
 
     private final VertsView verts;
@@ -71,20 +73,20 @@ public class KeyframesView extends BaseView {
      * Refreshes the positions and orientations from the keyframes
      */
     public void refreshData() {
-        Array<Keyframe> keyframes = kf.keyframes;
+        List<Keyframe> keyframes = kf.keyframes;
 
         Array<Array<Vector3d>> kfPositionsSep = new Array<>();
-        double[] kfPositions = new double[keyframes.size * 3];
-        double[] kfDirections = new double[keyframes.size * 3];
-        double[] kfUps = new double[keyframes.size * 3];
-        boolean[] kfSeams = new boolean[keyframes.size];
+        double[] kfPositions = new double[keyframes.size() * 3];
+        double[] kfDirections = new double[keyframes.size() * 3];
+        double[] kfUps = new double[keyframes.size() * 3];
+        boolean[] kfSeams = new boolean[keyframes.size()];
         Array<Vector3d> current = new Array<>();
         int i = 0;
         for (Keyframe kf : keyframes) {
 
             // Fill positions
             if (kf.seam) {
-                if (i > 0 && i < keyframes.size - 1) {
+                if (i > 0 && i < keyframes.size() - 1) {
                     current.add(kf.pos);
                     kfPositionsSep.add(current);
                     current = new Array<>();
@@ -111,7 +113,7 @@ public class KeyframesView extends BaseView {
         kfPositionsSep.add(current);
 
         setPathKnots(kfPositions, kfDirections, kfUps, kfSeams);
-        if (keyframes.size > 1) {
+        if (keyframes.size() > 1) {
             // Set points to segments
             synchronized (verts) {
                 verts.setEntity(kf.segments);
@@ -169,17 +171,17 @@ public class KeyframesView extends BaseView {
     }
 
     public void resamplePath() {
-        Array<Keyframe> keyframes = kf.keyframes;
+        List<Keyframe> keyframes = kf.keyframes;
 
-        if (keyframes.size > 0) {
+        if (!keyframes.isEmpty()) {
             Array<Array<Vector3d>> kfPositionsSep = new Array<>();
-            double[] kfPositions = new double[keyframes.size * 3];
+            double[] kfPositions = new double[keyframes.size() * 3];
             Array<Vector3d> current = new Array<>();
             int i = 0;
             for (Keyframe kf : keyframes) {
                 // Fill model table
                 if (kf.seam) {
-                    if (i > 0 && i < keyframes.size - 1) {
+                    if (i > 0 && i < keyframes.size() - 1) {
                         current.add(kf.pos);
                         kfPositionsSep.add(current);
                         current = new Array<>();
@@ -394,7 +396,7 @@ public class KeyframesView extends BaseView {
                 verts.setColor(ColorUtils.gPink);
             }
         }
-        int i = kf.keyframes.indexOf(keyframe, true) * 2;
+        int i = kf.keyframes.indexOf(keyframe) * 2;
         if (i >= 0) {
             Entity dir = kf.orientations.get(i);
             Entity up = kf.orientations.get(i + 1);
@@ -435,7 +437,7 @@ public class KeyframesView extends BaseView {
 
     public void unselect() {
         if (kf.selected != null) {
-            int i = kf.keyframes.indexOf(kf.selected, true) * 2;
+            int i = kf.keyframes.indexOf(kf.selected) * 2;
             if (i >= 0) {
                 Entity dir = kf.orientations.get(i);
                 Entity up = kf.orientations.get(i + 1);
