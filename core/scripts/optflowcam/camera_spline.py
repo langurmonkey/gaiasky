@@ -22,7 +22,7 @@ AxisAngle = namedtuple("AxisAngle", "axis angle")
 def get_zoom_pan_parameter_functions(w0, w1, u0, u1, rho):
     # see
     # J. J. van Wijk and W. A. A. Nuij, "Smooth and efficient zooming and panning"
-    # in IEEE Symposium on Information Visualization 2003 (IEEE Cat. No.03TH8714), 2003-10, pp. 15–23. 
+    # in IEEE Symposium on Information Visualization 2003 (IEEE Cat. No.03TH8714), 2003-10, pp. 15-23. 
     # doi: 10.1109/INFVIS.2003.1249004.
   
     # no panning
