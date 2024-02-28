@@ -252,6 +252,13 @@ tasks.register('dist') {
             into "$distDir/scripts"
         }
 
+        // Copy OptFlowCam scripts
+        mkdir "$distDir/extra"
+        copy {
+            from "$baseDir/core/scripts/optflowcam"
+            into "$distDir/extra/optflowcam"
+        }
+
         // Copy scripts, README, LICENSE and AUTHORS
         copy {
             from "exe"

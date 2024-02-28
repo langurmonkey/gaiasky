@@ -131,7 +131,23 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
             String message = (String) data[0];
             float seconds = defaultSeconds;
             if (data.length > 1) {
-                seconds = (Float) data[1];
+                try {
+                    // It is usually a float.
+                    seconds = (Float) data[1];
+                } catch (ClassCastException e) {
+                    try {
+                        // Try double.
+                        seconds = ((Double) data[1]).floatValue();
+                    } catch (ClassCastException e1) {
+                        try {
+                            // Try integer.
+                            seconds = ((Integer) data[1]).floatValue();
+                        } catch (ClassCastException e2) {
+                            // Try long.
+                            seconds = ((Long) data[1]).floatValue();
+                        }
+                    }
+                }
             }
             addNotification(message, seconds);
         }

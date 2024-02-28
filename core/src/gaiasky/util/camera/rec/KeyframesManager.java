@@ -17,6 +17,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.camera.rec.Camcorder.RecorderState;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -181,7 +182,8 @@ public class KeyframesManager implements IObserver {
     }
 
     public void saveKeyframesFile(List<Keyframe> keyframes,
-                                  String fileName) {
+                                  String fileName,
+                                  boolean notification) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
             try {
@@ -211,8 +213,10 @@ public class KeyframesManager implements IObserver {
             logger.error(e);
             return;
         }
-        logger.info(keyframes.size() + " keyframes saved to file " + f);
-
+        // Notification.
+        if (notification) {
+            GaiaSky.popupNotification(I18n.msg("gui.keyframes.save.ok", keyframes.size(), f.toString()), 10, this);
+        }
     }
 
     public double[] samplePaths(Array<Array<Vector3d>> pointsSep,
@@ -281,7 +285,8 @@ public class KeyframesManager implements IObserver {
             return;
         }
         double frameRate = Settings.settings.camrecorder.targetFps;
-        logger.info(keyframes.size() + " keyframes (" + cameraPath.n + " frames, " + frameRate + " FPS) exported to camera file " + f);
+        // Notification.
+        GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok", keyframes.size(), cameraPath.n, frameRate, f), 10, this);
     }
 
     /**
@@ -421,6 +426,65 @@ public class KeyframesManager implements IObserver {
         return true;
     }
 
+    /**
+     * Runs the OptFlowCam script at the given location with the current keyframes, with the given output file.
+     *
+     * @param loc        The location of the OptFlowCam script. This location must contain a
+     *                   <code>optflowcam_convert.py</code> file.
+     * @param outputFile Path to the output camera path (.gsc) file.
+     */
+    public void runOptFlowCamScript(Path loc, Path outputFile) {
+        final var scriptName = "optflowcam_convert.py";
+        final var inputFileName = "temp_keyframes.gkf";
+
+        GaiaSky.instance.getExecutorService().execute(() -> {
+            // Input: generate keyframes file, no notification.
+            EventManager.publish(Event.KEYFRAMES_FILE_SAVE, this, keyframes, inputFileName, false);
+            var inputFile = SysUtils.getDefaultCameraDir().resolve(inputFileName);
+
+
+            // Build process with python interpreter.
+            var pythonInterpreter = SysUtils.isWindows() ? "python3.exe" : "python3";
+            ProcessBuilder builder = new ProcessBuilder(
+                    pythonInterpreter,
+                    loc.resolve(scriptName).toString(),
+                    "-i",
+                    inputFile.toString(),
+                    "-o",
+                    outputFile.toString(),
+                    "--fps",
+                    Double.toString(Settings.settings.camrecorder.targetFps));
+            builder.directory(loc.toFile());
+            var err = builder.redirectError();
+
+            try {
+                var process = builder.start();
+                process.waitFor();
+
+                if (process.exitValue() == 0) {
+                    // Popup notification.
+                    GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFile.toString()), 10, this);
+                } else {
+                    // Error?
+                    GaiaSky.popupNotification(I18n.msg("error.process.run", "exit value " + process.exitValue()), 10, this, Logger.LoggerLevel.ERROR, null);
+                }
+
+                process.destroy();
+
+            } catch (IOException | InterruptedException e) {
+                GaiaSky.popupNotification(I18n.msg("error.process.run", e.getLocalizedMessage()), 10, this, Logger.LoggerLevel.ERROR, e);
+            }
+
+            // Clean up keyframes file.
+            try {
+                Files.deleteIfExists(inputFile);
+            } catch (IOException e) {
+                GaiaSky.popupNotification(I18n.msg("error.loading.notexistent", inputFile.toString()), 10, this, Logger.LoggerLevel.ERROR, e);
+            }
+
+        });
+    }
+
     @Override
     public void notify(final Event event,
                        Object source,
@@ -430,7 +494,11 @@ public class KeyframesManager implements IObserver {
             case KEYFRAMES_FILE_SAVE -> {
                 List<Keyframe> keyframes = (List<Keyframe>) data[0];
                 String fileName = (String) data[1];
-                saveKeyframesFile(keyframes, fileName);
+                Boolean notification = true;
+                if(data.length > 2) {
+                   notification = (Boolean) data[2];
+                }
+                saveKeyframesFile(keyframes, fileName, notification);
             }
             case KEYFRAMES_EXPORT -> {
                 var keyframes = (List<Keyframe>) data[0];

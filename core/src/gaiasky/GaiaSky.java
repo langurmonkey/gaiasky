@@ -1796,4 +1796,35 @@ public class GaiaSky implements ApplicationListener, IObserver {
         }
     }
 
+
+    /**
+     * Create a new notification that is displayed as a popup for the given duration of seconds, and also as a
+     * console message with the given level.
+     *
+     * @param message  The message.
+     * @param duration The popup duration, in seconds.
+     * @param source   The source object of the message.
+     * @param level    The logger level.
+     * @param t        The throwable, if any.
+     */
+    public static void popupNotification(String message, float duration, Object source, Logger.LoggerLevel level, Throwable t) {
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, source, message, duration);
+        if (t != null) {
+            logger.log(level, message, t.getLocalizedMessage());
+        } else {
+            logger.log(level, message);
+        }
+    }
+
+    /**
+     * Create a new notification that is displayed as a popup for the given duration of seconds, and also as a
+     * console message with the {@link Logger.LoggerLevel#INFO} level.
+     *
+     * @param message  The message.
+     * @param duration The popup duration, in seconds.
+     * @param source   The source object of the message.
+     */
+    public static void popupNotification(String message, float duration, Object source) {
+        popupNotification(message, duration, source, Logger.LoggerLevel.INFO, null);
+    }
 }

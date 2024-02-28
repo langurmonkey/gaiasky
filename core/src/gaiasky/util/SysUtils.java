@@ -17,7 +17,9 @@ import oshi.hardware.CentralProcessor;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +36,7 @@ public class SysUtils {
     private static final boolean windows;
     private static final boolean unix;
     private static final boolean solaris;
+    private static final boolean flatpak;
     private static final String ARCH;
     private static final boolean aArch64;
     private static final String GAIASKY_DIR_NAME = "gaiasky";
@@ -60,6 +63,9 @@ public class SysUtils {
         windows = OS.contains("win");
         unix = OS.contains("unix");
         solaris = OS.contains("sunos");
+
+        var sysInfo = new SystemInfo();
+        flatpak = sysInfo.getOperatingSystem().getVersionInfo().getCodeName().contains("Flatpak");
 
         if (linux) {
             // Check Steam Deck.
@@ -186,6 +192,10 @@ public class SysUtils {
         return mac;
     }
 
+    public static boolean isFlatpak() {
+        return flatpak;
+    }
+
     public static boolean isAppleSiliconMac() {
         return isMac() && aArch64;
     }
@@ -306,10 +316,11 @@ public class SysUtils {
 
     /**
      * Gets a pointer to the shader output directory for the crash reports.
+     *
      * @return A pointer to the shader output directory.
      */
     public static Path getCrashShadersDir() {
-       return getCrashReportsDir().resolve(SHADER_OUT_DIR_NAME);
+        return getCrashReportsDir().resolve(SHADER_OUT_DIR_NAME);
     }
 
     /**
@@ -326,7 +337,6 @@ public class SysUtils {
      * the user-configured data folder as input.
      *
      * @param dataLocation The user-defined data location.
-     *
      * @return A path that points to the temporary directory.
      */
     public static Path getTempDir(String dataLocation) {
@@ -348,7 +358,8 @@ public class SysUtils {
     }
 
     /**
-     * Returns the default cache directory, for non-essential data. This is ~/.gaiasky/ in Windows and macOS, and ~/.cache/gaiasky
+     * Returns the default cache directory, for non-essential data. This is ~/.gaiasky/ in Windows and macOS, and
+     * ~/.cache/gaiasky
      * in Linux.
      *
      * @return The default cache directory.
@@ -489,7 +500,6 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
-     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -517,7 +527,7 @@ public class SysUtils {
 
         // MacOS seems to be "special", only likes headless mode.
         if (isMac()) {
-            return new int[] { Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT };
+            return new int[]{Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT};
         }
 
         // Graphics device method.
@@ -530,7 +540,7 @@ public class SysUtils {
             w = (int) (gc.getBounds().getWidth() * scaleX);
             h = (int) (gc.getBounds().getHeight() * scaleY);
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             }
         } catch (HeadlessException e) {
             logger.error(I18n.msg("error.screensize.gd"));
@@ -543,12 +553,47 @@ public class SysUtils {
             w = (int) screenSize.getWidth();
             h = (int) screenSize.getHeight();
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             }
         } catch (Exception e) {
             logger.error(I18n.msg("error.screensize.toolkit"));
             logger.debug(e);
         }
+        return null;
+    }
+
+    private static String getJarName() {
+        return new File(SysUtils.class.getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getPath())
+                .getName();
+    }
+
+    public static Path getProgramDirectory() {
+        if (runningFromJAR()) {
+            return getCurrentJARDirectory();
+        } else {
+            return getCurrentProjectDirectory();
+        }
+    }
+
+    private static boolean runningFromJAR() {
+        String jarName = getJarName();
+        return jarName.contains(".jar");
+    }
+
+    private static Path getCurrentProjectDirectory() {
+        return new File("").toPath().toAbsolutePath();
+    }
+
+    private static Path getCurrentJARDirectory() {
+        try {
+            return Path.of(new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent()).toAbsolutePath();
+        } catch (URISyntaxException exception) {
+            logger.error(exception);
+        }
+
         return null;
     }
 }

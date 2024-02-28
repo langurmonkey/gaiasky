@@ -65,7 +65,7 @@ public class Logger {
             log(LoggerLevel.DEBUG, messages);
     }
 
-    private static void log(LoggerLevel level, Object... messages) {
+    public static void log(LoggerLevel level, Object... messages) {
         int idx = -1;
         for (int i = 0; i < messages.length; i++) {
             Object msg = messages[i];
@@ -211,6 +211,10 @@ public class Logger {
 
         public void info(Object... messages) {
             Logger.info(prependTag(messages));
+        }
+
+        public void log(LoggerLevel level, Object... messages) {
+           Logger.log(level, prependTag(messages));
         }
 
         private Object[] prependTag(Object[] msgs) {

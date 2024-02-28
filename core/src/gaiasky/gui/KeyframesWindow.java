@@ -342,7 +342,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         // Reload window contents.
                         reinitialiseKeyframes(manager.keyframes, null);
                     } else {
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.keyframes.normalize.dist.zero"));
+                        GaiaSky.popupNotification(I18n.msg("gui.keyframes.normalize.dist.zero"), 10, this);
                     }
 
                     synchronized (view) {
@@ -353,6 +353,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
                     // Check timings.
                     checkKeyframeTimings();
+                } else {
+                    var text = I18n.msg("gui.keyframes.none");
+                    GaiaSky.popupNotification(text, 10, this, Logger.LoggerLevel.WARN, null);
                 }
                 return true;
             }
@@ -385,7 +388,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                     view.unselect();
                                 }
                                 lastKeyframeFileName = result.getFileName().toString();
-                                logger.info(I18n.msg("gui.keyframes.load.success", manager.keyframes.size(), result.getFileName()));
+                                // Notification.
+                                GaiaSky.popupNotification(I18n.msg("gui.keyframes.load.success", manager.keyframes.size(), result.getFileName()), 10, this);
                             } catch (RuntimeException e) {
                                 logger.error(I18n.msg("gui.keyframes.load.error", result.getFileName()), e);
                                 Label warn = new OwnLabel(I18n.msg("error.loading.format", result.getFileName()), skin);
@@ -420,6 +424,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         save.pad(pad10);
         save.addListener((event) -> {
             if (event instanceof ChangeEvent) {
+                if (manager.keyframes == null || manager.keyframes.isEmpty()) {
+                    var text = I18n.msg("gui.keyframes.none");
+                    GaiaSky.popupNotification(text, 10, this, Logger.LoggerLevel.WARN, null);
+                    return true;
+                }
                 String suggestedName = lastKeyframeFileName == null ? df.format(new Date()) + "_keyframes.gkf" : lastKeyframeFileName;
                 FileNameWindow fnw = new FileNameWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
@@ -448,13 +457,41 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         export.pad(pad10);
         export.addListener((event) -> {
             if (event instanceof ChangeEvent) {
+                if (manager.keyframes == null || manager.keyframes.isEmpty()) {
+                    var text = I18n.msg("gui.keyframes.none");
+                    GaiaSky.popupNotification(text, 10, this, Logger.LoggerLevel.WARN, null);
+                    return true;
+                }
                 String suggestedName = df.format(new Date()) + ".gsc";
-                FileNameWindow fnw = new FileNameWindow(suggestedName, stage, skin);
+                KeyframesExportWindow fnw = new KeyframesExportWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
                 fnw.setAcceptListener(() -> {
                     if (textField.isValid()) {
-                        EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, manager.keyframes, textField.getText());
-                        notice.clearActor();
+                        if (fnw.useOptFlowCam.isChecked()) {
+                            // We use OptFlowCam method: look for script and launch Python interpreter.
+                            var mainPath = SysUtils.getProgramDirectory();
+
+                            // Output: camera path file.
+                            var outputFile = SysUtils.getDefaultCameraDir().resolve(textField.getText());
+
+                            if (Files.exists(mainPath.resolve("core/scripts/optflowcam"))) {
+                                // Running from IDE.
+                                var loc = mainPath.resolve("core/scripts/optflowcam");
+                                manager.runOptFlowCamScript(loc, outputFile);
+                            } else if (Files.exists(mainPath.resolve("../extra/optflowcam"))) {
+                                // Running from package.
+                                var loc = mainPath.resolve("../extra/optflowcam");
+                                manager.runOptFlowCamScript(loc, outputFile);
+                            } else {
+                                String msg = I18n.msg("error.loading.notexistent", "OptFlowCam script: " + mainPath);
+                                GaiaSky.popupNotification(msg, 10, this, Logger.LoggerLevel.WARN, null);
+                            }
+
+
+                        } else {
+                            EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, manager.keyframes, textField.getText());
+                            notice.clearActor();
+                        }
                     } else {
                         Label warn = new OwnLabel(I18n.msg("error.file.name.notvalid", textField.getText()), skin);
                         warn.setColor(1f, .4f, .4f, 1f);
@@ -536,6 +573,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         recalculateButtonSize();
 
     }
+
 
     /**
      * Adds a new keyframe at the given index position using the given camera position, orientation and time.
@@ -921,6 +959,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
         nameL.setWidth(240f);
+        // Keyframes with target are yellow.
+        if (kf.target != null) {
+            nameL.setColor(ColorUtils.gYellowC);
+        }
         Cell<?> nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -1026,7 +1068,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         long frame = manager.getFrameNumber(kf);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
-        framesL.setWidth(86f);
+        framesL.setWidth(75f);
         framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / Settings.settings.camrecorder.targetFps)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad18).padBottom(pad10);
@@ -1037,7 +1079,21 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         clockImg.setScale(0.7f);
         clockImg.setOrigin(Align.center);
         addHighlightListener(clockImg, kf);
-        table.add(clockImg).width(clockImg.getWidth()).left().padRight(pad18).padBottom(pad10);
+        table.add(clockImg).width(clockImg.getWidth()).left().padRight(3f).padBottom(pad10);
+
+        // Target
+        Image targetImg = new Image(skin.getDrawable("iconic-target"));
+        targetImg.setScale(0.7f);
+        targetImg.setOrigin(Align.center);
+        addHighlightListener(targetImg, kf);
+        if(kf.target != null) {
+            targetImg.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.target", kf.target.toString()), skin));
+            targetImg.setColor(ColorUtils.gYellowC);
+        } else {
+            targetImg.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.target.no"), skin));
+            targetImg.setColor(ColorUtils.oDarkGrayC);
+        }
+        table.add(targetImg).width(targetImg.getWidth()).left().padRight(pad18).padBottom(pad10);
 
         // Frame name
         addFrameName(kf, index, table);
