@@ -15,7 +15,7 @@ code in this directory.
 
 We have modified the original source in the following manner:
 
-- add target --point of interest-- location parsing. Targets have been added to the Gaia Sky keyframes file format, so that a keyframe created when the camera is in focus mode, automatically gets the position of the focus as a target.
+- add target (point of interest) location parsing. Additionally, targets have been added to the Gaia Sky keyframes file format, so that a keyframe created when the camera is in focus mode, automatically gets the position of the focus as a target.
 - add frame rate as program argument.
 - global clean up code (remove ambiguous Unicode characters, remove unused functions, etc.).
 
