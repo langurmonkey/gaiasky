@@ -38,7 +38,7 @@ public class KeyframesManager implements IObserver {
      **/
     private static final String sep = ",";
     /** Separator regex. **/
-    private static final String gkfFileSeparatorRegex = "[\\s,]+";
+    private static final String gkfFileSeparatorRegex = ",";
     /**
      * Singleton.
      **/
