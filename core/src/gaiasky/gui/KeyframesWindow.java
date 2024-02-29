@@ -143,6 +143,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      */
     private OwnSlider timelineSlider;
 
+    private float pad5 = 5f;
+
     /**
      * Create a keyframes window with a given scene, stage and skin.
      *
@@ -1038,7 +1040,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(moveUp, kf);
-        table.add(moveUp).left().padRight(pad10).padBottom(pad10);
+        table.add(moveUp).left().padRight(pad5).padBottom(pad10);
 
         // Down
         OwnTextIconButton moveDown = new OwnTextIconButton("", skin, "caret-down");
@@ -1111,7 +1113,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(goTo, kf);
-        table.add(goTo).left().padRight(pad10).padBottom(pad10);
+        table.add(goTo).left().padRight(pad5).padBottom(pad10);
 
         // Set to current camera.
         OwnTextIconButton setCurrent = new OwnTextIconButton("", skin, "camera-slr");
@@ -1141,7 +1143,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(setCurrent, kf);
-        table.add(setCurrent).left().padRight(pad10).padBottom(pad10);
+        table.add(setCurrent).left().padRight(pad5).padBottom(pad10);
 
         // Seam.
         OwnTextIconButton seam = new OwnTextIconButton("", skin, "seam", "toggle");
@@ -1173,7 +1175,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(seam, kf);
-        table.add(seam).left().padRight(pad10).padBottom(pad10);
+        table.add(seam).left().padRight(pad5).padBottom(pad10);
 
         // Add after
         OwnTextIconButton addKeyframe = new OwnTextIconButton("", skin, "add");
@@ -1242,7 +1244,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(addKeyframe, kf);
-        table.add(addKeyframe).left().padRight(pad10).padBottom(pad10);
+        table.add(addKeyframe).left().padRight(pad5).padBottom(pad10);
 
         // Rubbish
         OwnTextIconButton rubbish = new OwnTextIconButton("", skin, "rubbish");
@@ -1273,7 +1275,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(rubbish, kf);
-        Cell<?> rub = table.add(rubbish).left().padRight(pad18).padBottom(pad10);
+        Cell<?> rub = table.add(rubbish).left().padBottom(pad10);
         rub.row();
         table.pack();
 
