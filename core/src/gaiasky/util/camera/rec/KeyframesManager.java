@@ -34,16 +34,18 @@ import java.util.concurrent.atomic.AtomicReference;
 public class KeyframesManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesManager.class);
     /**
-     * Separator for keyframes files
+     * Separator for keyframes files.
      **/
-    private static final String keyframeSeparator = ",";
+    private static final String sep = ",";
+    /** Separator regex. **/
+    private static final String gkfFileSeparatorRegex = "[\\s,]+";
     /**
-     * Singleton
+     * Singleton.
      **/
     public static KeyframesManager instance;
 
     /**
-     * Current keyframes
+     * Current keyframes.
      **/
     public final List<Keyframe> keyframes;
     /**
@@ -147,31 +149,33 @@ public class KeyframesManager implements IObserver {
             List<Keyframe> result = Collections.synchronizedList(new ArrayList<>());
             String line;
             while ((line = br.readLine()) != null) {
-                String[] tokens = line.split(keyframeSeparator);
-                if (tokens.length == 13) {
-                    // Keyframe has no target.
-                    double secs = Parser.parseDouble(tokens[0]);
-                    long time = Parser.parseLong(tokens[1]);
-                    Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
-                    Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
-                    Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
-                    boolean seam = Parser.parseInt(tokens[11]) == 1;
-                    String name = tokens[12];
-                    Keyframe kf = new Keyframe(name, pos, dir, up, time, secs, seam);
-                    result.add(kf);
-                } else if (tokens.length == 16) {
-                    // Keyframe has target.
-                    double secs = Parser.parseDouble(tokens[0]);
-                    long time = Parser.parseLong(tokens[1]);
-                    Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
-                    Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
-                    Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
-                    Vector3d target = new Vector3d(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
-                    boolean seam = Parser.parseInt(tokens[14]) == 1;
-                    String name = tokens[15];
-                    Keyframe kf = new Keyframe(name, pos, dir, up, target, time, secs, seam);
-                    result.add(kf);
-
+                line = line.strip();
+                if (!line.startsWith("#")) {
+                    String[] tokens = line.split(gkfFileSeparatorRegex);
+                    if (tokens.length == 13) {
+                        // Keyframe has no target.
+                        double secs = Parser.parseDouble(tokens[0]);
+                        long time = Parser.parseLong(tokens[1]);
+                        Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
+                        Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
+                        Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
+                        boolean seam = Parser.parseInt(tokens[11]) == 1;
+                        String name = tokens[12];
+                        Keyframe kf = new Keyframe(name, pos, dir, up, time, secs, seam);
+                        result.add(kf);
+                    } else if (tokens.length == 16) {
+                        // Keyframe has target.
+                        double secs = Parser.parseDouble(tokens[0]);
+                        long time = Parser.parseLong(tokens[1]);
+                        Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
+                        Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
+                        Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
+                        Vector3d target = new Vector3d(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
+                        boolean seam = Parser.parseInt(tokens[14]) == 1;
+                        String name = tokens[15];
+                        Keyframe kf = new Keyframe(name, pos, dir, up, target, time, secs, seam);
+                        result.add(kf);
+                    }
                 }
             }
 
@@ -194,18 +198,18 @@ public class KeyframesManager implements IObserver {
         }
         try (BufferedWriter os = new BufferedWriter(new FileWriter(f.toFile()))) {
             for (Keyframe kf : keyframes) {
-                os.append(Double.toString(kf.seconds)).append(keyframeSeparator).append(Long.toString(kf.time)).append(keyframeSeparator);
-                os.append(Double.toString(kf.pos.x)).append(keyframeSeparator).append(Double.toString(kf.pos.y)).append(keyframeSeparator).append(
-                        Double.toString(kf.pos.z)).append(keyframeSeparator);
-                os.append(Double.toString(kf.dir.x)).append(keyframeSeparator).append(Double.toString(kf.dir.y)).append(keyframeSeparator).append(
-                        Double.toString(kf.dir.z)).append(keyframeSeparator);
-                os.append(Double.toString(kf.up.x)).append(keyframeSeparator).append(Double.toString(kf.up.y)).append(keyframeSeparator).append(
-                        Double.toString(kf.up.z)).append(keyframeSeparator);
+                os.append(Double.toString(kf.seconds)).append(sep).append(Long.toString(kf.time)).append(sep);
+                os.append(Double.toString(kf.pos.x)).append(sep).append(Double.toString(kf.pos.y)).append(sep).append(
+                        Double.toString(kf.pos.z)).append(sep);
+                os.append(Double.toString(kf.dir.x)).append(sep).append(Double.toString(kf.dir.y)).append(sep).append(
+                        Double.toString(kf.dir.z)).append(sep);
+                os.append(Double.toString(kf.up.x)).append(sep).append(Double.toString(kf.up.y)).append(sep).append(
+                        Double.toString(kf.up.z)).append(sep);
                 if (kf.target != null) {
-                    os.append(Double.toString(kf.target.x)).append(keyframeSeparator).append(Double.toString(kf.target.y)).append(keyframeSeparator).append(
-                            Double.toString(kf.target.z)).append(keyframeSeparator);
+                    os.append(Double.toString(kf.target.x)).append(sep).append(Double.toString(kf.target.y)).append(sep).append(
+                            Double.toString(kf.target.z)).append(sep);
                 }
-                os.append(Integer.toString(kf.seam ? 1 : 0)).append(keyframeSeparator);
+                os.append(Integer.toString(kf.seam ? 1 : 0)).append(sep);
                 os.append(kf.name).append("\n");
             }
 
@@ -495,8 +499,8 @@ public class KeyframesManager implements IObserver {
                 List<Keyframe> keyframes = (List<Keyframe>) data[0];
                 String fileName = (String) data[1];
                 Boolean notification = true;
-                if(data.length > 2) {
-                   notification = (Boolean) data[2];
+                if (data.length > 2) {
+                    notification = (Boolean) data[2];
                 }
                 saveKeyframesFile(keyframes, fileName, notification);
             }

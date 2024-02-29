@@ -40,6 +40,13 @@ public class CameraPath {
     public long i;
 
     /**
+     * Separator for camera path files.
+     **/
+    private static final String sep = ",";
+    /** Separator regex. **/
+    private static final String gscFileSeparatorRegex = "[\\s,]+";
+
+    /**
      * Create an empty camera path.
      */
     public CameraPath() {
@@ -65,7 +72,7 @@ public class CameraPath {
             while ((line = is.readLine()) != null) {
                 line = line.strip();
                 if (!line.startsWith("#")) {
-                    String[] tokens = line.split("\\s+");
+                    String[] tokens = line.split(gscFileSeparatorRegex);
 
                     // Time.
                     times.add(Parser.parseLong(tokens[0]));
@@ -209,9 +216,6 @@ public class CameraPath {
         // Update size.
         n = times.size;
     }
-
-    /** Separator for camera path files. **/
-    private static final String sep = " ";
 
     /**
      * Persist the current camera path to the file pointed by the given path.
