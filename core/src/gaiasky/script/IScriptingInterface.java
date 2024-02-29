@@ -832,14 +832,19 @@ public interface IScriptingInterface {
 
     /**
      * <p>
-     * Projects the world space position of the given object to screen coordinates. It's the same as GLU gluProject with one small deviation: The viewport is assumed to span the
-     * whole screen. The screen coordinate system has its origin in the bottom left, with the y-axis pointing upwards and the x-axis pointing to the right. This
+     * Projects the world space position of the given object to screen coordinates. It's the same as GLU gluProject with
+     * one small deviation: The viewport is assumed to span the
+     * whole screen. The screen coordinate system has its origin in the bottom left, with the y-axis pointing upwards
+     * and the x-axis pointing to the right. This
      * makes it easily usable in conjunction with Batch and similar classes.
      * </p>
-     * <p>This call only works if Gaia Sky is using the simple perspective projection mode. It does not work with any of the following modes: panorama (with any of
+     * <p>This call only works if Gaia Sky is using the simple perspective projection mode. It does not work with any of
+     * the following modes: panorama (with any of
      * the projections), planetarium, orthosphere, stereoscopic, or any of the re-projection modes.</p>
+     *
      * @param name The name of the object to get the screen coordinates for.
-     * @return An array with the x and y screen coordinates, in pixels, with the origin at the bottom-left. If the object with the given name does not exist, or it falls
+     * @return An array with the x and y screen coordinates, in pixels, with the origin at the bottom-left. If the
+     * object with the given name does not exist, or it falls
      * off-screen, it returns null.
      */
     double[] getObjectScreenCoordinates(String name);
@@ -2255,7 +2260,7 @@ public interface IScriptingInterface {
      * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
      * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns
-     *                immediately
+     *                immediately.
      */
     void cameraTransition(double[] camPos,
                           double[] camDir,
@@ -2280,7 +2285,7 @@ public interface IScriptingInterface {
      * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
      * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns
-     *                immediately
+     *                immediately.
      */
     void cameraTransition(double[] camPos,
                           String units,
@@ -2303,8 +2308,7 @@ public interface IScriptingInterface {
      * </p>
      *
      * @param camPos                     The target camera position in the internal reference system and the given
-     *                                   distance
-     *                                   units.
+     *                                   distance units.
      * @param camDir                     The target camera direction in the internal reference system.
      * @param camUp                      The target camera up in the internal reference system.
      * @param positionDurationSeconds    The duration of the transition in position, in seconds.
@@ -2352,13 +2356,12 @@ public interface IScriptingInterface {
      * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
      * </p>
      * <p>
-     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * This function puts the camera in free mode, so make sure to change it afterward if you need to. Also,
      * this only works with the natural camera.
      * </p>
      *
      * @param camPos                     The target camera position in the internal reference system and the given
-     *                                   distance
-     *                                   units.
+     *                                   distance units.
      * @param units                      The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      * @param camDir                     The target camera direction in the internal reference system.
      * @param camUp                      The target camera up in the internal reference system.
@@ -2385,9 +2388,7 @@ public interface IScriptingInterface {
      *                                   </ul>
      * @param orientationSmoothFactor    Smooth factor for the orientations (depends on type).
      * @param sync                       If true, the call waits for the transition to finish before returning,
-     *                                   otherwise
-     *                                   it
-     *                                   returns immediately
+     *                                   otherwise it returns immediately.
      */
     void cameraTransition(double[] camPos,
                           String units,
@@ -2400,6 +2401,86 @@ public interface IScriptingInterface {
                           String orientationSmoothType,
                           double orientationSmoothFactor,
                           boolean sync);
+
+    /**
+     * <p>
+     * Creates a smooth transition from the current camera position to the given camera position in
+     * the given number of seconds.
+     * </p>
+     * <p>
+     * This function accepts smoothing type and factor.
+     * </p>
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     * </p>
+     * <p>
+     * This function puts the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     * </p>
+     *
+     * @param camPos          The target camera position in the internal reference system and the given
+     *                        distance units.
+     * @param units           The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param durationSeconds The duration of the transition in position, in seconds.
+     * @param smoothType      The function type to use for the smoothing of positions. Either "logit",
+     *                        "logisticsigmoid" or "none".
+     *                        <ul>
+     *                        <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        an effect, otherwise, linear interpolation is used.</li>
+     *                        <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                        0.09 and 0.01.</li>
+     *                        <li>"none": no smoothing is applied.</li>
+     *                        </ul>
+     * @param smoothFactor    Smooth factor for the positions (depends on type).
+     * @param sync            If true, the call waits for the transition to finish before returning,
+     *                        otherwise it returns immediately.
+     */
+    void cameraPositionTransition(double[] camPos,
+                                  String units,
+                                  double durationSeconds,
+                                  String smoothType,
+                                  double smoothFactor,
+                                  boolean sync);
+
+    /**
+     * <p>
+     * Creates a smooth transition from the current camera orientation to the given camera orientation {camDir, camUp}
+     * in
+     * the given number of seconds.
+     * </p>
+     * <p>
+     * This function accepts smoothing type and factor.
+     * </p>
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     * </p>
+     * <p>
+     * This function puts the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     * </p>
+     *
+     * @param camDir          The target camera direction in the internal reference system.
+     * @param camUp           The target camera up in the internal reference system.
+     * @param durationSeconds The duration of the transition in orientation, in seconds.
+     * @param smoothType      The function type to use for the smoothing of orientations. Either "logit",
+     *                        "logisticsigmoid" or "none".
+     *                        <ul>
+     *                        <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        an effect, otherwise, linear interpolation is used.</li>
+     *                        <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                        0.09 and 0.01.</li>
+     *                        <li>"none": no smoothing is applied.</li>
+     *                        </ul>
+     * @param smoothFactor    Smooth factor for the orientations (depends on type).
+     * @param sync            If true, the call waits for the transition to finish before returning,
+     *                        otherwise it returns immediately.
+     */
+    void cameraOrientationTransition(double[] camDir,
+                                     double[] camUp,
+                                     double durationSeconds,
+                                     String smoothType,
+                                     double smoothFactor,
+                                     boolean sync);
 
     /**
      * Sleeps for the given number of seconds in the application time (FPS), so

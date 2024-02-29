@@ -252,8 +252,7 @@ public class SAMPClient implements IObserver {
                                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, graph.children.get(0));
                             }
                             // Open UI datasets
-                            GaiaSky.instance.scripting().maximizeInterfaceWindow();
-                            GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
+                            GaiaSky.instance.scripting().expandUIPane("Datasets");
                             idToNode.add(id, node);
                             idToUrl.put(id, url);
                         }

@@ -90,7 +90,7 @@ import java.util.function.Function;
  * Implementation of the Gaia Sky scripting API located at {@link IScriptingInterface}. This implementation uses
  * mainly the event manager to communicate with the rest of Gaia Sky.
  */
-@SuppressWarnings({ "unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue" })
+@SuppressWarnings({"unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue"})
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
@@ -346,7 +346,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraPosition(double x,
                                   double y,
                                   double z) {
-        setCameraPosition(new double[] { x, y, z });
+        setCameraPosition(new double[]{x, y, z});
     }
 
     @Override
@@ -354,7 +354,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                   double y,
                                   double z,
                                   String units) {
-        setCameraPosition(new double[] { x, y, z }, units);
+        setCameraPosition(new double[]{x, y, z}, units);
     }
 
     @Override
@@ -362,7 +362,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                   double y,
                                   double z,
                                   boolean immediate) {
-        setCameraPosition(new double[] { x, y, z }, immediate);
+        setCameraPosition(new double[]{x, y, z}, immediate);
     }
 
     @Override
@@ -371,7 +371,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                   double z,
                                   String units,
                                   boolean immediate) {
-        setCameraPosition(new double[] { x, y, z }, units, immediate);
+        setCameraPosition(new double[]{x, y, z}, units, immediate);
     }
 
     public void setCameraPosition(final List<?> vec,
@@ -420,7 +420,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkDistanceUnits(units, "units")) {
             var u = DistanceUnits.valueOf(units.toUpperCase());
             Vector3d campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
-            return new double[] { u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z) };
+            return new double[]{u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z)};
         }
         return null;
     }
@@ -469,7 +469,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraDirection() {
         Vector3d camdir = GaiaSky.instance.cameraManager.getDirection();
-        return new double[] { camdir.x, camdir.y, camdir.z };
+        return new double[]{camdir.x, camdir.y, camdir.z};
     }
 
     @Override
@@ -505,7 +505,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraUp() {
         Vector3d camUp = GaiaSky.instance.cameraManager.getUp();
-        return new double[] { camUp.x, camUp.y, camUp.z };
+        return new double[]{camUp.x, camUp.y, camUp.z};
     }
 
     @Override
@@ -612,7 +612,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraSpeed(final float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
             postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this,
-                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED), false));
+                    MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED), false));
         }
     }
 
@@ -624,7 +624,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraRotationSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
             postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this,
-                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
+                    MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
         }
     }
 
@@ -645,8 +645,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraTurningSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
             postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this,
-                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED),
-                                       false));
+                    MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED),
+                    false));
         }
     }
 
@@ -849,12 +849,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 posPrec.put(posDouble);
                 if (camera.getCamera().direction.dot(posFloat) > 0) {
                     camera.getCamera().project(posFloat);
-                    if(posFloat.x < 0 || posFloat.x > Gdx.graphics.getWidth()
-                    || posFloat.y < 0 || posFloat.y > Gdx.graphics.getHeight()) {
+                    if (posFloat.x < 0 || posFloat.x > Gdx.graphics.getWidth()
+                            || posFloat.y < 0 || posFloat.y > Gdx.graphics.getHeight()) {
                         // Off screen.
                         return null;
                     }
-                    return new double[] { posFloat.x, posFloat.y };
+                    return new double[]{posFloat.x, posFloat.y};
                 }
             }
         }
@@ -956,8 +956,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setProperMotionsNumberFactor(float factor) {
         postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this,
-                                                MathUtilsDouble.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR,
-                                                                     Constants.MAX_PM_NUM_FACTOR)));
+                MathUtilsDouble.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR,
+                        Constants.MAX_PM_NUM_FACTOR)));
     }
 
     @Override
@@ -1149,7 +1149,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public float getStarBrightness() {
         return (float) MathUtilsDouble.lint(Settings.settings.scene.star.brightness, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER,
-                                            Constants.MAX_SLIDER);
+                Constants.MAX_SLIDER);
     }
 
     @Override
@@ -1166,7 +1166,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public float getStarSize() {
         return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER,
-                                    Constants.MAX_SLIDER);
+                Constants.MAX_SLIDER);
     }
 
     @Override
@@ -1182,7 +1182,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public float getStarMinOpacity() {
         return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER,
-                                    Constants.MAX_SLIDER);
+                Constants.MAX_SLIDER);
     }
 
     @Override
@@ -1330,7 +1330,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                      String directory,
                                      String namePrefix) {
         if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS,
-                                                                                                                           "FPS") && checkString(directory, "directory")
+                "FPS") && checkString(directory, "directory")
                 && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
             em.post(Event.FRAME_OUTPUT_MODE_CMD, this, Settings.ScreenshotMode.ADVANCED);
             em.post(Event.CONFIG_FRAME_OUTPUT_CMD, this, width, height, fps, directory, namePrefix);
@@ -1943,7 +1943,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     // Check intersection with object
                     boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2),
-                                                                                       focusView.getRadius());
+                            focusView.getRadius());
 
                     if (intersects) {
                         cameraRotate(5d, 5d);
@@ -1954,7 +1954,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                         objectPosition = focusView.getAbsolutePosition(aux3b2);
                         intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2),
-                                                                                   focusView.getRadius());
+                                focusView.getRadius());
                     }
 
                     cameraStop();
@@ -2039,7 +2039,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 IParticleRecord sb = set.getCandidateBean();
                 if (sb != null) {
                     double[] rgb = sb.rgb();
-                    return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appMag(), rgb[0], rgb[1], rgb[2] };
+                    return new double[]{sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appMag(), rgb[0], rgb[1], rgb[2]};
                 }
             }
         }
@@ -2060,7 +2060,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             focusView.getFocus(name);
             focusView.getAbsolutePosition(name, aux3b1);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[] { u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue()) };
+            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
     }
@@ -2079,7 +2079,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             focusView.getFocus(name);
             focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[] { u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue()) };
+            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
     }
@@ -2148,7 +2148,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkNotNull(object, "object") && checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
 
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            double[] posUnits = new double[] { u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2]) };
+            double[] posUnits = new double[]{u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2])};
 
             var body = Mapper.body.get(object);
             body.pos.set(posUnits);
@@ -2349,7 +2349,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[] { id }));
+        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[]{id}));
     }
 
     @Override
@@ -2373,14 +2373,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void expandUIPane(String panelName) {
-        if (checkString(panelName, new String[] { "Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks" }, "panelName")) {
+        if (checkString(panelName, new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"}, "panelName")) {
             postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", true));
         }
     }
 
     @Override
     public void collapseUIPane(String panelName) {
-        if (checkString(panelName, new String[] { "Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks" }, "panelName")) {
+        if (checkString(panelName, new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"}, "panelName")) {
             postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", false));
         }
     }
@@ -2469,7 +2469,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 y += parent.getY();
                 parent = parent.getParent();
             }
-            return new float[] { x, y, actor.getWidth(), actor.getHeight() };
+            return new float[]{x, y, actor.getWidth(), actor.getHeight()};
         } else {
             return null;
         }
@@ -2513,7 +2513,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void preloadTexture(String path) {
-        preloadTextures(new String[] { path });
+        preloadTextures(new String[]{path});
     }
 
     @Override
@@ -2566,16 +2566,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Object monitor = new Object();
             IObserver watcher = (event, source, data) -> {
                 switch (event) {
-                case CAMERA_PLAY_INFO -> {
-                    Boolean status = (Boolean) data[0];
-                    if (!status) {
-                        synchronized (monitor) {
-                            monitor.notify();
+                    case CAMERA_PLAY_INFO -> {
+                        Boolean status = (Boolean) data[0];
+                        if (!status) {
+                            synchronized (monitor) {
+                                monitor.notify();
+                            }
                         }
                     }
-                }
-                default -> {
-                }
+                    default -> {
+                    }
                 }
             };
             em.subscribe(watcher, Event.CAMERA_PLAY_INFO);
@@ -2717,7 +2717,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  String orientationSmoothType,
                                  double orientationSmoothFactor) {
         cameraTransition(dArray(camPos), "internal", dArray(camDir), dArray(camUp), seconds, positionSmoothType, positionSmoothFactor, seconds, orientationSmoothType,
-                         orientationSmoothFactor, true);
+                orientationSmoothFactor, true);
     }
 
     @Override
@@ -2731,7 +2731,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  String orientationSmoothType,
                                  double orientationSmoothFactor) {
         cameraTransition(camPos, "internal", camDir, camUp, positionDurationSeconds, positionSmoothType, positionSmoothFactor, orientationDurationSeconds,
-                         orientationSmoothType, orientationSmoothFactor, true);
+                orientationSmoothType, orientationSmoothFactor, true);
     }
 
     public void cameraTransition(List<?> camPos,
@@ -2746,7 +2746,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  double orientationSmoothFactor,
                                  boolean sync) {
         cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), positionDurationSeconds, positionSmoothType, positionSmoothFactor,
-                         orientationDurationSeconds, orientationSmoothType, orientationSmoothFactor, sync);
+                orientationDurationSeconds, orientationSmoothType, orientationSmoothFactor, sync);
     }
 
     @Override
@@ -2776,20 +2776,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 end = () -> unparkRunnable(name);
 
             var u = DistanceUnits.valueOf(units.toUpperCase());
-            double[] posUnits = new double[] { u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2]) };
+            double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
 
             // Create and park runnable
             CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
-                                                                      posUnits,
-                                                                      camDir,
-                                                                      camUp,
-                                                                      positionDurationSeconds,
-                                                                      positionSmoothType,
-                                                                      positionSmoothFactor,
-                                                                      orientationDurationSeconds,
-                                                                      orientationSmoothType,
-                                                                      orientationSmoothFactor,
-                                                                      end);
+                    posUnits,
+                    camDir,
+                    camUp,
+                    positionDurationSeconds,
+                    positionSmoothType,
+                    positionSmoothFactor,
+                    orientationDurationSeconds,
+                    orientationSmoothType,
+                    orientationSmoothFactor,
+                    end);
             parkRunnable(name, r);
 
             if (sync) {
@@ -2806,6 +2806,91 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 unparkRunnable(name);
             }
         }
+    }
+
+    @Override
+    public void cameraPositionTransition(double[] camPos, String units, double durationSeconds, String smoothType, double smoothFactor, boolean sync) {
+        if (checkDistanceUnits(units, "units") &&
+                checkSmoothType(smoothType, "smoothType")) {
+            NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
+
+            // Put camera in free mode.
+            em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+
+            // Set up final actions
+            String name = "cameraTransition" + (cTransSeq++);
+            Runnable end = null;
+            if (!sync)
+                end = () -> unparkRunnable(name);
+
+            var u = DistanceUnits.valueOf(units.toUpperCase());
+            double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
+
+            // Create and park position transition runnable
+            CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
+                    posUnits,
+                    durationSeconds,
+                    smoothType,
+                    smoothFactor,
+                    end);
+            parkRunnable(name, r);
+
+            if (sync) {
+                // Wait on lock
+                synchronized (r.lock) {
+                    try {
+                        r.lock.wait();
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                }
+
+                // Remove and return
+                unparkRunnable(name);
+            }
+        }
+
+    }
+
+    @Override
+    public void cameraOrientationTransition(double[] camDir, double[] camUp, double durationSeconds, String smoothType, double smoothFactor, boolean sync) {
+        if (checkSmoothType(smoothType, "smoothType")) {
+            NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
+
+            // Put camera in free mode.
+            em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+
+            // Set up final actions
+            String name = "cameraTransition" + (cTransSeq++);
+            Runnable end = null;
+            if (!sync)
+                end = () -> unparkRunnable(name);
+
+            // Create and park orientation transition runnable
+            CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
+                    camDir,
+                    camUp,
+                    durationSeconds,
+                    smoothType,
+                    smoothFactor,
+                    end);
+            parkRunnable(name, r);
+
+            if (sync) {
+                // Wait on lock
+                synchronized (r.lock) {
+                    try {
+                        r.lock.wait();
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                }
+
+                // Remove and return
+                unparkRunnable(name);
+            }
+        }
+
     }
 
     public void cameraTransition(List<?> camPos,
@@ -2921,7 +3006,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                                 double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     public double[] galacticToInternalCartesian(int l,
@@ -2936,7 +3021,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                                 double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     public double[] eclipticToInternalCartesian(int l,
@@ -2950,7 +3035,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                                   double dec,
                                                   double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     public double[] equatorialToInternalCartesian(int ra,
@@ -2965,7 +3050,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Vector3b in = aux3b1.set(x, y, z);
         Vector3d out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
-        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble() };
+        return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble()};
     }
 
     public double[] internalCartesianToEquatorial(int x,
@@ -2978,7 +3063,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public double[] equatorialCartesianToInternalCartesian(double[] eq,
                                                            double kmFactor) {
         aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
-        return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
+        return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
     }
 
     public double[] equatorialCartesianToInternalCartesian(final List<?> eq,
@@ -3078,7 +3163,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setHDRToneMappingType(String type) {
-        if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
+        if (checkString(type, new String[]{"auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE"}, "tone mapping type"))
             postRunnable(() -> em.post(Event.TONEMAPPING_TYPE_CMD, this, Settings.ToneMapping.valueOf(type.toUpperCase())));
     }
 
@@ -3661,7 +3746,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean loadStarDataset(String dsName,
                                    String path,
                                    boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[] { 0, 0, 0, 0 }, null, null, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
@@ -3669,7 +3754,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                    String path,
                                    double magnitudeScale,
                                    boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[] { 0, 0, 0, 0 }, null, null, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
@@ -3732,7 +3817,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                        double particleSize,
                                        String ct,
                                        boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, null, null, sync);
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{1.5d, 100d}, ct, null, null, sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -3760,7 +3845,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                        double[] fadeOut,
                                        boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize,
-                                   new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) }, ct, fadeIn, fadeOut, sync);
+                new double[]{Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0))}, ct, fadeIn, fadeOut, sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -3775,7 +3860,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                        final List<?> fadeOut,
                                        boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut),
-                                   sync);
+                sync);
     }
 
     @Override
@@ -3808,7 +3893,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                        final List<?> fadeOut,
                                        boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, dArray(sizeLimits), ct,
-                                   dArray(fadeIn), dArray(fadeOut), sync);
+                dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -3824,7 +3909,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                        double[] fadeOut,
                                        boolean sync) {
         return loadParticleDataset(dsName, path, CatalogInfoSource.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn,
-                                   fadeOut, sync);
+                fadeOut, sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -3841,7 +3926,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                        double[] fadeOut,
                                        boolean sync) {
         DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(dsName, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn,
-                                                                       fadeOut);
+                fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
@@ -4194,7 +4279,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     var body = Mapper.body.get(entity);
                     body.setColor(datasetOptions.particleColor);
                     body.setLabelColor(datasetOptions.labelColor);
-                    body.setPosition(new double[] { 0, 0, 0 });
+                    body.setPosition(new double[]{0, 0, 0});
 
                     var fade = Mapper.fade.get(entity);
                     fade.setFadeIn(datasetOptions.fadeIn);
@@ -4517,7 +4602,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             final var shapeLc = shapeType.toLowerCase();
             postRunnable(() -> {
                 Entity trackingObject = getFocusEntity(objectName);
-                float[] color = new float[] { r, g, b, a };
+                float[] color = new float[]{r, g, b, a};
                 int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
                 // Create shape
                 Archetype at = scene.archetypes().get("ShapeObject");
@@ -4529,7 +4614,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 var body = Mapper.body.get(newShape);
                 body.setColor(color);
-                body.setLabelColor(new float[] { r, g, b, a });
+                body.setLabelColor(new float[]{r, g, b, a});
                 body.size = (float) (size * Constants.KM_TO_U);
 
                 var graph = Mapper.graph.get(newShape);
@@ -4550,13 +4635,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 var m = new Matrix4();
                 var orient = ShapeOrientation.valueOf(orientation.toUpperCase());
                 switch (orient) {
-                case CAMERA -> {
-                    var camera = GaiaSky.instance.cameraManager.getCamera();
-                    m.rotateTowardDirection(camera.direction, camera.up);
-                }
-                case EQUATORIAL -> m.idt();
-                case ECLIPTIC -> m.set(Coordinates.eclipticToEquatorialF());
-                case GALACTIC -> m.set(Coordinates.galacticToEquatorialF());
+                    case CAMERA -> {
+                        var camera = GaiaSky.instance.cameraManager.getCamera();
+                        m.rotateTowardDirection(camera.direction, camera.up);
+                    }
+                    case EQUATORIAL -> m.idt();
+                    case ECLIPTIC -> m.set(Coordinates.eclipticToEquatorialF());
+                    case GALACTIC -> m.set(Coordinates.galacticToEquatorialF());
                 }
                 trf.setTransformMatrix(m);
 
@@ -4816,20 +4901,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case INPUT_EVENT -> inputCode = (Integer) data[0];
-        case DISPOSE -> {
-            // Stop all
-            for (AtomicBoolean stop : stops) {
-                if (stop != null)
-                    stop.set(true);
+            case INPUT_EVENT -> inputCode = (Integer) data[0];
+            case DISPOSE -> {
+                // Stop all
+                for (AtomicBoolean stop : stops) {
+                    if (stop != null)
+                        stop.set(true);
+                }
             }
-        }
-        case SCENE_LOADED -> {
-            this.scene = (Scene) data[0];
-            this.focusView.setScene(this.scene);
-        }
-        default -> {
-        }
+            case SCENE_LOADED -> {
+                this.scene = (Scene) data[0];
+                this.focusView.setScene(this.scene);
+            }
+            default -> {
+            }
         }
 
     }
@@ -5037,6 +5122,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return type.equalsIgnoreCase("logit") || type.equalsIgnoreCase("logisticsigmoid") || type.equalsIgnoreCase("none");
     }
 
+    enum TransitionType {
+        POSITION, ORIENTATION, ALL;
+
+        public boolean isPosition() {
+            return this == ALL || this == POSITION;
+        }
+
+        public boolean isOrientation() {
+            return this == ALL || this == ORIENTATION;
+        }
+
+        public boolean isAll() {
+            return this == ALL;
+        }
+    }
+
     class CameraTransitionRunnable implements Runnable {
         final Object lock;
         final Vector3d v3d1, v3d2, v3d3;
@@ -5055,6 +5156,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         /** Maps input x to output x for orientations. **/
         Function<Double, Double> orientationMapper;
 
+        /** Type of transition **/
+        final TransitionType type;
+
+
         /**
          * A runnable that interpolates the camera state (position, direction, up) to the new given state
          * in the specified number of seconds. This method uses a pure linear interpolation.
@@ -5072,7 +5177,79 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                         double[] up,
                                         double seconds,
                                         Runnable end) {
-            this(cam, pos, dir, up, seconds, "", 0, seconds, "", 0, end);
+            this(cam,
+                    pos,
+                    dir,
+                    up,
+                    seconds,
+                    "",
+                    0,
+                    seconds,
+                    "",
+                    0,
+                    end);
+        }
+
+        /**
+         * A runnable that interpolates the camera orientation to the new given orientation
+         * in the specified number of seconds. This method accepts a smoothing factor and type.
+         *
+         * @param cam             The camera to use.
+         * @param dir             The final position.
+         * @param up              The final position.
+         * @param durationSeconds The duration of the position interpolation, in seconds.
+         * @param smoothType      Position smooth type.
+         * @param smoothFactor    Position smooth factor (depends on type).
+         * @param end             An optional runnable that is executed when the transition has completed.
+         */
+        public CameraTransitionRunnable(NaturalCamera cam,
+                                        double[] dir,
+                                        double[] up,
+                                        double durationSeconds,
+                                        String smoothType,
+                                        double smoothFactor,
+                                        Runnable end) {
+            this(cam,
+                    null,
+                    dir,
+                    up,
+                    -1,
+                    null,
+                    -1,
+                    durationSeconds,
+                    smoothType,
+                    smoothFactor,
+                    end);
+        }
+
+        /**
+         * A runnable that interpolates the camera position to the new given position
+         * in the specified number of seconds. This method accepts a smoothing factor and type.
+         *
+         * @param cam             The camera to use.
+         * @param pos             The final position.
+         * @param durationSeconds The duration of the position interpolation, in seconds.
+         * @param smoothType      Position smooth type.
+         * @param smoothFactor    Position smooth factor (depends on type).
+         * @param end             An optional runnable that is executed when the transition has completed.
+         */
+        public CameraTransitionRunnable(NaturalCamera cam,
+                                        double[] pos,
+                                        double durationSeconds,
+                                        String smoothType,
+                                        double smoothFactor,
+                                        Runnable end) {
+            this(cam,
+                    pos,
+                    null,
+                    null,
+                    durationSeconds,
+                    smoothType,
+                    smoothFactor,
+                    -1,
+                    null,
+                    -1,
+                    end);
         }
 
         /**
@@ -5103,31 +5280,46 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                         String orientationSmoothType,
                                         double orientationSmoothFactor,
                                         Runnable end) {
+            if (pos == null) {
+                type = TransitionType.ORIENTATION;
+            } else if (dir == null || up == null) {
+                type = TransitionType.POSITION;
+            } else {
+                type = TransitionType.ALL;
+            }
             this.cam = cam;
-            this.targetDir = new Vector3d(dir).nor();
-            this.targetUp = new Vector3d(up).nor();
-            this.posDuration = positionDurationSeconds;
-            this.orientationDuration = orientationDurationSeconds;
+            if (type.isPosition() && pos != null) {
+                this.posDuration = positionDurationSeconds;
+            }
+            if (type.isOrientation() && dir != null && up != null) {
+                this.targetDir = new Vector3d(dir).nor();
+                this.targetUp = new Vector3d(up).nor();
+                this.orientationDuration = orientationDurationSeconds;
+            }
             this.start = GaiaSky.instance.getT();
             this.elapsed = 0;
             this.end = end;
             this.lock = new Object();
 
-            // Mappers.
-            String posType = positionSmoothType.toLowerCase().strip();
-            positionMapper = getMapper(posType, positionSmoothFactor);
+            if (type.isPosition()) {
+                // Mappers.
+                String posType = positionSmoothType.toLowerCase().strip();
+                positionMapper = getMapper(posType, positionSmoothFactor);
+                // Set up interpolation.
+                posInterpolator = getPath(cam.getPos().tov3d(aux3d3), pos);
+            }
 
-            String orientationType = orientationSmoothType.toLowerCase().strip();
-            orientationMapper = getMapper(orientationType, orientationSmoothFactor);
+            if (type.isOrientation()) {
+                String orientationType = orientationSmoothType.toLowerCase().strip();
+                orientationMapper = getMapper(orientationType, orientationSmoothFactor);
 
-            // Set up interpolation.
-            posInterpolator = getPath(cam.getPos().tov3d(aux3d3), pos);
-            // Start and end orientations.
-            startOrientation = new QuaternionDouble();
-            startOrientation.setFromCamera(cam.direction, cam.up);
-            // End orientation.
-            endOrientation = new QuaternionDouble();
-            endOrientation.setFromCamera(targetDir, targetUp);
+                // Start and end orientations.
+                startOrientation = new QuaternionDouble();
+                startOrientation.setFromCamera(cam.direction, cam.up);
+                // End orientation.
+                endOrientation = new QuaternionDouble();
+                endOrientation.setFromCamera(targetDir, targetUp);
+            }
 
             // Aux
             v3d1 = new Vector3d();
@@ -5156,12 +5348,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
          *
          * @param p0 The initial position.
          * @param p1 The final position.
-         *
          * @return The linear interpolation path.
          */
         private PathDouble<Vector3d> getPath(Vector3d p0,
                                              double[] p1) {
-            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1) };
+            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1)};
             return new LinearDouble<>(points);
         }
 
@@ -5170,21 +5361,29 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Update elapsed time
             elapsed = GaiaSky.instance.getT() - start;
 
-            // Interpolation variables
-            double alphaPos = MathUtilsDouble.clamp(elapsed / posDuration, 0.0, 0.999999999999999999);
-            double alphaOrientation = MathUtilsDouble.clamp(elapsed / orientationDuration, 0.0, 0.999999999999999999);
+            if (type.isPosition()) {
+                // Interpolation variable.
+                double alphaPos = MathUtilsDouble.clamp(elapsed / posDuration, 0.0, 0.999999999999999999);
+                // Interpolate camera position.
+                cam.setPos(posInterpolator.valueAt(v3d1, positionMapper.apply(alphaPos)));
+            }
 
-            // Interpolate camera position.
-            cam.setPos(posInterpolator.valueAt(v3d1, positionMapper.apply(alphaPos)));
+            if (type.isOrientation()) {
+                // Interpolation variable.
+                double alphaOrientation = MathUtilsDouble.clamp(elapsed / orientationDuration, 0.0, 0.999999999999999999);
 
-            // Interpolate camera orientation using quaternions.
-            qd.set(startOrientation).slerp(endOrientation, orientationMapper.apply(alphaOrientation));
-            var up = qd.getUp(v3d3);
-            cam.setUp(up);
-            var direction = qd.getDirection(v3d3);
-            cam.setDirection(v3d3);
+                // Interpolate camera orientation using quaternions.
+                qd.set(startOrientation).slerp(endOrientation, orientationMapper.apply(alphaOrientation));
+                var up = qd.getUp(v3d3);
+                cam.setUp(up);
+                var direction = qd.getDirection(v3d3);
+                cam.setDirection(v3d3);
+            }
 
             // Finish if needed
+            if (type.isPosition()) {
+
+            }
             if (elapsed >= posDuration && elapsed >= orientationDuration) {
                 // On end, run runnable if present, otherwise notify lock
                 if (end != null) {

@@ -456,8 +456,7 @@ public class GuiRegistry implements IObserver {
                                                         EventManager.publish(Event.FOCUS_CHANGE_CMD, this, EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
                                                     }
                                                     // Open UI datasets.
-                                                    GaiaSky.instance.scripting().maximizeInterfaceWindow();
-                                                    GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
+                                                    GaiaSky.instance.scripting().expandUIPane("Datasets");
                                                 } else {
                                                     logger.info("No data loaded (did the load crash?)");
                                                 }
