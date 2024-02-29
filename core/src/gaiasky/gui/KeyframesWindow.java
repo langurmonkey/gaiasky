@@ -1033,7 +1033,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     // We can move up.
                     manager.keyframes.remove(kf);
                     manager.keyframes.add(idx - 1, kf);
-                    reinitialiseKeyframes(manager.keyframes, null);
+                    if (idx - 1 == 0) {
+                        // If we moved to index 0, exchange seconds.
+                        manager.keyframes.get(1).seconds = manager.keyframes.get(0).seconds;
+                        manager.keyframes.get(0).seconds = 0;
+                    }
+                    reinitialiseKeyframes(manager.keyframes, kf);
                 }
                 return true;
             }
@@ -1053,7 +1058,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     // We can move down.
                     manager.keyframes.remove(kf);
                     manager.keyframes.add(idx + 1, kf);
-                    reinitialiseKeyframes(manager.keyframes, null);
+                    reinitialiseKeyframes(manager.keyframes, kf);
+                    if (idx == 0) {
+                        // We moved the first keyframe to the position of the second, exchange seconds.
+                        manager.keyframes.get(1).seconds = manager.keyframes.get(0).seconds;
+                        manager.keyframes.get(0).seconds = 0;
+                    }
                 }
                 return true;
             }
@@ -1088,7 +1098,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         targetImg.setScale(0.7f);
         targetImg.setOrigin(Align.center);
         addHighlightListener(targetImg, kf);
-        if(kf.target != null) {
+        if (kf.target != null) {
             targetImg.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.target", kf.target.toString()), skin));
             targetImg.setColor(ColorUtils.gYellowC);
         } else {
