@@ -12,14 +12,22 @@
 
 import numpy as np
 
-from collections import namedtuple
+import bisect
 import copy
 from functools import partial
 from multiprocessing.pool import Pool
+from collections import namedtuple
 
 AxisAngle = namedtuple("AxisAngle", "axis angle")
 
-def get_zoom_pan_parameter_functions(w0, w1, u0, u1, rho):
+def get_zoom_pan_parameter_functions(w0: float, w1: float,
+                                     u0: float, u1: float,
+                                     rho: float=np.sqrt(2)) -> tuple:
+    '''
+    Returns the parameter functions u and w as well as the path length S in the
+    zoom and panning metric. With rho=sqrt(2), this is equivalent to the
+    formulas we used in our paper.
+    '''
     # see
     # J. J. van Wijk and W. A. A. Nuij, "Smooth and efficient zooming and panning"
     # in IEEE Symposium on Information Visualization 2003 (IEEE Cat. No.03TH8714), 2003-10, pp. 15-23. 
@@ -67,38 +75,37 @@ def get_zoom_pan_parameter_functions(w0, w1, u0, u1, rho):
 
     return us, ws, S
 
-def get_zoom_pan_parameter(w0, w1, u0, u1, rho, t):
-
-    #assert 0 <= t and t <= 1 + 1e-14
+def get_zoom_pan_parameter(t: float, w0: float, w1: float, 
+                                     u0: float, u1: float, 
+                                     rho: float=np.sqrt(2)) -> tuple:
+    '''
+    Returns the parameter u and w for the path parameter t, where t0=0
+    gives w0 and u0 and t1=1 gives w1 and u1.
+    '''
 
     us, ws, S = get_zoom_pan_parameter_functions(w0, w1, u0, u1, rho)
     return us(t*S), ws(t*S)
 
-def get_zoom_pan_parameters(w0, w1, u0, u1, rho, n):
 
-    us, ws, S = get_zoom_pan_parameter_functions(w0, w1, u0, u1, rho)
+def unpack_camera(cam: dict) -> tuple:
+    '''
+    Returns an orthonormal basis for the given camera configuration.
 
-    ss = np.linspace(0, S, n)
-    return us(ss), ws(ss)
+    Input camera object needs to have a view and up vector.
+    '''
 
-def smooth_zoom_pan(start=[0,0,1], end=[1,0,1], n=101, rho=np.sqrt(2)):
-    dir = np.array(end) - np.array(start)
-    dist = np.linalg.norm(dir)
-    dir = dir/dist
+    pos = np.array(cam["position"])
+    s = cam["frustum_scale"]
+    view, up, right = get_orthonormal_basis(cam)
 
-    w0 = start[2]; w1 = end[2]
-    u0 = 0; u1 = dist
-
-    u, w = get_zoom_pan_parameters(w0, w1, u0, u1, rho, n)    
-
-    xs = start[0] + u*dir[0]
-    ys = start[1] + u*dir[1]
-    zs = w
-
-    return (xs, ys, zs)
-
+    return pos, view, up, right, s
 
 def normalized(a):
+    '''
+    Returns a normalized ndarray and prints a warning
+    if the norm is close to zero
+    '''
+    
     l2 = np.linalg.norm(a)
     if l2 < 1e-15:
         print("Norm near zero for ", a)
@@ -106,8 +113,12 @@ def normalized(a):
     return a / l2
 
 def get_orthonormal_basis(cam: dict) -> tuple:
-    pos = np.array(cam["position"])
-    s = cam["frustum_scale"]
+    '''
+    Returns an orthonormal basis for the given camera configuration.
+
+    Input camera object needs to have a view and up vector.
+    '''
+
     view = normalized(np.array(cam["view"]))
     up = normalized(np.array(cam["up"]))
     right = normalized(np.cross(up, view))
@@ -115,34 +126,9 @@ def get_orthonormal_basis(cam: dict) -> tuple:
 
     assert np.all([not np.isclose(np.linalg.norm(v), 0) for v in [view, up, right]]), "Given vectors do not form a basis for camera orientation!"
 
-    return pos, view, up, right, s
+    return view, up, right
 
-def get_look_at_point(cam: dict) -> list:
-    pos, view, _, _, s = get_orthonormal_basis(cam)
-    focal = cam["focal"]
-
-    look = pos + s*focal*view
-    return look
-
-def get_rotation_keyframe(start: dict, end: dict):
-    _, view1, up1, right1, _ = get_orthonormal_basis(start)
-    _, view2, up2, right2, _ = get_orthonormal_basis(end)
-    
-    axisangle, _ = get_rotation({"view":view1, "up":up1, "right": right1},
-                             {"view":view2, "up":up2, "right": right2})
-
-    return axisangle
-
-def get_rotation_angle(start: dict, end: dict) -> float:
-    _, view1, up1, right1, _ = get_orthonormal_basis(start)
-    _, view2, up2, right2, _ = get_orthonormal_basis(end)
-    
-    axisangle, _ = get_rotation({"view":view1, "up":up1, "right": right1},
-                             {"view":view2, "up":up2, "right": right2})
-
-    return axisangle.angle
-
-def get_rotation(start: dict, end: dict, compatibility: AxisAngle = None) -> tuple:
+def get_rotation(start: dict, end: dict) -> tuple:
     vecs1 = [start[key] for key in ["view", "right", "up"]]
     vecs2 = [end[key] for key in ["view", "right", "up"]]
 
@@ -192,24 +178,91 @@ def get_rotation(start: dict, end: dict, compatibility: AxisAngle = None) -> tup
     if beta_end == None:
         beta_end = np.arctan2(h[1], h[0])
 
-    if compatibility != None:
-        if np.dot(axis, compatibility.axis) < 0 and np.sign(-beta_end) != np.sign(compatibility.angle):
-            if np.sign(compatibility.angle) > 0:
-                beta_end -= 2*np.pi
-            else:
-                beta_end += 2*np.pi
-        elif np.dot(axis, compatibility.axis) > 0 and np.sign(beta_end) != np.sign(compatibility.angle):
-            if np.sign(compatibility.angle) > 0:
-                beta_end += 2*np.pi
-            else:
-                beta_end -= 2*np.pi
-
     # interpolating rotation matrix
     R_f = lambda t: R_axis @ R_beta(t, beta_end) @ R_axis.T @ R1
 
     return AxisAngle(axis, beta_end), R_f
 
-def cam_from_params(u, w, R, focal, lookat_pos, lookat_dir)->dict:
+def interpolate_t(t: float, focal: float, metric="3DImageFlow", **kwargs) -> dict:
+    if "start" in kwargs and "end" in kwargs:
+        start = kwargs["start"]
+        end = kwargs["end"]
+
+        # assure orthonormal camera reference frame
+        pos1, view1, up1, right1, s1 = unpack_camera(start)
+        pos2, view2, up2, right2, s2 = unpack_camera(end)
+    
+    else:
+        for arg in ["pos1", "view1", "up1", "right1", "s1", "pos2", "view2", "up2", "right2", "s2"]:
+            if not arg in kwargs:
+                raise ValueError(f"Function 'interpolate_t' needs keyword argument '{arg}' if no 'start' and 'end' are given.")
+
+        pos1 = kwargs["pos1"]
+        view1 = kwargs["view1"]
+        up1 = kwargs["up1"]
+        right1 = kwargs["right1"]
+        s1 = kwargs["s1"]
+
+        pos2 = kwargs["pos2"]
+        view2 = kwargs["view2"]
+        up2 = kwargs["up2"]
+        right2 = kwargs["right2"]
+        s2 = kwargs["s2"]
+
+    if not "R_f" in kwargs:
+        _, R_f = get_rotation({"view":view1, "up":up1, "right": right1},
+                          {"view":view2, "up":up2, "right": right2})
+    else:
+        R_f =  kwargs["R_f"]
+
+    # interpolating look at points
+    look1 = pos1 + s1*focal*view1
+    look2 = pos2 + s2*focal*view2
+
+    look_diff = look2 - look1
+
+    if metric == "LookatLinear":
+        pos = (1-t)*pos1 + t*pos2
+        look = (1-t)*look1 + t*look2
+        view = normalized(look - pos)
+        up = normalized((1-t)*up1 + t*up2)
+
+        cam = {
+            "position" : pos.tolist(),
+                "view" : view.tolist(),
+                  "up" : up.tolist(),
+       "frustum_scale" : np.linalg.norm(look - pos)/focal,
+               "focal" : focal
+            }
+
+        return cam
+
+    elif metric == "TransformationsLinear":
+        u = t
+        w = (1-t)*s1 + t*s2
+
+        cam = cam_from_params(u, w, R_f(t), focal, look1, look_diff)
+        return cam
+
+    elif metric == "3DImageFlow":
+        rho = kwargs["rho"]
+
+        w0 = s1; w1 = s2
+        u0 = 0;  u1 = np.linalg.norm(look_diff)
+
+        look_diff_n = np.zeros(3) if u1 < 1e-14 else normalized(look_diff)
+
+        u, w = get_zoom_pan_parameter(t, w0, w1, u0, u1, rho)
+        cam = cam_from_params(u, w, R_f(t), focal, look1, look_diff_n)
+
+        return cam
+
+    else:
+        raise ValueError(f"Unknown metric {metric}")
+
+def cam_from_params(u: float, w: float, 
+                    R: np.ndarray, focal: float, 
+                    lookat_pos: np.ndarray, lookat_dir: np.ndarray) -> dict:
     up = R[:,1]
     view = R[:,2]
     scale = w
@@ -226,159 +279,50 @@ def cam_from_params(u, w, R, focal, lookat_pos, lookat_dir)->dict:
     }
     return cam
 
-def frustum_transform_simple(start: dict, end: dict, focal: float, n: int=101, rho:float=np.sqrt(2), metric="3DImageFlow") -> list:
+def interpolate_simple(start: dict, end: dict,
+                       focal: float, metric="3DImageFlow", 
+                       n: int=101, **kwargs) -> list:
     '''
-    Uses the idea of smooth zooming and panning but extended to 3D. 
-    We smoothly transform one camera frustum (approximation) to another frustum
-    so that the optical flow in the frustum volume is minimal.
+    Simply interpolate between a start and end camera with n sample points
+    according to the given metric.
 
-    ### Arguments:
-        - start ... start point given as a dictionary with position, view, up vector and frustum scale
-        - end   ... end point given as a dictionary with position, view, up vector and frustum scale
-        - focal ... camera focal length
-        - n     ... number of points on the path
-        - rho   ... parameter that influences how much the camera will move away (same as in smooth_zoom_pan)
+    kwargs should contain the parameter rho if metric==3DImageFlow.
     '''
 
-    # assure orthonormal camera reference frame
-    pos1, view1, up1, right1, s1 = get_orthonormal_basis(start)
-    pos2, view2, up2, right2, s2 = get_orthonormal_basis(end)
-    
-    _, R_f = get_rotation({"view":view1, "up":up1, "right": right1},
-                          {"view":view2, "up":up2, "right": right2})
-
-    # interpolating look at points
-    look1 = pos1 + s1*focal*view1
-    look2 = pos2 + s2*focal*view2
-
-    look_diff = look2 - look1
-
-    cams = [None]*n
-
-    if metric == "LookatLinear":
-        for i, t in enumerate(np.linspace(0, 1, n)):
-            pos = (1-t)*pos1 + t*pos2
-            look = (1-t)*look1 + t*look2
-            view = normalized(look - pos)
-            up = normalized((1-t)*up1 + t*up2)
-
-            cam = {
-            "position" : pos.tolist(),
-                "view" : view.tolist(),
-                  "up" : up.tolist(),
-      "frustum_scale" : np.linalg.norm(look - pos)/focal,
-               "focal" : focal
-            }
-
-            cams[i] = cam
-
-    elif metric == "TransformationsLinear":
-        for i, t in enumerate(np.linspace(0, 1, n)):
-            u = t
-            w = (1-t)*s1 + t*s2
-
-            cam = cam_from_params(u, w, R_f(t), focal, look1, look_diff)
-            cams[i] = cam
-
-    elif metric == "3DImageFlow":    
-        w0 = s1; w1 = s2
-        u0 = 0;  u1 = np.linalg.norm(look_diff)
-
-        look_diff_n = np.zeros(3) if u1 < 1e-14 else normalized(look_diff)
-
-        us, ws = get_zoom_pan_parameters(w0, w1, u0, u1, rho, n)
-        cams = [cam_from_params(us[i], ws[i], R_f(t), focal, look1, look_diff_n) for i, t in enumerate(np.linspace(0, 1, n))]
-
-    else:
-        raise ValueError(f"Unknown metric {metric}")
+    cams = [interpolate_t(t, focal, metric, 
+                          start=start, end=end, 
+                          **kwargs)
+                for t in np.linspace(0, 1, n)]
 
     return cams
 
-def frustum_transform_t(start: dict, end: dict, focal: float, t: float, rho:float=np.sqrt(2), metric="3DImageFlow", rot_compat:AxisAngle = None) -> dict:
-    # assure orthonormal camera reference frame
-    pos1, view1, up1, right1, s1 = get_orthonormal_basis(start)
-    pos2, view2, up2, right2, s2 = get_orthonormal_basis(end)
-    
-    axisangle, R_f = get_rotation({"view":view1, "up":up1, "right": right1},
-                          {"view":view2, "up":up2, "right": right2},
-                          rot_compat)
-
-    # interpolating look at points
-    look1 = pos1 + s1*focal*view1
-    look2 = pos2 + s2*focal*view2
-
-    look_diff = look2 - look1
-
-    if metric == "LookatLinear":
-        pos = (1-t)*pos1 + t*pos2
-        view = normalized((1-t)*look1 + t*look2 - pos)
-        up = normalized((1-t)*up1 + t*up2)
-
-        cam = {
-        "position" : pos.tolist(),
-            "view" : view.tolist(),
-              "up" : up.tolist(),
-  "frustum_scale" : np.linalg.norm(view),
-           "focal" : focal
-        }
-
-        return cam
-
-    elif metric == "TransformationsLinear":
-        u = t
-        w = (1-t)*s1 + t*s2
-
-        cam = cam_from_params(u, w, R_f(t), focal, look1, look_diff)
-        return cam
-
-    elif metric == "3DImageFlow":
-
-        w0 = s1; w1 = s2
-        u0 = 0;  u1 = np.linalg.norm(look_diff)
-
-        look_diff_n = np.zeros(3) if u1 < 1e-14 else normalized(look_diff)
-
-        u, w = get_zoom_pan_parameter(w0, w1, u0, u1, rho, t)
-        cam = cam_from_params(u, w, R_f(t), focal, look1, look_diff_n)
-
-        return cam
-
-    else:
-        raise ValueError(f"Unknown metric {metric}")
-
-def frustum_deCasteljau(t: float, control_points: list, focal: float, rho:float=np.sqrt(2), metric="3DImageFlow")->dict:
+def interpolate_deCasteljau(t: float, control_points: list, 
+                            focal: float, metric: str, **kwargs) -> dict:
 
     if len(control_points) == 1:
         return control_points[0]
 
-    new_control_points = []
-    for i, cp in enumerate(control_points[:-1]):
-        new_control_points.append(frustum_transform_t(cp, control_points[i+1], focal, t, rho, metric))
+    new_control_points = [interpolate_t(t, focal, metric, start=cp, end=control_points[i+1], **kwargs) 
+                          for i, cp in enumerate(control_points[:-1])]
     
-    return frustum_deCasteljau(t, new_control_points, focal, rho)
+    return interpolate_deCasteljau(t, new_control_points, focal, metric, **kwargs)
 
-def frustum_transform_bezier(control_points: list, focal: float, n: int=101, rho:float=np.sqrt(2), metric="3DImageFlow") -> list:
+def interpolate_bezier(control_points: list, focal: float, metric: str, n: int=101, **kwargs) -> list:
 
     if len(control_points) == 2:
-        return frustum_transform_simple(control_points[0], control_points[1], focal, n, rho, metric)
+        return interpolate_simple(control_points[0], control_points[1], focal, metric, n, **kwargs)
 
-    cams = [None]*n
-    for i,t in enumerate(np.linspace(0, 1, n)):
-        point = frustum_deCasteljau(t, control_points, focal, rho, metric)
-        cams[i] = point[0]
+    cams = [interpolate_deCasteljau(t, control_points, focal, metric, **kwargs)[0] 
+            for t in np.linspace(0, 1, n)]
+    
     return cams
 
 def get_segment_index(t, knots):
-    # could use binary search here but
-    # knot array is most likely small
-    segment_index = 0
-    for knot in knots[1:]:
-        if knot <= t:
-            segment_index += 1
-
+    segment_index = bisect.bisect_left(knots, t) - 1
     return segment_index
 
-def frustum_CatmullRom(t: float, control_points: list, knots: list, focal: float, rho:float=np.sqrt(2), metric="3DImageFlow")->dict:
+def interpolate_CatmullRom(t: float, control_points: list, knots: list,
+                           focal: float, metric="3DImageFlow", **kwargs)->dict:
 
     assert len(control_points) == len(knots), f"Number of control points and number of knots do not match"
 
@@ -426,16 +370,22 @@ def frustum_CatmullRom(t: float, control_points: list, knots: list, focal: float
             else:
                 s = (t - segment_knots[1])/(segment_knots[2] - segment_knots[1])
 
-            cam = frustum_transform_t(segment_control_points[i], segment_control_points[i+1], focal, s, rho, metric)
+            cam = interpolate_t(s, focal, metric, start=segment_control_points[i], end=segment_control_points[i+1], **kwargs)
             segment_control_points[i] = cam
 
     return segment_control_points[0]
 
 def disambiguate_spline(control_points: list, knots: list, spline: list):
     """
-    If spline has jumps/discontinuities in it, we need to fix the spline
-    by inserting additional control points and knots.
+    Inserts new control points and knots to resolve any gaps/discontinuities
+    that may be present in the spline.
+
+    Depending on the original control points, this function may not detect
+    the discontinuities reliably or detect some that are not present.
     """
+
+    # this could be further improved because the current implementation
+    # is prone to false positives/negatives due to absolute tolerances
 
     spline_positions = [np.array(c["position"]) for c in spline]
 
@@ -470,36 +420,46 @@ def disambiguate_spline(control_points: list, knots: list, spline: list):
                                not np.isclose(dot_di_di1, 1, atol=0.2))
 
         length_discontinuous = (not np.isclose(norm_di, norm_di_1, rtol=0.2) and \
-                                not np.isclose(norm_di, norm_di1, rtol=0.2))
+                                not np.isclose(norm_di, norm_di1, rtol=0.2) and \
+                                not np.isclose(norm_di, 0       , atol=0.01))
+
 
         if angle_discontinuous or length_discontinuous: 
         
             print(f"i:{i} t:{t} segment:{segment_index} angle:{angle_discontinuous} length:{length_discontinuous}")
+            print(f"cos angle di-1 and di: {dot_di_di_1} di+1 and di: {dot_di_di1}")
+            print(f"norms di-1: {norm_di_1} di: {norm_di} di+1: {norm_di1}")
 
-            knot = t
-
-            if np.any(map(lambda knot: np.isclose(t, knot), knots)):
+            if np.any(map(lambda knot: np.isclose(t, knot), new_knots)):
                 # if t is close to a knot (or the same) inserting
                 # the new point can cause problems when computing the
-                # spline
+                # spline and is probably a false positive
                 continue
 
             cam = spline[i]
+
+            new_segment_index = get_segment_index(t, new_knots)
         
             new_control_points.insert(segment_index+1, cam)
-            new_knots = np.insert(new_knots, segment_index+1, knot)
+            new_knots = np.insert(new_knots, segment_index+1, t)
 
             last_fixed_segment = segment_index
 
     return new_control_points, new_knots
 
-def frustum_transform_spline(control_points: list, knots: list, focal: float, n: int=101, rho:float=np.sqrt(2), method="CatmullRom", metric="3DImageFlow") -> list:
+def interpolate_keyframes(control_points: list, knots: list, 
+                          focal: float, method="CatmullRom", metric="3DImageFlow",
+                          n: int=101, **kwargs) -> list:
+
+    if metric == "3DImageFlow" and not "rho" in kwargs:
+        kwargs["rho"] = np.sqrt(2)
+        print("No named argument rho given for metric 3DImageFlow. Using default parameter sqrt(2).")
 
     if len(control_points) != len(knots):
         raise ValueError("Number of control points and number of knots are not equal")    
         
     if len(control_points) == 2:
-        return frustum_transform_simple(control_points[0], control_points[1], focal, n, rho, metric)
+        return interpolate_simple(control_points[0], control_points[1], focal, metric, n, **kwargs)
 
     cams = [None]*n
         
@@ -511,28 +471,31 @@ def frustum_transform_spline(control_points: list, knots: list, focal: float, n:
         cams = []
         for i, knot in enumerate(knots[:-1]):
             nn = knots[i+1] - knots[i]
-            cams.extend(frustum_transform_simple(control_points[i], control_points[i+1], focal, nn, rho, metric))
+            cams.extend(interpolate_simple(control_points[i], control_points[i+1], focal, metric, nn, **kwargs))
         return cams
 
     pool = Pool()
     if method == "CatmullRom":
         n_control_points = len(control_points)
-        cams = pool.map(partial(frustum_CatmullRom, control_points=control_points, knots=normalized_knots, focal=focal, rho=rho, metric=metric), np.linspace(0, 1, n))
+        cams = pool.map(partial(interpolate_CatmullRom, control_points=control_points, knots=normalized_knots, 
+                                                    focal=focal, metric=metric, **kwargs),
+                                                    np.linspace(0, 1, n))
 
         for i in range(4):
-            print(i)
-
             control_points, normalized_knots = disambiguate_spline(control_points, normalized_knots, cams)
             if n_control_points == len(control_points):
                 break
             
             n_control_points = len(control_points)
-            cams = pool.map(partial(frustum_CatmullRom, control_points=control_points, knots=normalized_knots, focal=focal, rho=rho, metric=metric), np.linspace(0, 1, n))
+            cams = pool.map(partial(interpolate_CatmullRom, control_points=control_points, knots=normalized_knots, 
+                                                        focal=focal, metric=metric, **kwargs),
+                                                        np.linspace(0, 1, n))
 
     elif method == "Bezier":
-        cams = pool.map(partial(frustum_deCasteljau, control_points=control_points, focal=focal, rho=rho, metric=metric), np.linspace(0, 1, n))
+        cams = pool.map(partial(interpolate_deCasteljau, control_points=control_points, focal=focal,
+                                                    metric=metric, **kwargs),
+                                                    np.linspace(0, 1, n))
     else:
-        pool.close()
         raise ValueError(f"Method {method} unknown")
 
     pool.close()

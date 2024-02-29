@@ -1,12 +1,12 @@
-# OptFlowCam
+# OptFlowCam keyframes processing
 
 This directory includes an implementation of the [OptFlowCam](https://livelyliz.github.io/OptFlowCam/) technique described in the paper:
 
 - *Piotrowski, Motejat, Roessl, Theisel. "OptFlowCam: A 3D-Image-Flow-Based Metric in Camera Space
 for Camera Paths in Scenes with Extreme Scale Variations", Eurographics 2024*
 
-The technique produces very good results for keyframed camera paths with large scale variations. The script
-is used to process Gaia Sky keyframe files (``.gkf``) and convert them to camera path files (``.gsc``).
+The Optical Flow Camera is used in Gaia Sky as an additional export method for keyframes. The technique produces very good results for keyframed camera paths with large scale variations. The script
+ itself processes Gaia Sky keyframe files (``.gkf``) and converts them to camera path files (``.gsc``).
 
 The original code was provided by **L. Piotrowski**, and is licensed under the GPLv3, as is the
 code in this directory.

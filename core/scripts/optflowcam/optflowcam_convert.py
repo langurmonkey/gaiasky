@@ -17,27 +17,12 @@ import sys
 
 import json
 
-import camera_spline as ofc_cs
+import optflowcam_interpolation as ofc_ip
 
 import numpy as np
 
-def m_to_iu(meters):
-    return meters/(1e9)
-
 def km_to_iu(kilometers):
     return kilometers/(1e6)
-
-def iu_to_m(ius):
-    return ius*1e9
-
-def iu_to_km(ius):
-    return ius*1e6
-
-def pc_to_km(parsec):
-    return parsec*3.0857*1e13
-
-def pc_to_iu(parsec):
-    return parsec*3.0857*1e7
 
 def check_path(value):
     '''
@@ -77,7 +62,7 @@ def make_filepath_unique(filepath):
 
 def write_csv(filepath, data):
     with open(filepath, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile, delimiter=' ',
+        writer = csv.writer(csvfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writerows(data)
         csvfile.close()
@@ -176,7 +161,7 @@ def convert_optflow_to_gaia(path, keyframes):
 
     gaia_path = [None]*n
     for i, p in enumerate(path):
-        spacetime = int(spacetime_start + i/n*(spacetime_end - spacetime_start))
+        spacetime = int(spacetime_start + i/(n-1) * (spacetime_end - spacetime_start))
 
         pos = p["position"]
         view = p["view"]
@@ -196,7 +181,9 @@ def main():
 
     n = int(knots[-1]*fps - knots[0]*fps) + 1 
 
-    path = ofc_cs.frustum_transform_spline(keyframes, knots, 1, n, method="CatmullRom", metric="3DImageFlow")
+    path = ofc_ip.interpolate_keyframes(keyframes, knots, 1, 
+                                        "CatmullRom", "3DImageFlow", n,
+                                        rho=np.sqrt(2))
     gaia_path = convert_optflow_to_gaia(path, keyframes)
 
     with open(args.in_file + "_optflow.json", 'w', encoding='utf-8') as f:
@@ -212,6 +199,7 @@ def main():
         f.close()
 
     write_csv(args.out_file, gaia_path)
+    print("Output file written to %s" % args.out_file)
 
 if __name__ == "__main__":
     main()
