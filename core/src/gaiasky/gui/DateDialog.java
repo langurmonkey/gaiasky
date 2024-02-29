@@ -18,8 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
@@ -29,9 +31,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
 
 public class DateDialog extends GenericDialog {
+    private static final Logger.Log logger = Logger.getLogger(DateDialog.class);
 
     private OwnTextField day, year, hour, min, sec;
     private SelectBox<String> month;
@@ -75,10 +77,10 @@ public class DateDialog extends GenericDialog {
         day.setMaxLength(2);
         day.setWidth(inputWidth);
         day.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyTyped) {
                     checkField(day, 1, 31);
+                    checkFullDate();
                     return true;
                 }
             }
@@ -93,10 +95,10 @@ public class DateDialog extends GenericDialog {
         year.setMaxLength(8);
         year.setWidth(inputWidth);
         year.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyTyped) {
                     checkField(year, (int) (Settings.settings.runtime.minTimeMs * Nature.MS_TO_S), (int) (Settings.settings.runtime.maxTimeMs * Nature.MS_TO_S));
+                    checkFullDate();
                     return true;
                 }
             }
@@ -120,10 +122,10 @@ public class DateDialog extends GenericDialog {
         hour.setMaxLength(2);
         hour.setWidth(inputWidth);
         hour.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyTyped) {
                     checkField(hour, 0, 23);
+                    checkFullDate();
                     return true;
                 }
             }
@@ -134,10 +136,10 @@ public class DateDialog extends GenericDialog {
         min.setMaxLength(2);
         min.setWidth(inputWidth);
         min.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyTyped) {
                     checkField(min, 0, 59);
+                    checkFullDate();
                     return true;
                 }
             }
@@ -148,10 +150,10 @@ public class DateDialog extends GenericDialog {
         sec.setMaxLength(2);
         sec.setWidth(inputWidth);
         sec.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyTyped) {
                     checkField(sec, 0, 59);
+                    checkFullDate();
                     return true;
                 }
             }
@@ -175,6 +177,7 @@ public class DateDialog extends GenericDialog {
         cool = checkField(hour, 0, 23) && cool;
         cool = checkField(min, 0, 59) && cool;
         cool = checkField(sec, 0, 59) && cool;
+        cool = checkFullDate() && cool;
 
         if (cool) {
             // Set the date
@@ -183,6 +186,8 @@ public class DateDialog extends GenericDialog {
             // Send time change command
             ZoneOffset offset = LocalDateTime.now().atZone(timeZone).getOffset();
             EventManager.publish(Event.TIME_CHANGE_CMD, this, date.toInstant(offset));
+        } else {
+            return false;
         }
         return true;
     }
@@ -192,13 +197,26 @@ public class DateDialog extends GenericDialog {
 
     }
 
+    public boolean checkFullDate() {
+        try {
+            var ignored = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()), Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            // Probably error in leap years (Feb 29?).
+            if (month.getSelectedIndex() == 1 && Integer.parseInt(day.getText()) == 29) {
+                day.setColor(ColorUtils.gRedC);
+            }
+            return false;
+        }
+    }
+
     /**
      * Returns true if all is good
      *
      * @param f   The text field
      * @param min The minimum value
      * @param max The maximum value
-     *
      * @return The boolean indicating whether the value in this field is between
      * min and max
      */
@@ -210,7 +228,7 @@ public class DateDialog extends GenericDialog {
                 return false;
             }
         } catch (Exception e) {
-            f.setColor(1, 0, 0, 1);
+            f.setColor(ColorUtils.gRedC);
             return false;
         }
         f.setColor(defaultColor);
@@ -220,7 +238,7 @@ public class DateDialog extends GenericDialog {
     /** Updates the time **/
     public void updateTime(Instant instant, ZoneId zid) {
         LocalDateTime date = LocalDateTime.ofInstant(instant, zid);
-        int year = date.get(ChronoField.YEAR);
+        int year = date.getYear();
         int month = date.getMonthValue();
         int day = date.getDayOfMonth();
 
