@@ -23,6 +23,7 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class KeyframesManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesManager.class);
@@ -466,8 +468,18 @@ public class KeyframesManager implements IObserver {
                 process.waitFor();
 
                 if (process.exitValue() == 0) {
+                    // Find out actually written file.
+                    var output = process.getInputStream();
+                    var lines = new BufferedReader(
+                            new InputStreamReader(output, StandardCharsets.UTF_8))
+                            .lines()
+                            .toList();
+                    var outputFileLocation = outputFile.toAbsolutePath().toString();
+                    if (!lines.isEmpty()) {
+                        outputFileLocation = lines.get(lines.size() - 1).substring(23);
+                    }
                     // Popup notification.
-                    GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFile.toString()), 10, this);
+                    GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFileLocation), 10, this);
                 } else {
                     // Error?
                     GaiaSky.popupNotification(I18n.msg("error.process.run", "exit value " + process.exitValue()), 10, this, Logger.LoggerLevel.ERROR, null);
