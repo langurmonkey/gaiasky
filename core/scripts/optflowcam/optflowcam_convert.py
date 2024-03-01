@@ -122,8 +122,9 @@ def convert_gaia_to_optflow(gaia_keyframes):
 
     t = 0
     for i, row in enumerate(gaia_keyframes):
-        t = t + float(row[0])
-        spacetime = int(row[1])
+        duration = float(row[0])
+        t = t + duration
+        simtime = int(row[1])
         pos = [float(p) / scale for p in row[2:5]]
         view = [float(p) / scale for p in row[5:8]]
         up = [float(p) / scale for p in row[8:11]]
@@ -141,11 +142,12 @@ def convert_gaia_to_optflow(gaia_keyframes):
             sys.exit("Bad format in keyframes file, row %d" % i)
 
         keyframe = {
+            "duration": duration,
             "position": pos,
             "view": view,
             "up": up,
             "frustum_scale": fs,
-            "time": spacetime,
+            "simtime": simtime,
             "focal": 1
         }
         keyframes.append(keyframe)
@@ -153,21 +155,55 @@ def convert_gaia_to_optflow(gaia_keyframes):
 
     return keyframes, knots
 
-def convert_optflow_to_gaia(path, keyframes):
-    spacetime_start = keyframes[0]["time"]
-    spacetime_end = keyframes[-1]["time"]
-
+def convert_optflow_to_gaia(path: list, keyframes: list, fps: float):
     n = len(path)
 
+    # Simulation time needs a strict linear interpolation between keyframes.
+    # Keyframe_frames contains the final keyframe index for each frame.
+    keyframe_frames = []
+    for i in range(1, len(keyframes)):
+        kf0 = i - 1
+        kf1 = i
+        curr_num_frames = int(fps * keyframes[kf1]["duration"])
+        for j in range(curr_num_frames):
+            keyframe_frames.append(kf1)
+    keyframe_frames.append(kf1)
+
+
+    current_kf = 0
+    partial_count = 0
     gaia_path = [None]*n
     for i, p in enumerate(path):
-        spacetime = int(spacetime_start + i/(n-1) * (spacetime_end - spacetime_start))
+        # Linear interpolation of simulation time.
+        kf1i = keyframe_frames[i]
+        kf1 = keyframes[kf1i]
+        kf0 = keyframes[kf1i - 1]
 
+        if current_kf != kf1i:
+            # Restart counter.
+            partial_count = 0
+            current_kf = kf1i
+        else:
+            partial_count = partial_count + 1
+
+        duration = kf1["duration"]
+        curr_num_frames = int(fps * duration)
+
+        # Work out interpolation variable.
+        t = partial_count / (curr_num_frames - 1)
+        # Clamp t.
+        t = max(0.0, min(1.0, t))
+
+        simtime0 = kf0["simtime"]
+        simtime1 = kf1["simtime"]
+        simtime = int((1-t)*simtime0 + t*simtime1)
+
+        # Add frame parameters.
         pos = p["position"]
         view = p["view"]
         up = p["up"]
 
-        row = [spacetime, pos[0], pos[1], pos[2], view[0], view[1], view[2], up[0], up[1], up[2]]
+        row = [simtime, pos[0], pos[1], pos[2], view[0], view[1], view[2], up[0], up[1], up[2]]
         gaia_path[i] = row
 
     return gaia_path
@@ -179,12 +215,12 @@ def main():
     gaia_keyframes = read_csv(args.in_file)
     keyframes, knots = convert_gaia_to_optflow(gaia_keyframes) 
 
-    n = int(knots[-1]*fps - knots[0]*fps) + 1 
+    n = int(knots[-1] * fps - knots[0] * fps) 
 
     path = ofc_ip.interpolate_keyframes(keyframes, knots, 1, 
                                         "CatmullRom", "3DImageFlow", n,
                                         rho=np.sqrt(2))
-    gaia_path = convert_optflow_to_gaia(path, keyframes)
+    gaia_path = convert_optflow_to_gaia(path, keyframes, fps)
 
     with open(args.in_file + "_optflow.json", 'w', encoding='utf-8') as f:
 

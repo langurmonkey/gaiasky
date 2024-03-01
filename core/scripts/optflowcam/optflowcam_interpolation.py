@@ -86,6 +86,19 @@ def get_zoom_pan_parameter(t: float, w0: float, w1: float,
     us, ws, S = get_zoom_pan_parameter_functions(w0, w1, u0, u1, rho)
     return us(t*S), ws(t*S)
 
+def get_zoom_pan_parameters(n: int, w0: float, w1: float, 
+                            u0: float, u1: float, 
+                            rho: float=np.sqrt(2)) -> tuple:
+    '''
+    Returns the parameter list for u and w for the range [0,1] divided 
+    into n samples.
+    '''
+
+    us, ws, S = get_zoom_pan_parameter_functions(w0, w1, u0, u1, rho)
+
+    ss = np.linspace(0, S, n)
+    return us(ss), ws(ss)
+
 
 def unpack_camera(cam: dict) -> tuple:
     '''
@@ -474,31 +487,31 @@ def interpolate_keyframes(control_points: list, knots: list,
             cams.extend(interpolate_simple(control_points[i], control_points[i+1], focal, metric, nn, **kwargs))
         return cams
 
-    pool = Pool()
-    if method == "CatmullRom":
-        n_control_points = len(control_points)
-        cams = pool.map(partial(interpolate_CatmullRom, control_points=control_points, knots=normalized_knots, 
-                                                    focal=focal, metric=metric, **kwargs),
-                                                    np.linspace(0, 1, n))
-
-        for i in range(4):
-            control_points, normalized_knots = disambiguate_spline(control_points, normalized_knots, cams)
-            if n_control_points == len(control_points):
-                break
-            
+    with Pool() as pool:
+        if method == "CatmullRom":
             n_control_points = len(control_points)
             cams = pool.map(partial(interpolate_CatmullRom, control_points=control_points, knots=normalized_knots, 
                                                         focal=focal, metric=metric, **kwargs),
                                                         np.linspace(0, 1, n))
 
-    elif method == "Bezier":
-        cams = pool.map(partial(interpolate_deCasteljau, control_points=control_points, focal=focal,
-                                                    metric=metric, **kwargs),
-                                                    np.linspace(0, 1, n))
-    else:
-        raise ValueError(f"Method {method} unknown")
+            for i in range(4):
+                control_points, normalized_knots = disambiguate_spline(control_points, normalized_knots, cams)
+                if n_control_points == len(control_points):
+                    break
+                
+                n_control_points = len(control_points)
+                cams = pool.map(partial(interpolate_CatmullRom, control_points=control_points, knots=normalized_knots, 
+                                                            focal=focal, metric=metric, **kwargs),
+                                                            np.linspace(0, 1, n))
 
-    pool.close()
-    pool.join()
+        elif method == "Bezier":
+            cams = pool.map(partial(interpolate_deCasteljau, control_points=control_points, focal=focal,
+                                                        metric=metric, **kwargs),
+                                                        np.linspace(0, 1, n))
+        else:
+            raise ValueError(f"Method {method} unknown")
+
+        pool.close()
+        pool.join()
 
     return cams
