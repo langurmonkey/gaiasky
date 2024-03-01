@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
+import org.apache.commons.io.FilenameUtils;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
@@ -595,5 +596,22 @@ public class SysUtils {
         }
 
         return null;
+    }
+
+    public static Path uniqueFileName(Path file) {
+        if (!Files.isRegularFile(file)) {
+            logger.error("Given path is not a file: " + file);
+            return null;
+        }
+        var parent = file.getParent();
+        var fileName = FilenameUtils.getBaseName(file.toString());
+        var ext = FilenameUtils.getExtension(file.toString());
+        var f = file;
+        int i = 1;
+        while (Files.exists(f) && Files.isRegularFile(f)) {
+            f = parent.resolve(fileName + "_" + i + ext);
+            i++;
+        }
+        return f;
     }
 }

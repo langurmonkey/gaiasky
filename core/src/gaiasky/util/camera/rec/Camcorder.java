@@ -180,11 +180,8 @@ public class Camcorder implements IObserver {
                     // Annotate by date.
                     Path f = SysUtils.getDefaultCameraDir().resolve(filename + ".gsc");
                     if (Files.exists(f)) {
-                        try {
-                            Files.delete(f);
-                        } catch (IOException e) {
-                            logger.error(e);
-                        }
+                        // Make unique.
+                        f = SysUtils.uniqueFileName(f);
                     }
 
                     // Persist path.
@@ -199,9 +196,9 @@ public class Camcorder implements IObserver {
                     long elapsed = System.currentTimeMillis() - startMs;
                     startMs = 0;
                     float secs = elapsed / 1000f;
+                    assert f != null;
                     logger.info(I18n.msg("notif.camerarecord.done", f.toAbsolutePath(), secs));
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.camerarecord.done", f.toAbsolutePath(), secs));
-                    f = null;
                     mode.set(RecorderState.IDLE);
                 }
             }

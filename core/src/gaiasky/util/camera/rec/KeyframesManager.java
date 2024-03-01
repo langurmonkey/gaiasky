@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 public class KeyframesManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesManager.class);
@@ -192,29 +191,29 @@ public class KeyframesManager implements IObserver {
                                   boolean notification) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
-            try {
-                Files.delete(f);
-            } catch (IOException e) {
-                logger.error(e);
-            }
+            // Make file name unique.
+            f = SysUtils.uniqueFileName(f);
         }
-        try (BufferedWriter os = new BufferedWriter(new FileWriter(f.toFile()))) {
-            for (Keyframe kf : keyframes) {
-                os.append(Double.toString(kf.seconds)).append(sep).append(Long.toString(kf.time)).append(sep);
-                os.append(Double.toString(kf.pos.x)).append(sep).append(Double.toString(kf.pos.y)).append(sep).append(
-                        Double.toString(kf.pos.z)).append(sep);
-                os.append(Double.toString(kf.dir.x)).append(sep).append(Double.toString(kf.dir.y)).append(sep).append(
-                        Double.toString(kf.dir.z)).append(sep);
-                os.append(Double.toString(kf.up.x)).append(sep).append(Double.toString(kf.up.y)).append(sep).append(
-                        Double.toString(kf.up.z)).append(sep);
-                if (kf.target != null) {
-                    os.append(Double.toString(kf.target.x)).append(sep).append(Double.toString(kf.target.y)).append(sep).append(
-                            Double.toString(kf.target.z)).append(sep);
+        try {
+            assert f != null;
+            try (BufferedWriter os = new BufferedWriter(new FileWriter(f.toFile()))) {
+                for (Keyframe kf : keyframes) {
+                    os.append(Double.toString(kf.seconds)).append(sep).append(Long.toString(kf.time)).append(sep);
+                    os.append(Double.toString(kf.pos.x)).append(sep).append(Double.toString(kf.pos.y)).append(sep).append(
+                            Double.toString(kf.pos.z)).append(sep);
+                    os.append(Double.toString(kf.dir.x)).append(sep).append(Double.toString(kf.dir.y)).append(sep).append(
+                            Double.toString(kf.dir.z)).append(sep);
+                    os.append(Double.toString(kf.up.x)).append(sep).append(Double.toString(kf.up.y)).append(sep).append(
+                            Double.toString(kf.up.z)).append(sep);
+                    if (kf.target != null) {
+                        os.append(Double.toString(kf.target.x)).append(sep).append(Double.toString(kf.target.y)).append(sep).append(
+                                Double.toString(kf.target.z)).append(sep);
+                    }
+                    os.append(Integer.toString(kf.seam ? 1 : 0)).append(sep);
+                    os.append(kf.name).append("\n");
                 }
-                os.append(Integer.toString(kf.seam ? 1 : 0)).append(sep);
-                os.append(kf.name).append("\n");
-            }
 
+            }
         } catch (IOException e) {
             logger.error(e);
             return;
