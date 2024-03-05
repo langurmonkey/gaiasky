@@ -135,7 +135,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonMinimap.setSize(buttonWidth, buttonHeight);
         buttonMinimap.setName("map");
         buttonMinimap.setChecked(Settings.settings.program.minimap.active);
-        String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
+        String[] minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title", true);
         buttonMinimap.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
         buttonMinimap.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -149,7 +149,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonLoad = new OwnTextIconButton("", skin, "load");
         buttonLoad.setSize(buttonWidth, buttonHeight);
         buttonLoad.setName("loadcatalog");
-        buttonLoad.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
+        buttonLoad.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog", true), skin));
         buttonLoad.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, buttonLoad);
@@ -163,7 +163,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonSettings = new OwnTextIconButton("", skin, "preferences");
         buttonSettings.setSize(buttonWidth, buttonHeight);
         buttonSettings.setName("preferences");
-        String prefsHotkey = kb.getStringKeys("action.preferences");
+        String[] prefsHotkey = kb.getStringKeys("action.preferences", true);
         buttonSettings.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.preferences"), prefsHotkey, skin));
         buttonSettings.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -178,7 +178,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonLog = new OwnTextIconButton("", skin, "log");
         buttonLog.setSize(buttonWidth, buttonHeight);
         buttonLog.setName("show log");
-        buttonLog.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
+        buttonLog.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.log"), kb.getStringKeys("action.log", true), skin));
         buttonLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LOG_ACTION, buttonLog);
@@ -192,8 +192,8 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonHelp = new OwnTextIconButton("", skin, "help");
         buttonHelp.setSize(buttonWidth, buttonHeight);
         buttonHelp.setName("about");
-        String helpHotkey = kb.getStringKeys("action.help");
-        buttonHelp.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.help"), helpHotkey, skin));
+        String[] helpHotkeys = kb.getStringKeys("action.help", true);
+        buttonHelp.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.help"), helpHotkeys, skin));
         buttonHelp.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_ABOUT_ACTION, buttonHelp);
@@ -207,7 +207,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonQuit = new OwnTextIconButton("", skin, "quit");
         buttonQuit.setSize(buttonWidth, buttonHeight);
         buttonQuit.setName("quit");
-        buttonQuit.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
+        buttonQuit.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.quit.title"), kb.getStringKeys("action.exit", true), skin));
         buttonQuit.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_QUIT_ACTION, buttonQuit);
@@ -251,8 +251,8 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
 
         // Add button tooltip.
         if (action != null && !action.isBlank()) {
-            String shortcutKeys = KeyBindings.instance.getStringKeys(action);
-            if(shortcutKeys != null) {
+            String[] shortcutKeys = KeyBindings.instance.getStringKeys(action, true);
+            if(shortcutKeys != null && shortcutKeys.length > 0) {
                 button.addListener(new OwnTextHotkeyTooltip(title, shortcutKeys, skin));
             } else {
                 button.addListener(new OwnTextTooltip(title, skin));

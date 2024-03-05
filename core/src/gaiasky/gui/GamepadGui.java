@@ -551,7 +551,7 @@ public class GamepadGui extends AbstractGui {
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             cameraModel[0][9] = button3d;
             button3d.setChecked(Settings.settings.program.modeStereo.active);
-            final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
+            final String[] hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode", true);
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
             button3d.addListener(event -> {
@@ -576,7 +576,7 @@ public class GamepadGui extends AbstractGui {
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
             cameraModel[1][9] = buttonDome;
             buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
-            final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
+            final String[] hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium", true);
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
             buttonDome.addListener(event -> {
@@ -603,7 +603,7 @@ public class GamepadGui extends AbstractGui {
             cameraModel[2][9] = buttonCubemap;
             buttonCubemap.setProgrammaticChangeEvents(false);
             buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
-            final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
+            final String[] hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360", true);
             buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
             buttonCubemap.addListener(event -> {
@@ -630,7 +630,7 @@ public class GamepadGui extends AbstractGui {
             cameraModel[3][9] = buttonOrthoSphere;
             buttonOrthoSphere.setProgrammaticChangeEvents(false);
             buttonOrthoSphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
-            final String hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere");
+            final String[] hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere", true);
             buttonOrthoSphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
             buttonOrthoSphere.setName("orthosphere");
             buttonOrthoSphere.addListener(event -> {

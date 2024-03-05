@@ -269,8 +269,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         Image icon = new Image(skin.getDrawable(ct.style));
         visibility = new OwnTextIconButton(TextUtils.capitalise(I18n.msg("gui.keyframes.visibility")), icon, skin, "toggle");
         // Tooltip (with or without hotkey)
-        String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
-        if (hk != null) {
+        String[] hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key, true);
+        if (hk != null && hk.length > 0) {
             visibility.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(Objects.requireNonNull(ct.getName())), hk, skin));
         } else {
             visibility.addListener(new OwnTextTooltip(TextUtils.capitalise(Objects.requireNonNull(ct.getName())), skin));

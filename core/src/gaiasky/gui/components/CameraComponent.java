@@ -133,7 +133,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             button3d.setChecked(Settings.settings.program.modeStereo.active);
-            final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
+            final String[] hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode", true);
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
             button3d.addListener(event -> {
@@ -156,7 +156,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
             buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
-            final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
+            final String[] hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium", true);
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
             buttonDome.addListener(event -> {
@@ -181,7 +181,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
             buttonCubemap.setProgrammaticChangeEvents(false);
             buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
-            final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
+            final String[] hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360", true);
             buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
             buttonCubemap.addListener(event -> {
@@ -206,7 +206,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             buttonOrthosphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
             buttonOrthosphere.setProgrammaticChangeEvents(false);
             buttonOrthosphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
-            final String hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere");
+            final String[] hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere", true);
             buttonOrthosphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
             buttonOrthosphere.setName("orthosphere");
             buttonOrthosphere.addListener(event -> {
@@ -232,7 +232,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 buttonMaster = new OwnTextIconButton("", iconMaster, skin, "default");
                 buttonMaster.setProgrammaticChangeEvents(false);
                 buttonMaster.setSize(28f, 29.6f);
-                final String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
+                final String[] hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure", true);
                 buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.slave.config")), hkmaster, skin));
                 buttonMaster.setName("master");
                 buttonMaster.addListener(event -> {

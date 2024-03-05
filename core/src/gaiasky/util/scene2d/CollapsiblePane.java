@@ -79,7 +79,18 @@ public class CollapsiblePane extends Table {
      * @param topIcons               List of top icons that will be added between the label and the
      *                               expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, Runnable expandCollapseRunnable, String shortcut, Actor... topIcons) {
+    public CollapsiblePane(final Stage stage,
+                           final String labelText,
+                           final Actor content,
+                           float width,
+                           final Skin skin,
+                           String labelStyle,
+                           String expandButtonStyle,
+                           String detachButtonStyle,
+                           boolean expanded,
+                           Runnable expandCollapseRunnable,
+                           String shortcut,
+                           Actor... topIcons) {
         super(skin);
         this.stage = stage;
         this.labelText = labelText;

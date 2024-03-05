@@ -13,17 +13,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
 
 public class OwnTextHotkeyTooltip extends Tooltip<Table> {
     private final OwnLabel label;
+    private HorizontalGroup groupHotkeys;
     private OwnLabel labelHotkey;
 
     public OwnTextHotkeyTooltip(String text, String hotkey, Skin skin, int breakSpaces) {
-        this(text, hotkey, skin, TooltipManager.getInstance(), skin.get(TextTooltipStyle.class), breakSpaces);
+        this(text, hotkey != null ? new String[]{hotkey} : null, skin, TooltipManager.getInstance(), skin.get(TextTooltipStyle.class), breakSpaces);
+    }
+
+    public OwnTextHotkeyTooltip(String text, String[] hotkeys, Skin skin, int breakSpaces) {
+        this(text, hotkeys, skin, TooltipManager.getInstance(), skin.get(TextTooltipStyle.class), breakSpaces);
     }
 
     public OwnTextHotkeyTooltip(String text, String hotkey, Skin skin) {
         this(text, hotkey, skin, -1);
     }
 
-    public OwnTextHotkeyTooltip(String text, String hotkey, Skin skin, final TooltipManager manager, TextTooltipStyle style, int breakSpaces) {
+    public OwnTextHotkeyTooltip(String text, String[] hotkeys, Skin skin) {
+        this(text, hotkeys, skin, -1);
+    }
+
+    public OwnTextHotkeyTooltip(String text, String[] hotkeys, Skin skin, final TooltipManager manager, TextTooltipStyle style, int breakSpaces) {
         super(null, manager);
 
         // Warp text if breakSpaces <= 0
@@ -47,27 +56,34 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
 
         label = new OwnLabel(text, skin);
 
-        if (hotkey != null)
-            labelHotkey = new OwnLabel("[" + hotkey + "]", skin, "hotkey");
+        if (hotkeys != null && hotkeys.length > 0) {
+            groupHotkeys = new HorizontalGroup();
+            groupHotkeys.pad(2f);
 
-        table.add(label).padRight(labelHotkey != null ? 10f : 0f);
-        if (labelHotkey != null) {
-            table.add(labelHotkey);
+            int n = hotkeys.length;
+            for (int i = 0; i < hotkeys.length; i++) {
+                var hotkey = hotkeys[i];
+                labelHotkey = new OwnLabel("[" + hotkey + "]", skin, "hotkey");
+                groupHotkeys.addActor(labelHotkey);
+                if (i < n - 1) {
+                    groupHotkeys.addActor(new OwnLabel(" / ", skin));
+                }
+            }
+        }
+
+        table.add(label).padRight(groupHotkeys != null ? 10f : 0f);
+        if (groupHotkeys != null) {
+            table.add(groupHotkeys);
         }
 
         table.pack();
 
         getContainer().setActor(table);
         getContainer().pack();
-        getContainer().width(new Value() {
-            public float get(Actor context) {
-                return Math.min(manager.maxWidth, label.getGlyphLayout().width + 10f + (labelHotkey != null ? labelHotkey.getGlyphLayout().width + 60f : 0f));
-            }
-        });
 
         setStyle(style);
 
-        getContainer().pad(8f);
+        getContainer().pad(8f, 16f, 8f, 16f);
     }
 
     public void setStyle(TextTooltipStyle style) {

@@ -94,7 +94,7 @@ public class StereoGui extends AbstractGui {
         back = new OwnImageButton(skin, "sc-exit");
         back.setSize(bw, bh);
         back.setName("exit stereo mode");
-        back.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.stereo.notice.back"), kb.getStringKeys("action.toggle/element.stereomode"), skin));
+        back.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.stereo.notice.back"), kb.getStringKeys("action.toggle/element.stereomode", true), skin));
         back.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active);

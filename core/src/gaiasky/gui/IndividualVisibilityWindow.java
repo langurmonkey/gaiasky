@@ -95,7 +95,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 // Name is the key
                 button.setName(ct.key);
                 // Tooltip (with or without hotkey)
-                String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
+                String[] hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key, true);
                 if (hk != null) {
                     button.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(ct.getName()), hk, skin));
                 } else {

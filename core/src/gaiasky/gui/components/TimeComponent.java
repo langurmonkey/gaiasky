@@ -136,7 +136,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        stepForward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime"), skin));
+        stepForward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime", true), skin));
 
         playPause = new OwnImageButton(skin, "media-play-pause");
         playPause.setChecked(Settings.settings.runtime.timeOn);
@@ -147,7 +147,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        String timeHotkey = KeyBindings.instance.getStringKeys("action.pauseresume");
+        String[] timeHotkey = KeyBindings.instance.getStringKeys("action.pauseresume", true);
         playPause.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.playstop"), timeHotkey, skin));
 
         stepBackward = new OwnImageButton(skin, "media-skip-backward");
@@ -160,7 +160,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        stepBackward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
+        stepBackward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime", true), skin));
 
         /* Reset time */
         OwnTextIconButton resetTime = new OwnTextIconButton(I18n.msg("gui.resettime"), skin, "reset");

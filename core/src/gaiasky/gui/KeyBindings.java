@@ -112,10 +112,11 @@ public class KeyBindings {
     }
 
     /**
-     * Gets the keys that trigger the action identified by the given name
+     * Gets the first keys found that trigger the action identified by the given name.
+     * If many sets of keys are assigned to the same action, only the first ones are returned.
      *
-     * @param actionId The action ID
-     * @return The keys
+     * @param actionId The action ID.
+     * @return The keys.
      */
     public TreeSet<Integer> getKeys(String actionId) {
         ProgramAction action = findAction(actionId);
@@ -130,12 +131,65 @@ public class KeyBindings {
         return null;
     }
 
-    public String getStringKeys(String actionId) {
-        return getStringKeys(actionId, "+");
+    /**
+     * Gets all the sets of keys that trigger the action identified by the given name.
+     *
+     * @param actionId The action ID.
+     * @return The list of key sets.
+     */
+    public List<TreeSet<Integer>> getAllKeys(String actionId) {
+        List<TreeSet<Integer>> result = new ArrayList<>();
+        ProgramAction action = findAction(actionId);
+        if (action != null) {
+            Set<Map.Entry<TreeSet<Integer>, ProgramAction>> entries = mappings.entrySet();
+            for (Map.Entry<TreeSet<Integer>, ProgramAction> entry : entries) {
+                if (entry.getValue().equals(action)) {
+                    result.add(entry.getKey());
+                }
+            }
+            return result;
+        }
+        return null;
     }
 
-    public String getStringKeys(String actionId, String join) {
-        TreeSet<Integer> keys = getKeys(actionId);
+    public String getStringKeys(String actionId) {
+        var r = getStringKeys(actionId, "+", false);
+        if (r != null && r.length > 0) {
+            return r[0];
+        }
+        return null;
+    }
+
+    public String[] getStringKeys(String actionId, boolean allSets) {
+        return getStringKeys(actionId, "+", allSets);
+    }
+
+    public String[] getStringKeys(String actionId, String join, boolean allSets) {
+        if (allSets) {
+            var keySets = getAllKeys(actionId);
+            if(keySets != null && !keySets.isEmpty()) {
+                String[] result = new String[keySets.size()];
+                int i = 0;
+                for (TreeSet<Integer> keys : keySets) {
+                    result[i] = getStringKeys(keys, join);
+                    i++;
+                }
+                return result;
+            } else {
+                return null;
+            }
+        } else {
+            var keys = getKeys(actionId);
+            var s = getStringKeys(keys, join);
+            if (s != null) {
+                return new String[]{s};
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private String getStringKeys(TreeSet<Integer> keys, String join) {
         if (keys != null) {
             StringBuilder sb = new StringBuilder();
             Iterator<Integer> it = keys.descendingIterator();

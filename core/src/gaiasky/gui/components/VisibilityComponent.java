@@ -80,8 +80,8 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     // Name is the key
                     button.setName(ct.key);
                     // Tooltip (with or without hotkey)
-                    String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
-                    if (hk != null) {
+                    String[] hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key, true);
+                    if (hk != null && hk.length > 0) {
                         button.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(ct.getName()), hk, skin));
                     } else {
                         button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
