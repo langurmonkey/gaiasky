@@ -75,6 +75,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -398,6 +399,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             }
         }
 
+    }
+    public void setCameraPosition(List<Double> position,
+                                  String units,
+                                  boolean immediate) {
+        setCameraPosition(dArray(position), units, immediate);
     }
 
     private void cameraPositionEvent(double[] position,
@@ -1042,8 +1048,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                   int min,
                                   int sec,
                                   int millisec) {
-        LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
-        em.post(Event.TIME_CHANGE_CMD, this, date.toInstant(ZoneOffset.UTC));
+        if (checkDateTime(year, month, day, hour, min, sec, millisec)) {
+            LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
+            em.post(Event.TIME_CHANGE_CMD, this, date.toInstant(ZoneOffset.UTC));
+        }
     }
 
     @Override
@@ -1054,7 +1062,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setSimulationTime(final long time) {
-        if (checkNum(time, 1, Long.MAX_VALUE, "time"))
+        if (checkNum(time, -Long.MAX_VALUE, Long.MAX_VALUE, "time"))
             em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
     }
 
@@ -1120,7 +1128,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                               int min,
                               int sec,
                               int millisec) {
-        em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
+        if (checkDateTime(year, month, day, hour, min, sec, millisec)) {
+            em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
+        }
     }
 
     @Override
@@ -2877,7 +2887,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             parkRunnable(name, r);
 
             if (sync) {
-                // Wait on lock
+                // Wait on lock.
                 synchronized (r.lock) {
                     try {
                         r.lock.wait();
@@ -2925,6 +2935,56 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                  long seconds,
                                  boolean sync) {
         cameraTransition(camPos, units, camDir, camUp, (double) seconds, sync);
+    }
+
+    @Override
+    public void timeTransition(int year,
+                               int month,
+                               int day,
+                               int hour,
+                               int min,
+                               int sec,
+                               int milliseconds,
+                               double durationSeconds,
+                               String smoothType,
+                               double smoothFactor,
+                               boolean sync) {
+        if (checkDateTime(year, month, day, hour, min, sec, milliseconds)) {
+            // Set up final actions
+            String name = "timeTransition" + (cTransSeq++);
+            Runnable end = null;
+            if (!sync)
+                end = () -> unparkRunnable(name);
+
+            // Create and park orientation transition runnable
+            TimeTransitionRunnable r = new TimeTransitionRunnable(year,
+                    month,
+                    day,
+                    hour,
+                    min,
+                    sec,
+                    milliseconds,
+                    durationSeconds,
+                    smoothType,
+                    smoothFactor,
+                    end);
+            parkRunnable(name, r);
+
+            if (sync) {
+                // Wait on lock.
+                synchronized (r.lock) {
+                    try {
+                        r.lock.wait();
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                }
+
+                // Remove and return
+                unparkRunnable(name);
+            }
+
+        }
     }
 
     @Override
@@ -4716,7 +4776,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setMaximumSimulationTime(long years) {
-        Settings.settings.runtime.setMaxTime(Math.abs(years));
+        if (checkFinite(years, "years")) {
+            Settings.settings.runtime.setMaxTime(Math.abs(years));
+        }
     }
 
     @Override
@@ -4731,10 +4793,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public void setMaximumSimulationTime(double years) {
-        if (Double.isFinite(years))
-            setMaximumSimulationTime((long) years);
-        else
-            logger.error("The number of years is not a finite number: " + years);
+        setMaximumSimulationTime((long) years);
     }
 
     public void setMaximumSimulationTime(Long years) {
@@ -4742,10 +4801,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public void setMaximumSimulationTime(Double years) {
-        if (Double.isFinite(years))
-            setMaximumSimulationTime(years.longValue());
-        else
-            logger.error("The number of years is not a finite number: " + years);
+        setMaximumSimulationTime(years.longValue());
     }
 
     public void setMaximumSimulationTime(Integer years) {
@@ -5073,6 +5129,33 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return entity != null;
     }
 
+    private boolean checkDateTime(int year,
+                                  int month,
+                                  int day,
+                                  int hour,
+                                  int min,
+                                  int sec,
+                                  int millisec) {
+        boolean ok;
+        ok = checkNum(month, 1, 12, "month");
+        ok = ok && checkNum(day, 1, 31, "month");
+        ok = ok && checkNum(hour, 0, 23, "month");
+        ok = ok && checkNum(min, 0, 59, "month");
+        ok = ok && checkNum(sec, 0, 59, "month");
+        ok = ok && checkNum(millisec, 0, 990, "month");
+
+        if (ok) {
+            // Try to create a date.
+            try {
+                var date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
+            } catch (DateTimeException e) {
+                logger.error("Date/time error: " + e.getLocalizedMessage());
+                ok = false;
+            }
+        }
+        return ok;
+    }
+
     private void logPossibleValues(String value,
                                    String[] possibleValues,
                                    String name) {
@@ -5135,6 +5218,107 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
         public boolean isAll() {
             return this == ALL;
+        }
+    }
+
+    class TimeTransitionRunnable implements Runnable {
+        final Object lock;
+        final Long currentTimeMs;
+        Long targetTimeMs;
+        Long dt;
+        final double duration;
+        double elapsed, start;
+        Runnable end;
+        /** Maps input x to output x for positions. **/
+        Function<Double, Double> mapper;
+
+        /**
+         * Creates a time transition to the given time in UTC.
+         *
+         * @param year            The year to represent.
+         * @param month           The month-of-year to represent, from 1 (January) to 12
+         *                        (December).
+         * @param day             The day-of-month to represent, from 1 to 31.
+         * @param hour            The hour-of-day to represent, from 0 to 23.
+         * @param min             The minute-of-hour to represent, from 0 to 59.
+         * @param sec             The second-of-minute to represent, from 0 to 59.
+         * @param milliseconds    The millisecond-of-second, from 0 to 999.
+         * @param durationSeconds The duration of the transition, in seconds.
+         * @param smoothType      The function type to use for smoothing. Either "logit", "logisticsigmoid" or "none".
+         *                        <ul>
+         *                        <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+         *                        an effect, otherwise, linear interpolation is used.</li>
+         *                        <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+         *                        0.09 and 0.01.</li>
+         *                        <li>"none": no smoothing is applied.</li>
+         *                        </ul>
+         * @param smoothFactor    Smoothing factor (depends on type, see #smoothType).
+         */
+        public TimeTransitionRunnable(int year,
+                                      int month,
+                                      int day,
+                                      int hour,
+                                      int min,
+                                      int sec,
+                                      int milliseconds,
+                                      double durationSeconds,
+                                      String smoothType,
+                                      double smoothFactor,
+                                      Runnable end) {
+
+            lock = new Object();
+            duration = durationSeconds;
+            this.start = GaiaSky.instance.getT();
+            this.currentTimeMs = GaiaSky.instance.time.getTime().toEpochMilli();
+            this.mapper = getMapper(smoothType, smoothFactor);
+
+            try {
+                LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, milliseconds);
+                var instant = date.toInstant(ZoneOffset.UTC);
+                targetTimeMs = instant.toEpochMilli();
+                dt = targetTimeMs - currentTimeMs;
+            } catch (DateTimeException e) {
+                logger.error("Could not create time transition: bad date.", e);
+            }
+        }
+
+        private Function<Double, Double> getMapper(String smoothingType,
+                                                   double smoothingFactor) {
+            Function<Double, Double> mapper;
+            if (Objects.equals(smoothingType, "logisticsigmoid")) {
+                final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
+                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logisticSigmoid(x, fac), 0.0, 1.0);
+            } else if (Objects.equals(smoothingType, "logit")) {
+                final double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
+                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logit(x) * fac + 0.5, 0.0, 1.0);
+            } else {
+                mapper = (x) -> x;
+            }
+            return mapper;
+        }
+
+        @Override
+        public void run() {
+            // Update elapsed time.
+            elapsed = GaiaSky.instance.getT() - start;
+
+            double alpha = MathUtilsDouble.clamp(elapsed / duration, 0.0, 0.999999999999999999);
+            // Linear interpolation in simulation time.
+            alpha = mapper.apply(alpha);
+            var t = currentTimeMs + (long) (alpha * dt);
+            em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(t));
+
+            // Finish if needed.
+            if (elapsed >= duration) {
+                // On end, run runnable if present, otherwise notify lock
+                if (end != null) {
+                    end.run();
+                } else {
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                }
+            }
         }
     }
 
@@ -5380,10 +5564,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 cam.setDirection(v3d3);
             }
 
-            // Finish if needed
-            if (type.isPosition()) {
-
-            }
+            // Finish if needed.
             if (elapsed >= posDuration && elapsed >= orientationDuration) {
                 // On end, run runnable if present, otherwise notify lock
                 if (end != null) {

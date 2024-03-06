@@ -1007,7 +1007,7 @@ public interface IScriptingInterface {
     void setAmbientLight(float value);
 
     /**
-     * Sets the time of the application, in UTC.
+     * Sets the time of the application to the given time, in UTC.
      *
      * @param year     The year to represent.
      * @param month    The month-of-year to represent, from 1 (January) to 12
@@ -2315,9 +2315,9 @@ public interface IScriptingInterface {
      * @param positionSmoothType         The function type to use for the smoothing of positions. Either "logit",
      *                                   "logisticsigmoid" or "none".
      *                                   <ul>
-     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
      *                                   an effect, otherwise, linear interpolation is used.</li>
-     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
      *                                   0.09 and 0.01.</li>
      *                                   <li>"none": no smoothing is applied.</li>
      *                                   </ul>
@@ -2326,9 +2326,9 @@ public interface IScriptingInterface {
      * @param orientationSmoothType      The function type to use for the smoothing of orientations. Either "logit",
      *                                   "logisticsigmoid" or "none".
      *                                   <ul>
-     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
      *                                   an effect, otherwise, linear interpolation is used.</li>
-     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
      *                                   0.09 and 0.01.</li>
      *                                   <li>"none": no smoothing is applied.</li>
      *                                   </ul>
@@ -2369,9 +2369,9 @@ public interface IScriptingInterface {
      * @param positionSmoothType         The function type to use for the smoothing of positions. Either "logit",
      *                                   "logisticsigmoid" or "none".
      *                                   <ul>
-     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
      *                                   an effect, otherwise, linear interpolation is used.</li>
-     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
      *                                   0.09 and 0.01.</li>
      *                                   <li>"none": no smoothing is applied.</li>
      *                                   </ul>
@@ -2380,9 +2380,9 @@ public interface IScriptingInterface {
      * @param orientationSmoothType      The function type to use for the smoothing of orientations. Either "logit",
      *                                   "logisticsigmoid" or "none".
      *                                   <ul>
-     *                                   <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
      *                                   an effect, otherwise, linear interpolation is used.</li>
-     *                                   <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
      *                                   0.09 and 0.01.</li>
      *                                   <li>"none": no smoothing is applied.</li>
      *                                   </ul>
@@ -2425,9 +2425,9 @@ public interface IScriptingInterface {
      * @param smoothType      The function type to use for the smoothing of positions. Either "logit",
      *                        "logisticsigmoid" or "none".
      *                        <ul>
-     *                        <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
      *                        an effect, otherwise, linear interpolation is used.</li>
-     *                        <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                        <li>"logit": starts fast and ends fast. The smooth factor must be between
      *                        0.09 and 0.01.</li>
      *                        <li>"none": no smoothing is applied.</li>
      *                        </ul>
@@ -2465,9 +2465,9 @@ public interface IScriptingInterface {
      * @param smoothType      The function type to use for the smoothing of orientations. Either "logit",
      *                        "logisticsigmoid" or "none".
      *                        <ul>
-     *                        <li>"logit": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
      *                        an effect, otherwise, linear interpolation is used.</li>
-     *                        <li>"logisticsigmoid": starts fast and ends fast. The smooth factor must be between
+     *                        <li>"logit": starts fast and ends fast. The smooth factor must be between
      *                        0.09 and 0.01.</li>
      *                        <li>"none": no smoothing is applied.</li>
      *                        </ul>
@@ -2481,6 +2481,43 @@ public interface IScriptingInterface {
                                      String smoothType,
                                      double smoothFactor,
                                      boolean sync);
+
+    /**
+     * Creates a time transition from the current time to the given time (year, month, day, hour, minute, second,
+     * millisecond). The time is given in UTC.
+     *
+     * @param year            The year to represent.
+     * @param month           The month-of-year to represent, from 1 (January) to 12
+     *                        (December).
+     * @param day             The day-of-month to represent, from 1 to 31.
+     * @param hour            The hour-of-day to represent, from 0 to 23.
+     * @param min             The minute-of-hour to represent, from 0 to 59.
+     * @param sec             The second-of-minute to represent, from 0 to 59.
+     * @param milliseconds    The millisecond-of-second, from 0 to 999.
+     * @param durationSeconds The duration of the transition, in seconds.
+     * @param smoothType      The function type to use for smoothing. Either "logit", "logisticsigmoid" or "none".
+     *                        <ul>
+     *                        <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        an effect, otherwise, linear interpolation is used.</li>
+     *                        <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                        0.09 and 0.01.</li>
+     *                        <li>"none": no smoothing is applied.</li>
+     *                        </ul>
+     * @param smoothFactor    Smoothing factor (depends on type, see #smoothType).
+     * @param sync            If true, the call waits for the transition to finish before returning,
+     *                        otherwise it returns immediately.
+     */
+    void timeTransition(int year,
+                        int month,
+                        int day,
+                        int hour,
+                        int min,
+                        int sec,
+                        int milliseconds,
+                        double durationSeconds,
+                        String smoothType,
+                        double smoothFactor,
+                        boolean sync);
 
     /**
      * Sleeps for the given number of seconds in the application time (FPS), so
