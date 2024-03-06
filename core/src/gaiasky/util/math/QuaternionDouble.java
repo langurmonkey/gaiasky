@@ -221,7 +221,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the roll euler angle in radians, which is the rotation around the z axis. Requires that this quaternion is normalized.
+     * Get the roll euler angle in radians, which is the rotation around the z axis. Requires that this quaternion is
+     * normalized.
      *
      * @return the rotation around the z axis in radians (between -PI and +PI)
      */
@@ -231,7 +232,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the roll euler angle in degrees, which is the rotation around the z axis. Requires that this quaternion is normalized.
+     * Get the roll euler angle in degrees, which is the rotation around the z axis. Requires that this quaternion is
+     * normalized.
      *
      * @return the rotation around the z axis in degrees (between -180 and +180)
      */
@@ -240,7 +242,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the pitch euler angle in radians, which is the rotation around the x axis. Requires that this quaternion is normalized.
+     * Get the pitch euler angle in radians, which is the rotation around the x axis. Requires that this quaternion is
+     * normalized.
      *
      * @return the rotation around the x axis in radians (between -(PI/2) and +(PI/2))
      */
@@ -250,7 +253,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the pitch euler angle in degrees, which is the rotation around the x axis. Requires that this quaternion is normalized.
+     * Get the pitch euler angle in degrees, which is the rotation around the x axis. Requires that this quaternion is
+     * normalized.
      *
      * @return the rotation around the x axis in degrees (between -90 and +90)
      */
@@ -259,7 +263,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the yaw euler angle in radians, which is the rotation around the y axis. Requires that this quaternion is normalized.
+     * Get the yaw euler angle in radians, which is the rotation around the y axis. Requires that this quaternion is
+     * normalized.
      *
      * @return the rotation around the y axis in radians (between -PI and +PI)
      */
@@ -268,7 +273,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the yaw euler angle in degrees, which is the rotation around the y axis. Requires that this quaternion is normalized.
+     * Get the yaw euler angle in degrees, which is the rotation around the y axis. Requires that this quaternion is
+     * normalized.
      *
      * @return the rotation around the y axis in degrees (between -180 and +180)
      */
@@ -601,7 +607,8 @@ public class QuaternionDouble implements Serializable {
      * </p>
      *
      * <p>
-     * Taken from Bones framework for JPCT, see http://www.aptalkarga.com/bones/ which in turn took it from Graphics Gem code at
+     * Taken from Bones framework for JPCT, see http://www.aptalkarga.com/bones/ which in turn took it from Graphics Gem
+     * code at
      * ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z.
      * </p>
      *
@@ -621,8 +628,9 @@ public class QuaternionDouble implements Serializable {
 
     /**
      * Sets this quaternion from the given camera basis, using its direction and up vectors.
+     *
      * @param direction The camera direction vector.
-     * @param up The camera up vector.
+     * @param up        The camera up vector.
      * @return The quaternion representing the current camera orientation.
      */
     public QuaternionDouble setFromCamera(Vector3d direction, Vector3d up) {
@@ -717,7 +725,8 @@ public class QuaternionDouble implements Serializable {
      * </p>
      *
      * <p>
-     * Taken from Bones framework for JPCT, see http://www.aptalkarga.com/bones/ which in turn took it from Graphics Gem code at
+     * Taken from Bones framework for JPCT, see http://www.aptalkarga.com/bones/ which in turn took it from Graphics Gem
+     * code at
      * ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z.
      * </p>
      *
@@ -822,7 +831,7 @@ public class QuaternionDouble implements Serializable {
      * <p>This method is often faster than
      * {@link QuaternionDouble#slerp(QuaternionDouble, double)}, but less accurate.
      *
-     * @param q2 the desired value when blend=1 (not null, unaffected).
+     * @param q2    the desired value when blend=1 (not null, unaffected).
      * @param blend the fractional change amount.
      */
     public void nlerp(QuaternionDouble q2, float blend) {
@@ -843,7 +852,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Spherical linear interpolation between this quaternion and the {@code end} quaternion, based on the alpha value in the range
+     * Spherical linear interpolation between this quaternion and the {@code end} quaternion, based on the alpha value
+     * in the range
      * [0,1]. Taken from. Taken from Bones framework for JPCT, see <a href="http://www.aptalkarga.com/bones/">here</a>.
      *
      * @param end   the end quaternion.
@@ -883,7 +893,8 @@ public class QuaternionDouble implements Serializable {
 
     /**
      * Second implementation of slerp, slightly different from the default one.
-     * @param end The end quaternion.
+     *
+     * @param end   The end quaternion.
      * @param alpha The fractional change amount in [0,1].
      */
     public void slerp2(QuaternionDouble end, double alpha) {
@@ -996,8 +1007,6 @@ public class QuaternionDouble implements Serializable {
     /**
      * Add quaternion q, scaled by s, to this quaternion (this = this + q * s)
      *
-     * @param q
-     * @param s
      * @return this quaternion for chaining.
      */
     public QuaternionDouble mulAdd(QuaternionDouble q, double s) {
@@ -1009,10 +1018,13 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the axis angle representation of the rotation in degrees. The supplied vector will receive the axis (x, y and z values)
-     * of the rotation and the value returned is the angle in degrees around that axis. Note that this method will alter the
-     * supplied vector, the existing value of the vector is ignored. </p> This will normalize this quaternion if needed. The
-     * received axis is a unit vector. However, if this is an identity quaternion (no rotation), then the length of the axis may be
+     * Get the axis angle representation of the rotation in degrees. The supplied vector will receive the axis (x, y and
+     * z values)
+     * of the rotation and the value returned is the angle in degrees around that axis. Note that this method will alter
+     * the
+     * supplied vector, the existing value of the vector is ignored. This will normalize this quaternion if needed. The
+     * received axis is a unit vector. However, if this is an identity quaternion (no rotation), then the length of the
+     * axis may be
      * zero.
      *
      * @param axis vector which will receive the axis
@@ -1025,11 +1037,13 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the axis-angle representation of the rotation in radians. The supplied vector will receive the axis (x, y and z values)
-     * of the rotation and the value returned is the angle in radians around that axis. Note that this method will alter the
-     * supplied vector, the existing value of the vector is ignored. </p> This will normalize this quaternion if needed. The
-     * received axis is a unit vector. However, if this is an identity quaternion (no rotation), then the length of the axis may be
-     * zero.
+     * Get the axis-angle representation of the rotation in radians. The supplied vector will receive the axis (x, y and
+     * z values)
+     * of the rotation and the value returned is the angle in radians around that axis. Note that this method will alter
+     * the
+     * supplied vector, the existing value of the vector is ignored. This will normalize this quaternion if needed.
+     * The received axis is a unit vector. However, if this is an identity quaternion (no rotation), then the length of the
+     * axis may be zero.
      *
      * @param axis vector which will receive the axis
      * @return the angle in radians
@@ -1067,7 +1081,8 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the angle in degrees of the rotation this quaternion represents. Use {@link #getAxisAngle(Vector3d)} to get both the axis
+     * Get the angle in degrees of the rotation this quaternion represents. Use {@link #getAxisAngle(Vector3d)} to get
+     * both the axis
      * and the angle of this rotation. Use {@link #getAngleAround(Vector3d)} to get the angle around a specific axis.
      *
      * @return the angle in degrees of the rotation
@@ -1077,11 +1092,16 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the swing rotation and twist rotation for the specified axis. The twist rotation represents the rotation around the
-     * specified axis. The swing rotation represents the rotation of the specified axis itself, which is the rotation around an
+     * <p>
+     * Get the swing rotation and twist rotation for the specified axis. The twist rotation represents the rotation
+     * around the
+     * specified axis. The swing rotation represents the rotation of the specified axis itself, which is the rotation
+     * around an
      * axis perpendicular to the specified axis.
      * </p>
+     * <p>
      * The swing and twist rotation can be used to reconstruct the original quaternion: this = swing * twist
+     * </p>
      *
      * @param axisX the X component of the normalized axis for which to get the swing and twist rotation
      * @param axisY the Y component of the normalized axis for which to get the swing and twist rotation
@@ -1097,11 +1117,16 @@ public class QuaternionDouble implements Serializable {
     }
 
     /**
-     * Get the swing rotation and twist rotation for the specified axis. The twist rotation represents the rotation around the
-     * specified axis. The swing rotation represents the rotation of the specified axis itself, which is the rotation around an
+     * <p>
+     * Get the swing rotation and twist rotation for the specified axis. The twist rotation represents the rotation
+     * around the
+     * specified axis. The swing rotation represents the rotation of the specified axis itself, which is the rotation
+     * around an
      * axis perpendicular to the specified axis.
      * </p>
+     * <p>
      * The swing and twist rotation can be used to reconstruct the original quaternion: this = swing * twist
+     * </p>
      *
      * @param axis  the normalized axis for which to get the swing and twist rotation
      * @param swing will receive the swing rotation: the rotation around an axis perpendicular to the specified axis

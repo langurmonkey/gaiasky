@@ -722,7 +722,7 @@ public class ModifiedScanningLaw {
 
     /**
      * Adjusts the spin phase (omega) and the number of spin revolutions
-     * (omegaRevs) so that 0 <= omega < 2*pi
+     * (omegaRevs) so that 0 &le; omega &lt; 2*pi
      */
     protected void adjustOmega() {
         if (omega >= TWO_PI) {
@@ -775,8 +775,8 @@ public class ModifiedScanningLaw {
     }
 
     /**
-     * The sigmoid function provides a smooth transition from 0 (for x << 0) to
-     * 1 (for x >> 0)
+     * The sigmoid function provides a smooth transition from 0 (for x &lt;&lt; 0) to
+     * 1 (for x &gt;&gt; 0)
      *
      * @param x The value.
      * @return The sigmoid.

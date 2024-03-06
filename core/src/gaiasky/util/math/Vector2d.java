@@ -395,7 +395,7 @@ public class Vector2d implements Serializable, VectorDouble<Vector2d> {
         return new double[] { x, y };
     }
 
-    /** Rotates the Vector2d by 90 degrees in the specified direction, where >= 0 is counter-clockwise and < 0 is clockwise. */
+    /** Rotates the {@link Vector2d} by 90 degrees in the specified direction, where &ge;0 is counter-clockwise and &lt;0 is clockwise. */
     public Vector2d rotate90(int dir) {
         double x = this.x;
         if (dir >= 0) {

@@ -63,9 +63,9 @@ public final class StdRandom {
      *
      * @param n number of possible integers
      *
-     * @return a random integer uniformly between 0 (inclusive) and <tt>N</tt> (exclusive)
+     * @return a random integer uniformly between 0 (inclusive) and <code>N</code> (exclusive)
      *
-     * @throws IllegalArgumentException if <tt>n <= 0</tt>
+     * @throws IllegalArgumentException if <code>n &le; 0</code>
      */
     public static int uniform(int n) {
         if (n <= 0)
@@ -98,8 +98,8 @@ public final class StdRandom {
      *
      * @return a random integer uniformly in [a, b)
      *
-     * @throws IllegalArgumentException if <tt>b <= a</tt>
-     * @throws IllegalArgumentException if <tt>b - a >= Integer.MAX_VALUE</tt>
+     * @throws IllegalArgumentException if <code>b &le; a</code>
+     * @throws IllegalArgumentException if <code>b - a &ge; Integer.MAX_VALUE</code>
      */
     public static int uniform(int a, int b) {
         if (b <= a)
@@ -117,7 +117,7 @@ public final class StdRandom {
      *
      * @return a random real number uniformly in [a, b)
      *
-     * @throws IllegalArgumentException unless <tt>a < b</tt>
+     * @throws IllegalArgumentException unless <code>a &lt; b</code>
      */
     public static double uniform(double a, double b) {
         if (!(a < b))
@@ -129,12 +129,12 @@ public final class StdRandom {
      * Returns a random boolean from a Bernoulli distribution with success
      * probability <em>p</em>.
      *
-     * @param p the probability of returning <tt>true</tt>
+     * @param p the probability of returning <code>true</code>
      *
-     * @return <tt>true</tt> with probability <tt>p</tt> and
-     * <tt>false</tt> with probability <tt>p</tt>
+     * @return <code>true</code> with probability <code>p</code> and
+     * <code>false</code> with probability <code>p</code>
      *
-     * @throws IllegalArgumentException unless <tt>p >= 0.0</tt> and <tt>p <= 1.0</tt>
+     * @throws IllegalArgumentException unless <code>p &ge; 0.0</code> and <code>p &le; 1.0</code>
      */
     public static boolean bernoulli(double p) {
         if (!(p >= 0.0 && p <= 1.0))
@@ -146,8 +146,8 @@ public final class StdRandom {
      * Returns a random boolean from a Bernoulli distribution with success
      * probability 1/2.
      *
-     * @return <tt>true</tt> with probability 1/2 and
-     * <tt>false</tt> with probability 1/2
+     * @return <code>true</code> with probability 1/2 and
+     * <code>false</code> with probability 1/2
      */
     public static boolean bernoulli() {
         return bernoulli(0.5);
@@ -181,7 +181,7 @@ public final class StdRandom {
      * @param sigma the standard deviation
      *
      * @return a real number distributed according to the Gaussian distribution
-     * with mean <tt>mu</tt> and standard deviation <tt>sigma</tt>
+     * with mean <code>mu</code> and standard deviation <code>sigma</code>
      */
     public static double gaussian(double mu, double sigma) {
         return mu + sigma * gaussian();
@@ -194,10 +194,10 @@ public final class StdRandom {
      * @param p the parameter of the geometric distribution
      *
      * @return a random integer from a geometric distribution with success
-     * probability <tt>p</tt>; or <tt>Integer.MAX_VALUE</tt> if
-     * <tt>p</tt> is (nearly) equal to <tt>1.0</tt>.
+     * probability <code>p</code>; or <code>Integer.MAX_VALUE</code> if
+     * <code>p</code> is (nearly) equal to <code>1.0</code>.
      *
-     * @throws IllegalArgumentException unless <tt>p >= 0.0</tt> and <tt>p <= 1.0</tt>
+     * @throws IllegalArgumentException unless <code>p &ge; 0.0</code> and <code>p &le; 1.0</code>
      */
     public static int geometric(double p) {
         if (!(p >= 0.0 && p <= 1.0))
@@ -211,9 +211,9 @@ public final class StdRandom {
      *
      * @param lambda the mean of the Poisson distribution
      *
-     * @return a random integer from a Poisson distribution with mean <tt>lambda</tt>
+     * @return a random integer from a Poisson distribution with mean <code>lambda</code>
      *
-     * @throws IllegalArgumentException unless <tt>lambda > 0.0</tt> and not infinite
+     * @throws IllegalArgumentException unless <code>lambda &gt; 0.0</code> and not infinite
      */
     public static int poisson(double lambda) {
         if (!(lambda > 0.0))
@@ -248,9 +248,9 @@ public final class StdRandom {
      * @param alpha shape parameter
      *
      * @return a random real number from a Pareto distribution with shape
-     * parameter <tt>alpha</tt>
+     * parameter <code>alpha</code>
      *
-     * @throws IllegalArgumentException unless <tt>alpha > 0.0</tt>
+     * @throws IllegalArgumentException unless <code>alpha &gt; 0.0</code>
      */
     public static double pareto(double alpha) {
         if (!(alpha > 0.0))
@@ -273,11 +273,11 @@ public final class StdRandom {
      * @param probabilities the probability of occurrence of each integer
      *
      * @return a random integer from a discrete distribution:
-     * <tt>i</tt> with probability <tt>probabilities[i]</tt>
+     * <code>i</code> with probability <code>probabilities[i]</code>
      *
-     * @throws NullPointerException     if <tt>probabilities</tt> is <tt>null</tt>
-     * @throws IllegalArgumentException if sum of array entries is not (very nearly) equal to <tt>1.0</tt>
-     * @throws IllegalArgumentException unless <tt>probabilities[i] >= 0.0</tt> for each index <tt>i</tt>
+     * @throws NullPointerException     if <code>probabilities</code> is <code>null</code>
+     * @throws IllegalArgumentException if sum of array entries is not (very nearly) equal to <code>1.0</code>
+     * @throws IllegalArgumentException unless <code>probabilities[i] &ge; 0.0</code> for each index <code>i</code>
      */
     public static int discrete(double[] probabilities) {
         if (probabilities == null)
@@ -311,12 +311,12 @@ public final class StdRandom {
      * @param frequencies the frequency of occurrence of each integer
      *
      * @return a random integer from a discrete distribution:
-     * <tt>i</tt> with probability proportional to <tt>frequencies[i]</tt>
+     * <code>i</code> with probability proportional to <code>frequencies[i]</code>
      *
-     * @throws NullPointerException     if <tt>frequencies</tt> is <tt>null</tt>
-     * @throws IllegalArgumentException if all array entries are <tt>0</tt>
-     * @throws IllegalArgumentException if <tt>frequencies[i]</tt> is negative for any index <tt>i</tt>
-     * @throws IllegalArgumentException if sum of frequencies exceeds <tt>Integer.MAX_VALUE</tt> (2<sup>31</sup> - 1)
+     * @throws NullPointerException     if <code>frequencies</code> is <code>null</code>
+     * @throws IllegalArgumentException if all array entries are <code>0</code>
+     * @throws IllegalArgumentException if <code>frequencies[i]</code> is negative for any index <code>i</code>
+     * @throws IllegalArgumentException if sum of frequencies exceeds <code>Integer.MAX_VALUE</code> (2<sup>31</sup> - 1)
      */
     public static int discrete(int[] frequencies) {
         if (frequencies == null)
@@ -353,9 +353,9 @@ public final class StdRandom {
      * @param lambda the rate of the exponential distribution
      *
      * @return a random real number from an exponential distribution with
-     * rate <tt>lambda</tt>
+     * rate <code>lambda</code>
      *
-     * @throws IllegalArgumentException unless <tt>lambda > 0.0</tt>
+     * @throws IllegalArgumentException unless <code>lambda &gt; 0.0</code>
      */
     public static double exp(double lambda) {
         if (!(lambda > 0.0))
@@ -372,7 +372,7 @@ public final class StdRandom {
      *
      * @return a random real number from a beta distribution normalized in [-1,1]
      *
-     * @throws IllegalArgumentException unless <tt>alpha, beta > 0.0</tt>
+     * @throws IllegalArgumentException unless <code>alpha, beta &gt; 0.0</code>
      */
     public static double beta(double alpha, double beta) {
         if (alpha <= 0 || beta <= 0)
@@ -386,7 +386,7 @@ public final class StdRandom {
      *
      * @param a the array to shuffle
      *
-     * @throws NullPointerException if <tt>a</tt> is <tt>null</tt>
+     * @throws NullPointerException if <code>a</code> is <code>null</code>
      */
     public static void shuffle(Object[] a) {
         if (a == null)
@@ -405,7 +405,7 @@ public final class StdRandom {
      *
      * @param a the array to shuffle
      *
-     * @throws NullPointerException if <tt>a</tt> is <tt>null</tt>
+     * @throws NullPointerException if <code>a</code> is <code>null</code>
      */
     public static void shuffle(double[] a) {
         if (a == null)
@@ -424,7 +424,7 @@ public final class StdRandom {
      *
      * @param a the array to shuffle
      *
-     * @throws NullPointerException if <tt>a</tt> is <tt>null</tt>
+     * @throws NullPointerException if <code>a</code> is <code>null</code>
      */
     public static void shuffle(int[] a) {
         if (a == null)
@@ -445,8 +445,8 @@ public final class StdRandom {
      * @param lo the left endpoint (inclusive)
      * @param hi the right endpoint (inclusive)
      *
-     * @throws NullPointerException      if <tt>a</tt> is <tt>null</tt>
-     * @throws IndexOutOfBoundsException unless <tt>(0 <= lo) && (lo <= hi) && (hi < a.length)</tt>
+     * @throws NullPointerException      if <code>a</code> is <code>null</code>
+     * @throws IndexOutOfBoundsException unless <code>(0 &le; lo) &amp;&amp; (lo &le; hi) &amp;&amp; (hi &lt; a.length)</code>
      */
     public static void shuffle(Object[] a, int lo, int hi) {
         if (a == null)
@@ -469,8 +469,8 @@ public final class StdRandom {
      * @param lo the left endpoint (inclusive)
      * @param hi the right endpoint (inclusive)
      *
-     * @throws NullPointerException      if <tt>a</tt> is <tt>null</tt>
-     * @throws IndexOutOfBoundsException unless <tt>(0 <= lo) && (lo <= hi) && (hi < a.length)</tt>
+     * @throws NullPointerException      if <code>a</code> is <code>null</code>
+     * @throws IndexOutOfBoundsException unless <code>(0 &le; lo) &amp;&amp; (lo &le; hi) &amp;&amp; (hi &lt; a.length)</code>
      */
     public static void shuffle(double[] a, int lo, int hi) {
         if (a == null)
@@ -493,8 +493,8 @@ public final class StdRandom {
      * @param lo the left endpoint (inclusive)
      * @param hi the right endpoint (inclusive)
      *
-     * @throws NullPointerException      if <tt>a</tt> is <tt>null</tt>
-     * @throws IndexOutOfBoundsException unless <tt>(0 <= lo) && (lo <= hi) && (hi < a.length)</tt>
+     * @throws NullPointerException      if <code>a</code> is <code>null</code>
+     * @throws IndexOutOfBoundsException unless <code>(0 &le; lo) &amp;&amp; (lo &le; hi) &amp;&amp; (hi &lt; a.length)</code>
      */
     public static void shuffle(int[] a, int lo, int hi) {
         if (a == null)

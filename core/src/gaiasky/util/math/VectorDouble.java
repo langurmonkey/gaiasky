@@ -32,8 +32,9 @@ public interface VectorDouble<T extends VectorDouble<T>> {
     T limit(double limit);
 
     /**
+     * <p>
      * Limits the length of this vector, based on the desired maximum length squared.
-     * <p/>
+     * </p>
      * This method is slightly faster than limit().
      *
      * @param limit2 squared desired maximum length for this vector
@@ -54,13 +55,14 @@ public interface VectorDouble<T extends VectorDouble<T>> {
     T setLength(double len);
 
     /**
+     * <p>
      * Sets the length of this vector, based on the square of the desired length. Does nothing is this vector is zero.
-     * <p/>
+     * </p>
      * This method is slightly faster than setLength().
      *
-     * @param len2 desired square of the length for this vector
+     * @param len2 desired square of the length for this vector.
      *
-     * @return this vector for chaining
+     * @return this vector for chaining.
      *
      * @see #len2()
      */
@@ -199,25 +201,25 @@ public interface VectorDouble<T extends VectorDouble<T>> {
     boolean isOnLine(T other);
 
     /**
-     * @return true if this vector is collinear with the other vector ({@link #isOnLine(VectorDouble, double)} &&
+     * @return true if this vector is collinear with the other vector ({@link #isOnLine(VectorDouble, double)} and
      * {@link #hasSameDirection(VectorDouble)}).
      */
     boolean isCollinear(T other, double epsilon);
 
     /**
-     * @return true if this vector is collinear with the other vector ({@link #isOnLine(VectorDouble)} &&
+     * @return true if this vector is collinear with the other vector ({@link #isOnLine(VectorDouble)} and
      * {@link #hasSameDirection(VectorDouble)}).
      */
     boolean isCollinear(T other);
 
     /**
-     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(VectorDouble, double)} &&
+     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(VectorDouble, double)} and
      * {@link #hasOppositeDirection(VectorDouble)}).
      */
     boolean isCollinearOpposite(T other, double epsilon);
 
     /**
-     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(VectorDouble)} &&
+     * @return true if this vector is opposite collinear with the other vector ({@link #isOnLine(VectorDouble)} and
      * {@link #hasOppositeDirection(VectorDouble)}).
      */
     boolean isCollinearOpposite(T other);
@@ -232,17 +234,17 @@ public interface VectorDouble<T extends VectorDouble<T>> {
      */
     boolean isPerpendicular(T other, double epsilon);
 
-    /** @return Whether this vector has similar direction compared to the other vector. True if the normalized dot product is > 0. */
+    /** @return Whether this vector has similar direction compared to the other vector. True if the normalized dot product is &gt;0. */
     boolean hasSameDirection(T other);
 
-    /** @return Whether this vector has opposite direction compared to the other vector. True if the normalized dot product is < 0. */
+    /** @return Whether this vector has opposite direction compared to the other vector. True if the normalized dot product is &lt;0. */
     boolean hasOppositeDirection(T other);
 
     /**
      * Compares this vector with the other vector, using the supplied epsilon for fuzzy equality testing.
      *
-     * @param other
-     * @param epsilon
+     * @param other The other vector.
+     * @param epsilon The maximum deviation.
      *
      * @return whether the vectors have fuzzy equality.
      */
@@ -251,23 +253,23 @@ public interface VectorDouble<T extends VectorDouble<T>> {
     /**
      * First scale a supplied vector, then add it to this vector.
      *
-     * @param v      addition vector
-     * @param scalar for scaling the addition vector
+     * @param v      addition vector.
+     * @param scalar for scaling the addition vector.
      */
     T mulAdd(T v, double scalar);
 
     /**
      * First scale a supplied vector, then add it to this vector.
      *
-     * @param v      addition vector
-     * @param mulVec vector by whose values the addition vector will be scaled
+     * @param v      addition vector.
+     * @param mulVec vector by whose values the addition vector will be scaled.
      */
     T mulAdd(T v, T mulVec);
 
     /**
-     * Sets the components of this vector to 0
+     * Sets the components of this vector to 0.
      *
-     * @return This vector for chaining
+     * @return This vector for chaining.
      */
     T setZero();
 }

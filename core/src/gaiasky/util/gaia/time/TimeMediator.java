@@ -41,11 +41,9 @@ public class TimeMediator {
     /**
      * Convert a given time.
      *
-     * @param t time [ns] to convert
+     * @param t time [ns] to convert.
      *
-     * @return converted time
-     *
-     * @ data needed in conversion not available
+     * @return converted time.
      */
     public long convert(long t) {
         return converter.convert(t);

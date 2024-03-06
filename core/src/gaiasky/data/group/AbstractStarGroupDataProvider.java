@@ -225,23 +225,23 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Checks whether the parallax is accepted or not.
-     * <p>
+     *
      * <b>If adaptive is not enabled:</b>
      * <pre>
-     * accepted = pllx &gt; 0 &&amp;&&amp; pllx_err &lt; pllx * pllx_err_factor &&amp;&&amp; pllx_err &le; 1
+     * accepted = pllx &gt; 0 &amp;&amp; pllx_err &lt; pllx * pllx_err_factor &amp;&amp; pllx_err &le; 1
      * </pre>
-     * </p>
+     *
      * <p>
      * <b>If adaptive is enabled:</b>
      * </p>
      * <pre>
-     * accepted = pllx &gt; 0 &&amp;&&amp; pllx_err &lt; pllx * max(0.5, pllx_err_factor) &&amp;&&amp; pllx_err &le; 1, if apparent_magnitude &lt; 13.2
-     * accepted = pllx &gt; 0 &&amp;&&amp; pllx_err &lt; pllx * pllx_err_factor &&amp;&&amp; pllx_err &le; 1, otherwise
+     * accepted = pllx &gt; 0 &amp;&amp; pllx_err &lt; pllx * max(0.5, pllx_err_factor) &amp;&amp; pllx_err &le; 1, if apparent_magnitude &lt; 13.2
+     * accepted = pllx &gt; 0 &amp;&amp; pllx_err &lt; pllx * pllx_err_factor &amp;&amp; pllx_err &le; 1, otherwise
      * </pre>
      *
-     * @param appmag  Apparent magnitude of star
-     * @param pllx    Parallax of star
-     * @param pllxerr Parallax error of star
+     * @param appmag  Apparent magnitude of star.
+     * @param pllx    Parallax of star.
+     * @param pllxerr Parallax error of star.
      *
      * @return True if parallax is accepted, false otherwise
      */

@@ -98,20 +98,20 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
     }
 
     /**
-     * Returns an index >= 0 and <= {@link #mask} for the specified {@code item}.
+     * Returns an index &ge; 0 and &le; {@link #mask} for the specified {@code item}.
      * <p>
      * The default implementation uses Fibonacci hashing on the item's {@link Object#hashCode()}: the hashcode is multiplied by a
      * long constant (2 to the 64th, divided by the golden ratio) then the uppermost bits are shifted into the lowest positions to
-     * obtain an index in the desired range. Multiplication by a long may be slower than int (eg on GWT) but greatly improves
-     * rehashing, allowing even very poor hashcodes, such as those that only differ in their upper bits, to be used without high
-     * collision rates. Fibonacci hashing has increased collision rates when all or most hashcodes are multiples of larger
+     * obtain an index in the desired range. Multiplication by a long may be slower than int (e.g., on GWT) but greatly improves
+     * rehashing, allowing even very poor hash codes, such as those that only differ in their upper bits, to be used without high
+     * collision rates. Fibonacci hashing has increased collision rates when all or most hash codes are multiples of larger
      * Fibonacci numbers (see <a href=
      * "https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/">Malte
      * Skarupke's blog post</a>).
      * <p>
-     * This method can be overridden to customizing hashing. This may be useful eg in the unlikely event that most hashcodes are
-     * Fibonacci numbers, if keys provide poor or incorrect hashcodes, or to simplify hashing if keys provide high quality
-     * hashcodes and don't need Fibonacci hashing: {@code return item.hashCode() & mask;}
+     * This method can be overridden to customizing hashing. This may be useful eg in the unlikely event that most hash codes are
+     * Fibonacci numbers, if keys provide poor or incorrect hash codes, or to simplify hashing if keys provide high quality
+     * hash codes and don't need Fibonacci hashing: {@code return item.hashCode() & mask;}
      */
     protected int place(K item) {
         return (int) (item.hashCode() * 0x9E3779B97F4A7C15L >>> shift);
