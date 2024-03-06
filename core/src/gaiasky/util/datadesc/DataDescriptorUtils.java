@@ -127,7 +127,7 @@ public class DataDescriptorUtils {
     }
 
     /**
-     * Constructs a data descriptor from a server JSON file. If the file is null and {@link this#fh} is also null,
+     * Constructs a data descriptor from a server JSON file. If the file is null and <code>fh</code> is also null,
      * it returns null.
      *
      * @param fh The pointer to the server JSON file.

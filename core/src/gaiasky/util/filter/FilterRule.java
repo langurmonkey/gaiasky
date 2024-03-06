@@ -19,7 +19,7 @@ public class FilterRule {
     /**
      * Creates a new filter with the given attribute, value and comparator function
      *
-     * @param comp The comparator function: '>', '>=', '<', '<=', '==', '!='
+     * @param comp The comparator function: '&gt;', '&ge;', '&lt;', '&le;', '==', '!='
      * @param attr The attribute to compare
      * @param val  The value to compare to
      */

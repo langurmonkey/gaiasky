@@ -49,12 +49,12 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected Set<Long> mustLoadIds = null;
     protected List<AdditionalCols> additional;
     /**
-     * Files or folders with optionally gzipped CSVs containing additional columns to be matched by sourceid with the main catalog. Column names must comport
+     * Files or folders with optionally gzipped CSVs containing additional columns to be matched by sourceId with the main catalog. Column names must comport
      * to {@link ColId}.
      */
     protected String[] additionalFiles = null;
     /**
-     * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
+     * RUWE cap value. Will accept all stars with star_ruwe &le; ruwe
      */
     protected Double ruwe = Double.NaN;
     /**
@@ -64,7 +64,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * <p>
      * The loader will only load stars for which the parallax error is
-     * at most the percentage given here, in [0..1]. Faint stars (gmag >= 13.1)
+     * at most the percentage given here, in [0..1]. Faint stars (gmag &ge; 13.1)
      * More specifically, the following must be met:
      * </p>
      * <code>pllx_err &lt; pllx * pllxErrFactor</code>
@@ -73,7 +73,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * <p>
      * The loader will only load stars for which the parallax error is
-     * at most the percentage given here, in [0..1]. Bright stars (gmag < 13.1)
+     * at most the percentage given here, in [0..1]. Bright stars (gmag &lt; 13.1)
      * More specifically, the following must be met:
      * </p>
      * <code>pllx_err &lt; pllx * pllxErrFactor</code>
@@ -228,16 +228,16 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * <p>
      * <b>If adaptive is not enabled:</b>
      * <pre>
-     * accepted = pllx > 0 && pllx_err < pllx * pllx_err_factor && pllx_err <= 1
+     * accepted = pllx &gt; 0 &&amp;&&amp; pllx_err &lt; pllx * pllx_err_factor &&amp;&&amp; pllx_err &le; 1
      * </pre>
      * </p>
      * <p>
      * <b>If adaptive is enabled:</b>
-     * <pre>
-     * accepted = pllx > 0 && pllx_err < pllx * max(0.5, pllx_err_factor) && pllx_err <= 1, if apparent_magnitude < 13.2
-     * accepted = pllx > 0 && pllx_err < pllx * pllx_err_factor && pllx_err <= 1, otherwise
-     * </pre>
      * </p>
+     * <pre>
+     * accepted = pllx &gt; 0 &&amp;&&amp; pllx_err &lt; pllx * max(0.5, pllx_err_factor) &&amp;&&amp; pllx_err &le; 1, if apparent_magnitude &lt; 13.2
+     * accepted = pllx &gt; 0 &&amp;&&amp; pllx_err &lt; pllx * pllx_err_factor &&amp;&&amp; pllx_err &le; 1, otherwise
+     * </pre>
      *
      * @param appmag  Apparent magnitude of star
      * @param pllx    Parallax of star

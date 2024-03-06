@@ -160,8 +160,8 @@ public class Gti implements Comparable<Gti> {
     }
 
     /**
-     * Is this GTI X '<' than the GTI passed in Y? If X starts before Y it is
-     * less than Y. If X and Y start at the same time, X is les than Y if it
+     * Is this GTI X '&lt;' than the GTI passed in Y? If X starts before Y it is
+     * less than Y. If X and Y start at the same time, X is less than Y if it
      * ends before Y If X and Y are the same X is not less than Y
      *
      * @param i GTI to test

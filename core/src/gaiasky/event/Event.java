@@ -170,7 +170,7 @@ public enum Event {
      * <li>Double with the speed of the camera in km/s</li>
      * <li>Vector3d with the velocity vector of the camera</li>
      * <li>The PerspectiveCamera</li>
-     * </ul>
+     * </ol>
      **/
     CAMERA_MOTION_UPDATE,
     /**

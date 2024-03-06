@@ -201,7 +201,7 @@ public class IntNode {
     }
 
     /**
-     * @param index The zero-based index of the child node to get, must be: 0 <= index < {@link #getChildCount()}.
+     * @param index The zero-based index of the child node to get, must be: 0 &le; index &lt; {@link #getChildCount()}.
      *
      * @return The child node at the specified index
      */

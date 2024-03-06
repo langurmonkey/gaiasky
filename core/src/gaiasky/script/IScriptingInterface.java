@@ -566,7 +566,7 @@ public interface IScriptingInterface {
     /**
      * Sets the focus and instantly moves the camera to a point in the line
      * defined by <code>focus</code>-<code>other</code> and rotated
-     * <code>rotation</code> degrees around <code>focus<code> using the camera
+     * <code>rotation</code> degrees around <code>focus</code> using the camera
      * up vector as a rotation axis.
      *
      * @param focus      The name of the focus object.
@@ -2213,7 +2213,7 @@ public interface IScriptingInterface {
      * the given number of seconds. This function waits for the transition to finish and then returns control
      * to the script.
      * <p>
-     * </p>
+     * <p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
      * this only works with the natural camera.
      * </p>
@@ -3775,7 +3775,7 @@ public interface IScriptingInterface {
     /**
      * Returns the column-major matrix representing the given reference system transformation.
      *
-     * @param name <p>The name of the reference system transformation:
+     * @param name <p>The name of the reference system transformation:</p>
      *             <ul>
      *             <li>'equatorialtoecliptic', 'eqtoecl'</li>
      *             <li>'ecliptictoequatorial', 'ecltoeq'</li>
@@ -3784,7 +3784,6 @@ public interface IScriptingInterface {
      *             <li>'ecliptictogalactic', 'ecltogal</li>
      *             <li>'galactictoecliptic', 'galtoecl</li>
      *             </ul>
-     *             </p>
      * @return The transformation matrix in column-major order.
      */
     double[] getRefSysTransform(String name);

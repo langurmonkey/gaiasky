@@ -51,7 +51,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * <p>
      * The loader will only load stars for which the parallax error is
      * at most the percentage given here, in [0..1]. This applies to
-     * faint stars (gmag >= 13.1)
+     * faint stars (gmag &ge; 13.1)
      * More specifically, the following must be met:
      * </p>
      * <code>pllx_err &lt; pllx * pllxErrFactor</code>
@@ -64,7 +64,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * <p>
      * The loader will only load stars for which the parallax error is
      * at most the percentage given here, in [0..1]. This applies to
-     * bright stars (gmag < 13.1)
+     * bright stars (gmag &lt; 13.1)
      * More specifically, the following must be met:
      * </p>
      * <code>pllx_err &lt; pllx * pllxErrFactor</code>
@@ -74,7 +74,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
     void setParallaxErrorFactorBright(double parallaxErrorFactor);
 
     /**
-     * Whether to use an adaptive threshold, relaxing it for bright (appmag >= 13) stars to let more
+     * Whether to use an adaptive threshold, relaxing it for bright (appmag &ge; 13) stars to let more
      * bright stars in.
      */
     void setAdaptiveParallax(boolean adaptive);

@@ -167,7 +167,7 @@ public class IntMesh implements Disposable {
      * @param attributes     the {@link VertexAttributes}. Each vertex attribute defines one property of a vertex such as position,
      *                       normal or texture coordinate
      *
-     * @author Jaroslaw Wisniewski <j.wisniewski@appsisle.com>
+     * @author Jaroslaw Wisniewski
      **/
     public IntMesh(boolean staticVertices,
                    boolean staticIndices,

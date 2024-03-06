@@ -49,7 +49,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Insert into the tree.
      *
      * @param x the item to insert.
-     *
      * @throws RuntimeException if x is already present.
      */
     public void insert(T x) {
@@ -60,7 +59,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Remove from the tree.
      *
      * @param x the item to remove.
-     *
      * @throws RuntimeException if x is not found.
      */
     public void remove(T x) {
@@ -89,7 +87,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Find an item in the tree.
      *
      * @param x the item to search for.
-     *
      * @return the matching item or null if not found.
      */
     public Comparable<T> find(Comparable<T> x) {
@@ -100,7 +97,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Find the start of the interval where x is in.
      *
      * @param x is the item to search the start for.
-     *
      * @return node containing the start of the interval where x
      * is in, or null if x is not contained in any interval.
      */
@@ -121,7 +117,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to get element field.
      *
      * @param t the node.
-     *
      * @return the element field or null if t is null.
      */
     private Comparable<T> elementAt(BinaryNode<T> t) {
@@ -133,9 +128,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x the item to insert.
      * @param t the node that roots the tree.
-     *
      * @return the new root.
-     *
      * @throws RuntimeException if x is already present.
      */
     protected BinaryNode<T> insert(T x, BinaryNode<T> t) {
@@ -155,9 +148,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x the item to remove.
      * @param t the node that roots the tree.
-     *
      * @return the new root.
-     *
      * @throws RuntimeException if x is not found.
      */
     protected BinaryNode<T> remove(Comparable<T> x, BinaryNode<T> t) {
@@ -180,9 +171,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to remove minimum item from a subtree.
      *
      * @param t the node that roots the tree.
-     *
      * @return the new root.
-     *
      * @throws RuntimeException if x is not found.
      */
     protected BinaryNode<T> removeMin(BinaryNode<T> t) {
@@ -199,7 +188,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to find the smallest item in a subtree.
      *
      * @param t the node that roots the tree.
-     *
      * @return node containing the smallest item.
      */
     protected BinaryNode<T> findMin(BinaryNode<T> t) {
@@ -214,7 +202,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to find the largest item in a subtree.
      *
      * @param t the node that roots the tree.
-     *
      * @return node containing the largest item.
      */
     private BinaryNode<T> findMax(BinaryNode<T> t) {
@@ -230,7 +217,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x is item to search for.
      * @param t the node that roots the tree.
-     *
      * @return node containing the matched item.
      */
     private BinaryNode<T> find(Comparable<T> x, BinaryNode<T> t) {
@@ -252,7 +238,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x is the item to search the start for.
      * @param t the node that roots the tree.
-     *
      * @return node containing the start of the interval where x
      * is in, or null if x is not contained in any interval.
      */
@@ -276,6 +261,8 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Basic node stored in unbalanced binary search trees
      * Note that this class is not accessible outside
      * of this package.
+     *
+     * @param <T> The type contained in the node.
      */
     public static class BinaryNode<T> {
         // Friendly data; accessible by other package routines

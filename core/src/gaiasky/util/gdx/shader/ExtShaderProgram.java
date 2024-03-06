@@ -56,7 +56,7 @@ public class ExtShaderProgram implements Disposable {
      **/
     private final static ObjectMap<Application, Array<ExtShaderProgram>> shaders = new ObjectMap<>();
     /**
-     * Flag indicating whether attributes & uniforms must be present at all times.
+     * Flag indicating whether attributes &amp; uniforms must be present at all times.
      **/
     public static boolean pedantic = true;
     /**
@@ -956,7 +956,7 @@ public class ExtShaderProgram implements Disposable {
      * Sets the vertex attribute with the given name. The {@link ExtShaderProgram} must be bound for this to work.
      *
      * @param name      the attribute name
-     * @param size      the number of components, must be >= 1 and <= 4
+     * @param size      the number of components, must be &ge; 1 and &le; 4
      * @param type      the type, must be one of GL20.GL_BYTE, GL20.GL_UNSIGNED_BYTE, GL20.GL_SHORT,
      *                  GL20.GL_UNSIGNED_SHORT,GL20.GL_FIXED, or GL20.GL_FLOAT. GL_FIXED will not work on the desktop
      * @param normalize whether fixed point data should be normalized. Will not work on the desktop
@@ -992,7 +992,7 @@ public class ExtShaderProgram implements Disposable {
      * Sets the vertex attribute with the given name. The {@link ExtShaderProgram} must be bound for this to work.
      *
      * @param name      the attribute name
-     * @param size      the number of components, must be >= 1 and <= 4
+     * @param size      the number of components, must be &ge; 1 and &le; 4
      * @param type      the type, must be one of GL20.GL_BYTE, GL20.GL_UNSIGNED_BYTE, GL20.GL_SHORT,
      *                  GL20.GL_UNSIGNED_SHORT,GL20.GL_FIXED, or GL20.GL_FLOAT. GL_FIXED will not work on the desktop
      * @param normalize whether fixed point data should be normalized. Will not work on the desktop

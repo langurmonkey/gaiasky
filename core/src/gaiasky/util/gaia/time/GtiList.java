@@ -51,7 +51,7 @@ public class GtiList extends ArrayList<Gti> {
     }
 
     /**
-     * sort the list such that t_i_start <= t_i+1_start forall i=0,
+     * sort the list such that t_i_start &le; t_i+1_start forall i=0,
      * this->size()-1
      */
     public void sortIt() {
@@ -62,17 +62,17 @@ public class GtiList extends ArrayList<Gti> {
     }
 
     /**
-     * combine list with second list (logical OR)
+     * combine list with second list (logical or)
      *
      * <pre>
-     *    +----------------+ Gti 1 (
-     * +-----------+ Gti 2
+     *    +----------------+ gti 1 (
+     * +-----------+ gti 2
      * ||
      * \/
      * +-------------------+ combined
      * </pre>
      *
-     * @param list List to combine with
+     * @param list list to combine with
      */
     public void or(final GtiList list) throws RuntimeException {
         this.addAll(list);

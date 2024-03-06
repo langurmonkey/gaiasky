@@ -48,7 +48,8 @@ import java.util.Comparator;
  * Needs to be explicitly disposed as it might allocate a ShaderProgram when GLSL 2.0 is used.
  * </p>
  * <p>
- * States (* = any, EV = entry value - same as value before flush):<br/>
+ * States (* = any, EV = entry value - same as value before flush):
+ * </p>
  * <table>
  * <tr>
  * <td></td>
@@ -85,8 +86,8 @@ import java.util.Comparator;
  * <td>*</td>
  * <td>disabled</td>
  * </tr>
+ * <caption>Camera strategy table.</caption>
  * </table>
- * </p>
  */
 public class CameraGroupStrategy implements GroupStrategy, Disposable {
     private static final int GROUP_OPAQUE = 0;

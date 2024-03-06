@@ -36,7 +36,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the cubic b-spline value for the given position (t).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param t          The position (0<=t<=1) on the spline
+     * @param t          The position ([0,1]) on the spline
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
@@ -51,7 +51,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the cubic b-spline derivative for the given position (t).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param t          The position (0<=t<=1) on the spline
+     * @param t          The position ([0,1]) on the spline
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
@@ -70,9 +70,9 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the cubic b-spline value for the given span (i) at the given position (u).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param i          The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - 3 (cubic
+     * @param i          The span ([0,spanCount]) spanCount = continuous ? points.length : points.length - 3 (cubic
      *                   degree)
-     * @param u          The position (0<=u<=1) on the span
+     * @param u          The position ([0,1]) on the span
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
@@ -98,9 +98,9 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the cubic b-spline derivative for the given span (i) at the given position (u).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param i          The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - 3 (cubic
+     * @param i          The span ([0,spanCount]) spanCount = continuous ? points.length : points.length - 3 (cubic
      *                   degree)
-     * @param u          The position (0<=u<=1) on the span
+     * @param u          The position ([0,1]) on the span
      * @param points     The control points
      * @param continuous If true the b-spline restarts at 0 when reaching 1
      * @param tmp        A temporary vector used for the calculation
@@ -126,7 +126,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the n-degree b-spline value for the given position (t).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param t          The position (0<=t<=1) on the spline
+     * @param t          The position ([0,1]) on the spline
      * @param points     The control points
      * @param degree     The degree of the b-spline
      * @param continuous If true the b-spline restarts at 0 when reaching 1
@@ -146,7 +146,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the n-degree b-spline derivative for the given position (t).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param t          The position (0<=t<=1) on the spline
+     * @param t          The position ([0,1]) on the spline
      * @param points     The control points
      * @param degree     The degree of the b-spline
      * @param continuous If true the b-spline restarts at 0 when reaching 1
@@ -166,8 +166,8 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the n-degree b-spline value for the given span (i) at the given position (u).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param i          The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree
-     * @param u          The position (0<=u<=1) on the span
+     * @param i          The span ([0,spanCount]) spanCount = continuous ? points.length : points.length - degree
+     * @param u          The position ([0,1]) on the span
      * @param points     The control points
      * @param degree     The degree of the b-spline
      * @param continuous If true the b-spline restarts at 0 when reaching 1
@@ -186,8 +186,8 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * Calculates the n-degree b-spline derivative for the given span (i) at the given position (u).
      *
      * @param out        The {@link VectorDouble} to set to the result.
-     * @param i          The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree
-     * @param u          The position (0<=u<=1) on the span
+     * @param i          The span ([0,spanCount]) spanCount = continuous ? points.length : points.length - degree
+     * @param u          The position ([0,1]) on the span
      * @param points     The control points
      * @param degree     The degree of the b-spline
      * @param continuous If true the b-spline restarts at 0 when reaching 1

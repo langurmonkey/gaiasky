@@ -339,13 +339,13 @@ public class IntModel implements Disposable {
     }
 
     /**
-     * Calculates the local and world transform of all {@link Node} instances in this model, recursively. First each
+     * <p>Calculates the local and world transform of all {@link Node} instances in this model, recursively. First each
      * {@link Node#localTransform} transform is calculated based on the translation, rotation and scale of each Node. Then each
      * {@link Node#calculateWorldTransform()} is calculated, based on the parent's world transform and the local transform of each
      * Node. Finally, the animation bone matrices are updated accordingly.</p>
      * <p>
      * This method can be used to recalculate all transforms if any of the Node's local properties (translation, rotation, scale)
-     * was modified.
+     * was modified.</p>
      */
     public void calculateTransforms() {
         final int n = nodes.size;

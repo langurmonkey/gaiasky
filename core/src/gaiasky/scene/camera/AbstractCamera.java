@@ -33,53 +33,53 @@ public abstract class AbstractCamera implements ICamera {
     private static final Matrix4d invProjectionView = new Matrix4d();
     private static final double VIEW_ANGLE = Math.toRadians(0.05);
     /**
-     * Camera far value
+     * Camera far value.
      **/
     public double CAM_FAR;
     /**
-     * Camera near value
+     * Camera near value.
      **/
     public double CAM_NEAR;
     public Vector3b pos, posInv, prevPos;
     public Vector3d tmp, shift;
     /**
-     * The main camera
+     * The main camera.
      **/
     public PerspectiveCamera camera;
     public float fovFactor;
     /**
      * Angle from the center to the corner of the screen in scene coordinates,
-     * in radians
+     * in radians.
      **/
     protected float angleEdgeRad;
     /**
-     * Aspect ratio
+     * Aspect ratio.
      **/
     protected float ar;
     /**
-     * Distance of camera to center
+     * Distance of camera to center.
      **/
     protected double distance;
     /**
-     * The parent
+     * The parent.
      **/
     protected CameraManager parent;
     /**
-     * Stereoscopic mode cameras
+     * Stereoscopic mode cameras.
      **/
     protected PerspectiveCamera camLeft, camRight;
     /**
-     * Vector with all perspective cameras
+     * Vector with all perspective cameras.
      **/
     protected PerspectiveCamera[] cameras;
     protected Matrix4d projection, view, combined;
     protected FrustumDouble frustum;
     /**
-     * Closest non-star body to the camera
+     * Closest non-star body to the camera.
      **/
     protected FocusView closestBody;
     /**
-     * The closest particle to the camera
+     * The closest particle to the camera.
      */
     protected IFocus closestStar;
     protected FocusView closestStarView;
@@ -87,7 +87,7 @@ public abstract class AbstractCamera implements ICamera {
     protected Matrix4 prevCombined;
     /**
      * The closest between {@link AbstractCamera#closestBody} and
-     * {@link AbstractCamera#closestStar}
+     * {@link AbstractCamera#closestStar}.
      */
     protected IFocus closest;
     /** The last input event was by a gamepad. **/
