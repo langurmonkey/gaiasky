@@ -58,8 +58,7 @@ public class ContextMenu extends Table {
      */
     public static void removeAll(Stage stage) {
         for (Actor actor : stage.getActors()) {
-            if (actor instanceof ContextMenu) {
-                ContextMenu menu = (ContextMenu) actor;
+            if (actor instanceof ContextMenu menu) {
                 menu.removeHierarchy();
             }
         }
@@ -113,9 +112,8 @@ public class ContextMenu extends Table {
         sharedMenuItemInputListener = new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                if (pointer == -1 && event.getListenerActor() instanceof MenuItem) {
-                    MenuItem item = (MenuItem) event.getListenerActor();
-                    if (item.isDisabled() == false) {
+                if (pointer == -1 && event.getListenerActor() instanceof MenuItem item) {
+                    if (!item.isDisabled()) {
                         setActiveItem(item, false);
                     }
                 }
@@ -123,11 +121,10 @@ public class ContextMenu extends Table {
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                if (pointer == -1 && event.getListenerActor() instanceof MenuItem) {
+                if (pointer == -1 && event.getListenerActor() instanceof MenuItem item) {
                     if (activeSubMenu != null)
                         return;
 
-                    MenuItem item = (MenuItem) event.getListenerActor();
                     if (item == activeItem) {
                         setActiveItem(null, false);
                     }
@@ -138,7 +135,7 @@ public class ContextMenu extends Table {
         sharedMenuItemChangeListener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (event.isStopped() == false)
+                if (!event.isStopped())
                     removeHierarchy();
             }
         };
@@ -174,7 +171,7 @@ public class ContextMenu extends Table {
             if (i >= children.size)
                 i = 0;
             Actor actor = children.get(i);
-            if (actor instanceof MenuItem && ((MenuItem) actor).isDisabled() == false) {
+            if (actor instanceof MenuItem && !((MenuItem) actor).isDisabled()) {
                 setActiveItem((MenuItem) actor, true);
                 break;
             }
@@ -190,7 +187,7 @@ public class ContextMenu extends Table {
             if (i == -1)
                 i = children.size - 1;
             Actor actor = children.get(i);
-            if (actor instanceof MenuItem && ((MenuItem) actor).isDisabled() == false) {
+            if (actor instanceof MenuItem && !((MenuItem) actor).isDisabled()) {
                 setActiveItem((MenuItem) actor, true);
                 break;
             }

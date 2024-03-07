@@ -313,17 +313,23 @@ public interface IntMeshPartBuilder {
 
         public VertexInfo set(Vector3 pos, Vector3 nor, Vector3 tan, Vector3 bin, Color col, Vector2 uv) {
             reset();
-            if ((hasPosition = pos != null))
+            hasPosition = pos != null;
+            hasNormal = nor != null;
+            hasTangent = tan != null;
+            hasBinormal = bin != null;
+            hasColor = col != null;
+            hasUV = uv != null;
+            if (hasPosition)
                 position.set(pos);
-            if ((hasNormal = nor != null))
+            if (hasNormal)
                 normal.set(nor);
-            if ((hasTangent = tan != null))
+            if (hasTangent)
                 tangent.set(tan);
-            if ((hasBinormal = bin != null))
+            if (hasBinormal)
                 tangent.set(bin);
-            if ((hasColor = col != null))
+            if (hasColor)
                 color.set(col);
-            if ((hasUV = uv != null))
+            if (hasUV)
                 this.uv.set(uv);
             return this;
         }
@@ -353,7 +359,8 @@ public interface IntMeshPartBuilder {
         }
 
         public VertexInfo setPos(Vector3 pos) {
-            if ((hasPosition = pos != null) == true)
+            hasPosition = pos != null;
+            if (hasPosition)
                 position.set(pos);
             return this;
         }
@@ -365,7 +372,8 @@ public interface IntMeshPartBuilder {
         }
 
         public VertexInfo setNor(Vector3 nor) {
-            if ((hasNormal = nor != null) == true)
+            hasNormal = nor != null;
+            if (hasNormal)
                 normal.set(nor);
             return this;
         }
@@ -377,7 +385,8 @@ public interface IntMeshPartBuilder {
         }
 
         public VertexInfo setTan(Vector3 tan) {
-            if ((hasTangent = tan != null) == true)
+            hasTangent = tan != null;
+            if (hasTangent)
                 tangent.set(tan);
             return this;
         }
@@ -389,7 +398,8 @@ public interface IntMeshPartBuilder {
         }
 
         public VertexInfo setBin(Vector3 bin) {
-            if ((hasBinormal = bin != null) == true)
+            hasBinormal = bin != null;
+            if (hasBinormal)
                 binormal.set(bin);
             return this;
         }
@@ -401,7 +411,8 @@ public interface IntMeshPartBuilder {
         }
 
         public VertexInfo setCol(Color col) {
-            if ((hasColor = col != null) == true)
+            hasColor = col != null;
+            if (hasColor)
                 color.set(col);
             return this;
         }
@@ -413,7 +424,8 @@ public interface IntMeshPartBuilder {
         }
 
         public VertexInfo setUV(Vector2 uv) {
-            if ((hasUV = uv != null) == true)
+            hasUV = uv != null;
+            if (hasUV)
                 this.uv.set(uv);
             return this;
         }

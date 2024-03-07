@@ -10,7 +10,10 @@ package gaiasky.desktop.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import gaiasky.gui.ConsoleLogger;
+import gaiasky.scene.record.BillboardDataset;
 import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
@@ -19,24 +22,22 @@ import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3d;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 public class GalaxyGenerator {
+    private static final Logger.Log logger = Logger.getLogger(GalaxyGenerator.class);
 
     private static final String separator = " ";
 
     /** Whether to write the results to disk **/
     private static final boolean writeFile = true;
 
-    /** spiral | milkyway | uniform | bulge **/
-    private static final String GALAXY_TYPE = "uniform";
-
-    /** star | dust | hii | bulge | gas **/
-    private static final String PARTICLE_TYPE = "gas";
+    enum GalaxyType {
+        spiral, milkyway, uniform, bulge
+    }
 
     /** Number of particles **/
     private static final int N = 3000;
@@ -64,9 +65,45 @@ public class GalaxyGenerator {
 
     private static final boolean radialDensity = true;
 
+    /** CLI arguments. **/
+    private static CLIArgs cliArgs;
+
+    private static class CLIArgs {
+        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
+        private boolean help = false;
+
+        @Parameter(names = {"--galaxytype"}, required = true, description = "The galaxy type to use.", order = 1)
+        private GalaxyType galaxyType = GalaxyType.uniform;
+
+        @Parameter(names = {"--particletype"}, required = true, description = "The particle type to use.", order = 2)
+        private BillboardDataset.ParticleType particleType = BillboardDataset.ParticleType.GAS;
+
+        @Parameter(names = {"-o", "--ouptut"}, description = "The output directory.", required = true, order = 2)
+        private String outputDir = "/home/tsagrista/.local/share/gaiasky/data/galaxy/";
+
+        @Parameter(names = {"-s", "--skip-welcome"}, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
+        private boolean skipWelcome = false;
+
+    }
+
     public static void main(String[] args) {
         try {
             Gdx.files = new Lwjgl3Files();
+            cliArgs = new CLIArgs();
+            JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
+            jc.setProgramName("galaxy-generator");
+            try {
+                jc.parse(args);
+
+                if (cliArgs.help) {
+                    jc.usage();
+                    return;
+                }
+            } catch (Exception e) {
+                logger.error("galaxy-generator: bad program arguments\n\n");
+                jc.usage();
+                return;
+            }
 
             SettingsManager.initialize(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
 
@@ -80,73 +117,59 @@ public class GalaxyGenerator {
 
             List<double[]> gal;
 
-            if (GALAXY_TYPE.equals("spiral")) {
-                gal = generateGalaxySpiral();
-            } else if (GALAXY_TYPE.equals("milkyway")) {
-                gal = generateMilkyWay();
-            } else if (GALAXY_TYPE.equals("uniform")) {
-                gal = generateUniform();
-            } else if (GALAXY_TYPE.equals("bulge")) {
-                gal = generateBulge();
-            } else {
-                PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-                out.println("Wrong galaxy type: " + GALAXY_TYPE);
-                return;
-            }
+            gal = switch (cliArgs.galaxyType) {
+                case spiral -> generateGalaxySpiral();
+                case milkyway -> generateMilkyWay();
+                case uniform -> generateUniform();
+                case bulge -> generateBulge();
+            };
 
             if (writeFile) {
-                writeToDisk(gal, "/home/tsagrista/.local/share/gaiasky/data/galaxy/");
+                writeToDisk(gal, cliArgs.outputDir);
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
     private static double generateNewSize() {
-        switch (PARTICLE_TYPE) {
-        case "star":
-        case "dust":
-            return Math.abs(StdRandom.uniform() * 20.0 + StdRandom.uniform() * 3.0);
-        case "bulge":
-            return Math.abs(StdRandom.uniform() * 40.0 + StdRandom.uniform() * 6.0);
-        case "hii":
-            return Math.abs(StdRandom.uniform() * 70.0 + StdRandom.uniform() * 30.0);
-        case "gas":
-            return Math.abs(StdRandom.uniform() * 100.0 + StdRandom.uniform() * 50.0);
-        default:
-            return 1;
-        }
+        return switch (cliArgs.particleType) {
+            case STAR, DUST -> Math.abs(StdRandom.uniform() * 20.0 + StdRandom.uniform() * 3.0);
+            case BULGE -> Math.abs(StdRandom.uniform() * 40.0 + StdRandom.uniform() * 6.0);
+            case HII -> Math.abs(StdRandom.uniform() * 70.0 + StdRandom.uniform() * 30.0);
+            case GAS -> Math.abs(StdRandom.uniform() * 100.0 + StdRandom.uniform() * 50.0);
+            default -> 1;
+        };
     }
 
     // Clamp
     private static double[] cl(double r, double g, double b) {
-        return new double[] { MathUtilsDouble.clamp(r, 0, 1), MathUtilsDouble.clamp(g, 0, 1), MathUtilsDouble.clamp(b, 0, 1) };
+        return new double[]{MathUtilsDouble.clamp(r, 0, 1), MathUtilsDouble.clamp(g, 0, 1), MathUtilsDouble.clamp(b, 0, 1)};
     }
 
     private static double[] generateNewColor() {
         double r = StdRandom.gaussian();
-        switch (PARTICLE_TYPE) {
-        case "star":
-            r *= 0.15;
-            if (StdRandom.uniform(2) == 0) {
-                // Blue/white star
-                return cl(0.95 - r, 0.8 - r, 0.6);
-            } else {
-                // Red/white star
-                return cl(0.95, 0.8 - r, 0.6 - r);
-            }
-        case "bulge":
-            return new double[] { 0.9, 0.9, 0.8 };
-        case "dust":
-            return null;
-        case "hii":
-            return new double[] { 0.78, 0.31, 0.55 };
-        case "gas":
-            r *= 0.1;
-            return cl(0.068 + r, 0.06 + r, 0.2 + r * 1.3);
-        default:
-            return null;
+        switch (cliArgs.particleType) {
+            case STAR:
+                r *= 0.15;
+                if (StdRandom.uniform(2) == 0) {
+                    // Blue/white star
+                    return cl(0.95 - r, 0.8 - r, 0.6);
+                } else {
+                    // Red/white star
+                    return cl(0.95, 0.8 - r, 0.6 - r);
+                }
+            case BULGE:
+                return new double[]{0.9, 0.9, 0.8};
+            case HII:
+                return new double[]{0.78, 0.31, 0.55};
+            case GAS:
+                r *= 0.1;
+                return cl(0.068 + r, 0.06 + r, 0.2 + r * 1.3);
+            case DUST:
+            default:
+                return null;
         }
     }
 
@@ -156,9 +179,9 @@ public class GalaxyGenerator {
         double[] color = generateNewColor();
 
         if (color == null || color.length < 3)
-            particles.add(new double[] { x, y, z, size });
+            particles.add(new double[]{x, y, z, size});
         else
-            particles.add(new double[] { x, y, z, size, color[0], color[1], color[2] });
+            particles.add(new double[]{x, y, z, size, color[0], color[1], color[2]});
     }
 
     private static List<double[]> generateUniform() {
@@ -274,13 +297,13 @@ public class GalaxyGenerator {
             double x = StdRandom.gaussian() * armWidth;
             double y = StdRandom.gaussian() * armHeight;
 
-            particles.add(new double[] { x, y, z, Math.abs(StdRandom.gaussian()) });
+            particles.add(new double[]{x, y, z, Math.abs(StdRandom.gaussian())});
         }
 
         // Generate arms
         for (int i = 0; i < Narms; i++) {
-            Logger.getLogger(GalaxyGenerator.class).info("Generating arm " + (i + 1));
-            double zplus = bar ? barLength / 2.0 * (i < Narms / 2.0 ? 1.0 : -1.0) : 0.0;
+            logger.info("Generating arm " + (i + 1));
+            double zPlus = bar ? barLength / 2.0 * (i < Narms / 2.0 ? 1.0 : -1.0) : 0.0;
 
             angle = bar && i == Narms / 2.0 ? 190.0 : angle;
 
@@ -300,9 +323,9 @@ public class GalaxyGenerator {
                 // Differential rotation
                 particle.rotate(rotAxis, maxRotation * particle.len() / radius);
 
-                particle.add(0.0, 0.0, zplus);
+                particle.add(0.0, 0.0, zPlus);
 
-                particles.add(new double[] { particle.x, particle.y, particle.z, Math.abs(StdRandom.gaussian()) });
+                particles.add(new double[]{particle.x, particle.y, particle.z, Math.abs(StdRandom.gaussian())});
             }
             angle += stepAngle;
         }
@@ -315,7 +338,7 @@ public class GalaxyGenerator {
         gal.sort(Comparator.comparingDouble(f -> f[0]));
 
         String filePath = dir + "galaxy_";
-        if (GALAXY_TYPE.equals("spiral")) {
+        if (cliArgs.galaxyType == GalaxyType.spiral) {
             filePath += (bar ? "bar" + barLength + "_" : "nobar_") + Narms + "arms_" + N + "particles_" + radius + "radius_" + armWidthRatio + "ratio_" + maxRotation + "deg.dat.gz";
         } else {
             filePath += N + "particles.dat.gz";
@@ -330,14 +353,24 @@ public class GalaxyGenerator {
         if (fh.isDirectory()) {
             throw new RuntimeException("File is directory: " + filePath);
         }
-        f.createNewFile();
+        if (f.createNewFile()) {
 
+            final BufferedWriter bw = getBufferedWriter(gal, filePath);
+
+            bw.close();
+            logger.info(I18n.msg("notif.written", gal.size(), filePath));
+        } else {
+            logger.error("Error creating file: " + f.getAbsolutePath());
+        }
+
+    }
+
+    private static BufferedWriter getBufferedWriter(List<double[]> gal, String filePath) throws IOException {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filePath))));
         bw.write("X" + separator + "Y" + separator + "Z" + separator + "size" + separator + "r" + separator + "g" + separator + "b");
         bw.newLine();
 
-        for (int i = 0; i < gal.size(); i++) {
-            double[] star = gal.get(i);
+        for (double[] star : gal) {
             StringBuilder sb = new StringBuilder();
             sb.append(star[0]);
             for (int j = 1; j < star.length; j++) {
@@ -348,10 +381,7 @@ public class GalaxyGenerator {
             bw.write(sb.toString());
             bw.newLine();
         }
-
-        bw.close();
-
-        Logger.getLogger(GalaxyGenerator.class).info(I18n.msg("notif.written", gal.size(), filePath));
+        return bw;
     }
 
 }
