@@ -27,12 +27,12 @@ import gaiasky.util.GuiUtils;
 public abstract class GuiGamepadListener extends AbstractGamepadListener {
     protected final Stage stage;
 
-    public GuiGamepadListener(String mappingsFile, Stage stage) {
+    protected GuiGamepadListener(String mappingsFile, Stage stage) {
         super(mappingsFile);
         this.stage = stage;
     }
 
-    public GuiGamepadListener(IGamepadMappings mappings, Stage stage) {
+    protected GuiGamepadListener(IGamepadMappings mappings, Stage stage) {
         super(mappings);
         this.stage = stage;
     }

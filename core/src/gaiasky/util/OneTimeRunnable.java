@@ -16,7 +16,7 @@ import gaiasky.event.EventManager;
 public abstract class OneTimeRunnable implements Runnable {
     private final String name;
 
-    public OneTimeRunnable(String name) {
+    protected OneTimeRunnable(String name) {
         this.name = name;
     }
 

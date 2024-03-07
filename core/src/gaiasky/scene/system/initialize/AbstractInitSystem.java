@@ -20,13 +20,13 @@ public abstract class AbstractInitSystem extends IteratingSystem implements Enti
     protected Engine engineBackup;
     private InitializerMode mode;
 
-    public AbstractInitSystem(boolean setUp, Family family, int priority) {
+    protected AbstractInitSystem(boolean setUp, Family family, int priority) {
         super(family, priority);
         this.mode = setUp ? InitializerMode.SETUP : InitializerMode.INIT;
         this.logger = Logger.getLogger(getClass());
     }
 
-    public AbstractInitSystem(Family family, int priority) {
+    protected AbstractInitSystem(Family family, int priority) {
         // Initialize by default
         this(false, family, priority);
     }

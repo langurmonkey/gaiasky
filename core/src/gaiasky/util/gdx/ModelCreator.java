@@ -28,7 +28,7 @@ public abstract class ModelCreator {
     protected int index;
     protected boolean flipNormals;
     protected boolean hardEdges;
-    public ModelCreator() {
+    protected ModelCreator() {
         this.vertices = new ArrayList<>();
         this.normals = new ArrayList<>();
         this.binormals = new ArrayList<>();

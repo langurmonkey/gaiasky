@@ -17,7 +17,7 @@ public abstract class AbstractView {
     protected Entity entity;
 
     /** Creates an empty abstract view without entity. **/
-    public AbstractView() {
+    protected AbstractView() {
     }
 
     /**
@@ -25,7 +25,7 @@ public abstract class AbstractView {
      *
      * @param entity The entity.
      */
-    public AbstractView(Entity entity) {
+    protected AbstractView(Entity entity) {
         setEntity(entity);
     }
 

@@ -29,7 +29,7 @@ public abstract class Filter<T> implements Disposable {
     protected FrameBuffer outputBuffer = null;
     protected ShaderProgram program;
     private boolean programBegan = false;
-    public Filter(ShaderProgram program) {
+    protected Filter(ShaderProgram program) {
         this.program = program;
     }
 

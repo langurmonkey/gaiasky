@@ -12,7 +12,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 
 public abstract class AbstractUpdateSystem extends IteratingSystem implements EntityUpdater {
 
-    public AbstractUpdateSystem(Family family, int priority) {
+    protected AbstractUpdateSystem(Family family, int priority) {
         super(family, priority);
     }
 

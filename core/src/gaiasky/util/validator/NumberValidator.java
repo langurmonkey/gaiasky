@@ -5,7 +5,7 @@ public abstract class NumberValidator<T extends Number> extends CallbackValidato
     protected final T min;
     protected final T max;
 
-    public NumberValidator(IValidator parent,
+    protected NumberValidator(IValidator parent,
                            T min,
                            T max) {
         super(parent);

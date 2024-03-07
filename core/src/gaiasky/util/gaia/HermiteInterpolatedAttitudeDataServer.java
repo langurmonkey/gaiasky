@@ -26,7 +26,7 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
      * @param tStart  start time of the valid attitude interval
      * @param tLength length of the valid attitude interval
      */
-    public HermiteInterpolatedAttitudeDataServer(long tStart, Duration tLength) {
+    protected HermiteInterpolatedAttitudeDataServer(long tStart, Duration tLength) {
         long tEnd = tStart + tLength.asNanoSecs();
         gtis = new GtiList();
         try {

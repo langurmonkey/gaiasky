@@ -95,7 +95,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         }
     }
 
-    public InstancedRenderSystem(SceneRenderer sceneRenderer,
+    protected InstancedRenderSystem(SceneRenderer sceneRenderer,
                                  RenderGroup rg,
                                  float[] alphas,
                                  ExtShaderProgram[] shaders) {

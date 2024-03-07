@@ -21,7 +21,7 @@ public abstract class GuiComponent {
 
     protected float pad30, pad20, pad12, pad9, pad8, pad6, pad4, pad3, pad1;
 
-    public GuiComponent(Skin skin, Stage stage) {
+    protected GuiComponent(Skin skin, Stage stage) {
         this.skin = skin;
         this.stage = stage;
         pad8 = 8f;

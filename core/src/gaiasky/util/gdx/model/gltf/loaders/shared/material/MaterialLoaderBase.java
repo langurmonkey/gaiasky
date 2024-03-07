@@ -16,7 +16,7 @@ abstract public class MaterialLoaderBase implements MaterialLoader {
 	private final Array<Material> materials = new Array<>();
 	private final Material defaultMaterial;
 	
-	public MaterialLoaderBase(TextureResolver textureResolver, Material defaultMaterial) {
+	protected MaterialLoaderBase(TextureResolver textureResolver, Material defaultMaterial) {
 		super();
 		this.textureResolver = textureResolver;
 		this.defaultMaterial = defaultMaterial;

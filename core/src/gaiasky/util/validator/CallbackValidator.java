@@ -12,11 +12,11 @@ public abstract class CallbackValidator implements IValidator {
     private Runnable isValidCallback, isInvalidCallback;
     private IValidator parent;
 
-    public CallbackValidator() {
+    protected CallbackValidator() {
         super();
     }
 
-    public CallbackValidator(IValidator parent) {
+    protected CallbackValidator(IValidator parent) {
         super();
         this.parent = parent;
     }

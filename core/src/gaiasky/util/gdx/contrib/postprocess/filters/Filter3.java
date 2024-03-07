@@ -31,7 +31,7 @@ public abstract class Filter3<T> implements Disposable {
     protected FrameBuffer outputBuffer = null;
     protected ShaderProgram program;
     private boolean programBegan = false;
-    public Filter3(ShaderProgram program) {
+    protected Filter3(ShaderProgram program) {
         this.program = program;
     }
 

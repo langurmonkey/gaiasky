@@ -13,7 +13,7 @@ import gaiasky.event.IObserver;
 public abstract class EntityRadio implements IObserver {
     protected Entity entity;
 
-    public EntityRadio(Entity entity) {
+    protected EntityRadio(Entity entity) {
         this.entity = entity;
     }
 

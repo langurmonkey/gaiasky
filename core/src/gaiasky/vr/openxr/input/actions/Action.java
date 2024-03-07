@@ -30,7 +30,7 @@ public abstract class Action implements AutoCloseable {
     // The controller device attached to this pose.
     protected final XrControllerDevice controllerDevice;
 
-    public Action(String name, String localizedName, int type, XrControllerDevice device) {
+    protected Action(String name, String localizedName, int type, XrControllerDevice device) {
         this.name = name;
         this.localizedName = localizedName;
         this.xrActionType = type;

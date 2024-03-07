@@ -23,7 +23,7 @@ import java.util.List;
 
 public abstract class PointCloudRenderer extends ImmediateModeRenderSystem implements IObserver {
 
-    public PointCloudRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    protected PointCloudRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
     }
 

@@ -19,7 +19,7 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
 
     protected boolean highAccuracy;
 
-    public AbstractVSOP87() {
+    protected AbstractVSOP87() {
         super();
     }
 

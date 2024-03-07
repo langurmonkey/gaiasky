@@ -46,11 +46,11 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     protected IGamepadMappings mappings;
     protected long lastAxisEvtTime = 0, lastButtonPollTime = 0;
 
-    public AbstractGamepadListener(String mappingsFile) {
+    protected AbstractGamepadListener(String mappingsFile) {
         this(AbstractGamepadMappings.readGamepadMappings(mappingsFile));
     }
 
-    public AbstractGamepadListener(IGamepadMappings mappings) {
+    protected AbstractGamepadListener(IGamepadMappings mappings) {
         this.mappings = mappings;
         this.em = EventManager.instance;
         em.subscribe(this, Event.RELOAD_CONTROLLER_MAPPINGS);

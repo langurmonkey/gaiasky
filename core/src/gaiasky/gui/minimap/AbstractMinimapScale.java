@@ -47,7 +47,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
 
     protected ICamera cam;
 
-    public AbstractMinimapScale() {
+    protected AbstractMinimapScale() {
         aux3d1 = new Vector3d();
         aux3d2 = new Vector3d();
         aux3b1 = new Vector3b();

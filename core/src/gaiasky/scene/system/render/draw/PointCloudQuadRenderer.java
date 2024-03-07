@@ -21,7 +21,7 @@ public abstract class PointCloudQuadRenderer extends PointCloudRenderSystem impl
     // UV coordinates per vertex index (0,1,2,4)
     protected Pair<Float, Float>[] vertUV;
 
-    public PointCloudQuadRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    protected PointCloudQuadRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
 
         vertPos = new Pair[4];

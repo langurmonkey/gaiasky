@@ -93,7 +93,7 @@ public abstract class AbstractCamera implements ICamera {
     /** The last input event was by a gamepad. **/
     protected boolean gamepadInput;
 
-    public AbstractCamera(CameraManager parent) {
+    protected AbstractCamera(CameraManager parent) {
         initNearFar();
 
         this.parent = parent;

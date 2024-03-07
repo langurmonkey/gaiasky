@@ -29,7 +29,7 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
     protected final Array<ObjectMap.Entry<String, IntModelData>> items = new Array<>();
     protected IntModelParameters defaultParameters = new IntModelParameters();
 
-    public IntModelLoader(FileHandleResolver resolver) {
+    protected IntModelLoader(FileHandleResolver resolver) {
         super(resolver);
     }
 

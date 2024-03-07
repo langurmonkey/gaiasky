@@ -30,7 +30,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected Entity entity;
     protected double scaling = 1d;
 
-    public AbstractOrbitCoordinates() {
+    protected AbstractOrbitCoordinates() {
         super();
         instances.add(this);
     }

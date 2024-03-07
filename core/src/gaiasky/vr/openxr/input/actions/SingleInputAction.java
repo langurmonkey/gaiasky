@@ -21,7 +21,7 @@ public abstract class SingleInputAction<T> extends Action implements InputAction
     public long lastChangeTime;
     public boolean isActive;
 
-    public SingleInputAction(String name, String localizedName, int type, XrControllerDevice device) {
+    protected SingleInputAction(String name, String localizedName, int type, XrControllerDevice device) {
         super(name, localizedName, type, device);
     }
 

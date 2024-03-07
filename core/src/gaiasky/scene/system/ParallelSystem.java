@@ -29,7 +29,7 @@ public abstract class ParallelSystem extends EntitySystem {
      *
      * @param family The family of entities iterated over in this System
      */
-    public ParallelSystem(Family family) {
+    protected ParallelSystem(Family family) {
         this(family, 0);
     }
 
@@ -39,7 +39,7 @@ public abstract class ParallelSystem extends EntitySystem {
      * @param family   The family of entities iterated over in this System
      * @param priority The priority to execute this system with (lower means higher priority)
      */
-    public ParallelSystem(Family family, int priority) {
+    protected ParallelSystem(Family family, int priority) {
         super(priority);
         this.family = family;
 
