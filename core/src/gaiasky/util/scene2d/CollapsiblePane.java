@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.component.Title;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 
@@ -46,11 +47,12 @@ public class CollapsiblePane extends Table {
      * Creates a collapsible pane.
      *
      * @param stage             The main stage.
-     * @param labelText         The text of the label.
+     * @param icon              The image icon to add left of the title. May be null.
+     * @param title             The text of the title label.
      * @param content           The content actor.
      * @param width             The preferred width of this pane.
      * @param skin              The skin to use.
-     * @param labelStyle        The style of the label.
+     * @param titleStyle        The style of the label.
      * @param expandButtonStyle The style of the expand icon.
      * @param detachButtonStyle The style of the detach icon.
      * @param expanded          Whether the pane is expanded or collapsed to begin with.
@@ -58,19 +60,40 @@ public class CollapsiblePane extends Table {
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
-        this(stage, labelText, content, width, skin, labelStyle, expandButtonStyle, detachButtonStyle, expanded, null, shortcut, topIcons);
+    public CollapsiblePane(final Stage stage, final Image icon, final String title, final Actor content, float width, final Skin skin, String titleStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
+        this(stage, icon, title, content, width, skin, titleStyle, expandButtonStyle, detachButtonStyle, expanded, null, shortcut, topIcons);
+    }
+
+    /**
+     * Creates a collapsible pane.
+     *
+     * @param stage             The main stage.
+     * @param title             The text of the title label.
+     * @param content           The content actor.
+     * @param width             The preferred width of this pane.
+     * @param skin              The skin to use.
+     * @param titleStyle        The style of the label.
+     * @param expandButtonStyle The style of the expand icon.
+     * @param detachButtonStyle The style of the detach icon.
+     * @param expanded          Whether the pane is expanded or collapsed to begin with.
+     * @param shortcut          The shortcut to expand/collapse. Shown in a tooltip.
+     * @param topIcons          List of top icons that will be added between the label and the
+     *                          expand/detach icons.
+     */
+    public CollapsiblePane(final Stage stage, final String title, final Actor content, float width, final Skin skin, String titleStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
+        this(stage, null, title, content, width, skin, titleStyle, expandButtonStyle, detachButtonStyle, expanded, null, shortcut, topIcons);
     }
 
     /**
      * Creates a collapsible pane.
      *
      * @param stage                  The main stage.
-     * @param labelText              The text of the label.
+     * @param icon                   The image icon to add left of the title. May be null.
+     * @param title                  The text of the title label.
      * @param content                The content actor.
      * @param width                  The preferred width of this pane.
      * @param skin                   The skin to use.
-     * @param labelStyle             The style of the label.
+     * @param titleStyle             The style of the label.
      * @param expandButtonStyle      The style of the expand icon.
      * @param detachButtonStyle      The style of the detach icon.
      * @param expanded               Whether the pane is expanded or collapsed to begin with.
@@ -80,11 +103,12 @@ public class CollapsiblePane extends Table {
      *                               expand/detach icons.
      */
     public CollapsiblePane(final Stage stage,
-                           final String labelText,
+                           final Image icon,
+                           final String title,
                            final Actor content,
                            float width,
                            final Skin skin,
-                           String labelStyle,
+                           String titleStyle,
                            String expandButtonStyle,
                            String detachButtonStyle,
                            boolean expanded,
@@ -93,38 +117,39 @@ public class CollapsiblePane extends Table {
                            Actor... topIcons) {
         super(skin);
         this.stage = stage;
-        this.labelText = labelText;
+        this.labelText = title;
         this.content = content;
         this.skin = skin;
         this.space = 6.4f;
         this.collapseSpeed = 100;
         this.expandCollapseRunnable = expandCollapseRunnable;
 
-        OwnLabel mainLabel = new OwnLabel(labelText, skin, labelStyle);
-        float lw = mainLabel.getWidth();
-        LabelStyle ls = skin.get(labelStyle, LabelStyle.class);
+        OwnLabel titleLabel = new OwnLabel(title, skin, titleStyle);
+        float lw = titleLabel.getWidth();
+        LabelStyle ls = skin.get(titleStyle, LabelStyle.class);
 
         float mWidth = width * 0.8f;
         if (lw > mWidth) {
             com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout();
-            for (int chars = labelText.length() - 1; chars > 0; chars--) {
-                layout.setText(ls.font, TextUtils.capString(labelText, chars));
+            for (int chars = title.length() - 1; chars > 0; chars--) {
+                layout.setText(ls.font, TextUtils.capString(title, chars));
                 if (layout.width <= mWidth) {
-                    mainLabel.setText(TextUtils.capString(labelText, chars));
+                    titleLabel.setText(TextUtils.capString(title, chars));
+                    titleLabel.addListener(new OwnTextTooltip(title, skin));
                     break;
                 }
             }
         }
-        mainLabel.addListener(new ClickListener() {
+        titleLabel.addListener(new ClickListener() {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if (event.getButton() == Buttons.LEFT)
-                    toggleExpandCollapse(mainLabel);
+                    toggleExpandCollapse(titleLabel);
 
                 // Bubble up
                 super.touchUp(event, x, y, pointer, button);
             }
         });
-        mainLabel.addListener(event -> {
+        titleLabel.addListener(event -> {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();
                 if (type == Type.enter) {
@@ -171,16 +196,19 @@ public class CollapsiblePane extends Table {
         // Question icon
         OwnLabel questionLabel = new OwnLabel("(?)", skin, "question");
         if (shortcut != null && !shortcut.isEmpty())
-            questionLabel.addListener(new OwnTextHotkeyTooltip(labelText, shortcut, skin));
+            questionLabel.addListener(new OwnTextHotkeyTooltip(title, shortcut, skin));
 
         Table headerTable = new Table(skin);
 
-        HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(6.4f);
-        titleGroup.addActor(expandIcon);
-        titleGroup.addActor(mainLabel);
+        Table titleGroup = new Table(skin);
+        titleGroup.add(expandIcon).padRight(10f);
+        if (icon != null) {
+            icon.setColor(skin.getColor("theme"));
+            titleGroup.add(icon).padRight(6.4f);
+        }
+        titleGroup.add(titleLabel).padRight(6.4f);
         if (shortcut != null && !shortcut.isEmpty())
-            titleGroup.addActor(questionLabel);
+            titleGroup.add(questionLabel);
 
         HorizontalGroup headerGroupLeft = new HorizontalGroup();
         headerGroupLeft.space(space).align(Align.left);

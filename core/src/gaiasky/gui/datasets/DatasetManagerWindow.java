@@ -488,7 +488,9 @@ public class DatasetManagerWindow extends GenericDialog {
                 buttons.add(selectNone).size(buttonSize, buttonSize).right().bottom();
             }
 
-            CollapsiblePane groupPane = new CollapsiblePane(stage, I18n.msg("gui.download.type." + type.typeStr),
+            var paneImage = new OwnImage(skin.getDrawable(getIcon(type.typeStr)));
+            paneImage.setSize(45f, 45f);
+            CollapsiblePane groupPane = new CollapsiblePane(stage, paneImage, I18n.msg("gui.download.type." + type.typeStr),
                     contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
                     null, filter != null && !filter.isBlank(), null, buttons);
             leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
@@ -1137,7 +1139,7 @@ public class DatasetManagerWindow extends GenericDialog {
         boolean error = false;
         Exception errorException = null;
         Array<File> processedFiles = new Array<>();
-        while ((entry = tarIs.getNextTarEntry()) != null) {
+        while (null != (entry = tarIs.getNextTarEntry())) {
             if (entry.isDirectory()) {
                 continue;
             }
