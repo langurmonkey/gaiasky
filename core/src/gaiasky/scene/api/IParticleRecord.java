@@ -7,9 +7,8 @@
 
 package gaiasky.scene.api;
 
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
-import gaiasky.util.ObjectDoubleMap;
-import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
@@ -163,7 +162,7 @@ public interface IParticleRecord {
      */
     double b();
 
-    void setExtraAttributes(ObjectDoubleMap<UCD> extra);
+    void setExtraAttributes(ObjectMap<UCD, Object> extra);
 
     boolean hasExtra();
 
@@ -171,11 +170,35 @@ public interface IParticleRecord {
 
     boolean hasExtra(UCD ucd);
 
-    double getExtra(String name);
+    /**
+     * Gets the extra data filed with the given name.
+     * @param name The name of the data filed to get.
+     * @return The data field, or null if it does not exist.
+     */
+    Object getExtra(String name);
 
-    double getExtra(UCD ucd);
+    /**
+     * Gets the extra data filed with the given UCD.
+     * @param ucd The UCD of the data filed to get.
+     * @return The data field, or null if it does not exist.
+     */
+    Object getExtra(UCD ucd);
 
-    Keys<UCD> extraKeys();
+    /**
+     * Gets the extra data filed with the given name, as a double number.
+     * @param name The name of the data filed to get.
+     * @return The data field as a double, or NaN if it does not exist or is not a number.
+     */
+    double getExtraNumber(String name);
+
+    /**
+     * Gets the extra data filed with the given UCD, as a double number.
+     * @param ucd The UCD of the data filed to get.
+     * @return The data field as a double, or NaN if it does not exist or is not a number.
+     */
+    double getExtraNumber(UCD ucd);
+
+    ObjectMap.Keys<UCD> extraKeys();
 
     /**
      * Returns the particle record type.

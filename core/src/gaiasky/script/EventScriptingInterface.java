@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.SceneJsonLoader;
@@ -400,6 +401,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
 
     }
+
     public void setCameraPosition(List<Double> position,
                                   String units,
                                   boolean immediate) {
@@ -1635,14 +1637,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             /* target angle */
             double target = Math.toRadians(solidAngle);
-            if (target < 0)
-                target = Math.toRadians(20d);
+            if (target < 0) {
+                // Particles have different sizes to the rest.
+                if (focusView.isParticleSet()) {
+                    var rx0 = 1.31; // pc
+                    var rx1 = 2805.0; // pc
+                    var y0 = 1.0;
+                    var y1 = 0.001;
+                    target =  Math.toRadians(y0 + (y1 - y0) * (focusView.getAbsolutePosition(aux3b1).lenDouble() * Constants.U_TO_PC - rx0) / (rx1 - rx0));
+
+                } else {
+                    target = Math.toRadians(20.0);
+                }
+            }
 
             long prevTime = TimeUtils.millis();
             if (focusView.getSolidAngle() < target) {
-                // Add forward movement while distance > target distance
+                // Add forward movement while distance > target distance.
                 while (focusView.getSolidAngle() < target && (stop == null || !stop.get())) {
-                    // dt in ms
+                    // dt in ms.
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
 
@@ -4127,8 +4140,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private List<IParticleRecord> loadParticleBeans(DataSource ds,
-                                                    DatasetOptions datasetOptions) {
-        STILDataProvider provider = new STILDataProvider();
+                                                    DatasetOptions datasetOptions,
+                                                    STILDataProvider provider) {
         provider.setDatasetOptions(datasetOptions);
         String catalogName = datasetOptions != null && datasetOptions.catalogName != null ? datasetOptions.catalogName : ds.getName();
         return provider.loadData(ds, 1.0f, () -> {
@@ -4250,14 +4263,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     // Only local files allowed for JSON.
                     loadJsonDataset(dsName, path.toString(), sync);
                 } else if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
-                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
+                    var provider = new STILDataProvider();
+                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions, provider);
                     if (data != null && !data.isEmpty()) {
                         // STAR GROUP
                         AtomicReference<Entity> starGroup = new AtomicReference<>();
                         postRunnable(() -> {
                             if (datasetOptions != null)
                                 datasetOptions.initializeCatalogInfo = false;
-                            starGroup.set(EntityUtils.getStarSet(scene, dsName, ds.getName(), data, datasetOptions, false));
+                            starGroup.set(EntityUtils.getStarSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions, false));
 
                             // Catalog info.
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
@@ -4279,12 +4293,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (datasetOptions.type == DatasetLoadType.PARTICLES) {
                     // PARTICLE GROUP
-                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
+                    var provider = new STILDataProvider();
+                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions, provider);
                     if (data != null && !data.isEmpty()) {
                         AtomicReference<Entity> particleGroup = new AtomicReference<>();
                         postRunnable(() -> {
                             datasetOptions.initializeCatalogInfo = false;
-                            particleGroup.set(EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, datasetOptions, false));
+                            particleGroup.set(EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions, false));
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
@@ -4304,12 +4319,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (datasetOptions.type == DatasetLoadType.PARTICLES_EXT) {
                     // PARTICLE GROUP EXTENDED
-                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
+                    var provider = new STILDataProvider();
+                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions, provider);
                     if (data != null && !data.isEmpty()) {
                         AtomicReference<Entity> particleGroup = new AtomicReference<>();
                         postRunnable(() -> {
                             datasetOptions.initializeCatalogInfo = false;
-                            particleGroup.set(EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, datasetOptions, false));
+                            particleGroup.set(EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions, false));
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
@@ -4566,7 +4582,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     synchronized (focusView) {
                         focusView.setEntity(entity);
                         if (focusView.isSet()) {
-                            ObjectDoubleMap.Keys<UCD> ucds = focusView.getSet().data().get(0).extraKeys();
+                            ObjectMap.Keys<UCD> ucds = focusView.getSet().data().get(0).extraKeys();
                             for (UCD ucd : ucds)
                                 if (ucd.colName.equalsIgnoreCase(name))
                                     return new AttributeUCD(ucd);

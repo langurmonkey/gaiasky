@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.gui.GenericDialog;
 import gaiasky.gui.beans.AttributeComboBoxBean;
@@ -19,7 +20,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Logger;
-import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.TextUtils;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.FilterRule;
@@ -110,7 +110,7 @@ public class DatasetFiltersWindow extends GenericDialog {
             scrollPane.setScrollbarsVisible(true);
             scrollPane.setFadeScrollBars(false);
             scrollPane.setScrollingDisabled(true, false);
-            scrollPane.setWidth(880f);
+            scrollPane.setWidth(1180f);
             scrollPane.setHeight(500f);
             content.add(scrollPane).left().colspan(2).row();
 
@@ -148,11 +148,11 @@ public class DatasetFiltersWindow extends GenericDialog {
             for (FilterRule rule : rules) {
                 // UNIT
                 var unitStr = rule.getAttribute().getUnit();
-                var unitStrCapped = TextUtils.capString(unitStr, 12);
+                var unitStrCapped = unitStr != null ? TextUtils.capString(unitStr, 12) : "";
 
                 OwnLabel unit = new OwnLabel(unitStrCapped, skin);
-                unit.setWidth(120f);
-                if (unitStr.length() > unitStrCapped.length()) {
+                unit.setWidth(130f);
+                if (unitStr != null && unitStr.length() > unitStrCapped.length()) {
                     unit.addListener(new OwnTextTooltip(unitStr, skin));
                 }
 
@@ -185,7 +185,7 @@ public class DatasetFiltersWindow extends GenericDialog {
                     if (!set.data().isEmpty()) {
                         IParticleRecord first = set.data().get(0);
                         if (first.hasExtra()) {
-                            ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
+                            ObjectMap.Keys<UCD> ucds = first.extraKeys();
                             for (UCD ucd : ucds)
                                 attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                         }
@@ -193,10 +193,11 @@ public class DatasetFiltersWindow extends GenericDialog {
                 }
 
                 // Value text field and validator
-                FloatValidator defaultValidator = new FloatValidator(-Float.MAX_VALUE, Float.MAX_VALUE);
+                FloatValidator numberValidator = new FloatValidator(-Float.MAX_VALUE, Float.MAX_VALUE);
                 FloatValidator colorValidator = new FloatValidator(0, 1);
                 boolean useColorVal = rule.getAttribute() instanceof AttributeColorRed || rule.getAttribute() instanceof AttributeColorBlue || rule.getAttribute() instanceof AttributeColorGreen;
-                OwnTextField value = new OwnTextField(Double.toString(rule.getValue()), skin, useColorVal ? colorValidator : defaultValidator);
+                boolean isNumberAttribute = rule.getAttribute().isNumberAttribute();
+                OwnTextField value = new OwnTextField(rule.getValue().toString(), skin, useColorVal ? colorValidator : (isNumberAttribute ? numberValidator : null));
 
                 OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
                 attribute.setItems(attrs);
@@ -206,10 +207,15 @@ public class DatasetFiltersWindow extends GenericDialog {
                         IAttribute newAttr = attribute.getSelected().attr;
                         rule.setAttribute(newAttr);
                         // Update validator for colors
+                        boolean isNum = rule.getAttribute().isNumberAttribute();
                         if (newAttr instanceof AttributeColorRed || newAttr instanceof AttributeColorBlue || newAttr instanceof AttributeColorGreen) {
                             value.setValidator(colorValidator);
                         } else {
-                            value.setValidator(defaultValidator);
+                            if(isNum) {
+                                value.setValidator(numberValidator);
+                            } else {
+                                value.setValidator(null);
+                            }
                         }
                         // Update unit
                         unit.setText(newAttr.getUnit());
@@ -238,7 +244,7 @@ public class DatasetFiltersWindow extends GenericDialog {
                 rulesTable.add(comparator).left().padRight(pad18).padBottom(pad10);
 
                 // VALUE
-                value.setWidth(180f);
+                value.setWidth(280f);
                 value.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         if (value.isValid()) {
@@ -247,8 +253,9 @@ public class DatasetFiltersWindow extends GenericDialog {
                                 filterEdited = true;
                                 return true;
                             } catch (Exception e) {
-                                logger.error(e);
-                                return false;
+                                rule.setValue(value.getText());
+                                filterEdited = true;
+                                return true;
                             }
                         }
                         return false;

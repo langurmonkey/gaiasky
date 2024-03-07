@@ -18,8 +18,20 @@ public class AttributeUCD implements IAttribute {
     }
 
     @Override
-    public double get(IParticleRecord bean) {
+    public Object get(IParticleRecord bean) {
         return bean.getExtra(ucd);
+    }
+
+    @Override
+    public double getNumber(IParticleRecord bean) {
+        var val = bean.getExtra(ucd);
+        if (val instanceof Number n) {
+            return n.doubleValue();
+        } else if (val instanceof String s) {
+            return s.hashCode();
+        } else {
+            return Double.NaN;
+        }
     }
 
     @Override
@@ -39,5 +51,10 @@ public class AttributeUCD implements IAttribute {
 
     public String toString() {
         return ucd.colName;
+    }
+
+    @Override
+    public boolean isNumberAttribute() {
+        return false;
     }
 }

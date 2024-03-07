@@ -159,7 +159,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                                 // COLOR
                                 if (hlCmap) {
                                     // Color map
-                                    double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                                    double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().getNumber(particle), hl.getHlcmmin(), hl.getHlcmmax());
                                     tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
                                 } else {
                                     // Plain

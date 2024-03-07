@@ -146,7 +146,7 @@ public class HiddenHelperUser implements IObserver {
 
         @Override
         public void run() {
-            ((EventScriptingInterface) GaiaSky.instance.scripting()).goToObject(body, 20, 1, stop);
+            ((EventScriptingInterface) GaiaSky.instance.scripting()).goToObject(body, -1, 1, stop);
             currentTasks.removeValue(this, true);
         }
 

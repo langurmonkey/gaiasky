@@ -10,6 +10,7 @@ package gaiasky.data.group;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleRecord;
@@ -35,10 +36,7 @@ import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
-import uk.ac.starlink.table.RowSequence;
-import uk.ac.starlink.table.StarTable;
-import uk.ac.starlink.table.StarTableFactory;
-import uk.ac.starlink.table.TableBuilder;
+import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
@@ -61,16 +59,18 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         logger = Logger.getLogger(STILDataProvider.class);
     }
 
-    // These names are not allowed
+    /** These names are not allowed **/
     private static final String[] forbiddenNameValues = {"-", "...", "nop", "nan", "?", "_", "x", "n/a"};
-    // Store already visited colName:attribute pairs.
+    /** Store already visited colName:attribute pairs. **/
     private final Map<String, Integer> stringAttributesMap;
-    // Store the last index for a given attribute.
+    /** Store the last index for a given attribute. **/
     private final Map<String, Integer> lastIndexMap;
     private StarTableFactory factory;
     private long objectId = 1;
-    // Dataset options, may be null
+    /** Dataset options, may be null. **/
     private DatasetOptions datasetOptions;
+    /** The list of {@link ColumnInfo} objects of the last table loaded by this provider. **/
+    private List<ColumnInfo> columnInfoList;
 
     public STILDataProvider() {
         super();
@@ -117,7 +117,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects.
-     *
      * @return Pair of <UCD,Double>.
      */
     private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs,
@@ -150,7 +149,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
-     *
      * @return Pair of <UCD,double[]>
      */
     private Pair<UCD, double[]> getDoubleArrayUcd(Array<UCD> UCDs,
@@ -177,7 +175,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The set of UCD objects
      * @param row  The row
-     *
      * @return A pair with the UCD and the string
      */
     private Pair<UCD, String> getStringUcd(Array<UCD> UCDs,
@@ -224,10 +221,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @param ds             The data source.
      * @param factor         Length factor.
      * @param preCallback    A function that runs before.
-     * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the current number of loaded objects and the
+     * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the
+     *                       current number of loaded objects and the
      *                       second holds the total number of objects to load.
      * @param postCallback   A function that runs after the data has been loaded.
-     *
      * @return The list of particle records.
      */
     public List<IParticleRecord> loadData(DataSource ds,
@@ -253,6 +250,16 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                 UCDParser ucdParser = new UCDParser();
                 ucdParser.parse(table);
+
+                final int numColumns = table.getColumnCount();
+                if (columnInfoList == null) {
+                    columnInfoList = new ArrayList<>(numColumns);
+                } else {
+                    columnInfoList.clear();
+                }
+                for (int i = 0; i < numColumns; i++) {
+                    columnInfoList.add(table.getColumnInfo(i));
+                }
 
                 // Automatically switch to extended particles if proper motions, colors or sizes are found in the data file.
                 if (datasetOptions != null) {
@@ -394,7 +401,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     }
                                 }
                             } else {
-                                if (!isStars){
+                                if (!isStars) {
                                     // We have particles without a size. We just clamp what we have.
                                     sizePc = MathUtilsDouble.clamp(sizePc, 1e-8, 3.0);
                                 }
@@ -611,7 +618,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 pr.setSize((float) sizePc);
                                 pr.setHip(hip);
                                 // Extra
-                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
+                                ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
                                 if (ucdParser.TEFF.isEmpty()) {
                                     UCD tEffUCD = new UCD("phys.temperature.effective", "teff", "K", -1);
                                     extraAttributes = initExtraAttributes(extraAttributes);
@@ -634,7 +641,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 pr.setNames(names);
                                 pr.setPos(p.realPosition.x, p.realPosition.y, p.realPosition.z);
                                 // Extra
-                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
+                                ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
                                 pr.setExtraAttributes(extraAttributes);
 
                                 list.add(pr);
@@ -651,7 +658,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 pr.setCol(colorPacked);
                                 pr.setSize((float) (sizePc * Constants.PC_TO_U));
                                 // Extra
-                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
+                                ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
                                 pr.setExtraAttributes(extraAttributes);
 
                                 list.add(pr);
@@ -709,30 +716,20 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    private ObjectDoubleMap<UCD> initExtraAttributes(ObjectDoubleMap<UCD> extra) {
+    private ObjectMap<UCD, Object> initExtraAttributes(ObjectMap<UCD, Object> extra) {
         if (extra == null)
-            extra = new ObjectDoubleMap<>(5);
+            extra = new ObjectMap<>(5);
         return extra;
     }
 
-    private ObjectDoubleMap<UCD> addExtraAttributes(UCDParser ucdp,
-                                                    Object[] row) {
+    private ObjectMap<UCD, Object> addExtraAttributes(UCDParser ucdParser,
+                                                      Object[] row) {
         // Extra
-        ObjectDoubleMap<UCD> extraAttributes = null;
-        for (UCD extra : ucdp.extra) {
-            double val = Double.NaN;
-            try {
-                val = ((Number) row[extra.index]).doubleValue();
-            } catch (Exception e) {
-                Object o = row[extra.index];
-                if (o instanceof Character c) {
-                    val = getStringAttributeValue(extra, c.toString());
-                } else if (o instanceof String) {
-                    val = getStringAttributeValue(extra, o);
-                }
-            }
+        ObjectMap<UCD, Object> extraAttributes = null;
+        for (UCD extra : ucdParser.extra) {
+            Object val = row[extra.index];
             if (extraAttributes == null)
-                extraAttributes = new ObjectDoubleMap<>((int) (ucdp.extra.size * 1.25f), 0.8f);
+                extraAttributes = new ObjectMap<>((int) (ucdParser.extra.size * 1.25f), 0.8f);
             extraAttributes.put(extra, val);
         }
         return extraAttributes;
@@ -774,6 +771,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             }
         }
         return false;
+    }
+
+    public List<ColumnInfo> getColumnInfoList() {
+        return columnInfoList;
     }
 
     @Override

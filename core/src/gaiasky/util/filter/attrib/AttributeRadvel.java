@@ -12,7 +12,12 @@ import gaiasky.util.i18n.I18n;
 
 public class AttributeRadvel extends AttributeAbstract implements IAttribute {
     @Override
-    public double get(IParticleRecord bean) {
+    public Object get(IParticleRecord bean) {
+        return bean.radvel();
+    }
+
+    @Override
+    public double getNumber(IParticleRecord bean) {
         return bean.radvel();
     }
 
@@ -22,5 +27,10 @@ public class AttributeRadvel extends AttributeAbstract implements IAttribute {
 
     public String toString() {
         return I18n.msg("gui.attrib.radvel");
+    }
+
+    @Override
+    public boolean isNumberAttribute() {
+        return true;
     }
 }

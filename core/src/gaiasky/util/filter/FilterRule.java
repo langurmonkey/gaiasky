@@ -9,21 +9,26 @@ package gaiasky.util.filter;
 
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.filter.attrib.IAttribute;
+import gaiasky.util.parse.Parser;
+
+import java.util.Comparator;
 
 public class FilterRule {
-    // Value in the same units as the one internal units
-    private double value;
+    private static final Comparator<String> stringComparator = String::compareTo;
+
+    private Object value;
     private IComparator comparator;
     private IAttribute attribute;
+
 
     /**
      * Creates a new filter with the given attribute, value and comparator function
      *
      * @param comp The comparator function: '&gt;', '&ge;', '&lt;', '&le;', '==', '!='
-     * @param attr The attribute to compare
-     * @param val  The value to compare to
+     * @param attr The attribute to compare.
+     * @param val  The value to compare to.
      */
-    public FilterRule(String comp, IAttribute attr, double val) {
+    public FilterRule(String comp, IAttribute attr, Object val) {
         this.attribute = attr;
         this.value = val;
 
@@ -38,11 +43,18 @@ public class FilterRule {
         return new FilterRule(comparator.toString(), attribute, value);
     }
 
-    public double getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public double getDoubleValue() {
+        if (value instanceof Number n) {
+            return n.doubleValue();
+        }
+        return Double.NaN;
+    }
+
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -76,7 +88,7 @@ public class FilterRule {
     // COMPARATORS
     public interface IComparator {
 
-        boolean evaluate(double val1, double val2);
+        boolean evaluate(Object val1, Object val2);
 
         String toString();
 
@@ -84,8 +96,19 @@ public class FilterRule {
 
     public static class ComparatorGeq implements IComparator {
         @Override
-        public boolean evaluate(double val1, double val2) {
-            return val1 >= val2;
+        public boolean evaluate(Object val1, Object val2) {
+            if (val1 instanceof Number n1 && val2 instanceof Number n2)
+                return n1.doubleValue() >= n2.doubleValue();
+            else if (val1 instanceof String s1 && val2 instanceof String s2) {
+                return stringComparator.compare(s1, s2) >= 0;
+            } else if (val1 instanceof String s && val2 instanceof Number n) {
+                try {
+                    return Parser.parseDoubleException(s) >= n.doubleValue();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -96,8 +119,19 @@ public class FilterRule {
 
     public static class ComparatorG implements IComparator {
         @Override
-        public boolean evaluate(double val1, double val2) {
-            return val1 > val2;
+        public boolean evaluate(Object val1, Object val2) {
+            if (val1 instanceof Number n1 && val2 instanceof Number n2)
+                return n1.doubleValue() > n2.doubleValue();
+            else if (val1 instanceof String s1 && val2 instanceof String s2) {
+                return stringComparator.compare(s1, s2) >= 0;
+            } else if (val1 instanceof String s && val2 instanceof Number n) {
+                try {
+                    return Parser.parseDoubleException(s) > n.doubleValue();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -108,8 +142,19 @@ public class FilterRule {
 
     public static class ComparatorLeq implements IComparator {
         @Override
-        public boolean evaluate(double val1, double val2) {
-            return val1 <= val2;
+        public boolean evaluate(Object val1, Object val2) {
+            if (val1 instanceof Number n1 && val2 instanceof Number n2)
+                return n1.doubleValue() <= n2.doubleValue();
+            else if (val1 instanceof String s1 && val2 instanceof String s2) {
+                return stringComparator.compare(s1, s2) <= 0;
+            } else if (val1 instanceof String s && val2 instanceof Number n) {
+                try {
+                    return Parser.parseDoubleException(s) <= n.doubleValue();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -120,8 +165,19 @@ public class FilterRule {
 
     public static class ComparatorL implements IComparator {
         @Override
-        public boolean evaluate(double val1, double val2) {
-            return val1 < val2;
+        public boolean evaluate(Object val1, Object val2) {
+            if (val1 instanceof Number n1 && val2 instanceof Number n2)
+                return n1.doubleValue() < n2.doubleValue();
+            else if (val1 instanceof String s1 && val2 instanceof String s2) {
+                return stringComparator.compare(s1, s2) < 0;
+            } else if (val1 instanceof String s && val2 instanceof Number n) {
+                try {
+                    return Parser.parseDoubleException(s) < n.doubleValue();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -132,8 +188,19 @@ public class FilterRule {
 
     public static class ComparatorEq implements IComparator {
         @Override
-        public boolean evaluate(double val1, double val2) {
-            return val1 == val2;
+        public boolean evaluate(Object val1, Object val2) {
+            if (val1 instanceof Number n1 && val2 instanceof Number n2)
+                return n1.doubleValue() == n2.doubleValue();
+            else if (val1 instanceof String s1 && val2 instanceof String s2) {
+                return s1.equalsIgnoreCase(s2);
+            } else if (val1 instanceof String s && val2 instanceof Number n) {
+                try {
+                    return Parser.parseDoubleException(s) == n.doubleValue();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -144,8 +211,19 @@ public class FilterRule {
 
     public static class ComparatorNeq implements IComparator {
         @Override
-        public boolean evaluate(double val1, double val2) {
-            return val1 != val2;
+        public boolean evaluate(Object val1, Object val2) {
+            if (val1 instanceof Number n1 && val2 instanceof Number n2)
+                return n1.doubleValue() != n2.doubleValue();
+            else if (val1 instanceof String s1 && val2 instanceof String s2) {
+                return !s1.equalsIgnoreCase(s2);
+            } else if (val1 instanceof String s && val2 instanceof Number n) {
+                try {
+                    return Parser.parseDoubleException(s) != n.doubleValue();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         }
 
         @Override

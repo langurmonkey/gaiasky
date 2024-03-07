@@ -20,6 +20,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.component.Title;
+import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.*;
@@ -45,7 +46,10 @@ public class LabelEntityRenderSystem {
     private final Vector3 F32 = new Vector3();
     private final Vector3b B31 = new Vector3b();
 
+    private final ParticleUtils particleUtils;
+
     public LabelEntityRenderSystem() {
+        particleUtils = new ParticleUtils();
     }
 
     public void renderLocation(LabelView view,
@@ -59,6 +63,7 @@ public class LabelEntityRenderSystem {
 
         // Parent scaffolding.
         var scaffolding = Mapper.modelScaffolding.get(graph.parent);
+
 
         Vector3d labelPosition = D31;
         view.textPosition(camera, labelPosition);
@@ -297,6 +302,9 @@ public class LabelEntityRenderSystem {
                                   FontRenderSystem sys,
                                   RenderingContext rc,
                                   ICamera camera) {
+
+        var set = view.particleSet;
+
         // Dataset label.
         if (view.particleSet.renderSetLabel) {
             var pos = D31;
@@ -315,27 +323,29 @@ public class LabelEntityRenderSystem {
             var pointData = view.particleSet.pointData;
             int n = Math.min(pointData.size(), view.particleSet.numLabels);
             for (int i = 0; i < n; i++) {
-                IParticleRecord pb = pointData.get(active[i]);
-                if (pb.names() != null) {
-                    Vector3b particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
-                    float distToCamera = (float) particlePosition.lenDouble();
-                    float solidAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
+                if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
+                    IParticleRecord pb = pointData.get(active[i]);
+                    if (pb.names() != null) {
+                        Vector3b particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
+                        float distToCamera = (float) particlePosition.lenDouble();
+                        float solidAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
 
-                    Vector3d labelPosition = particlePosition.put(D32);
-                    if (view.particleSet.isWireframe()) {
-                        textPosition(camera, labelPosition, distToCamera, solidAngle * 0.3e-6, 0);
-                    } else {
-                        textPosition(camera, labelPosition, distToCamera, Math.min(view.particleSet.particleSizeLimits[1], solidAngle) * 1e-6, 0);
+                        Vector3d labelPosition = particlePosition.put(D32);
+                        if (view.particleSet.isWireframe()) {
+                            textPosition(camera, labelPosition, distToCamera, solidAngle * 0.3e-6, 0);
+                        } else {
+                            textPosition(camera, labelPosition, distToCamera, Math.min(view.particleSet.particleSizeLimits[1], solidAngle) * 1e-6, 0);
+                        }
+
+                        shader.setUniformf("u_viewAngle", solidAngle);
+                        shader.setUniformf("u_viewAnglePow", 1f);
+                        shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
+                        float textSize = (float) FastMath.tanh(solidAngle) * distToCamera * 1e5f;
+                        float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+                        textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+                        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, pb.names()[0], labelPosition, distToCamera,
+                                view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
                     }
-
-                    shader.setUniformf("u_viewAngle", solidAngle);
-                    shader.setUniformf("u_viewAnglePow", 1f);
-                    shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
-                    float textSize = (float) FastMath.tanh(solidAngle) * distToCamera * 1e5f;
-                    float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
-                    textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, pb.names()[0], labelPosition, distToCamera,
-                            view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
                 }
             }
         }
@@ -357,11 +367,15 @@ public class LabelEntityRenderSystem {
         Vector3b starPosition = B31;
         int n = Math.min(pointData.size(), set.numLabels);
         for (int i = 0; i < n; i++) {
-            int idx = active[i];
-            renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+            if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
+                int idx = active[i];
+                renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+            }
         }
         for (Integer i : set.forceLabel) {
-            renderStarLabel(view, set, i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+            if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
+                renderStarLabel(view, set, i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+            }
         }
     }
 

@@ -24,6 +24,7 @@ import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.math.Vector3b;
+import uk.ac.starlink.table.ColumnInfo;
 
 import java.util.List;
 
@@ -135,6 +136,7 @@ public class EntityUtils {
                                         String name,
                                         String file,
                                         List<IParticleRecord> data,
+                                        List<ColumnInfo> columnInfoList,
                                         DatasetOptions datasetOptions,
                                         boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
@@ -176,6 +178,7 @@ public class EntityUtils {
         set.setExtended(datasetOptions != null && datasetOptions.type == DatasetLoadType.PARTICLES_EXT);
         set.setData(data);
         set.setDatafile(file);
+        set.setColumnInfoList(columnInfoList);
         set.setProfileDecay(profileDecay);
         set.setColorNoise(colorNoise);
         set.setParticleSizeLimits(particleSizeLimits);
@@ -196,6 +199,7 @@ public class EntityUtils {
                                     String name,
                                     String file,
                                     List<IParticleRecord> data,
+                                    List<ColumnInfo> columnInfoList,
                                     DatasetOptions datasetOptions,
                                     boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
@@ -229,6 +233,7 @@ public class EntityUtils {
         var set = Mapper.starSet.get(entity);
         set.setData(data);
         set.setDatafile(file);
+        set.setColumnInfoList(columnInfoList);
         set.setRenderSetLabel(renderSetLabel);
 
         scene.initializeEntity(entity);

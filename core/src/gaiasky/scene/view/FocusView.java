@@ -949,6 +949,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return isValid() && (particleSet != null || starSet != null);
     }
 
+    public boolean isParticleSet() {
+        return isValid() && particleSet != null;
+    }
+
     public boolean isStarSet() {
         return isValid() && starSet != null;
     }

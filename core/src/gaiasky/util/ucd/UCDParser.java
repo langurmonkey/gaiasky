@@ -19,7 +19,7 @@ import java.util.*;
 public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked
     // first with equals() and then with matches()
-    public static String[] idColNames = new String[] { "hip", "id", "source_id", "tycho2_id" };
+    public static String[] idColNames = new String[] { "hip", "id", "source_id", "tycho2_id", "identifier" };
     public static String[] nameColNames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "names", "proper", "proper_name", "common_name",
             "designation" };
     public static String[] raColNames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
@@ -210,7 +210,7 @@ public class UCDParser {
         this.hasId = !this.ID.isEmpty();
 
         if (this.NAME.isEmpty()) {
-            this.NAME.addAll(getByColNames(nameColNames));
+            this.NAME.addAll(getByColNames(new UCDType[] { UCDType.META, UCDType.UNKNOWN, UCDType.MISSING }, nameColNames, null));
         }
         this.hasName = !this.NAME.isEmpty();
 

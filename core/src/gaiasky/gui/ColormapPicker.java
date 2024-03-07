@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.scene.Mapper;
@@ -398,7 +399,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 if (!set.data().isEmpty()) {
                     IParticleRecord first = set.data().get(0);
                     if (first.hasExtra()) {
-                        ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
+                        ObjectMap.Keys<UCD> ucds = first.extraKeys();
                         for (UCD ucd : ucds)
                             attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                     }
@@ -551,7 +552,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 for (Entity pg : pgarray) {
                     var set = Mapper.particleSet.has(pg) ? Mapper.particleSet.get(pg) : Mapper.starSet.get(pg);
                     for (IParticleRecord pb : set.data()) {
-                        double val = attrib.get(pb);
+                        double val = attrib.getNumber(pb);
                         if (!Double.isNaN(val) && !Double.isInfinite(val)) {
                             if (val < min)
                                 min = val;

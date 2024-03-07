@@ -13,7 +13,12 @@ import gaiasky.util.i18n.I18n;
 public class AttributeColorRed extends AttributeAbstract implements IAttribute {
 
     @Override
-    public double get(IParticleRecord bean) {
+    public Object get(IParticleRecord bean) {
+        return bean.rgb()[0];
+    }
+
+    @Override
+    public double getNumber(IParticleRecord bean) {
         return bean.rgb()[0];
     }
 
@@ -24,5 +29,10 @@ public class AttributeColorRed extends AttributeAbstract implements IAttribute {
 
     public String toString() {
         return I18n.msg("gui.attrib.color.red");
+    }
+
+    @Override
+    public boolean isNumberAttribute() {
+        return true;
     }
 }

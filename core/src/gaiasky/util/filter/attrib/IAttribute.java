@@ -15,26 +15,41 @@ public interface IAttribute {
     Vector3d aux2 = new Vector3d();
 
     /**
-     * Gets the value of this attribute
+     * Gets the value of this attribute.
      *
-     * @param bean The particle or star bean
+     * @param bean The particle or star bean.
      *
-     * @return The value
+     * @return The value.
      */
-    double get(IParticleRecord bean);
+    Object get(IParticleRecord bean);
 
     /**
-     * Gets the unit in string
+     * Gets the number value of this attribute.
      *
-     * @return The unit of this attribute
+     * @param bean The particle or star bean.
+     *
+     * @return The number value.
+     */
+    double getNumber(IParticleRecord bean);
+
+    /**
+     * Gets the unit in string.
+     *
+     * @return The unit of this attribute.
      */
     String getUnit();
 
     /**
-     * Gets the name
+     * Gets the name.
      *
-     * @return The name
+     * @return The name.
      */
     String toString();
+
+    /**
+     * Check whether the attribute contains a numeric value.
+     * @return True if the attribute has a numeric value.
+     */
+    boolean isNumberAttribute();
 
 }

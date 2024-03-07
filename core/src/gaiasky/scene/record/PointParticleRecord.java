@@ -7,10 +7,9 @@
 
 package gaiasky.scene.record;
 
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
-import gaiasky.util.ObjectDoubleMap;
-import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
@@ -274,7 +273,7 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public void setExtraAttributes(ObjectDoubleMap<UCD> extra) {
+    public void setExtraAttributes(ObjectMap<UCD, Object> extra) {
 
     }
 
@@ -284,7 +283,7 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public Keys<UCD> extraKeys() {
+    public ObjectMap.Keys<UCD> extraKeys() {
         return null;
     }
 
@@ -304,12 +303,22 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public double getExtra(String name) {
+    public Object getExtra(String name) {
+        return null;
+    }
+
+    @Override
+    public Object getExtra(UCD ucd) {
+        return null;
+    }
+
+    @Override
+    public double getExtraNumber(String name) {
         return 0;
     }
 
     @Override
-    public double getExtra(UCD ucd) {
+    public double getExtraNumber(UCD ucd) {
         return 0;
     }
 }

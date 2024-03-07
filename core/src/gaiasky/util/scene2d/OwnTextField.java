@@ -9,9 +9,11 @@ package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -38,6 +40,8 @@ public class OwnTextField extends TextField {
     private final String clearButtonDrawableDown = "clear-down";
     private Drawable clearDrawable;
     private float clearX, clearY, clearW, clearH;
+
+    private EventListener validatorListener, validatorTooltipListener;
 
     public OwnTextField(@Null String text, Skin skin) {
         super(text, new TextFieldStyle(skin.get(TextFieldStyle.class)));
@@ -98,8 +102,20 @@ public class OwnTextField extends TextField {
     }
 
     public void setValidator(IValidator validator) {
-        this.validator = validator;
-        initValidator();
+        if(validator == null) {
+            // Remove.
+            if(validatorListener != null) {
+                removeListener(validatorListener);
+                validatorListener = null;
+            }
+            if(validatorTooltipListener != null) {
+                removeListener(validatorTooltipListener);
+                validatorTooltipListener = null;
+            }
+        } else {
+            this.validator = validator;
+            initValidator();
+        }
     }
 
     public void setErrorColor(Color errorColor) {
@@ -145,7 +161,7 @@ public class OwnTextField extends TextField {
         if (validator != null) {
             errorColor = new Color(0xff3333ff);
             regularColor = getColor().cpy();
-            addListener(event -> {
+            addListener(validatorListener = (event) -> {
                 if (event instanceof ChangeEvent) {
                     String str = getText();
                     if (validator.validate(str)) {
@@ -182,13 +198,13 @@ public class OwnTextField extends TextField {
     private void addValidatorTooltip(IValidator validator) {
         if (validator != null) {
             if (validator instanceof FloatValidator fv) {
-                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMinString(), fv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMinString(), fv.getMaxString()), skin));
             } else if (validator instanceof DoubleValidator dv) {
-                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", dv.getMinString(), dv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", dv.getMinString(), dv.getMaxString()), skin));
             } else if (validator instanceof IntValidator iv) {
-                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMinString(), iv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMinString(), iv.getMaxString()), skin));
             } else if (validator instanceof LongValidator lv) {
-                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", lv.getMinString(), lv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", lv.getMinString(), lv.getMaxString()), skin));
             }
             if (validator instanceof CallbackValidator cv) {
                 addValidatorTooltip(cv.getParent());

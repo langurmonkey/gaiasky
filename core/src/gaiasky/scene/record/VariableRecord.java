@@ -7,7 +7,7 @@
 
 package gaiasky.scene.record;
 
-import gaiasky.util.ObjectDoubleMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.util.ucd.UCD;
 
 public class VariableRecord extends ParticleRecord {
@@ -32,7 +32,7 @@ public class VariableRecord extends ParticleRecord {
                           double[] variTimes,
                           Long id,
                           String[] names,
-                          ObjectDoubleMap<UCD> extra) {
+                          ObjectMap<UCD, Object> extra) {
         super(ParticleRecordType.STAR, dataD, dataF, id, names, extra);
         this.nVari = nVari;
         this.variMags = variMags;

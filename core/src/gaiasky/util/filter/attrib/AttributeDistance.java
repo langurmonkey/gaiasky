@@ -13,7 +13,11 @@ import gaiasky.util.i18n.I18n;
 
 public class AttributeDistance extends AttributeAbstract implements IAttribute {
     @Override
-    public double get(IParticleRecord bean) {
+    public Object get(IParticleRecord bean) {
+        return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
+    }
+    @Override
+    public double getNumber(IParticleRecord bean) {
         return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
     }
 
@@ -23,5 +27,10 @@ public class AttributeDistance extends AttributeAbstract implements IAttribute {
 
     public String toString() {
         return I18n.msg("gui.attrib.distsun");
+    }
+
+    @Override
+    public boolean isNumberAttribute() {
+        return true;
     }
 }

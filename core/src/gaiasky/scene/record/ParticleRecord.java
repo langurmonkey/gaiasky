@@ -9,10 +9,10 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.NumberUtils;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectMap.Keys;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.ObjectDoubleMap;
-import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.TLV3D;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
@@ -29,11 +29,11 @@ public class ParticleRecord implements IParticleRecord {
      */
     public enum ParticleRecordType {
         /** Simple positional particles. **/
-        PARTICLE(3, 0, new int[] { 0, 1, 2 }, new int[] {}),
+        PARTICLE(3, 0, new int[]{0, 1, 2}, new int[]{}),
         /** Stars. **/
-        STAR(3, 11, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }),
+        STAR(3, 11, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}),
         /** Extended particles, with proper motions, colors and sizes. **/
-        PARTICLE_EXT(3, 10, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }),
+        PARTICLE_EXT(3, 10, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
         /** Fake particle record, not implemented by this class! **/
         FAKE(0, 0, null, null);
 
@@ -89,7 +89,7 @@ public class ParticleRecord implements IParticleRecord {
     public String[] names;
 
     // Extra attributes (optional).
-    public ObjectDoubleMap<UCD> extra;
+    public ObjectMap<UCD, Object> extra;
 
     // Octant, if in octree.
     public OctreeNode octant;
@@ -147,7 +147,7 @@ public class ParticleRecord implements IParticleRecord {
                           float[] dataF,
                           Long id,
                           String[] names,
-                          ObjectDoubleMap<UCD> extra) {
+                          ObjectMap<UCD, Object> extra) {
         this(type, dataD, dataF, id, names);
         this.names = names;
         this.extra = extra;
@@ -158,7 +158,7 @@ public class ParticleRecord implements IParticleRecord {
                           float[] dataF,
                           Long id,
                           String name) {
-        this(type, dataD, dataF, id, name == null ? new String[] {} : new String[] { name });
+        this(type, dataD, dataF, id, name == null ? new String[]{} : new String[]{name});
     }
 
     public ParticleRecord(ParticleRecordType type,
@@ -166,8 +166,8 @@ public class ParticleRecord implements IParticleRecord {
                           float[] dataF,
                           Long id,
                           String name,
-                          ObjectDoubleMap<UCD> extra) {
-        this(type, dataD, dataF, id, name == null ? new String[] {} : new String[] { name }, extra);
+                          ObjectMap<UCD, Object> extra) {
+        this(type, dataD, dataF, id, name == null ? new String[]{} : new String[]{name}, extra);
     }
 
     @Override
@@ -364,7 +364,7 @@ public class ParticleRecord implements IParticleRecord {
         if (names != null)
             names[0] = name;
         else
-            names = new String[] { name };
+            names = new String[]{name};
     }
 
     @Override
@@ -401,7 +401,7 @@ public class ParticleRecord implements IParticleRecord {
     @Override
     public double[] rgb() {
         Color c = new Color(NumberUtils.floatToIntColor(dataF[type.floatIndexIndirection[I_FCOL]]));
-        return new double[] { c.r, c.g, c.b };
+        return new double[]{c.r, c.g, c.b};
     }
 
     @Override
@@ -512,7 +512,7 @@ public class ParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public void setExtraAttributes(ObjectDoubleMap<UCD> extra) {
+    public void setExtraAttributes(ObjectMap<UCD, Object> extra) {
         this.extra = extra;
     }
 
@@ -550,22 +550,44 @@ public class ParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public double getExtra(String name) {
+    public Object getExtra(String name) {
         if (extra != null) {
             Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
                 if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
-                    return extra.get(ucd, Double.NaN);
+                    return extra.get(ucd);
                 }
             }
         }
-        return Double.NaN;
+        return null;
     }
 
     @Override
-    public double getExtra(UCD ucd) {
-        return hasExtra(ucd) ? extra.get(ucd, Double.NaN) : Double.NaN;
+    public Object getExtra(UCD ucd) {
+        if (hasExtra(ucd)) {
+            return extra.get(ucd);
+        }
+        return null;
+    }
 
+    @Override
+    public double getExtraNumber(String name) {
+        var value = getExtra(name);
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        } else {
+            return Double.NaN;
+        }
+    }
+
+    @Override
+    public double getExtraNumber(UCD ucd) {
+        var value = getExtra(ucd);
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        } else {
+            return Double.NaN;
+        }
     }
 
 }

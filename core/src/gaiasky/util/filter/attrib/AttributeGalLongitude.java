@@ -12,7 +12,12 @@ import gaiasky.util.i18n.I18n;
 
 public class AttributeGalLongitude extends AttributeAbstract implements IAttribute {
     @Override
-    public double get(IParticleRecord bean) {
+    public Object get(IParticleRecord bean) {
+        return bean.l();
+    }
+
+    @Override
+    public double getNumber(IParticleRecord bean) {
         return bean.l();
     }
 
@@ -22,5 +27,10 @@ public class AttributeGalLongitude extends AttributeAbstract implements IAttribu
 
     public String toString() {
         return I18n.msg("gui.attrib.gallon");
+    }
+
+    @Override
+    public boolean isNumberAttribute() {
+        return true;
     }
 }

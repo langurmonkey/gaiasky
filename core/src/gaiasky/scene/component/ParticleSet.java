@@ -28,6 +28,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
+import uk.ac.starlink.table.ColumnInfo;
 
 import java.time.Instant;
 import java.util.*;
@@ -50,6 +51,10 @@ public class ParticleSet implements Component, IDisposable {
      * List that contains the point data. It contains only [x y z].
      */
     public List<IParticleRecord> pointData;
+    /**
+     * List of {@link uk.ac.starlink.table.ColumnInfo} objects for the data in this set.
+     */
+    public List<ColumnInfo> columnInfoList;
     /**
      * This flag enables muting particle rendering.
      **/
@@ -300,6 +305,10 @@ public class ParticleSet implements Component, IDisposable {
         }
     }
 
+    public void setColumnInfoList(List<ColumnInfo> columnInfoList) {
+        this.columnInfoList = columnInfoList;
+    }
+
     /**
      * Regenerates the name index
      */
@@ -540,12 +549,12 @@ public class ParticleSet implements Component, IDisposable {
 
     // Radius in stars is different!
     public double getRadius() {
-        return isStars ? getSize() * Constants.STAR_SIZE_FACTOR : getSize() / 2.0;
+        return isStars ? getSize() * Constants.STAR_SIZE_FACTOR : getSize() * 1.0e3;
     }
 
     // Radius in stars is different!
     public double getRadius(int i) {
-        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) / 2.0 : getRadius();
+        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) * 1.0e3 : getRadius();
     }
 
     /**

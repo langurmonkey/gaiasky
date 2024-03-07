@@ -12,8 +12,13 @@ import gaiasky.util.i18n.I18n;
 
 public class AttributeAbsmag extends AttributeAbstract implements IAttribute {
     @Override
-    public double get(IParticleRecord pb) {
-        return pb.absMag();
+    public Object get(IParticleRecord bean) {
+        return bean.absMag();
+    }
+
+    @Override
+    public double getNumber(IParticleRecord bean) {
+        return bean.absMag();
     }
 
     public String getUnit() {
@@ -22,5 +27,10 @@ public class AttributeAbsmag extends AttributeAbstract implements IAttribute {
 
     public String toString() {
         return I18n.msg("gui.attrib.absmag");
+    }
+
+    @Override
+    public boolean isNumberAttribute() {
+        return true;
     }
 }

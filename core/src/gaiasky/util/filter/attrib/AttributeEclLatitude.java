@@ -12,7 +12,12 @@ import gaiasky.util.i18n.I18n;
 
 public class AttributeEclLatitude extends AttributeAbstract implements IAttribute {
     @Override
-    public double get(IParticleRecord bean) {
+    public Object get(IParticleRecord bean) {
+        return bean.beta();
+    }
+
+    @Override
+    public double getNumber(IParticleRecord bean) {
         return bean.beta();
     }
 
@@ -22,5 +27,10 @@ public class AttributeEclLatitude extends AttributeAbstract implements IAttribut
 
     public String toString() {
         return I18n.msg("gui.attrib.ecllat");
+    }
+
+    @Override
+    public boolean isNumberAttribute() {
+        return true;
     }
 }
