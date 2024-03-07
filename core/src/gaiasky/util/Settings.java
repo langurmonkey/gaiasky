@@ -435,10 +435,14 @@ public class Settings extends SettingsObject {
 
         @Override
         public String toString() {
-            String name = I18n.msg("gui.reproj.mode." + this.name().toLowerCase(I18n.locale));
-            if (name != null && !name.isEmpty()) {
-                return name;
-            } else {
+            try {
+                String name = I18n.msg("gui.reproj.mode." + this.name().toLowerCase());
+                if (name != null && !name.isEmpty()) {
+                    return name;
+                } else {
+                    return this.name();
+                }
+            }catch (Exception e) {
                 return this.name();
             }
         }
