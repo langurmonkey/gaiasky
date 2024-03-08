@@ -1116,11 +1116,12 @@ public enum Event {
     SHOW_SEARCH_ACTION,
     /**
      * Shows a window with a summary of the search object in the data (string)
-     * as taken from the wikipedia API.
+     * as taken from the wikipedia API (if found), plus the actual data of the object in memory.
+     * Contains the {@link FocusView} object.
      */
-    SHOW_WIKI_INFO_ACTION,
-    /** Updates the wiki info window if it is open. **/
-    UPDATE_WIKI_INFO_ACTION,
+    SHOW_DATA_INFO_ACTION,
+    /** Updates the data window. Contains the {@link FocusView} object. **/
+    UPDATE_DATA_INFO_ACTION,
     /**
      * Shows a window with the Gaia or Hipparcos archive info for the object in the data,
      * which must be a {@link FocusView}.

@@ -171,6 +171,12 @@ public interface IParticleRecord {
     boolean hasExtra(UCD ucd);
 
     /**
+     * Gets the extra attributes map.
+     * @return The map.
+     */
+    ObjectMap<UCD, Object> getExtra();
+
+    /**
      * Gets the extra data filed with the given name.
      * @param name The name of the data filed to get.
      * @return The data field, or null if it does not exist.

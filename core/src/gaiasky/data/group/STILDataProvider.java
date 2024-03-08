@@ -403,7 +403,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 if (!isStars) {
                                     // We have particles without a size. We just clamp what we have.
-                                    sizePc = MathUtilsDouble.clamp(sizePc, 1e-8, 3.0);
+                                    double maxSizePc = 3.0;
+                                    if (params != null && params.containsKey("maxSizePc")) {
+                                        var value = params.get("maxSizePc");
+                                        if (value instanceof Number n) {
+                                            maxSizePc = n.doubleValue();
+                                        }
+                                    }
+                                    sizePc = MathUtilsDouble.clamp(sizePc, 1e-8, maxSizePc);
                                 }
                             }
 

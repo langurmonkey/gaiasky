@@ -58,10 +58,10 @@ public class FullGui extends AbstractGui {
     protected ControlsWindow controlsWindow;
     protected ControlsInterface controlsInterface;
     protected MinimapWindow minimapWindow;
-    protected Container<FocusInfoInterface> fi;
+    protected Container<CameraInfoInterface> fi;
     protected Container<TopInfoInterface> ti;
     protected Container<NotificationsInterface> ni;
-    protected FocusInfoInterface focusInterface;
+    protected CameraInfoInterface focusInterface;
     protected NotificationsInterface notificationsInterface;
     protected MessagesInterface messagesInterface;
     protected CustomInterface customInterface;
@@ -71,7 +71,7 @@ public class FullGui extends AbstractGui {
     protected MinimapInterface minimapInterface;
     protected LoadProgressInterface loadProgressInterface;
     protected LogWindow logWindow;
-    protected WikiInfoWindow wikiInfoWindow;
+    protected DataInfoWindow dataInfoWindow;
     protected ArchiveViewWindow archiveViewWindow;
     protected DecimalFormat nf;
     protected Label pointerXCoord, pointerYCoord;
@@ -108,7 +108,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, FOV_CHANGED_CMD, SHOW_WIKI_INFO_ACTION, UPDATE_WIKI_INFO_ACTION, SHOW_ARCHIVE_VIEW_ACTION, UPDATE_ARCHIVE_VIEW_ACTION, SHOW_PLAYCAMERA_ACTION, REMOVE_KEYBOARD_FOCUS, REMOVE_GUI_COMPONENT, ADD_GUI_COMPONENT, SHOW_LOG_ACTION, RA_DEC_UPDATED, LON_LAT_UPDATED, POPUP_MENU_FOCUS, SHOW_LAND_AT_LOCATION_ACTION, DISPLAY_POINTER_COORDS_CMD, TOGGLE_MINIMAP, SHOW_MINIMAP_ACTION, SHOW_PROCEDURAL_GEN_ACTION);
+        EventManager.instance.subscribe(this, FOV_CHANGED_CMD, UPDATE_DATA_INFO_ACTION, SHOW_DATA_INFO_ACTION, SHOW_ARCHIVE_VIEW_ACTION, UPDATE_ARCHIVE_VIEW_ACTION, SHOW_PLAYCAMERA_ACTION, REMOVE_KEYBOARD_FOCUS, REMOVE_GUI_COMPONENT, ADD_GUI_COMPONENT, SHOW_LOG_ACTION, RA_DEC_UPDATED, LON_LAT_UPDATED, POPUP_MENU_FOCUS, SHOW_LAND_AT_LOCATION_ACTION, DISPLAY_POINTER_COORDS_CMD, TOGGLE_MINIMAP, SHOW_MINIMAP_ACTION, SHOW_PROCEDURAL_GEN_ACTION);
     }
 
     protected void buildGui() {
@@ -142,7 +142,7 @@ public class FullGui extends AbstractGui {
         }
 
         // FOCUS INFORMATION - BOTTOM RIGHT
-        focusInterface = new FocusInfoInterface(skin);
+        focusInterface = new CameraInfoInterface(skin);
         fi = new Container<>(focusInterface);
         fi.setFillParent(true);
         fi.bottom().right();
@@ -406,22 +406,21 @@ public class FullGui extends AbstractGui {
                 if (!logWindow.isVisible() || !logWindow.hasParent())
                     logWindow.show(stage);
             }
-            case UPDATE_WIKI_INFO_ACTION -> {
-                if (wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()) {
-                    // Update
-                    String searchName = (String) data[0];
-                    wikiInfoWindow.update(searchName);
+            case UPDATE_DATA_INFO_ACTION -> {
+                if (dataInfoWindow != null && dataInfoWindow.isVisible() && dataInfoWindow.hasParent() && !dataInfoWindow.isUpdating()) {
+                    FocusView object = (FocusView) data[0];
+                    dataInfoWindow.update(object);
                 }
             }
-            case SHOW_WIKI_INFO_ACTION -> {
-                String searchName = (String) data[0];
-                if (wikiInfoWindow == null) {
-                    wikiInfoWindow = new WikiInfoWindow(stage, skin);
+            case SHOW_DATA_INFO_ACTION -> {
+                FocusView object = (FocusView) data[0];
+                if (dataInfoWindow == null) {
+                    dataInfoWindow = new DataInfoWindow(stage, skin);
                 }
-                if (!wikiInfoWindow.isUpdating()) {
-                    wikiInfoWindow.update(searchName);
-                    if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
-                        wikiInfoWindow.show(stage);
+                if (!dataInfoWindow.isUpdating()) {
+                    dataInfoWindow.update(object);
+                    if (!dataInfoWindow.isVisible() || !dataInfoWindow.hasParent())
+                        dataInfoWindow.show(stage);
                 }
             }
             case UPDATE_ARCHIVE_VIEW_ACTION -> {

@@ -78,7 +78,7 @@ public class GamepadGui extends AbstractGui {
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthoSphere, buttonGoHome;
 
     private TopInfoInterface topLine;
-    private FocusInfoInterface focusInterface;
+    private CameraInfoInterface focusInterface;
     private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop;
@@ -235,7 +235,7 @@ public class GamepadGui extends AbstractGui {
             infoT.add(vrInfoT).left().center().padRight(pad30 * 2f);
 
             // Focus info interface
-            focusInterface = new FocusInfoInterface(skin, vr);
+            focusInterface = new CameraInfoInterface(skin, vr);
             infoT.add(focusInterface).left().center();
 
             tabContents.add(container(infoT, tw1, th));

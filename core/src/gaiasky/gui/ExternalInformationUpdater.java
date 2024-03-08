@@ -40,14 +40,9 @@ public class ExternalInformationUpdater {
     private static final Log logger = Logger.getLogger(ExternalInformationUpdater.class);
 
     private static final int TIMEOUT_MS = 5000;
-    private final String[] suffixes = { "_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", "" };
-    private final String[] suffixes_model = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "_Galaxy", "_Dwarf", "" };
-    private final String[] suffixes_gal = { "_(dwarf_galaxy)", "_(galaxy)", "_Galaxy", "_Dwarf", "_Cluster", "" };
-    private final String[] suffixes_cluster = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
-    private final String[] suffixes_star = { "_(star)", "" };
     private Skin skin;
     private LabelStyle linkStyle;
-    private Cell<Link> infoCell, gaiaCell, simbadCell;
+    private Cell<Link> dataCell, gaiaCell, simbadCell;
     private Link simbadLink;
     private OwnTextButton infoButton, gaiaButton;
     // The table to modify
@@ -69,58 +64,43 @@ public class ExternalInformationUpdater {
             if (focus != null) {
                 logger.debug("Looking up network resources for '" + focus.getName() + "'");
 
-                infoCell = table.add().left();
+                table.row();
+                dataCell = table.add().left();
                 gaiaCell = table.add().left();
                 simbadCell = table.add().left();
 
-                // Add table
+                // Gaia archive.
                 if (focus.isStar()) {
                     EventManager.publish(Event.UPDATE_ARCHIVE_VIEW_ACTION, this, focus);
                     if (gaiaButton != null)
                         gaiaButton.remove();
                     gaiaButton = new OwnTextButton(I18n.msg("gui.focusinfo.archive"), skin);
                     gaiaButton.pad(pad / 3f, pad, pad / 3f, pad);
-                    gaiaButton.addListener(new GaiaButtonListener(focus));
+                    gaiaButton.addListener(new GaiaArchiveButtonListener(focus));
                     gaiaButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.gaiaarchive"), skin));
                     gaiaCell.setActor(gaiaButton).padRight(pad);
                 } else {
                     gaiaCell.padRight(0);
                 }
 
-                String wikiname = focus.getName().replace(' ', '_');
-
-                setWikiLink(wikiname, focus, new LinkListener() {
-                    @Override
-                    public void ok(String link) {
-                        if (infoCell != null) {
-                            try {
-                                String actualWikiname = link.substring(Constants.URL_WIKIPEDIA.length());
-                                EventManager.publish(Event.UPDATE_WIKI_INFO_ACTION, this, actualWikiname);
-                                if (infoButton != null)
-                                    infoButton.remove();
-                                infoButton = new OwnTextButton(I18n.msg("gui.focusinfo.moreinfo"), skin);
-                                infoButton.setDisabled(Settings.settings.program.offlineMode);
-                                infoButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.wiki"), skin));
-                                infoButton.pad(pad / 3f, pad, pad / 3f, pad);
-                                infoButton.addListener((event) -> {
-                                    if (event instanceof ChangeEvent) {
-                                        EventManager.publish(Event.SHOW_WIKI_INFO_ACTION, this, actualWikiname);
-                                        return true;
-                                    }
-                                    return false;
-                                });
-                                infoCell.setActor(infoButton).padRight(pad);
-                            } catch (Exception ignored) {
-                            }
-                        }
+                // Data button (+ Info).
+                EventManager.publish(Event.UPDATE_DATA_INFO_ACTION, this, focus);
+                if (infoButton != null)
+                    infoButton.remove();
+                infoButton = new OwnTextButton(I18n.msg("gui.focusinfo.moreinfo"), skin);
+                infoButton.setDisabled(Settings.settings.program.offlineMode);
+                infoButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.wiki"), skin));
+                infoButton.pad(pad / 3f, pad, pad / 3f, pad);
+                infoButton.addListener((event) -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.publish(Event.SHOW_DATA_INFO_ACTION, this, focus);
+                        return true;
                     }
-
-                    @Override
-                    public void ko(String link) {
-                        if (infoCell != null)
-                            infoCell.padRight(0);
-                    }
+                    return false;
                 });
+                dataCell.setActor(infoButton).padRight(pad);
+
+                // Simbad link.
                 setSimbadLink(focus, new LinkListener() {
                     @Override
                     public void ok(String link) {
@@ -161,41 +141,6 @@ public class ExternalInformationUpdater {
         }
     }
 
-    private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
-        try {
-            String url = Constants.URL_WIKIPEDIA;
-            var view = (FocusView) focus;
-            if (Mapper.hip.has(view.getEntity())) {
-                urlCheck(url, wikiname, suffixes_star, listener);
-            } else if (view.isParticle()) {
-                urlCheck(url, wikiname, suffixes_gal, listener);
-            } else if (Mapper.tagBillboardGalaxy.has(view.getEntity())) {
-                urlCheck(url, wikiname, suffixes_gal, listener);
-            } else if (Mapper.celestial.has(view.getEntity())) {
-                var celestial = Mapper.celestial.get(view.getEntity());
-                if (celestial.wikiName != null) {
-                    listener.ok(url + celestial.wikiName.replace(' ', '_'));
-                } else {
-                    urlCheck(url, wikiname, suffixes_model, listener);
-                }
-            } else if (view.isCluster()) {
-                urlCheck(url, wikiname, suffixes_cluster, listener);
-            } else if (Mapper.starSet.has(view.getEntity())) {
-                urlCheck(url, wikiname, suffixes_star, listener);
-            } else {
-                urlCheck(url, wikiname, suffixes, listener);
-            }
-
-        } catch (Exception e) {
-            logger.error(e);
-            listener.ko(null);
-        }
-    }
-
-    private void urlCheck(final String base, final String name, final String[] suffixes, LinkListener listener) {
-        final AtomicInteger index = new AtomicInteger(0);
-        createRequest(base, name, suffixes, index, listener);
-    }
 
     private void createRequest(final String base, final String name, final String[] suffixes, final AtomicInteger index, LinkListener listener) {
         if (index.get() < suffixes.length) {
@@ -232,20 +177,15 @@ public class ExternalInformationUpdater {
             });
         } else {
             // Ran out of suffixes!
-            listener.ko(base + name);
+            listener.ok(null);
         }
     }
 
-    private interface LinkListener {
-        void ok(String link);
 
-        void ko(String link);
-    }
-
-    private static class GaiaButtonListener implements EventListener {
+    private static class GaiaArchiveButtonListener implements EventListener {
         private final FocusView focus;
 
-        public GaiaButtonListener(FocusView focus) {
+        public GaiaArchiveButtonListener(FocusView focus) {
             super();
             this.focus = focus;
         }

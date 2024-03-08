@@ -108,6 +108,15 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(go);
 
+            MenuItem moreInfo = new MenuItem(I18n.msg("context.moreinfo", candidateNameShort), skin, skin.getDrawable("iconic-info"));
+            moreInfo.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_DATA_INFO_ACTION, moreInfo, candidate);
+                }
+                return false;
+            });
+            addItem(moreInfo);
+
             addSeparator();
 
             // Tracking object

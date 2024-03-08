@@ -978,6 +978,10 @@
       "font": "ui-19",
       "fontColor": "lightblue"
     },
+    "object-name-large": {
+      "font": "ui-25",
+      "fontColor": "lightblue"
+    },
     "header-large": {
       "font": "title-40",
       "fontColor": "theme"

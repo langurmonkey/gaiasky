@@ -16,6 +16,7 @@ import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.api.IStarGroupDataProvider;
+import gaiasky.data.group.STILDataProvider;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
@@ -224,6 +225,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 provider.setTransformMatrix(transform.matrix);
                 set.setData(provider.loadData(set.datafile, set.factor));
                 set.isExtended = !set.data().isEmpty() && set.data().get(0).getType() == ParticleRecordType.PARTICLE_EXT;
+
+                if (provider instanceof STILDataProvider stil) {
+                    set.setColumnInfoList(stil.getColumnInfoList());
+                }
             } catch (Exception e) {
                 Logger.getLogger(this.getClass()).error(e);
                 set.pointData = null;

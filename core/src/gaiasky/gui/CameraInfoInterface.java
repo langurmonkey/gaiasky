@@ -37,7 +37,7 @@ import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
 
-public class FocusInfoInterface extends TableGuiInterface implements IObserver {
+public class CameraInfoInterface extends TableGuiInterface implements IObserver {
     static private final int MAX_RULER_NAME_LEN = 9;
     private final FocusView view;
     private final Table focusInfo;
@@ -65,11 +65,11 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private ExternalInformationUpdater externalInfoUpdater;
     private boolean maximized;
 
-    public FocusInfoInterface(Skin skin) {
+    public CameraInfoInterface(Skin skin) {
         this(skin, false);
     }
 
-    public FocusInfoInterface(Skin skin, boolean vr) {
+    public CameraInfoInterface(Skin skin, boolean vr) {
         super(skin);
         this.setBackground("bg-pane");
         this.maximized = true;
@@ -271,7 +271,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusInfo.add(focusName).width(width).left().colspan(2).padBottom(pad5).row();
         focusInfo.add(focusActionsGroup).width(width).left().colspan(2).padBottom(pad5).row();
         focusInfo.add(focusType).left().padBottom(pad5).colspan(2).row();
-        focusInfo.add(new OwnLabel("ID", skin, "hud")).left();
+        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.id"), skin, "hud")).left();
         focusInfo.add(hg(focusId, focusIdExpand)).left().padLeft(pad15).row();
         focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.names"), skin, "hud")).left().padBottom(pad5);
         focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad15).row();
@@ -579,7 +579,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                     absMagLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
                     focusAbsMag.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
                 } else {
-                    // Stars, apparent magnitude form Earth is fixed, from camera not so much.
+                    // Stars, particles, etc. Apparent magnitude form Earth is fixed, from camera not so much.
 
                     // Apparent magnitude (earth)
                     appMagEarthLabel.setText(I18n.msg("gui.focusinfo.appmag.earth"));

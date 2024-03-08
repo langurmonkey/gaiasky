@@ -550,6 +550,11 @@ public class ParticleRecord implements IParticleRecord {
     }
 
     @Override
+    public ObjectMap<UCD, Object> getExtra() {
+        return extra;
+    }
+
+    @Override
     public Object getExtra(String name) {
         if (extra != null) {
             Keys<UCD> ucds = extra.keys();

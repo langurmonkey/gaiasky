@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.util.i18n.I18n;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -449,6 +448,14 @@ public class TextUtils {
             suffixesNew[i] = suffixes[1];
         suffixesNew[suffixes.length] = suffixAdditional;
         return concatAll(base, suffixesNew);
+    }
+
+    public static <T> T[] addToBeginningOfArray(T[] elements, T element) {
+        T[] newArray = Arrays.copyOf(elements, elements.length + 1);
+        newArray[0] = element;
+        System.arraycopy(elements, 0, newArray, 1, elements.length);
+
+        return newArray;
     }
 
     public static boolean contains(String[] list,

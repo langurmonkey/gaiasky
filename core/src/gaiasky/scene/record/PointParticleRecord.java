@@ -303,6 +303,11 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
+    public ObjectMap<UCD, Object> getExtra() {
+        return null;
+    }
+
+    @Override
     public Object getExtra(String name) {
         return null;
     }

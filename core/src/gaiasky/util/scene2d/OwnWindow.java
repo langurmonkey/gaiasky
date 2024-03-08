@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -194,7 +195,8 @@ public class OwnWindow extends Table {
     }
 
     /**
-     * Returns the window's style. Modifying the returned style may not have an effect until {@link #setStyle(WindowStyle)} is
+     * Returns the window's style. Modifying the returned style may not have an effect until
+     * {@link #setStyle(WindowStyle)} is
      * called.
      */
     public WindowStyle getStyle() {
@@ -217,8 +219,7 @@ public class OwnWindow extends Table {
         if (stage == null)
             return;
         Camera camera = stage.getCamera();
-        if (camera instanceof OrthographicCamera) {
-            OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+        if (camera instanceof OrthographicCamera orthographicCamera) {
             float parentWidth = stage.getWidth();
             float parentHeight = stage.getHeight();
             if (getX(Align.right) - camera.position.x > parentWidth / 2 / orthographicCamera.zoom)
@@ -252,7 +253,9 @@ public class OwnWindow extends Table {
 
         if (style.stageBackground != null) {
             stageToLocalCoordinates(tmpPosition.set(0, 0));
-            stageToLocalCoordinates(tmpSize.set(stage.getWidth(), stage.getHeight()));
+            if (stage != null) {
+                stageToLocalCoordinates(tmpSize.set(stage.getWidth(), stage.getHeight()));
+            }
             drawStageBackground(batch, parentAlpha, getX() + tmpPosition.x, getY() + tmpPosition.y, getX() + tmpSize.x,
                     getY() + tmpSize.y);
         }
@@ -346,5 +349,13 @@ public class OwnWindow extends Table {
     public Label getTitleLabel() {
         return titleLabel;
     }
+
+    protected HorizontalGroup hg(Actor... actors) {
+        HorizontalGroup hg = new HorizontalGroup();
+        for (Actor a : actors)
+            hg.addActor(a);
+        return hg;
+    }
+
 
 }

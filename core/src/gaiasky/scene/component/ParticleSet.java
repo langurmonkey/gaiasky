@@ -549,12 +549,12 @@ public class ParticleSet implements Component, IDisposable {
 
     // Radius in stars is different!
     public double getRadius() {
-        return isStars ? getSize() * Constants.STAR_SIZE_FACTOR : getSize() * 1.0e3;
+        return isStars ? getSize() * Constants.STAR_SIZE_FACTOR : getSize();
     }
 
     // Radius in stars is different!
     public double getRadius(int i) {
-        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) * 1.0e3 : getRadius();
+        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) : getRadius();
     }
 
     /**
