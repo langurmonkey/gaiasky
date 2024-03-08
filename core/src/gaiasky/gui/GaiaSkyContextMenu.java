@@ -37,6 +37,7 @@ import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnImage;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GaiaSkyContextMenu extends ContextMenu {
 
@@ -52,7 +53,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
     private final CatalogManager catalogManager;
     private final Scene scene;
     // Rel effects off
-    private final boolean relativisticEffects = false;
+    private final AtomicBoolean relativisticEffects = new AtomicBoolean(false);
     // The name of the candidate
     private String candidateName;
     // Short name of candidate
@@ -427,7 +428,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         //});
         //addItem(VRUI);
 
-        if (relativisticEffects) {
+        if (relativisticEffects.get()) {
             // Spawn gravitational waves
             MenuItem gravWaveStart = new MenuItem(I18n.msg("context.startgravwave"), skin, "default");
             gravWaveStart.addListener(event -> {
