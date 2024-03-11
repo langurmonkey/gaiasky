@@ -334,7 +334,7 @@ public class GlobalResources {
 
     /**
      * Deletes recursively all non-partial files from the path, and all partial files older than
-     * {@link Constants#PART_FILE_MAX_AGE_MS}.
+     * {@link Constants#getPartFileMaxAgeMs()}.
      *
      * @param path the path to delete.
      *
@@ -345,7 +345,7 @@ public class GlobalResources {
             stream.sorted(Comparator.reverseOrder())
                     // It is not a .part file, or it is a .part file older than 6 hours, and it is not a directory.
                     .filter(p -> (!p.toString().endsWith(".part") ||
-                            (p.toString().endsWith(".part") && (TimeUtils.millis() - p.toFile().lastModified() > Constants.PART_FILE_MAX_AGE_MS)))
+                            (p.toString().endsWith(".part") && (TimeUtils.millis() - p.toFile().lastModified() > Constants.getPartFileMaxAgeMs())))
                             && !Files.isDirectory(p))
                     .map(Path::toFile)
                     .forEach(f -> {

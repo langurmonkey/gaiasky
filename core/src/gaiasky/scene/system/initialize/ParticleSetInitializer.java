@@ -138,7 +138,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                                   ParticleSet set,
                                   Label label) {
         if (base.id < 0) {
-            base.id = ParticleSet.idSeq++;
+            base.id = ParticleSet.getNextSequence();
         }
 
         if (set.factor == null)

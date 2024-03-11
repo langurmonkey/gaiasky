@@ -47,10 +47,6 @@ public class AttributeMap {
         return attributeMap.containsKey(key);
     }
 
-    public boolean containsValue(Class<? extends Component> value) {
-        return attributeMap.containsValue(value);
-    }
-
     public Map<String, Class<? extends Component>> initialize() {
         // Load the attribute map from the JSON definition.
         var attributeMapFile = Gdx.files.internal("archetypes/attributemap.json");
@@ -95,17 +91,6 @@ public class AttributeMap {
         }
 
         return attributeMap;
-    }
-
-    private void putAll(Class<? extends Component> clazz, String... attributes) {
-        for (String attribute : attributes) {
-            if (attributeMap.containsKey(attribute)) {
-                logger.warn("Attribute already defined: " + attribute);
-                throw new RuntimeException("Attribute already defined: " + attribute);
-            } else {
-                attributeMap.put(attribute, clazz);
-            }
-        }
     }
 
     private void putAll(Class<? extends Component> clazz, Array<String> attributes) {

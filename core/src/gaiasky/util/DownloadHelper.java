@@ -68,7 +68,7 @@ public class DownloadHelper {
             // Resume download if target file (?.tar.gz.part) exists.
             // Check temp file last modified date, and remove it if it is older than Constants#PART_FILE_MAX_AGE_MS.
             long age = TimeUtils.millis() - to.lastModified();
-            if (age > Constants.PART_FILE_MAX_AGE_MS && to.exists()) {
+            if (age > Constants.getPartFileMaxAgeMs() && to.exists()) {
                to.delete();
             }
             final boolean resume = to.exists() && to.name().endsWith(".part");

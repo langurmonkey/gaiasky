@@ -53,7 +53,7 @@ public class StarSetUtils {
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);
-        base.id = ParticleSet.idSeq++;
+        base.id = ParticleSet.getNextSequence();
         base.setName(name.replace("%%SGID%%", Long.toString(base.id)));
         base.ct = new ComponentTypes(ComponentType.Stars);
 

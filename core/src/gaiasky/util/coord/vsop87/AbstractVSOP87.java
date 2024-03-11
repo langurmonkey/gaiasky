@@ -30,7 +30,7 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
 
     @Override
     public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
-        if (!Constants.withinVSOPTime(date.toEpochMilli()))
+        if (Constants.notWithinVSOPTime(date.toEpochMilli()))
             return null;
 
         double tau = AstroUtils.tau(AstroUtils.getJulianDateCache(date));

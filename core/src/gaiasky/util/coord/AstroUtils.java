@@ -282,7 +282,7 @@ public class AstroUtils {
      * @param out The out vector with [lambda, beta, r] in radians and kilometres.
      */
     public static void plutoEclipticCoordinates(Instant date, Vector3b out) {
-        if (!Constants.withinVSOPTime(date.toEpochMilli()))
+        if (Constants.notWithinVSOPTime(date.toEpochMilli()))
             return;
         plutoEclipticCoordinates(getDaysSinceJ2000(date), out);
     }

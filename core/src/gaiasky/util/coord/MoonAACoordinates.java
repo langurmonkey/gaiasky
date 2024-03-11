@@ -24,7 +24,7 @@ public class MoonAACoordinates extends AbstractOrbitCoordinates {
 
     @Override
     public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
-        if (!Constants.withinVSOPTime(date.toEpochMilli()))
+        if (Constants.notWithinVSOPTime(date.toEpochMilli()))
             return null;
         out = AstroUtils.moonEclipticCoordinates(date, aux, out);
         // To internal units

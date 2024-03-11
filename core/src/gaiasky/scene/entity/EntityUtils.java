@@ -158,7 +158,7 @@ public class EntityUtils {
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);
-        base.id = ParticleSet.idSeq++;
+        base.id = ParticleSet.getNextSequence();
         base.setName(name.replace("%%PGID%%", Long.toString(base.id)));
         base.setCt(ct);
 
@@ -211,7 +211,7 @@ public class EntityUtils {
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);
-        base.id = ParticleSet.idSeq++;
+        base.id = ParticleSet.getNextSequence();
         base.setName(name.replace("%%SGID%%", Long.toString(base.id)));
         base.setComponentType(ComponentType.Stars);
 
@@ -272,17 +272,6 @@ public class EntityUtils {
         } else if (Mapper.starSet.has(entity)) {
             return Mapper.starSet.get(entity);
         }
-        return null;
-    }
-
-    /**
-     * Gets the first dataset ancestor of this entity.
-     *
-     * @param entity The entity.
-     *
-     * @return The catalog info.
-     */
-    public static CatalogInfo getDatasetAncestor(Entity entity) {
         return null;
     }
 

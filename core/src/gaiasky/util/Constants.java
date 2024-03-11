@@ -274,7 +274,7 @@ public class Constants {
      */
     public static double PC_TO_U = Nature.PC_TO_KM * KM_TO_U;
     /**
-     * Kiloparsec to local unit conversion. Multiply this by all values in Kpc.
+     * Kilo parsec to local unit conversion. Multiply this by all values in Kpc.
      */
     public static double KPC_TO_U = PC_TO_U * 1000d;
     /**
@@ -304,15 +304,18 @@ public class Constants {
     /**
      * Logarithmic depth buffer constant. Controls the resolution close to the camera
      */
-    public static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
+    private static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
+    public static float getCameraK() {
+        return (float) CAMERA_K;
+    }
+
 
     /**
      * Maximum age of part files, in milliseconds (6 hours).
      */
-    public static long PART_FILE_MAX_AGE_MS = 6 * 3600 * 1000;
-
-    public static float getCameraK() {
-        return (float) CAMERA_K;
+    private static final long PART_FILE_MAX_AGE_MS = 6 * 3600 * 1000;
+    public static long getPartFileMaxAgeMs() {
+        return PART_FILE_MAX_AGE_MS;
     }
 
     public static void initialize(double distanceScaleFactor) {
@@ -343,9 +346,9 @@ public class Constants {
      * @param time The time as the number of milliseconds since January 1, 1970,
      *             00:00:00 GMT.
      *
-     * @return Whether the given time is within the bounds of VSOP
+     * @return Whether the given time is within the bounds of VSOP.
      */
-    public static boolean withinVSOPTime(long time) {
-        return time <= Constants.MAX_VSOP_TIME_MS && time >= Constants.MIN_VSOP_TIME_MS;
+    public static boolean notWithinVSOPTime(long time) {
+        return time > Constants.MAX_VSOP_TIME_MS || time < Constants.MIN_VSOP_TIME_MS;
     }
 }

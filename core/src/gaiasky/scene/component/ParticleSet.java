@@ -36,7 +36,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParticleSet implements Component, IDisposable {
 
-    public static long idSeq = 0;
+    private static long idSeq = 0;
+    public static synchronized long getNextSequence() {
+        return idSeq++;
+    }
 
     // Auxiliary vectors.
     protected final Vector3b B31 = new Vector3b();
