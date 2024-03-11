@@ -37,6 +37,7 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
+import gaiasky.util.parse.Parser;
 
 import java.util.Random;
 
@@ -130,6 +131,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
+
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             int n = set.pointData.size();
@@ -153,42 +155,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         IParticleRecord particle = set.get(i);
                         double[] p = particle.rawDoubleData();
 
-                        // COLOR
-                        if (hl.isHighlighted()) {
-                            if (hlCmap) {
-                                // Color map.
-                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().getNumber(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2],
-                                                                                                                  hl.getHlcmAlpha());
-                            } else {
-                                // Plain highlight color.
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
-                            }
-                        } else {
-                            if (extended && particle.hasColor() && Float.isFinite(particle.col())) {
-                                // Use particle color.
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = particle.col();
-                            } else {
-                                // Generate color.
-                                if (colorMin != null && colorMax != null) {
-                                    double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-                                    // fac = 0 -> colorMin,  fac = 1 -> colorMax
-                                    double fac = (dist - minDistance) / (maxDistance - minDistance);
-                                    interpolateColor(colorMin, colorMax, c, fac);
-                                }
-                                float r = 0, g = 0, b = 0;
-                                if (set.colorNoise != 0) {
-                                    r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                }
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1),
-                                                                                                                  MathUtils.clamp(c[1] + g, 0, 1),
-                                                                                                                  MathUtils.clamp(c[2] + b, 0, 1),
-                                                                                                                  MathUtils.clamp(c[3], 0, 1));
-                            }
-                        }
-
                         // SIZE
                         if (extended && particle.hasSize()) {
                             model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = particle.size();
@@ -200,9 +166,80 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         float textureIndex = -1.0f;
                         if (set.textureArray != null && !set.isWireframe()) {
                             int nTextures = set.textureArray.getDepth();
-                            textureIndex = (float) rand.nextInt(nTextures);
+                            if (set.textureAttribute != null && particle.hasExtra(set.textureAttribute)) {
+                                var value = particle.getExtra(set.textureAttribute);
+                                if (value instanceof Number num) {
+                                    textureIndex = MathUtils.clamp(num.intValue() - 1, 0, nTextures - 1);
+                                } else if(value instanceof String str) {
+                                    // Try to parse it as integer, otherwise, use hash code.
+                                    try {
+                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) -1, 0, nTextures -1);
+                                    } catch (NumberFormatException ignored) {
+                                        textureIndex = value.hashCode() % nTextures;
+                                    }
+                                } else {
+                                   // Any other type, use hash code.
+                                    textureIndex = value.hashCode() % nTextures;
+                                }
+                            } else {
+                                // Random index.
+                                textureIndex = (float) rand.nextInt(nTextures);
+                            }
                         }
                         model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = textureIndex;
+
+                        // COLOR
+                        if (hl.isHighlighted()) {
+                            if (hlCmap) {
+                                // Color map.
+                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().getNumber(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2],
+                                        hl.getHlcmAlpha());
+                            } else {
+                                // Plain highlight color.
+                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                            }
+                        } else {
+                            if (extended && particle.hasColor() && Float.isFinite(particle.col())) {
+                                // Use particle color.
+                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = particle.col();
+                            } else {
+                                // Generate color.
+                                if(set.colorFromTexture && set.textureArray != null && textureIndex >= 0f) {
+                                    // Generate color using texture index, so particles with the same index get the
+                                    // same color.
+                                    float r = 0, g = 0, b = 0;
+                                    if (set.colorNoise != 0) {
+                                        StdRandom.setSeed((long) textureIndex);
+                                        r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                        g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                        b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                    }
+                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1),
+                                            MathUtils.clamp(c[1] + g, 0, 1),
+                                            MathUtils.clamp(c[2] + b, 0, 1),
+                                            MathUtils.clamp(c[3], 0, 1));
+
+                                } else {
+                                    if (colorMin != null && colorMax != null) {
+                                        double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                        // fac = 0 -> colorMin,  fac = 1 -> colorMax
+                                        double fac = (dist - minDistance) / (maxDistance - minDistance);
+                                        interpolateColor(colorMin, colorMax, c, fac);
+                                    }
+                                    float r = 0, g = 0, b = 0;
+                                    if (set.colorNoise != 0) {
+                                        r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                        g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                        b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                    }
+                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1),
+                                            MathUtils.clamp(c[1] + g, 0, 1),
+                                            MathUtils.clamp(c[2] + b, 0, 1),
+                                            MathUtils.clamp(c[3], 0, 1));
+                                }
+                            }
+                        }
 
                         // PARTICLE POSITION
                         model.instanceAttributes[curr.instanceIdx + model.particlePosOffset] = (float) p[0];
@@ -270,7 +307,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 } else {
                     double s = .3e-4f;
                     shaderProgram.setUniformf("u_sizeFactor",
-                                              (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                            (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                 }
 
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));

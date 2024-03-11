@@ -188,6 +188,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                     }
                 }
             }
+            // Sort using natural order.
+            actualFilePaths.sort();
             // Send to load.
             if (!actualFilePaths.isEmpty()) {
                 manager.load(base.getName() + " Textures", TextureArray.class, new TextureArrayParameter(actualFilePaths));

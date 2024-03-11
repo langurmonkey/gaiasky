@@ -10,7 +10,7 @@ package gaiasky.util.ucd;
 /**
  * Represents the UCD (universal content descriptor) for a column of a table.
  */
-public class UCD {
+public class UCD implements Comparable<UCD> {
 
     public String originalUCD, converted, colName, unit;
     public String[][] UCD;
@@ -67,6 +67,11 @@ public class UCD {
                 originalUCD.equals(ucd.originalUCD) &&
                 colName.equals(ucd.colName) &&
                 unit.equals(ucd.unit);
+    }
+
+    @Override
+    public int compareTo(gaiasky.util.ucd.UCD ucd) {
+        return colName.compareTo(ucd.colName);
     }
 
     public enum UCDType {

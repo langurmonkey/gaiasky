@@ -16,6 +16,7 @@ import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
@@ -35,6 +36,7 @@ import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.ucd.UCD;
 import org.apache.commons.io.FilenameUtils;
 import uk.ac.starlink.table.ColumnInfo;
 
@@ -326,7 +328,12 @@ public class DataInfoWindow extends GenericDialog {
                 var columnInfoList = set.columnInfoList;
                 var map = bean.getExtra();
                 var keys = map.keys();
-                for (var ucd : keys) {
+                Array<UCD> arr = new Array<>();
+                for(var ucd : keys) {
+                    arr.add(ucd);
+                }
+                arr.sort();
+                for (var ucd : arr) {
                     Object value = map.get(ucd);
                     var columnGroup = new HorizontalGroup();
                     columnGroup.space(7f);

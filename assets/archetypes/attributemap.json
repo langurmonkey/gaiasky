@@ -657,6 +657,10 @@
         "description": "The color of the particles at the maximum distance, as RGBA. If this is set, the color of the particles gets interpolated from ``colorMin`` to ``colorMax`` depending on the distance of the particles to the origin.",
         "units": "Double[4]"
       },
+      "colorFromTexture": {
+        "description": "If true, color of this particle depends on the texture assigned to it. This is useful when using 'textureAttribute', for instance, where the texture is assigned depending on the value of an attribute for this object. This feature requires a non-zero 'colorNoise', as it is used to generate the colors.",
+        "units": "Boolean"
+      },
       "fixedAngularSize": {
         "description": "Set a fixed angular size for all particles in this set, as a solid angle in radians (see aliases for other units).",
         "units": "Double",
@@ -680,6 +684,10 @@
       "textures": {
         "description": "List of texture files to render the particles of this group. If more than one texture is provided, each particle is assigned a texture randomly. This can also point to one or more directories, in which case all the image files within are used. All images must have the same dimensions. If this is provided, ``profileDecay`` is ignored.",
         "units": "String[]"
+      },
+      "textureAttribute": {
+        "description": "If present, this attribute is used to assign textures to particles. It should be an integer attribute in [1,n], where n is the number of textures. If the value of the attribute is out of this range, it is clamped. The attribute value is used as an index to query the texture array, where the textures are sorted using the natural order of their file names. If the attribute is of any other type, Gaia Sky will do its best to use it to assign textures as well, but no guarantees.",
+        "units": "String"
       },
       "modelFile": {
         "description": "Path to the model file to use (``obj``, ``obj.gz`` ``g3db``, ``g3dj``, ``gltf``, ``glb``). If present, the ``modelType`` and ``modelParams`` attributes are ignored. The model should have only positions (vector-3), normals (vector-3), and texture coordinates (vector-2) as vertex attributes. Only the first mesh of the model is used. Textures, lighting and material are ignored. This is only used in extended particle groups.",

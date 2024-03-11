@@ -536,7 +536,7 @@ public class ParticleRecord implements IParticleRecord {
         if (extra != null) {
             Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
-                if (ucd.originalUCD.equals(name) || ucd.colName.equals(name)) {
+                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
                     return true;
                 }
             }

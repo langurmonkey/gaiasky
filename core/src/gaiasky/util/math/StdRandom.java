@@ -46,7 +46,7 @@ public final class StdRandom {
      */
     public static void setSeed(long s) {
         seed = s;
-        random = new Random(seed);
+        random.setSeed(s);
     }
 
     /**

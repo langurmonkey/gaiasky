@@ -32,6 +32,7 @@ import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
+import gaiasky.util.parse.Parser;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Random;
@@ -121,6 +122,37 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                     if (utils.filter(i, set, desc) && set.isVisible(i)) {
                         IParticleRecord pb = set.get(i);
                         double[] p = pb.rawDoubleData();
+
+                        // SIZE, CMAP_VALUE
+                        tempVerts[curr.vertexIdx + additionalOffset] =
+                                (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
+
+                        // TEXTURE INDEX
+                        float textureIndex = -1.0f;
+                        if (set.textureArray != null) {
+                            int nTextures = set.textureArray.getDepth();
+                            if (set.textureAttribute != null && pb.hasExtra(set.textureAttribute)) {
+                                var value = pb.getExtra(set.textureAttribute);
+                                if (value instanceof Number num) {
+                                    textureIndex = MathUtils.clamp(num.intValue() - 1, 0, nTextures - 1);
+                                } else if (value instanceof String str) {
+                                    // Try to parse it as integer, otherwise, use hash code.
+                                    try {
+                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0, nTextures - 1);
+                                    } catch (NumberFormatException ignored) {
+                                        textureIndex = value.hashCode() % nTextures;
+                                    }
+                                } else {
+                                    // Any other type, use hash code.
+                                    textureIndex = value.hashCode() % nTextures;
+                                }
+                            } else {
+                                // Random index.
+                                textureIndex = (float) rand.nextInt(nTextures);
+                            }
+                        }
+                        tempVerts[curr.vertexIdx + textureIndexOffset] = textureIndex;
+
                         // COLOR
                         if (hl.isHighlighted()) {
                             if (hlCmap) {
@@ -132,33 +164,40 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
                             }
                         } else {
-                            if (colorMin != null && colorMax != null) {
-                                double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-                                // fac = 0 -> colorMin,  fac = 1 -> colorMax
-                                double fac = (dist - minDistance) / (maxDistance - minDistance);
-                                interpolateColor(colorMin, colorMax, c, fac);
-                            }
-                            float r = 0, g = 0, b = 0;
-                            if (set.colorNoise != 0) {
-                                r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                            }
-                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1),
-                                                                                             MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
-                        }
+                            // Generate color.
+                            if (set.colorFromTexture && set.textureArray != null && textureIndex >= 0f) {
+                                // Generate color using texture index, so particles with the same index get the
+                                // same color.
+                                float r = 0, g = 0, b = 0;
+                                if (set.colorNoise != 0) {
+                                    StdRandom.setSeed((long) textureIndex);
+                                    r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                    g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                    b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                }
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(
+                                        MathUtils.clamp(c[0] + r, 0, 1),
+                                        MathUtils.clamp(c[1] + g, 0, 1),
+                                        MathUtils.clamp(c[2] + b, 0, 1),
+                                        MathUtils.clamp(c[3], 0, 1));
 
-                        // SIZE, CMAP_VALUE
-                        tempVerts[curr.vertexIdx + additionalOffset] =
-                                (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
-
-                        // TEXTURE INDEX
-                        float textureIndex = -1.0f;
-                        if (set.textureArray != null) {
-                            int nTextures = set.textureArray.getDepth();
-                            textureIndex = (float) rand.nextInt(nTextures);
+                            } else {
+                                if (colorMin != null && colorMax != null) {
+                                    double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                    // fac = 0 -> colorMin,  fac = 1 -> colorMax
+                                    double fac = (dist - minDistance) / (maxDistance - minDistance);
+                                    interpolateColor(colorMin, colorMax, c, fac);
+                                }
+                                float r = 0, g = 0, b = 0;
+                                if (set.colorNoise != 0) {
+                                    r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                    g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                    b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                }
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1),
+                                        MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                            }
                         }
-                        tempVerts[curr.vertexIdx + textureIndexOffset] = textureIndex;
 
                         // POSITION
                         final int idx = curr.vertexIdx;
@@ -187,10 +226,10 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                 shaderProgram.setUniformf("u_falloff", set.profileDecay);
                 shaderProgram.setUniformf("u_sizeFactor",
-                                          (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.1)) * sizeFactor * meanDist / (
-                                                  camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                        (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.1)) * sizeFactor * meanDist / (
+                                camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                 shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()),
-                                          (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
+                        (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
 
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 

@@ -121,6 +121,11 @@ public class ParticleSet implements Component, IDisposable {
     public float colorNoise = 0;
 
     /**
+     * Assign a different color to each texture. Only used when textures are active.
+     */
+    public boolean colorFromTexture = false;
+
+    /**
      * Fixed angular size for all particles in this set, in radians. Applies only to quads. Negative to disable.
      */
     public double fixedAngularSize = -1;
@@ -133,6 +138,11 @@ public class ParticleSet implements Component, IDisposable {
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
     public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0))};
+    /**
+     * The texture attribute is an attribute in the original table that points to the texture to use. Ideally, it should
+     * be an integer value from 1 to n, where n is the number of textures.
+     */
+    public String textureAttribute;
     /**
      * Texture files to use for rendering the particles, at random. Applies only to quads.
      **/
@@ -408,6 +418,10 @@ public class ParticleSet implements Component, IDisposable {
         this.colorNoise = colorNoise.floatValue();
     }
 
+    public void setColorFromTexture(boolean colorFromTexture) {
+        this.colorFromTexture = colorFromTexture;
+    }
+
     /**
      * Set fixed angular size, in radians.
      */
@@ -450,6 +464,10 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setParticlesizelimits(double[] sizeLimits) {
         setParticleSizeLimits(sizeLimits);
+    }
+
+    public void setTextureAttribute(String textureAttribute) {
+        this.textureAttribute = textureAttribute;
     }
 
     public void setTexture(String texture) {
