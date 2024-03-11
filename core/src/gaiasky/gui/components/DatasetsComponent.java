@@ -295,7 +295,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         } else {
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }
-        int cap = 20;
+        int cap = 25;
         String types = ci.type.toString() + " / " + ci.getCt();
         OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin, "grey-large");
         typesLabel.addListener(new OwnTextTooltip(types, skin));
@@ -355,7 +355,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         // Info
         ScrollPane scroll = new OwnScrollPane(c, skin, "minimalist-nobg");
-        scroll.setName("datasets component scroll");
         scroll.setScrollingDisabled(false, true);
         scroll.setForceScroll(false, false);
         scroll.setFadeScrollBars(false);

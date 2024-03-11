@@ -59,6 +59,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The user interface panel that welcomes the user to Gaia Sky. Contains buttons to access the dataset manager and to
@@ -66,6 +67,7 @@ import java.util.Set;
  */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
+    private static AtomicReference<DataDescriptor> localDatasets = new AtomicReference<>();
 
     private final XrLoadStatus vrStatus;
     private final boolean skipWelcome;
@@ -77,7 +79,6 @@ public class WelcomeGui extends AbstractGui {
     private boolean downloadError = false;
     private Texture bgTex;
     private DataDescriptor serverDatasets;
-    private DataDescriptor localDatasets;
     private Array<Button> buttonList;
     private int currentSelected = 0;
     private PopupNotificationsInterface popupInterface;
@@ -600,8 +601,8 @@ public class WelcomeGui extends AbstractGui {
         buildWelcomeUI();
     }
 
-    private void reloadLocalDatasets() {
-        this.localDatasets = DataDescriptorUtils.instance().buildLocalDatasets(null);
+    private static void reloadLocalDatasets() {
+        localDatasets.set(DataDescriptorUtils.instance().buildLocalDatasets(null));
     }
 
     private void savePreferences() {
@@ -611,11 +612,11 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numTotalDatasetsEnabled() {
-        return this.localDatasets != null ? (int) this.localDatasets.datasets.stream().filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr)).count() : 0;
+        return localDatasets.get() != null ? (int) localDatasets.get().datasets.stream().filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr)).count() : 0;
     }
 
     private int numCatalogsAvailable() {
-        return this.localDatasets != null ? this.localDatasets.datasets.size() : 0;
+        return localDatasets.get() != null ? localDatasets.get().datasets.size() : 0;
     }
 
     private int numGaiaDRCatalogsEnabled() {
@@ -635,7 +636,7 @@ public class WelcomeGui extends AbstractGui {
 
     private int numStarCatalogsEnabled() {
         int matches = 0;
-        if (serverDatasets == null && localDatasets == null) {
+        if (serverDatasets == null && localDatasets.get() == null) {
             return 0;
         }
 
@@ -650,8 +651,8 @@ public class WelcomeGui extends AbstractGui {
                     dataset = serverDatasets.findDatasetByDescriptor(path);
                 }
                 // Try local description
-                if (dataset == null && localDatasets != null) {
-                    dataset = localDatasets.findDatasetByDescriptor(path);
+                if (dataset == null && localDatasets.get() != null) {
+                    dataset = localDatasets.get().findDatasetByDescriptor(path);
                 }
                 if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {
                     matches++;
@@ -996,6 +997,10 @@ public class WelcomeGui extends AbstractGui {
             return true;
         }
 
+    }
+
+    public static AtomicReference<DataDescriptor> getLocalDatasets() {
+        return localDatasets;
     }
 
 }

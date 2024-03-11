@@ -11,12 +11,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.WelcomeGui;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Settings;
+import gaiasky.util.datadesc.DatasetDesc;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +42,27 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         var base = Mapper.base.get(entity);
         var datasetDesc = Mapper.datasetDescription.get(entity);
+        if (datasetDesc.catalogInfo == null && WelcomeGui.getLocalDatasets().get() != null) {
+            // Try to get it from the datasets.
+            var local = WelcomeGui.getLocalDatasets().get();
+            var dataset = local.findDatasetByName(base.getName());
+            if (dataset != null) {
+                datasetDesc.catalogInfo = fromDatasetDesc(dataset, entity);
+            }
+        }
         initializeCatalogInfo(entity, datasetDesc, true, base.getName(), datasetDesc.description);
+    }
+
+    private CatalogInfo fromDatasetDesc(DatasetDesc dd, Entity entity) {
+        var result = new CatalogInfo(dd.name,
+                dd.description,
+                view.getDataFile(),
+                CatalogInfoSource.INTERNAL,
+                1f,
+                entity);
+        result.nParticles = dd.nObjects;
+        result.sizeBytes = dd.sizeBytes;
+        return result;
     }
 
     protected void initializeCatalogInfo(Entity entity,
