@@ -1160,32 +1160,66 @@ public interface IScriptingInterface {
     void setStarGlowFactor(float glowFactor);
 
     /**
-     * Gets the current star size value in pixels.
+     * Gets the current point size value in pixels.
      *
      * @return The size value, in pixels.
      */
+    float getPointSize();
+
+    /**
+     * Gets the current star size value in pixels.
+     *
+     * @return The size value, in pixels.
+     * @deprecated Use {@link  #getPointSize()} instead.
+     */
     float getStarSize();
+
+    /**
+     * Sets the base point size.
+     *
+     * @param size The size value, between {@link Constants#MIN_STAR_POINT_SIZE} and
+     *             {@link Constants#MAX_STAR_POINT_SIZE}.
+     */
+    void setPointSize(float size);
 
     /**
      * Sets the size of the rasterized stars, in pixels.
      *
      * @param size The size value in pixels, between {@link Constants#MIN_STAR_POINT_SIZE} and
      *             {@link Constants#MAX_STAR_POINT_SIZE}.
+     * @deprecated Use {@link  #setPointSize(float)} instead.
      */
     void setStarSize(float size);
+
+    /**
+     * Gets the base star opacity.
+     *
+     * @return The base opacity value.
+     */
+    float getStarBaseOpacity();
 
     /**
      * Gets the minimum star opacity.
      *
      * @return The minimum opacity value.
+     * @deprecated Use {@link #getStarBaseOpacity()} instead.
      */
     float getStarMinOpacity();
+
+    /**
+     * Sets the base star opacity.
+     *
+     * @param opacity The base opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and
+     *                {@link Constants#MAX_STAR_MIN_OPACITY}.
+     */
+    void setStarBaseOpacity(float opacity);
 
     /**
      * Sets the minimum star opacity.
      *
      * @param opacity The minimum opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and
      *                {@link Constants#MAX_STAR_MIN_OPACITY}.
+     * @deprecated Use {@link #setStarBaseOpacity(float)} instead.
      */
     void setStarMinOpacity(float opacity);
 

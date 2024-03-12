@@ -1176,15 +1176,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public float getStarSize() {
+    public float getPointSize() {
         return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER,
                 Constants.MAX_SLIDER);
     }
 
     @Override
-    public void setStarSize(final float size) {
+    public float getStarSize() {
+        return getPointSize();
+    }
+    @Override
+    public void setPointSize(final float size) {
         if (checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size"))
             em.post(Event.STAR_POINT_SIZE_CMD, this, size);
+    }
+
+    @Override
+    public void setStarSize(final float size) {
+        setPointSize(size);
     }
 
     public void setStarSize(final int size) {
@@ -1192,15 +1201,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public float getStarMinOpacity() {
+    public float getStarBaseOpacity() {
         return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER,
                 Constants.MAX_SLIDER);
     }
 
     @Override
+    public float getStarMinOpacity() {
+        return getStarBaseOpacity();
+    }
+
+    @Override
+    public void setStarBaseOpacity(float opacity) {
+        if (checkNum(opacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
+            EventManager.publish(Event.STAR_BASE_LEVEL_CMD, this, opacity);
+    }
+
+    @Override
     public void setStarMinOpacity(float minOpacity) {
-        if (checkNum(minOpacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
-            EventManager.publish(Event.STAR_BASE_LEVEL_CMD, this, minOpacity);
+       setStarBaseOpacity(minOpacity);
     }
 
     public float getMinStarOpacity() {
