@@ -145,7 +145,7 @@ public interface IScriptingInterface {
                               float fontSize);
 
     /**
-     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but
+     * Same as {@link #displayImageObject(int, String, float, float, float, float, float, float)} but
      * using an array for the color
      * instead of giving each component separately.
      *
@@ -262,7 +262,7 @@ public interface IScriptingInterface {
                             float a);
 
     /**
-     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but
+     * Same as {@link #displayImageObject(int, String, float, float, float, float, float, float)} but
      * using a
      * double array for the color instead of each component separately.
      *
@@ -426,14 +426,14 @@ public interface IScriptingInterface {
                            boolean immediate);
 
     /**
-     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[])}.
+     * Component-wise version of {@link #setCameraPosition(double[])}.
      */
     void setCameraPosition(double x,
                            double y,
                            double z);
 
     /**
-     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], String)}.
+     * Component-wise version of {@link #setCameraPosition(double[], String)}.
      */
     void setCameraPosition(double x,
                            double y,
@@ -441,7 +441,7 @@ public interface IScriptingInterface {
                            String units);
 
     /**
-     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], boolean)}.
+     * Component-wise version of {@link #setCameraPosition(double[], boolean)}.
      */
     void setCameraPosition(double x,
                            double y,
@@ -449,7 +449,7 @@ public interface IScriptingInterface {
                            boolean immediate);
 
     /**
-     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], String, boolean)}.
+     * Component-wise version of {@link #setCameraPosition(double[], String, boolean)}.
      */
     void setCameraPosition(double x,
                            double y,
@@ -477,7 +477,7 @@ public interface IScriptingInterface {
      * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
-     * within a parked runnable, use {@link IScriptingInterface#setCameraPosition(double[], boolean)},
+     * within a parked runnable, use {@link #setCameraPosition(double[], boolean)},
      * with the boolean set to <code>true</code>.
      *
      * @param position Vector of three components in internal coordinates and Km.
@@ -488,7 +488,7 @@ public interface IScriptingInterface {
      * Sets the camera position to the given coordinates, in the internal reference system and the given units.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
-     * within a parked runnable, use {@link IScriptingInterface#setCameraPosition(double[], boolean)},
+     * within a parked runnable, use {@link #setCameraPosition(double[], boolean)},
      * with the boolean set to <code>true</code>.
      *
      * @param position Vector of three components in internal coordinates and the given units.
@@ -520,12 +520,12 @@ public interface IScriptingInterface {
     /**
      * Sets the camera direction vector to the given vector, in the internal reference system.
      * You can convert from spherical coordinates using
-     * {@link IScriptingInterface#equatorialCartesianToInternalCartesian(double[], double)},
-     * {@link IScriptingInterface#galacticToInternalCartesian(double, double, double)} and
-     * {@link IScriptingInterface#eclipticToInternalCartesian(double, double, double)}.
+     * {@link #equatorialCartesianToInternalCartesian(double[], double)},
+     * {@link #galacticToInternalCartesian(double, double, double)} and
+     * {@link #eclipticToInternalCartesian(double, double, double)}.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
-     * within a parked runnable, use {@link IScriptingInterface#setCameraDirection(double[], boolean)},
+     * within a parked runnable, use {@link #setCameraDirection(double[], boolean)},
      * with the boolean set to <code>true</code>.
      *
      * @param dir The direction vector in equatorial cartesian coordinates.
@@ -556,7 +556,7 @@ public interface IScriptingInterface {
      * Sets the camera up vector to the given vector, in the internal reference system.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
-     * within a parked runnable, use {@link IScriptingInterface#setCameraUp(double[], boolean)},
+     * within a parked runnable, use {@link #setCameraUp(double[], boolean)},
      * with the boolean set to <code>true</code>.
      *
      * @param up The up vector in equatorial coordinates.
@@ -614,7 +614,7 @@ public interface IScriptingInterface {
      * Changes the speed of the camera when it rotates around a focus.
      *
      * @param speed The new rotation speed in [0,100]
-     * @deprecated Use {@link IScriptingInterface#setCameraRotationSpeed(float)}
+     * @deprecated Use {@link #setCameraRotationSpeed(float)}
      */
     @Deprecated
     void setRotationCameraSpeed(float speed);
@@ -630,7 +630,7 @@ public interface IScriptingInterface {
      * Changes the turning speed of the camera.
      *
      * @param speed The new turning speed, from 1 to 100.
-     * @deprecated Use {@link IScriptingInterface#setCameraTurningSpeed(float)}
+     * @deprecated Use {@link #setCameraTurningSpeed(float)}
      */
     @Deprecated
     void setTurningCameraSpeed(float speed);
@@ -1077,7 +1077,7 @@ public interface IScriptingInterface {
     boolean isSimulationTimeOn();
 
     /**
-     * Deprecated, use {@link IScriptingInterface#setTimeWarp(double)} instead.
+     * Deprecated, use {@link #setTimeWarp(double)} instead.
      */
     @Deprecated
     void setSimulationPace(double pace);
@@ -1340,12 +1340,12 @@ public interface IScriptingInterface {
 
     /**
      * Takes a screenshot of the current frame and saves it to the configured
-     * location (see {@link IScriptingInterface#configureScreenshots(int, int, String, String)}).
+     * location (see {@link #configureScreenshots(int, int, String, String)}).
      */
     void saveScreenshot();
 
     /**
-     * Alias to {@link IScriptingInterface#saveScreenshot()}.
+     * Alias to {@link #saveScreenshot()}.
      */
     void takeScreenshot();
 
@@ -1359,7 +1359,7 @@ public interface IScriptingInterface {
      * @param fps        Target frames per second (number of images per second).
      * @param directory  The output directory path.
      * @param namePrefix The file name prefix.
-     * @deprecated Use {@link IScriptingInterface#configureFrameOutput(int, int, int, String, String)} instead.
+     * @deprecated Use {@link #configureFrameOutput(int, int, int, String, String)} instead.
      */
     @Deprecated
     void configureRenderOutput(int width,
@@ -1418,7 +1418,7 @@ public interface IScriptingInterface {
      * Is the frame output system on?
      *
      * @return True if the frame output is active.
-     * @deprecated Use {@link IScriptingInterface#isFrameOutputActive()} instead.
+     * @deprecated Use {@link #isFrameOutputActive()} instead.
      */
     @Deprecated
     boolean isRenderOutputActive();
@@ -1434,7 +1434,7 @@ public interface IScriptingInterface {
      * Gets the current FPS setting in the frame output system.
      *
      * @return The FPS setting.
-     * @deprecated Use {@link IScriptingInterface#getFrameOutputFps()} instead.
+     * @deprecated Use {@link #getFrameOutputFps()} instead.
      */
     @Deprecated
     double getRenderOutputFps();
@@ -1521,8 +1521,8 @@ public interface IScriptingInterface {
      * Also, <strong>use this with caution</strong>, as scaling coordinates
      * may have unintended side effects, and remember to set the scaling
      * back to 1.0 at the end of your script.
-     * Additionally, use either {@link IScriptingInterface#refreshAllOrbits()} or
-     * {@link IScriptingInterface#refreshObjectOrbit(String)} right after
+     * Additionally, use either {@link #refreshAllOrbits()} or
+     * {@link #refreshObjectOrbit(String)} right after
      * this call in order to immediately refresh the scaled orbits.
      * </p>
      *
@@ -1541,7 +1541,7 @@ public interface IScriptingInterface {
     /**
      * Forces the refresh of the orbit of the object identified by
      * <code>name</code>. This should generally be called after a call to
-     * {@link IScriptingInterface#setOrbitCoordinatesScaling(String, double)}.
+     * {@link #setOrbitCoordinatesScaling(String, double)}.
      */
     void refreshObjectOrbit(String name);
 
@@ -1574,7 +1574,7 @@ public interface IScriptingInterface {
      * </p>
      * <p>Warning: This method is not deterministic. It is implemented as a loop that sends 'camera forward' events
      * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
-     * look into the {@link IScriptingInterface#parkRunnable(String, Runnable)} family of calls.</p>
+     * look into the {@link #parkRunnable(String, Runnable)} family of calls.</p>
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      */
@@ -1587,7 +1587,7 @@ public interface IScriptingInterface {
      *
      * <p>Warning: This method is not deterministic. It is implemented as a loop that sends 'camera forward' events
      * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
-     * look into the {@link IScriptingInterface#parkRunnable(String, Runnable)} family of calls.</p>
+     * look into the {@link #parkRunnable(String, Runnable)} family of calls.</p>
      *
      * @param name       The name or id (HIP, TYC, sourceId) of the object.
      * @param solidAngle The target solid angle of the object, in degrees. The angle
@@ -1608,7 +1608,7 @@ public interface IScriptingInterface {
      *
      * <p>Warning: This method is not deterministic. It is implemented as a loop that sends 'camera forward' events
      * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
-     * look into the {@link IScriptingInterface#parkRunnable(String, Runnable)} family of calls.</p>
+     * look into the {@link #parkRunnable(String, Runnable)} family of calls.</p>
      *
      * @param name            The name or id (HIP, TYC, sourceId) of the object.
      * @param solidAngle      The target solid angle of the object, in degrees. The angle
@@ -1829,7 +1829,7 @@ public interface IScriptingInterface {
     /**
      * Adds a new trajectory object with the given name, points and color. The trajectory
      * is rendered using the 'line renderer' setting in the preferences dialog.
-     * This is a very similar call to {@link IScriptingInterface#addPolyline(String, double[], double[])},
+     * This is a very similar call to {@link #addPolyline(String, double[], double[])},
      * but in this case the line can be rendered with higher quality
      * polyline quadstrips.
      *
@@ -1845,7 +1845,7 @@ public interface IScriptingInterface {
     /**
      * Adds a new trajectory object with the given name, points and color. The trajectory
      * is rendered using the 'line renderer' setting in the preferences dialog.
-     * This is a very similar call to {@link IScriptingInterface#addPolyline(String, double[], double[])},
+     * This is a very similar call to {@link #addPolyline(String, double[], double[])},
      * but in this case the line can be rendered with higher quality
      * polyline quadstrips.
      *
@@ -2013,7 +2013,7 @@ public interface IScriptingInterface {
     /**
      * Maximizes the interface window.
      *
-     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#expandUIPane(String)} instead.
+     * @deprecated The controls window is part of the old UI. Use {@link #expandUIPane(String)} instead.
      */
     @Deprecated
     void maximizeInterfaceWindow();
@@ -2021,7 +2021,7 @@ public interface IScriptingInterface {
     /**
      * Minimizes the interface window.
      *
-     * @deprecated The controls window is part of the old UI. Use {@link IScriptingInterface#collapseUIPane(String)} instead.
+     * @deprecated The controls window is part of the old UI. Use {@link #collapseUIPane(String)} instead.
      */
     @Deprecated
     void minimizeInterfaceWindow();
@@ -2044,7 +2044,7 @@ public interface IScriptingInterface {
     void expandUIPane(String panelName);
 
     /**
-     * @deprecated Use {@link IScriptingInterface#expandUIPane(String)}.
+     * @deprecated Use {@link #expandUIPane(String)}.
      */
     @Deprecated
     void expandGuiComponent(String name);
@@ -2067,7 +2067,7 @@ public interface IScriptingInterface {
     void collapseUIPane(String panelName);
 
     /**
-     * @deprecated Use {@link IScriptingInterface#collapseUIPane(String)}.
+     * @deprecated Use {@link #collapseUIPane(String)}.
      */
     @Deprecated
     void collapseGuiComponent(String name);
@@ -2149,13 +2149,24 @@ public interface IScriptingInterface {
                       long timeoutMs);
 
     /**
-     * Sets the target frame rate of the camera recorder. This will cap the frame rate of Gaia
-     * Sky to this value while the camera is recording. When playing the camera file
-     * back, you are responsible to set the right frame rate.
+     * Sets the target frame rate of the camcorder. This artificially sets the frame rate (the frame time) of Gaia
+     * Sky to this value while the camera is recording and playing. Make sure to use the right FPS setting during
+     * playback!
      *
-     * @param targetFps The target frame rate for the camera recorder.
+     * @param targetFps The target frame rate for the camcorder.
+     */
+    void setCamcorderFps(double targetFps);
+
+    /**
+     * @deprecated Use {@link #setCamcorderFps(double)} instead.
      */
     void setCameraRecorderFps(double targetFps);
+
+    /**
+     * Gets the current frame rate setting of the camcorder.
+     * @return The FPS setting of the camcorder.
+     */
+    double getCamcorderFps();
 
     /**
      * Starts recording the camera path to an auto-generated file in the default
@@ -2167,9 +2178,9 @@ public interface IScriptingInterface {
     /**
      * Starts recording a camera path with the given filename. The filename
      * is without extension or path. The final path with the camera file, after
-     * invoking {@link IScriptingInterface#stopRecordingCameraPath()}, is:
+     * invoking {@link #stopRecordingCameraPath()}, is:
      * <br /><br />
-     * <code>{@link IScriptingInterface#getDefaultCameraDir()} + "/" + filename + ".gsc"</code>
+     * <code>{@link #getDefaultCameraDir()} + "/" + filename + ".gsc"</code>
      * <br /><br />
      * This command has no effect if the camera is already being recorded.
      */
@@ -2198,7 +2209,7 @@ public interface IScriptingInterface {
     void runCameraPath(String file);
 
     /**
-     * Alias for {@link IScriptingInterface#runCameraPath(String)}
+     * Alias for {@link #runCameraPath(String)}
      */
     void playCameraPath(String file);
 
@@ -2215,7 +2226,7 @@ public interface IScriptingInterface {
                        boolean sync);
 
     /**
-     * Alias for {@link IScriptingInterface#runCameraPath(String, boolean)}
+     * Alias for {@link #runCameraPath(String, boolean)}
      */
     void playCameraPath(String file,
                         boolean sync);
@@ -2265,7 +2276,7 @@ public interface IScriptingInterface {
                           double seconds);
 
     /**
-     * Same as {@link IScriptingInterface#cameraTransition(double[], double[], double[], double)} but the
+     * Same as {@link #cameraTransition(double[], double[], double[], double)} but the
      * camera position is given in Km.
      *
      * @param camPos  The target camera position in Km.
@@ -3001,7 +3012,7 @@ public interface IScriptingInterface {
     void postRunnable(Runnable runnable);
 
     /**
-     * See {@link IScriptingInterface#parkSceneRunnable(String, Runnable)}.
+     * See {@link #parkSceneRunnable(String, Runnable)}.
      */
     void parkRunnable(String id,
                       Runnable runnable);
@@ -3056,7 +3067,7 @@ public interface IScriptingInterface {
      * Removes the runnable with the given id, if any.
      *
      * @param id The id of the runnable to remove.
-     * @deprecated Use {@link IScriptingInterface#removeRunnable(String)}.
+     * @deprecated Use {@link #removeRunnable(String)}.
      */
     @Deprecated
     void unparkRunnable(String id);
@@ -3082,10 +3093,10 @@ public interface IScriptingInterface {
      * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
-     * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
+     * {@link #loadDataset(String, String)}.<br/>
      * If <code>sync</code> is false, the loading happens
      * in a new thread and the call returns immediately. In this case, you can use
-     * {@link IScriptingInterface#hasDataset(String)}
+     * {@link #hasDataset(String)}
      * to check whether the dataset is already loaded and available.
      * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
      * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
@@ -3106,10 +3117,10 @@ public interface IScriptingInterface {
      * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
-     * {@link IScriptingInterface#loadDataset(String, String, boolean)}.<br/>
+     * {@link #loadDataset(String, String, boolean)}.<br/>
      * If <code>sync</code> is false, the loading happens
      * in a new thread and the call returns immediately. In this case, you can use
-     * {@link IScriptingInterface#hasDataset(String)}
+     * {@link #hasDataset(String)}
      * to check whether the dataset is already loaded and available.
      * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
      * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
@@ -3765,7 +3776,7 @@ public interface IScriptingInterface {
      * <p>Creates a backup of the current settings state that can be restored later on.
      * The settings are backed up in a stack, so multiple calls to this method put different copies of the settings
      * on the stack in a LIFO fashion.</p>
-     * <p>This method, together with {@link IScriptingInterface#restoreSettings()}, are useful to back up and restore
+     * <p>This method, together with {@link #restoreSettings()}, are useful to back up and restore
      * the
      * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
      * unmodified after your script ends.</p>
@@ -3774,7 +3785,7 @@ public interface IScriptingInterface {
 
     /**
      * <p>Takes the settings object at the top of the settings stack and makes it effective.</p>
-     * <p>This method, together with {@link IScriptingInterface#backupSettings()}, are useful to back up and restore the
+     * <p>This method, together with {@link #backupSettings()}, are useful to back up and restore the
      * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
      * unmodified after your script ends.</p>
      * <p>WARN: This function applies all settings immediately, and the user interface may be re-initialized.
@@ -3786,8 +3797,8 @@ public interface IScriptingInterface {
 
     /**
      * Clears the stack of settings objects. This will invalidate all previous calls to
-     * {@link IScriptingInterface#backupSettings()},
-     * effectively making the settings stack empty. Calling {@link IScriptingInterface#restoreSettings()} after this
+     * {@link #backupSettings()},
+     * effectively making the settings stack empty. Calling {@link #restoreSettings()} after this
      * method will return false.
      */
     void clearSettingsStack();

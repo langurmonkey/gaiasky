@@ -59,6 +59,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.gdx.TextureArrayLoader;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -245,10 +246,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private List<IGui> guis;
     // The sprite batch to render the back buffer to screen
     private SpriteBatch renderBatch;
-    /**
-     * Camera recording or not?
-     */
-    private boolean camRecording = false;
     // Gaia Sky has finished initialization
     private boolean initialized = false;
     /**
@@ -363,7 +360,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         if (settings.graphics.fpsLimit > 0.0) {
             // If FPS limit is on, dynamic resolution is off.
-            sleep(settings.graphics.fpsLimit);
+            targetFrameRate(settings.graphics.fpsLimit);
         } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.timeSinceMillis(startTimeScene) > 10000
                 && TimeUtils.millis() - lastDynamicResolutionChange > 1000 && !settings.runtime.openXr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate.
@@ -835,7 +832,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events.
-        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE,
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE,
                 Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
                 Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE, Event.GO_HOME_INSTANT_CMD);
@@ -1225,13 +1222,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
      *
      * @param fps The target frame rate.
      */
-    private void sleep(double fps) {
+    private void targetFrameRate(double fps) {
         if (fps > 0.0) {
             var currentFrameTimeNanos = (System.nanoTime() - startNanos);
             var targetFrameTimeNanos = Nature.S_TO_NS / fps;
             if (currentFrameTimeNanos < targetFrameTimeNanos) {
                 busySleep((long) (targetFrameTimeNanos - currentFrameTimeNanos));
-                //Thread.sleep((long) Math.ceil(targetFrameTimeMs - currentFrameTimeMs));
             }
             startNanos = System.nanoTime();
         }
@@ -1313,7 +1309,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             // If frame output is active, we need to set our delta t according to
             // the configured frame rate of the frame output system.
             dtGs = 1.0 / settings.frame.targetFps;
-        } else if (camRecording) {
+        } else if (Camcorder.instance.isRecording()) {
             // If Camera is recording, we need to set our delta t according to
             // the configured frame rate of the camrecorder.
             dtGs = 1.0 / settings.camrecorder.targetFps;
@@ -1534,13 +1530,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
                         i++;
                     }
                     assetManager.load(sceneName, Scene.class, new SceneLoaderParameters(dataFilesToLoad));
-                }
-            }
-            case RECORD_CAMERA_CMD -> {
-                if (data != null && data.length > 0) {
-                    camRecording = (Boolean) data[0];
-                } else {
-                    camRecording = !camRecording;
                 }
             }
             case CAMERA_MODE_CMD -> { // Register/unregister GUI.

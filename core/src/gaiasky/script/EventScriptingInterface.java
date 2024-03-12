@@ -57,6 +57,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ReprojectionMode;
 import gaiasky.util.Settings.ScreenshotSettings;
+import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.*;
 import gaiasky.util.filter.attrib.AttributeUCD;
@@ -2540,10 +2541,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraRecorderFps(double targetFps) {
+    public void setCamcorderFps(double targetFps) {
         if (checkNum(targetFps, Constants.MIN_FPS, Constants.MAX_FPS, "targetFps")) {
             em.post(Event.CAMRECORDER_FPS_CMD, this, targetFps);
         }
+    }
+
+    @Override
+    public void setCameraRecorderFps(double targetFps) {
+        setCamcorderFps(targetFps);
+    }
+
+    @Override
+    public double getCamcorderFps() {
+        return Settings.settings.camrecorder.targetFps;
     }
 
     private Texture getTexture(String path) {
@@ -3031,7 +3042,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
 
                 // Remove and return
-                unparkRunnable(name);
+                removeRunnable(name);
             }
 
         }
@@ -3043,8 +3054,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (seconds == 0f)
                 return;
 
-            if (this.isFrameOutputActive()) {
-                this.sleepFrames(Math.max(1, Math.round(this.getFrameOutputFps() * seconds)));
+            if (isFrameOutputActive()) {
+                sleepFrames(Math.max(1, Math.round(getFrameOutputFps() * seconds)));
+            } else if(Camcorder.instance.isRecording()) {
+                sleepFrames(Math.max(1, Math.round(getCamcorderFps() * seconds)));
             } else {
                 try {
                     Thread.sleep(Math.round(seconds * 1000f));
