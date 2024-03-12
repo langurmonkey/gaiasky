@@ -2,6 +2,7 @@ package gaiasky.util.camera.rec;
 
 import com.badlogic.gdx.utils.LongArray;
 import gaiasky.util.DoubleArray;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.rec.KeyframesManager.PathPart;
 import gaiasky.util.camera.rec.KeyframesManager.PathType;
@@ -19,6 +20,7 @@ import java.util.List;
  * Contains the in-memory data for a specific camera path.
  */
 public class CameraPath {
+    private static final Logger.Log logger = Logger.getLogger(CameraPath.class);
 
     /**
      * Number of steps in the current path.
@@ -35,6 +37,11 @@ public class CameraPath {
     public final DoubleArray data;
 
     /**
+     * Optional frame rate. If &lt; 0, it is considered uncapped.
+     */
+    public double frameRate = -1.0;
+
+    /**
      * Current step number.
      */
     public long i;
@@ -49,18 +56,18 @@ public class CameraPath {
     /**
      * Create an empty camera path.
      */
-    public CameraPath() {
+    public CameraPath(double targetFps) {
         times = new LongArray();
         data = new DoubleArray();
         n = 0;
         i = 0;
+        frameRate = targetFps;
     }
 
     /**
      * Create a camera path from a <code>.gsc</code> file.
      *
      * @param file The file.
-     *
      * @throws RuntimeException If the file can't be read, is not in the right format, or does not exist.
      */
     public CameraPath(InputStream file) throws RuntimeException {
@@ -71,7 +78,17 @@ public class CameraPath {
             String line;
             while ((line = is.readLine()) != null) {
                 line = line.strip();
-                if (!line.startsWith("#")) {
+                var comment = line.startsWith("#");
+                if (comment && line.startsWith("#fps")) {
+                    // Read FPS value.
+                    var fpsString = line.split(gscFileSeparatorRegex)[1];
+                    try {
+                        frameRate = Parser.parseDoubleException(fpsString);
+                    } catch (NumberFormatException ignored) {
+                        logger.error("Error parsing FPS value from line: " + line);
+                    }
+                }
+                if (!comment) {
                     String[] tokens = line.split(gscFileSeparatorRegex);
 
                     // Time.
@@ -111,7 +128,7 @@ public class CameraPath {
         final var v3d2 = new Vector3d();
 
         /* Frame counter */
-        double frameRate = Settings.settings.camrecorder.targetFps;
+        frameRate = Settings.settings.camrecorder.targetFps;
 
         PathPart currentPosSpline = posSplines[0];
         int k = 0;
@@ -221,7 +238,6 @@ public class CameraPath {
      * Persist the current camera path to the file pointed by the given path.
      *
      * @param f The path of the file.
-     *
      * @throws RuntimeException If the path does not point to a file, or the file could not be written.
      */
     public void persist(Path f) throws Exception {
@@ -232,6 +248,10 @@ public class CameraPath {
 
         Files.createFile(f);
         try (var os = new BufferedWriter(new FileWriter(f.toFile()))) {
+            // Print FPS if needed.
+            if (frameRate > 0.0) {
+                os.append("#fps ").append(Double.toString(frameRate)).append("\n");
+            }
             // Print header.
             os.append("#time_ms").append(sep).append("pos_x").append(sep).append("pos_y").append(sep).append("pos_z").append(sep);
             os.append("dir_x").append(sep).append("dir_y").append(sep).append("dir_z").append(sep);

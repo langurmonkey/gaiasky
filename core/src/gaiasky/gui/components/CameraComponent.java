@@ -21,6 +21,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.SlaveManager;
 import gaiasky.util.TextUtils;
+import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -39,7 +40,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected boolean fovFlag = true;
     private boolean fieldLock = false;
 
-    public CameraComponent(Skin skin, Stage stage) {
+    public CameraComponent(Skin skin,
+                           Stage stage) {
         super(skin, stage);
     }
 
@@ -52,6 +54,15 @@ public class CameraComponent extends GuiComponent implements IObserver {
         recCamera.setChecked(Settings.settings.runtime.recordCamera);
         recCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
+                if (recCamera.isChecked() && Camcorder.instance.isPlaying()) {
+                    // Nope.
+                    recCamera.setCheckedNoFire(false);
+                    return false;
+                } else if (!recCamera.isChecked() && !Camcorder.instance.isRecording()) {
+                    // Nope.
+                    recCamera.setCheckedNoFire(false);
+                    return false;
+                }
                 EventManager.publish(Event.RECORD_CAMERA_CMD, recCamera, recCamera.isChecked(), null);
                 return true;
             }
@@ -78,6 +89,10 @@ public class CameraComponent extends GuiComponent implements IObserver {
         playCamera.setChecked(false);
         playCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
+                if (Camcorder.instance.isRecording()) {
+                    // Nope.
+                    return false;
+                }
                 EventManager.publish(Event.SHOW_PLAYCAMERA_ACTION, playCamera);
                 return true;
             }
@@ -307,7 +322,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeedLimit.setSelectedIndex(Settings.settings.scene.camera.speedLimitIndex);
 
         // CAMERA SPEED
-        cameraSpeed = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
+        cameraSpeed = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED,
+                                        Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(componentWidth);
         cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
@@ -320,7 +336,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // ROTATION SPEED
-        rotateSpeed = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
+        rotateSpeed = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED,
+                                        Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(componentWidth);
         rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
@@ -333,7 +350,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // TURNING SPEED
-        turnSpeed = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
+        turnSpeed = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED,
+                                      Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(componentWidth);
         turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);
@@ -403,125 +421,127 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraGroup.pack();
         EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.ROTATION_SPEED_CMD,
-                Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CHANGED_CMD,
-                Event.CUBEMAP_CMD, Event.CAMERA_CINEMATIC_CMD, Event.ORIENTATION_LOCK_CMD,
-                Event.RECORD_CAMERA_CMD);
+                                        Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CHANGED_CMD,
+                                        Event.CUBEMAP_CMD, Event.CAMERA_CINEMATIC_CMD, Event.ORIENTATION_LOCK_CMD,
+                                        Event.RECORD_CAMERA_CMD);
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
-            case CAMERA_CINEMATIC_CMD -> {
-                final boolean gui = source == cinematic;
-                if (!gui) {
-                    cinematic.setProgrammaticChangeEvents(false);
-                    cinematic.setChecked((Boolean) data[0]);
-                    cinematic.setProgrammaticChangeEvents(true);
-                }
+        case CAMERA_CINEMATIC_CMD -> {
+            final boolean gui = source == cinematic;
+            if (!gui) {
+                cinematic.setProgrammaticChangeEvents(false);
+                cinematic.setChecked((Boolean) data[0]);
+                cinematic.setProgrammaticChangeEvents(true);
             }
-            case CAMERA_MODE_CMD -> {
-                if (source != cameraMode) {
-                    // Update camera mode selection
-                    final var mode = (CameraMode) data[0];
-                    var cModes = cameraMode.getItems();
-                    CameraComboBoxBean selected = null;
-                    for (var cameraModeBean : cModes) {
-                        if (cameraModeBean.mode == mode) {
-                            selected = cameraModeBean;
-                            break;
-                        }
-                    }
-                    if (selected != null) {
-                        cameraMode.getSelection().setProgrammaticChangeEvents(false);
-                        cameraMode.setSelected(selected);
-                        cameraMode.getSelection().setProgrammaticChangeEvents(true);
+        }
+        case CAMERA_MODE_CMD -> {
+            if (source != cameraMode) {
+                // Update camera mode selection
+                final var mode = (CameraMode) data[0];
+                var cModes = cameraMode.getItems();
+                CameraComboBoxBean selected = null;
+                for (var cameraModeBean : cModes) {
+                    if (cameraModeBean.mode == mode) {
+                        selected = cameraModeBean;
+                        break;
                     }
                 }
-            }
-            case ROTATION_SPEED_CMD -> {
-                if (source != rotateSpeed) {
-                    float value = (Float) data[0];
-                    fieldLock = true;
-                    rotateSpeed.setMappedValue(value);
-                    fieldLock = false;
+                if (selected != null) {
+                    cameraMode.getSelection().setProgrammaticChangeEvents(false);
+                    cameraMode.setSelected(selected);
+                    cameraMode.getSelection().setProgrammaticChangeEvents(true);
                 }
             }
-            case CAMERA_SPEED_CMD -> {
-                if (source != cameraSpeed) {
-                    final float value = (Float) data[0];
-                    fieldLock = true;
-                    cameraSpeed.setMappedValue(value);
-                    fieldLock = false;
+        }
+        case ROTATION_SPEED_CMD -> {
+            if (source != rotateSpeed) {
+                float value = (Float) data[0];
+                fieldLock = true;
+                rotateSpeed.setMappedValue(value);
+                fieldLock = false;
+            }
+        }
+        case CAMERA_SPEED_CMD -> {
+            if (source != cameraSpeed) {
+                final float value = (Float) data[0];
+                fieldLock = true;
+                cameraSpeed.setMappedValue(value);
+                fieldLock = false;
+            }
+        }
+        case TURNING_SPEED_CMD -> {
+            if (source != turnSpeed) {
+                final float value = (Float) data[0];
+                fieldLock = true;
+                turnSpeed.setMappedValue(value);
+                fieldLock = false;
+            }
+        }
+        case SPEED_LIMIT_CMD -> {
+            if (source != cameraSpeedLimit) {
+                final int value = (Integer) data[0];
+                cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(false);
+                cameraSpeedLimit.setSelectedIndex(value);
+                cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(true);
+            }
+        }
+        case ORIENTATION_LOCK_CMD -> {
+            if (source != orientationLock) {
+                final boolean lock = (Boolean) data[0];
+                orientationLock.setProgrammaticChangeEvents(false);
+                orientationLock.setChecked(lock);
+                orientationLock.setProgrammaticChangeEvents(true);
+            }
+        }
+        case FOV_CHANGED_CMD -> {
+            if (source != fieldOfView) {
+                fovFlag = false;
+                fieldOfView.setValue((Float) data[0]);
+                fovFlag = true;
+            }
+        }
+        case STEREOSCOPIC_CMD -> {
+            if (source != button3d && !Settings.settings.runtime.openXr) {
+                button3d.setProgrammaticChangeEvents(false);
+                button3d.setChecked((boolean) data[0]);
+                button3d.setProgrammaticChangeEvents(true);
+            }
+        }
+        case CUBEMAP_CMD -> {
+            if (!Settings.settings.runtime.openXr) {
+                final CubemapProjection proj = (CubemapProjection) data[1];
+                final boolean enable = (boolean) data[0];
+                if (proj.isPanorama() && source != buttonCubemap) {
+                    buttonCubemap.setProgrammaticChangeEvents(false);
+                    buttonCubemap.setChecked(enable);
+                    buttonCubemap.setProgrammaticChangeEvents(true);
+                    fieldOfView.setDisabled(enable);
+                } else if (proj.isPlanetarium() && source != buttonDome) {
+                    buttonDome.setProgrammaticChangeEvents(false);
+                    buttonDome.setChecked(enable);
+                    buttonDome.setProgrammaticChangeEvents(true);
+                    fieldOfView.setDisabled(enable);
+                } else if (proj.isOrthosphere() && source != buttonOrthosphere) {
+                    buttonOrthosphere.setProgrammaticChangeEvents(false);
+                    buttonOrthosphere.setChecked(enable);
+                    buttonOrthosphere.setProgrammaticChangeEvents(true);
+                    fieldOfView.setDisabled(enable);
                 }
             }
-            case TURNING_SPEED_CMD -> {
-                if (source != turnSpeed) {
-                    final float value = (Float) data[0];
-                    fieldLock = true;
-                    turnSpeed.setMappedValue(value);
-                    fieldLock = false;
-                }
+        }
+        case RECORD_CAMERA_CMD -> {
+            boolean state = (Boolean) data[0];
+            if (source != recCamera) {
+                recCamera.setCheckedNoFire(state);
             }
-            case SPEED_LIMIT_CMD -> {
-                if (source != cameraSpeedLimit) {
-                    final int value = (Integer) data[0];
-                    cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(false);
-                    cameraSpeedLimit.setSelectedIndex(value);
-                    cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(true);
-                }
-            }
-            case ORIENTATION_LOCK_CMD -> {
-                if (source != orientationLock) {
-                    final boolean lock = (Boolean) data[0];
-                    orientationLock.setProgrammaticChangeEvents(false);
-                    orientationLock.setChecked(lock);
-                    orientationLock.setProgrammaticChangeEvents(true);
-                }
-            }
-            case FOV_CHANGED_CMD -> {
-                if(source != fieldOfView) {
-                    fovFlag = false;
-                    fieldOfView.setValue((Float) data[0]);
-                    fovFlag = true;
-                }
-            }
-            case STEREOSCOPIC_CMD -> {
-                if (source != button3d && !Settings.settings.runtime.openXr) {
-                    button3d.setProgrammaticChangeEvents(false);
-                    button3d.setChecked((boolean) data[0]);
-                    button3d.setProgrammaticChangeEvents(true);
-                }
-            }
-            case CUBEMAP_CMD -> {
-                if (!Settings.settings.runtime.openXr) {
-                    final CubemapProjection proj = (CubemapProjection) data[1];
-                    final boolean enable = (boolean) data[0];
-                    if (proj.isPanorama() && source != buttonCubemap) {
-                        buttonCubemap.setProgrammaticChangeEvents(false);
-                        buttonCubemap.setChecked(enable);
-                        buttonCubemap.setProgrammaticChangeEvents(true);
-                        fieldOfView.setDisabled(enable);
-                    } else if (proj.isPlanetarium() && source != buttonDome) {
-                        buttonDome.setProgrammaticChangeEvents(false);
-                        buttonDome.setChecked(enable);
-                        buttonDome.setProgrammaticChangeEvents(true);
-                        fieldOfView.setDisabled(enable);
-                    } else if (proj.isOrthosphere() && source != buttonOrthosphere) {
-                        buttonOrthosphere.setProgrammaticChangeEvents(false);
-                        buttonOrthosphere.setChecked(enable);
-                        buttonOrthosphere.setProgrammaticChangeEvents(true);
-                        fieldOfView.setDisabled(enable);
-                    }
-                }
-            }
-            case RECORD_CAMERA_CMD -> {
-                boolean state = (Boolean) data[0];
-                if (source != recCamera) {
-                    recCamera.setCheckedNoFire(state);
-                }
-            }
-            default -> {
-            }
+        }
+        default -> {
+        }
         }
 
     }

@@ -1172,6 +1172,7 @@ public interface IScriptingInterface {
      * @return The size value, in pixels.
      * @deprecated Use {@link  #getPointSize()} instead.
      */
+    @Deprecated
     float getStarSize();
 
     /**
@@ -1189,6 +1190,7 @@ public interface IScriptingInterface {
      *             {@link Constants#MAX_STAR_POINT_SIZE}.
      * @deprecated Use {@link  #setPointSize(float)} instead.
      */
+    @Deprecated
     void setStarSize(float size);
 
     /**
@@ -1204,6 +1206,7 @@ public interface IScriptingInterface {
      * @return The minimum opacity value.
      * @deprecated Use {@link #getStarBaseOpacity()} instead.
      */
+    @Deprecated
     float getStarMinOpacity();
 
     /**
@@ -1221,6 +1224,7 @@ public interface IScriptingInterface {
      *                {@link Constants#MAX_STAR_MIN_OPACITY}.
      * @deprecated Use {@link #setStarBaseOpacity(float)} instead.
      */
+    @Deprecated
     void setStarMinOpacity(float opacity);
 
     /**
@@ -2160,6 +2164,7 @@ public interface IScriptingInterface {
     /**
      * @deprecated Use {@link #setCamcorderFps(double)} instead.
      */
+    @Deprecated
     void setCameraRecorderFps(double targetFps);
 
     /**
