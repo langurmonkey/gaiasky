@@ -2950,6 +2950,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         cameraTransition(camPos, units, camDir, camUp, (double) seconds, sync);
     }
 
+    public void cameraOrientationTransition(List<?> camDir,
+                                            List<?> camUp,
+                                            double durationSeconds,
+                                            String smoothType,
+                                            double smoothFactor,
+                                            boolean sync) {
+        cameraOrientationTransition(dArray(camDir), dArray(camUp), durationSeconds, smoothType, smoothFactor, sync);
+    }
+
+    public void cameraPositionTransition(List<?> camPos,
+                                         String units,
+                                         double durationSeconds,
+                                         String smoothType,
+                                         double smoothFactor,
+                                         boolean sync) {
+        cameraPositionTransition(dArray(camPos), units, durationSeconds, smoothType, smoothFactor, sync);
+    }
+
     @Override
     public void timeTransition(int year,
                                int month,
