@@ -1,3 +1,34 @@
+<a name="3.6.0"></a>
+## [3.6.0](https://codeberg.org/gaiasky/gaiasky/tree/3.5.9-2) (2024-03-12)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.9-2...3.6.0)
+
+### Bug Fixes
+- check leap years in date dialog. 
+- prevent NaNs in some camera operations. 
+- clean up test scripts a bit. 
+- `startRecordingCameraPath(String filename)` does not use the filename correctly. 
+
+### Build System
+- update dependency library versions. 
+
+### Features
+- add 'textureAttribute' to particle sets, so that textures are selected with respect to the value of an attribute. 
+- use local dataset descriptors to construct catalog infos, when they are not explicitly set. 
+- enable local data information in the '+ info' window. This displays the local data on an object. In particle and star groups, the extra attributes are also offered. 
+- enable extra arguments of type string for star and particle sets. 
+- rename 'star systems' group to 'exoplanets \& extrasolar systems'. Add icons to group title in dataset manager. 
+- add time transition API call and test script. 
+- add support for multiple key sets bound to actions in hotkey tooltip. 
+- keyframes and camera path file saving no longer overwrites existing files. Instead, it generates a new unique file name based on the given one. 
+- support comma- as well as whitespace-separated values for camera and keyframes files. Default to comma-separated values for writing. 
+- add support for OptFlowCam (Piotrowski 2024) method to convert keyframes into camera path files. Gaia Sky calls the local python3 interpreter to process the keyframe files, so a local python3 installation (with numpy) needs to be in place for it to work. 
+- reorganize keyframes window layout for better use of space. 
+- add support for B-splines, additionally to Catmull-Rom splines, as a method for interpolating positions between keyframes. 
+- add API call to get the window coordinates of an object, in pixels. 
+- add API calls to do camera transitions only in position and orientation. 
+- add different durations for the transitions in position and orientation in the API call. 
+- add smooth interpolation methods to `cameraTransition()` calls. The new methods can use either a logistic sigmoid or a logit function. Smoothing factor is configurable via a parameter. 
+
 <a name="3.5.9-2"></a>
 ## [3.5.9-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.9) (2024-02-22)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.9...3.5.9-2)
