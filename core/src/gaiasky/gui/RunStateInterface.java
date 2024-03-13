@@ -67,7 +67,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
         cancelCamera.addListener(new OwnTextTooltip(I18n.msg("gui.stop"), skin));
         cancelCamera.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STOP_CAMERA_PLAY, cancelCamera);
+                EventManager.publish(Event.PLAY_CAMERA_CMD, cancelCamera, false);
             }
             return false;
         });

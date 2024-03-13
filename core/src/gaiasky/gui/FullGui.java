@@ -388,7 +388,7 @@ public class FullGui extends AbstractGui {
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.exists(result) && Files.exists(result)) {
-                            EventManager.publish(PLAY_CAMERA_CMD, fc, result);
+                            EventManager.publish(PLAY_CAMERA_CMD, fc, true, result);
                             return true;
                         } else {
                             logger.error("Selection must be a file: " + result.toAbsolutePath());

@@ -15,6 +15,9 @@ import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.LengthValidator;
 import gaiasky.util.validator.RegexpValidator;
 
+/**
+ * Generic dialog to pick a file name for a file.
+ */
 public class FileNameWindow extends GenericDialog {
 
     private final String defaultName;

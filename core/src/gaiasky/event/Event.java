@@ -746,7 +746,8 @@ public enum Event {
      */
     PLANETARIUM_GEOMETRYWARP_FILE_CMD,
     /**
-     * Issues the play command. Contains the path to the file to play.
+     * Command to play and stop the camcorder. Contains a boolean with the state (true: start, false: stop), and
+     * the path to the file to play if the first object is true.
      **/
     PLAY_CAMERA_CMD,
     /**
@@ -837,7 +838,8 @@ public enum Event {
     RECALCULATE_CONTROLS_WINDOW_SIZE,
     /**
      * Issues the command to enable camera recording. Contains the boolean
-     * indicating the state (on/off) and a file name (null for auto-generated).
+     * indicating the state (start/finish) and a file name (null for auto-generated) if starting, or a boolean indicating
+     * whether to show the file name picker window if finishing.
      **/
     RECORD_CAMERA_CMD,
     /**
@@ -1291,11 +1293,6 @@ public enum Event {
      * Switches stereoscopic profile, contains the index of the new profile.
      **/
     STEREO_PROFILE_CMD,
-
-    /**
-     * Stops the current camera playing operation, if any
-     **/
-    STOP_CAMERA_PLAY,
 
     /**
      * Sets and unsets the target time. Contains a time (set), or nothing

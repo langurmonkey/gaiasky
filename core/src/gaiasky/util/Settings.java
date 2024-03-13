@@ -4199,15 +4199,6 @@ public class Settings extends SettingsObject {
         public void toggleRecord(Boolean rec,
                                  Settings settings) {
             recordCamera = Objects.requireNonNullElseGet(rec, () -> !recordCamera);
-
-            if (recordCamera) {
-                // Activation, set limit FPS
-                backupLimitFps = settings.graphics.fpsLimit;
-                settings.graphics.fpsLimit = settings.frame.targetFps;
-            } else {
-                // Deactivation, remove limit
-                settings.graphics.fpsLimit = backupLimitFps;
-            }
         }
 
         @Override

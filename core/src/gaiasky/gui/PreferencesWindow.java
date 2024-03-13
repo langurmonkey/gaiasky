@@ -340,9 +340,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LIMIT FPS
         IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
-        double limitFps = settings.graphics.fpsLimit == 0 ? 60 : settings.graphics.fpsLimit;
+        double limitFps = settings.graphics.fpsLimit <= 0 ? 60 : settings.graphics.fpsLimit;
         this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsDouble.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitFpsValidator);
-        this.maxFpsInput.setDisabled(settings.graphics.fpsLimit == 0);
+        this.maxFpsInput.setDisabled(settings.graphics.fpsLimit <= 0);
 
         OwnLabel maxFpsLabel = new OwnLabel(I18n.msg("gui.limitfps"), skin);
         maxFps = new OwnCheckBox("", skin);
