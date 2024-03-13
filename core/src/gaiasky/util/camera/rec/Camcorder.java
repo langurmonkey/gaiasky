@@ -174,6 +174,7 @@ public class Camcorder implements IObserver {
                     }
 
                 } else {
+                    // Stop.
                     var showFilePicker = true;
                     if (data.length > 1 && data[1] != null) {
                         showFilePicker = (Boolean) data[1];
@@ -205,7 +206,7 @@ public class Camcorder implements IObserver {
                     }
                     // Mode.
                     mode.set(RecorderState.IDLE);
-                    
+
                     // Finish off.
                     if (showFilePicker) {
                         // Display filename picker window.
