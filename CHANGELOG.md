@@ -1,3 +1,18 @@
+<a name="3.6.0-2"></a>
+## [3.6.0-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.0) (2024-03-14)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.0...3.6.0-2)
+
+### Bug Fixes
+- camcorder record and play button inconsistent states.
+- state handling in the camcorder. 
+- `sleep(seconds)` call also respects the camcorder FPS setting during recording. 
+- rename some API calls, deprecate old versions. 
+- add companion calls for camera orientation and position transitions. 
+- orbit coordinate not working when time is before the orbit start. 
+
+### Features
+- annotate camera files with frame rate so that playback can adjust it automatically.
+
 <a name="3.6.0"></a>
 ## [3.6.0](https://codeberg.org/gaiasky/gaiasky/tree/3.5.9-2) (2024-03-12)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.9-2...3.6.0)
