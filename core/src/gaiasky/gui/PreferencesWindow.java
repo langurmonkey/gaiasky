@@ -2654,19 +2654,27 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // SVT cache size
         if (svtCacheSize != null) {
-            restartDialog = restartDialog || (int) svtCacheSize.getValue() != settings.scene.renderer.virtualTextures.cacheSize;
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.SVT_CACHE_SIZE_CMD, this, (int) svtCacheSize.getValue()));
+            var reloadSVT = (int) svtCacheSize.getValue() != settings.scene.renderer.virtualTextures.cacheSize;
+            restartDialog = restartDialog || reloadSVT;
+            if (reloadSVT) {
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.SVT_CACHE_SIZE_CMD, this, (int) svtCacheSize.getValue()));
+            }
         }
 
         // SSR
         if (ssr != null) {
-            resetRenderFlags = resetRenderFlags || settings.postprocess.ssr.active != ssr.isChecked();
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
+            var reloadSSR = settings.postprocess.ssr.active != ssr.isChecked();
+            resetRenderFlags = resetRenderFlags || reloadSSR;
+            if (reloadSSR) {
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
+            }
         }
 
         // Back-buffer scale
         if (backBufferScale != null && !backBufferScale.isDisabled()) {
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.BACKBUFFER_SCALE_CMD, backBufferScale, backBufferScale.getValue()));
+            if (settings.graphics.backBufferScale != backBufferScale.getValue()) {
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.BACKBUFFER_SCALE_CMD, backBufferScale, backBufferScale.getValue()));
+            }
         }
 
         // Interface

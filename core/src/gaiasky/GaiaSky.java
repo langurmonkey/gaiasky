@@ -130,7 +130,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     /**
      * Forbids the creation of the scripting server.
      */
-    private boolean noScripting = false;
+    private final boolean noScripting;
     /**
      * Parked update runnables. Run after the update-scene stage.
      */
@@ -467,6 +467,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Set log level.
         Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
         Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
+
+        // Update back-buffer resolution.
+        if (Gdx.graphics != null && settings != null && (settings.graphics.backBufferResolution[0] <= 0 || settings.graphics.backBufferResolution[1] <= 0)) {
+            settings.graphics.backBufferResolution[0] = (int) (Gdx.graphics.getWidth() * settings.graphics.backBufferScale);
+            settings.graphics.backBufferResolution[1] = (int) (Gdx.graphics.getWidth() * settings.graphics.backBufferScale);
+        }
 
         // Initialize array pool.
         Pools.get(Array.class, 200);

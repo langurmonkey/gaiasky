@@ -52,6 +52,10 @@ graphics:
     resolution: [ 1920, 1080 ]
   # Enable VSYNC
   vsync: true
+  # Bits per pixel
+  bitDepth: 0
+  # Refresh rate
+  refreshRate: 0
   # Limit frame rate, set to 0 to disable frame limiter
   fpsLimit: 0.0
   # Here be dragons! This is just for testing. Unstable!
@@ -169,7 +173,7 @@ scene:
       # radius/distance limit for rendering as quad. If angle is any bigger, we render as a model.
       quad: 0.0
       # radius/distance limit for rendering as point. If angle is any bigger, we render as quad.
-      point: 1.7e-8
+      point: 1.7E-8
       # radius/distance limit for rendering at all. If angle is smaller than this quantity, no rendering happens.
       none: 0.0
   # Label settings.
@@ -257,7 +261,7 @@ scene:
     # Sparse Virtual Texture global settings.
     virtualTextures:
       # Cache size, in tiles per side.
-      cacheSize: 6
+      cacheSize: 8
       # The detection buffer reduction factor.
       detectionBufferFactor: 8.0
       # Maximum number of tiles to load per frame.
@@ -359,6 +363,8 @@ program:
   recursiveGrid:
     # Origin of the recursive grid in [FOCUS|REFSYS].
     origin: REFSYS
+    # Animate the grid
+    animate: false
     # If origin is refsys, this option adds projection lines to the current focus.
     projectionLines: true
     # Recursive grid style [CIRCULAR|SQUARE].
@@ -401,7 +407,7 @@ program:
       active: false
       # List of URLs of the slave instances.
       # Example: [http://localhost:13900/api/, http://localhost:13901/api].
-      slaves: [ ]
+      slaves: []
     # Slave configuration.
     slave:
       # In a client-server configuration, this makes this instance act as a slave
@@ -429,10 +435,10 @@ program:
     scale: 1.3
     # UI animation time in milliseconds.
     animationMs: 600
-    # Preferred distance units [M|KM|AU|PC|LY|INTERNAL].
-    distanceUnits: PC
     # Show mode change pop-up dialogs (panorama, planetarium, stereoscopic, and game modes).
     modeChangeInfo: true
+    # Preferred distance units [M|KM|AU|PC|LY|INTERNAL].
+    distanceUnits: PC
     # Use the new UI, with anchored buttons, instead of the controls window.
     newUI: true
   # Ask for confirmation on exit.
@@ -474,7 +480,7 @@ controls:
     # processed by Gaia Sky. Find the connected controller names in the Preferences
     # window, Controls tab.
     # Example: blacklist: [Microsoft Xbox 360 pad, Playstation 4 dualshock]
-    blacklist: [ ]
+    blacklist: []
 
 #
 # Frame output configuration
@@ -497,7 +503,7 @@ frame:
   # Stamp frames with current simulation time
   time: false
   # The target frame rate of the render system
-  targetFps: 60
+  targetFps: 60.0
 
 #
 # Screenshots configuration
@@ -524,10 +530,10 @@ camrecorder:
   targetFps: 60
   # Keyframe configuration
   keyframe:
-    # Interpolation method for the camera position, in [SPLINE|LINEAR]
-    position: SPLINE
-    # Interpolation method for the camera orientation, in [SPLINE|LINEAR]
-    orientation: SPLINE
+    # Interpolation method for the camera position, in [CATMULL_ROM_SPLINE|B_SPLINE|LINEAR]
+    position: CATMULL_ROM_SPLINE
+    # Interpolation method for the camera orientation, in [CATMULL_ROM_SPLINE|B_SPLINE|LINEAR]
+    orientation: CATMULL_ROM_SPLINE
   # Automatically activate frame output system when playing a camera path
   auto: false
 
@@ -557,6 +563,9 @@ postprocess:
   # Screen space reflections
   ssr:
     active: false
+  # Film grain
+  filmGrain:
+    intensity: 0.0
   # Lens flare effect settings
   lensFlare:
     active: false

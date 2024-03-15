@@ -118,7 +118,7 @@ public class GaiaSkyDesktop implements IObserver {
     /**
      * Force re-computing the UI scale.
      **/
-    private boolean reinitializeUIScale = false;
+    private boolean configFileOverwritten = false;
     /**
      * The Gaia Sky application instance.
      **/
@@ -195,7 +195,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Init properties file.
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                gaiaSkyDesktop.setReinitializeUIScale(initConfigFile(cliArgs.vr));
+                gaiaSkyDesktop.setConfigFileOverwritten(initConfigFile(cliArgs.vr));
             }
 
             // Init global configuration.
@@ -542,7 +542,7 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
 
         // Compute base UI scale.
-        if (reinitializeUIScale) {
+        if (configFileOverwritten) {
             // Height linear interpolation:
             // min:HD -> max:5K
             s.program.ui.scale = MathUtilsDouble.lint(s.graphics.resolution[1], 600, 2680, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
@@ -648,7 +648,12 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
-        gs = new GaiaSky(cliArgs.skipWelcome, cliArgs.vr, cliArgs.externalView, cliArgs.headless, cliArgs.noScriptingServer, cliArgs.debug);
+        gs = new GaiaSky(cliArgs.skipWelcome,
+                cliArgs.vr,
+                cliArgs.externalView,
+                cliArgs.headless,
+                cliArgs.noScriptingServer,
+                cliArgs.debug);
         new Lwjgl3Application(gs, cfg);
     }
 
@@ -670,8 +675,8 @@ public class GaiaSkyDesktop implements IObserver {
         new Lwjgl3Application(new ErrorDialog(ex, message), cfg);
     }
 
-    public void setReinitializeUIScale(boolean b) {
-        this.reinitializeUIScale = b;
+    public void setConfigFileOverwritten(boolean b) {
+        this.configFileOverwritten = b;
     }
 
     @Override
