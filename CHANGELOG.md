@@ -1,3 +1,10 @@
+<a name="3.6.0-3"></a>
+## [3.6.0-3](https://codeberg.org/gaiasky/gaiasky/tree/3.6.0-2) (2024-03-15)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.0-2...3.6.0-3)
+
+### Bug Fixes
+- back-buffer scale initialization when config file is resetted. 
+
 <a name="3.6.0-2"></a>
 ## [3.6.0-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.0) (2024-03-14)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.0...3.6.0-2)
