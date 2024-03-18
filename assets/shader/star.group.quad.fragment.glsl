@@ -29,13 +29,17 @@ float starTexture(vec2 uv) {
 }
 
 void main() {
-    vec2 uv = v_uv;
-    float profile = starTexture(uv);
-    float alpha = v_col.a * profile;
-
-    if (alpha <= 0.0) {
+    if (v_col.a <= 0.0) {
         discard;
     }
+
+    vec2 uv = v_uv;
+    float profile = starTexture(uv);
+
+    if (profile <= 0.0) {
+        discard;
+    }
+    float alpha = v_col.a * profile;
 
     // White core
     float core = saturate(1.0 - smoothstep(0.0, 0.04, distance(vec2(0.5), uv) * 2.0));

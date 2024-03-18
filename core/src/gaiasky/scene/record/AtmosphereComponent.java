@@ -223,7 +223,10 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         // Planet position
         if (ground) {
             // Camera position must be corrected using the rotation angle of the planet
-            aux3.rotate(-rc.ascendingNode, 0, 1, 0).mul(Coordinates.getTransformD(inverseRefPlaneTransform)).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
+            aux3.rotate(-rc.ascendingNode, 0, 1, 0)
+                    .mul(Coordinates.getTransformD(inverseRefPlaneTransform))
+                    .rotate(-rc.inclination - rc.axialTilt, 0, 0, 1)
+                    .rotate(-rc.angle, 0, 1, 0);
         }
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.PlanetPos))).value.set(aux3.put(aux));
         // CameraPos = -PlanetPos
@@ -238,7 +241,10 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         aux3.nor();
         if (ground) {
             // Camera position must be corrected using the rotation angle of the planet
-            aux3.rotate(-rc.ascendingNode, 0, 1, 0).mul(Coordinates.getTransformD(inverseRefPlaneTransform)).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
+            aux3.rotate(-rc.ascendingNode, 0, 1, 0)
+                    .mul(Coordinates.getTransformD(inverseRefPlaneTransform))
+                    .rotate(-rc.inclination - rc.axialTilt, 0, 0, 1)
+                    .rotate(-rc.angle, 0, 1, 0);
         }
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.LightPos))).value.set(aux3.put(aux));
 

@@ -101,7 +101,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
             if (Mapper.tagHeliotropic.has(entity) && attitude.nonRotatedPos != null) {
                 attitude.nonRotatedPos.set(body.pos);
                 // Undo rotation.
-                attitude.nonRotatedPos.mul(Coordinates.eqToEcl()).rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
+                attitude.nonRotatedPos.mul(Coordinates.eqToEcl())
+                        .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
                 // Update attitude from server if needed.
                 if (attitude.attitudeServer != null) {
                     attitude.attitude = attitude.attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli()));
@@ -157,12 +158,22 @@ public class ModelUpdater extends AbstractUpdateSystem {
             } else if (rotation.rc != null) {
                 // Planets and moons have rotation components
                 RotationComponent rc = rotation.rc;
-                graph.translation.setToTranslation(localTransform).scl(size * sizeFactor).rotate(0, 1, 0, (float) rc.ascendingNode).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform)).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
-                graph.orientation.idt().rotate(0, 1, 0, (float) rc.ascendingNode).mul(Coordinates.getTransformD(scaffolding.refPlaneTransform)).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
+                graph.translation.setToTranslation(localTransform)
+                        .scl(size * sizeFactor)
+                        .rotate(0, 1, 0, (float) rc.ascendingNode)
+                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
+                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt))
+                        .rotate(0, 1, 0, (float) rc.angle);
+                graph.orientation.idt().rotate(0, 1, 0, (float) rc.ascendingNode)
+                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
+                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
             } else {
                 // The rest of bodies are just sitting there, in their reference system
-                graph.translation.setToTranslation(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
-                graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform));
+                graph.translation.setToTranslation(localTransform)
+                        .scl(size * sizeFactor)
+                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
+                graph.orientation.idt()
+                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform));
             }
         } else {
             // Nothing whatsoever
