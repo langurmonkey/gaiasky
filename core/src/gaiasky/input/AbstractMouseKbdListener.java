@@ -49,9 +49,9 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
                     iCamera.setGamepadInput(false);
                 }
             }
-        }
-        if (cliArgs.debugInput) {
-            logger.info(String.format("Key down: %d", keyCode));
+            if (cliArgs.debugInput) {
+                logger.info(String.format("Key down: %d", keyCode));
+            }
         }
         return false;
     }
@@ -62,9 +62,9 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
             if (iCamera != null) {
                 iCamera.setGamepadInput(false);
             }
-        }
-        if (cliArgs.debugInput) {
-            logger.info(String.format("Key up: %d", keyCode));
+            if (cliArgs.debugInput) {
+                logger.info(String.format("Key up: %d", keyCode));
+            }
         }
         return false;
     }

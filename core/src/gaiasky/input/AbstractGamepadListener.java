@@ -78,9 +78,9 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
                               int buttonCode) {
         if (isActive()) {
             lastControllerUsed = controller;
-        }
-        if (cliArgs.debugInput) {
-            logger.info(String.format("Button down [controller: %s, button: %d]", controller.getName(), buttonCode));
+            if (cliArgs.debugInput) {
+                logger.info(String.format("Button down [controller: %s, button: %d]", controller.getName(), buttonCode));
+            }
         }
         return false;
     }
@@ -90,9 +90,9 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
                             int buttonCode) {
         if (isActive()) {
             lastControllerUsed = controller;
-        }
-        if (cliArgs.debugInput) {
-            logger.info(String.format("Button down [controller: %s, button: %d]", controller.getName(), buttonCode));
+            if (cliArgs.debugInput) {
+                logger.info(String.format("Button down [controller: %s, button: %d]", controller.getName(), buttonCode));
+            }
         }
         return false;
     }
@@ -103,9 +103,9 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
                              float value) {
         if (isActive()) {
             lastControllerUsed = controller;
-        }
-        if (cliArgs.debugInput) {
-            logger.info(String.format("Axis moved [controller: %s, axis: %d, value: %f]", controller.getName(), axisCode, value));
+            if (cliArgs.debugInput) {
+                logger.info(String.format("Axis moved [controller: %s, axis: %d, value: %f]", controller.getName(), axisCode, value));
+            }
         }
         return false;
     }
