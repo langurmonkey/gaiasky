@@ -531,7 +531,22 @@ public class SysUtils {
             return new int[]{Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT};
         }
 
-        // Graphics device method.
+        // Graphics device method, window bounds.
+        try {
+            Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            w = rect.width;
+            h = rect.height;
+            if (w > 0 && h > 0) {
+                return new int[]{w, h};
+            } else {
+                logger.error(I18n.msg("error.screensize.gd.windowbounds"));
+            }
+        } catch (HeadlessException e) {
+            logger.error(I18n.msg("error.screensize.gd.windowbounds"));
+            logger.debug(e);
+        }
+
+        // Graphics device method, screen device.
         try {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
             GraphicsConfiguration gc = gd.getDefaultConfiguration();
@@ -542,6 +557,8 @@ public class SysUtils {
             h = (int) (gc.getBounds().getHeight() * scaleY);
             if (w > 0 && h > 0) {
                 return new int[]{w, h};
+            } else {
+                logger.error(I18n.msg("error.screensize.gd"));
             }
         } catch (HeadlessException e) {
             logger.error(I18n.msg("error.screensize.gd"));
@@ -555,6 +572,8 @@ public class SysUtils {
             h = (int) screenSize.getHeight();
             if (w > 0 && h > 0) {
                 return new int[]{w, h};
+            } else {
+                logger.error(I18n.msg("error.screensize.toolkit"));
             }
         } catch (Exception e) {
             logger.error(I18n.msg("error.screensize.toolkit"));
