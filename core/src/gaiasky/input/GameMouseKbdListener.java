@@ -170,6 +170,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public boolean touchUp(float x, float y, int pointer, int button) {
+        super.touchUp(x, y, pointer, button);
         if (isActive()) {
             if (button == Input.Buttons.RIGHT) {
                 int w = Gdx.graphics.getWidth();

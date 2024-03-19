@@ -9,6 +9,7 @@ package gaiasky.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -33,7 +34,8 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     protected long lastPollTime = 0;
     private final CLIArgs cliArgs;
 
-    protected AbstractMouseKbdListener(GestureListener gl, ICamera camera) {
+    protected AbstractMouseKbdListener(GestureListener gl,
+                                       ICamera camera) {
         super(gl);
         this.iCamera = camera;
         this.active = new AtomicBoolean(true);
@@ -50,7 +52,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
                 }
             }
             if (cliArgs.debugInput) {
-                logger.info(String.format("Key down: %d", keyCode));
+                logger.info(String.format("Key down: %d (%s)", keyCode, Input.Keys.toString(keyCode)));
             }
         }
         return false;
@@ -63,7 +65,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
                 iCamera.setGamepadInput(false);
             }
             if (cliArgs.debugInput) {
-                logger.info(String.format("Key up: %d", keyCode));
+                logger.info(String.format("Key up: %d (%s)", keyCode, Input.Keys.toString(keyCode)));
             }
         }
         return false;
@@ -73,6 +75,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
      * Returns whether the key is pressed.
      *
      * @param keyCode The key code as found in {@link Input.Keys}.
+     *
      * @return true or false.
      */
     public boolean isKeyPressed(int keyCode) {
@@ -83,6 +86,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
      * Returns whether the given logical key code is pressed.
      *
      * @param keyCode The logical key code as found in {@link Input.Keys}.
+     *
      * @return true or false.
      */
     public boolean isLogicalKeyPressed(int keyCode) {
@@ -93,6 +97,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
      * Returns true if all keys are pressed
      *
      * @param keys The keys to test
+     *
      * @return True if all are pressed
      */
     public boolean allPressed(int... keys) {
@@ -123,6 +128,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
      * Returns true if any of the physical keys are pressed.
      *
      * @param keys The keys to test.
+     *
      * @return True if any physical keys are pressed.
      */
     public boolean anyPressed(int... keys) {
@@ -137,6 +143,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
      * Same as {@link AbstractMouseKbdListener#anyPressed(int...)}, but converts the physical keys to logical keys first.
      *
      * @param keys The logical keys.
+     *
      * @return Whether any of the keys are pressed.
      */
     public boolean anyPressedLogical(int... keys) {
@@ -162,6 +169,62 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
                 }
             }
         }
+    }
+
+    private String getButtonString(final int button) {
+        return switch (button) {
+            case Buttons.RIGHT -> "RIGHT";
+            case Buttons.LEFT -> "LEFT";
+            case Buttons.MIDDLE -> "MIDDLE";
+            case Buttons.BACK -> "BACK";
+            case Buttons.FORWARD -> "FORWARD";
+            default -> "UNKNOWN";
+        };
+    }
+
+    @Override
+    public boolean touchUp(float x,
+                           float y,
+                           int pointer,
+                           int button) {
+        if (isActive() && cliArgs.debugInput) {
+            logger.info(String.format("Mouse button up [x: %f, y: %f, pointer: %d, button: %d (%s)]", x, y, pointer, button, getButtonString(button)));
+        }
+        return super.touchUp(x, y, pointer, button);
+    }
+
+    public boolean touchUp(int x,
+                           int y,
+                           int pointer,
+                           int button) {
+        return this.touchUp((float) x, (float) y, pointer, button);
+    }
+
+    @Override
+    public boolean touchDown(float x,
+                             float y,
+                             int pointer,
+                             int button) {
+        if (isActive() && cliArgs.debugInput) {
+            logger.info(String.format("Mouse button down [x: %f, y: %f, pointer: %d, button: %d (%s)]", x, y, pointer, button, getButtonString(button)));
+        }
+        return super.touchDown(x, y, pointer, button);
+    }
+
+    public boolean touchDown(int x,
+                             int y,
+                             int pointer,
+                             int button) {
+        return this.touchDown((float) x, (float) y, pointer, button);
+    }
+
+    @Override
+    public boolean scrolled(float amountX,
+                            float amountY) {
+        if (isActive() && cliArgs.debugInput) {
+            logger.info(String.format("Scroll [x: %f, y: %f]", amountX, amountY));
+        }
+        return super.scrolled(amountX, amountY);
     }
 
     /**

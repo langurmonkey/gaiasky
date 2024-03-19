@@ -436,6 +436,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     public boolean scrolled(float amountX,
                             float amountY) {
         if (isActive()) {
+            super.scrolled(amountX, amountY);
             if (Settings.settings.runtime.inputEnabled) {
                 return zoom(amountY * scrollFactor);
             }
