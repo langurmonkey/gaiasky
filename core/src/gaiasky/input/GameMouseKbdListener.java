@@ -98,7 +98,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
             camera.setDiverted(true);
             // Capture mouse.
             setMouseCapture(true);
-            // Unfocus camera.
+            // Un-focus camera.
             GaiaSky.instance.mainGui.getGuiStage().unfocusAll();
 
             ModePopupInfo mpi = new ModePopupInfo();
@@ -175,8 +175,8 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
                 int w = Gdx.graphics.getWidth();
                 int h = Gdx.graphics.getHeight();
                 Gdx.input.setCursorPosition(w / 2, h / 2);
-                prevX = w / 2;
-                prevY = h / 2;
+                prevX = w / 2.0f;
+                prevY = h / 2.0f;
             }
             return true;
         }

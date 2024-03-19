@@ -34,6 +34,7 @@ import gaiasky.data.util.OrbitDataLoader;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.data.util.SceneLoader;
 import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
+import gaiasky.desktop.GaiaSkyDesktop.CLIArgs;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -112,25 +113,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
     public final Object frameMonitor = new Object();
     private final String sceneName = "SceneData";
     /**
-     * Set log level to debug.
+     * Command line interface arguments for this run.
      */
-    private final boolean debugMode;
-    /**
-     * Whether to attempt a connection to the VR HMD.
-     */
-    private final boolean vr;
-    /**
-     * Headless mode.
-     */
-    private final boolean headless;
-    /**
-     * Skip welcome screen if possible.
-     */
-    private final boolean skipWelcome;
-    /**
-     * Forbids the creation of the scripting server.
-     */
-    private final boolean noScripting;
+    private final CLIArgs cliArgs;
     /**
      * Parked update runnables. Run after the update-scene stage.
      */
@@ -410,38 +395,18 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     /**
      * Creates an instance of Gaia Sky.
-     */
-    public GaiaSky() {
-        this(false, false, false, false, false, false);
-    }
-
-    /**
-     * Creates an instance of Gaia Sky.
      *
-     * @param skipWelcome  Skips welcome screen if possible.
-     * @param vr           Launch in VR mode.
-     * @param externalView Open a new window with a view of the rendered scene.
-     * @param headless     Launch in headless mode, without window.
-     * @param debugMode    Output debug information.
+     * @param cliArgs The command line arguments for this run.
      */
-    public GaiaSky(final boolean skipWelcome,
-                   final boolean vr,
-                   final boolean externalView,
-                   final boolean headless,
-                   final boolean noScriptingServer,
-                   final boolean debugMode) {
+    public GaiaSky(final CLIArgs cliArgs) {
         super();
+        assert cliArgs != null : "CLI arguments can't be null";
 
         // Instance and settings.
         instance = this;
 
-        // Set flags.
-        this.skipWelcome = skipWelcome;
-        this.vr = vr;
-        this.externalView = externalView;
-        this.headless = headless;
-        this.noScripting = noScriptingServer;
-        this.debugMode = debugMode;
+        // Set CLI arguments.
+        this.cliArgs = cliArgs;
 
         // Set update-render process to initial GUI.
         this.updateRenderProcess = runnableInitialGui;
@@ -465,8 +430,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         startTime = TimeUtils.millis();
         final var settings = Settings.settings;
         // Set log level.
-        Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
-        Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
+        Gdx.app.setLogLevel(cliArgs.debug ? Application.LOG_DEBUG : Application.LOG_INFO);
+        Logger.level = cliArgs.debug ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
 
         // Update back-buffer resolution.
         if (Gdx.graphics != null && settings != null && (settings.graphics.backBufferResolution[0] <= 0 || settings.graphics.backBufferResolution[1] <= 0)) {
@@ -484,14 +449,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Console logger.
         consoleLogger = new ConsoleLogger();
 
-        if (debugMode)
+        if (cliArgs.debug)
             logger.debug("Logging level set to DEBUG");
 
         // Init graphics and window.
         graphics = Gdx.graphics;
-        window = headless ? null : ((Lwjgl3Graphics) graphics).getWindow();
+        window = cliArgs.headless ? null : ((Lwjgl3Graphics) graphics).getWindow();
 
         // Log basic info.
+        assert settings != null;
         logger.info(settings.version.version, I18n.msg("gui.build", settings.version.build));
         logger.info(I18n.msg("notif.info.displaymode", graphics.getWidth(), graphics.getHeight(), Gdx.graphics.isFullscreen()));
         logger.info(I18n.msg("notif.info.device", GL30.glGetString(GL30.GL_RENDERER)));
@@ -564,7 +530,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Initialise Cameras.
         initializeConstants();
-        cameraManager = new CameraManager(assetManager, CameraMode.FOCUS_MODE, vr, globalResources);
+        cameraManager = new CameraManager(assetManager, CameraMode.FOCUS_MODE, cliArgs.vr, globalResources);
 
         // Set asset manager to asset bean.
         AssetBean.setAssetManager(assetManager);
@@ -585,7 +551,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         new ScreenshotsManager(this, sceneRenderer, globalResources);
 
         // Load various assets.
-        assetManager.load("gaiasky-assets", GaiaSkyAssets.class, new GaiaSkyLoaderParameters(this, noScripting));
+        assetManager.load("gaiasky-assets", GaiaSkyAssets.class, new GaiaSkyLoaderParameters(this, cliArgs.noScriptingServer));
 
         // Tell the asset manager to load all the assets.
         final var assets = AssetBean.getAssets();
@@ -600,7 +566,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-        welcomeGui = new WelcomeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, skipWelcome, vrStatus);
+        welcomeGui = new WelcomeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, cliArgs.skipWelcome, vrStatus);
         welcomeGui.initialize(assetManager, globalResources.getSpriteBatch());
 
         if (settings.runtime.openXr) {
@@ -670,7 +636,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     private void initializeConstants() {
-        if (vr) {
+        if (cliArgs.vr) {
             Constants.initialize(Settings.settings.scene.distanceScaleVr);
         } else {
             Constants.initialize(Settings.settings.scene.distanceScaleDesktop);
@@ -687,7 +653,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      **/
     private XrLoadStatus createVR() {
         final var settings = Settings.settings;
-        if (vr) {
+        if (cliArgs.vr) {
             // Initializing the VRContext may fail if no HMD is connected or no OpenXR runtime is found.
             try {
                 settings.runtime.openXr = true;
@@ -827,7 +793,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.VISIBILITY_OF_COMPONENTS, this, sceneRenderer.visible);
 
         // Key bindings.
-        inputMultiplexer.addProcessor(new KeyboardInputController(Gdx.input));
+        inputMultiplexer.addProcessor(new KeyboardInputController(Gdx.input, cliArgs.debugInput));
 
         // Broadcast scene.
         EventManager.publish(Event.SCENE_LOADED, this, scene);
@@ -931,7 +897,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Timer.schedule(logAttributes, 5);
 
         // In VR, scale satellites.
-        if (vr) {
+        if (cliArgs.vr) {
             final var scaleGaia = new Task() {
                 @Override
                 public void run() {
@@ -1475,6 +1441,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
         return this.postProcessor;
     }
 
+    public CLIArgs getCliArgs() {
+        return cliArgs;
+    }
+
     public boolean isOn(final int ordinal) {
         return this.sceneRenderer.isOn(ordinal);
     }
@@ -1693,7 +1663,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public boolean isHeadless() {
-        return headless;
+        return cliArgs.headless;
     }
 
     public GlobalResources getGlobalResources() {
@@ -1780,7 +1750,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @return The state of VR for this instance.
      */
     public boolean isVR() {
-        return vr;
+        return cliArgs.vr;
     }
 
     public float getEffectiveFovFactor() {

@@ -649,12 +649,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
-        gs = new GaiaSky(cliArgs.skipWelcome,
-                         cliArgs.vr,
-                         cliArgs.externalView,
-                         cliArgs.headless,
-                         cliArgs.noScriptingServer,
-                         cliArgs.debug);
+        gs = new GaiaSky(cliArgs);
         new Lwjgl3Application(gs, cfg);
     }
 
@@ -718,59 +713,63 @@ public class GaiaSkyDesktop implements IObserver {
     /**
      * Program CLI arguments.
      */
-    private static class CLIArgs {
+    public static class CLIArgs {
         @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0)
-        private boolean help = false;
+        public boolean help = false;
 
         @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1)
-        private boolean version = false;
+        public boolean version = false;
 
-        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1)
-        private boolean asciiArt = false;
+        @Parameter(names = { "-i", "--ascii-art" }, description = "Add nice ascii art to --version information.", order = 1)
+        public boolean asciiArt = false;
 
         @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
-        private boolean skipWelcome = false;
+        public boolean skipWelcome = false;
 
         @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4)
-        private String propertiesFile = null;
+        public String propertiesFile = null;
 
         @Parameter(names = { "-a",
                 "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
-        private String assetsLocation = null;
+        public String assetsLocation = null;
 
         @Parameter(names = { "-vr",
                 "--openxr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenXR. Make sure your OpenXR runtime is running.", order = 6)
-        private boolean vr = false;
+        public boolean vr = false;
 
         @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7)
-        private boolean externalView = false;
+        public boolean externalView = false;
 
         @Parameter(names = { "-n",
-                "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
-        private boolean noScriptingServer = false;
+                "--no-script" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
+        public boolean noScriptingServer = false;
 
         @Parameter(names = { "-d", "--debug" }, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9)
-        private boolean debug = false;
+        public boolean debug = false;
 
         @Parameter(names = { "-g",
-                "--gpudebug" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10)
-        private boolean debugGpu = false;
+                "--debug-gpu" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10)
+        public boolean debugGpu = false;
+
+        @Parameter(names = {
+                "--debug-input" }, description = "Activate input debug mode. Prints out debug information for all input events (keyboard/mouse/controllers).", order = 10)
+        public boolean debugInput = false;
 
         @Parameter(names = { "-l", "--headless" }, description = "Use headless (windowless) mode, for servers.", order = 11)
-        private boolean headless = false;
+        public boolean headless = false;
 
         @Parameter(names = {
-                "--safemode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12)
-        private boolean safeMode = false;
+                "--safe-mode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12)
+        public boolean safeMode = false;
 
         @Parameter(names = {
-                "--nosafemode" }, description = "Force deactivation of safe graphics mode. Warning: this bypasses internal checks and may break things! Useful to get rid of safe graphics mode in the settings.", order = 13)
-        private boolean noSafeMode = false;
+                "--no-safe-mode" }, description = "Force deactivation of safe graphics mode. Warning: this bypasses internal checks and may break things! Useful to get rid of safe graphics mode in the settings.", order = 13)
+        public boolean noSafeMode = false;
 
-        @Parameter(names = { "--hdpimode" }, description =
+        @Parameter(names = { "--hdpi-mode" }, description =
                 "The HDPI mode to use. Defines how HiDPI monitors are handled. Operating systems may have a per-monitor HiDPI scale setting. The operating system " +
                         "may report window width/height and mouse coordinates in a logical coordinate system at a lower resolution than the actual " +
                         "physical resolution. This setting allows you to specify whether you want to work in logical or raw pixel units.", order = 14)
-        private HdpiMode hdpiMode = HdpiMode.Pixels;
+        public HdpiMode hdpiMode = HdpiMode.Pixels;
     }
 }

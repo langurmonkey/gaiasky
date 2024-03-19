@@ -10,6 +10,8 @@ package gaiasky.input;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.utils.TimeUtils;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.GaiaSkyDesktop.CLIArgs;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -45,6 +47,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     protected Controller lastControllerUsed = null;
     protected IGamepadMappings mappings;
     protected long lastAxisEvtTime = 0, lastButtonPollTime = 0;
+    private final CLIArgs cliArgs;
 
     protected AbstractGamepadListener(String mappingsFile) {
         this(AbstractGamepadMappings.readGamepadMappings(mappingsFile));
@@ -53,6 +56,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     protected AbstractGamepadListener(IGamepadMappings mappings) {
         this.mappings = mappings;
         this.em = EventManager.instance;
+        this.cliArgs = GaiaSky.instance.getCliArgs();
         em.subscribe(this, Event.RELOAD_CONTROLLER_MAPPINGS);
     }
 
@@ -70,25 +74,38 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     @Override
-    public boolean buttonDown(Controller controller, int buttonCode) {
+    public boolean buttonDown(Controller controller,
+                              int buttonCode) {
         if (isActive()) {
             lastControllerUsed = controller;
+        }
+        if (cliArgs.debugInput) {
+            logger.info(String.format("Button down [controller: %s, button: %d]", controller.getName(), buttonCode));
         }
         return false;
     }
 
     @Override
-    public boolean buttonUp(Controller controller, int buttonCode) {
+    public boolean buttonUp(Controller controller,
+                            int buttonCode) {
         if (isActive()) {
             lastControllerUsed = controller;
+        }
+        if (cliArgs.debugInput) {
+            logger.info(String.format("Button down [controller: %s, button: %d]", controller.getName(), buttonCode));
         }
         return false;
     }
 
     @Override
-    public boolean axisMoved(Controller controller, int axisCode, float value) {
+    public boolean axisMoved(Controller controller,
+                             int axisCode,
+                             float value) {
         if (isActive()) {
             lastControllerUsed = controller;
+        }
+        if (cliArgs.debugInput) {
+            logger.info(String.format("Axis moved [controller: %s, axis: %d, value: %f]", controller.getName(), axisCode, value));
         }
         return false;
     }
@@ -104,7 +121,8 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         return isKeyPressed(lastControllerUsed, buttonCode);
     }
 
-    public boolean isKeyPressed(Controller controller, int buttonCode) {
+    public boolean isKeyPressed(Controller controller,
+                                int buttonCode) {
         return controller != null && controller.getButton(buttonCode);
     }
 
@@ -119,7 +137,8 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         return anyPressed(lastControllerUsed, buttonCodes);
     }
 
-    public boolean anyPressed(Controller controller, int... buttonCodes) {
+    public boolean anyPressed(Controller controller,
+                              int... buttonCodes) {
         if (controller == null) {
             return false;
         }
@@ -182,7 +201,9 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         if (event == Event.RELOAD_CONTROLLER_MAPPINGS) {
             mappings = AbstractGamepadMappings.readGamepadMappings((String) data[0]);
         }

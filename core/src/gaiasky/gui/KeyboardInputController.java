@@ -17,19 +17,21 @@ import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.input.InputUtils;
 import gaiasky.input.KeyRegister;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeSet;
 
 /**
  * This input adapter binds the key mappings to the input system in Libgdx.
  */
 public class KeyboardInputController extends InputAdapter implements IObserver {
+    private static final Log logger = Logger.getLogger(KeyboardInputController.class);
 
     private final Input input;
+    private final boolean debugInput;
     public KeyBindings mappings;
     /**
      * Holds the pressed keys at any moment
@@ -37,9 +39,11 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
     public TreeSet<Integer> pressedKeys;
     private final KeyRegister register;
 
-    public KeyboardInputController(Input input) {
+    public KeyboardInputController(Input input,
+                                   boolean debugInput) {
         super();
         this.input = input;
+        this.debugInput = debugInput;
         this.register = new KeyRegister();
         pressedKeys = new TreeSet<>();
         KeyBindings.initialize();
@@ -58,6 +62,9 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
             pressedKeys.add(keyCode);
             register.registerKeyDownTime(keyCode, TimeUtils.millis());
         }
+        if (debugInput) {
+            logger.info(String.format("Key down: %d", keyCode));
+        }
         return false;
 
     }
@@ -72,7 +79,6 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
         cleanSpecial();
         long now = System.currentTimeMillis();
 
-
         if (Settings.settings.runtime.inputEnabled) {
             // Use key mappings
             ProgramAction action = mappings.getMappings().get(pressedKeys);
@@ -84,6 +90,9 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
             EventManager.publish(Event.SHOW_QUIT_ACTION, this);
         }
         pressedKeys.remove(keyCode);
+        if (debugInput) {
+            logger.info(String.format("Key up: %d", keyCode));
+        }
         return false;
 
     }
@@ -99,7 +108,9 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         if (Objects.requireNonNull(event) == Event.CLEAN_PRESSED_KEYS) {
             if (pressedKeys != null) {
                 pressedKeys.clear();

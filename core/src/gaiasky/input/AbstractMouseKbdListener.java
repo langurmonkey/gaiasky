@@ -11,14 +11,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.TimeUtils;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.GaiaSkyDesktop.CLIArgs;
 import gaiasky.gui.IInputListener;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMouseKbdListener extends GestureDetector implements IInputListener {
+    private static final Log logger = Logger.getLogger(AbstractMouseKbdListener.class);
 
     protected final AtomicBoolean active;
     protected ICamera iCamera;
@@ -26,11 +31,13 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     protected long minPollTime = 150;
     protected long minPollInterval = 0;
     protected long lastPollTime = 0;
+    private final CLIArgs cliArgs;
 
     protected AbstractMouseKbdListener(GestureListener gl, ICamera camera) {
         super(gl);
         this.iCamera = camera;
         this.active = new AtomicBoolean(true);
+        this.cliArgs = GaiaSky.instance.getCliArgs();
     }
 
     @Override
@@ -43,6 +50,9 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
                 }
             }
         }
+        if (cliArgs.debugInput) {
+            logger.info(String.format("Key down: %d", keyCode));
+        }
         return false;
     }
 
@@ -52,6 +62,9 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
             if (iCamera != null) {
                 iCamera.setGamepadInput(false);
             }
+        }
+        if (cliArgs.debugInput) {
+            logger.info(String.format("Key up: %d", keyCode));
         }
         return false;
     }
