@@ -60,7 +60,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     /** These names are not allowed **/
-    private static final String[] forbiddenNameValues = {"-", "...", "nop", "nan", "?", "_", "x", "n/a"};
+    private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
     /** Store already visited colName:attribute pairs. **/
     private final Map<String, Integer> stringAttributesMap;
     /** Store the last index for a given attribute. **/
@@ -117,6 +117,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects.
+     *
      * @return Pair of <UCD,Double>.
      */
     private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs,
@@ -149,6 +150,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
+     *
      * @return Pair of <UCD,double[]>
      */
     private Pair<UCD, double[]> getDoubleArrayUcd(Array<UCD> UCDs,
@@ -175,6 +177,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The set of UCD objects
      * @param row  The row
+     *
      * @return A pair with the UCD and the string
      */
     private Pair<UCD, String> getStringUcd(Array<UCD> UCDs,
@@ -225,6 +228,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *                       current number of loaded objects and the
      *                       second holds the total number of objects to load.
      * @param postCallback   A function that runs after the data has been loaded.
+     *
      * @return The list of particle records.
      */
     public List<IParticleRecord> loadData(DataSource ds,
@@ -263,7 +267,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                 // Automatically switch to extended particles if proper motions, colors or sizes are found in the data file.
                 if (datasetOptions != null) {
-                    if ((ucdParser.hasPm || ucdParser.hasSize || ucdParser.hasColor) && (datasetOptions.type == null || datasetOptions.type == DatasetLoadType.PARTICLES)) {
+                    if ((ucdParser.hasPm || ucdParser.hasSize || ucdParser.hasColor) && (datasetOptions.type == null
+                            || datasetOptions.type == DatasetLoadType.PARTICLES)) {
                         // Switch to extended.
                         datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
                     }
@@ -517,8 +522,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             float tEff;
                             if (!ucdParser.TEFF.isEmpty()) {
                                 Pair<UCD, Double> tEffPair = getDoubleUcd(ucdParser.TEFF, row);
-                                assert tEffPair != null;
-                                tEff = tEffPair.getSecond().floatValue();
+                                if (tEffPair != null) {
+                                    // Use value from table.
+                                    tEff = tEffPair.getSecond().floatValue();
+                                } else {
+                                    // Use color index.
+                                    tEff = (float) bvToTEff.bvToTeff(colorIndex);
+                                }
                             } else {
                                 // Convert B-V to T_eff using Ballesteros 2012
                                 tEff = (float) bvToTEff.bvToTeff(colorIndex);
@@ -567,9 +577,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Name from ID.
                                 if (idIsNotNumber) {
                                     Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
-                                    names = new String[]{idPair.getSecond()};
+                                    names = new String[] { idPair.getSecond() };
                                 } else {
-                                    names = new String[]{Long.toString(id)};
+                                    names = new String[] { Long.toString(id) };
                                 }
                             } else {
                                 // We have a name.
@@ -590,7 +600,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 }
                                 // Default to ID.
                                 if (names.length == 0) {
-                                    names = new String[]{Long.toString(id)};
+                                    names = new String[] { Long.toString(id) };
                                 }
                             }
 
@@ -598,7 +608,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (rgb != null) {
                                 colors.put(id, rgb);
                             }
-                            sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
+                            sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
                             if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS
                                     || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {

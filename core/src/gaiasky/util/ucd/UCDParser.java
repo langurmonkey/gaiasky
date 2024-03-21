@@ -337,7 +337,7 @@ public class UCDParser {
         if (mag != null)
             for (UCD candidate : mag) {
                 if (TextUtils.contains(candidate.UCDStrings, "phot.mag")) {
-                    if (candidate.UCDStrings.length == 1 || TextUtils.contains(candidate.UCDStrings, "stat.mean")|| TextUtils.startsWith(candidate.UCDStrings, "em.opt.")) {
+                    if (candidate.UCDStrings.length == 1 || TextUtils.contains(candidate.UCDStrings, "stat.mean")|| TextUtils.startsWith(candidate.UCDStrings, "em.opt")) {
                         this.MAG.add(candidate);
                     }
                 }
@@ -430,9 +430,17 @@ public class UCDParser {
     }
 
     public boolean has(UCD ucd) {
-        return has(ucd, POS1) || has(ucd, POS2) || has(ucd, POS3) || has(ucd, PMRA) || has(ucd, PMDEC) || has(ucd, RADVEL) || has(ucd, ID) || has(ucd, COL) || has(ucd,
-                                                                                                                                                                   TEFF)
-                || has(ucd, NAME) || has(ucd, MAG);
+        return has(ucd, POS1)
+                || has(ucd, POS2)
+                || has(ucd, POS3)
+                || has(ucd, PMRA)
+                || has(ucd, PMDEC)
+                || has(ucd, RADVEL)
+                || has(ucd, ID)
+                || has(ucd, COL)
+                || has(ucd, TEFF)
+                || has(ucd, NAME)
+                || has(ucd, MAG);
     }
 
     public boolean has(UCD ucd,
