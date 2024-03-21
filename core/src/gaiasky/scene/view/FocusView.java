@@ -763,7 +763,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public QuaternionDouble getOrientationQuaternion() {
         if (Mapper.orientation.has(entity)) {
             var orientation = Mapper.orientation.get(entity);
-            if (orientation.hasAttitude()) {
+            if (orientation.hasQuaternions()) {
                 return orientation.quaternionOrientation.getCurrentQuaternion();
             }
         }

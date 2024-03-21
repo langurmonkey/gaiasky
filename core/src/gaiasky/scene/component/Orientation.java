@@ -80,8 +80,8 @@ public class Orientation implements Component, ICopy {
         return rigidRotation != null;
     }
 
-    public boolean hasAttitude() {
-        return quaternionOrientation != null && quaternionOrientation.orientationServer != null && quaternionOrientation.orientationServer.hasOrientation();
+    public boolean hasQuaternions() {
+        return quaternionOrientation != null && quaternionOrientation.orientationServer != null;
     }
 
     public void initialize(AssetManager manager) {
@@ -92,13 +92,13 @@ public class Orientation implements Component, ICopy {
     }
 
     public void setUp(AssetManager manager) {
-        if (hasAttitude()) {
+        if (quaternionOrientation != null) {
             quaternionOrientation.setUp(manager);
         }
     }
 
     public boolean isReady(AssetManager manager) {
-        if (hasAttitude()) {
+        if (quaternionOrientation != null) {
             return quaternionOrientation.isReady(manager);
         } else {
             return true;

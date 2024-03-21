@@ -18,7 +18,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.LightingUtils;
-import gaiasky.scene.record.RotationComponent;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -35,7 +34,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
     private final Quaternion QF;
     private final QuaternionDouble QD;
 
-    public ModelUpdater(Family family, int priority) {
+    public ModelUpdater(Family family,
+                        int priority) {
         super(family, priority);
         this.camera = GaiaSky.instance.cameraManager;
         this.D32 = new Vector3d();
@@ -45,12 +45,14 @@ public class ModelUpdater extends AbstractUpdateSystem {
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity,
+                                 float deltaTime) {
         updateEntity(entity, deltaTime);
     }
 
     @Override
-    public void updateEntity(Entity entity, float deltaTime) {
+    public void updateEntity(Entity entity,
+                             float deltaTime) {
         var body = Mapper.body.get(entity);
         var model = Mapper.model.get(entity);
         var graph = Mapper.graph.get(entity);
@@ -72,27 +74,40 @@ public class ModelUpdater extends AbstractUpdateSystem {
             setToLocalTransform(entity, body, graph, cloud.cloud.size, 1, cloud.cloud.localTransform, true);
         }
         if (engine != null && engine.render) {
-            EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(), MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
+            EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(),
+                                 MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
         }
     }
 
-    int lastLevel = -1;
-
-    protected void updateLocalTransform(Entity entity, Body body, GraphNode graph, ModelScaffolding scaffolding) {
+    protected void updateLocalTransform(Entity entity,
+                                        Body body,
+                                        GraphNode graph,
+                                        ModelScaffolding scaffolding) {
         setToLocalTransform(entity, body, graph, scaffolding.sizeScaleFactor, graph.localTransform, true);
     }
 
-    public void setToLocalTransform(Entity entity, Body body, GraphNode graph, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
+    public void setToLocalTransform(Entity entity,
+                                    Body body,
+                                    GraphNode graph,
+                                    float sizeFactor,
+                                    Matrix4 localTransform,
+                                    boolean forceUpdate) {
         setToLocalTransform(entity, body, graph, body.size, sizeFactor, localTransform, forceUpdate);
     }
 
-    public void setToLocalTransform(Entity entity, Body body, GraphNode graph, float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
+    public void setToLocalTransform(Entity entity,
+                                    Body body,
+                                    GraphNode graph,
+                                    float size,
+                                    float sizeFactor,
+                                    Matrix4 localTransform,
+                                    boolean forceUpdate) {
         // Update translation, orientation and local transform.
         ITimeFrameProvider time = GaiaSky.instance.time;
 
         // Helio-tropic satellites need this chunk before the actual update is carried out.
         var orientation = Mapper.orientation.get(entity);
-        if (orientation != null && orientation.hasAttitude() && (time.getHdiff() != 0 || forceUpdate)) {
+        if (orientation != null && orientation.hasQuaternions() && (time.getHdiff() != 0 || forceUpdate)) {
             var attitude = (QuaternionOrientation) orientation.quaternionOrientation;
             if (Mapper.tagHeliotropic.has(entity) && attitude.nonRotatedPos != null) {
                 attitude.nonRotatedPos.set(body.pos);
@@ -108,8 +123,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
         if (sizeFactor != 1 || forceUpdate) {
             var scaffolding = Mapper.modelScaffolding.get(entity);
-            var rotation = orientation.rigidRotation;
-            var quaternionOrientation = orientation.quaternionOrientation;
+            var quaternionOrientation = orientation != null ? orientation.quaternionOrientation : null;
+            var rigidRotation = orientation != null ? orientation.rigidRotation : null;
             if (Mapper.tagQuatOrientation.has(entity)) {
                 // Billboards use quaternion orientation.
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
@@ -152,18 +167,17 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 MD4.set(localTransform).mul(graph.orientation);
                 MD4.putIn(localTransform);
 
-            } else if (rotation != null) {
+            } else if (rigidRotation != null) {
                 // Planets and moons have rotation components
-                RotationComponent rc = rotation;
                 graph.translation.setToTranslation(localTransform)
                         .scl(size * sizeFactor)
-                        .rotate(0, 1, 0, (float) rc.ascendingNode)
+                        .rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
                         .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
-                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt))
-                        .rotate(0, 1, 0, (float) rc.angle);
-                graph.orientation.idt().rotate(0, 1, 0, (float) rc.ascendingNode)
+                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt))
+                        .rotate(0, 1, 0, (float) rigidRotation.angle);
+                graph.orientation.idt().rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
                         .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
-                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
+                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt));
             } else {
                 // The rest of bodies are just sitting there, in their reference system
                 graph.translation.setToTranslation(localTransform)

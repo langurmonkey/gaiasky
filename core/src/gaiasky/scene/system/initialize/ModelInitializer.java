@@ -95,7 +95,7 @@ public class ModelInitializer extends AbstractInitSystem {
         var bb = Mapper.billboard.get(entity);
 
         boolean isPlanet = atmosphere != null || cloud != null;
-        boolean isSatellite = orientation != null && orientation.hasAttitude();
+        boolean isSatellite = base.ct.isEnabled(ComponentType.Satellites);
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
         boolean isBillboardGal = Mapper.tagBillboardGalaxy.has(entity);
@@ -131,7 +131,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
 
         if (isSatellite) {
-            initializeSatellite(orientation, scaffolding, sa, label);
+            initializeSatellite(scaffolding, sa, label);
         }
 
         if (isPlanet) {
@@ -140,6 +140,10 @@ public class ModelInitializer extends AbstractInitSystem {
             EntityUtils.setColor2Data(body, celestial, 0.6f);
         } else {
             EntityUtils.setColor2Data(body, celestial, 0.1f);
+        }
+
+        if (orientation != null) {
+            initializeOrientation(orientation);
         }
     }
 
@@ -379,7 +383,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    public void initializeSatellite(Orientation orientation, ModelScaffolding scaffolding, SolidAngle sa, Label label) {
+    public void initializeSatellite(ModelScaffolding scaffolding, SolidAngle sa, Label label) {
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e18;
         sa.thresholdPoint = thPoint / 3.3e10;
@@ -390,6 +394,9 @@ public class ModelInitializer extends AbstractInitSystem {
 
         scaffolding.billboardSizeFactor = 10f;
 
+    }
+
+    public void initializeOrientation(Orientation orientation) {
         orientation.initialize(AssetBean.manager());
     }
 
