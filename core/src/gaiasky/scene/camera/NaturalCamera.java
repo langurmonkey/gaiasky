@@ -583,7 +583,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         // Track
                         if (!vr && isTracking()) {
                             // Track the tracking object
-                            this.trackingObject.getPredictedPosition(aux5b, trackingName, time, this, false);
+                            this.trackingObject.getPredictedPosition(aux5b, trackingName, time, false);
                             directionToTrackingObject(aux5b);
                         }
 
@@ -941,7 +941,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Stops the camera movement.
      */
     public void stopForwardMovement() {
-        boolean stopped = (vel.len2() != 0);
         force.setZero();
         vel.setZero();
     }

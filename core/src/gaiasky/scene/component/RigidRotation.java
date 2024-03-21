@@ -7,11 +7,9 @@
 
 package gaiasky.scene.component;
 
-import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Engine;
 import gaiasky.scene.record.RotationComponent;
 
-public class Rotation implements Component, ICopy {
+public class RigidRotation implements Cloneable {
 
     /** Holds information about the rotation of the body **/
     public RotationComponent rc;
@@ -32,9 +30,14 @@ public class Rotation implements Component, ICopy {
     }
 
     @Override
-    public Component getCopy(Engine engine) {
-        var copy = engine.createComponent(this.getClass());
-        copy.rc = rc;
-        return copy;
+    public RigidRotation clone() {
+        try {
+            var copy = (RigidRotation) super.clone();
+            copy.rc = rc;
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
+
 }

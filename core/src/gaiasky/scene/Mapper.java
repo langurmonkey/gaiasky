@@ -22,6 +22,7 @@ public class Mapper {
     public static final ComponentMapper<Celestial> celestial = ComponentMapper.getFor(Celestial.class);
     public static final ComponentMapper<Coordinates> coordinates = ComponentMapper.getFor(Coordinates.class);
     public static final ComponentMapper<Label> label = ComponentMapper.getFor(Label.class);
+    public static final ComponentMapper<Orientation> orientation = ComponentMapper.getFor(Orientation.class);
     public static final ComponentMapper<RefSysTransform> transform = ComponentMapper.getFor(RefSysTransform.class);
     public static final ComponentMapper<AffineTransformations> affine = ComponentMapper.getFor(AffineTransformations.class);
     public static final ComponentMapper<Constel> constel = ComponentMapper.getFor(Constel.class);
@@ -31,7 +32,6 @@ public class Mapper {
     public static final ComponentMapper<Fade> fade = ComponentMapper.getFor(Fade.class);
     public static final ComponentMapper<Focus> focus = ComponentMapper.getFor(Focus.class);
     public static final ComponentMapper<Highlight> highlight = ComponentMapper.getFor(Highlight.class);
-    public static final ComponentMapper<Rotation> rotation = ComponentMapper.getFor(Rotation.class);
     public static final ComponentMapper<DatasetDescription> datasetDescription = ComponentMapper.getFor(DatasetDescription.class);
     public static final ComponentMapper<ParticleSet> particleSet = ComponentMapper.getFor(ParticleSet.class);
     public static final ComponentMapper<StarSet> starSet = ComponentMapper.getFor(StarSet.class);
@@ -49,7 +49,6 @@ public class Mapper {
     public static final ComponentMapper<Atmosphere> atmosphere = ComponentMapper.getFor(Atmosphere.class);
     public static final ComponentMapper<Cloud> cloud = ComponentMapper.getFor(Cloud.class);
     public static final ComponentMapper<ModelScaffolding> modelScaffolding = ComponentMapper.getFor(ModelScaffolding.class);
-    public static final ComponentMapper<Attitude> attitude = ComponentMapper.getFor(Attitude.class);
     public static final ComponentMapper<MotorEngine> engine = ComponentMapper.getFor(MotorEngine.class);
     public static final ComponentMapper<RenderType> renderType = ComponentMapper.getFor(RenderType.class);
     public static final ComponentMapper<LocationMark> loc = ComponentMapper.getFor(LocationMark.class);

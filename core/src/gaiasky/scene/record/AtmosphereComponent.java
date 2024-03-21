@@ -16,7 +16,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ModelScaffolding;
-import gaiasky.scene.component.Rotation;
+import gaiasky.scene.component.RigidRotation;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger.Log;
@@ -71,7 +71,8 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         fogColor = new Vector3();
     }
 
-    public void doneLoading(Material planetMat, float planetSize) {
+    public void doneLoading(Material planetMat,
+                            float planetSize) {
         this.planetSize = planetSize;
         setUpAtmosphericScatteringMaterial(planetMat);
 
@@ -156,21 +157,34 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
     /**
      * Updates the atmospheric scattering shader parameters.
      *
-     * @param mat         The material to update.
-     * @param alpha       The opacity value.
-     * @param ground      Whether it is the ground shader or the atmosphere.
-     * @param graph       The graph node component.
-     * @param rotation    The rotation component.
-     * @param scaffolding The model scaffolding component.
-     * @param vrOffset    The VR offset vector.
+     * @param mat           The material to update.
+     * @param alpha         The opacity value.
+     * @param ground        Whether it is the ground shader or the atmosphere.
+     * @param graph         The graph node component.
+     * @param rigidRotation The rotation component.
+     * @param scaffolding   The model scaffolding component.
+     * @param vrOffset      The VR offset vector.
      */
-    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, GraphNode graph, Rotation rotation, ModelScaffolding scaffolding, Vector3d vrOffset) {
+    public void updateAtmosphericScatteringParams(Material mat,
+                                                  float alpha,
+                                                  boolean ground,
+                                                  GraphNode graph,
+                                                  RotationComponent rigidRotation,
+                                                  ModelScaffolding scaffolding,
+                                                  Vector3d vrOffset) {
         Vector3b parentTranslation = null;
         Entity parent = graph.parent;
         if (parent != null) {
             parentTranslation = Mapper.graph.get(parent).translation;
         }
-        updateAtmosphericScatteringParams(mat, alpha, ground, graph.translation, rotation.rc, scaffolding.inverseRefPlaneTransform, parentTranslation, vrOffset);
+        updateAtmosphericScatteringParams(mat,
+                                          alpha,
+                                          ground,
+                                          graph.translation,
+                                          rigidRotation,
+                                          scaffolding.inverseRefPlaneTransform,
+                                          parentTranslation,
+                                          vrOffset);
     }
 
     /**
@@ -184,7 +198,14 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
      * @param parentTranslation The parent translation vector.
      * @param vrOffset          The VR offset vector.
      */
-    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Vector3b translation, RotationComponent rc, String inverseRefPlaneTransform, Vector3b parentTranslation, Vector3d vrOffset) {
+    public void updateAtmosphericScatteringParams(Material mat,
+                                                  float alpha,
+                                                  boolean ground,
+                                                  Vector3b translation,
+                                                  RotationComponent rc,
+                                                  String inverseRefPlaneTransform,
+                                                  Vector3b parentTranslation,
+                                                  Vector3d vrOffset) {
 
         translation.put(aux3);
         if (vrOffset != null) {
@@ -221,7 +242,7 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
             mat.set(new AtmosphereAttribute(AtmosphereAttribute.CameraHeight, camHeight));
 
         // Planet position
-        if (ground) {
+        if (ground && rc != null) {
             // Camera position must be corrected using the rotation angle of the planet
             aux3.rotate(-rc.ascendingNode, 0, 1, 0)
                     .mul(Coordinates.getTransformD(inverseRefPlaneTransform))
@@ -239,7 +260,7 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
             aux3.add(parentTranslation);
         }
         aux3.nor();
-        if (ground) {
+        if (ground && rc != null) {
             // Camera position must be corrected using the rotation angle of the planet
             aux3.rotate(-rc.ascendingNode, 0, 1, 0)
                     .mul(Coordinates.getTransformD(inverseRefPlaneTransform))
@@ -273,6 +294,7 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
     public void setFogColor(double[] fogColor) {
         this.fogColor.set((float) fogColor[0], (float) fogColor[1], (float) fogColor[2]);
     }
+
     public void setFogcolor(double[] fogColor) {
         setFogColor(fogColor);
     }
@@ -324,7 +346,8 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
      * @param seed The seed to use.
      * @param size The body size in internal units.
      */
-    public void randomizeAll(long seed, double size) {
+    public void randomizeAll(long seed,
+                             double size) {
         Random rand = new Random(seed);
         // Size
         double sizeKm = size * Constants.U_TO_KM;

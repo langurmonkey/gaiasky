@@ -28,7 +28,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
 import gaiasky.data.OctreeLoader;
-import gaiasky.data.api.IAttitudeServer;
+import gaiasky.data.api.OrientationServer;
 import gaiasky.data.util.AttitudeLoader;
 import gaiasky.data.util.OrbitDataLoader;
 import gaiasky.data.util.PointCloudData;
@@ -496,7 +496,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
         assetManager.setLoader(Pixmap.class, new OwnPixmapLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
-        assetManager.setLoader(IAttitudeServer.class, new AttitudeLoader(dataResolver));
+        assetManager.setLoader(OrientationServer.class, new AttitudeLoader(dataResolver));
         assetManager.setLoader(ExtShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
         assetManager.setLoader(BitmapFont.class, new BitmapFontLoader(internalResolver));
         assetManager.setLoader(Texture.class, new OwnTextureLoader(internalResolver));

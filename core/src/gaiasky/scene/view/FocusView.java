@@ -8,8 +8,6 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -468,7 +466,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public Vector3b getPredictedPosition(Vector3b out,
                                          String name,
                                          ITimeFrameProvider time,
-                                         ICamera camera,
                                          boolean force) {
         if (!isValid()) {
             return out;
@@ -508,9 +505,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public Vector3b getPredictedPosition(Vector3b out,
                                          ITimeFrameProvider time,
-                                         ICamera camera,
+                                         ICamera unused,
                                          boolean force) {
-        return getPredictedPosition(out, null, time, camera, force);
+        return getPredictedPosition(out, null, time, force);
     }
 
     @Override
@@ -656,8 +653,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         }
     }
 
-    Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
-
     @Override
     public double getElevationAt(Vector3b camPos,
                                  Vector3b nextPos) {
@@ -760,15 +755,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public RotationComponent getRotationComponent() {
-        return Mapper.rotation.has(entity) ? Mapper.rotation.get(entity).rc : null;
+        var orientation = Mapper.orientation.get(entity);
+        return orientation != null ? orientation.rigidRotation : null;
     }
 
     @Override
     public QuaternionDouble getOrientationQuaternion() {
-        if (Mapper.attitude.has(entity)) {
-            var attitude = Mapper.attitude.get(entity);
-            if (attitude.attitude != null) {
-                return attitude.attitude.getQuaternion();
+        if (Mapper.orientation.has(entity)) {
+            var orientation = Mapper.orientation.get(entity);
+            if (orientation.hasAttitude()) {
+                return orientation.quaternionOrientation.getCurrentQuaternion();
             }
         }
         return null;
@@ -1209,10 +1205,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             }
         }
         return list;
-    }
-
-    public boolean isSameEntity(FocusView other) {
-        return entity == other.entity;
     }
 
 }

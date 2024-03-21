@@ -12,7 +12,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.time.ITimeFrameProvider;
 
-public class RotationComponent implements IUpdatable<RotationComponent> {
+public class RotationComponent implements IUpdatable<RotationComponent>, Cloneable {
     /**
      * Angular velocity [deg/hour] around the rotation axis.
      **/
@@ -156,5 +156,14 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
     @Override
     public void updateWith(RotationComponent object) {
         copyFrom(object);
+    }
+
+    @Override
+    public RotationComponent clone() {
+        try {
+            return (RotationComponent) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

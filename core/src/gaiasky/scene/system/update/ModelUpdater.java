@@ -16,10 +16,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.ModelScaffolding;
-import gaiasky.scene.component.MotorEngine;
+import gaiasky.scene.component.*;
 import gaiasky.scene.entity.LightingUtils;
 import gaiasky.scene.record.RotationComponent;
 import gaiasky.util.DecalUtils;
@@ -29,8 +26,6 @@ import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-
-import java.util.Date;
 
 public class ModelUpdater extends AbstractUpdateSystem {
 
@@ -95,24 +90,26 @@ public class ModelUpdater extends AbstractUpdateSystem {
         // Update translation, orientation and local transform.
         ITimeFrameProvider time = GaiaSky.instance.time;
 
-        // Heliotropic satellites need this chunk before the actual update is carried out.
-        var attitude = Mapper.attitude.get(entity);
-        if (attitude != null && (time.getHdiff() != 0 || forceUpdate)) {
+        // Helio-tropic satellites need this chunk before the actual update is carried out.
+        var orientation = Mapper.orientation.get(entity);
+        if (orientation != null && orientation.hasAttitude() && (time.getHdiff() != 0 || forceUpdate)) {
+            var attitude = (QuaternionOrientation) orientation.quaternionOrientation;
             if (Mapper.tagHeliotropic.has(entity) && attitude.nonRotatedPos != null) {
                 attitude.nonRotatedPos.set(body.pos);
                 // Undo rotation.
                 attitude.nonRotatedPos.mul(Coordinates.eqToEcl())
                         .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
                 // Update attitude from server if needed.
-                if (attitude.attitudeServer != null) {
-                    attitude.attitude = attitude.attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli()));
+                if (attitude.orientationServer != null) {
+                    attitude.orientationServer.getOrientation(time.getTime());
                 }
             }
         }
 
         if (sizeFactor != 1 || forceUpdate) {
-            var rotation = Mapper.rotation.get(entity);
             var scaffolding = Mapper.modelScaffolding.get(entity);
+            var rotation = orientation.rigidRotation;
+            var quaternionOrientation = orientation.quaternionOrientation;
             if (Mapper.tagQuatOrientation.has(entity)) {
                 // Billboards use quaternion orientation.
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
@@ -135,12 +132,12 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 if (engine.qf != null) {
                     engine.rotationMatrix.getRotation(engine.qf);
                 }
-            } else if (attitude != null) {
+            } else if (quaternionOrientation != null) {
                 // Satellites have attitude.
 
                 graph.translation.setToTranslation(localTransform).scl(size * sizeFactor);
-                if (attitude.attitude != null) {
-                    QD.set(attitude.attitude.getQuaternion());
+                if (quaternionOrientation.orientationServer != null && quaternionOrientation.orientationServer.hasOrientation()) {
+                    QD.set(quaternionOrientation.getCurrentQuaternion());
                     QF.set((float) QD.x, (float) QD.y, (float) QD.z, (float) QD.w);
                 } else {
                     QD.setFromAxis(0, 1, 0, AstroUtils.getSunLongitude(GaiaSky.instance.time.getTime()));
@@ -148,16 +145,16 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
                 // Update orientation
                 graph.orientation.idt().rotate(QD);
-                if (attitude.attitude != null) {
+                if (quaternionOrientation.orientationServer != null && quaternionOrientation.orientationServer.hasOrientation()) {
                     graph.orientation.rotate(0, 0, 1, 180);
                 }
 
                 MD4.set(localTransform).mul(graph.orientation);
                 MD4.putIn(localTransform);
 
-            } else if (rotation.rc != null) {
+            } else if (rotation != null) {
                 // Planets and moons have rotation components
-                RotationComponent rc = rotation.rc;
+                RotationComponent rc = rotation;
                 graph.translation.setToTranslation(localTransform)
                         .scl(size * sizeFactor)
                         .rotate(0, 1, 0, (float) rc.ascendingNode)

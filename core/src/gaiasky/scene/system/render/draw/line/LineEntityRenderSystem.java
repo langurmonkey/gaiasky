@@ -16,7 +16,6 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Body;
@@ -191,7 +190,6 @@ public class LineEntityRenderSystem {
 
         // A focus object is needed in order to render the projection lines.
         if (camera.hasFocus()) {
-            IFocus focus = camera.getFocus();
             // Line in ZX.
             renderer.addLine(lineView, gr.a.x, gr.a.y, gr.a.z, gr.b.x, gr.b.y, gr.b.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
             // Line in Y.
@@ -278,7 +276,7 @@ public class LineEntityRenderSystem {
             float baseOpacity = (float) (alpha * trajectory.alpha * base.opacity);
 
             Vector3d parentPos;
-            parentPos = Mapper.attitude.has(graph.parent) ? Mapper.attitude.get(graph.parent).nonRotatedPos : null;
+            parentPos = Mapper.orientation.has(graph.parent) ? Mapper.orientation.get(graph.parent).getNonRotatedPos() : null;
             int last = parentPos != null ? 2 : 1;
 
             float topAlpha = 1;

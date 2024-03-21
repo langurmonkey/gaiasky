@@ -149,7 +149,7 @@ def get_rotation(start: dict, end: dict) -> tuple:
     R1 = np.array([vecs1[1], vecs1[2], vecs1[0]]).T
     R2 = np.array([vecs2[1], vecs2[2], vecs2[0]]).T
 
-    # rotation matrix around z-axis
+    # rigidRotation matrix around z-axis
     R_beta = lambda t, beta: np.array([[np.cos(t*beta), -np.sin(t*beta), 0.0], 
                                        [np.sin(t*beta),  np.cos(t*beta), 0.0], 
                                        [0.0, 0.0, 1.0]], dtype=float)
@@ -162,7 +162,7 @@ def get_rotation(start: dict, end: dict) -> tuple:
     # tolerance has to be so high because some cases produce eigenvalues that are not zero
     indices = np.where(np.isclose(eigenvals.real,0, atol=1e-7))
     if len(indices[0]) == 0:
-        raise ValueError("Cannot determine axis of rotation")
+        raise ValueError("Cannot determine axis of rigidRotation")
     
     axis = eigenvecs[:,indices[0][0]].flatten()
     
@@ -183,15 +183,15 @@ def get_rotation(start: dict, end: dict) -> tuple:
     # and v1 so that its y-coordinate is zero
     R_axis = np.array([c1, c2, axis]).T
 
-    # can get angle of rotation by determining the angle of the transformed vector
+    # can get angle of rigidRotation by determining the angle of the transformed vector
     # projected to xy plane with the x-axis
     h = R_axis.T @ vecs2[0]
 
-    # get the angle of rotation
+    # get the angle of rigidRotation
     if beta_end == None:
         beta_end = np.arctan2(h[1], h[0])
 
-    # interpolating rotation matrix
+    # interpolating rigidRotation matrix
     R_f = lambda t: R_axis @ R_beta(t, beta_end) @ R_axis.T @ R1
 
     return AxisAngle(axis, beta_end), R_f

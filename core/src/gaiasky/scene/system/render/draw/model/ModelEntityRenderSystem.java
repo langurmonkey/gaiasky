@@ -517,7 +517,7 @@ public class ModelEntityRenderSystem {
                 float atmOpacity = (float) MathUtilsDouble.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
                 if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0) {
                     var graph = Mapper.graph.get(entity);
-                    var rotation = Mapper.rotation.get(entity);
+                    var rotation = Mapper.orientation.get(entity).rigidRotation;
                     atmosphere.atmosphere.updateAtmosphericScatteringParams(model.model.instance.materials.first(), alpha * atmOpacity, true, graph,
                                                                             rotation, scaffolding, rc.vrOffset);
                 } else {
@@ -552,9 +552,9 @@ public class ModelEntityRenderSystem {
         float atmOpacity = (float) MathUtilsDouble.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
         if (atmOpacity > 0) {
             var graph = Mapper.graph.get(entity);
-            var rotation = Mapper.rotation.get(entity);
+            var orientation = Mapper.orientation.get(entity);
             AtmosphereComponent ac = atmosphere.atmosphere;
-            ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, graph, rotation, scaffolding,
+            ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, graph, orientation.rigidRotation, scaffolding,
                                                  rc.vrOffset);
             ac.mc.updateRelativisticEffects(cam);
             ac.mc.updateEclipsingBodyUniforms(entity);

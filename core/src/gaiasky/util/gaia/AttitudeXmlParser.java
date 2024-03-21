@@ -10,6 +10,7 @@ package gaiasky.util.gaia;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlReader.Element;
 import gaiasky.util.BinarySearchTree;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -44,7 +45,7 @@ public class AttitudeXmlParser {
         endOfMission = getDate("2026-09-14 17:44:20");
     }
 
-    public static BinarySearchTree parseFolder(String folder) {
+    public static BinarySearchTree<AttitudeIntervalBean> parseFolder(String folder) {
         final Array<FileHandle> list;
         try (Stream<Path> paths = Files.walk(Paths.get(Settings.settings.data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).toList();
@@ -54,7 +55,7 @@ public class AttitudeXmlParser {
                     list.add(new FileHandle(p.toFile()));
             }
 
-            BinarySearchTree bst = new BinarySearchTree();
+            BinarySearchTree<AttitudeIntervalBean> bst = new BinarySearchTree<>();
 
             // GENERATE LIST OF DURATIONS
             SortedMap<Instant, FileHandle> datesMap = new TreeMap<>();
@@ -127,7 +128,7 @@ public class AttitudeXmlParser {
     }
 
     private static AttitudeIntervalBean parseFile(FileHandle fh, Duration duration, Instant activationTime) {
-        BaseAttitudeDataServer<?> result = null;
+        BaseAttitudeDataServer<IAttitude> result = null;
 
         XmlReader reader = new XmlReader();
         XmlReader.Element element = reader.parse(fh);
@@ -146,23 +147,23 @@ public class AttitudeXmlParser {
 
         // Spin phase
         XmlReader.Element spinphase = scanlaw.getChildByName("spinphase");
-        Quantity.Angle spinPhase = new Quantity.Angle(getDouble(spinphase, "value"), spinphase.get("unit"));
+        Quantity.Angle spinPhase = new Quantity.Angle(getValueDouble(spinphase), spinphase.get("unit"));
 
         // Precession pahse
         XmlReader.Element precessphase = scanlaw.getChildByName("precessphase");
-        Quantity.Angle precessionPhase = new Quantity.Angle(getDouble(precessphase, "value"), precessphase.get("unit"));
+        Quantity.Angle precessionPhase = new Quantity.Angle(getValueDouble(precessphase), precessphase.get("unit"));
 
         // Precession rate - always in rev/yr
         XmlReader.Element precessrate = scanlaw.getChildByName("precessrate");
-        double precessionRate = getDouble(precessrate, "value");
+        double precessionRate = getValueDouble(precessrate);
 
         // Scan rate
         XmlReader.Element scanrate = scanlaw.getChildByName("scanrate");
-        Quantity.Angle scanRate = new Quantity.Angle(getDouble(scanrate, "value"), scanrate.get("unit").split("_")[0]);
+        Quantity.Angle scanRate = new Quantity.Angle(getValueDouble(scanrate), scanrate.get("unit").split("_")[0]);
 
         // Solar aspect angle
         XmlReader.Element saa = scanlaw.getChildByName("solaraspectangle");
-        Quantity.Angle solarAspectAngle = new Quantity.Angle(getDouble(saa, "value"), saa.get("unit"));
+        Quantity.Angle solarAspectAngle = new Quantity.Angle(getValueDouble(saa), saa.get("unit"));
 
         if (className.contains("MslAttitudeDataServer")) {
             // We need to pass the startTime, duration and MSL to the constructor
@@ -195,7 +196,7 @@ public class AttitudeXmlParser {
             result = epsl;
         }
 
-        return new AttitudeIntervalBean(name, new Date(activationTime.toEpochMilli()), result, fh.name());
+        return new AttitudeIntervalBean(name, activationTime, result, fh.name());
     }
 
     private static Instant getDate(String date) {
@@ -208,7 +209,7 @@ public class AttitudeXmlParser {
         }
     }
 
-    private static Double getDouble(XmlReader.Element e, String property) {
-        return Double.parseDouble(e.get(property));
+    private static Double getValueDouble(Element e) {
+        return Double.parseDouble(e.get("value"));
     }
 }

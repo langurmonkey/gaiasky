@@ -9,19 +9,23 @@ package gaiasky.util.gaia;
 
 import gaiasky.util.LruCache;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
 public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
     public String name;
-    public Date activationTime;
+    public Instant activationTime;
     public String file;
-    public BaseAttitudeDataServer attitude;
+    public BaseAttitudeDataServer<IAttitude> attitude;
 
     public Map<Long, IAttitude> cache;
     public long hits = 0, misses = 0;
 
-    public AttitudeIntervalBean(String name, Date activationTime, BaseAttitudeDataServer attitude, String file) {
+    public AttitudeIntervalBean(String name,
+                                Instant activationTime,
+                                BaseAttitudeDataServer<IAttitude> attitude,
+                                String file) {
         this.file = file;
         this.name = name;
         this.activationTime = activationTime;
@@ -31,9 +35,13 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
     }
 
     public synchronized IAttitude get(Date date) {
-        Long time = date.getTime();
+        return get(date.toInstant());
+    }
+
+    public synchronized IAttitude get(Instant instant) {
+        Long time = instant.toEpochMilli();
         if (!cache.containsKey(time)) {
-            IAttitude att = attitude.getAttitude(date);
+            IAttitude att = attitude.getAttitude(instant);
             cache.put(time, att);
             misses++;
             return att;

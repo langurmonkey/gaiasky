@@ -14,29 +14,29 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.data.api.IAttitudeServer;
-import gaiasky.data.util.AttitudeLoader.AttitudeLoaderParameters;
+import gaiasky.data.api.OrientationServer;
+import gaiasky.data.util.AttitudeLoader.OrientationServerParameters;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
-public class AttitudeLoader extends AsynchronousAssetLoader<IAttitudeServer, AttitudeLoaderParameters> {
+public class AttitudeLoader extends AsynchronousAssetLoader<OrientationServer, OrientationServerParameters> {
     private static final Log logger = Logger.getLogger(AttitudeLoader.class);
 
-    IAttitudeServer server;
+    OrientationServer server;
 
     public AttitudeLoader(FileHandleResolver resolver) {
         super(resolver);
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, AttitudeLoaderParameters parameter) {
+    public void loadAsync(AssetManager manager, String fileName, FileHandle file, OrientationServerParameters parameter) {
         try {
             String className = parameter.loaderClass;
             if (className == null || className.isBlank()) {
                 logger.error("Attitude loader class name is null or blank");
                 throw new RuntimeException("Attitude loader class name is null or blank");
             }
-            Class<? extends IAttitudeServer> c = (Class<? extends IAttitudeServer>) Class.forName(className);
+            Class<? extends OrientationServer> c = (Class<? extends OrientationServer>) Class.forName(className);
             server = c.getDeclaredConstructor(String.class).newInstance(fileName);
         } catch (Exception e) {
             logger.error("Error creating attitude server from class: " + parameter.loaderClass);
@@ -45,21 +45,21 @@ public class AttitudeLoader extends AsynchronousAssetLoader<IAttitudeServer, Att
     }
 
     @Override
-    public IAttitudeServer loadSync(AssetManager manager, String fileName, FileHandle file, AttitudeLoaderParameters parameter) {
+    public OrientationServer loadSync(AssetManager manager, String fileName, FileHandle file, OrientationServerParameters parameter) {
         return server;
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, AttitudeLoaderParameters parameter) {
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, OrientationServerParameters parameter) {
         return null;
     }
 
-    static public class AttitudeLoaderParameters extends AssetLoaderParameters<IAttitudeServer> {
+    static public class OrientationServerParameters extends AssetLoaderParameters<OrientationServer> {
 
         public String loaderClass;
 
-        public AttitudeLoaderParameters(String loaderClass) {
+        public OrientationServerParameters(String loaderClass) {
             this.loaderClass = loaderClass;
         }
     }

@@ -98,12 +98,28 @@
         ]
       }
     },
-    "Rotation": {
-      "description": "Defines the rotation model of objects.",
+    "Orientation": {
+      "description": "Defines the orientation model of objects. Can be defined as a rigid rotation (given parameters like rotation period, axial tilt, etc.) or via quaternion-based orientations.",
       "rotation": {
         "description": "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes ``angularVelocity``, ``period``, ``axialtilt``, ``inclination``, ``ascendingNode`` and ``meridianAngle``. See :ref:`rotation` for more information.",
-        "unit": "Map"
-      }
+        "unit": "Map",
+        "aliases": [ "rigidRotation" ]
+      },
+      "orientationProvider": {
+        "description": "Provider class for the quaternion orientations.",
+        "units": "String",
+        "aliases": [
+          "provider:HeliotropicSatellite",
+          "attitudeProvider"
+        ]
+      },
+      "orientationSource": {
+        "description": "Location of the data file(s), necessary to initialize the quaternion orientation provider.",
+        "units": "String",
+        "aliases": [
+          "attitudeLocation"
+        ]
+      },
     },
     "Celestial": {
       "description": "Defines attributes common to all celestial objects (stars, planets, moons, etc.).",
@@ -801,20 +817,6 @@
       "numLabels:StarGroup": {
         "description": "Number of labels to render for this star group. Defaults to the configuration setting.",
         "units": "Integer"
-      }
-    },
-    "Attitude": {
-      "description": "Defines attributes related to the attitude of satellites and spacecraft.",
-      "attitudeProvider": {
-        "description": "Provider class for the attitude.",
-        "units": "String",
-        "aliases": [
-          "provider:HeliotropicSatellite"
-        ]
-      },
-      "attitudeLocation": {
-        "description": "Location of the data file(s) necessary for the attitude provider.",
-        "units": "String"
       }
     },
     "ParticleExtra": {

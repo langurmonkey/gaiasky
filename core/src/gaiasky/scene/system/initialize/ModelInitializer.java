@@ -15,8 +15,6 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.AssetBean;
-import gaiasky.data.api.IAttitudeServer;
-import gaiasky.data.util.AttitudeLoader.AttitudeLoaderParameters;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
@@ -90,14 +88,14 @@ public class ModelInitializer extends AbstractInitSystem {
         var label = Mapper.label.get(entity);
         var atmosphere = Mapper.atmosphere.get(entity);
         var cloud = Mapper.cloud.get(entity);
-        var attitude = Mapper.attitude.get(entity);
+        var orientation = Mapper.orientation.get(entity);
         var engine = Mapper.engine.get(entity);
         var fade = Mapper.fade.get(entity);
         var focus = Mapper.focus.get(entity);
         var bb = Mapper.billboard.get(entity);
 
         boolean isPlanet = atmosphere != null || cloud != null;
-        boolean isSatellite = attitude != null;
+        boolean isSatellite = orientation != null && orientation.hasAttitude();
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
         boolean isBillboardGal = Mapper.tagBillboardGalaxy.has(entity);
@@ -133,7 +131,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
 
         if (isSatellite) {
-            initializeSatellite(attitude, scaffolding, sa, label);
+            initializeSatellite(orientation, scaffolding, sa, label);
         }
 
         if (isPlanet) {
@@ -152,7 +150,7 @@ public class ModelInitializer extends AbstractInitSystem {
         var model = Mapper.model.get(entity);
         var atmosphere = Mapper.atmosphere.get(entity);
         var cloud = Mapper.cloud.get(entity);
-        var attitude = Mapper.attitude.get(entity);
+        var orientation = Mapper.orientation.get(entity);
         var parentOrientation = Mapper.parentOrientation.get(entity);
         var engine = Mapper.engine.get(entity);
         var fade = Mapper.fade.get(entity);
@@ -172,15 +170,15 @@ public class ModelInitializer extends AbstractInitSystem {
         if (parentOrientation != null) {
             // Satellites.
             if (parentOrientation.parentOrientation) {
-                parentOrientation.parentrc = graph.parent.getComponent(Rotation.class).rc;
+                parentOrientation.setRigidRotation(graph.parent.getComponent(Orientation.class).rigidRotation);
             }
             parentOrientation.orientationf = new Matrix4();
         }
-        if (attitude != null) {
-            // Attitude-based models.
-            if (attitude.attitudeLocation != null && manager.isLoaded(attitude.attitudeLocation)) {
-                attitude.attitudeServer = manager.get(attitude.attitudeLocation);
-            }
+
+
+        if (orientation != null) {
+            // Quaternion-based orientation.
+            orientation.setUp(manager);
         }
         if (engine != null) {
             // Spacecraft radio.
@@ -381,7 +379,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    public void initializeSatellite(Attitude attitude, ModelScaffolding scaffolding, SolidAngle sa, Label label) {
+    public void initializeSatellite(Orientation orientation, ModelScaffolding scaffolding, SolidAngle sa, Label label) {
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e18;
         sa.thresholdPoint = thPoint / 3.3e10;
@@ -391,10 +389,8 @@ public class ModelInitializer extends AbstractInitSystem {
         label.labelMax = label.labelMax * 2f;
 
         scaffolding.billboardSizeFactor = 10f;
-        attitude.nonRotatedPos = new Vector3d();
-        if (attitude.attitudeLocation != null && !attitude.attitudeLocation.isBlank()) {
-            AssetBean.manager().load(attitude.attitudeLocation, IAttitudeServer.class, new AttitudeLoaderParameters(attitude.provider));
-        }
+
+        orientation.initialize(AssetBean.manager());
     }
 
     public boolean isRandomizeModel(ModelScaffolding scaffolding) {

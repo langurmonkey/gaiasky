@@ -216,7 +216,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             shaderProgram.setUniformf("u_period", trajectory != null && trajectory.oc != null ? (float) trajectory.oc.period : 0f);
             Entity parent = renderable.getParentEntity();
             if (parent != null) {
-                Vector3d urp = Mapper.attitude.has(parent) ? Mapper.attitude.get(parent).nonRotatedPos : null;
+                Vector3d urp = Mapper.orientation.has(parent) ? Mapper.orientation.get(parent).getNonRotatedPos() : null;
                 if (urp != null)
                     shaderProgram.setUniformf("u_parentPos", (float) urp.x, (float) urp.y, (float) urp.z);
                 else

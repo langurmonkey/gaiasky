@@ -25,7 +25,6 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -125,9 +124,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
             // Update rotation.
             if (time.getHdiff() != 0) {
-                var rotation = Mapper.rotation.get(entity);
-                if (rotation != null && rotation.rc != null) {
-                    rotation.rc.update(time);
+                var orientation = Mapper.orientation.get(entity);
+                if (orientation != null && orientation.rigidRotation != null) {
+                    orientation.rigidRotation.update(time);
                 }
             }
 
@@ -366,7 +365,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
         var engine = view.engine;
 
         if (engine.yawv != 0 || engine.pitchv != 0 || engine.rollv != 0 || engine.vel.len2() != 0 || engine.render) {
-            var coord = Mapper.coordinates.get(entity);
+            var coordinates = Mapper.coordinates.get(entity);
 
             // We use the simulation time for the integration
             // Poll keys
@@ -377,7 +376,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             double dt = time.getDt();
 
             // POSITION
-            coord.coordinates.getEquatorialCartesianCoordinates(time.getTime(), view.body.pos);
+            coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), view.body.pos);
 
             if (engine.leveling) {
                 // No velocity, we just stop Euler angle motions

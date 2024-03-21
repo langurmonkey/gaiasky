@@ -7,10 +7,14 @@
 
 package gaiasky.data.api;
 
-import gaiasky.util.gaia.IAttitude;
+import gaiasky.util.math.QuaternionDouble;
 
+import java.time.Instant;
 import java.util.Date;
 
-public interface IAttitudeServer {
-    IAttitude getAttitude(final Date date);
+public interface OrientationServer {
+    QuaternionDouble getOrientation(final Date date);
+    QuaternionDouble getOrientation(final Instant instant);
+    QuaternionDouble getLastOrientation();
+    boolean hasOrientation();
 }

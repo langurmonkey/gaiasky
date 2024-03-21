@@ -28,7 +28,7 @@
                 "Celestial",
                 "Magnitude",
                 "Coordinates",
-                "Rotation",
+                "Orientation",
                 "Label",
                 "SolidAngle",
                 "Focus",
@@ -95,7 +95,6 @@
         "HeliotropicSatellite": {
             "parent": "Satellite",
             "components": [
-                "Attitude",
                 "TagHeliotropic*"
             ],
             "aliases": [

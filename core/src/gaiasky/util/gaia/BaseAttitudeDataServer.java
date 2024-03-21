@@ -11,6 +11,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gaia.time.TimeContext;
 
+import java.time.Instant;
 import java.util.Date;
 
 public abstract class BaseAttitudeDataServer<A extends IAttitude> {
@@ -46,6 +47,11 @@ public abstract class BaseAttitudeDataServer<A extends IAttitude> {
 
     public A getAttitude(Date date) {
         long tNs = (long) ((AstroUtils.getJulianDateCache(date.toInstant()) - AstroUtils.JD_J2010) * Nature.D_TO_NS);
+        return getAttitudeNative(tNs);
+    }
+
+    public A getAttitude(Instant instant) {
+        long tNs = (long) ((AstroUtils.getJulianDateCache(instant) - AstroUtils.JD_J2010) * Nature.D_TO_NS);
         return getAttitudeNative(tNs);
     }
 

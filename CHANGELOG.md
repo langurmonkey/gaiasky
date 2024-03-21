@@ -213,7 +213,7 @@
 - zero-length keyframed path crashes the 'normalize times' action. Fixes [#741](https://codeberg.org/gaiasky/gaiasky/issues/741). 
 - add missing, untranslated strings to I18N files. Fixes [#740](https://codeberg.org/gaiasky/gaiasky/issues/740). 
 - start and dataset manager buttons do not scale horizontally with content. 
-- ascending node parameter in rotation component does not apply correctly. Bump source version to 3.5.7, for new data is needed. 
+- ascending node parameter in rigidRotation component does not apply correctly. Bump source version to 3.5.7, for new data is needed. 
 - prevent SVT level overflows, and prompt for restart when tile cache size is modified in preferences. 
 - remove custom amount of vertical scroll in scroll panes. Scrolling should now be much easier. 
 
@@ -671,7 +671,7 @@
 - stop intercepting data location in paths, implementation did not work for Windows when the original path contained '*', and it was useless anyway, as we always use fully-defined paths. 
 - avoid expanding dataset file paths in dataset manager to prevent horizontal overflow. 
 ### Features
-- improve drag rotation behaviour when very close to objects. 
+- improve drag rigidRotation behaviour when very close to objects. 
 
 
 <a name="3.3.1"></a>
@@ -683,7 +683,7 @@
 - context menu crashes when no object is hit. Fixes [#694](https://codeberg.org/gaiasky/gaiasky/issues/694). 
 - add 'gamepads detected' notification text to I18N files. 
 - screen resizing sets internal resolution state and is persisted on restart. Adjust automatic UI scaling algorithm. 
-- apply 'angle from zenith' in planetarium mode as camera rotation instead of as an effect parameter to enable 5-side optimization when aperture <= 180. 
+- apply 'angle from zenith' in planetarium mode as camera rigidRotation instead of as an effect parameter to enable 5-side optimization when aperture <= 180. 
 - reimplement automatic tone mapping algorithm and manager. 
 - refocusing on a star set does not always work. 
 - camera speed API call not mapping values correctly. 

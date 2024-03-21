@@ -7,7 +7,7 @@
 
 package gaiasky.util.gaia;
 
-import gaiasky.data.api.IAttitudeServer;
+import gaiasky.data.api.OrientationServer;
 import gaiasky.util.BinarySearchTree;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -15,9 +15,10 @@ import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.QuaternionDouble;
 
+import java.time.Instant;
 import java.util.Date;
 
-public class GaiaAttitudeServer implements IAttitudeServer {
+public class GaiaAttitudeServer implements OrientationServer {
     private static final Log logger = Logger.getLogger(GaiaAttitudeServer.class);
     // Dummy attitude for launch sequence
     IAttitude dummyAttitude;
@@ -25,9 +26,10 @@ public class GaiaAttitudeServer implements IAttitudeServer {
     // The previous attitude
     AttitudeIntervalBean prevAttitude = null, current;
     // The first activation date
-    Date initialDate;
+    Instant initialDate;
     // List of attitudes in a BST sorted by activation date
-    private BinarySearchTree attitudes;
+    private BinarySearchTree<AttitudeIntervalBean> attitudes;
+    private IAttitude attitude;
 
     public GaiaAttitudeServer(String folder) {
         if (Settings.settings.data.realGaiaAttitude) {
@@ -46,6 +48,25 @@ public class GaiaAttitudeServer implements IAttitudeServer {
         }
     }
 
+    @Override
+    public QuaternionDouble getOrientation(Date date) {
+        return getOrientation(date.toInstant());
+    }
+
+    @Override
+    public QuaternionDouble getOrientation(Instant instant) {
+        if (attitude != null && attitude.getTime() == instant.toEpochMilli()) {
+            return attitude.getQuaternion();
+        } else {
+            attitude = getAttitude(instant);
+            if (attitude != null) {
+                return attitude.getQuaternion();
+            } else {
+                return null;
+            }
+        }
+    }
+
     /**
      * Returns the NSL37 attitude for the given date.
      *
@@ -53,11 +74,11 @@ public class GaiaAttitudeServer implements IAttitudeServer {
      *
      * @return The attitude
      */
-    public synchronized IAttitude getAttitude(final Date date) {
+    public synchronized IAttitude getAttitude(final Instant date) {
         IAttitude result;
         if (Settings.settings.data.realGaiaAttitude) {
             // Find AttitudeType in timeSlots
-            if (date.before(initialDate)) {
+            if (date.compareTo(initialDate) < 0) {
                 result = dummyAttitude;
             } else {
                 try {
@@ -88,6 +109,16 @@ public class GaiaAttitudeServer implements IAttitudeServer {
 
         return result;
 
+    }
+
+    @Override
+    public QuaternionDouble getLastOrientation() {
+        return hasOrientation() ? attitude.getQuaternion() : null;
+    }
+
+    @Override
+    public boolean hasOrientation() {
+        return attitude != null;
     }
 
     public synchronized String getCurrentAttitudeName() {
