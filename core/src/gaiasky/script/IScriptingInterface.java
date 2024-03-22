@@ -869,6 +869,15 @@ public interface IScriptingInterface {
     boolean getObjectVisibility(String name);
 
     /**
+     * Sets the given quaternion files (CSV with times and quaternions)
+     * @param name The name of the object. The object must already have an <code>Orientation</code> component.
+     * @param file The file path. The file is a CSV where each line has the time (ISO-8601) and the
+     *             x, y, z and w components of the quaternion for that time.
+     * @return True if the object was found and could be updated.
+     */
+    boolean setObjectQuaternionSlerpOrientation(String name, String file);
+
+    /**
      * Sets the label size factor. The label size will be multiplied by this.
      *
      * @param factor Factor in {@link Constants#MIN_LABEL_SIZE} and {@link Constants#MAX_LABEL_SIZE}.
@@ -881,7 +890,7 @@ public interface IScriptingInterface {
      * This setting does not override the visibility of the object itself, or of
      * the label visibility component element.
      * Changes to the force display label flag are not persisted on restart.
-     *
+     /*
      * @param name       The object name.
      * @param forceLabel Whether to force the label to render for this object or not.
      */

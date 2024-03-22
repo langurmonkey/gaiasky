@@ -898,6 +898,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public boolean setObjectQuaternionSlerpOrientation(String name,
+                                                       String file) {
+        return false;
+    }
+
+    @Override
     public void setLabelSizeFactor(float factor) {
         if (checkNum(factor, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, "labelSizeFactor")) {
             postRunnable(() -> em.post(Event.LABEL_SIZE_CMD, this, factor));
