@@ -261,7 +261,7 @@ public class CameraPath {
                 os.append("#fps ").append(Double.toString(frameRate)).append("\n");
             }
             // Print header.
-            os.append("#time_ms").append(sep).append("pos_x").append(sep).append("pos_y").append(sep).append("pos_z").append(sep);
+            os.append("#time").append(sep).append("pos_x").append(sep).append("pos_y").append(sep).append("pos_z").append(sep);
             os.append("dir_x").append(sep).append("dir_y").append(sep).append("dir_z").append(sep);
             os.append("up_x").append(sep).append("up_y").append(sep).append("up_z").append(sep);
             os.append("\n");
