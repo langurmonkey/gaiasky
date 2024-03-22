@@ -9,6 +9,8 @@ package gaiasky.util.camera.rec;
 
 import gaiasky.util.math.Vector3d;
 
+import java.time.Instant;
+
 /**
  * Represents a single camera keyframe.
  */
@@ -20,7 +22,7 @@ public class Keyframe {
     // Point of interest. May be null (camera not in focus mode).
     public Vector3d target;
     // Keyframe start time.
-    public long time;
+    public Instant time;
     // Keyframe duration.
     public double seconds;
     /**
@@ -33,7 +35,7 @@ public class Keyframe {
                     Vector3d dir,
                     Vector3d up,
                     Vector3d target,
-                    long time,
+                    Instant time,
                     double secs,
                     boolean seam) {
         this.name = name;
@@ -50,7 +52,7 @@ public class Keyframe {
                     Vector3d pos,
                     Vector3d dir,
                     Vector3d up,
-                    long time,
+                    Instant time,
                     double secs,
                     boolean seam) {
         this(name, pos, dir, up, null, time, secs, seam);

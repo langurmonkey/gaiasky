@@ -156,7 +156,8 @@ public class KeyframesManager implements IObserver {
                     if (tokens.length == 13) {
                         // Keyframe has no target.
                         double secs = Parser.parseDouble(tokens[0]);
-                        long time = Parser.parseLong(tokens[1]);
+                        Instant time = parseTime(tokens[1]);
+                        // Orientation.
                         Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
                         Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
                         Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
@@ -167,7 +168,7 @@ public class KeyframesManager implements IObserver {
                     } else if (tokens.length == 16) {
                         // Keyframe has target.
                         double secs = Parser.parseDouble(tokens[0]);
-                        long time = Parser.parseLong(tokens[1]);
+                        Instant time = parseTime(tokens[1]);
                         Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
                         Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
                         Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
@@ -186,6 +187,18 @@ public class KeyframesManager implements IObserver {
         }
     }
 
+    private Instant parseTime(String timeToken) {
+        // Time. Either instant or epoch millis.
+        Instant time;
+        try {
+            // Try with epoch millis.
+            time = Instant.ofEpochMilli(Parser.parseLongException(timeToken));
+        } catch (NumberFormatException ignored) {
+            time = Instant.parse(timeToken);
+        }
+        return time;
+    }
+
     public void saveKeyframesFile(List<Keyframe> keyframes,
                                   String fileName,
                                   boolean notification) {
@@ -198,7 +211,7 @@ public class KeyframesManager implements IObserver {
             assert f != null;
             try (BufferedWriter os = new BufferedWriter(new FileWriter(f.toFile()))) {
                 for (Keyframe kf : keyframes) {
-                    os.append(Double.toString(kf.seconds)).append(sep).append(Long.toString(kf.time)).append(sep);
+                    os.append(Double.toString(kf.seconds)).append(sep).append(kf.time.toString()).append(sep);
                     os.append(Double.toString(kf.pos.x)).append(sep).append(Double.toString(kf.pos.y)).append(sep).append(
                             Double.toString(kf.pos.z)).append(sep);
                     os.append(Double.toString(kf.dir.x)).append(sep).append(Double.toString(kf.dir.y)).append(sep).append(
@@ -399,7 +412,7 @@ public class KeyframesManager implements IObserver {
         EventManager.publish(Event.CAMERA_STOP, this);
 
         // Set time.
-        EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(currentPath.times.get((int) currentPath.i)));
+        EventManager.publish(Event.TIME_CHANGE_CMD, this, currentPath.times.get((int) currentPath.i));
 
         // Set position, direction, up.
         int ip = (int) currentPath.i * 9;

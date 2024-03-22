@@ -43,12 +43,14 @@ public class BinarySearchTree<T extends Comparable<T>> {
             if (t.find(i) != null)
                 System.out.println("Find error2!");
         }
+
     }
 
     /**
      * Insert into the tree.
      *
      * @param x the item to insert.
+     *
      * @throws RuntimeException if x is already present.
      */
     public void insert(T x) {
@@ -59,6 +61,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Remove from the tree.
      *
      * @param x the item to remove.
+     *
      * @throws RuntimeException if x is not found.
      */
     public void remove(T x) {
@@ -87,6 +90,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Find an item in the tree.
      *
      * @param x the item to search for.
+     *
      * @return the matching item or null if not found.
      */
     public Comparable<T> find(Comparable<T> x) {
@@ -97,7 +101,8 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Find the start of the interval where x is in.
      *
      * @param x is the item to search the start for.
-     * @return node containing the start of the interval where x
+     *
+     * @return object contained in the start of the interval where x
      * is in, or null if x is not contained in any interval.
      */
     public Comparable<T> findIntervalStart(Comparable<T> x) {
@@ -117,6 +122,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to get element field.
      *
      * @param t the node.
+     *
      * @return the element field or null if t is null.
      */
     private Comparable<T> elementAt(BinaryNode<T> t) {
@@ -128,10 +134,13 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x the item to insert.
      * @param t the node that roots the tree.
+     *
      * @return the new root.
+     *
      * @throws RuntimeException if x is already present.
      */
-    protected BinaryNode<T> insert(T x, BinaryNode<T> t) {
+    protected BinaryNode<T> insert(T x,
+                                   BinaryNode<T> t) {
         if (t == null)
             t = new BinaryNode<>(x);
         else if (x.compareTo(t.element) < 0)
@@ -148,10 +157,13 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x the item to remove.
      * @param t the node that roots the tree.
+     *
      * @return the new root.
+     *
      * @throws RuntimeException if x is not found.
      */
-    protected BinaryNode<T> remove(Comparable<T> x, BinaryNode<T> t) {
+    protected BinaryNode<T> remove(Comparable<T> x,
+                                   BinaryNode<T> t) {
         if (t == null)
             throw new RuntimeException("Item not found: " + x.toString());
         if (x.compareTo(t.element) < 0)
@@ -171,7 +183,9 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to remove minimum item from a subtree.
      *
      * @param t the node that roots the tree.
+     *
      * @return the new root.
+     *
      * @throws RuntimeException if x is not found.
      */
     protected BinaryNode<T> removeMin(BinaryNode<T> t) {
@@ -188,6 +202,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to find the smallest item in a subtree.
      *
      * @param t the node that roots the tree.
+     *
      * @return node containing the smallest item.
      */
     protected BinaryNode<T> findMin(BinaryNode<T> t) {
@@ -202,6 +217,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * Internal method to find the largest item in a subtree.
      *
      * @param t the node that roots the tree.
+     *
      * @return node containing the largest item.
      */
     private BinaryNode<T> findMax(BinaryNode<T> t) {
@@ -217,9 +233,11 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x is item to search for.
      * @param t the node that roots the tree.
+     *
      * @return node containing the matched item.
      */
-    private BinaryNode<T> find(Comparable<T> x, BinaryNode<T> t) {
+    private BinaryNode<T> find(Comparable<T> x,
+                               BinaryNode<T> t) {
         while (t != null) {
             if (x.compareTo(t.element) < 0)
                 t = t.left;
@@ -238,10 +256,12 @@ public class BinarySearchTree<T extends Comparable<T>> {
      *
      * @param x is the item to search the start for.
      * @param t the node that roots the tree.
+     *
      * @return node containing the start of the interval where x
      * is in, or null if x is not contained in any interval.
      */
-    private BinaryNode<T> findIntervalStart(Comparable<T> x, BinaryNode<T> t) {
+    private BinaryNode<T> findIntervalStart(Comparable<T> x,
+                                            BinaryNode<T> t) {
         BinaryNode<T> lastPrev = null;
         while (t != null) {
             if (x.compareTo(t.element) < 0) {

@@ -1,6 +1,6 @@
 package gaiasky.util.camera.rec;
 
-import com.badlogic.gdx.utils.LongArray;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.util.DoubleArray;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -14,6 +14,7 @@ import gaiasky.util.parse.Parser;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class CameraPath {
     /**
      * Contains the time as a long timestamp for each step.
      */
-    public final LongArray times;
+    public final Array<Instant> times;
     /**
      * Contains the position (3), direction (3) and up (3) values for each step.
      */
@@ -57,7 +58,7 @@ public class CameraPath {
      * Create an empty camera path.
      */
     public CameraPath(double targetFps) {
-        times = new LongArray();
+        times = new Array<>();
         data = new DoubleArray();
         n = 0;
         i = 0;
@@ -68,10 +69,11 @@ public class CameraPath {
      * Create a camera path from a <code>.gsc</code> file.
      *
      * @param file The file.
+     *
      * @throws RuntimeException If the file can't be read, is not in the right format, or does not exist.
      */
     public CameraPath(InputStream file) throws RuntimeException {
-        times = new LongArray();
+        times = new Array<>();
         data = new DoubleArray();
 
         try (BufferedReader is = new BufferedReader(new InputStreamReader(file))) {
@@ -92,7 +94,12 @@ public class CameraPath {
                     String[] tokens = line.split(gscFileSeparatorRegex);
 
                     // Time.
-                    times.add(Parser.parseLong(tokens[0]));
+                    try {
+                        // Try with epoch millis.
+                        times.add(Instant.ofEpochMilli(Parser.parseLongException(tokens[0])));
+                    } catch (NumberFormatException ignored) {
+                        times.add(Instant.parse(tokens[0]));
+                    }
 
                     // Position.
                     data.add(Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]));
@@ -118,7 +125,7 @@ public class CameraPath {
      */
     public CameraPath(List<Keyframe> keyframes,
                       PathPart[] posSplines) {
-        times = new LongArray();
+        times = new Array<>();
         data = new DoubleArray();
 
         final var q = new QuaternionDouble();
@@ -147,7 +154,7 @@ public class CameraPath {
             long nFrames = (long) (k1.seconds * frameRate);
             double splinePosSubStep = splinePosStep / nFrames;
 
-            long dt = k1.time - k0.time;
+            long dt = k1.time.toEpochMilli() - k0.time.toEpochMilli();
             long tStep = dt / nFrames;
 
             for (long fr = 0; fr < nFrames; fr++) {
@@ -157,7 +164,7 @@ public class CameraPath {
                 double b = splinePosIdx + splinePosSubStep * fr;
 
                 // TIME
-                times.add(k0.time + tStep * fr);
+                times.add(k0.time.plusMillis(tStep * fr));
 
                 // POS
                 currentPosSpline.path.valueAt(v3d1, b);
@@ -198,7 +205,7 @@ public class CameraPath {
     /**
      * Add a new time step at the end of the path.
      *
-     * @param time The time, in milliseconds.
+     * @param time The time, as an {@link Instant}.
      * @param px   The x-position.
      * @param py   The y-position.
      * @param pz   The z-position.
@@ -209,7 +216,7 @@ public class CameraPath {
      * @param uy   The y-up.
      * @param uz   The z-up.
      */
-    public void add(long time,
+    public void add(Instant time,
                     double px,
                     double py,
                     double pz,
@@ -238,6 +245,7 @@ public class CameraPath {
      * Persist the current camera path to the file pointed by the given path.
      *
      * @param f The path of the file.
+     *
      * @throws RuntimeException If the path does not point to a file, or the file could not be written.
      */
     public void persist(Path f) throws Exception {
@@ -260,7 +268,7 @@ public class CameraPath {
 
             // Print data.
             for (int i = 0; i < n; i++) {
-                os.append(Long.toString(times.get(i))).append(sep);
+                os.append(times.get(i).toString()).append(sep);
                 int ip = i * 9;
                 os.append(Double.toString(data.get(ip))).append(sep).append(Double.toString(data.get(ip + 1))).append(sep).append(Double.toString(data.get(ip + 2)));
                 os.append(sep).append(Double.toString(data.get(ip + 3))).append(sep).append(Double.toString(data.get(ip + 4))).append(sep).append(

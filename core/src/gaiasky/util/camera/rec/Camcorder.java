@@ -77,7 +77,7 @@ public class Camcorder implements IObserver {
         switch (mode.get()) {
             case RECORDING:
                 if (recordingPath.get() != null) {
-                    recordingPath.get().add(time.getTime().toEpochMilli(),
+                    recordingPath.get().add(time.getTime(),
                             position.x(), position.y(), position.z(),
                             direction.x(), direction.y(), direction.z(),
                             up.x(), up.y(), up.z());
@@ -87,7 +87,7 @@ public class Camcorder implements IObserver {
                 if (playingPath != null) {
                     if (playingPath.get().i < playingPath.get().n) {
                         // Set time.
-                        EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(playingPath.get().times.get((int) playingPath.get().i)));
+                        EventManager.publish(Event.TIME_CHANGE_CMD, this, playingPath.get().times.get((int) playingPath.get().i));
 
                         // Set position, direction, up.
                         int ip = (int) playingPath.get().i * 9;

@@ -364,7 +364,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-
         // Open keyframes.
         OwnTextIconButton open = new OwnTextIconButton(I18n.msg("gui.keyframes.load"), skin, "open");
         open.setHeight(buttonSize);
@@ -489,7 +488,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                 GaiaSky.popupNotification(msg, 10, this, Logger.LoggerLevel.WARN, null);
                             }
 
-
                         } else {
                             EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, manager.keyframes, textField.getText());
                             notice.clearActor();
@@ -576,7 +574,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     }
 
-
     /**
      * Adds a new keyframe at the given index position using the given camera position, orientation and time.
      *
@@ -586,6 +583,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * @param cUp     The up vector.
      * @param cTarget The location of the point of interest (focus), if any.
      * @param cTime   The time.
+     *
      * @return True if the keyframe was added, false otherwise.
      */
     private boolean addKeyframe(int index,
@@ -593,7 +591,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                 Vector3d cDir,
                                 Vector3d cUp,
                                 Vector3d cTarget,
-                                long cTime) {
+                                Instant cTime) {
 
         try {
             boolean secOk = secondsInput.isValid();
@@ -641,7 +639,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
             } else {
                 logger.info(I18n.msg("gui.keyframes.notadded") + "-" + I18n.msg("gui.keyframes.error.values", secOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong"),
-                        nameOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong")));
+                                                                                nameOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong")));
             }
         } catch (Exception e) {
             logger.error(I18n.msg("gui.keyframes.notadded") + " - " + I18n.msg("gui.keyframes.error.input"), e);
@@ -654,6 +652,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * Adds a new keyframe at the given index position using the current camera state and time.
      *
      * @param index The position of the keyframe, negative to add at the end.
+     *
      * @return True if the keyframe was added, false otherwise.
      */
     private boolean addKeyframe(int index) {
@@ -664,10 +663,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         Vector3d cUp = new Vector3d();
         Vector3d cTarget = null;
         ICamera cam = GaiaSky.instance.getICamera();
-        long cTime;
+        Instant cTime;
         // Freeze the camera info
         synchronized (windowLock) {
-            cTime = manager.t.getTime().toEpochMilli();
+            cTime = manager.t.getTime();
             cPos.set(manager.pos);
             cDir.set(manager.dir);
             cUp.set(manager.up);
@@ -1072,7 +1071,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addHighlightListener(moveDown, kf);
         table.add(moveDown).left().padRight(pad10).padBottom(pad10);
 
-
         // Seconds
         addFrameSeconds(kf, prevT, index, table);
 
@@ -1087,7 +1085,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Clock - time
         Image clockImg = new Image(skin.getDrawable("clock"));
-        clockImg.addListener(new OwnTextTooltip(dateFormat.format(Instant.ofEpochMilli(kf.time)), skin));
+        clockImg.addListener(new OwnTextTooltip(dateFormat.format(kf.time), skin));
         clockImg.setScale(0.7f);
         clockImg.setOrigin(Align.center);
         addHighlightListener(clockImg, kf);
@@ -1196,7 +1194,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 // Work out keyframe properties
                 Keyframe k0, k1;
                 Vector3d pos, dir, up, target;
-                long time;
+                Instant time;
                 if (index < manager.keyframes.size() - 1) {
                     // We can interpolate.
                     k0 = manager.keyframes.get(index);
@@ -1224,7 +1222,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     up = q0.getUp(new Vector3d());
 
                     // Time.
-                    time = k0.time + (long) ((k1.time - k0.time) / 2d);
+                    time = k0.time.plusMillis((long) ((k1.time.toEpochMilli() - k0.time.toEpochMilli()) / 2d));
                 } else {
                     // Last keyframe.
                     k0 = manager.keyframes.get(index - 1);
@@ -1247,7 +1245,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     up = new Vector3d(k1.up);
 
                     // Time.
-                    time = k1.time + (long) ((k1.time - k0.time) / 2d);
+                    time = k1.time.plusMillis((long) ((k1.time.toEpochMilli() - k0.time.toEpochMilli()) / 2d));
                 }
                 return addKeyframe(index + 1, pos, dir, up, target, time);
             }
@@ -1332,7 +1330,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     public GenericDialog show(Stage stage,
                               Action action) {
         // Subscriptions
-        EventManager.instance.subscribe(this, Event.KEYFRAME_PLAY_FRAME, Event.KEYFRAMES_REFRESH, Event.KEYFRAME_SELECT, Event.KEYFRAME_UNSELECT, Event.KEYFRAME_ADD, Event.TOGGLE_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Event.KEYFRAME_PLAY_FRAME, Event.KEYFRAMES_REFRESH, Event.KEYFRAME_SELECT, Event.KEYFRAME_UNSELECT, Event.KEYFRAME_ADD,
+                                        Event.TOGGLE_VISIBILITY_CMD);
         // Re-add if necessary
         if (Mapper.graph.get(keyframesPathEntity).parent == null) {
             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, keyframesPathEntity, false);
@@ -1374,7 +1373,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                        boolean cleanModel) {
         // Clean camera.
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
-        if (focus != null && Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith(I18n.msg("gui.keyframes.name.default", 0).substring(0, 6))) {
+        if (focus != null && Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith(
+                I18n.msg("gui.keyframes.name.default", 0).substring(0, 6))) {
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, Settings.settings.scene.homeObject);
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
         }
@@ -1432,56 +1432,56 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-            case KEYFRAME_ADD -> addKeyframe(-1);
-            case KEYFRAME_PLAY_FRAME -> {
-                if (source == manager) {
-                    // Just need to update the widgets.
+        case KEYFRAME_ADD -> addKeyframe(-1);
+        case KEYFRAME_PLAY_FRAME -> {
+            if (source == manager) {
+                // Just need to update the widgets.
 
-                    // Set timeline.
-                    timelineSlider.setProgrammaticChangeEvents(false);
-                    timelineSlider.setMappedValue(manager.currentPath.i);
-                    timelineSlider.setProgrammaticChangeEvents(true);
+                // Set timeline.
+                timelineSlider.setProgrammaticChangeEvents(false);
+                timelineSlider.setMappedValue(manager.currentPath.i);
+                timelineSlider.setProgrammaticChangeEvents(true);
 
-                    // Check end.
-                    if (manager.isIdle()) {
-                        playPause.setProgrammaticChangeEvents(false);
-                        playPause.setChecked(false);
-                        playPause.setProgrammaticChangeEvents(true);
-                    }
+                // Check end.
+                if (manager.isIdle()) {
+                    playPause.setProgrammaticChangeEvents(false);
+                    playPause.setChecked(false);
+                    playPause.setProgrammaticChangeEvents(true);
                 }
             }
-            case KEYFRAMES_REFRESH -> reinitialiseKeyframes(manager.keyframes, null);
-            case KEYFRAME_SELECT -> {
-                Keyframe kf = (Keyframe) data[0];
-                OwnLabel nl = keyframeNames.get(kf);
-                if (nl != null) {
-                    colorBak = nl.getColor().cpy();
-                    nl.setColor(skin.getColor("theme"));
-                    scrollToKeyframe(kf);
+        }
+        case KEYFRAMES_REFRESH -> reinitialiseKeyframes(manager.keyframes, null);
+        case KEYFRAME_SELECT -> {
+            Keyframe kf = (Keyframe) data[0];
+            OwnLabel nl = keyframeNames.get(kf);
+            if (nl != null) {
+                colorBak = nl.getColor().cpy();
+                nl.setColor(skin.getColor("theme"));
+                scrollToKeyframe(kf);
+            }
+        }
+        case KEYFRAME_UNSELECT -> {
+            Keyframe kf = (Keyframe) data[0];
+            OwnLabel nl = keyframeNames.get(kf);
+            if (nl != null && colorBak != null) {
+                nl.setColor(colorBak);
+            }
+        }
+        case TOGGLE_VISIBILITY_CMD -> {
+            String key = (String) data[0];
+            Button b = visibility;
+            if (key.equals(ComponentType.Keyframes.key) && b != null && source != b) {
+                b.setProgrammaticChangeEvents(false);
+                if (data.length == 2) {
+                    b.setChecked((Boolean) data[1]);
+                } else {
+                    b.setChecked(!b.isChecked());
                 }
+                b.setProgrammaticChangeEvents(true);
             }
-            case KEYFRAME_UNSELECT -> {
-                Keyframe kf = (Keyframe) data[0];
-                OwnLabel nl = keyframeNames.get(kf);
-                if (nl != null && colorBak != null) {
-                    nl.setColor(colorBak);
-                }
-            }
-            case TOGGLE_VISIBILITY_CMD -> {
-                String key = (String) data[0];
-                Button b = visibility;
-                if (key.equals(ComponentType.Keyframes.key) && b != null && source != b) {
-                    b.setProgrammaticChangeEvents(false);
-                    if (data.length == 2) {
-                        b.setChecked((Boolean) data[1]);
-                    } else {
-                        b.setChecked(!b.isChecked());
-                    }
-                    b.setProgrammaticChangeEvents(true);
-                }
-            }
-            default -> {
-            }
+        }
+        default -> {
+        }
         }
     }
 

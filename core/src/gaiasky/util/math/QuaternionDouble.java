@@ -853,8 +853,8 @@ public class QuaternionDouble implements Serializable {
 
     /**
      * Spherical linear interpolation between this quaternion and the {@code end} quaternion, based on the alpha value
-     * in the range
-     * [0,1]. Taken from. Taken from Bones framework for JPCT, see <a href="http://www.aptalkarga.com/bones/">here</a>.
+     * in the range [0,1]. Taken from. Taken from Bones framework for JPCT,
+     * see <a href="http://www.aptalkarga.com/bones/">here</a>.
      *
      * @param end   the end quaternion.
      * @param alpha alpha in the range [0,1].

@@ -1306,7 +1306,7 @@ public enum Event {
     TESSELLATION_QUALITY_CMD,
 
     /**
-     * Issues a change time command, contains the Instant object with the new time
+     * Issues a change time command, contains the Instant object with the new time.
      **/
     TIME_CHANGE_CMD,
 
