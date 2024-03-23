@@ -31,20 +31,9 @@ public class QuaternionSlerpOrientationServer implements OrientationServer {
 
     public QuaternionSlerpOrientationServer(String dataFile) {
         super();
-        var path = Paths.get(Settings.settings.data.dataFile(dataFile));
-        if (!Files.exists(path)) {
-            throw new RuntimeException(I18n.msg("error.file.exists", path.toString()));
-        }
-        if (!Files.isRegularFile(path)) {
-            throw new RuntimeException(I18n.msg("error.file.isdir", path.toString()));
-        }
-        if (!Files.isReadable(path)) {
-            throw new RuntimeException(I18n.msg("error.file.read", path.toString()));
-        }
-
         lastOrientation = new QuaternionDouble();
+        var path = Paths.get(Settings.settings.data.dataFile(dataFile));
         data = initialize(path);
-
     }
 
     private Array<Pair<Instant, QuaternionDouble>> initialize(Path path) {
