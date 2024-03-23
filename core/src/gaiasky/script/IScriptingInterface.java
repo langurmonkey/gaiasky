@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
+import gaiasky.scene.component.RigidRotation;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
@@ -392,6 +393,7 @@ public interface IScriptingInterface {
      * system.
      *
      * @param vec Vector of three components in internal coordinates and Km.
+     *
      * @deprecated Use {@link #setCameraPosition(double[])} instead.
      */
     @Deprecated
@@ -469,6 +471,7 @@ public interface IScriptingInterface {
      * Gets the current camera position, in the requested units.
      *
      * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     *
      * @return The camera position coordinates in the internal reference system and in the requested units.
      */
     double[] getCameraPosition(String units);
@@ -614,6 +617,7 @@ public interface IScriptingInterface {
      * Changes the speed of the camera when it rotates around a focus.
      *
      * @param speed The new rotation speed in [0,100]
+     *
      * @deprecated Use {@link #setCameraRotationSpeed(float)}
      */
     @Deprecated
@@ -630,6 +634,7 @@ public interface IScriptingInterface {
      * Changes the turning speed of the camera.
      *
      * @param speed The new turning speed, from 1 to 100.
+     *
      * @deprecated Use {@link #setCameraTurningSpeed(float)}
      */
     @Deprecated
@@ -826,6 +831,7 @@ public interface IScriptingInterface {
      * "element.stars", "element.planets" or "element.moons". See {@link gaiasky.render.ComponentTypes.ComponentType}.
      *
      * @param key The key of the component type to query.
+     *
      * @return The visibility of the component type.
      */
     boolean getComponentTypeVisibility(String key);
@@ -843,6 +849,7 @@ public interface IScriptingInterface {
      * the projections), planetarium, orthosphere, stereoscopic, or any of the re-projection modes.</p>
      *
      * @param name The name of the object to get the screen coordinates for.
+     *
      * @return An array with the x and y screen coordinates, in pixels, with the origin at the bottom-left. If the
      * object with the given name does not exist, or it falls
      * off-screen, it returns null.
@@ -855,6 +862,7 @@ public interface IScriptingInterface {
      *
      * @param name    The name of the object. Must be an instance of {@link IVisibilitySwitch}.
      * @param visible The visible status to set. Set to false in order to hide the object. True to make it visible.
+     *
      * @return True if the visibility was set successfully, false if there were errors.
      */
     boolean setObjectVisibility(String name,
@@ -864,18 +872,24 @@ public interface IScriptingInterface {
      * Gets the visibility of a particular object.
      *
      * @param name The name of the object. Must be an instance of {@link IVisibilitySwitch}.
+     *
      * @return The visibility status of the object, if it exists.
      */
     boolean getObjectVisibility(String name);
 
     /**
-     * Sets the given quaternion files (CSV with times and quaternions)
+     * Sets the given quaternions file (CSV with times and quaternions) as the orientation provider
+     * for this object. This call removes the previous orientation model from the object (either
+     * {@link RigidRotation} or {@link gaiasky.scene.component.QuaternionOrientation}.
+     *
      * @param name The name of the object. The object must already have an <code>Orientation</code> component.
      * @param file The file path. The file is a CSV where each line has the time (ISO-8601) and the
      *             x, y, z and w components of the quaternion for that time.
+     *
      * @return True if the object was found and could be updated.
      */
-    boolean setObjectQuaternionSlerpOrientation(String name, String file);
+    boolean setObjectQuaternionSlerpOrientation(String name,
+                                                String file);
 
     /**
      * Sets the label size factor. The label size will be multiplied by this.
@@ -890,7 +904,8 @@ public interface IScriptingInterface {
      * This setting does not override the visibility of the object itself, or of
      * the label visibility component element.
      * Changes to the force display label flag are not persisted on restart.
-     /*
+     * /*
+     *
      * @param name       The object name.
      * @param forceLabel Whether to force the label to render for this object or not.
      */
@@ -912,6 +927,7 @@ public interface IScriptingInterface {
      * given name.
      *
      * @param name The name of the object.
+     *
      * @return The value of the force display label flag of the object, if it exists.
      */
     boolean getForceDisplayLabel(String name);
@@ -1179,6 +1195,7 @@ public interface IScriptingInterface {
      * Gets the current star size value in pixels.
      *
      * @return The size value, in pixels.
+     *
      * @deprecated Use {@link  #getPointSize()} instead.
      */
     @Deprecated
@@ -1197,6 +1214,7 @@ public interface IScriptingInterface {
      *
      * @param size The size value in pixels, between {@link Constants#MIN_STAR_POINT_SIZE} and
      *             {@link Constants#MAX_STAR_POINT_SIZE}.
+     *
      * @deprecated Use {@link  #setPointSize(float)} instead.
      */
     @Deprecated
@@ -1213,6 +1231,7 @@ public interface IScriptingInterface {
      * Gets the minimum star opacity.
      *
      * @return The minimum opacity value.
+     *
      * @deprecated Use {@link #getStarBaseOpacity()} instead.
      */
     @Deprecated
@@ -1231,6 +1250,7 @@ public interface IScriptingInterface {
      *
      * @param opacity The minimum opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and
      *                {@link Constants#MAX_STAR_MIN_OPACITY}.
+     *
      * @deprecated Use {@link #setStarBaseOpacity(float)} instead.
      */
     @Deprecated
@@ -1372,6 +1392,7 @@ public interface IScriptingInterface {
      * @param fps        Target frames per second (number of images per second).
      * @param directory  The output directory path.
      * @param namePrefix The file name prefix.
+     *
      * @deprecated Use {@link #configureFrameOutput(int, int, int, String, String)} instead.
      */
     @Deprecated
@@ -1431,6 +1452,7 @@ public interface IScriptingInterface {
      * Is the frame output system on?
      *
      * @return True if the frame output is active.
+     *
      * @deprecated Use {@link #isFrameOutputActive()} instead.
      */
     @Deprecated
@@ -1447,6 +1469,7 @@ public interface IScriptingInterface {
      * Gets the current FPS setting in the frame output system.
      *
      * @return The FPS setting.
+     *
      * @deprecated Use {@link #getFrameOutputFps()} instead.
      */
     @Deprecated
@@ -1471,6 +1494,7 @@ public interface IScriptingInterface {
      * Gets an object from the scene graph by <code>name</code> or id (HIP, TYC, Gaia SourceId).
      *
      * @param name The name or id (HIP, TYC, Gaia SourceId) of the object.
+     *
      * @return The object as a {@link gaiasky.scene.view.FocusView}, or null
      * if it does not exist.
      */
@@ -1483,6 +1507,7 @@ public interface IScriptingInterface {
      * @param name           The name or id (HIP, TYC, Gaia SourceId) of the object.
      * @param timeoutSeconds The timeout in seconds to wait until returning.
      *                       If negative, it waits indefinitely.
+     *
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      * the timeout has passed.
      */
@@ -1493,6 +1518,7 @@ public interface IScriptingInterface {
      * Gets a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
      *
      * @param name The name of the line object.
+     *
      * @return The line object as a {@link gaiasky.scene.view.VertsView}, or null
      * if it does not exist.
      */
@@ -1504,6 +1530,7 @@ public interface IScriptingInterface {
      * @param name           The name of the line object.
      * @param timeoutSeconds The timeout in seconds to wait until returning.
      *                       If negative, it waits indefinitely.
+     *
      * @return The line object as a {@link gaiasky.scene.view.VertsView}, or null
      * if it does not exist.
      */
@@ -1574,6 +1601,7 @@ public interface IScriptingInterface {
      * name or id (HIP, TYC, sourceId).
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
+     *
      * @return The radius of the object in Km. If the object identified by name
      * or id (HIP, TYC, sourceId). does not exist, it returns a negative
      * value.
@@ -1681,6 +1709,7 @@ public interface IScriptingInterface {
      * exist, it returns a negative distance.
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
+     *
      * @return The distance to the object in km if it exists, a negative value
      * otherwise.
      */
@@ -1691,6 +1720,7 @@ public interface IScriptingInterface {
      * and it is loaded.
      *
      * @param starId The star identifier or name.
+     *
      * @return An array with (ra [deg], dec [deg], parallax [mas], pmra [mas/yr], pmdec [mas/yr], radvel [km/s], appmag
      * [mag], red [0,1], green [0,1], blue [0,1]) if the
      * star exists and is loaded, null otherwise.
@@ -1703,6 +1733,7 @@ public interface IScriptingInterface {
      * it returns null.
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
+     *
      * @return A 3-vector with the object's position in internal units and the internal reference system.
      */
     double[] getObjectPosition(String name);
@@ -1714,6 +1745,7 @@ public interface IScriptingInterface {
      *
      * @param name  The name or id (HIP, TYC, sourceId) of the object.
      * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     *
      * @return A 3-vector with the object's position in the requested units and internal reference system.
      */
     double[] getObjectPosition(String name,
@@ -1727,6 +1759,7 @@ public interface IScriptingInterface {
      * may be useful to compute the camera state.
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
+     *
      * @return A 3-vector with the object's predicted position in the internal reference system.
      */
     double[] getObjectPredictedPosition(String name);
@@ -1740,6 +1773,7 @@ public interface IScriptingInterface {
      *
      * @param name  The name or id (HIP, TYC, sourceId) of the object.
      * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     *
      * @return A 3-vector with the object's predicted position in the requested units and in the internal reference system.
      */
     double[] getObjectPredictedPosition(String name,
@@ -2092,6 +2126,7 @@ public interface IScriptingInterface {
      *          in [0,1] from left to right.
      * @param y The new y coordinate of the new top-left corner of the window,
      *          in [0,1] from bottom to top.
+     *
      * @deprecated The controls window is now deprecated in favour of the new UI.
      */
     @Deprecated
@@ -2137,6 +2172,7 @@ public interface IScriptingInterface {
      * only work in asynchronous mode.</strong>
      *
      * @param name The name of the gui element.
+     *
      * @return A vector of floats with the position (0, 1) of the bottom left
      * corner in pixels from the bottom-left of the screen and the size
      * (2, 3) in pixels of the element.
@@ -2156,6 +2192,7 @@ public interface IScriptingInterface {
      *
      * @param name      The name of the focus to wait for.
      * @param timeoutMs Timeout in ms to wait. Set negative to disable timeout.
+     *
      * @return True if the timeout ran out. False otherwise.
      */
     boolean waitFocus(String name,
@@ -2178,6 +2215,7 @@ public interface IScriptingInterface {
 
     /**
      * Gets the current frame rate setting of the camcorder.
+     *
      * @return The FPS setting of the camcorder.
      */
     double getCamcorderFps();
@@ -2603,6 +2641,7 @@ public interface IScriptingInterface {
      * @param l The galactic longitude in degrees.
      * @param b The galactic latitude in degrees.
      * @param r The distance in Km.
+     *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      * internal reference system, in internal units.
      */
@@ -2617,6 +2656,7 @@ public interface IScriptingInterface {
      * @param l The ecliptic longitude in degrees.
      * @param b The ecliptic latitude in degrees.
      * @param r The distance in Km.
+     *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      * internal reference system, in internal units.
      */
@@ -2631,6 +2671,7 @@ public interface IScriptingInterface {
      * @param ra  The right ascension in degrees.
      * @param dec The declination in degrees.
      * @param r   The distance in Km.
+     *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      * internal reference system, in internal units.
      */
@@ -2645,6 +2686,7 @@ public interface IScriptingInterface {
      * @param x The x component, in any distance units.
      * @param y The y component, in any distance units.
      * @param z The z component, in any distance units.
+     *
      * @return An array of doubles containing <code>[ra, dec, distance]</code>
      * with <code>ra</code> and <code>dec</code> in degrees and
      * <code>distance</code> in the same distance units as the input
@@ -2662,6 +2704,7 @@ public interface IScriptingInterface {
      * @param eq       Equatorial cartesian coordinates (X->[ra=0,dec=0], Y->[ra=90,dec=0], Z->[ra=0,dec=90])
      * @param kmFactor Factor used to bring the input coordinate units to Kilometers, so that <code>eq * factor =
      *                 Km</code>
+     *
      * @return Internal coordinates ready to be fed in other scripting functions
      */
     double[] equatorialCartesianToInternalCartesian(double[] eq,
@@ -2672,6 +2715,7 @@ public interface IScriptingInterface {
      * to galactic cartesian coordinates.
      *
      * @param eq Vector with [x, y, z] equatorial cartesian coordinates
+     *
      * @return Vector with [x, y, z] galactic cartesian coordinates
      */
     double[] equatorialToGalactic(double[] eq);
@@ -2681,6 +2725,7 @@ public interface IScriptingInterface {
      * to ecliptic cartesian coordinates.
      *
      * @param eqInternal Vector with [x, y, z] equatorial cartesian coordinates
+     *
      * @return Vector with [x, y, z] ecliptic cartesian coordinates
      */
     double[] equatorialToEcliptic(double[] eqInternal);
@@ -2690,6 +2735,7 @@ public interface IScriptingInterface {
      * to equatorial cartesian coordinates.
      *
      * @param galInternal Vector with [x, y, z] galactic cartesian coordinates
+     *
      * @return Vector with [x, y, z] equatorial cartesian coordinates
      */
     double[] galacticToEquatorial(double[] galInternal);
@@ -2699,6 +2745,7 @@ public interface IScriptingInterface {
      * to equatorial cartesian coordinates.
      *
      * @param eclInternal Vector with [x, y, z] ecliptic cartesian coordinates
+     *
      * @return Vector with [x, y, z] equatorial cartesian coordinates
      */
     double[] eclipticToEquatorial(double[] eclInternal);
@@ -2919,6 +2966,7 @@ public interface IScriptingInterface {
      * Enables or disables the stars glowing over objects.
      *
      * @param state Activate (true) or deactivate (false).
+     *
      * @deprecated Use {@link #setStarGlowOverObjects(boolean)} instead.
      */
     @Deprecated
@@ -3081,6 +3129,7 @@ public interface IScriptingInterface {
      * Removes the runnable with the given id, if any.
      *
      * @param id The id of the runnable to remove.
+     *
      * @deprecated Use {@link #removeRunnable(String)}.
      */
     @Deprecated
@@ -3098,6 +3147,7 @@ public interface IScriptingInterface {
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
      *               dataset.
      * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     *
      * @return False if the dataset could not be loaded, true otherwise.
      */
     boolean loadDataset(String dsName,
@@ -3120,6 +3170,7 @@ public interface IScriptingInterface {
      *               dataset.
      * @param path   Absolute path (or relative to the working path of Gaia Sky) to the file to load.
      * @param sync   Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3147,6 +3198,7 @@ public interface IScriptingInterface {
      * @param type    The {@link CatalogInfoSource} object to use as the dataset type.
      * @param options The {@link DatasetOptions} object holding the options for this dataset.
      * @param sync    Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3168,6 +3220,7 @@ public interface IScriptingInterface {
      * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>,
      *               <code>.csv</code> or <code>.fits</code> file to load.
      * @param sync   Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3189,6 +3242,7 @@ public interface IScriptingInterface {
      * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag -
      *                       magnitudeScale</code>.
      * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3211,6 +3265,7 @@ public interface IScriptingInterface {
      *                       magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3238,6 +3293,7 @@ public interface IScriptingInterface {
      * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                       camera to the Sun) of this dataset. Set to null to disable.
      * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3269,6 +3325,7 @@ public interface IScriptingInterface {
      * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see
      *                      {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param sync          Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3306,6 +3363,7 @@ public interface IScriptingInterface {
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3346,6 +3404,7 @@ public interface IScriptingInterface {
      * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                           camera to the Sun) of this dataset. Set to null to disable.
      * @param sync               Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3381,6 +3440,7 @@ public interface IScriptingInterface {
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3410,6 +3470,7 @@ public interface IScriptingInterface {
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3442,6 +3503,7 @@ public interface IScriptingInterface {
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3474,6 +3536,7 @@ public interface IScriptingInterface {
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                      camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3510,6 +3573,7 @@ public interface IScriptingInterface {
      * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from
      *                       camera to the Sun) of this dataset. Set to null to disable.
      * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      * <code>sync</code> is false.
      */
@@ -3529,6 +3593,7 @@ public interface IScriptingInterface {
      *
      * @param dsName The name of the dataset.
      * @param path   The absolute path, or the path in the data directory, of the dataset file.
+     *
      * @return False if the dataset could not be loaded. True otherwise.
      */
     boolean loadJsonCatalog(String dsName,
@@ -3542,6 +3607,7 @@ public interface IScriptingInterface {
      *
      * @param dsName The name of the dataset.
      * @param path   The absolute path, or the path in the data directory, of the dataset file.
+     *
      * @return False if the dataset could not be loaded. True otherwise.
      */
     boolean loadJsonDataset(String dsName,
@@ -3555,6 +3621,7 @@ public interface IScriptingInterface {
      * @param dsName The name of the dataset.
      * @param path   The absolute path, or the path in the data directory, of the dataset file.
      * @param sync   If true, the call does not return until the dataset is loaded and available in Gaia Sky.
+     *
      * @return False if the dataset could not be loaded. True otherwise.
      */
     boolean loadJsonDataset(String dsName,
@@ -3565,6 +3632,7 @@ public interface IScriptingInterface {
      * Removes the dataset identified by the given name, if it exists.
      *
      * @param dsName The name of the dataset to remove.
+     *
      * @return False if the dataset could not be found.
      */
     boolean removeDataset(String dsName);
@@ -3573,6 +3641,7 @@ public interface IScriptingInterface {
      * Hides the dataset identified by the given name, if it exists and is not hidden.
      *
      * @param dsName The name of the dataset to hide.
+     *
      * @return False if the dataset could not be found.
      */
     boolean hideDataset(String dsName);
@@ -3588,6 +3657,7 @@ public interface IScriptingInterface {
      * Checks whether the dataset identified by the given name is loaded
      *
      * @param dsName The name of the dataset to query.
+     *
      * @return True if the dataset is loaded, false otherwise.
      */
     boolean hasDataset(String dsName);
@@ -3596,6 +3666,7 @@ public interface IScriptingInterface {
      * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden
      *
      * @param dsName The name of the dataset to show.
+     *
      * @return False if the dataset could not be found.
      */
     boolean showDataset(String dsName);
@@ -3606,14 +3677,17 @@ public interface IScriptingInterface {
      *
      * @param dsName The name of the dataset.
      * @param matrix The 16 values of the 4x4 transformation matrix in column-major order.
+     *
      * @return True if the dataset was found and the transformation matrix could be applied. False otherwise.
      */
-    boolean setDatasetTransformationMatrix(String dsName, double[] matrix);
+    boolean setDatasetTransformationMatrix(String dsName,
+                                           double[] matrix);
 
     /**
      * Clears the transformation matrix (if any) in the dataset identified by the given name.
      *
      * @param dsName The name of the dataset.
+     *
      * @return True if the dataset was found and the transformations cleared.
      */
     boolean clearDatasetTransformationMatrix(String dsName);
@@ -3635,6 +3709,7 @@ public interface IScriptingInterface {
      * @param dsName     The dataset name.
      * @param colorIndex Color index in [0,8].
      * @param highlight  Whether to highlight or not.
+     *
      * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName,
@@ -3646,6 +3721,7 @@ public interface IScriptingInterface {
      *
      * @param dsName    The dataset name.
      * @param highlight State.
+     *
      * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName,
@@ -3657,6 +3733,7 @@ public interface IScriptingInterface {
      * @param dsName    The dataset name.
      * @param r         Red component.
      * @param highlight State.
+     *
      * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName,
@@ -3681,6 +3758,7 @@ public interface IScriptingInterface {
      * @param minMap        The minimum mapping value.
      * @param maxMap        The maximum mapping value.
      * @param highlight     State.
+     *
      * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName,
@@ -3697,6 +3775,7 @@ public interface IScriptingInterface {
      * @param sizeFactor The size factor to apply to the particles when highlighted, must be in
      *                   [{@link gaiasky.util.Constants#MIN_DATASET_SIZE_FACTOR},
      *                   {@link gaiasky.util.Constants#MAX_DATASET_SIZE_FACTOR}].
+     *
      * @return False if the dataset could not be found.
      */
     boolean setDatasetHighlightSizeFactor(String dsName,
@@ -3710,6 +3789,7 @@ public interface IScriptingInterface {
      *
      * @param dsName     The dataset name.
      * @param allVisible Whether all stars in the dataset should be visible when highlighted or not.
+     *
      * @return False if the dataset could not be found.
      */
     boolean setDatasetHighlightAllVisible(String dsName,
@@ -3843,6 +3923,7 @@ public interface IScriptingInterface {
      *             <li>'ecliptictogalactic', 'ecltogal</li>
      *             <li>'galactictoecliptic', 'galtoecl</li>
      *             </ul>
+     *
      * @return The transformation matrix in column-major order.
      */
     double[] getRefSysTransform(String name);
@@ -3867,6 +3948,7 @@ public interface IScriptingInterface {
      * Converts the value in internal units to metres.
      *
      * @param internalUnits The value in internal units.
+     *
      * @return The value in metres.
      */
     double internalUnitsToMetres(double internalUnits);
@@ -3875,6 +3957,7 @@ public interface IScriptingInterface {
      * Converts the value in internal units to Kilometers.
      *
      * @param internalUnits The value in internal units.
+     *
      * @return The value in Kilometers.
      */
     double internalUnitsToKilometres(double internalUnits);
@@ -3883,6 +3966,7 @@ public interface IScriptingInterface {
      * Converts the array in internal units to Kilometers.
      *
      * @param internalUnits The array in internal units.
+     *
      * @return The array in Kilometers.
      */
     double[] internalUnitsToKilometres(double[] internalUnits);
@@ -3891,6 +3975,7 @@ public interface IScriptingInterface {
      * Converts the value in internal units to parsecs.
      *
      * @param internalUnits The value in internal units.
+     *
      * @return The value in parsecs.
      */
     double internalUnitsToParsecs(double internalUnits);
@@ -3899,6 +3984,7 @@ public interface IScriptingInterface {
      * Converts the array in internal units to parsecs.
      *
      * @param internalUnits The array in internal units.
+     *
      * @return The array in parsecs.
      */
     double[] internalUnitsToParsecs(double[] internalUnits);
@@ -3907,6 +3993,7 @@ public interface IScriptingInterface {
      * Converts the metres to internal units.
      *
      * @param metres The value in metres.
+     *
      * @return The value in internal units.
      */
     double metresToInternalUnits(double metres);
@@ -3915,6 +4002,7 @@ public interface IScriptingInterface {
      * Converts the kilometres to internal units.
      *
      * @param kilometres The value in kilometers.
+     *
      * @return The value in internal units.
      */
     double kilometresToInternalUnits(double kilometres);
@@ -3923,6 +4011,7 @@ public interface IScriptingInterface {
      * Converts the parsecs to internal units.
      *
      * @param parsecs The value in parsecs.
+     *
      * @return The value in internal units.
      */
     double parsecsToInternalUnits(double parsecs);
@@ -3942,6 +4031,7 @@ public interface IScriptingInterface {
      * @param vector Vector to rotate, with at least 3 components.
      * @param axis   The axis, with at least 3 components.
      * @param angle  Angle in degrees.
+     *
      * @return The new vector, rotated.
      */
     double[] rotate3(double[] vector,
@@ -3953,6 +4043,7 @@ public interface IScriptingInterface {
      * the y axis points up.
      *
      * @param vector Vector to rotate, with at least 2 components.
+     *
      * @return The new vector, rotated.
      */
     double[] rotate2(double[] vector,
@@ -3963,6 +4054,7 @@ public interface IScriptingInterface {
      *
      * @param vec1 First 3D vector.
      * @param vec2 Second 3D vector.
+     *
      * @return Cross product 3D vector.
      */
     double[] cross3(double[] vec1,
@@ -3973,6 +4065,7 @@ public interface IScriptingInterface {
      *
      * @param vec1 First 3D vector.
      * @param vec2 Second 3D vector.
+     *
      * @return The dot product scalar.
      */
     double dot3(double[] vec1,
