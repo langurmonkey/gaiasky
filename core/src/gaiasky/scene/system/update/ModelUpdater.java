@@ -111,16 +111,12 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 && orientation != null
                 && orientation.quaternionOrientation != null
                 && (time.getHdiff() != 0 || forceUpdate)) {
-            var attitude = (QuaternionOrientation) orientation.quaternionOrientation;
-            if (attitude.nonRotatedPos != null) {
-                attitude.nonRotatedPos.set(body.pos);
+            var quaternionOrientation = (QuaternionOrientation) orientation.quaternionOrientation;
+            if (quaternionOrientation.nonRotatedPos != null) {
+                quaternionOrientation.nonRotatedPos.set(body.pos);
                 // Undo rotation.
-                attitude.nonRotatedPos.mul(Coordinates.eqToEcl())
+                quaternionOrientation.nonRotatedPos.mul(Coordinates.eqToEcl())
                         .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
-                // Update attitude from server if needed.
-                if (attitude.orientationServer != null) {
-                    attitude.orientationServer.getOrientation(time.getTime());
-                }
             }
         }
 
@@ -128,6 +124,13 @@ public class ModelUpdater extends AbstractUpdateSystem {
             var scaffolding = Mapper.modelScaffolding.get(entity);
             var quaternionOrientation = orientation != null ? orientation.quaternionOrientation : null;
             var rigidRotation = orientation != null ? orientation.rigidRotation : null;
+
+            // Update quaternion orientation if needed.
+            if (quaternionOrientation != null) {
+                quaternionOrientation.getQuaternion(time.getTime());
+            }
+
+            // Do actual update.
             if (Mapper.tagBillboard.has(entity)) {
                 // Billboard orientation computation.
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
