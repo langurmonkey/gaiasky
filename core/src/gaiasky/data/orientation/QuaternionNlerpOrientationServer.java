@@ -11,18 +11,18 @@ import gaiasky.util.math.QuaternionDouble;
 
 /**
  * Orientation server that reads a list of times and quaternions from a file, and interpolates
- * them using {@link QuaternionDouble#slerp(QuaternionDouble, double)}.
+ * them using {@link QuaternionDouble#nlerp(QuaternionDouble, double)}.
  */
-public class QuaternionSlerpOrientationServer extends QuaternionInterpolationOrientationServer {
+public class QuaternionNlerpOrientationServer extends QuaternionInterpolationOrientationServer {
 
-    public QuaternionSlerpOrientationServer(String dataFile) {
+    public QuaternionNlerpOrientationServer(String dataFile) {
         super(dataFile);
     }
 
     @Override
     protected QuaternionDouble interpolate(QuaternionDouble q0, QuaternionDouble q1, double alpha) {
         lastOrientation.set(q0);
-        lastOrientation.slerp(q1, alpha);
+        lastOrientation.nlerp(q1, alpha);
         return lastOrientation;
     }
 }

@@ -930,7 +930,7 @@ public class QuaternionDouble implements Serializable {
      * @param blend the fractional change amount.
      */
     public void nlerp(QuaternionDouble q2,
-                      float blend) {
+                      double blend) {
         double dot = dot(q2);
         double blendI = 1.0 - blend;
         if (dot < 0.0) {

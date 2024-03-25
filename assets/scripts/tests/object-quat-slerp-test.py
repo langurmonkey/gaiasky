@@ -19,7 +19,10 @@ def lprint(string):
 dir = os.path.abspath(os.path.dirname(__file__))
 data_file = os.path.join(dir, "quaternion-orientations.csv")
 
-gs.setObjectQuaternionSlerpOrientation("Gaia", data_file)
+# Set slerp orientation server.
+#gs.setObjectQuaternionSlerpOrientation("Gaia", data_file)
+# Uncomment next line to use nlerp instead.
+gs.setObjectQuaternionNlerpOrientation("Gaia", data_file)
 
 # At this point, Gaia sources its orientation from the CSV file.
 lprint("Gaia is now using quaternion-orientaitons.csv")

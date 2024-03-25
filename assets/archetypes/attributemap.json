@@ -119,7 +119,7 @@
         "aliases": [
           "attitudeLocation"
         ]
-      },
+      }
     },
     "Celestial": {
       "description": "Defines attributes common to all celestial objects (stars, planets, moons, etc.).",

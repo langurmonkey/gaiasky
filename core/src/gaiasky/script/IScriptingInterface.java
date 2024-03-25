@@ -897,6 +897,9 @@ public interface IScriptingInterface {
      * for this object. This call removes the previous orientation model from the object (either
      * {@link RigidRotation} or {@link gaiasky.scene.component.QuaternionOrientation}.
      * </p>
+     * <p>
+     * The interpolation between quaternions is done using slerp (spherical linear interpolation).
+     * </p>
      *
      * @param name The name of the object. The object must already have an <code>Orientation</code> component.
      * @param file The file path. The file is a CSV where each line has the time (ISO-8601) and the
@@ -906,6 +909,27 @@ public interface IScriptingInterface {
      * @return True if the object was found and could be updated.
      */
     boolean setObjectQuaternionSlerpOrientation(String name,
+                                                String file);
+
+
+    /**
+     * <p>
+     * Sets the given quaternions file (CSV with times and quaternions) as the orientation provider
+     * for this object. This call removes the previous orientation model from the object (either
+     * {@link RigidRotation} or {@link gaiasky.scene.component.QuaternionOrientation}.
+     * </p>
+     * <p>
+     * The interpolation between quaternions is done using nlerp (normalized linear interpolation).
+     * </p>
+     *
+     * @param name The name of the object. The object must already have an <code>Orientation</code> component.
+     * @param file The file path. The file is a CSV where each line has the time (ISO-8601) and the
+     *             x, y, z and w components of the quaternion for that time. For instance, a valid line would
+     *             be "<code>2018-04-01T15:20:15Z,0.9237,0.3728,0.0358,0.0795</code>".
+     *
+     * @return True if the object was found and could be updated.
+     */
+    boolean setObjectQuaternionNlerpOrientation(String name,
                                                 String file);
 
     /**
