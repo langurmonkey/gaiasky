@@ -45,7 +45,7 @@ public class TessellationRenderer extends AbstractRenderSystem {
             batch.begin(camera.getCamera());
             renderables.forEach(r -> {
                 Render render = (Render) r;
-                renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagQuatOrientation.has(render.entity));
+                renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagBillboard.has(render.entity));
             });
             batch.end();
         }

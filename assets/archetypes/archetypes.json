@@ -137,7 +137,7 @@
         "Billboard": {
             "parent": "ModelBody",
             "components": [
-                "TagQuaternionOrientation*",
+                "TagBillboardSimple*",
                 "Fade"
             ],
             "aliases": [

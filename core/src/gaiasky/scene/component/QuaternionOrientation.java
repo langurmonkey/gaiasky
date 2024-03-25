@@ -2,7 +2,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.data.api.OrientationServer;
-import gaiasky.data.util.AttitudeLoader.OrientationServerParameters;
+import gaiasky.data.util.OrientationServerLoader.OrientationServerParameters;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 

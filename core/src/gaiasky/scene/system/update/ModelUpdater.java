@@ -75,7 +75,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         }
         if (engine != null && engine.render) {
             EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(),
-                                 MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
+                    MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
         }
     }
 
@@ -107,9 +107,12 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
         // Helio-tropic satellites need this chunk before the actual update is carried out.
         var orientation = Mapper.orientation.get(entity);
-        if (orientation != null && orientation.hasQuaternions() && (time.getHdiff() != 0 || forceUpdate)) {
+        if (Mapper.tagHeliotropic.has(entity)
+                && orientation != null
+                && orientation.quaternionOrientation != null
+                && (time.getHdiff() != 0 || forceUpdate)) {
             var attitude = (QuaternionOrientation) orientation.quaternionOrientation;
-            if (Mapper.tagHeliotropic.has(entity) && attitude.nonRotatedPos != null) {
+            if (attitude.nonRotatedPos != null) {
                 attitude.nonRotatedPos.set(body.pos);
                 // Undo rotation.
                 attitude.nonRotatedPos.mul(Coordinates.eqToEcl())
@@ -125,8 +128,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
             var scaffolding = Mapper.modelScaffolding.get(entity);
             var quaternionOrientation = orientation != null ? orientation.quaternionOrientation : null;
             var rigidRotation = orientation != null ? orientation.rigidRotation : null;
-            if (Mapper.tagQuatOrientation.has(entity)) {
-                // Billboards use quaternion orientation.
+            if (Mapper.tagBillboard.has(entity)) {
+                // Billboard orientation computation.
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
                 graph.translation.setToTranslation(localTransform).scl(size).rotate(QF);
             } else if (Mapper.engine.has(entity)) {
@@ -148,19 +151,21 @@ public class ModelUpdater extends AbstractUpdateSystem {
                     engine.rotationMatrix.getRotation(engine.qf);
                 }
             } else if (quaternionOrientation != null) {
-                // Satellites have attitude.
+                // Satellites have quaternion orientations, typically.
 
                 graph.translation.setToTranslation(localTransform).scl(size * sizeFactor);
-                if (quaternionOrientation.orientationServer != null && quaternionOrientation.orientationServer.hasOrientation()) {
+                var hasOrientationServer = quaternionOrientation.orientationServer != null && quaternionOrientation.orientationServer.hasOrientation();
+                if (hasOrientationServer) {
                     QD.set(quaternionOrientation.getCurrentQuaternion());
                     QF.set((float) QD.x, (float) QD.y, (float) QD.z, (float) QD.w);
                 } else {
+                    // Use solar longitude.
                     QD.setFromAxis(0, 1, 0, AstroUtils.getSunLongitude(GaiaSky.instance.time.getTime()));
                 }
 
                 // Update orientation
                 graph.orientation.idt().rotate(QD);
-                if (quaternionOrientation.orientationServer != null && quaternionOrientation.orientationServer.hasOrientation()) {
+                if (hasOrientationServer) {
                     graph.orientation.rotate(0, 0, 1, 180);
                 }
 

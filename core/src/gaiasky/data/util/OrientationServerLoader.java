@@ -15,16 +15,15 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.api.OrientationServer;
-import gaiasky.data.util.AttitudeLoader.OrientationServerParameters;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
-public class AttitudeLoader extends AsynchronousAssetLoader<OrientationServer, OrientationServerParameters> {
-    private static final Log logger = Logger.getLogger(AttitudeLoader.class);
+public class OrientationServerLoader extends AsynchronousAssetLoader<OrientationServer, OrientationServerLoader.OrientationServerParameters> {
+    private static final Log logger = Logger.getLogger(OrientationServerLoader.class);
 
     OrientationServer server;
 
-    public AttitudeLoader(FileHandleResolver resolver) {
+    public OrientationServerLoader(FileHandleResolver resolver) {
         super(resolver);
     }
 
@@ -33,13 +32,13 @@ public class AttitudeLoader extends AsynchronousAssetLoader<OrientationServer, O
         try {
             String className = parameter.loaderClass;
             if (className == null || className.isBlank()) {
-                logger.error("Attitude loader class name is null or blank");
-                throw new RuntimeException("Attitude loader class name is null or blank");
+                logger.error("Orientation server loader class name is null or blank");
+                throw new RuntimeException("Orientation server loader class name is null or blank");
             }
             Class<? extends OrientationServer> c = (Class<? extends OrientationServer>) Class.forName(className);
             server = c.getDeclaredConstructor(String.class).newInstance(fileName);
         } catch (Exception e) {
-            logger.error("Error creating attitude server from class: " + parameter.loaderClass);
+            logger.error("Error creating orientation server from class: " + parameter.loaderClass);
             throw new RuntimeException(e);
         }
     }

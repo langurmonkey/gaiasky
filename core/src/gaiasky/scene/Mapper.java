@@ -72,7 +72,7 @@ public class Mapper {
 
     // Tags
     public static final ComponentMapper<TagBackgroundModel> tagBackgroundModel = ComponentMapper.getFor(TagBackgroundModel.class);
-    public static final ComponentMapper<TagQuaternionOrientation> tagQuatOrientation = ComponentMapper.getFor(TagQuaternionOrientation.class);
+    public static final ComponentMapper<TagBillboardSimple> tagBillboard = ComponentMapper.getFor(TagBillboardSimple.class);
     public static final ComponentMapper<TagHeliotropic> tagHeliotropic = ComponentMapper.getFor(TagHeliotropic.class);
     public static final ComponentMapper<TagNoProcess> tagNoProcess = ComponentMapper.getFor(TagNoProcess.class);
     public static final ComponentMapper<TagNoProcessChildren> tagNoProcessChildren = ComponentMapper.getFor(TagNoProcessChildren.class);

@@ -16,7 +16,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
-import net.jafama.FastMath;
 
 public class ModelExtractor extends AbstractExtractSystem {
 
@@ -69,7 +68,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                 if (renderText(base, body, sa, label)) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
-            } else if (Mapper.tagQuatOrientation.has(entity)) {
+            } else if (Mapper.tagBillboard.has(entity)) {
                 // Simple billboards.
                 if (body.solidAngleApparent >= sa.thresholdNone) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
