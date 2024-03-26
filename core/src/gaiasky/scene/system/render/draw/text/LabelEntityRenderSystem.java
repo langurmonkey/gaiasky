@@ -20,7 +20,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.component.Title;
-import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.*;
@@ -46,10 +45,7 @@ public class LabelEntityRenderSystem {
     private final Vector3 F32 = new Vector3();
     private final Vector3b B31 = new Vector3b();
 
-    private final ParticleUtils particleUtils;
-
     public LabelEntityRenderSystem() {
-        particleUtils = new ParticleUtils();
     }
 
     public void renderLocation(LabelView view,
@@ -369,7 +365,10 @@ public class LabelEntityRenderSystem {
         for (int i = 0; i < n; i++) {
             if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                 int idx = active[i];
-                renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+                if (!renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera)) {
+                    // Only render until the first is not rendered.
+                    break;
+                }
             }
         }
         for (Integer i : set.forceLabel) {
@@ -382,16 +381,16 @@ public class LabelEntityRenderSystem {
     /**
      * Renders the label for a single star in a star group.
      */
-    private void renderStarLabel(LabelView view,
-                                 StarSet set,
-                                 int idx,
-                                 Vector3b starPosition,
-                                 float thresholdLabel,
-                                 ExtSpriteBatch batch,
-                                 ExtShaderProgram shader,
-                                 FontRenderSystem sys,
-                                 RenderingContext rc,
-                                 ICamera camera) {
+    private boolean renderStarLabel(LabelView view,
+                                    StarSet set,
+                                    int idx,
+                                    Vector3b starPosition,
+                                    float thresholdLabel,
+                                    ExtSpriteBatch batch,
+                                    ExtShaderProgram shader,
+                                    FontRenderSystem sys,
+                                    RenderingContext rc,
+                                    ICamera camera) {
         boolean forceLabel = set.forceLabel.contains(idx);
         IParticleRecord star = set.pointData.get(idx);
         starPosition = set.fetchPosition(star, set.cPosD, starPosition, set.currDeltaYears);
@@ -403,20 +402,27 @@ public class LabelEntityRenderSystem {
         }
         float solidAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
 
-        if (forceLabel || solidAngle >= thresholdLabel && camera.isVisible(solidAngle, starPosition.put(D32), distToCamera)) {
-            Vector3d labelPosition = D32.set(starPosition);
-            textPosition(camera, labelPosition, distToCamera, solidAngle, radius);
+        var visibleCamera = camera.isVisible(solidAngle, starPosition.put(D32), distToCamera);
+        if (visibleCamera) {
+            if (forceLabel || solidAngle > thresholdLabel) {
+                Vector3d labelPosition = D32.set(starPosition);
+                textPosition(camera, labelPosition, distToCamera, solidAngle, radius);
 
-            shader.setUniformf("u_viewAngle", solidAngle);
-            shader.setUniformf("u_viewAnglePow", 1f);
-            shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
-            // Override object color
-            shader.setUniform4fv("u_color", view.textColour(star.names()[0]), 0, 4);
-            double textSize = FastMath.tanh(solidAngle) * distToCamera * 1e5d;
-            float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
-            textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-            render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, star.names()[0], labelPosition, distToCamera,
-                    view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
+                shader.setUniformf("u_viewAngle", solidAngle);
+                shader.setUniformf("u_viewAnglePow", 1f);
+                shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
+                // Override object color
+                shader.setUniform4fv("u_color", view.textColour(star.names()[0]), 0, 4);
+                double textSize = FastMath.tanh(solidAngle) * distToCamera * 1e5d;
+                float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+                textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+                return render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, star.names()[0], labelPosition, distToCamera,
+                        view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
+            } else {
+                return false;
+            }
+        } else {
+            return true;
         }
     }
 
@@ -611,7 +617,7 @@ public class LabelEntityRenderSystem {
         DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
     }
 
-    protected void render3DLabel(LabelView view,
+    protected boolean render3DLabel(LabelView view,
                                  ExtSpriteBatch batch,
                                  ExtShaderProgram shader,
                                  BitmapFont font,
@@ -624,10 +630,10 @@ public class LabelEntityRenderSystem {
                                  double size,
                                  double radius,
                                  boolean forceLabel) {
-        render3DLabel(view, batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, radius, -1, -1, forceLabel);
+        return render3DLabel(view, batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, radius, -1, -1, forceLabel);
     }
 
-    protected void render3DLabel(LabelView view,
+    protected boolean render3DLabel(LabelView view,
                                  ExtSpriteBatch batch,
                                  ExtShaderProgram shader,
                                  BitmapFont font,
@@ -666,6 +672,8 @@ public class LabelEntityRenderSystem {
 
             DecalUtils.drawFont3D(font, batch, labelText, (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z, size, rot, camera, !rc.isCubemap(),
                     minSizeDegrees, maxSizeDegrees);
+            return true;
         }
+        return false;
     }
 }

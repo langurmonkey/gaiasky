@@ -11,15 +11,12 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.jafama.FastMath;
 
-import java.io.Serializable;
-
 @SuppressWarnings("unused")
-public class Vector3d implements Serializable, VectorDouble<Vector3d> {
+public class Vector3d implements VectorDouble<Vector3d> {
     public final static Vector3d X = new Vector3d(1, 0, 0);
     public final static Vector3d Y = new Vector3d(0, 1, 0);
     public final static Vector3d Z = new Vector3d(0, 0, 1);
     public final static Vector3d Zero = new Vector3d(0, 0, 0);
-    private static final long serialVersionUID = 3840054589595372522L;
     private final static Matrix4d tmpMat = new Matrix4d();
     /** the x-component of this vector **/
     public double x;

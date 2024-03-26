@@ -60,7 +60,7 @@ public class OctreeUpdater extends AbstractUpdateSystem {
 
                 ICamera camera = GaiaSky.instance.cameraManager;
 
-                // Update root node
+                // Update root node, add all objects to roulette in cascade.
                 root.octant.update(graph.translation, camera, octree.roulette, base.opacity);
 
                 // Call the update method of all entities in the roulette list.

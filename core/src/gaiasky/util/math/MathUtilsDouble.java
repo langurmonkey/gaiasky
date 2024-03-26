@@ -136,6 +136,14 @@ public final class MathUtilsDouble {
         return value;
     }
 
+    static public long clamp(long value,
+                            long min,
+                            long max) {
+        if (value < min)
+            return min;
+        return Math.min(value, max);
+    }
+
     static public float clamp(float value,
                               float min,
                               float max) {

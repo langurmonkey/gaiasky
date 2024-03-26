@@ -10,13 +10,10 @@ package gaiasky.util.math;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix3;
 
-import java.io.Serializable;
-
-public class Vector2d implements Serializable, VectorDouble<Vector2d> {
+public class Vector2d implements VectorDouble<Vector2d> {
     public final static Vector2d X = new Vector2d(1, 0);
     public final static Vector2d Y = new Vector2d(0, 1);
     public final static Vector2d Zero = new Vector2d(0, 0);
-    private static final long serialVersionUID = 913902788239530931L;
     /** the x-component of this vector **/
     public double x;
     /** the y-component of this vector **/

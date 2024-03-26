@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ParticleSet implements Component, IDisposable {
 
     private static long idSeq = 0;
+
     public static synchronized long getNextSequence() {
         return idSeq++;
     }
@@ -814,27 +815,31 @@ public class ParticleSet implements Component, IDisposable {
                                   Vector3b camPos,
                                   Vector3b out,
                                   double deltaYears) {
-        Vector3b pm = B32.set(0, 0, 0);
+        Vector3d pm = D32;
         if (pb.hasProperMotion()) {
             pm.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
+        } else {
+            pm.set(0, 0, 0);
         }
-        Vector3b destination = out.set(pb.x(), pb.y(), pb.z());
+        out.set(pb.x(), pb.y(), pb.z());
         // Apply affine transformations, if any.
-        if (entity != null) {
+        if (entity != null && Mapper.affine.has(entity)) {
             var affine = Mapper.affine.get(entity);
             if (affine != null && !affine.isEmpty()) {
                 synchronized (mat) {
                     affine.apply(mat.idt());
-                    destination.mul(mat);
+                    out.mul(mat);
                 }
             }
         }
-        if (camPos != null && !camPos.hasNaN())
-            destination.sub(camPos).add(pm);
-        else
-            destination.add(pm);
+        if (camPos != null && !camPos.hasNaN()) {
+            out.sub(camPos);
+        }
+        if (!pm.isZero()) {
+            out.add(pm);
+        }
 
-        return destination;
+        return out;
     }
 
     /**

@@ -225,7 +225,7 @@ public class Constants {
     public static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
     public static final String URL_WIKI_API_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/";
     /** {@link Apfloat} default precision. **/
-    public static final int PREC = 32;
+    public static final int PREC = 25;
     /** Number of directional lights. **/
     public static final int N_DIR_LIGHTS = 3;
     /** Number of point lights. **/

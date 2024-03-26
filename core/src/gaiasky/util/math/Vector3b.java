@@ -15,13 +15,10 @@ import net.jafama.FastMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 
-import java.io.Serializable;
-
-public class Vector3b implements Serializable {
+public class Vector3b {
     public final static Vector3b X = new Vector3b(1, 0, 0);
     public final static Vector3b Y = new Vector3b(0, 1, 0);
     public final static Vector3b Z = new Vector3b(0, 0, 1);
-    private static final long serialVersionUID = 3840054589595372522L;
     // Number of digits of precision
     private static final int prec = Constants.PREC;
     private final static Matrix4d tmpMat = new Matrix4d();
@@ -926,9 +923,7 @@ public class Vector3b implements Serializable {
             return false;
         if (y.hashCode() != other.y.hashCode())
             return false;
-        if (z.hashCode() != other.z.hashCode())
-            return false;
-        return true;
+        return z.hashCode() == other.z.hashCode();
     }
 
     public Vector3b setZero() {

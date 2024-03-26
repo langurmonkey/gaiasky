@@ -36,6 +36,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
@@ -538,6 +539,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
         var set = Mapper.starSet.get(sg);
         set.setEpoch(epoch);
+        // In octrees, we use half of what's in the numLabels in settings.
+        set.setNumLabels(MathUtilsDouble.clamp((long) (Settings.settings.scene.star.group.numLabels * 0.5), 5L, 50L));
 
         var sgDatasetDesc = Mapper.datasetDescription.get(sg);
         sgDatasetDesc.setCatalogInfoBare(datasetDesc.catalogInfo);
