@@ -526,26 +526,6 @@ public class SysUtils {
     public static int[] getDisplayResolution() {
         int w, h;
 
-        // MacOS seems to be "special", only likes headless mode.
-        if (isMac()) {
-            return new int[]{Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT};
-        }
-
-        // Graphics device method, window bounds.
-        try {
-            Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-            w = rect.width;
-            h = rect.height;
-            if (w > 0 && h > 0) {
-                return new int[]{w, h};
-            } else {
-                logger.error(I18n.msg("error.screensize.gd.windowbounds"));
-            }
-        } catch (HeadlessException e) {
-            logger.error(I18n.msg("error.screensize.gd.windowbounds"));
-            logger.debug(e);
-        }
-
         // Graphics device method, screen device.
         try {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -558,27 +538,47 @@ public class SysUtils {
             if (w > 0 && h > 0) {
                 return new int[]{w, h};
             } else {
-                logger.error(I18n.msg("error.screensize.gd"));
+                logger.warn(I18n.msg("error.screensize.gd"));
             }
         } catch (HeadlessException e) {
-            logger.error(I18n.msg("error.screensize.gd"));
+            logger.warn(I18n.msg("error.screensize.gd"));
             logger.debug(e);
         }
 
         // Toolkit method.
         try {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            w = (int) screenSize.getWidth();
-            h = (int) screenSize.getHeight();
+            double dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+            double scale = dpi / 96.0;
+            w = (int) (screenSize.getWidth() * scale);
+            h = (int) (screenSize.getHeight() * scale);
             if (w > 0 && h > 0) {
                 return new int[]{w, h};
             } else {
-                logger.error(I18n.msg("error.screensize.toolkit"));
+                logger.warn(I18n.msg("error.screensize.toolkit"));
             }
         } catch (Exception e) {
-            logger.error(I18n.msg("error.screensize.toolkit"));
+            logger.warn(I18n.msg("error.screensize.toolkit"));
             logger.debug(e);
         }
+
+        // Graphics device method, window bounds.
+        try {
+            Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            double dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+            double scale = dpi / 96.0;
+            w = (int) (rect.width * scale);
+            h = (int) (rect.height * scale);
+            if (w > 0 && h > 0) {
+                return new int[]{w, h};
+            } else {
+                logger.warn(I18n.msg("error.screensize.gd.windowbounds"));
+            }
+        } catch (HeadlessException e) {
+            logger.warn(I18n.msg("error.screensize.gd.windowbounds"));
+            logger.debug(e);
+        }
+
         return null;
     }
 

@@ -551,7 +551,7 @@ public class GaiaSkyDesktop implements IObserver {
         if (configFileOverwritten) {
             // Height linear interpolation:
             // min:HD -> max:5K
-            s.program.ui.scale = MathUtilsDouble.lint(s.graphics.resolution[1], 600, 2680, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+            s.program.ui.scale = MathUtilsDouble.lint(s.graphics.resolution[1], 800, 3200, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
             logger.info("UI scale re-initialized to " + s.program.ui.scale);
         }
 
@@ -622,7 +622,7 @@ public class GaiaSkyDesktop implements IObserver {
                 h = (int) Math.max(h, wh[1] * 0.85f);
             } else {
                 // Default.
-                logger.error(I18n.msg("error.screensize.default", w, h));
+                logger.warn(I18n.msg("error.screensize.default", w, h));
             }
             Settings.settings.graphics.resolution[0] = w;
             Settings.settings.graphics.resolution[1] = h;
