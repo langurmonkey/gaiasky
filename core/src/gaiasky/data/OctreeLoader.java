@@ -36,7 +36,6 @@ import gaiasky.util.Settings;
 import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
@@ -518,7 +517,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     /**
      * Loads the data of the given octant.
      *
-     * @param octant    The octant to load.
+     * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper entity.
      * @param fullInit      Whether to fully initialise the objects (on-demand load) or
      *                      not (startup)
@@ -532,6 +531,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
         var datasetDesc = Mapper.datasetDescription.get(octreeWrapper);
         var octree = Mapper.octree.get(octreeWrapper);
+        var root = Mapper.octant.get(octreeWrapper);
 
         List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
         Entity sg = utils.getDefaultStarSet("stargroup-%%SGID%%", data, baseInitializer, setInitializer, fullInit);
@@ -539,8 +539,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
         var set = Mapper.starSet.get(sg);
         set.setEpoch(epoch);
-        // In octrees, we use half of what's in the numLabels in settings.
-        set.setNumLabels(MathUtilsDouble.clamp((long) (Settings.settings.scene.star.group.numLabels * 0.5), 5L, 50L));
 
         var sgDatasetDesc = Mapper.datasetDescription.get(sg);
         sgDatasetDesc.setCatalogInfoBare(datasetDesc.catalogInfo);

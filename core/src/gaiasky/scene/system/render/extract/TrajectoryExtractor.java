@@ -59,10 +59,11 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
 
                 boolean added = false;
                 float angleLimit = (float) Settings.settings.scene.renderer.orbitSolidAngleThreshold * camera.getFovFactor();
+                var angleLimitUp = angleLimit * SHADER_MODEL_OVERLAP_FACTOR;
                 if (body.solidAngle > angleLimit) {
                     // Fade the orbit using its solid angle and the threshold in the settings.
-                    if (body.solidAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
-                        trajectory.alpha = MathUtilsDouble.lint(body.solidAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, body.color[3]);
+                    if (body.solidAngle < angleLimitUp) {
+                        trajectory.alpha = MathUtilsDouble.flint(body.solidAngle, angleLimit, angleLimitUp, 0, body.color[3]);
                     } else {
                         trajectory.alpha = body.color[3];
                     }

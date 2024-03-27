@@ -182,6 +182,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         }
     }
 
+    private final double rad02 = Math.toRadians(2);
+    private final double rad40 = Math.toRadians(40);
+
     /**
      * Text position for single objects (models, single stars, etc.).
      *
@@ -206,7 +209,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             offset.set(cam.getUp());
             offset.crs(out).nor();
 
-            float displacement = (float) MathUtilsDouble.lint(body.solidAngleApparent, Math.toRadians(2), Math.toRadians(40), 1, 20);
+            float displacement = (float) MathUtilsDouble.flint(body.solidAngleApparent, rad02, rad40, 1, 20);
             float dist = -0.015f * displacement * cam.getFovFactor() * (float) out.len();
             offset.add(cam.getUp()).nor().scl(dist);
 

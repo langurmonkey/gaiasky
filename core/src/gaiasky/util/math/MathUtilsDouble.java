@@ -137,8 +137,8 @@ public final class MathUtilsDouble {
     }
 
     static public long clamp(long value,
-                            long min,
-                            long max) {
+                             long min,
+                             long max) {
         if (value < min)
             return min;
         return Math.min(value, max);
@@ -217,14 +217,39 @@ public final class MathUtilsDouble {
     }
 
     /**
-     * Linear interpolation
+     * Fast linear interpolation. If you can guarantee that x0 &le; x1, then use this.
      *
-     * @param x  The value to interpolate
-     * @param x0 Inferior limit to the independent value
-     * @param x1 Superior limit to the independent value
-     * @param y0 Inferior limit to the dependent value
-     * @param y1 Superior limit to the dependent value
-     * @return The interpolated value
+     * @param x  The value to interpolate.
+     * @param x0 Inferior limit to the independent value.
+     * @param x1 Superior limit to the independent value.
+     * @param y0 Inferior limit to the dependent value.
+     * @param y1 Superior limit to the dependent value.
+     * @return The interpolated value.
+     */
+    public static double flint(double x,
+                               double x0,
+                               double x1,
+                               double y0,
+                               double y1) {
+        if (x < x0) {
+            return y0;
+        }
+        if (x > x1) {
+            return y1;
+        }
+
+        return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+    }
+
+    /**
+     * Linear interpolation.
+     *
+     * @param x  The value to interpolate.
+     * @param x0 Inferior limit to the independent value.
+     * @param x1 Superior limit to the independent value.
+     * @param y0 Inferior limit to the dependent value.
+     * @param y1 Superior limit to the dependent value.
+     * @return The interpolated value.
      */
     public static double lint(double x,
                               double x0,
@@ -249,13 +274,13 @@ public final class MathUtilsDouble {
     }
 
     /**
-     * Linear interpolation
+     * Linear interpolation.
      *
-     * @param x  The value to interpolate
-     * @param x0 Inferior limit to the independent value
-     * @param x1 Superior limit to the independent value
-     * @param y0 Inferior limit to the dependent value
-     * @param y1 Superior limit to the dependent value
+     * @param x  The value to interpolate.
+     * @param x0 Inferior limit to the independent value.
+     * @param x1 Superior limit to the independent value.
+     * @param y0 Inferior limit to the dependent value.
+     * @param y1 Superior limit to the dependent value.
      * @return The interpolated value
      */
     public static float lint(float x,
@@ -281,13 +306,13 @@ public final class MathUtilsDouble {
     }
 
     /**
-     * Linear interpolation
+     * Linear interpolation.
      *
-     * @param x  The value to interpolate
-     * @param x0 Inferior limit to the independent value
-     * @param x1 Superior limit to the independent value
-     * @param y0 Inferior limit to the dependent value
-     * @param y1 Superior limit to the dependent value
+     * @param x  The value to interpolate.
+     * @param x0 Inferior limit to the independent value.
+     * @param x1 Superior limit to the independent value.
+     * @param y0 Inferior limit to the dependent value.
+     * @param y1 Superior limit to the dependent value.
      * @return The interpolated value
      */
     public static float lint(long x,
@@ -523,6 +548,7 @@ public final class MathUtilsDouble {
     /**
      * Implements the logit function, defined as <code>logit(x) = log(x/(1-x))</code>. Note that logit(0) = -Infinity,
      * and logit(1) = Infinity.
+     *
      * @param x The value to sample.
      */
     public static double logit(double x) {

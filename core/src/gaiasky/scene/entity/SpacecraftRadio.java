@@ -79,7 +79,7 @@ public class SpacecraftRadio extends EntityRadio {
      */
     private void setToMachine(final Body body, final Model model, final ModelScaffolding scaffolding, final MotorEngine engine, final MachineDefinition machine, final boolean initialize) {
         model.model = machine.getModel();
-        engine.thrustMagnitude = machine.getPower() * engine.thrustBase;
+        engine.thrustMagnitude = machine.getPower() * MotorEngine.thrustBase;
         engine.fullPowerTime = machine.getFullpowertime();
         engine.mass = machine.getMass();
         scaffolding.shadowMapValues = machine.getShadowvalues();

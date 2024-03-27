@@ -64,8 +64,7 @@ public class ParticleUtils {
 
     public double getVariableSizeScaling(final StarSet set, final int idx) {
         IParticleRecord ipr = set.pointData.get(idx);
-        if (ipr instanceof VariableRecord) {
-            VariableRecord vr = (VariableRecord) ipr;
+        if (ipr instanceof VariableRecord vr) {
             double[] times = vr.variTimes;
             float[] sizes = vr.variMags;
             int n = vr.nVari;

@@ -37,7 +37,7 @@ public class ClusterUpdater extends AbstractUpdateSystem {
             var sa = Mapper.sa.get(entity);
 
             base.opacity *= 0.1f * base.getVisibilityOpacityFactor();
-            cluster.fadeAlpha = (float) MathUtilsDouble.lint(body.solidAngleApparent, sa.thresholdPoint, sa.thresholdQuad, 0f, 1f);
+            cluster.fadeAlpha = (float) MathUtilsDouble.flint(body.solidAngleApparent, sa.thresholdPoint, sa.thresholdQuad, 0f, 1f);
             body.labelColor[3] = 8.0f * cluster.fadeAlpha;
 
             // Compute local transform.

@@ -119,7 +119,7 @@ public class BillboardEntityRenderSystem implements IObserver {
             if (solidAngle >= thPointTimesFovFactor) {
                 double fuzzySize = getRenderSizeStarSet(size, radius, distToCamera, solidAngle);
                 // Ease into billboard.
-                alpha *= (float) MathUtilsDouble.lint(solidAngle, thPointTimesFovFactor, thPointTimesFovFactor * 2f, 0, 1);
+                alpha *= (float) MathUtilsDouble.flint(solidAngle, thPointTimesFovFactor, thPointTimesFovFactor * 2f, 0, 1);
 
                 Vector3 pos = starPos.put(F31);
                 shader.setUniformMatrix("u_matrix", camera.getCamera().view);

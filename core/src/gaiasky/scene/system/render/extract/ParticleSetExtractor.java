@@ -69,7 +69,9 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
                 addToRender(render, RenderGroup.LINE);
             }
         }
-        addToRender(render, RenderGroup.FONT_LABEL);
+        if ((starSet.renderParticleLabels && starSet.numLabels > 0) || starSet.renderSetLabel) {
+            addToRender(render, RenderGroup.FONT_LABEL);
+        }
     }
 
     /**
@@ -88,6 +90,8 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
                 addToRender(render, RenderGroup.PARTICLE_GROUP);
             }
         }
-        addToRender(render, RenderGroup.FONT_LABEL);
+        if ((set.renderParticleLabels && set.numLabels > 0) || set.renderSetLabel) {
+            addToRender(render, RenderGroup.FONT_LABEL);
+        }
     }
 }

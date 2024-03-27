@@ -76,6 +76,10 @@ public class ParticleSet implements Component, IDisposable {
      **/
     public boolean renderSetLabel = true;
     /**
+     * Whether to render particle labels at all for this set.
+     **/
+    public boolean renderParticleLabels = true;
+    /**
      * Number of labels to render for this group.
      **/
     public int numLabels = -1;

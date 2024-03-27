@@ -208,9 +208,9 @@ scene:
     # be balanced with the dataset and the draw distance.
     # 6.0 M is calibrated to use 6 GB heap space with the default dataset.
     maxStars: 6500000
-    # The octant thresholds:
-    # - radius/distance above which we start painting stars in octant with fade in. Angle in radians.
-    # - radius/distance below which we paint stars in octant with fade out. Above this angle, inner stars are painted with full brightness. Angle in radians.
+    # The octant thresholds [rad]:
+    # - radius/distance below which we do not observe the octant. Above this angle, inner stars' opacity is interpolated. Angle in radians.
+    # - radius/distance above which we observe the octant fully. Above this angle, inner stars are painted with full opacity. Angle in radians.
     threshold: [ 1.4, 1.8 ]
     # If on, particles fade in and out between levels of detail.
     fade: true

@@ -68,10 +68,10 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
             // Baked fade-in as we get close to focus.
             IFocus focus = camera.getFocus();
-            base.opacity *= (float) MathUtilsDouble.lint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
+            base.opacity *= (float) MathUtilsDouble.flint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
         }
 
-        gr.fovFactor = camera.getFovFactor() * .75e-3f;
+        gr.fovFactor = camera.getFovFactor() * 0.75e-3f;
 
         updateLocalTransform(camera, body, gr, graph, transform);
         // Distance in u_tessQuality.

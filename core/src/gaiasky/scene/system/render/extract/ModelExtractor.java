@@ -81,9 +81,9 @@ public class ModelExtractor extends AbstractExtractSystem {
                     double thQuad2 = sa.thresholdQuad * camera.getFovFactor() * 2 / scaffolding.sizeScaleFactor;
                     double thQuad1 = thQuad2 / 8.0 / scaffolding.sizeScaleFactor;
                     if (body.solidAngleApparent < thPoint * 4) {
-                        scaffolding.fadeOpacity = (float) MathUtilsDouble.lint(body.solidAngleApparent, thPoint, thPoint * 4, 1, 0);
+                        scaffolding.fadeOpacity = (float) MathUtilsDouble.flint(body.solidAngleApparent, thPoint, thPoint * 4, 1, 0);
                     } else {
-                        scaffolding.fadeOpacity = (float) MathUtilsDouble.lint(body.solidAngleApparent, thQuad1, thQuad2, 0, 1);
+                        scaffolding.fadeOpacity = (float) MathUtilsDouble.flint(body.solidAngleApparent, thQuad1, thQuad2, 0, 1);
                     }
 
                     if (body.solidAngleApparent < thQuad1) {

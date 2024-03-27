@@ -1305,13 +1305,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double func;
         if (dist < DIST_A) {
             // d < 0.1 pc
-            func = MathUtilsDouble.lint(dist, 0, DIST_A, 0, 1e6);
+            func = MathUtilsDouble.flint(dist, 0, DIST_A, 0, 1e6);
         } else if (dist < DIST_B) {
             // 0.1 pc < d < 5 Kpc
-            func = MathUtilsDouble.lint(dist, DIST_A, DIST_B, 1e6, 1e10);
+            func = MathUtilsDouble.flint(dist, DIST_A, DIST_B, 1e6, 1e10);
         } else {
             // d > 5 Kpc
-            func = MathUtilsDouble.lint(dist, DIST_B, DIST_C, 1e10, 2e16);
+            func = MathUtilsDouble.flint(dist, DIST_B, DIST_C, 1e10, 2e16);
         }
 
         return dist >= 0 ? (Math.max(func, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
@@ -1532,6 +1532,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     DIST_A = 0.1 * Constants.PC_TO_U;
                     DIST_B = 5.0 * Constants.KPC_TO_U;
                     DIST_C = 5000.0 * Constants.MPC_TO_U;
+                    MAX_ALLOWED_DISTANCE = 50_000.0 * Constants.MPC_TO_U;
                 }
             }
             case CAMERA_TRACKING_OBJECT_CMD -> {

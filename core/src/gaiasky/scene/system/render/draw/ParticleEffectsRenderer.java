@@ -98,15 +98,15 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
             return 1;
         } else if (cspeed <= 1.0) {
             // lint(1..0.5)
-            return MathUtilsDouble.lint(cspeed, 0.4, 1.0, 1.0, 0.5);
+            return MathUtilsDouble.flint(cspeed, 0.4, 1.0, 1.0, 0.5);
         } else if (cspeed <= 2.0) {
             // lint(0.5..0.3)
-            return MathUtilsDouble.lint(cspeed, 1.0, 2.0, 0.5, 0.3);
+            return MathUtilsDouble.flint(cspeed, 1.0, 2.0, 0.5, 0.3);
         } else if (cspeed <= 3.0) {
             return 0.3;
         } else {
             // lint(0.3..0.1)
-            return MathUtilsDouble.lint(cspeed, 3, 5, 0.3, 0.1);
+            return MathUtilsDouble.flint(cspeed, 3, 5, 0.3, 0.1);
         }
     }
 

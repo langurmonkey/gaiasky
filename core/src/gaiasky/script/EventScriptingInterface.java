@@ -1834,7 +1834,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
                     em.post(Event.TURNING_SPEED_CMD, this,
-                            (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+                            (float) MathUtilsDouble.flint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
                     // Save cinematic
                     boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -2038,12 +2038,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
                     em.post(Event.TURNING_SPEED_CMD, this,
-                            (float) MathUtilsDouble.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED));
+                            (float) MathUtilsDouble.flint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED));
 
                     // Save rotation speed, set it to 20
                     double rotationSpeedBak = Settings.settings.scene.camera.rotate;
                     em.post(Event.ROTATION_SPEED_CMD, this,
-                            (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED));
+                            (float) MathUtilsDouble.flint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED));
 
                     // Save cinematic
                     boolean cinematic = Settings.settings.scene.camera.cinematic;

@@ -609,11 +609,15 @@ public class OctreeNode implements ILineRenderable {
      * @param cam             The current camera.
      * @param roulette        List where the nodes to be processed are to be added.
      * @param opacity         The opacity to set.
+     * @param updateNumLabels Whether to perform the performance optimization to update the number of labels in each
+     *                        star
+     *                        group according to the current view angle.
      */
     public void update(Vector3b parentTransform,
                        ICamera cam,
                        List<IOctreeObject> roulette,
-                       float opacity) {
+                       float opacity,
+                       boolean updateNumLabels) {
         this.opacity = opacity;
         this.observed = false;
 
@@ -644,21 +648,28 @@ public class OctreeNode implements ILineRenderable {
                 assert loader != null : "Octant loader is null!";
                 loader.touch(this);
 
-                // Add objects
+                // Add objects.
                 addObjectsTo(roulette);
+                if (updateNumLabels) {
+                    // Update the number of labels of star groups.
+                    updateNumberLabels(th0);
+                }
             }  // What do? Move first in queue?
 
             double alpha = 1;
             if (Settings.settings.scene.octree.fade && viewAngle < th1) {
-                alpha = MathUtilsDouble.clamp(MathUtilsDouble.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
+                // Compute smooth interpolation for octant alpha.
+                // Transition stage.
+                alpha = MathUtilsDouble.clamp(MathUtilsDouble.flint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
             }
             this.opacity *= (float) alpha;
 
-            // Update children
+
+            // Update children.
             for (int i = 0; i < 8; i++) {
                 OctreeNode child = children[i];
                 if (child != null) {
-                    child.update(parentTransform, cam, roulette, this.opacity);
+                    child.update(parentTransform, cam, roulette, this.opacity, updateNumLabels);
                 }
             }
 
@@ -680,6 +691,31 @@ public class OctreeNode implements ILineRenderable {
             roulette.addAll(objects);
             for (IOctreeObject obj : objects) {
                 nObjectsObserved += obj.getStarCount();
+            }
+        }
+    }
+
+    /**
+     * Here we adjust the number of labels of each star group in the node depending on the depth.
+     *
+     * @param threshold The threshold to compare to the view angle.
+     */
+    private void updateNumberLabels(double threshold) {
+        if (objects != null) {
+            // Label factor depends on view angle and threshold.
+            double labelFactor = 0.0;
+            if (this.opacity > 0.0 && viewAngle > threshold) {
+                labelFactor = MathUtilsDouble.flint(viewAngle, threshold, 2.9, 0.0, 0.6);
+            }
+
+            int newNumLabels = (int) (Settings.settings.scene.star.group.numLabels * labelFactor);
+            for (IOctreeObject obj : objects) {
+                if (obj instanceof OctreeObjectView oov) {
+                    if (oov.set != null) {
+                        oov.set.numLabels = newNumLabels;
+                    }
+                }
+
             }
         }
     }
@@ -712,18 +748,18 @@ public class OctreeNode implements ILineRenderable {
      * must be smaller than fov/2 plus a correction (approximates octants to spheres)
      *
      * @param cam The camera
-     * @return Whether the octant is observed
+     * @return Whether the octant is observed.
      */
     private boolean computeObservedFast(ICamera cam) {
         // vector from camera to center of box
-        Vector3d cpospos = auxD1.set(centre).sub(cam.getPos());
+        Vector3d camPosBox = auxD1.set(centre).sub(cam.getPos());
         // auxD2 rotation axis
         Vector3d axis = auxD2.set(cam.getDirection()).crs(centre);
         Vector3d edge = auxD3.set(cam.getDirection()).rotate(axis, cam.getCamera().fieldOfView / 2d);
         // get angle at edge (when far side is radius)
-        double angle1 = FastMath.toDegrees(FastMath.atan(radius / cpospos.len()));
+        double angle1 = FastMath.toDegrees(FastMath.atan(radius / camPosBox.len()));
         // get actual angle
-        double angle2 = edge.angle(cpospos);
+        double angle2 = edge.angle(camPosBox);
         // We're in the containing sphere or centre is in front of us
         return distToCamera <= radius || angle2 < angle1;
     }

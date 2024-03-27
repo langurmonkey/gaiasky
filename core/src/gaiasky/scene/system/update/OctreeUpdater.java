@@ -12,7 +12,6 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
@@ -61,7 +60,7 @@ public class OctreeUpdater extends AbstractUpdateSystem {
                 ICamera camera = GaiaSky.instance.cameraManager;
 
                 // Update root node, add all objects to roulette in cascade.
-                root.octant.update(graph.translation, camera, octree.roulette, base.opacity);
+                root.octant.update(graph.translation, camera, octree.roulette, base.opacity, root.octant.numChildrenRec > 4);
 
                 // Call the update method of all entities in the roulette list.
                 updateOctreeObjects(base, graph, octree, deltaTime);
@@ -90,7 +89,7 @@ public class OctreeUpdater extends AbstractUpdateSystem {
      */
     protected void updateOctreeObjects(Base base, GraphNode graph, Octree octree, float deltaTime) {
         updateGraph(base, graph, octree, GaiaSky.instance.time);
-        updateParticleSet(octree, deltaTime);
+        updateParticleSets(octree, deltaTime);
     }
 
     private void updateGraph(Base base, GraphNode graph, Octree octree, ITimeFrameProvider time) {
@@ -104,7 +103,7 @@ public class OctreeUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void updateParticleSet(Octree octree, float deltaTime) {
+    private void updateParticleSets(Octree octree, float deltaTime) {
         int size = octree.roulette.size();
         for (int i = 0; i < size; i++) {
             Entity entity = ((OctreeObjectView) octree.roulette.get(i)).getEntity();
