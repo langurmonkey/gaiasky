@@ -67,7 +67,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
-    private static AtomicReference<DataDescriptor> localDatasets = new AtomicReference<>();
+    private static final AtomicReference<DataDescriptor> localDatasets = new AtomicReference<>();
 
     private final XrLoadStatus vrStatus;
     private final boolean skipWelcome;
