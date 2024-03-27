@@ -26,6 +26,10 @@ public class StarSet extends ParticleSet {
      * Does this contain variable stars?
      **/
     public boolean variableStars = false;
+    /**
+     * Number of particles to render as a billboard for this group.
+     **/
+    public int numBillboards = -1;
 
     /**
      * Updates the parameters of the focus, if the focus is active in this group.

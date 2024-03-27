@@ -309,6 +309,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Billboard.
         var bb = Mapper.billboard.get(entity);
         bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardStarSet;
+        set.numBillboards = set.numBillboards > 0 ? set.numBillboards : Settings.settings.scene.star.group.numBillboard;
 
     }
 

@@ -703,16 +703,18 @@ public class OctreeNode implements ILineRenderable {
     private void updateNumberLabels(double threshold) {
         if (objects != null) {
             // Label factor depends on view angle and threshold.
-            double labelFactor = 0.0;
+            double octantFactor = 0.0;
             if (this.opacity > 0.0 && viewAngle > threshold) {
-                labelFactor = MathUtilsDouble.flint(viewAngle, threshold, 2.9, 0.0, 0.6);
+                octantFactor = MathUtilsDouble.flint(viewAngle, threshold, 2.9, 0.0, 0.6);
             }
 
-            int newNumLabels = (int) (Settings.settings.scene.star.group.numLabels * labelFactor);
+            int newNumLabels = (int) (Settings.settings.scene.star.group.numLabels * octantFactor);
+            int newNumBillboard = (int) (Settings.settings.scene.star.group.numBillboard * octantFactor);
             for (IOctreeObject obj : objects) {
                 if (obj instanceof OctreeObjectView oov) {
                     if (oov.set != null) {
                         oov.set.numLabels = newNumLabels;
+                        oov.set.numBillboards = newNumBillboard;
                     }
                 }
 
