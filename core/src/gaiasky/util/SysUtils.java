@@ -20,6 +20,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,7 +56,6 @@ public class SysUtils {
     private static final String SHADER_OUT_DIR_NAME = "shaders";
     private static final String SHADER_CACHE_DIR_NAME = "shadercache";
     private static final String LOG_DIR_NAME = "log";
-
 
     static {
         OS = System.getProperty("os.name").toLowerCase();
@@ -338,6 +338,7 @@ public class SysUtils {
      * the user-configured data folder as input.
      *
      * @param dataLocation The user-defined data location.
+     *
      * @return A path that points to the temporary directory.
      */
     public static Path getTempDir(String dataLocation) {
@@ -501,6 +502,7 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
+     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -526,6 +528,32 @@ public class SysUtils {
     public static int[] getDisplayResolution() {
         int w, h;
 
+        // Try hack for macOS.
+        try {
+            if (SysUtils.isMac()) {
+                // Use reflection to avoid compile errors on non-macOS environments.
+                GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                GraphicsConfiguration gc = gd.getDefaultConfiguration();
+                Object screen = Class.forName("sun.awt.CGraphicsDevice")
+                        .cast(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+                Method getScaleFactor = screen.getClass().getDeclaredMethod("getScaleFactor");
+                Object obj = getScaleFactor.invoke(screen);
+                if (obj instanceof Integer dpi) {
+                    w = (int) (gc.getBounds().getWidth() * dpi);
+                    h = (int) (gc.getBounds().getHeight() * dpi);
+
+                    if (w > 0 && h > 0) {
+                        return new int[] { w, h };
+                    } else {
+                        logger.warn(I18n.msg("error.screensize.gd.macos"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn(I18n.msg("error.screensize.gd.macos"));
+            logger.debug(e);
+        }
+
         // Graphics device method, screen device.
         try {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -536,7 +564,7 @@ public class SysUtils {
             w = (int) (gc.getBounds().getWidth() * scaleX);
             h = (int) (gc.getBounds().getHeight() * scaleY);
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             } else {
                 logger.warn(I18n.msg("error.screensize.gd"));
             }
@@ -553,7 +581,7 @@ public class SysUtils {
             w = (int) (screenSize.getWidth() * scale);
             h = (int) (screenSize.getHeight() * scale);
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             } else {
                 logger.warn(I18n.msg("error.screensize.toolkit"));
             }
@@ -570,7 +598,7 @@ public class SysUtils {
             w = (int) (rect.width * scale);
             h = (int) (rect.height * scale);
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             } else {
                 logger.warn(I18n.msg("error.screensize.gd.windowbounds"));
             }
@@ -584,9 +612,9 @@ public class SysUtils {
 
     private static String getJarName() {
         return new File(SysUtils.class.getProtectionDomain()
-                .getCodeSource()
-                .getLocation()
-                .getPath())
+                                .getCodeSource()
+                                .getLocation()
+                                .getPath())
                 .getName();
     }
 
