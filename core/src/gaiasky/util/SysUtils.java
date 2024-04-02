@@ -531,22 +531,16 @@ public class SysUtils {
         // Try hack for macOS.
         try {
             if (SysUtils.isMac()) {
-                // Use reflection to avoid compile errors on non-macOS environments.
                 GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
                 GraphicsConfiguration gc = gd.getDefaultConfiguration();
-                Object screen = Class.forName("sun.awt.CGraphicsDevice")
-                        .cast(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
-                Method getScaleFactor = screen.getClass().getDeclaredMethod("getScaleFactor");
-                Object obj = getScaleFactor.invoke(screen);
-                if (obj instanceof Integer dpi) {
-                    w = (int) (gc.getBounds().getWidth() * dpi);
-                    h = (int) (gc.getBounds().getHeight() * dpi);
-
-                    if (w > 0 && h > 0) {
-                        return new int[] { w, h };
-                    } else {
-                        logger.warn(I18n.msg("error.screensize.gd.macos"));
-                    }
+                var ha = gc.getDevice().getDisplayMode().getHeight();
+                var wa = gc.getDevice().getDisplayMode().getWidth();
+                w = (int) (gc.getBounds().getWidth());
+                h = (int) (gc.getBounds().getHeight());
+                if (w > 0 && h > 0) {
+                    return new int[] { w, h };
+                } else {
+                    logger.warn(I18n.msg("error.screensize.gd"));
                 }
             }
         } catch (Exception e) {

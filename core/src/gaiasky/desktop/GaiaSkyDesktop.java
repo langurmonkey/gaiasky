@@ -72,10 +72,6 @@ public class GaiaSkyDesktop implements IObserver {
      **/
     private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
     /**
-     * Full default OpenGL version string in VR mode (with OpenXR).
-     **/
-    private static final String XR_OPENGL = DEFAULT_OPENGL_MAJOR + "." + XR_OPENGL_MINOR;
-    /**
      * Minimum required OpenGL major version for Gaia Sky to run.
      **/
     private static final int MIN_OPENGL_MAJOR = 3;
@@ -602,13 +598,12 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg) {
-        configureWindowSize(cfg, 1f, 1f, false);
+        configureWindowSize(cfg, 1f, 1f);
     }
 
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg,
                                      float widthFactor,
-                                     float heightFactor,
-                                     boolean force169Ratio) {
+                                     float heightFactor) {
         int w = Settings.settings.graphics.getScreenWidth();
         int h = Settings.settings.graphics.getScreenHeight();
         if (w <= 0 || h <= 0) {
@@ -626,15 +621,6 @@ public class GaiaSkyDesktop implements IObserver {
             }
             Settings.settings.graphics.resolution[0] = w;
             Settings.settings.graphics.resolution[1] = h;
-        }
-
-        // Force aspect ratio.
-        if (force169Ratio) {
-            if (h < w) {
-                // Horizontal ratio, force 16:9, while keeping height fixed.
-                w = (int) ((h / 9d) * 16d);
-            }  // Vertical ratio, do nothing.
-
         }
 
         // Apply factors.
@@ -666,7 +652,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
-        configureWindowSize(cfg, 0.6f, 0.85f, false);
+        configureWindowSize(cfg, 0.6f, 0.85f);
         cfg.setResizable(false);
         cfg.setTitle(title);
 
