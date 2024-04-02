@@ -14,9 +14,9 @@ import org.apfloat.Apfloat;
 public class Constants {
 
     /** Default resolution: width. **/
-    public static final int DEFAULT_RESOLUTION_WIDTH = 1600;
+    public static final int DEFAULT_RESOLUTION_WIDTH = 1920;
     /** Default resolution: height. **/
-    public static final int DEFAULT_RESOLUTION_HEIGHT = 900;
+    public static final int DEFAULT_RESOLUTION_HEIGHT = 1080;
 
     /** Default star magnitude. **/
     public static final double DEFAULT_MAG = 15;

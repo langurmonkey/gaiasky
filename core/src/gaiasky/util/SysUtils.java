@@ -527,6 +527,7 @@ public class SysUtils {
         int w, h;
 
         // MacOS seems to be "special", only likes headless mode.
+        // If we access any AWT classes we get a nice black screen.
         if (isMac()) {
             return new int[]{Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT};
         }

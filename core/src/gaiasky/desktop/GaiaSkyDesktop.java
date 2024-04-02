@@ -37,6 +37,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
 import gaiasky.util.math.MathUtilsDouble;
 import org.yaml.snakeyaml.Yaml;
+import oshi.SystemInfo;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -251,6 +252,11 @@ public class GaiaSkyDesktop implements IObserver {
                 RESTServer.initialize(Settings.settings.program.net.restPort);
             }
 
+            SystemInfo sysInfo = new SystemInfo();
+            var displays = sysInfo.getHardware().getDisplays();
+            for(var display: displays) {
+                out.println(display.toString());
+            }
             // Slave manager.
             SlaveManager.initialize();
 

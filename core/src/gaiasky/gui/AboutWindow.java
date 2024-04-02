@@ -72,7 +72,7 @@ public class AboutWindow extends GenericDialog {
 
         // Create the tab buttons
         var tabGroup = new HorizontalGroup();
-        tabGroup.align(Align.left);
+        tabGroup.left();
 
         final var tabHelp = new OwnTextButton(I18n.msg("gui.help.help"), skin, "toggle-big");
         tabHelp.pad(pad10);
@@ -102,7 +102,7 @@ public class AboutWindow extends GenericDialog {
         if (showUpdateTab)
             tabButtons.add(tabUpdates);
 
-        content.add(tabGroup).align(Align.left).padLeft(pad10);
+        content.add(tabGroup).left().padLeft(pad10);
         content.row();
         content.pad(pad18);
 
@@ -136,14 +136,14 @@ public class AboutWindow extends GenericDialog {
         contentHelp.row();
         contentHelp.add(gaiasky).pad(pad18).padBottom(pad18 * 5f).colspan(2);
         contentHelp.row();
-        contentHelp.add(docsTitle).align(Align.left).padBottom(pad34).row();
-        contentHelp.add(docsLink).align(Align.left).padBottom(pad18 * 4f);
+        contentHelp.add(docsTitle).left().padBottom(pad34).row();
+        contentHelp.add(docsLink).left().padBottom(pad18 * 4f);
         contentHelp.row();
-        contentHelp.add(repoTitle).align(Align.left).padBottom(pad34).row();
-        contentHelp.add(repoLink).align(Align.left).padBottom(pad18 * 4f);
+        contentHelp.add(repoTitle).left().padBottom(pad34).row();
+        contentHelp.add(repoLink).left().padBottom(pad18 * 4f);
         contentHelp.row();
-        contentHelp.add(homepageTitle).align(Align.left).padBottom(pad34).row();
-        contentHelp.add(homepageLink).align(Align.left).padBottom(pad34 * 2f);
+        contentHelp.add(homepageTitle).left().padBottom(pad34).row();
+        contentHelp.add(homepageLink).left().padBottom(pad34 * 2f);
         contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
@@ -181,7 +181,7 @@ public class AboutWindow extends GenericDialog {
         var contribTitle = new OwnLabel(I18n.msg("gui.help.contributors"), skin);
 
         var contrib = new Table(skin);
-        contrib.align(Align.left);
+        contrib.left();
         var contribName = new OwnLabel("Apl. Prof. Dr. Stefan Jordan", skin);
         var contribMail = new Link("jordan@ari.uni-heidelberg.de", linkStyle, "mailto:jordan@ari.uni-heidelberg.de");
         contrib.add(contribName).left().row();
@@ -397,74 +397,74 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
         contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
-        contentSystem.add(versionTitle).align(Align.topLeft).padRight(pad18).width(titleWidth);
-        contentSystem.add(version).align(Align.left);
+        contentSystem.add(versionTitle).left().top().padRight(pad18).width(titleWidth);
+        contentSystem.add(version).left();
         contentSystem.row();
-        contentSystem.add(revisionTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(revision).align(Align.left).padTop(pad10);
+        contentSystem.add(revisionTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(revision).left().padTop(pad10);
         contentSystem.row();
-        contentSystem.add(timeTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(time).align(Align.left).padTop(pad10);
+        contentSystem.add(timeTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(time).left().padTop(pad10);
         contentSystem.row();
-        contentSystem.add(builderTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(builder).align(Align.left).padTop(pad10);
+        contentSystem.add(builderTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(builder).left().padTop(pad10);
         contentSystem.row();
-        contentSystem.add(systemTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(system).align(Align.left).padTop(pad10);
+        contentSystem.add(systemTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(system).left().padTop(pad10);
         contentSystem.row();
 
         // PATHS
-        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad34);
+        contentSystem.add(paths).colspan(2).left().padTop(pad34);
         contentSystem.row();
         contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
-        contentSystem.add(configTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(config).align(Align.left);
+        contentSystem.add(configTitle).left().top().padRight(pad18);
+        contentSystem.add(config).left();
         contentSystem.row();
-        contentSystem.add(dataTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(data).align(Align.left);
+        contentSystem.add(dataTitle).left().top().padRight(pad18);
+        contentSystem.add(data).left();
         contentSystem.row();
-        contentSystem.add(screenshotsTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(screenshots).align(Align.left);
+        contentSystem.add(screenshotsTitle).left().top().padRight(pad18);
+        contentSystem.add(screenshots).left();
         contentSystem.row();
-        contentSystem.add(framesTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(frames).align(Align.left);
+        contentSystem.add(framesTitle).left().top().padRight(pad18);
+        contentSystem.add(frames).left();
         contentSystem.row();
-        contentSystem.add(cameraTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(camera).align(Align.left);
+        contentSystem.add(cameraTitle).left().top().padRight(pad18);
+        contentSystem.add(camera).left();
         contentSystem.row();
-        contentSystem.add(mappingsTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(mappings).align(Align.left);
+        contentSystem.add(mappingsTitle).left().top().padRight(pad18);
+        contentSystem.add(mappings).left();
         contentSystem.row();
-        contentSystem.add(musicTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(music).align(Align.left);
+        contentSystem.add(musicTitle).left().top().padRight(pad18);
+        contentSystem.add(music).left();
         contentSystem.row();
 
         // JAVA
-        contentSystem.add(javaInfo).colspan(2).align(Align.left).padTop(pad34 * 2f);
+        contentSystem.add(javaInfo).colspan(2).left().padTop(pad34 * 2f);
         contentSystem.row();
         contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
-        contentSystem.add(javaVersionTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(javaVersion).align(Align.left);
+        contentSystem.add(javaVersionTitle).left().top().padRight(pad18);
+        contentSystem.add(javaVersion).left();
         contentSystem.row();
-        contentSystem.add(javaRuntimeTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(javaRuntime).align(Align.left).padTop(pad10);
+        contentSystem.add(javaRuntimeTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(javaRuntime).left().padTop(pad10);
         contentSystem.row();
-        contentSystem.add(javaVMNameTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(javaVMName).align(Align.left).padTop(pad10);
+        contentSystem.add(javaVMNameTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(javaVMName).left().padTop(pad10);
         contentSystem.row();
-        contentSystem.add(javaVMVersionTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(javaVMVersion).align(Align.left).padTop(pad10);
+        contentSystem.add(javaVMVersionTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(javaVMVersion).left().padTop(pad10);
         contentSystem.row();
-        contentSystem.add(javaVMVendorTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(javaVMVendor).align(Align.left).padTop(pad10);
+        contentSystem.add(javaVMVendorTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(javaVMVendor).left().padTop(pad10);
         contentSystem.row();
-        contentSystem.add(memInfoButton).colspan(2).align(Align.left).padTop(pad18);
+        contentSystem.add(memInfoButton).colspan(2).left().padTop(pad18);
         contentSystem.row();
 
         // SYSTEM
-        contentSystem.add(sysInfo).colspan(2).align(Align.left).padTop(pad34 * 2f);
+        contentSystem.add(sysInfo).colspan(2).left().padTop(pad34 * 2f);
         contentSystem.row();
         contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
@@ -476,36 +476,56 @@ public class AboutWindow extends GenericDialog {
             var cpuTitle = new OwnLabel(I18n.msg("gui.help.cpu"), skin);
             var cpu = new OwnLabel(cp.toString(), skin);
 
-            contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad18).padTop(pad10).padBottom(pad18);
-            contentSystem.add(cpu).align(Align.left).padTop(pad10).padBottom(pad18);
+            contentSystem.add(cpuTitle).left().top().padRight(pad18).padTop(pad10).padBottom(pad18);
+            contentSystem.add(cpu).left().padTop(pad10).padBottom(pad18);
             contentSystem.row();
-        } catch (Error e) {
-            contentSystem.add(new OwnLabel(I18n.msg("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad18).padBottom(pad18).row();
+        } catch (Exception ignored) {
+            contentSystem.add(new OwnLabel(I18n.msg("gui.help.cpu.no"), skin)).colspan(2).left().padTop(pad18).padBottom(pad18).row();
         }
-        contentSystem.add(sysOSTitle).align(Align.topLeft).padRight(pad18).padBottom(pad18);
-        contentSystem.add(sysOS).align(Align.left).padBottom(pad18);
+        contentSystem.add(sysOSTitle).left().top().padRight(pad18).padBottom(pad18);
+        contentSystem.add(sysOS).left().padBottom(pad18);
         contentSystem.row();
 
-        contentSystem.add(glRendererTitle).align(Align.topLeft).padRight(pad18).padTop(pad18);
-        contentSystem.add(glRenderer).align(Align.left).padTop(pad10);
+        contentSystem.add(glRendererTitle).left().top().padRight(pad18).padTop(pad18);
+        contentSystem.add(glRenderer).left().padTop(pad10);
         contentSystem.row();
 
-        // GL
-        contentSystem.add(glInfo).colspan(2).align(Align.left).padTop(pad34 * 2f);
+        // DISPLAYS
+        var displaysInfo = new OwnLabel(I18n.msg("gui.help.displays"), skin, "header");
+
+        contentSystem.add(displaysInfo).colspan(2).left().padTop(pad34 * 2f);
         contentSystem.row();
         contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
-        contentSystem.add(glVersionTitle).align(Align.topLeft).padRight(pad18);
-        contentSystem.add(glVersion).align(Align.left);
+
+        try {
+            var si = new SystemInfo();
+            var displays = si.getHardware().getDisplays();
+            for (var display : displays) {
+                var displayLabel = new OwnLabel(display.toString(), skin);
+                contentSystem.add(displayLabel).colspan(2).left().padBottom(pad34).row();
+            }
+        } catch (Exception ignored) {
+            var none = new OwnLabel(I18n.msg("gui.focusinfo.na"), skin);
+            contentSystem.add(none).colspan(2).left().padBottom(pad34).row();
+        }
+
+        // GL
+        contentSystem.add(glInfo).colspan(2).left().padTop(pad34 * 2f);
         contentSystem.row();
-        contentSystem.add(glVendorTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(glVendor).align(Align.left).padTop(pad10);
+        contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
-        contentSystem.add(glslVersionTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(glslVersion).align(Align.left).padTop(pad10);
+        contentSystem.add(glVersionTitle).left().top().padRight(pad18);
+        contentSystem.add(glVersion).left();
         contentSystem.row();
-        contentSystem.add(glExtensionsTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
-        contentSystem.add(glExtensionsScroll).align(Align.left).padTop(pad10);
+        contentSystem.add(glVendorTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(glVendor).left().padTop(pad10);
+        contentSystem.row();
+        contentSystem.add(glslVersionTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(glslVersion).left().padTop(pad10);
+        contentSystem.row();
+        contentSystem.add(glExtensionsTitle).left().top().padRight(pad18).padTop(pad10);
+        contentSystem.add(glExtensionsScroll).left().padTop(pad10);
 
         OwnScrollPane systemScroll = new OwnScrollPane(contentSystem, skin, "minimalist-nobg");
         systemScroll.setFadeScrollBars(false);
