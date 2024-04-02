@@ -526,6 +526,11 @@ public class SysUtils {
     public static int[] getDisplayResolution() {
         int w, h;
 
+        // MacOS seems to be "special", only likes headless mode.
+        if (isMac()) {
+            return new int[]{Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT};
+        }
+
         // Graphics device method, screen device.
         try {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
