@@ -56,6 +56,7 @@ public class SysUtils {
     private static final String SHADER_CACHE_DIR_NAME = "shadercache";
     private static final String LOG_DIR_NAME = "log";
 
+
     static {
         OS = System.getProperty("os.name").toLowerCase();
         linux = OS.contains("linux");
@@ -525,29 +526,6 @@ public class SysUtils {
     public static int[] getDisplayResolution() {
         int w, h;
 
-        // Try hack for macOS.
-        try {
-            if (SysUtils.isMac()) {
-                // Use reflection to avoid compile errors on non-macOS environments.
-                GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                GraphicsConfiguration gc = gd.getDefaultConfiguration();
-                // Default dpi.
-                var dpi = 130.0;
-                var scale = dpi / 96.0;
-                w = (int) (gc.getBounds().getWidth() * scale);
-                h = (int) (gc.getBounds().getHeight() * scale);
-
-                if (w > 0 && h > 0) {
-                    return new int[]{w, h};
-                } else {
-                    logger.warn(I18n.msg("error.screensize.gd.macos"));
-                }
-            }
-        } catch (Exception e) {
-            logger.warn(I18n.msg("error.screensize.gd.macos"));
-            logger.debug(e);
-        }
-
         // Graphics device method, screen device.
         try {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -567,28 +545,11 @@ public class SysUtils {
             logger.debug(e);
         }
 
-        // Toolkit method.
-        try {
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            double dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-            double scale = dpi / 96.0;
-            w = (int) (screenSize.getWidth() * scale);
-            h = (int) (screenSize.getHeight() * scale);
-            if (w > 0 && h > 0) {
-                return new int[]{w, h};
-            } else {
-                logger.warn(I18n.msg("error.screensize.toolkit"));
-            }
-        } catch (Exception e) {
-            logger.warn(I18n.msg("error.screensize.toolkit"));
-            logger.debug(e);
-        }
-
         // Graphics device method, window bounds.
         try {
             Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
             double dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-            double scale = dpi / 96.0;
+            double scale = dpi > 0.0 ?  dpi / 96.0 : 1.0;
             w = (int) (rect.width * scale);
             h = (int) (rect.height * scale);
             if (w > 0 && h > 0) {
@@ -598,6 +559,23 @@ public class SysUtils {
             }
         } catch (HeadlessException e) {
             logger.warn(I18n.msg("error.screensize.gd.windowbounds"));
+            logger.debug(e);
+        }
+
+        // Toolkit method.
+        try {
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            double dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+            double scale = dpi > 0.0 ?  dpi / 96.0 : 1.0;
+            w = (int) (screenSize.getWidth() * scale);
+            h = (int) (screenSize.getHeight() * scale);
+            if (w > 0 && h > 0) {
+                return new int[]{w, h};
+            } else {
+                logger.warn(I18n.msg("error.screensize.toolkit"));
+            }
+        } catch (Exception e) {
+            logger.warn(I18n.msg("error.screensize.toolkit"));
             logger.debug(e);
         }
 
