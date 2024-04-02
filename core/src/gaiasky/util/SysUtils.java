@@ -20,7 +20,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -338,7 +337,6 @@ public class SysUtils {
      * the user-configured data folder as input.
      *
      * @param dataLocation The user-defined data location.
-     *
      * @return A path that points to the temporary directory.
      */
     public static Path getTempDir(String dataLocation) {
@@ -502,7 +500,6 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
-     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -534,20 +531,16 @@ public class SysUtils {
                 // Use reflection to avoid compile errors on non-macOS environments.
                 GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
                 GraphicsConfiguration gc = gd.getDefaultConfiguration();
-                Object screen = Class.forName("sun.awt.CGraphicsDevice")
-                        .cast(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
-                Method getXResolution = screen.getClass().getDeclaredMethod("getXResolution");
-                Object obj = getXResolution.invoke(screen);
-                if (obj instanceof Double dpi) {
-                    var scale = dpi / 96.0;
-                    w = (int) (gc.getBounds().getWidth() * scale);
-                    h = (int) (gc.getBounds().getHeight() * scale);
+                // Default dpi.
+                var dpi = 130.0;
+                var scale = dpi / 96.0;
+                w = (int) (gc.getBounds().getWidth() * scale);
+                h = (int) (gc.getBounds().getHeight() * scale);
 
-                    if (w > 0 && h > 0) {
-                        return new int[] { w, h };
-                    } else {
-                        logger.warn(I18n.msg("error.screensize.gd.macos"));
-                    }
+                if (w > 0 && h > 0) {
+                    return new int[]{w, h};
+                } else {
+                    logger.warn(I18n.msg("error.screensize.gd.macos"));
                 }
             }
         } catch (Exception e) {
@@ -565,7 +558,7 @@ public class SysUtils {
             w = (int) (gc.getBounds().getWidth() * scaleX);
             h = (int) (gc.getBounds().getHeight() * scaleY);
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             } else {
                 logger.warn(I18n.msg("error.screensize.gd"));
             }
@@ -582,7 +575,7 @@ public class SysUtils {
             w = (int) (screenSize.getWidth() * scale);
             h = (int) (screenSize.getHeight() * scale);
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             } else {
                 logger.warn(I18n.msg("error.screensize.toolkit"));
             }
@@ -599,7 +592,7 @@ public class SysUtils {
             w = (int) (rect.width * scale);
             h = (int) (rect.height * scale);
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             } else {
                 logger.warn(I18n.msg("error.screensize.gd.windowbounds"));
             }
@@ -613,9 +606,9 @@ public class SysUtils {
 
     private static String getJarName() {
         return new File(SysUtils.class.getProtectionDomain()
-                                .getCodeSource()
-                                .getLocation()
-                                .getPath())
+                .getCodeSource()
+                .getLocation()
+                .getPath())
                 .getName();
     }
 
