@@ -252,11 +252,6 @@ public class GaiaSkyDesktop implements IObserver {
                 RESTServer.initialize(Settings.settings.program.net.restPort);
             }
 
-            SystemInfo sysInfo = new SystemInfo();
-            var displays = sysInfo.getHardware().getDisplays();
-            for(var display: displays) {
-                out.println(display.toString());
-            }
             // Slave manager.
             SlaveManager.initialize();
 

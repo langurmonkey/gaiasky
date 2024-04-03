@@ -100,11 +100,13 @@ abstract class GaiaSkyRun extends JavaExec {
 
 tasks.register('run', GaiaSkyRun) {
     dependsOn jar
+    description = 'Runs Gaia Sky.'
     setup()
 }
 
 tasks.register('runTranslationStatus', JavaExec) {
     dependsOn jar
+    description = 'Runs the I18n status program, which generates statistics about the current status of the translation files.'
     systemProperties['assets.location'] = './assets/'
     classpath = project.ext.sourceSets.main.runtimeClasspath
     classpath += project.files(project.ext.assetsDir)
@@ -115,6 +117,7 @@ tasks.register('runTranslationStatus', JavaExec) {
 
 tasks.register('runI18nFormatter', JavaExec) {
     dependsOn jar
+    description = 'Runs the I18n formatter, which formats the i18n files with missing keys.'
     systemProperties['assets.location'] = './assets/'
     classpath = project.ext.sourceSets.main.runtimeClasspath
     classpath += project.files(project.ext.assetsDir)
@@ -124,6 +127,7 @@ tasks.register('runI18nFormatter', JavaExec) {
 }
 
 tasks.register('createDistDir') {
+    description = 'Creates the dist/ directory.'
     doLast {
         File distDir = new File(project.distDir as String)
         // Prepare output directory
@@ -134,6 +138,7 @@ tasks.register('createDistDir') {
 
 tasks.register('copyToLib') {
     dependsOn createDistDir
+    description = 'Copies all classpath files to the dist/lib directory.'
     doLast {
         // Create releases/dist/lib
         File distLib = new File(project.distDir as String, 'lib')
@@ -174,6 +179,7 @@ tasks.register('copyToLib') {
 
 tasks.register('gaiaskyJar') {
     dependsOn compileJava, jar, copyToLib
+    description = 'Creates the Gaia Sky jar file, gaiasky-core.jar.'
     doLast {
         copy {
             from "$baseDir/core/build/libs/core-" + version + ".jar"
@@ -184,6 +190,7 @@ tasks.register('gaiaskyJar') {
 }
 
 tasks.register('genReleaseNotes', Exec) {
+    description = 'Generates the release notes of Gaia Sky.'
     println("generate-releasenotes $tag $distDir/releasenotes.txt")
     workingDir "$baseDir/core/scripts/release/"
     commandLine "/bin/bash", "generate-releasenotes", "$tag", "$distDir/releasenotes.txt"
@@ -191,6 +198,7 @@ tasks.register('genReleaseNotes', Exec) {
 
 tasks.register('dist') {
     dependsOn gaiaskyJar, genReleaseNotes
+    description = 'Builds Gaia Sky and creates an executable distribution.'
     doLast {
         // Version check
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
@@ -309,6 +317,7 @@ dist.dependsOn classes
 
 tasks.register('createTar') {
     dependsOn dist
+    description = 'Builds Gaia Sky and creates a tar.gz file with it.'
     doLast {
         File packageDir = new File(project.packageDir)
 
@@ -334,6 +343,7 @@ tasks.register('createTar') {
 }
 
 tasks.register('downloadJRE', Download) {
+    description = 'Downloads the JRE, needed to include in the package files.'
     src "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jre_x64_linux_hotspot_21.0.2_13.tar.gz"
     dest new File("$tmpDir", "$jreArchive")
     onlyIfModified true
@@ -341,6 +351,7 @@ tasks.register('downloadJRE', Download) {
 }
 tasks.register('downloadAndExtractJRE') {
     dependsOn downloadJRE
+    description = 'Downloads and extracts the JRE, needed to include in the package files.'
     doLast {
         File jreArchivePath = new File("$tmpDir", "$jreArchive")
         // Delete pre-existing jre
@@ -364,6 +375,7 @@ tasks.register('downloadAndExtractJRE') {
 
 tasks.register('createAppImage') {
     dependsOn createTar, downloadAndExtractJRE
+    description = 'Creates the AppImage package for Gaia Sky.'
     doLast {
         String gsId = "gaiasky"
         String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
@@ -420,6 +432,7 @@ tasks.register('createAppImage') {
 
 tasks.register('createArch') {
     dependsOn createTar
+    description = 'Creates the Arch Linux AUR files for Gaia Sky.'
     doLast {
         File archDir = new File(project.packageDir + "/arch/")
         mkdir archDir
@@ -460,6 +473,7 @@ tasks.register('createArch') {
 
 tasks.register('createDebian') {
     dependsOn createTar
+    description = 'Creates the Debian package for Gaia Sky.'
     doLast {
         // DEBIAN directory
         File debDebianDir = new File(project.packageDir + "/debian")
@@ -525,6 +539,7 @@ static def getVersionRevision(String tagRev) {
 
 tasks.register('prepareInstall4jScript') {
     dependsOn createTar
+    description = 'Prepares the install4j script by performing some substitutions, and copies it to the releases directory.'
     doLast {
         copy {
             from "installerscripts/template.install4j"
@@ -542,6 +557,7 @@ tasks.register('prepareInstall4jScript') {
 
 tasks.register('install4jMedia', Install4jTask) {
     dependsOn prepareInstall4jScript
+    description = 'Runs the install4j process to create the media packages.'
 
     if (project.hasProperty("winKeystorePassword")) {
         winKeystorePassword = project.ext.winKeystorePassword
@@ -563,6 +579,7 @@ tasks.register('install4jMedia', Install4jTask) {
 
 tasks.register('genGPGSignatures', Exec) {
     dependsOn install4jMedia
+    description = 'Generate the GPG signature files for all packages.'
     println("Generating GPG signature files: $packageDir")
     workingDir "$baseDir/core/scripts/release/"
     commandLine "/bin/bash", "sign-packages.sh", "$packageDir"
@@ -570,6 +587,7 @@ tasks.register('genGPGSignatures', Exec) {
 
 tasks.register('pack') {
     dependsOn 'genGPGSignatures', 'createAppImage', 'createArch', 'createDebian'
+    description = 'Generate a full release of Gaia Sky, with all the media files for Linux, Windows and macOS.'
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz and gaiasky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
