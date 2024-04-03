@@ -204,7 +204,7 @@ public class CollapsiblePane extends Table {
         titleGroup.add(expandIcon).padRight(10f);
         if (icon != null) {
             icon.setColor(skin.getColor("theme"));
-            titleGroup.add(icon).padRight(6.4f);
+            titleGroup.add(icon).size(icon.getWidth(), icon.getHeight()).padRight(6.4f);
         }
         titleGroup.add(titleLabel).padRight(6.4f);
         if (shortcut != null && !shortcut.isEmpty())

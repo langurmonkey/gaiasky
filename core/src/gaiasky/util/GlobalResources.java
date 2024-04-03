@@ -56,20 +56,20 @@ public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
     private static final Vector3d aux = new Vector3d();
     private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
-    // Global all-purpose sprite batch
+    // Global all-purpose sprite batch.
     private final SpriteBatch spriteBatch;
     private final ExtShaderProgram extSpriteShader;
-    // Sprite batch using int indices
+    // Sprite batch using int indices.
     private final ExtSpriteBatch extSpriteBatch;
     private final AssetManager manager;
     private ShaderProgram shapeShader;
     private final ShaderProgram spriteShader;
-    // Cursors
+    // Cursors.
     private Cursor linkCursor;
     private Cursor resizeXCursor;
     private Cursor resizeYCursor;
     private Cursor emptyCursor;
-    // The global skin
+    // The UI skin.
     private Skin skin;
     /**
      * Decimal format.

@@ -612,7 +612,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 progress.setValue(60f);
                 progress.setVisible(false);
 
-                t.add(typeImage).left().padRight(pad18);
+                t.add(typeImage).size(typeImage.getWidth(), typeImage.getHeight()).left().padRight(pad18);
                 t.add(title).left().padRight(pad18);
                 t.add(installOrSelect).right().row();
                 t.add();
@@ -1139,7 +1139,7 @@ public class DatasetManagerWindow extends GenericDialog {
         boolean error = false;
         Exception errorException = null;
         Array<File> processedFiles = new Array<>();
-        while (null != (entry = tarIs.getNextTarEntry())) {
+        while (null != (entry = tarIs.getNextEntry())) {
             if (entry.isDirectory()) {
                 continue;
             }

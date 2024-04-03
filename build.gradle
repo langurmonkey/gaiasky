@@ -168,7 +168,8 @@ project(":core") {
     jar {
         manifest {
             attributes "Implementation-Title": "Gaia Sky",
-            "Implementation-Version": archiveVersion
+            "Implementation-Version": archiveVersion,
+            "Main-Class": "gaiasky.desktop.GaiaSkyDesktop"
         }
         from("../assets") {
             include "font/main-font.fnt"

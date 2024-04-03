@@ -11,14 +11,14 @@ public class PackUITextures {
     public static void main(String[] args) {
         //TexturePacker.Settings x1settings = new TexturePacker.Settings();
         //x1settings.scale[0] = 1f;
-        //x1settings.jpegQuality = 0.9f;
-        //x1settings.paddingX = 4;
-        //x1settings.paddingY = 4;
+        //x1settings.jpegQuality = 0.8f;
+        //x1settings.paddingX = 2;
+        //x1settings.paddingY = 2;
         //TexturePacker.Settings x2settings = new TexturePacker.Settings();
-        //x2settings.scale[0] = 1.6f;
-        //x2settings.jpegQuality = 0.9f;
-        //x2settings.paddingX = 4;
-        //x2settings.paddingY = 4;
+        //x2settings.scale[0] = 1.55f;
+        //x2settings.jpegQuality = 0.8f;
+        //x2settings.paddingX = 1;
+        //x2settings.paddingY = 1;
         //x2settings.filterMag = Texture.TextureFilter.Linear;
         //x2settings.filterMin = Texture.TextureFilter.MipMapLinearLinear;
 

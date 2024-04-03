@@ -1154,8 +1154,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
 
-        StringComobBoxBean[] themes = new StringComobBoxBean[]{new StringComobBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
-                new StringComobBoxBean(I18n.msg("gui.theme.darkblue"), "dark-blue"), new StringComobBoxBean(I18n.msg("gui.theme.darkorange"), "dark-orange"),
+        StringComobBoxBean[] themes = new StringComobBoxBean[]{
+                new StringComobBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
+                new StringComobBoxBean(I18n.msg("gui.theme.darkblue"), "dark-blue"),
+                new StringComobBoxBean(I18n.msg("gui.theme.darkorange"), "dark-orange"),
                 new StringComobBoxBean(I18n.msg("gui.theme.nightred"), "night-red")};
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(selectWidth);
