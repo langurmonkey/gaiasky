@@ -15,6 +15,7 @@
 
 ## Libraries and code
 
+-  [LWJGL](https://lwjgl.org)
 -  [Libgdx](https://libgdx.badlogicgames.com).
 -  [libgdx-contribs-postprocessing](https://github.com/manuelbua/libgdx-contribs/tree/master/postprocessing).
 -  [gdx-gltf](https://github.com/mgsx-dev/gdx-gltf).
@@ -22,9 +23,15 @@
 -  [VSOP87 code generator tool](https://neoprogrammics.com/vsop87/source_code_generator_tool/) for the base VSOP87 Java code.
 -  Mark Taylor's [STIL](http://www.star.bristol.ac.uk/~mbt/stil/) and [jsamp](http://www.star.bristol.ac.uk/~mbt/jsamp/), available under (at least) the Academic Free License and the BSD License.
 -  Sergei Klioner and Robin Geyer (TU Dresden) for the idea and octave implementation of the gravitational waves effect.
+-  Mikko Tommila for [Apfloat](https://github.com/mtommila/apfloat).
 -  [Py4J](https://www.py4j.org).
 -  [set111](https://www.shadertoy.com/view/tsBXW3) for the original black hole shader code, licensed by default under [CC-BY-NC-SA](https://www.shadertoy.com/view/tsBXW3).
--  [MCXR](https://github.com/mcxr-org) for some OpenXR abstraction code on top of LWGJL3.
+-  Cedric Beust for [JCommander](https://jcommander.org).
+-  [Joise](https://joise.sudoplaygames.com/).
+-  [JTar](https://github.com/kamranzafar/jtar).
+-  [OSHI](https://oshi.ooo).
+-  [Apache Commons IO](https://commons.apache.org/proper/commons-io).
+-  [MCXR](https://github.com/mcxr-org), used as inspiration for the OpenXR abstraction layer on top of LWJGL 3.
 - Wolfgang Löffler for the base implementation of the ephemeris based on Chebyshev polynomials.
 
 

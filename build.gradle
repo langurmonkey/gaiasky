@@ -20,7 +20,6 @@ allprojects {
         slf4jVersion = "2.0.+"
         sparkjavaVersion = "2.9.+"
         jafamaVersion = "2.3.+"
-        compressVersion = "1.26.+"
         commonsioVersion = "2.+"
         py4jVersion = "0.10.9.+"
         oshiVersion = "6.4.+"
