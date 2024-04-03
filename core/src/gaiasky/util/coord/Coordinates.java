@@ -499,6 +499,9 @@ public class Coordinates {
          * delta = math.copysign(math.pi / 2, z) else: delta = math.atan(z /
          * math.sqrt(xsq + ysq))
          */
+        if (vec == null || out == null) {
+            return null;
+        }
 
         double x = vec.x.doubleValue();
         double y = vec.y.doubleValue();
