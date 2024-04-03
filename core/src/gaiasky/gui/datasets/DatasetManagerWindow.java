@@ -44,18 +44,13 @@ import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
 import gaiasky.util.scene2d.*;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.kamranzafar.jtar.TarEntry;
+import org.kamranzafar.jtar.TarInputStream;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.FileAlreadyExistsException;
@@ -68,6 +63,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 
 /**
  * The dataset manager. Download, enable, disable and remove datasets.
@@ -1130,11 +1126,11 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private void decompress(String in, File out, DatasetDesc dataset) throws Exception {
         FileInfoInputStream fIs = new FileInfoInputStream(in);
-        GzipCompressorInputStream gzIs = new GzipCompressorInputStream(fIs);
-        TarArchiveInputStream tarIs = new TarArchiveInputStream(gzIs);
+        GZIPInputStream gzIs = new GZIPInputStream(fIs);
+        TarInputStream tarIs = new TarInputStream(gzIs);
         double sizeKb = fileSize(in) / 1000d;
         String sizeKbStr = nf.format(sizeKb);
-        TarArchiveEntry entry;
+        TarEntry entry;
         long last = 0;
         boolean error = false;
         Exception errorException = null;
@@ -1151,9 +1147,16 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
 
-            try {
+            try (FileOutputStream fos = new FileOutputStream(curFile); BufferedOutputStream dest = new BufferedOutputStream(fos)) {
                 processedFiles.add(curFile);
-                IOUtils.copy(tarIs, new FileOutputStream(curFile));
+
+                int count;
+                byte[] data = new byte[2048];
+
+                while((count = tarIs.read(data)) != -1) {
+                    dest.write(data, 0, count);
+                }
+
             } catch (IOException e) {
                 errorException = e;
                 error = true;
