@@ -61,6 +61,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.Camcorder;
+import gaiasky.util.coord.vsop87.VSOP87Binary;
+import gaiasky.util.coord.vsop87.VSOP87Loader;
 import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.gdx.TextureArrayLoader;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -513,6 +515,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(IntModel.class, ".glb", new GLBWrapperLoader(dataResolver));
         assetManager.setLoader(GaiaSkyAssets.class, new GaiaSkyLoader(internalResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
+        assetManager.setLoader(VSOP87Binary.class, new VSOP87Loader(dataResolver));
 
         // Init global resources -- Can't be postponed!
         this.globalResources = new GlobalResources(assetManager);

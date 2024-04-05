@@ -529,8 +529,8 @@ public class KeyBindings {
             overwriteMappingsFile(defaultMappings, customMappings, false);
         } else {
             // Check versions.
-            var customVersionStr = readFirstLine(customMappings);
-            var defaultVersionStr = readFirstLine(defaultMappings);
+            var customVersionStr = TextUtils.readFirstLine(customMappings);
+            var defaultVersionStr = TextUtils.readFirstLine(defaultMappings);
             if (customVersionStr.isEmpty() || !customVersionStr.get().startsWith("#v")) {
                 // We have no version in local file, overwrite.
                 overwriteMappingsFile(defaultMappings, customMappings, true);
@@ -579,8 +579,8 @@ public class KeyBindings {
      * @param backup Whether to create a backup of dst if it exists.
      */
     private void overwriteMappingsFile(Path src, Path dst, boolean backup) {
-        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : "Source file does not exist or not readable.";
-        assert dst != null : "Destination file can't be null.";
+        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : I18n.msg("error.file.exists.readable", src != null ? src.getFileName().toString() : "null");
+        assert dst != null : I18n.msg("notif.null.not", "dest");
         if (backup && dst.toFile().exists() && dst.toFile().canRead()) {
             Date date = Calendar.getInstance().getTime();
             DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-hhmmss");
@@ -591,7 +591,7 @@ public class KeyBindings {
             // Copy.
             try {
                 Files.copy(dst, backupFile, StandardCopyOption.REPLACE_EXISTING);
-                logger.info("Local mappings file backed up as " + backupFile);
+                logger.info(I18n.msg("notif.file.backup", backupFile));
             } catch (IOException e) {
                 logger.error(e);
             }
@@ -599,26 +599,14 @@ public class KeyBindings {
         // Actually copy file.
         try {
             Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
-            logger.info("Default keyboard mappings file copied to " + dst);
+            logger.info(I18n.msg("notif.file.update", dst.toString()));
+            if (backup) {
+                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.file.overriden.backup", dst.toString()), -1f);
+            } else {
+                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.file.overriden", dst.toString()), -1f);
+            }
         } catch (IOException e) {
             logger.error(e);
-        }
-    }
-
-    /**
-     * Reads the first line of a file.
-     *
-     * @param file The path pointing to the file to read.
-     * @return The first line as a string.
-     */
-    private Optional<String> readFirstLine(Path file) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file.toFile()));
-            String line = reader.readLine();
-            reader.close();
-            return Optional.of(line);
-        } catch (Exception e) {
-            return Optional.empty();
         }
     }
 

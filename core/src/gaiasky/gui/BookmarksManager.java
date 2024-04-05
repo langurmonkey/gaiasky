@@ -13,6 +13,7 @@ import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
+import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -20,6 +21,8 @@ import gaiasky.util.parse.Parser;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
@@ -29,6 +32,7 @@ public class BookmarksManager implements IObserver {
     private Path bookmarksFile;
     private List<BookmarkNode> bookmarks;
     private Map<Path, BookmarkNode> nodes;
+    private int version;
 
     public BookmarksManager() {
         initDefault();
@@ -42,19 +46,88 @@ public class BookmarksManager implements IObserver {
         Path defaultBookmarks = Paths.get(Settings.ASSETS_LOC, SysUtils.getBookmarksDirName(), bookmarksFileName);
         bookmarksFile = customBookmarks;
         if (!Files.exists(customBookmarks)) {
-            try {
-                Files.copy(defaultBookmarks, customBookmarks, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                logger.error(e);
+            // Bookmarks file does not exist, just copy it.
+            overwriteBookmarksFile(defaultBookmarks, customBookmarks, false);
+        } else {
+            // Update, maybe.
+            var customVersion = getFileVersion(customBookmarks);
+            var defaultVersion = getFileVersion(defaultBookmarks);
+            if (defaultVersion > customVersion) {
+                overwriteBookmarksFile(defaultBookmarks, customBookmarks, true);
             }
         }
         logger.info(I18n.msg("gui.bookmark.file.use", bookmarksFile));
 
         bookmarks = loadBookmarks(bookmarksFile);
+        version = getFileVersion(bookmarksFile);
         if (bookmarks != null) {
             logger.info(I18n.msg("gui.bookmark.loaded", bookmarks.size()));
         }
 
+    }
+
+    /**
+     * Copies the file src to the file to, optionally making a backup.
+     *
+     * @param src    The source file.
+     * @param dst    The destination file.
+     * @param backup Whether to create a backup of dst if it exists.
+     */
+    private void overwriteBookmarksFile(Path src, Path dst, boolean backup) {
+        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : I18n.msg("error.file.exists.readable", src != null ? src.getFileName().toString() : "null");
+        assert dst != null : I18n.msg("notif.null.not", "dest");
+        if (backup && dst.toFile().exists() && dst.toFile().canRead()) {
+            Date date = Calendar.getInstance().getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-hhmmss");
+            String strDate = dateFormat.format(date);
+
+            var backupName = dst.getFileName().toString() + "." + strDate;
+            Path backupFile = dst.getParent().resolve(backupName);
+            // Copy.
+            try {
+                Files.copy(dst, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                logger.info(I18n.msg("notif.file.backup", backupFile));
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+        // Actually copy file.
+        try {
+            Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+            logger.info(I18n.msg("notif.file.update", dst.toString()));
+            if (backup) {
+                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.file.overriden.backup", dst.toString()), -1f);
+            } else {
+                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.file.overriden", dst.toString()), -1f);
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
+
+    /**
+     * Gets the version from the given bookmarks file by reading the first line.
+     *
+     * @param path The path to the file.
+     * @return The version, or -1 if it does not exist.
+     */
+    private int getFileVersion(Path path) {
+        var l = TextUtils.readFirstLine(path);
+        if (l.isPresent()) {
+            var firstLine = l.get().strip();
+            if (!firstLine.isBlank()) {
+                if (firstLine.startsWith("#v")) {
+                    int version = Parser.parseIntException(firstLine.substring(2));
+                    return version;
+                } else {
+                    logger.warn(I18n.msg("error.file.version", path));
+                }
+            } else {
+                logger.warn(I18n.msg("error.file.version", path));
+            }
+        }
+        return -1;
     }
 
     /**
@@ -131,30 +204,32 @@ public class BookmarksManager implements IObserver {
 
     private synchronized void persistBookmarks(Path file) {
         if (bookmarks != null) {
-            String content = "# Bookmarks file for Gaia Sky, one bookmark per line, folder separator: '/', comments: '#'";
-            content += buildContent(bookmarks);
+            StringBuilder content = new StringBuilder();
+            if(version >= 0) {
+                content.append(String.format("#v%04d\n", version));
+            }
+            content.append("# Bookmarks file for Gaia Sky, one bookmark per line, folder separator: '/', comments: '#'");
+            buildContent(content, bookmarks);
 
             try {
                 Files.delete(file);
-                Files.write(file, content.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                Files.write(file, content.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             } catch (IOException e) {
                 logger.error(e);
             }
         }
     }
 
-    private String buildContent(List<BookmarkNode> bookmarks) {
-        StringBuilder contentBuilder = new StringBuilder();
+    private void buildContent(StringBuilder content, List<BookmarkNode> bookmarks) {
         for (BookmarkNode b : bookmarks) {
             if (b.children == null || b.children.isEmpty()) {
                 // Write
-                contentBuilder.append("\n").append(b.path.toString());
+                content.append("\n").append(b.path.toString());
             } else {
                 // Down one level
-                contentBuilder.append(buildContent(b.children));
+                buildContent(content, b.children);
             }
         }
-        return contentBuilder.toString();
     }
 
     /**
@@ -378,9 +453,9 @@ public class BookmarksManager implements IObserver {
          * <code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name}</code>
          */
         public static final String POS_BOOKMARK_REGEX = "\\{" + VEC3_REGEX +
-                                                        "\\|" + VEC3_REGEX +
-                                                        "\\|" + VEC3_REGEX +
-                                                        "\\|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z\\|[^|,\\\\]+}";
+                "\\|" + VEC3_REGEX +
+                "\\|" + VEC3_REGEX +
+                "\\|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z\\|[^|,\\\\]+}";
 
         /**
          * <p>The text of the bookmark in the bookmarks.txt file.

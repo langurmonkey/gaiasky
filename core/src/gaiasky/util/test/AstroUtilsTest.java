@@ -11,19 +11,31 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3d;
 
+import java.time.Instant;
+
 public class AstroUtilsTest {
+
+    public static void check(Instant i, double resultJd, double expectedJd) {
+        System.out.println(i + ": " + resultJd);
+        if(Math.abs(resultJd - expectedJd) > 0.00001) {
+            System.err.println(i + " - Error: " + resultJd + " != " + expectedJd);
+        }
+    }
+
+    public static void julianDate(String dateUTC, double expected) {
+        var instant = Instant.parse(dateUTC);
+        double jd = AstroUtils.getJulianDate(instant);
+        check(instant, jd, expected);
+    }
+
     public static void main(String[] args) {
         MathManager.initialize(true);
-        Vector3d coord = new Vector3d();
-        AstroUtils.moonEclipticCoordinates(2448724.5, coord);
 
-        System.out.println("lambda[deg] : " + Math.toDegrees(coord.x));
-        System.out.println("beta[deg]   : " + Math.toDegrees(coord.y));
-        System.out.println("dist[km]    : " + coord.z);
+        julianDate("1099-12-19T12:00:00.000Z", 2122820.0);
+        julianDate("1993-01-01T00:00:00.00Z", 2448988.5);
+        julianDate("2000-01-01T00:00:00.00Z", 2451544.5);
+        julianDate("2010-01-01T00:00:00.00Z", 2455197.5);
+        julianDate("2013-01-01T00:30:00.00Z", 2456293.520833);
 
-        System.out.println("J2010: " + AstroUtils.JD_J2010);
-
-        double jd = AstroUtils.getJulianDate(2000, 1, 1, 12, 0, 0, 0, true);
-        System.out.println("2000-01-01.5 JD: " + jd);
     }
 }

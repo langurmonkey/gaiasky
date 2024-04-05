@@ -563,7 +563,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     // Apparent magnitude (earth)
                     appMagEarthLabel.setText(I18n.msg("gui.focusinfo.appmag.earth"));
                     float appMag = view.getAppmag();
-                    focusAppMagEarth.setText(nf.format(appMag));
+                    var appMagStr = Float.isFinite(appMag) ? nf.format(appMag) : "-";
+                    focusAppMagEarth.setText(appMagStr);
 
                     // Apparent magnitude (camera)
                     appMagCameraLabel.setText(I18n.msg("gui.focusinfo.appmag.camera"));

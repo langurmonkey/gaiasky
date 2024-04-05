@@ -66,7 +66,8 @@ public class DateDialog extends GenericDialog {
             }
             return false;
         });
-        setNow.setSize(388f, 28f);
+        setNow.setSize(388f, 32f);
+        setNow.pad(8f);
         content.add(setNow).center().colspan(2).padTop(pad).padBottom(pad * 3f);
         content.row();
 

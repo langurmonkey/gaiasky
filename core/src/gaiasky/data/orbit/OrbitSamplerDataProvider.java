@@ -73,7 +73,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             for (int i = 0; i < bodies.length; i++) {
                 String b = bodies[i];
                 double period = periods[i];
-                OrbitDataLoaderParameters param = new OrbitDataLoaderParameters(me.getClass(), b, now, true, period, 500);
+                OrbitDataLoaderParameters param = new OrbitDataLoaderParameters(me.getClass(), b, now, period, 500);
                 me.load(null, param);
 
             }
@@ -122,23 +122,11 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             d = Instant.ofEpochMilli(parameter.ini.getTime());
         }
 
+
+        var coordinates = Mapper.coordinates.get(parameter.entity);
         // Load orbit data
         for (int i = 0; i <= numSamples; i++) {
-            AstroUtils.getEclipticCoordinates(bodyDesc, d, ecl, Settings.settings.data.highAccuracy);
-            double eclX = ecl.x.doubleValue();
-
-            if (last == 0) {
-                last = Math.toDegrees(eclX);
-            }
-
-            accum += Math.toDegrees(eclX) - last;
-            last = Math.toDegrees(eclX);
-
-            if (accum > 360) {
-                break;
-            }
-
-            Coordinates.sphericalToCartesian(ecl, ecl);
+            coordinates.coordinates.getEclipticCartesianCoordinates(d, ecl);
             ecl.mul(Coordinates.eclToEq()).scl(1);
             data.x.add(ecl.x.doubleValue());
             data.y.add(ecl.y.doubleValue());

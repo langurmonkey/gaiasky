@@ -28,8 +28,10 @@ public class EventManager implements IObserver {
 
     /** Singleton pattern **/
     public static final EventManager instance = new EventManager();
-    /** Holds a priority queue for each time frame **/
-    private final Map<TimeFrame, PriorityQueue<Telegram>> queues;
+    /** Queue of delayed messages (one per time frame). **/
+    private final Map<TimeFrame, PriorityQueue<Telegram>> delayedQueue;
+    /** Queue of messages waiting for a consumer. */
+    private final List<Telegram> waitingList;
     /** Telegram pool **/
     private final Pool<Telegram> pool;
     /** Subscriptions Event-Observers **/
@@ -44,12 +46,13 @@ public class EventManager implements IObserver {
             }
         };
         // Initialize queues, one for each time frame.
-        queues = new HashMap<>(TimeFrame.values().length);
+        delayedQueue = new HashMap<>(TimeFrame.values().length);
         for (TimeFrame tf : TimeFrame.values()) {
             PriorityQueue<Telegram> pq = new PriorityQueue<>();
-            queues.put(tf, pq);
+            delayedQueue.put(tf, pq);
         }
         defaultTimeFrame = TimeFrame.REAL_TIME;
+        waitingList = Collections.synchronizedList(new ArrayList<>());
         subscribe(this, Event.EVENT_TIME_FRAME_CMD);
     }
 
@@ -78,6 +81,18 @@ public class EventManager implements IObserver {
      */
     public static void publishDelayed(Event event, Object source, long delayMs, Object... data) {
         instance.postDelayed(event, source, delayMs, data);
+    }
+
+    /**
+     * Register a new event with the given source and with the given data. The message is automatically
+     * dispatched if at least one consumer is present. Otherwise, it waits until a consumer is available.
+     *
+     * @param event  The event.
+     * @param source The source object, if any.
+     * @param data   The event data.
+     */
+    public static void publishWaitUntilConsumer(final Event event, Object source, final Object... data) {
+       instance.postWaitUntilConsumer(event, source, data);
     }
 
     /**
@@ -202,6 +217,33 @@ public class EventManager implements IObserver {
     }
 
     /**
+     * Register a new event with the given source and with the given data. The message is automatically
+     * dispatched if at least one consumer is present. Otherwise, it waits until a consumer is available.
+     *
+     * @param event  The event.
+     * @param source The source object, if any.
+     * @param data   The event data.
+     */
+    public void postWaitUntilConsumer(final Event event, Object source, final Object... data) {
+        Set<IObserver> observers = subscriptions.get(event.ordinal());
+        if (observers == null || observers.isEmpty()) {
+            // Add to consumers queue.
+            Telegram t = pool.obtain();
+            t.event = event;
+            t.source = source;
+            t.data = data;
+            t.timestamp = defaultTimeFrame.getCurrentTimeMs();
+            waitingList.add(t);
+        } else {
+            // Dispatch.
+            for (IObserver observer : observers) {
+                observer.notify(event, source, data);
+            }
+        }
+    }
+
+
+    /**
      * Register a new delayed event with the given type, data, delay and the default
      * time frame. The default time frame can be changed using the event
      * {@link Event#EVENT_TIME_FRAME_CMD}. The event will be passed along after
@@ -239,7 +281,7 @@ public class EventManager implements IObserver {
             t.timestamp = frame.getCurrentTimeMs() + delayMs;
 
             // Add to queue
-            queues.get(frame).add(t);
+            delayedQueue.get(frame).add(t);
         }
     }
 
@@ -250,8 +292,24 @@ public class EventManager implements IObserver {
      * This method must be called each time through the main loop.
      */
     public void dispatchDelayedMessages() {
-        for (TimeFrame tf : queues.keySet()) {
-            dispatch(queues.get(tf), tf.getCurrentTimeMs());
+        // Dispatch delayed messages.
+        for (TimeFrame tf : delayedQueue.keySet()) {
+            dispatch(delayedQueue.get(tf), tf.getCurrentTimeMs());
+        }
+
+        // Dispatch waiting messages.
+        if (!waitingList.isEmpty()) {
+            var it = waitingList.iterator();
+            while (it.hasNext()) {
+                var t = it.next();
+                var observers = subscriptions.get(t.event.ordinal());
+                if (observers != null && !observers.isEmpty()) {
+                    for (IObserver observer : observers) {
+                        observer.notify(t.event, t.source, t.data);
+                    }
+                    it.remove();
+                }
+            }
         }
     }
 

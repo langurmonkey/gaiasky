@@ -12,44 +12,6 @@ import gaiasky.util.math.Vector3b;
 import java.time.Instant;
 
 public interface iVSOP87 {
-
-    double L0(double t);
-
-    double L1(double t);
-
-    double L2(double t);
-
-    double L3(double t);
-
-    double L4(double t);
-
-    double L5(double t);
-
-    double B0(double t);
-
-    double B1(double t);
-
-    double B2(double t);
-
-    double B3(double t);
-
-    double B4(double t);
-
-    double B5(double t);
-
-    double R0(double t);
-
-    double R1(double t);
-
-    double R2(double t);
-
-    double R3(double t);
-
-    double R4(double t);
-
-    double R5(double t);
-
-    void setHighAccuracy(boolean highAccuracy);
-
     Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out);
+    Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out);
 }

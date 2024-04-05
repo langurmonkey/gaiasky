@@ -13,8 +13,12 @@ import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.util.i18n.I18n;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -979,6 +983,22 @@ public class TextUtils {
         h ^= h >>> 15;
 
         return h;
+    }
+
+    /**
+     * Reads the first line of a file.
+     *
+     * @param file The path pointing to the file to read.
+     * @return The first line as a string.
+     */
+    public static Optional<String> readFirstLine(Path file) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))) {
+            String line = reader.readLine();
+            reader.close();
+            return Optional.of(line);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
 }

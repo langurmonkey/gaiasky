@@ -55,7 +55,6 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
     static public class OrbitDataLoaderParameters extends AssetLoaderParameters<PointCloudData> {
 
         public Date ini;
-        public boolean forward;
         public double orbitalPeriod;
         public double multiplier;
         public int numSamples;
@@ -90,25 +89,20 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
             this.numSamples = numSamples;
         }
 
-        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod, int numSamples) {
+        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, double orbitalPeriod, int numSamples) {
             this(providerClass);
             this.name = name;
             this.ini = ini;
-            this.forward = forward;
             this.orbitalPeriod = orbitalPeriod;
             this.numSamples = numSamples;
         }
 
-        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod) {
-            this(providerClass, name, ini, forward, orbitalPeriod, -1);
+        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, double orbitalPeriod) {
+            this(providerClass, name, ini, orbitalPeriod, -1);
         }
 
         public void setIni(Date date) {
             this.ini = date;
-        }
-
-        public void setForward(boolean fwd) {
-            this.forward = fwd;
         }
 
         public void setOrbitalPeriod(double period) {
