@@ -56,6 +56,10 @@ public class GuiRegistry implements IObserver {
      **/
     private final Array<IGui> guis;
     /**
+     * GUIs not affected by the clean mode.
+     */
+    private final Array<IGui> specialGuis;
+    /**
      * Render lock object.
      */
     private final Object renderLock = new Object();
@@ -115,6 +119,7 @@ public class GuiRegistry implements IObserver {
         this.skin = skin;
         this.scene = scene;
         this.guis = new Array<>(true, 2);
+        this.specialGuis = new Array<>(true, 1);
         this.catalogManager = catalogManager;
         this.view = new FocusView();
         // Windows which are visible from any GUI.
@@ -125,10 +130,6 @@ public class GuiRegistry implements IObserver {
                 Event.SHOW_RESTART_ACTION,
                 Event.CLOSE_ALL_GUI_WINDOWS_CMD, Event.SHOW_DATE_TIME_EDIT_ACTION,
                 Event.SHOW_ADD_POSITION_BOOKMARK);
-    }
-
-    public InputMultiplexer getInputMultiplexer() {
-        return this.inputMultiplexer;
     }
 
     public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
@@ -215,6 +216,12 @@ public class GuiRegistry implements IObserver {
         }
     }
 
+    public void registerSpecialGui(IGui gui) {
+        if (!specialGuis.contains(gui, true)) {
+            specialGuis.add(gui);
+        }
+    }
+
     /**
      * Unregisters a GUI.
      *
@@ -222,6 +229,10 @@ public class GuiRegistry implements IObserver {
      */
     public void unregisterGui(IGui gui) {
         guis.removeValue(gui, true);
+    }
+
+    public void unregisterSpecialGui(IGui gui) {
+        specialGuis.removeValue(gui, true);
     }
 
     /**
@@ -246,7 +257,16 @@ public class GuiRegistry implements IObserver {
                     try {
                         guis.get(i).render(rw, rh);
                     } catch (Exception ignored) {
-
+                    }
+                }
+            }
+        } else if (Settings.settings.program.displayTimeNoUi) {
+            synchronized (renderLock) {
+                for (int i = 0; i < specialGuis.size; i++) {
+                    specialGuis.get(i).getGuiStage().getViewport().apply();
+                    try {
+                        specialGuis.get(i).render(rw, rh);
+                    } catch (Exception ignored) {
                     }
                 }
             }
@@ -275,8 +295,15 @@ public class GuiRegistry implements IObserver {
      * @param dt The delta time in seconds.
      */
     public void update(double dt) {
-        for (IGui gui : guis)
+        for (IGui gui : guis) {
             gui.update(dt);
+        }
+        // Only update special when needed.
+        if (!Settings.settings.runtime.displayGui && Settings.settings.program.displayTimeNoUi) {
+            for (IGui gui : specialGuis) {
+                gui.update(dt);
+            }
+        }
     }
 
     public void publishReleaseNotes() {

@@ -76,6 +76,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox invertY;
     private OwnCheckBox highAccuracyPositions;
     private OwnCheckBox shadowsCb;
+    private OwnCheckBox displayTimeNoUi;
     private OwnCheckBox pointerCoords;
     private OwnCheckBox modeChangeInfo;
     private OwnCheckBox debugInfo;
@@ -1211,6 +1212,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         distUnitsSelect.setWidth(selectWidth);
         distUnitsSelect.setSelectedIndex(settings.program.ui.distanceUnits.ordinal());
 
+        // DISPLAY TIME in NO-UI MODE
+        OwnLabel displayTimeNoUiLabel = new OwnLabel(I18n.msg("gui.ui.nogui.time"), skin);
+        displayTimeNoUi = new OwnCheckBox("", skin);
+        displayTimeNoUi.setChecked(settings.program.displayTimeNoUi);
+
         // MODE CHANGE POP-UP CHECKBOX
         OwnLabel modeChangeInfoLabel = new OwnLabel(I18n.msg("gui.ui.modechangeinfo"), skin);
         modeChangeInfo = new OwnCheckBox("", skin);
@@ -1243,6 +1249,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ui.add(minimapSize).colspan(2).left().padRight(pad10).padBottom(pad18).row();
         ui.add(distUnitsLabel).left().padRight(pad10).padBottom(pad18);
         ui.add(distUnitsSelect).colspan(2).left().padRight(pad10).padBottom(pad18).row();
+        ui.add(displayTimeNoUiLabel).left().padRight(pad10).padBottom(pad18);
+        ui.add(displayTimeNoUi).colspan(2).left().padRight(pad10).padBottom(pad18).row();
         ui.add(modeChangeInfoLabel).left().padRight(pad10).padBottom(pad18);
         ui.add(modeChangeInfo).colspan(2).left().padRight(pad10).padBottom(pad18).row();
         ui.add(newUILabel).left().padRight(pad10).padBottom(pad18);
@@ -2722,6 +2730,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Distance units
         settings.program.ui.distanceUnits = DistanceUnits.values()[distUnitsSelect.getSelectedIndex()];
+
+        // Display time in no-UI mode
+        settings.program.displayTimeNoUi = displayTimeNoUi.isChecked();
 
         // Mode change info
         settings.program.ui.modeChangeInfo = modeChangeInfo.isChecked();

@@ -163,7 +163,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     /**
      * The user interfaces.
      */
-    public IGui welcomeGui, loadingGui, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui, mainVRGui;
+    public IGui welcomeGui, loadingGui, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui, mainVRGui, timeGui;
     public StandaloneVRGui<?> welcomeGuiVR, loadingGuiVR;
 
     /**
@@ -1013,12 +1013,17 @@ public class GaiaSky implements ApplicationListener, IObserver {
         gamepadGui = new GamepadGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
         gamepadGui.initialize(assetManager, globalResources.getSpriteBatch());
 
+        // This one is special! Not affected by clean mode.
+        timeGui = new TimeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        timeGui.initialize(assetManager, globalResources.getSpriteBatch());
+
         if (guis != null) {
             guis.add(mainGui);
             guis.add(debugGui);
             guis.add(spacecraftGui);
             guis.add(stereoGui);
             guis.add(gamepadGui);
+            guis.add(timeGui);
         }
     }
 
@@ -1055,6 +1060,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         guiRegistry.registerGui(gamepadGui);
         guiRegistry.addProcessor(gamepadGui);
+
+        guiRegistry.registerSpecialGui(timeGui);
 
     }
 
@@ -1754,14 +1761,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     public boolean isVR() {
         return cliArgs.vr;
-    }
-
-    public float getEffectiveFovFactor() {
-        if (sceneRenderer.isCubemapRenderMode()) {
-            return 90f / 40f;
-        } else {
-            return cameraManager.getFovFactor();
-        }
     }
 
 

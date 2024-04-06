@@ -2218,6 +2218,8 @@ public class Settings extends SettingsObject {
         public boolean offlineMode;
         public boolean shaderCache = false;
         public boolean saveProceduralTextures = false;
+        /** Show time in no-GUI mode. **/
+        public boolean displayTimeNoUi = true;
         public MinimapSettings minimap;
         public FileChooserSettings fileChooser;
         public PointerSettings pointer;
@@ -4179,10 +4181,6 @@ public class Settings extends SettingsObject {
         public long maxTimeMs = 5000000L * (long) Nature.Y_TO_MS;
         // Min clock time, -5 Myr by default
         public long minTimeMs = -maxTimeMs;
-        /**
-         * Toggles the record camera
-         */
-        private double backupLimitFps = 0;
 
         public void setMaxTime(long years) {
             maxTimeMs = years * (long) Nature.Y_TO_MS;

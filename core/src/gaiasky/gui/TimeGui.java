@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2024 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
@@ -16,11 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class DebugGui extends AbstractGui {
-    protected DebugInterface debugInterface;
-    private Container<Actor> di;
+public class TimeGui extends AbstractGui {
+    private TimeGuiInterface time;
+    private Container<Actor> t;
 
-    public DebugGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public TimeGui(Skin skin, Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }
@@ -34,15 +34,15 @@ public class DebugGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        float pad = 16f;
+        float pad = 26f;
 
-        // DEBUG INFO - TOP RIGHT
-        debugInterface = new DebugInterface(skin, lock);
-        debugInterface.right().top();
-        di = new Container<>(debugInterface);
-        di.setFillParent(true);
-        di.right().top();
-        di.pad(pad, 0, 0, pad);
+        // Time - BOTTOM RIGHT
+        time = new TimeGuiInterface(skin);
+        time.right().bottom();
+        t = new Container<>(time);
+        t.setFillParent(true);
+        t.right().bottom();
+        t.pad(0, 0, pad, pad);
 
         rebuildGui();
     }
@@ -51,8 +51,8 @@ public class DebugGui extends AbstractGui {
     protected void rebuildGui() {
         if (stage != null) {
             stage.clear();
-            if (debugInterface != null && di != null)
-                stage.addActor(di);
+            if (time != null && t != null)
+                stage.addActor(t);
         }
     }
 
@@ -60,5 +60,4 @@ public class DebugGui extends AbstractGui {
     public boolean cancelTouchFocus() {
         return false;
     }
-
 }
