@@ -43,6 +43,7 @@ import gaiasky.util.math.InterpolationDouble;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.LengthValidator;
@@ -920,7 +921,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         secondsInput.addListener((evt) -> {
                             if (secondsInput.isValid() && evt instanceof InputEvent ie2 && System.currentTimeMillis() - lastMs > 1500) {
                                 if (ie2.getType() == InputEvent.Type.keyDown && (ie2.getKeyCode() == Input.Keys.ENTER || ie2.getKeyCode() == Input.Keys.ESCAPE)) {
-                                    double val = Double.parseDouble(secondsInput.getText());
+                                    double val = Parser.parseDouble(secondsInput.getText());
                                     double t = 0;
                                     for (Keyframe k : manager.keyframes) {
                                         if (k == kf)
