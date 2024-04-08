@@ -231,6 +231,7 @@ public class Scene {
             addInitializer(new BillboardSetInitializer(setUp, families.billboardSets, priority++));
             addInitializer(new AxesInitializer(setUp, families.axes, priority++));
             addInitializer(new RaymarchingInitializer(setUp, families.raymarchings, priority++));
+            addInitializer(new InvisibleInitializer(setUp, families.invisibles, priority++));
             addInitializer(new BackgroundModelInitializer(setUp, families.backgroundModels, priority++));
             addInitializer(new ClusterInitializer(setUp, families.clusters, priority++));
             addInitializer(new ConstellationInitializer(this, setUp, families.constellations, priority++));
@@ -360,6 +361,7 @@ public class Scene {
             addExtractor(newExtractor(LocExtractor.class, families.locations, priority++, sceneRenderer));
             addExtractor(newExtractor(PerimeterExtractor.class, families.perimeters, priority++, sceneRenderer));
             addExtractor(newExtractor(RaymarchingExtractor.class, families.raymarchings, priority, sceneRenderer));
+            addExtractor(newExtractor(InvisibleExtractor.class, families.invisibles, priority, sceneRenderer));
 
             // Remove all remaining systems.
             engine.removeAllSystems();
