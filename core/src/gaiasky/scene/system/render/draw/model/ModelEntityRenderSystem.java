@@ -31,7 +31,6 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.util.Objects;
 

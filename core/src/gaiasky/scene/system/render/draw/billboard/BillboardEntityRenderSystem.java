@@ -244,7 +244,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         var celestial = view.celestial;
 
         /*
-         *  REGULAR STARS, PLANETS, SATELLITES, BILLBOARDS and SSOs
+         *  REGULAR STARS, PLANETS, SATELLITES, NEBULAE, SSO and other BILLBOARDS.
          */
         var sa = Mapper.sa.get(entity);
         var extra = Mapper.extra.get(entity);
