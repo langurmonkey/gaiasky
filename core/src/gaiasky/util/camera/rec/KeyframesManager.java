@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class KeyframesManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesManager.class);
@@ -473,7 +474,6 @@ public class KeyframesManager implements IObserver {
                     "--fps",
                     Double.toString(Settings.settings.camrecorder.targetFps));
             builder.directory(loc.toFile());
-            var err = builder.redirectError();
 
             try {
                 var process = builder.start();
@@ -495,6 +495,17 @@ public class KeyframesManager implements IObserver {
                 } else {
                     // Error?
                     GaiaSky.popupNotification(I18n.msg("error.process.run", "exit value " + process.exitValue()), 10, this, Logger.LoggerLevel.ERROR, null);
+                    var err = process.getErrorStream();
+                    var out = process.getInputStream();
+                    String errStr = new BufferedReader(new InputStreamReader(err))
+                            .lines().collect(Collectors.joining("\n"));
+                    String outStr = new BufferedReader(new InputStreamReader(out))
+                            .lines().collect(Collectors.joining("\n"));
+
+                    logger.error("ERROR STREAM:");
+                    logger.error(errStr);
+                    logger.error("OUT STREAM:");
+                    logger.error(outStr);
                 }
 
                 process.destroy();

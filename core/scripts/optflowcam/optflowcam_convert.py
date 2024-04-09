@@ -14,6 +14,7 @@ import argparse
 import csv
 import os
 import sys
+import dateutil.parser
 
 import json
 
@@ -124,7 +125,15 @@ def convert_gaia_to_optflow(gaia_keyframes):
     for i, row in enumerate(gaia_keyframes):
         duration = float(row[0])
         t = t + duration
-        simtime = int(row[1])
+        try:
+            # Integer time (epoch millis)
+            simtime = int(row[1])
+        except:
+            # Instant string
+            d = dateutil.parser.parse(row[1])
+            simtime = d.timestamp() * 1_000
+
+
         pos = [float(p) / scale for p in row[2:5]]
         view = [float(p) / scale for p in row[5:8]]
         up = [float(p) / scale for p in row[8:11]]
