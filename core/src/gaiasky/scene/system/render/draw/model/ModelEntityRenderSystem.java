@@ -163,10 +163,12 @@ public class ModelEntityRenderSystem {
             if (scaffolding != null) {
                 alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity * base.opacity;
             } else {
-                alphaFactor = body.color[3] * base.opacity;
+                alphaFactor = base.opacity;
             }
 
-            mc.update(alpha * alphaFactor, relativistic);
+
+            float colorAlpha = Mapper.tagBillboard.has(entity) || Mapper.tagBillboardGalaxy.has(entity) ? body.color[3] : 1.0f;
+            mc.update(alpha * alphaFactor * colorAlpha, relativistic);
             model.model.setSize(body.size);
             batch.render(mc.instance, mc.env);
         }

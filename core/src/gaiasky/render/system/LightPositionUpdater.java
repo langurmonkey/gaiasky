@@ -94,8 +94,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
                 float angleEdgeDeg = camera.getAngleEdge() * MathUtils.radDeg;
                 for (int i = size - 1; i >= 0; i--) {
                     IRenderable s = renderables.get(i);
-                    if (s instanceof Render) {
-                        Render p = (Render) s;
+                    if (s instanceof Render p) {
                         var entity = p.getEntity();
 
                         if (Mapper.hip.has(entity)) {

@@ -39,6 +39,7 @@ public class LightingUtils {
                         if (pointLight != null) {
                             Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
                             if (nr.isStar() || nr.isStarGroup()) {
+                                // Only stars illuminate.
                                 float[] col = nr.getColor();
                                 double closestDist = nr.getClosestDistToCamera();
                                 // Dim light with distance.
@@ -49,8 +50,8 @@ public class LightingUtils {
                             } else {
                                 Vector3b campos = camera.getPos();
                                 pointLight.position.set(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
-                                pointLight.color.set(1f, 1f, 1f, 1f);
-                                pointLight.intensity = 1;
+                                pointLight.color.set(0f, 0f, 0f, 0f);
+                                pointLight.intensity = 0;
                             }
                         }
                     }

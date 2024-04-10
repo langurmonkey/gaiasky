@@ -262,7 +262,18 @@ public class ModelInitializer extends AbstractInitSystem {
         label.labelFactor = 0;
     }
 
-    private void initializeModel(Entity entity, Base base, Body body, Model model, Celestial celestial, Billboard bb, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus, boolean isBillboardGal) {
+    private void initializeModel(Entity entity,
+                                 Base base,
+                                 Body body,
+                                 Model model,
+                                 Celestial celestial,
+                                 Billboard bb,
+                                 SolidAngle sa,
+                                 Label label,
+                                 ModelScaffolding scaffolding,
+                                 GraphNode graph,
+                                 Focus focus,
+                                 boolean isBillboardGal) {
         // Models are tessellated if tessellation is active and their size is very large.
         model.model.tessellated = Settings.settings.scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
 
@@ -290,7 +301,7 @@ public class ModelInitializer extends AbstractInitSystem {
         sa.thresholdPoint = Math.toRadians(0.30);
         sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
         if (isBillboardGal) {
-            sa.thresholdQuad = Math.toRadians(0.9);
+            sa.thresholdQuad = Math.toRadians(0.3);
         }
 
         label.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);

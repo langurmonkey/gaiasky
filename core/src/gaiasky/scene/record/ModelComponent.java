@@ -792,6 +792,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
+    public void setBlending(String blendModeString) {
+        setBlendMode(blendModeString);
+    }
+
     public void updateVelocityBufferUniforms(ICamera camera) {
         for (Material mat : instance.materials) {
             updateVelocityBufferUniforms(mat, camera);
