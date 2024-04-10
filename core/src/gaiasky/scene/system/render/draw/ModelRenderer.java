@@ -44,7 +44,8 @@ public class ModelRenderer extends AbstractRenderSystem {
             try {
                 renderables.forEach(r -> {
                     Render render = (Render) r;
-                    renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagBillboard.has(render.entity));
+                    float colorAlpha = Mapper.body.get(render.entity).color[3];
+                    renderObject.render(render.entity, batch, camera, getAlpha(render.entity) * colorAlpha, t, rc, getRenderGroup(), !Mapper.tagBillboard.has(render.entity));
                 });
             } catch(Exception e) {
                 batch.cancel();
