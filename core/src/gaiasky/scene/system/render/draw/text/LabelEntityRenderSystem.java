@@ -197,13 +197,30 @@ public class LabelEntityRenderSystem {
         var transform = Mapper.transform.get(view.getEntity());
 
         var label = view.label;
+        var size = (float) Math.min(0.0005, dist* 2.5e-3d * camera.getFovFactor());
+        // +X
+        label.labelPosition.set(dist, 0d, 0d);
+        if (transform.matrix != null)
+            label.labelPosition.mul(transform.matrix);
+        label.labelPosition.add(v).sub(camera.getPos());
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera,
+                view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
+
+        // -X
+        label.labelPosition.set(-dist, 0d, 0d);
+        if (transform.matrix != null)
+            label.labelPosition.mul(transform.matrix);
+        label.labelPosition.add(v).sub(camera.getPos());
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera,
+                view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
+
         // +Z
         label.labelPosition.set(0d, 0d, dist);
         if (transform.matrix != null)
             label.labelPosition.mul(transform.matrix);
         label.labelPosition.add(v).sub(camera.getPos());
         render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera,
-                view.textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
+                view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
 
         // -Z
         label.labelPosition.set(0d, 0d, -dist);
@@ -211,7 +228,7 @@ public class LabelEntityRenderSystem {
             label.labelPosition.mul(transform.matrix);
         label.labelPosition.add(v).sub(camera.getPos());
         render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera,
-                view.textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
+                view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
     }
 
     public void renderMesh(LabelView view,

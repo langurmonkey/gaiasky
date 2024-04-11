@@ -135,9 +135,9 @@ public class RenderAssets {
         manager.load("per-vertex-diffuse", RelativisticShaderProvider.class,
                 new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.diffuse.fragment.glsl"));
         manager.load("per-vertex-lighting-grid", RelativisticShaderProvider.class,
-                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.grid.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/grid.fragment.glsl"));
         manager.load("per-vertex-lighting-recgrid", RelativisticShaderProvider.class,
-                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.gridrec.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/gridrec.fragment.glsl"));
         manager.load("per-vertex-lighting-starsurface", RelativisticShaderProvider.class,
                 new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
         manager.load("per-vertex-lighting-beam", RelativisticShaderProvider.class,

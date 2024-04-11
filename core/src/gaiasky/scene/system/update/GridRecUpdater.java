@@ -62,7 +62,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         var gr = Mapper.gridRec.get(entity);
         var transform = Mapper.transform.get(entity);
 
-        body.distToCamera = getDistanceToOrigin(camera);
+        body.distToCamera = getDistanceToOrigin(camera) * camera.getFovFactor();
         fade.currentDistance = body.distToCamera;
         gr.regime = body.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
         if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {

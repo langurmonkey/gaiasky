@@ -8,7 +8,7 @@ uniform vec4 u_emissiveColor;
 uniform float u_tessQuality;
 // Subgrid fading encoded in u_heightScale
 uniform float u_heightScale;
-// fovFactor
+// line width setting
 uniform float u_ts;
 // Grid style encoded in u_elevationMultiplier: 0 - concentric rings; 1 - uniform square grid
 uniform float u_elevationMultiplier = 1.0;
@@ -37,7 +37,7 @@ layout (location = 1) out vec4 velMap;
 
 #define PI 3.141592
 #define N 10.0
-#define WIDTH 2.0
+#define BASE_LINE_WIDTH 5.0
 #define RAD PI / 180.0
 #define BASE_COL_DIAG vec4(1.0, 0.792, 0.09, 0.3)
 
@@ -50,8 +50,7 @@ vec2 rotateUV(vec2 uv, float rotation) {
                 cos(rotation) * (uv.y) - sin(rotation) * (uv.x));
 }
 
-vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col, vec4 lcol) {
-    float lw = u_ts * WIDTH;
+vec4 circle_rec(vec2 tc, float lw, float d, float f, float alpha, vec4 col, vec4 lcol) {
     float factor = (1.0 - lw);
 
     vec2 tcp = tc * d * f;
@@ -97,16 +96,16 @@ vec4 circle(vec2 tc) {
     float alpha = clamp(1.0 - pow(length(tc), 4.0), 0.0, 1.0);
 
     float fade = pow(u_heightScale, 0.5);
+    float lw = abs(dFdx(tc.x)) * BASE_LINE_WIDTH * u_ts;
 
     // Draw two levels
-    vec4 r01 = circle_rec(tc, u_tessQuality, 10.0, alpha * fade, mix(u_emissiveColor, u_diffuseColor, u_heightScale), u_diffuseColor);
-    vec4 r02 = circle_rec(tc, u_tessQuality, 1.0, alpha, u_diffuseColor, u_diffuseColor);
+    vec4 r01 = circle_rec(tc, lw, u_tessQuality, 10.0, alpha * fade, mix(u_emissiveColor, u_diffuseColor, u_heightScale), u_diffuseColor);
+    vec4 r02 = circle_rec(tc, lw, u_tessQuality, 1.0, alpha, u_diffuseColor, u_diffuseColor);
 
     return max(r01, r02);
 }
 
-vec4 square_rec(vec2 tc, float d, float f, float alpha, vec4 col, vec4 lcol) {
-    float lw = u_ts * WIDTH * 2.0;
+vec4 square_rec(vec2 tc, float lw, float d, float f, float alpha, vec4 col, vec4 lcol) {
     float factor = (1.0 - lw);
 
     tc *= f * d;
@@ -125,10 +124,11 @@ vec4 square(vec2 tc) {
     float alpha = clamp(1.0 - pow(length(tc), 4.0), 0.0, 1.0);
 
     float fade = pow(u_heightScale, 0.5);
+    float lw = abs(dFdx(tc.x)) * BASE_LINE_WIDTH * u_ts * 2.0;
 
     // Draw two levels
-    vec4 r01 = square_rec(tc, u_tessQuality, 400.0, alpha * fade, mix(u_emissiveColor, u_diffuseColor, u_heightScale), u_diffuseColor);
-    vec4 r02 = square_rec(tc, u_tessQuality, 40.0, alpha * (1.0 - fade), u_diffuseColor, u_diffuseColor);
+    vec4 r01 = square_rec(tc, lw, u_tessQuality, 400.0, alpha * fade, mix(u_emissiveColor, u_diffuseColor, u_heightScale), u_diffuseColor);
+    vec4 r02 = square_rec(tc, lw, u_tessQuality, 40.0, alpha * (1.0 - fade), u_diffuseColor, u_diffuseColor);
 
     return max(r01, r02);
 }
