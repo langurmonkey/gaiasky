@@ -13,8 +13,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import gaiasky.desktop.GaiaSkyDesktop;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
@@ -99,7 +97,7 @@ public class SettingsManager {
     }
 
     public static void initialize(FileInputStream fis,
-                                   FileInputStream vis) {
+                                  FileInputStream vis) {
         SettingsManager.instance = new SettingsManager(fis, vis);
         instance.initSettings();
     }
@@ -342,6 +340,11 @@ public class SettingsManager {
         // Grid style.
         if (settings.program.recursiveGrid.style == null) {
             settings.program.recursiveGrid.style = Settings.GridStyle.CIRCULAR;
+        }
+
+        // UV grid.
+        if (settings.program.uvGrid == null) {
+            settings.program.uvGrid = new Settings.ProgramSettings.UVGridSettings();
         }
 
         // Line settings.

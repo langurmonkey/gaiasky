@@ -2224,6 +2224,7 @@ public class Settings extends SettingsObject {
         public FileChooserSettings fileChooser;
         public PointerSettings pointer;
         public RecursiveGridSettings recursiveGrid;
+        public UVGridSettings uvGrid;
         public ModeStereoSettings modeStereo;
         public ModeCubemapSettings modeCubemap;
         public NetSettings net;
@@ -2356,6 +2357,11 @@ public class Settings extends SettingsObject {
                             recursiveGrid.animate = (boolean) data[0];
                         }
                     }
+                    case UV_GRID_FRAME_COORDINATES_CMD -> {
+                        if (data.length > 0 && data[0] != null) {
+                            uvGrid.frameCoordinates = (boolean) data[0];
+                        }
+                    }
                     case UI_SCALE_CMD -> ui.scale = (Float) data[0];
                     default -> {
                     }
@@ -2400,7 +2406,7 @@ public class Settings extends SettingsObject {
                     Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
                     Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
                     Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
-                    Event.UI_SCALE_CMD, Event.RECURSIVE_GRID_ANIMATE_CMD);
+                    Event.UI_SCALE_CMD, Event.RECURSIVE_GRID_ANIMATE_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD);
 
             minimap.setupListeners();
             fileChooser.setupListeners();
@@ -2605,6 +2611,32 @@ public class Settings extends SettingsObject {
             @Override
             public RecursiveGridSettings clone() {
                 return (RecursiveGridSettings) super.clone();
+            }
+
+            @Override
+            protected void setParentRecursive(SettingsObject s) {
+            }
+
+            @Override
+            protected void setupListeners() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+
+            @Override
+            public void apply() {
+            }
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class UVGridSettings extends SettingsObject {
+            public boolean frameCoordinates = true;
+
+            @Override
+            public UVGridSettings clone() {
+                return (UVGridSettings) super.clone();
             }
 
             @Override

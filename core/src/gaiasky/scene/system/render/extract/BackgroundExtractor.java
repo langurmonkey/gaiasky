@@ -11,6 +11,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Label;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 
 public class BackgroundExtractor extends AbstractExtractSystem {
     public BackgroundExtractor(Family family, int priority) {
@@ -31,6 +33,7 @@ public class BackgroundExtractor extends AbstractExtractSystem {
             if (Mapper.grid.has(entity)) {
                 // UV grid
                 addToRender(render, RenderGroup.MODEL_VERT_GRID);
+                LabelEntityRenderSystem.resetVerticalOffset();
                 addToRender(render, RenderGroup.FONT_LABEL);
             } else {
                 // Regular background model (skybox)

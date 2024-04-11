@@ -46,7 +46,8 @@ public class ModelEntityRenderSystem {
     }
 
     /**
-     * Renders a single entity as a model. The entity is assumed to have a {@link gaiasky.scene.component.Model} component.
+     * Renders a single entity as a model. The entity is assumed to have a {@link gaiasky.scene.component.Model}
+     * component.
      *
      * @param entity      The entity to render.
      * @param batch       The model batch to use.
@@ -164,6 +165,13 @@ public class ModelEntityRenderSystem {
                 alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity * base.opacity;
             } else {
                 alphaFactor = base.opacity;
+            }
+
+            if (Mapper.grid.has(entity)) {
+                // Line width and fov factor.
+                ICamera cam = GaiaSky.instance.getICamera();
+                mc.setFloatExtAttribute(FloatAttribute.Generic1, Settings.settings.scene.renderer.line.width);
+                mc.setFloatExtAttribute(FloatAttribute.Generic2, cam.getFovFactor());
             }
 
 
@@ -520,7 +528,7 @@ public class ModelEntityRenderSystem {
                     var graph = Mapper.graph.get(entity);
                     var rotation = Mapper.orientation.get(entity).rigidRotation;
                     atmosphere.atmosphere.updateAtmosphericScatteringParams(model.model.instance.materials.first(), alpha * atmOpacity, true, graph,
-                                                                            rotation, scaffolding, rc.vrOffset);
+                            rotation, scaffolding, rc.vrOffset);
                 } else {
                     atmosphere.atmosphere.removeAtmosphericScattering(model.model.instance.materials.first());
                 }
@@ -556,7 +564,7 @@ public class ModelEntityRenderSystem {
             var orientation = Mapper.orientation.get(entity);
             AtmosphereComponent ac = atmosphere.atmosphere;
             ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, graph, orientation.rigidRotation, scaffolding,
-                                                 rc.vrOffset);
+                    rc.vrOffset);
             ac.mc.updateRelativisticEffects(cam);
             ac.mc.updateEclipsingBodyUniforms(entity);
             batch.render(ac.mc.instance, model.model.env);

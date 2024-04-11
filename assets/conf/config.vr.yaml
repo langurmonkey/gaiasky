@@ -369,6 +369,10 @@ program:
     projectionLines: true
     # Recursive grid style [CIRCULAR|SQUARE].
     style: CIRCULAR
+  # UV grid settings
+  uvGrid:
+    # Display coordinates in the frame of the window
+    frameCoordinates: true
   # Stereoscopic mode (3D).
   modeStereo:
     # Start in 3D mode.

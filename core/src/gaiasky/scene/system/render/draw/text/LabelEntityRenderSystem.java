@@ -8,7 +8,9 @@
 package gaiasky.scene.system.render.draw.text;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Align;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.I3DTextRenderable;
@@ -35,6 +37,8 @@ import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
+
+import java.text.DecimalFormat;
 
 public class LabelEntityRenderSystem {
 
@@ -197,7 +201,7 @@ public class LabelEntityRenderSystem {
         var transform = Mapper.transform.get(view.getEntity());
 
         var label = view.label;
-        var size = (float) Math.min(0.0005, dist* 2.5e-3d * camera.getFovFactor());
+        var size = (float) Math.min(0.0005, dist * 2.5e-3d * camera.getFovFactor());
         // +X
         label.labelPosition.set(dist, 0d, 0d);
         if (transform.matrix != null)
@@ -456,7 +460,12 @@ public class LabelEntityRenderSystem {
         }
     }
 
-    private static final int divisionsU = 36;
+    private static final int divisionsUV = 36;
+    private static int verticalOffset = 0;
+
+    public static void resetVerticalOffset() {
+        verticalOffset = 0;
+    }
 
     public void renderGridAnnotations(LabelView view,
                                       ExtSpriteBatch batch,
@@ -467,8 +476,21 @@ public class LabelEntityRenderSystem {
         var entity = view.getEntity();
         var grid = Mapper.grid.get(entity);
 
+        var fovFactor = camera.getFovFactor();
+        var lod = 1.0f;
+        if (fovFactor < 0.05) {
+            lod = 16.0f;
+        } else if (fovFactor < 0.1) {
+            lod = 8.0f;
+        } else if (fovFactor < 0.5) {
+            lod = 4.0f;
+        } else if (fovFactor < 0.75) {
+            lod = 2.0f;
+        }
+
+
         // Horizon
-        final int stepAngle = Math.round(360f / divisionsU);
+        final float stepAngle = 360f / (divisionsUV * lod);
 
         // Labels at 1 parsec.
         float distToCamera = (float) (1 * Constants.PC_TO_U);
@@ -478,7 +500,8 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 0f);
 
-        for (int angle = 0; angle < 360; angle += stepAngle) {
+        // Horizon line.
+        for (float angle = 0; angle < 360; angle += stepAngle) {
             F31.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0f, distToCamera, D31).valuesf()).mul(grid.annotTransform);
             effectsPos(F31, camera);
             if (F31.dot(camera.getCamera().direction.nor()) > 0) {
@@ -488,8 +511,8 @@ public class LabelEntityRenderSystem {
             }
 
         }
-        // North-south line
-        for (int angle = -90; angle <= 90; angle += stepAngle) {
+        // North-south line.
+        for (float angle = -90; angle <= 90; angle += stepAngle) {
             if (angle != 0) {
                 F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), distToCamera, D31).valuesf()).mul(grid.annotTransform);
                 effectsPos(F31, camera);
@@ -507,14 +530,82 @@ public class LabelEntityRenderSystem {
                 }
             }
         }
+
+
+        var paintProjectedLabels = !Settings.settings.program.modeCubemap.active && !Settings.settings.program.modeStereo.active;
+        if (Settings.settings.program.uvGrid.frameCoordinates && paintProjectedLabels) {
+            var vec = F31;
+            var vecDouble = D31;
+            var out = D32;
+            var cam = camera.getCamera();
+            var w = Gdx.graphics.getWidth();
+            var h = Gdx.graphics.getHeight();
+            var labelSize = Settings.settings.scene.label.size;
+            var offsetY = verticalOffset++ * 16 * labelSize;
+            Matrix4 trf = view.base.getName().contains("Ecliptic") ?
+                    Coordinates.equatorialToEclipticF() :
+                    view.base.getName().contains("Galactic") ? Coordinates.equatorialToGalacticF() : Coordinates.idtF();
+
+            var xStep = w / 6;
+            var yStep = h / 6;
+            float x, y;
+
+            // Horizontal grid.
+            y = 5f;
+            for (int xi = xStep; xi <= w - xStep; xi += xStep) {
+                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, "|", xi - 50, y, 0.95f, Align.center);
+            }
+            // Vertical grid.
+            x = w - 5;
+            for (int yi = yStep + 5; yi <= h - yStep + 5; yi += yStep) {
+                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, "-", x - 145, yi, 0.95f * labelSize, Align.right);
+            }
+
+            // Horizontal.
+            y = 25f + offsetY;
+            for (x = xStep; x <= w - xStep; x += xStep) {
+                vec.set(x, h - y, 0.99f);
+                // To world coordinates, equatorial.
+                cam.unproject(vec);
+                // Convert to grid system.
+                vec.mul(trf);
+                effectsPos(vec, camera);
+                vecDouble.set(vec);
+                // World coordinates to spherical coordinates.
+                Coordinates.cartesianToSpherical(vecDouble, out);
+
+                var text = angle((float) Math.toDegrees(out.x)) + "/" + angleSign((float) Math.toDegrees(out.y));
+                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, text, x - 50, y, 0.45f * labelSize, Align.center);
+            }
+
+            // Vertical.
+            yStep = h / 6;
+            x = w - 20;
+            for (y = yStep; y <= h - yStep; y += yStep) {
+                vec.set(x, h - y, 0.99f);
+                // To world coordinates, equatorial.
+                cam.unproject(vec);
+                // Convert to grid system.
+                vec.mul(trf);
+                effectsPos(vec, camera);
+                vecDouble.set(vec);
+                // World coordinates to spherical coordinates.
+                Coordinates.cartesianToSpherical(vecDouble, out);
+
+                var text = angle((float) Math.toDegrees(out.x)) + "/" + angleSign((float) Math.toDegrees(out.y));
+                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, text, x - 145, y + offsetY, 0.45f * labelSize, Align.right);
+            }
+        }
     }
 
-    private String angle(int angle) {
-        return angle + "°";
+    private final DecimalFormat nf = new DecimalFormat("##0.#");
+
+    private String angle(float angle) {
+        return nf.format(angle) + "°";
     }
 
-    private String angleSign(int angle) {
-        return (angle >= 0 ? "+" : "-") + Math.abs(angle) + "°";
+    private String angleSign(float angle) {
+        return (angle >= 0 ? "+" : "-") + nf.format(Math.abs(angle)) + "°";
     }
 
     private void effectsPos(Vector3 auxf,

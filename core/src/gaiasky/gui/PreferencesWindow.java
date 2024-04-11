@@ -87,6 +87,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox newUI;
     private OwnCheckBox exitConfirmation;
     private OwnCheckBox recGridProjectionLines;
+    private OwnCheckBox frameCoordinates;
     private OwnCheckBox dynamicResolution;
     private OwnCheckBox motionBlur;
     private OwnCheckBox ssr;
@@ -121,7 +122,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak,
             aberrationBak, lensFlareBak, filmGrainBak;
-    private boolean lightGlowBak, debugInfoBak, recGridAnimateBak;
+    private boolean lightGlowBak, debugInfoBak, recGridAnimateBak, frameCoordinatesBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
 
@@ -1040,6 +1041,30 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to content.
         addContentGroup(contentSceneTable, titleRecgrid, rg, 0f);
+
+        // UV GRIDS
+        OwnLabel titleUVGrids = new OwnLabel(I18n.msg("gui.ui.uvgrid"), skin, "header");
+        Table uvg = new Table();
+
+        // FRAME COORDINATES
+        OwnLabel frameCoordinatesLabel = new OwnLabel(I18n.msg("gui.ui.uvgrid.framecoords"), skin);
+        frameCoordinates = new OwnCheckBox("", skin);
+        frameCoordinates.setChecked(settings.program.uvGrid.frameCoordinates);
+        frameCoordinates.addListener((event) -> {
+            if (event instanceof ChangeEvent ce) {
+                EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinates.isChecked());
+            }
+            return false;
+        });
+
+        labels.add(frameCoordinatesLabel);
+
+        // Add to table
+        uvg.add(frameCoordinatesLabel).left().padBottom(pad10).padRight(pad34);
+        uvg.add(frameCoordinates).left().padBottom(pad10);
+
+        // Add to content.
+        addContentGroup(contentSceneTable, titleUVGrids, uvg);
 
         // ECLIPSES
         Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
@@ -2418,6 +2443,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         reprojectionBak = settings.postprocess.reprojection.mode;
         upscaleFilterBak = settings.postprocess.upscaleFilter;
         recGridAnimateBak = settings.program.recursiveGrid.animate;
+        frameCoordinatesBak = settings.program.uvGrid.frameCoordinates;
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -2921,6 +2947,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
         EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
         EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, this, recGridAnimateBak);
+        EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinatesBak);
     }
 
     private void reloadLanguage() {

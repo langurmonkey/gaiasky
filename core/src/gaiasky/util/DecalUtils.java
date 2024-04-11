@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Align;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -190,7 +191,7 @@ public class DecalUtils {
         font.getData().setScale(scale);
 
         if (align > 0) {
-            font.draw(batch, text, x, y, rc.w(), align, false);
+            font.draw(batch, text, x, y, align == Align.right ? 150 : 75, align, false);
         } else {
             font.draw(batch, text, x, y);
         }
@@ -221,7 +222,6 @@ public class DecalUtils {
      * Gets the billboard rotation using the parameters of the given camera
      *
      * @param camera The camera
-     *
      * @return The quaternion with the rotation
      */
     public static Quaternion getBillboardRotation(Camera camera) {
@@ -234,7 +234,6 @@ public class DecalUtils {
      *
      * @param direction The direction vector
      * @param up        The up vector
-     *
      * @return The quaternion with the rotation
      */
     public static Quaternion getBillboardRotation(Vector3 direction, Vector3 up) {
