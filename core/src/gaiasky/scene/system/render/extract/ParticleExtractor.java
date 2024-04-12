@@ -58,7 +58,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
         if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number && hasPm) {
             addToRender(render, RenderGroup.LINE);
         }
-        if (renderText(body, Mapper.sa.get(entity), Mapper.extra.get(entity))) {
+        if (renderText(body, Mapper.sa.get(entity), Mapper.label.get(entity), Mapper.extra.get(entity))) {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }
@@ -78,15 +78,15 @@ public class ParticleExtractor extends AbstractExtractSystem {
             addToRender(render, RenderGroup.LINE);
         }
 
-        if ((renderText(body, Mapper.sa.get(entity), Mapper.extra.get(entity)))) {
+        if ((renderText(body, Mapper.sa.get(entity), Mapper.label.get(entity), Mapper.extra.get(entity)))) {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
 
     }
 
-    private boolean renderText(Body body, SolidAngle sa, ParticleExtra particleExtra) {
+    private boolean renderText(Body body, SolidAngle sa, Label label, ParticleExtra particleExtra) {
         return particleExtra.computedSize > 0 &&
                 renderer.isOn(ComponentType.Labels) &&
-                body.solidAngleApparent >= (sa.thresholdLabel / camera.getFovFactor());
+                body.solidAngleApparent >= (sa.thresholdLabel / (label.labelBias * camera.getFovFactor()));
     }
 }

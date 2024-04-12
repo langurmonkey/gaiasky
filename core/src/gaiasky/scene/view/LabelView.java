@@ -89,13 +89,13 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextCelestial() {
-        return base.names != null && renderTextBase() && (label.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel);
+        return base.names != null && renderTextBase() && (label.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel / label.labelBias);
     }
 
     public boolean renderTextParticle() {
         return extra.computedSize > 0 &&
                 renderTextBase() &&
-                body.solidAngleApparent >= (sa.thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
+                body.solidAngleApparent >= (sa.thresholdLabel / (label.labelBias * GaiaSky.instance.cameraManager.getFovFactor()));
     }
 
     public boolean renderTextLocation() {

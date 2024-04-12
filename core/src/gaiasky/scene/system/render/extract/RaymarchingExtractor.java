@@ -47,6 +47,6 @@ public class RaymarchingExtractor extends AbstractExtractSystem {
                                Label label) {
         return base.names != null
                 && mustRender(base)
-                && (label.forceLabel || body.solidAngleApparent >= sa.thresholdLabel);
+                && (label.forceLabel || body.solidAngleApparent >= sa.thresholdLabel / label.labelBias);
     }
 }

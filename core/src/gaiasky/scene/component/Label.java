@@ -38,6 +38,8 @@ public class Label implements Component {
     public float textScale = -1;
     /** Power to apply to the view angle for labels. **/
     public float solidAnglePow = 1;
+    /** Bias to compute the label visibility. **/
+    public float labelBias = 1;
 
     /**
      * Position of label.
@@ -95,6 +97,10 @@ public class Label implements Component {
 
     public void setLabelMax(Double labelMax) {
         this.labelMax = labelMax.floatValue();
+    }
+
+    public void setLabelBias(Double labelBias) {
+        this.labelBias = labelBias.floatValue();
     }
 
     public void setTextScale(Double textScale) {

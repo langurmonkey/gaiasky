@@ -526,6 +526,10 @@
         "description": "Factor to apply to the size of the label for this object.",
         "units": "Double"
       },
+      "labelBias": {
+        "description": "Bias to compute the label visibility. >1 to increase visibility.",
+        "units": "Double"
+      },
       "labelMax": {
         "description": "Internal rendering factor, should not be set externally.",
         "units": "Double"
