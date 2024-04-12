@@ -26,6 +26,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected static final List<AbstractOrbitCoordinates> instances = new ArrayList<>();
 
     protected String orbitName;
+    protected boolean periodic = true;
     protected Vector3d center;
     protected Entity entity;
     protected double scaling = 1d;
@@ -82,6 +83,10 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
 
     public void setOrbitname(String orbitName) {
         setOrbitName(orbitName);
+    }
+
+    public void setPeriodic(Boolean periodic) {
+        this.periodic = periodic;
     }
 
     public void setScaling(double scaling) {

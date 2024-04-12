@@ -71,6 +71,10 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
 
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
+        boolean inRange = getData().loadPoint(out, date);
+        if(!periodic && !inRange) {
+            return null;
+        }
         if (data == null) {
             return out;
         }
