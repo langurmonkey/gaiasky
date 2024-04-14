@@ -17,22 +17,39 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.io.GzipUtils;
+
+import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 public class OrbitFileDataProvider implements IOrbitDataProvider {
     private PointCloudData data;
 
     @Override
-    public void initialize(Entity entity, Trajectory trajectory) {
+    public void initialize(Entity entity,
+                           Trajectory trajectory) {
 
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameters parameter) {
+    public void load(String file,
+                     OrbitDataLoaderParameters parameter) {
         if (file != null) {
             FileDataLoader odl = new FileDataLoader();
+            FileHandle f = Settings.settings.data.dataFileHandle(file);
             try {
-                FileHandle f = Settings.settings.data.dataFileHandle(file);
-                data = odl.load(f.read());
+                final InputStream is;
+                var isGzip = false;
+                try (var fis = f.read()){
+                    isGzip = GzipUtils.isGZipped(fis);
+                }
+                var fis = f.read();
+                if (isGzip) {
+                    is = new GZIPInputStream(fis);
+                } else {
+                    is = fis;
+                }
+                data = odl.load(is);
                 if (parameter.multiplier != 1f) {
                     int n = data.x.size();
                     for (int i = 0; i < n; i++) {
@@ -49,7 +66,9 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameters parameter, boolean newMethod) {
+    public void load(String file,
+                     OrbitDataLoaderParameters parameter,
+                     boolean newMethod) {
         load(file, parameter);
     }
 
