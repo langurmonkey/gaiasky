@@ -524,7 +524,7 @@ void main() {
         #endif // roughnessTextureFlag, shininessFlag
 
         #ifdef reflectionCubemapFlag
-            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
+            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 10.0).rgb;
         #endif // reflectionCubemapFlag
 
         // Metallic.
@@ -601,6 +601,7 @@ void main() {
             vec3 H = normalize(L - V);
             float NL = max(0.00001, dot(N, L));
             float NH = max(0.00001, dot(N, H));
+
             if (validLights == 1){
                 NL0 = NL;
                 L0 = L;
