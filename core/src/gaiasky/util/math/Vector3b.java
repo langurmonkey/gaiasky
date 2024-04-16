@@ -9,6 +9,7 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.Constants;
 import net.jafama.FastMath;
@@ -719,6 +720,15 @@ public class Vector3b {
         var m22 = new Apfloat(mat[Matrix4d.M22], prec);
         var m23 = new Apfloat(mat[Matrix4d.M23], prec);
         return this.set(x.multiply(m00).add(y.multiply(m01)).add(z.multiply(m02)).add(m03), x.multiply(m10).add(y.multiply(m11)).add(z.multiply(m12)).add(m13), x.multiply(m20).add(y.multiply(m21)).add(z.multiply(m22)).add(m23));
+    }
+
+    /**
+     * Multiplies the vector by the given {@link Quaternion}.
+     *
+     * @return This vector for chaining
+     */
+    public Vector3b mul(final QuaternionDouble quat) {
+        return quat.transform(this);
     }
 
     /**

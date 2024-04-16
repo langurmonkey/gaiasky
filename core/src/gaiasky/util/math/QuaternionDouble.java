@@ -10,6 +10,7 @@ package gaiasky.util.math;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.jafama.FastMath;
+import org.apfloat.Apfloat;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -137,6 +138,17 @@ public class QuaternionDouble implements Serializable {
         this.y = y;
         this.z = z;
         this.w = w;
+        return this;
+    }
+
+    public QuaternionDouble set(Apfloat x,
+                                Apfloat y,
+                                Apfloat z,
+                                Apfloat w) {
+        this.x = x.doubleValue();
+        this.y = y.doubleValue();
+        this.z = z.doubleValue();
+        this.w = w.doubleValue();
         return this;
     }
 
@@ -363,6 +375,15 @@ public class QuaternionDouble implements Serializable {
         v.x = tmp2.x;
         v.y = tmp2.y;
         v.z = tmp2.z;
+        return v;
+    }
+
+    public Vector3b transform(Vector3b v) {
+        tmp2.set(this);
+        tmp2.conjugate();
+        tmp2.mulLeft(tmp1.set(v.x, v.y, v.z, Apfloat.ZERO)).mulLeft(this);
+
+        v.set(tmp2.x, tmp2.y, tmp2.z);
         return v;
     }
 

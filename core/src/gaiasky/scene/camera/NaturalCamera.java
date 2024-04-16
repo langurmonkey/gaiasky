@@ -49,10 +49,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import org.lwjgl.opengl.GL30;
@@ -101,9 +98,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     double previousOrientationAngle = 0;
     /**
-     * Previous orientation matrix, for focus lock.
+     * Previous and aux quaternions, for focus lock.
      */
-    Matrix4d previousOrientation;
+    QuaternionDouble qPrev;
     /**
      * Fov value backup.
      **/
@@ -286,7 +283,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         this.accel = new Vector3d();
         this.force = new Vector3b();
         this.posBak = new Vector3d();
-        this.previousOrientation = new Matrix4d();
+        this.qPrev = new QuaternionDouble();
         this.focus = new FocusView();
         this.focusView = new FocusView();
         this.trackingObject = new FocusView();
@@ -517,21 +514,24 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                     up.rotate(aux2, angle);
                                     previousOrientationAngle = angleBak;
                                 } else if (focus.getOrientationQuaternion() != null) {
-                                    Matrix4d ori = focus.getOrientation();
+                                    // Compute partial rotation from qPrev to q.
+                                    var q = focus.getOrientationQuaternion();
+                                    qPrev.mulInverse(q);
+                                    qPrev.inverse();
                                     // aux5 <- focus (future) position.
                                     aux5b.set(aux4b);
-                                    // aux3 <- focus->camera vector.
+                                    // aux3 <- focus to camera vector.
                                     aux3b.set(pos).sub(aux5b);
                                     // aux3 <- orientation difference from last frame = aux * O * O'^-1.
-                                    aux3b.mul(ori).mul(previousOrientation);
+                                    aux3b.mul(qPrev);
                                     // aux3 <- camera pos after rotating.
                                     aux3b.add(aux5b);
                                     // pos <- aux3.
                                     pos.set(aux3b);
-                                    direction.mul(ori).mul(previousOrientation);
-                                    up.mul(ori).mul(previousOrientation);
-                                    // Set ori to this frame's inv(ori).
-                                    previousOrientation.set(ori).inv();
+                                    direction.mul(qPrev);
+                                    up.mul(qPrev);
+                                    // Set previous.
+                                    qPrev.set(q);
                                 }
                             }
                             // Add dx to camera position.
