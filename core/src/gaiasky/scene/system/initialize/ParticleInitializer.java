@@ -63,18 +63,14 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     public void initializeEntity(Entity entity) {
         view.setEntity(entity);
         var base = view.base;
-        var body = view.body;
         var celestial = Mapper.celestial.get(entity);
-        var mag = view.getMag();
         var pm = Mapper.pm.get(entity);
         var extra = Mapper.extra.get(entity);
         var sa = Mapper.sa.get(entity);
         var label = Mapper.label.get(entity);
         var render = Mapper.renderType.get(entity);
         var hip = Mapper.hip.get(entity);
-        var dist = Mapper.distance.get(entity);
         var focus = Mapper.focus.get(entity);
-        var coordinates = Mapper.coordinates.get(entity);
         var bb = Mapper.billboard.get(entity);
 
         // Focus active.
@@ -85,20 +81,30 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
         if (hip != null) {
             // Initialize star.
-            initializeStar(entity, base, body, celestial, mag, pm, extra, sa, label, render, dist, focus, coordinates);
+            initializeStar(base, celestial, pm, extra, sa, label, render, focus);
         } else {
             // Initialize particle.
-            initializeParticle(entity, base, body, celestial, mag, pm, extra, sa, label, render, focus, coordinates);
+            initializeParticle(base, celestial, pm, extra, sa, label, render, focus);
         }
     }
 
     @Override
     public void setUpEntity(Entity entity) {
+        view.setEntity(entity);
+        var body = view.body;
+        var celestial = Mapper.celestial.get(entity);
+        var mag = view.getMag();
+        var extra = Mapper.extra.get(entity);
+        var coordinates = Mapper.coordinates.get(entity);
         // Set up stars.
         if (Mapper.hip.has(entity)) {
+            var dist = Mapper.distance.get(entity);
+            setUpStar(entity, body, celestial, mag, extra, dist, coordinates);
             var model = Mapper.model.get(entity);
             model.renderConsumer = ModelEntityRenderSystem::renderParticleStarModel;
             utils.initModel(AssetBean.manager(), model);
+        } else {
+            setUpParticle(entity, body, celestial, mag, extra, coordinates);
         }
     }
 
@@ -141,7 +147,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
     }
 
-    private void initializeParticle(Entity entity, Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus, Coordinates coordinates) {
+    private void initializeParticle(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, render);
 
         sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
@@ -151,22 +157,24 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextParticle;
 
-        // Actual initialization.
-        setDerivedAttributes(entity, body, celestial, mag, coordinates, extra, false);
-
         if (base.ct == null)
             base.ct = new ComponentTypes(ComponentType.Galaxies);
-
-        // Relation between the particle size and actual star size (normalized for
-        // the Sun, 695700 Km of radius).
-        extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateCelestial;
         focus.hitRayConsumer = FocusHit::addHitRayCelestial;
     }
 
-    private void initializeStar(Entity entity, Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Distance dist, Focus focus, Coordinates coordinates) {
+    private void setUpParticle(Entity entity, Body body, Celestial celestial, Magnitude mag, ParticleExtra extra, Coordinates coordinates) {
+        // Actual initialization.
+        setDerivedAttributes(entity, body, celestial, mag, coordinates, extra, false);
+
+        // Relation between the particle size and actual star size (normalized for
+        // the Sun, 695700 Km of radius).
+        extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
+    }
+
+    private void initializeStar(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, render);
 
         sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;
@@ -178,19 +186,20 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextParticle;
 
-        setDerivedAttributes(entity, body, celestial, mag, coordinates, extra, true);
-
         if (base.ct == null)
             base.ct = new ComponentTypes(ComponentType.Stars);
-
-        // Relation between the particle size and actual star size (normalized for
-        // the Sun, 695700 Km of radius)
-        extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
-        dist.distance = 17200.4643429 * extra.radius;
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateStar;
         focus.hitRayConsumer = FocusHit::addHitRayCelestial;
+    }
+
+    private void setUpStar(Entity entity, Body body, Celestial celestial, Magnitude mag, ParticleExtra extra, Distance dist, Coordinates coordinates) {
+        setDerivedAttributes(entity, body, celestial, mag, coordinates, extra, true);
+        // Relation between the particle size and actual star size (normalized for
+        // the Sun, 695700 Km of radius)
+        extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
+        dist.distance = 17200.4643429 * extra.radius;
     }
 
     private void setDerivedAttributes(Entity entity, Body body, Celestial celestial, Magnitude mag, Coordinates coordinates, ParticleExtra extra, boolean isStar) {
