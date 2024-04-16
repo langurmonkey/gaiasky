@@ -35,6 +35,8 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
+import java.time.Instant;
+
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     private final Vector3d D31 = new Vector3d();
@@ -508,6 +510,28 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                                          ICamera unused,
                                          boolean force) {
         return getPredictedPosition(out, null, time, force);
+    }
+
+    @Override
+    public Vector3b getPredictedPosition(Vector3b out, double deltaTime) {
+        // Get a line copy of focus and update it.
+        var copy = scene.getLineCopy(entity);
+
+        // Get root of line copy.
+        var copyGraph = Mapper.graph.get(copy);
+        var root = copyGraph.getRoot(copy);
+        // This updates the graph node for all entities in the line.
+        scene.updateEntity(root, (float) deltaTime);
+
+        // This updates the rest of components of our entity.
+        scene.updateEntity(copy, (float) deltaTime);
+
+        EntityUtils.getAbsolutePosition(copy, out);
+
+        // Return to pool.
+        scene.returnCopyObject(copy);
+
+        return out;
     }
 
     @Override

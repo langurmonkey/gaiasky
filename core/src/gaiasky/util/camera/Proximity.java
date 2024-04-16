@@ -374,6 +374,11 @@ public class Proximity {
         }
 
         @Override
+        public Vector3b getPredictedPosition(Vector3b aux, double deltaTime) {
+            return null;
+        }
+
+        @Override
         public double getDistToCamera() {
             return this.distToCamera;
         }

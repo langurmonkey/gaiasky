@@ -410,7 +410,8 @@ public class Scene {
      * Runs the matching update systems on the given entity. The systems
      * are matched using their families.
      *
-     * @param entity The entity to update.
+     * @param entity    The entity to update.
+     * @param deltaTime Delta time in seconds.
      */
     public void updateEntity(Entity entity,
                              float deltaTime) {
@@ -488,7 +489,6 @@ public class Scene {
      * @param family         The family.
      * @param priority       The priority of the system (lower means the system gets executed before).
      * @param sceneRenderer  The scene renderer.
-     *
      * @return The new system instance.
      */
     private <T extends AbstractExtractSystem> T newExtractor(Class<T> extractorClass,
@@ -500,7 +500,8 @@ public class Scene {
             T system = c.newInstance(family, priority);
             system.setRenderer(sceneRenderer);
             return system;
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -625,7 +626,6 @@ public class Scene {
      * Returns the entity with the given name, or null if it does not exist.
      *
      * @param name The name of the entity to retrieve.
-     *
      * @return The entity.
      */
     public Entity getEntity(String name) {
@@ -636,7 +636,6 @@ public class Scene {
      * Returns the focus entity with the given name, if it exists.
      *
      * @param name The name.
-     *
      * @return The entity.
      */
     public Entity findFocus(String name) {
@@ -694,7 +693,7 @@ public class Scene {
     }
 
     public void findEntitiesByComponentType(gaiasky.render.ComponentTypes.ComponentType componentType,
-                                                     Array<Entity> list) {
+                                            Array<Entity> list) {
         engine.getEntities().forEach((entity) -> {
             var base = Mapper.base.get(entity);
             if (base.ct != null && base.ct.isEnabled(componentType))
@@ -709,7 +708,6 @@ public class Scene {
      *
      * @param name The name of the object
      * @param out  The out double array
-     *
      * @return The out double array if the object exists, has a position and out has 3 or more
      * slots. Null otherwise.
      */
@@ -800,7 +798,6 @@ public class Scene {
      * actually hold and wrap many objects.
      *
      * @param entity The entity.
-     *
      * @return The number of objects it holds.
      */
     public int getNumberObjects(Entity entity) {
@@ -821,7 +818,6 @@ public class Scene {
      * Computes the number of objects in the given octree node, recursively.
      *
      * @param node The node.
-     *
      * @return The number of objects.
      */
     public int getNumberObjects(OctreeNode node) {
