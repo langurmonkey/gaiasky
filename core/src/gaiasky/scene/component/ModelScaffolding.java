@@ -8,6 +8,8 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Matrix4;
 import gaiasky.render.ShadowMapImpl;
 
 import java.util.ArrayList;
@@ -53,6 +55,9 @@ public class ModelScaffolding implements Component {
 
     /** The factor to apply to the size when rendered as billboard. **/
     public float billboardSizeFactor;
+
+    public FrameBuffer shadowMapFb;
+    public Matrix4 shadowMapCombined;
 
     /**
      * Whether shadows should be rendered for this object

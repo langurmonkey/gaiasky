@@ -13,6 +13,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -37,7 +38,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.draw.*;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.scene.system.render.pass.LightGlowPass;
+import gaiasky.scene.system.render.pass.LightGlowRenderPass;
 import gaiasky.scene.system.render.pass.SVTRenderPass;
 import gaiasky.scene.system.render.pass.ShadowMapRenderPass;
 import gaiasky.util.Constants;
@@ -108,9 +109,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * in screenshots and frame capture.
      */
     private Map<Integer, FrameBuffer> frameBufferMap;
+
     private final ShadowMapRenderPass shadowMapPass;
-    private final LightGlowPass lightGlowPass;
+    private final LightGlowRenderPass lightGlowPass;
     private final SVTRenderPass svtPass;
+
+    private final List<Disposable> renderPasses;
 
     /**
      * Render groups with autonomous systems. These are systems that do not need renderables.
@@ -124,9 +128,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.globalResources = globalResources;
         this.rendering = new AtomicBoolean(false);
         this.renderAssets = new RenderAssets(globalResources);
+
         this.shadowMapPass = new ShadowMapRenderPass(this);
-        this.lightGlowPass = new LightGlowPass(this);
+        this.lightGlowPass = new LightGlowRenderPass(this);
         this.svtPass = new SVTRenderPass(this);
+
+        this.renderPasses = new ArrayList<>();
+        this.renderPasses.add(shadowMapPass);
+        this.renderPasses.add(lightGlowPass);
+        this.renderPasses.add(svtPass);
     }
 
     @Override
@@ -810,11 +820,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // Dispose SGRs
         if (sgrList != null) {
-            for (IRenderMode sgr : sgrList) {
-                if (sgr != null)
-                    sgr.dispose();
-            }
+            Arrays.stream(sgrList).forEach(IRenderMode::dispose);
             sgrList = null;
+        }
+
+        // Dispose render passes.
+        if (renderPasses != null) {
+            renderPasses.forEach(Disposable::dispose);
         }
     }
 
@@ -875,7 +887,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return this.shadowMapPass;
     }
 
-    public LightGlowPass getLightGlowPass() {
+    public LightGlowRenderPass getLightGlowPass() {
         return this.lightGlowPass;
     }
 

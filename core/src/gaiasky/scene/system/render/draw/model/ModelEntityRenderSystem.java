@@ -600,18 +600,21 @@ public class ModelEntityRenderSystem {
                                             ModelScaffolding scaffolding) {
         if (Settings.settings.scene.renderer.shadow.active && scaffolding.shadowMapValues != null) {
             Environment env = model.model.env;
-            var shadowMapPass = sceneRenderer.getShadowMapPass();
-            if (scaffolding.shadow > 0 && shadowMapPass.smTexMap.containsKey(entity)) {
-                Matrix4 combined = shadowMapPass.smCombinedMap.get(entity);
-                Texture tex = shadowMapPass.smTexMap.get(entity);
-                if (env.shadowMap == null) {
-                    if (scaffolding.shadowMap == null) {
-                        scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
-                    }
-                    env.shadowMap = scaffolding.shadowMap;
+            if (scaffolding.shadow > 0
+                    && scaffolding.shadowMapFb != null
+                    && scaffolding.shadowMapCombined != null) {
+                Matrix4 combined = scaffolding.shadowMapCombined;
+                Texture tex = scaffolding.shadowMapFb.getColorBufferTexture();
+
+                // Gather info.
+                if (scaffolding.shadowMap == null) {
+                    scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
                 }
                 scaffolding.shadowMap.setProjViewTrans(combined);
                 scaffolding.shadowMap.setDepthMap(tex);
+
+                // Set to environment.
+                env.shadowMap = scaffolding.shadowMap;
 
                 scaffolding.shadow--;
             } else {

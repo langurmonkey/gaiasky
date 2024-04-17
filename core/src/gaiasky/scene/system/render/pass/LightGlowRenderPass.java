@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -27,7 +28,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.BillboardRenderer;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static gaiasky.render.RenderGroup.*;
 
-public class LightGlowPass {
+public class LightGlowRenderPass implements Disposable {
 
     private final SceneRenderer sceneRenderer;
     // Light glow pre-render
@@ -47,7 +47,7 @@ public class LightGlowPass {
     // Disable texture view.
     private boolean uiViewCreated = true;
 
-    public LightGlowPass(final SceneRenderer sceneRenderer) {
+    public LightGlowRenderPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
         this.stars = new ArrayList<>();
         this.lpu = new LightPositionUpdater();
@@ -97,7 +97,6 @@ public class LightGlowPass {
                     }
                 }
             }
-
 
             if (billboardStarsRenderer == null) {
                 billboardStarsRenderer = (BillboardRenderer) sceneRenderer.getOrInitializeRenderSystem(BILLBOARD_STAR);
@@ -159,5 +158,12 @@ public class LightGlowPass {
 
     public LightPositionUpdater getLpu() {
         return lpu;
+    }
+
+    @Override
+    public void dispose() {
+        if (occlusionFrameBuffer != null) {
+            occlusionFrameBuffer.dispose();
+        }
     }
 }

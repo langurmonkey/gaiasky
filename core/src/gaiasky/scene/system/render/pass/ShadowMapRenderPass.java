@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -32,11 +33,12 @@ import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
+import javax.print.attribute.HashAttributeSet;
 import java.util.*;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
 
-public class ShadowMapRenderPass {
+public class ShadowMapRenderPass implements Disposable {
     /** Number of *shadow casting* lights supported. */
     private final static int NUM_SHADOW_CASTING_LIGHTS = 1;
     /** The scene renderer object. **/
@@ -47,14 +49,10 @@ public class ShadowMapRenderPass {
     private Camera cameraLight;
     /** Contains the candidates for regular and tessellated shadow maps. **/
     private List<Entity> shadowCandidates/*, shadowCandidatesTess */;
-    // Dimension 1: number of shadows, dimension 2: number of lights
-    private Matrix4[][] shadowMapCombined;
-    // Dimension 1: number of shadows, dimension 2: number of lights
-    public FrameBuffer[][] shadowMapFb;
-    /** Map containing the shadow map for each model body. **/
-    public Map<Entity, Texture> smTexMap;
-    /** Map containing the combined matrix for each model body. **/
-    public Map<Entity, Matrix4> smCombinedMap;
+    /**
+     * Cache with all the entities that have used shadow map frame buffers to date, for disposing.
+     */
+    private Set<Entity> shadowMapEntities;
 
     // Are the textures displaying in the UI already?
     private boolean uiViewCreated = true;
@@ -71,6 +69,7 @@ public class ShadowMapRenderPass {
     public void initialize() {
         // Shadow map camera
         cameraLight = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
+        shadowMapEntities = new HashSet<>();
 
         // Aux vectors
         aux1 = new Vector3();
@@ -88,32 +87,15 @@ public class ShadowMapRenderPass {
      * Builds the shadow map data; frame buffers, arrays, etc.
      */
     public void buildShadowMapData() {
-        if (shadowMapFb != null) {
-            for (FrameBuffer[] frameBufferArray : shadowMapFb)
-                for (FrameBuffer fb : frameBufferArray) {
-                    if (fb != null)
-                        fb.dispose();
-                }
-        }
-
-        // Shadow map frame buffer
-        shadowMapFb = new FrameBuffer[Settings.settings.scene.renderer.shadow.number][NUM_SHADOW_CASTING_LIGHTS];
-        // Shadow map combined matrices
-        shadowMapCombined = new Matrix4[Settings.settings.scene.renderer.shadow.number][NUM_SHADOW_CASTING_LIGHTS];
-        // Init
-        for (int i = 0; i < Settings.settings.scene.renderer.shadow.number; i++) {
-            for (int j = 0; j < NUM_SHADOW_CASTING_LIGHTS; j++) {
-                shadowMapFb[i][j] = new FrameBuffer(Pixmap.Format.RGBA8888, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution, true);
-                shadowMapCombined[i][j] = new Matrix4();
+        // Dispose current.
+        shadowMapEntities.forEach(entity -> {
+            var scaffolding = Mapper.modelScaffolding.get(entity);
+            if (scaffolding != null && scaffolding.shadowMapFb != null) {
+                scaffolding.shadowMapFb.dispose();
+                scaffolding.shadowMapFb = null;
             }
-        }
-        if (smTexMap == null)
-            smTexMap = new HashMap<>();
-        smTexMap.clear();
-
-        if (smCombinedMap == null)
-            smCombinedMap = new HashMap<>();
-        smCombinedMap.clear();
+        });
+        shadowMapEntities.clear();
 
         if (shadowCandidates == null) {
             shadowCandidates = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
@@ -123,7 +105,19 @@ public class ShadowMapRenderPass {
         //shadowCandidatesTess.clear();
     }
 
-    private void renderShadowMapCandidates(List<Entity> candidates, int shadowNRender, ICamera camera) {
+    private FrameBuffer newShadowMapFrameBuffer(Entity entity) {
+        // Add to cache for disposing.
+        shadowMapEntities.add(entity);
+        // Create frame buffer.
+        return new FrameBuffer(Pixmap.Format.RGBA8888,
+                               Settings.settings.scene.renderer.shadow.resolution,
+                               Settings.settings.scene.renderer.shadow.resolution,
+                               true);
+    }
+
+    private void renderShadowMapCandidates(List<Entity> candidates,
+                                           int shadowNRender,
+                                           ICamera camera) {
         var renderAssets = sceneRenderer.getRenderAssets();
         int nShadows = Math.min(candidates.size(), Settings.settings.scene.renderer.shadow.number);
         for (int i = 0; i < nShadows; i++) {
@@ -131,7 +125,6 @@ public class ShadowMapRenderPass {
             var body = Mapper.body.get(candidate);
             var model = Mapper.model.get(candidate);
             var scaffolding = Mapper.modelScaffolding.get(candidate);
-
 
             double radius = (body.size / 2.0) * scaffolding.sizeScaleFactor;
             // Distance from camera to object, radius * sv[0]
@@ -159,15 +152,22 @@ public class ShadowMapRenderPass {
                 cameraLight.up.set(cameraLight.direction).crs(aux1);
 
                 // Near is sv[1]*radius before the object
-                cameraLight.near = (float) (distance - radius * 2.0);
+                cameraLight.near = (float) (distance - radius * scaffolding.shadowMapValues[1]);
                 // Far is sv[2]*radius after the object
-                cameraLight.far = (float) (distance + radius * 2.0);
+                cameraLight.far = (float) (distance + radius * scaffolding.shadowMapValues[2]);
 
                 // Update cam
                 cameraLight.update(false);
 
-                // Render model depth map to frame buffer
-                shadowMapFb[i][j].begin();
+                // Render model depth map to frame buffer.
+                final var fb = scaffolding.shadowMapFb == null ? newShadowMapFrameBuffer(candidate) : scaffolding.shadowMapFb;
+
+                scaffolding.shadowMapFb = fb;
+                if (scaffolding.shadowMapCombined == null) {
+                    scaffolding.shadowMapCombined = new Matrix4();
+                }
+
+                fb.begin();
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // No tessellation
@@ -177,18 +177,13 @@ public class ShadowMapRenderPass {
 
                 // Save frame buffer and combined matrix
                 scaffolding.shadow = shadowNRender;
-                shadowMapCombined[i][j].set(cameraLight.combined);
-                smCombinedMap.put(candidate, shadowMapCombined[i][j]);
-                shadowMapFb[i][j].end();
-                smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
-
+                scaffolding.shadowMapCombined.set(cameraLight.combined);
+                fb.end();
 
                 if (!uiViewCreated) {
-                    final int ii = i;
-                    final int jj = j;
                     GaiaSky.postRunnable(() -> {
                         // Create UI view
-                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", shadowMapFb[ii][jj].getColorBufferTexture(), 0.2f);
+                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", fb.getColorBufferTexture(), 0.2f);
                     });
                     uiViewCreated = true;
                 }
@@ -196,7 +191,8 @@ public class ShadowMapRenderPass {
         }
     }
 
-    private void addCandidates(List<IRenderable> models, List<Entity> candidates) {
+    private void addCandidates(List<IRenderable> models,
+                               List<Entity> candidates) {
         if (candidates != null) {
             candidates.clear();
             int num = 0;
@@ -217,7 +213,10 @@ public class ShadowMapRenderPass {
     }
 
     @SuppressWarnings("unused")
-    private void renderShadowMapCandidatesTess(Array<Entity> candidates, int shadowNRender, ICamera camera, RenderingContext rc) {
+    private void renderShadowMapCandidatesTess(Array<Entity> candidates,
+                                               int shadowNRender,
+                                               ICamera camera,
+                                               RenderingContext rc) {
         int i = 0;
         int j = 0;
         var renderAssets = sceneRenderer.getRenderAssets();
@@ -273,7 +272,6 @@ public class ShadowMapRenderPass {
                 cameraLight.update(false);
 
                 // Render model depth map to frame buffer
-                shadowMapFb[i][j].begin();
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // Tessellation
@@ -283,11 +281,6 @@ public class ShadowMapRenderPass {
 
                 // Save frame buffer and combined matrix
                 scaffolding.shadow = shadowNRender;
-                shadowMapCombined[i][j].set(cameraLight.combined);
-                smCombinedMap.put(candidate, shadowMapCombined[i][j]);
-                smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
-
-                shadowMapFb[i][j].end();
                 i++;
             } else {
                 scaffolding.shadow = -1;
@@ -315,18 +308,32 @@ public class ShadowMapRenderPass {
         //List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
         models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 
-        final int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openXr) ? 2 : Settings.settings.program.modeCubemap.active ? 6 : 1;
+        final int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openXr) ?
+                2 :
+                Settings.settings.program.modeCubemap.active ? 6 : 1;
 
-        if (shadowMapFb != null && smCombinedMap != null) {
-            addCandidates(models, shadowCandidates);
-            //addCandidates(modelsTess, shadowCandidatesTess);
+        addCandidates(models, shadowCandidates);
+        //addCandidates(modelsTess, shadowCandidatesTess);
 
-            // Clear maps
-            smTexMap.clear();
-            smCombinedMap.clear();
+        renderShadowMapCandidates(shadowCandidates, shadowNRender, camera);
+        //renderShadowMapCandidatesTess(shadowCandidatesTess, shadowNRender, camera);
+    }
 
-            renderShadowMapCandidates(shadowCandidates, shadowNRender, camera);
-            //renderShadowMapCandidatesTess(shadowCandidatesTess, shadowNRender, camera);
+    public void disposeCachedFrameBuffers() {
+        if (shadowMapEntities != null) {
+            // Dispose current.
+            shadowMapEntities.forEach(entity -> {
+                var scaffolding = Mapper.modelScaffolding.get(entity);
+                if (scaffolding != null && scaffolding.shadowMapFb != null) {
+                    scaffolding.shadowMapFb.dispose();
+                    scaffolding.shadowMapFb = null;
+                }
+            });
+            shadowMapEntities.clear();
         }
+    }
+
+    public void dispose() {
+        disposeCachedFrameBuffers();
     }
 }

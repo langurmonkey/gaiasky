@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -43,7 +44,7 @@ import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
  * Render pass for the sparse virtual textures. The operation is distributed over 5 consecutive frames
  * to even out the contributions and achieve regular frame pacing.
  */
-public class SVTRenderPass {
+public class SVTRenderPass implements Disposable {
     /**
      * The tile detection buffer is smaller than the main window by this factor.
      * Should match the constant with the same name in svt.detection.fragment.glsl
@@ -296,5 +297,12 @@ public class SVTRenderPass {
         var modelComponent = Mapper.model.get(((Render) candidate).entity);
         var model = modelComponent.model;
         model.setBlendMode(blendBak);
+    }
+
+    @Override
+    public void dispose() {
+        if (frameBuffer != null) {
+            frameBuffer.dispose();
+        }
     }
 }

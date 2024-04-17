@@ -13,7 +13,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.system.render.pass.LightGlowPass;
+import gaiasky.scene.system.render.pass.LightGlowRenderPass;
 
 import java.util.List;
 
@@ -81,5 +81,5 @@ public interface ISceneRenderer {
     List<List<IRenderable>> getRenderLists();
 
     /** Gets the light glow pass object. **/
-    LightGlowPass getLightGlowPass();
+    LightGlowRenderPass getLightGlowPass();
 }
