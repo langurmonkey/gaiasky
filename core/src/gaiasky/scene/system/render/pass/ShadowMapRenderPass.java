@@ -37,6 +37,8 @@ import java.util.*;
 import static gaiasky.render.RenderGroup.MODEL_PIX;
 
 public class ShadowMapRenderPass {
+    /** Number of *shadow casting* lights supported. */
+    private final static int NUM_SHADOW_CASTING_LIGHTS = 1;
     /** The scene renderer object. **/
     private final SceneRenderer sceneRenderer;
     /** Contains the code to render models. **/
@@ -95,12 +97,12 @@ public class ShadowMapRenderPass {
         }
 
         // Shadow map frame buffer
-        shadowMapFb = new FrameBuffer[Settings.settings.scene.renderer.shadow.number][Constants.N_DIR_LIGHTS];
+        shadowMapFb = new FrameBuffer[Settings.settings.scene.renderer.shadow.number][NUM_SHADOW_CASTING_LIGHTS];
         // Shadow map combined matrices
-        shadowMapCombined = new Matrix4[Settings.settings.scene.renderer.shadow.number][Constants.N_DIR_LIGHTS];
+        shadowMapCombined = new Matrix4[Settings.settings.scene.renderer.shadow.number][NUM_SHADOW_CASTING_LIGHTS];
         // Init
         for (int i = 0; i < Settings.settings.scene.renderer.shadow.number; i++) {
-            for (int j = 0; j < 1; j++) {
+            for (int j = 0; j < NUM_SHADOW_CASTING_LIGHTS; j++) {
                 shadowMapFb[i][j] = new FrameBuffer(Pixmap.Format.RGBA8888, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution, true);
                 shadowMapCombined[i][j] = new Matrix4();
             }
@@ -123,10 +125,9 @@ public class ShadowMapRenderPass {
 
     private void renderShadowMapCandidates(List<Entity> candidates, int shadowNRender, ICamera camera) {
         var renderAssets = sceneRenderer.getRenderAssets();
-        int i = 0;
-        int j = 0;
-        // Normal bodies
-        for (Entity candidate : candidates) {
+        int nShadows = Math.min(candidates.size(), Settings.settings.scene.renderer.shadow.number);
+        for (int i = 0; i < nShadows; i++) {
+            var candidate = candidates.get(i);
             var body = Mapper.body.get(candidate);
             var model = Mapper.model.get(candidate);
             var scaffolding = Mapper.modelScaffolding.get(candidate);
@@ -137,59 +138,61 @@ public class ShadowMapRenderPass {
             double distance = radius * scaffolding.shadowMapValues[0];
             // Position, factor of radius
             Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
-            // Light direction depends on light.
-            Vector3 lightDir = aux1;
-            if (model.model.hasDirLight(0)) {
-                lightDir.set(model.model.dirLight(0).direction);
-            } else if (model.model.hasPointLight(0)) {
-                lightDir.set(model.model.pointLight(i).position);
-                aux2b.set(objPos).sub(lightDir).nor().put(lightDir);
+            for (int j = 0; j < NUM_SHADOW_CASTING_LIGHTS; j++) {
+                // Light direction depends on light.
+                Vector3 lightDir = aux1;
+                if (model.model.hasDirLight(j)) {
+                    lightDir.set(model.model.dirLight(j).direction);
+                } else if (model.model.hasPointLight(j)) {
+                    lightDir.set(model.model.pointLight(j).position);
+                    aux2b.set(objPos).sub(lightDir).nor().put(lightDir);
+                }
+                // Direction is that of the light
+                cameraLight.direction.set(lightDir);
+                objPos.sub(camera.getPos()).sub(lightDir.nor().scl((float) distance));
+                objPos.put(cameraLight.position);
+                // Up is perpendicular to dir
+                if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
+                    aux1.set(1, 0, 0);
+                else
+                    aux1.set(0, 1, 0);
+                cameraLight.up.set(cameraLight.direction).crs(aux1);
+
+                // Near is sv[1]*radius before the object
+                cameraLight.near = (float) (distance - radius * 2.0);
+                // Far is sv[2]*radius after the object
+                cameraLight.far = (float) (distance + radius * 2.0);
+
+                // Update cam
+                cameraLight.update(false);
+
+                // Render model depth map to frame buffer
+                shadowMapFb[i][j].begin();
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+                // No tessellation
+                renderAssets.mbPixelLightingDepth.begin(cameraLight);
+                modelRenderer.render(candidate, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                renderAssets.mbPixelLightingDepth.end();
+
+                // Save frame buffer and combined matrix
+                scaffolding.shadow = shadowNRender;
+                shadowMapCombined[i][j].set(cameraLight.combined);
+                smCombinedMap.put(candidate, shadowMapCombined[i][j]);
+                shadowMapFb[i][j].end();
+                smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
+
+
+                if (!uiViewCreated) {
+                    final int ii = i;
+                    final int jj = j;
+                    GaiaSky.postRunnable(() -> {
+                        // Create UI view
+                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", shadowMapFb[ii][jj].getColorBufferTexture(), 0.2f);
+                    });
+                    uiViewCreated = true;
+                }
             }
-            // Direction is that of the light
-            cameraLight.direction.set(lightDir);
-            objPos.sub(camera.getPos()).sub(lightDir.nor().scl((float) distance));
-            objPos.put(cameraLight.position);
-            // Up is perpendicular to dir
-            if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
-                aux1.set(1, 0, 0);
-            else
-                aux1.set(0, 1, 0);
-            cameraLight.up.set(cameraLight.direction).crs(aux1);
-
-            // Near is sv[1]*radius before the object
-            cameraLight.near = (float) (distance - radius * scaffolding.shadowMapValues[1]);
-            // Far is sv[2]*radius after the object
-            cameraLight.far = (float) (distance + radius * scaffolding.shadowMapValues[2]);
-
-            // Update cam
-            cameraLight.update(false);
-
-            // Render model depth map to frame buffer
-            shadowMapFb[i][j].begin();
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-            // No tessellation
-            renderAssets.mbPixelLightingDepth.begin(cameraLight);
-            modelRenderer.render(candidate, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, true);
-            renderAssets.mbPixelLightingDepth.end();
-
-            // Save frame buffer and combined matrix
-            scaffolding.shadow = shadowNRender;
-            shadowMapCombined[i][j].set(cameraLight.combined);
-            smCombinedMap.put(candidate, shadowMapCombined[i][j]);
-            smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
-
-            shadowMapFb[i][j].end();
-
-            if(!uiViewCreated) {
-                final int ii = i;
-                GaiaSky.postRunnable(() -> {
-                    // Create UI view
-                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", shadowMapFb[ii][j].getColorBufferTexture(), 0.2f);
-                });
-                uiViewCreated = true;
-            }
-            i++;
         }
     }
 

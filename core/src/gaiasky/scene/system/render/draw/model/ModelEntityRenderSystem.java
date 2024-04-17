@@ -72,7 +72,7 @@ public class ModelEntityRenderSystem {
                 boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
 
                 // Just run consumer.
-                model.renderConsumer.apply(this, entity, model, batch, alpha, t, rc, renderGroup, relativistic, shadow);
+                model.renderConsumer.apply(this, entity, model, batch, alpha, t, rc, renderGroup, shadow, relativistic);
             }
         }
     }
@@ -115,8 +115,8 @@ public class ModelEntityRenderSystem {
                                     double t,
                                     RenderingContext rc,
                                     RenderGroup renderGroup,
-                                    boolean relativistic,
-                                    boolean shadow) {
+                                    boolean shadow,
+                                    boolean relativistic) {
         model.model.setTransparency(alpha);
         batch.render(model.model.instance, model.model.env);
 
@@ -138,8 +138,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderGenericModel(Entity entity,
                                    Model model,
@@ -148,8 +148,8 @@ public class ModelEntityRenderSystem {
                                    double t,
                                    RenderingContext rc,
                                    RenderGroup renderGroup,
-                                   boolean relativistic,
-                                   boolean shadow) {
+                                   boolean shadow,
+                                   boolean relativistic) {
         var scaffolding = Mapper.modelScaffolding.get(entity);
 
         ModelComponent mc = model.model;
@@ -192,8 +192,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderShape(Entity entity,
                             Model model,
@@ -202,8 +202,8 @@ public class ModelEntityRenderSystem {
                             double t,
                             RenderingContext rc,
                             RenderGroup renderGroup,
-                            boolean relativistic,
-                            boolean shadow) {
+                            boolean shadow,
+                            boolean relativistic) {
         var mc = model.model;
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
@@ -228,8 +228,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderRecursiveGridModel(Entity entity,
                                          Model model,
@@ -279,8 +279,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderMeshModel(Entity entity,
                                 Model model,
@@ -289,8 +289,8 @@ public class ModelEntityRenderSystem {
                                 double t,
                                 RenderingContext rc,
                                 RenderGroup renderGroup,
-                                boolean relativistic,
-                                boolean shadow) {
+                                boolean shadow,
+                                boolean relativistic) {
         if (model.model != null) {
             var graph = Mapper.graph.get(entity);
             var base = Mapper.base.get(entity);
@@ -323,8 +323,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderStarClusterModel(Entity entity,
                                        Model model,
@@ -356,8 +356,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderParticleStarSetModel(Entity entity,
                                            Model model,
@@ -409,8 +409,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderParticleStarModel(Entity entity,
                                         Model model,
@@ -451,8 +451,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderSpacecraft(Entity entity,
                                  Model model,
@@ -497,8 +497,8 @@ public class ModelEntityRenderSystem {
      * @param t            The time, in seconds, since the session start.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
-     * @param relativistic Whether to apply relativistic effects.
      * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
      */
     public void renderPlanet(Entity entity,
                              Model model,
@@ -605,8 +605,9 @@ public class ModelEntityRenderSystem {
                 Matrix4 combined = shadowMapPass.smCombinedMap.get(entity);
                 Texture tex = shadowMapPass.smTexMap.get(entity);
                 if (env.shadowMap == null) {
-                    if (scaffolding.shadowMap == null)
+                    if (scaffolding.shadowMap == null) {
                         scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
+                    }
                     env.shadowMap = scaffolding.shadowMap;
                 }
                 scaffolding.shadowMap.setProjViewTrans(combined);
