@@ -64,7 +64,6 @@ vec2 vpow(vec2 v, float p){
 }
 
 void main() {
-    vec3 col = texture(u_texture0, v_texCoords).rgb;
 
     // depth buffer
     float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y);
@@ -91,20 +90,21 @@ void main() {
     float speed = length(vel * u_viewport);
     int nSamples = clamp(int(speed), 1, u_blurSamplesMax);
 
-    vec3 blurred = col;
+    // Get color at this fragment.
+    vec3 color = texture(u_texture0, v_texCoords).rgb;
     for (int i = 1; i < nSamples; ++i) {
-        // The -0.5 centers the blur on the fragment
-        vec2 offset = vel * (float(i) / float(nSamples - 0.5));
-        blurred += texture(u_texture0, v_texCoords + offset).rgb;
+        vec2 offset = vel * (float(i) / float(nSamples));
+        color += texture(u_texture0, v_texCoords + offset).rgb;
     }
-    blurred /= float(nSamples);
-    fragColor = vec4(blurred, 1.0);
+    // Average all samples to get final color.
+    color /= float(nSamples);
+    fragColor = vec4(color, 1.0);
 
     //float l = abs(length(velocity) * 5.0);
     //fragColor.rgb = vec3(l);
     //fragColor.a = 1.0;
     //if(v_texCoords.y < 0.5)
-    //    fragColor = vec4(blurred, 1.0);
+    //    fragColor = vec4(color, 1.0);
     //
     //if(v_texCoords.x < 0.5){
     //    // Show velocity buffer
