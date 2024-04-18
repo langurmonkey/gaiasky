@@ -1,18 +1,5 @@
-/*******************************************************************************
- * Copyright 2012 bmanuel
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+// Camera motion blur effect by Toni Sagrista.
+// This implementation follows: https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-27-motion-blur-post-processing-effect
 #version 330 core
 
 uniform sampler2D u_texture0;// scene
@@ -39,37 +26,13 @@ layout (location = 0) out vec4 fragColor;
 
 #include <shader/lib/logdepthbuff.glsl>
 
-vec4 velocityBuffer(vec2 velocity){
-    float valx = 0.0;
-    float valy = 0.0;
-    if (velocity.x < 0.0){
-        valx = abs(velocity.x);
-    }
-    if (velocity.y < 0.0){
-        valy = abs(velocity.y);
-    }
-    return vec4(abs(velocity.x), abs(velocity.y), valx + valy, 0.5) * 2.0;
-}
-
-vec2 maxLength(vec2 v, float maxLength){
-    float len = length(v);
-    if (len > maxLength){
-        v = normalize(v) * maxLength;
-    }
-    return v;
-}
-
-vec2 vpow(vec2 v, float p){
-    return vec2(sign(v.x) * pow(abs(v.x), p), sign(v.y) * pow(abs(v.y), p));
-}
-
 void main() {
 
     // depth buffer
     float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y);
-    // H is the viewport position at this pixel in the range -1 to 1.
+    // H is the viewport position at this pixel in the range -1 to 1 (NDC).
     vec4 H = vec4(v_texCoords.x * 2.0 - 1.0, (1.0 - v_texCoords.y) * 2.0 - 1.0, depth, 1.0);
-    // Transform by the view-projection inverse.
+    // Transform by the view-projection inverse. Clip coordinates.
     vec4 D = u_projViewInverse * H;
     // Transform by the view-projection inverse.
     vec4 worldPos = D / D.w;
