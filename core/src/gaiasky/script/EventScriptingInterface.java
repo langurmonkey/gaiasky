@@ -1993,7 +1993,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                               double longitude,
                               double latitude,
                               AtomicBoolean stop) {
-        if (checkNotNull(entity, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
+        if (checkNotNull(entity, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, -360d, 360d, "longitude")) {
             synchronized (focusView) {
                 focusView.setEntity(entity);
                 stops.add(stop);
