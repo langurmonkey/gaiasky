@@ -68,6 +68,7 @@ public abstract class AbstractCamera implements ICamera {
      * Stereoscopic mode cameras.
      **/
     protected PerspectiveCamera camLeft, camRight;
+
     /**
      * Vector with all perspective cameras.
      **/
@@ -436,5 +437,15 @@ public abstract class AbstractCamera implements ICamera {
     @Override
     public void setPointerProjectionOnFocus(Vector3 point) {
         // Empty.
+    }
+
+    @Override
+    public double getSpeedScaling() {
+        return 1;
+    }
+
+    @Override
+    public double getSpeedScalingCapped() {
+        return 1;
     }
 }

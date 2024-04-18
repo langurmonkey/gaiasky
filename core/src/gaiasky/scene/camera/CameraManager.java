@@ -269,6 +269,16 @@ public class CameraManager implements ICamera, IObserver {
         current.setPointerProjectionOnFocus(point);
     }
 
+    @Override
+    public double getSpeedScaling() {
+        return current.getSpeedScaling();
+    }
+
+    @Override
+    public double getSpeedScalingCapped() {
+        return current.getSpeedScalingCapped();
+    }
+
     public void backupCamera() {
         backupCamera = new BackupProjectionCamera(current.getCamera());
     }

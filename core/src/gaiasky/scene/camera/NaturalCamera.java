@@ -219,6 +219,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Factor applied to speed only.
      **/
     private double speedMultiplier = 1;
+
+    private double speedScaling, speedScalingCapped;
     /**
      * VR velocity vectors.
      **/
@@ -470,8 +472,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
 
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
-        double speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
-        double speedScalingCapped = Math.max(10d * Constants.M_TO_U, speedScaling);
+        speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
+        speedScalingCapped = Math.max(10d * Constants.M_TO_U, speedScaling);
         switch (m) {
             case FOCUS_MODE:
                 if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow()) {
@@ -2054,6 +2056,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void setPointerProjectionOnFocus(Vector3 point) {
         this.pointerCartesian.set(point);
         this.pointerCoordinatesFlag.set(true);
+    }
+
+    @Override
+    public double getSpeedScaling() {
+        return speedScaling;
+    }
+
+    @Override
+    public double getSpeedScalingCapped() {
+        return speedScalingCapped;
     }
 
     @Override

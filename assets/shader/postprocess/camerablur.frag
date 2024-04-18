@@ -35,7 +35,10 @@ void main() {
     // Transform by the view-projection inverse. Clip coordinates.
     vec4 D = u_projViewInverse * H;
     // Transform by the view-projection inverse.
-    vec4 worldPos = D / D.w;
+    //vec4 worldPos = D / D.w;
+    vec4 worldPos = D;
+    worldPos.xyz -= u_dCam;
+    worldPos /= D.w;
 
     // Current viewport position
     vec4 currentPos = H;

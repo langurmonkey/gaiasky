@@ -20,7 +20,8 @@ public final class CameraMotion extends PostProcessorEffect {
     private final float width;
     private final float height;
 
-    public CameraMotion(float width, float height) {
+    public CameraMotion(float width,
+                        float height) {
         this.width = width;
         this.height = height;
         cameraBlur = new CameraBlur();
@@ -41,8 +42,11 @@ public final class CameraMotion extends PostProcessorEffect {
     }
 
     private final Vector3 aux = new Vector3();
+
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src,
+                       FrameBuffer dest,
+                       GaiaSkyFrameBuffer main) {
         // Viewport.
         if (dest != null) {
             cameraBlur.setViewport(dest.getWidth(), dest.getHeight());
@@ -52,7 +56,7 @@ public final class CameraMotion extends PostProcessorEffect {
         // Delta camera pos.
         var cam = GaiaSky.instance.getICamera();
         cam.getDPos().put(aux);
-        cameraBlur.setDCam(aux);
+        cameraBlur.setDCam(aux.scl(1f / (float) cam.getSpeedScalingCapped()));
         // Zfar and K
         cameraBlur.setZfarK((float) cam.getFar(), Constants.getCameraK());
         // Previous projectionView inverse matrix.

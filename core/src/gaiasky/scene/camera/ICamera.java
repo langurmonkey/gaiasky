@@ -237,4 +237,7 @@ public interface ICamera {
      */
     void setPointerProjectionOnFocus(Vector3 point);
 
+    double getSpeedScaling();
+    double getSpeedScalingCapped();
+
 }
