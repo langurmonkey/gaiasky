@@ -25,10 +25,6 @@ out vec2 v_lineCenter;
 #include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 void main() {
     vec4 pos = a_position;
 
@@ -55,8 +51,4 @@ void main() {
     vec3 ndc = gpos.xyz / gpos.w; //perspective divide/normalize
     vec2 viewportCoord = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1
     v_lineCenter = viewportCoord * u_viewport;
-
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gpos, pos);
-    #endif
 }

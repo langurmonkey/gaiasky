@@ -100,10 +100,6 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif
-
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
 
@@ -138,7 +134,4 @@ void main() {
     ssrBuffers();
     #endif // ssrFlag
 
-    #ifdef velocityBufferFlag
-    velocityBuffer();
-    #endif
 }

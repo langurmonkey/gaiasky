@@ -23,10 +23,6 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif// ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif
-
 void main() {
     float trail;
     if (u_coordEnabled > 0.0) {
@@ -76,8 +72,4 @@ void main() {
     #ifdef ssrFlag
     ssrBuffers();
     #endif// ssrFlag
-
-    #ifdef velocityBufferFlag
-    velocityBuffer();
-    #endif
 }

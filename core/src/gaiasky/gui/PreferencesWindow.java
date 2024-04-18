@@ -89,7 +89,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox recGridProjectionLines;
     private OwnCheckBox frameCoordinates;
     private OwnCheckBox dynamicResolution;
-    private OwnCheckBox motionBlur;
     private OwnCheckBox ssr;
     private OwnCheckBox eclipses;
     private OwnCheckBox eclipseOutlines;
@@ -110,7 +109,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             smResolution, maxFpsInput;
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
             celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
-            chromaticAberration, filmGrain, lensFlare, velocityVectors;
+            chromaticAberration, filmGrain, lensFlare, velocityVectors, motionBlur;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
@@ -960,14 +959,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(ssrTooltip).left().padBottom(pad10).row();
 
             // MOTION BLUR
-            //OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
-            //motionBlur = new OwnCheckBox("", skin);
-            //motionBlur.setName("motion blur");
-            //motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur.active);
-            //motionBlur.setDisabled(safeMode || vr);
+            OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
+            motionBlur = new OwnSliderPlus("", Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY, skin);
+            motionBlur.setWidth(sliderWidth);
+            motionBlur.setMappedValue(settings.postprocess.motionBlur.strength);
+            motionBlur.addListener(event -> {
+                if(event instanceof ChangeEvent ce) {
+                   EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.getMappedValue());
+                }
+                return false;
+            });
 
-            //experimental.add(motionBlurLabel).left().padRight(pad34).padBottom(pad10);
-            //experimental.add(motionBlur).left().padRight(pad18).padBottom(pad10);
+            experimental.add(motionBlurLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(motionBlur).left().padRight(pad18).padBottom(pad10);
 
             // LABELS
             labels.addAll(dynamicResolutionLabel);
@@ -2680,12 +2684,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.graphics.dynamicResolution = !settings.runtime.openXr && dynamicResolution.isChecked();
         if (!settings.graphics.dynamicResolution) {
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
-        }
-
-        // Motion blur
-        if (motionBlur != null) {
-            resetRenderFlags = settings.postprocess.motionBlur.active != motionBlur.isChecked();
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked()));
         }
 
         // SVT cache size

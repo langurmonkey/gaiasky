@@ -13,4 +13,4 @@ vec3 computeRelativisticAberration(vec3 pos, float poslen, vec3 veldir, float vc
     float th_o = acos(costh_o);
     return rotate_vertex_position(pos, normalize(cross(cdir, pos)), th_o - th_s);
 }
-#endif
+#endif // GLSL_LIB_RELATIVITY

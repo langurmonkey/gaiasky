@@ -138,7 +138,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         addRelativisticUniforms(shaderProgram, camera);
         addGravWaveUniforms(shaderProgram);
         addDepthBufferUniforms(shaderProgram, camera);
-        addPreviousFrameUniforms(shaderProgram, camera);
         addVRScale(shaderProgram);
     }
 
@@ -190,22 +189,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     /**
-     * Uniforms needed for the velocity buffer.
-     *
-     * @param shaderProgram The program.
-     * @param camera        The camera.
-     */
-    protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram,
-                                            ICamera camera) {
-        // Velocity buffer for motion blur effect.
-        if (Settings.settings.postprocess.motionBlur.active) {
-            shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux3f));
-            shaderProgram.setUniformf("u_dCamPos", aux3d.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux3f));
-            shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
-        }
-    }
-
-    /**
      * Adds the camera up vector (only in non-cubemap mode) to compute
      * the billboard rotation. In regular mode, we use the camera up vector to
      * have screen-aligned billboards. In cubemap mode(s), we use a global up direction.
@@ -232,9 +215,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     protected ExtShaderProgram getShaderProgram(ExtShaderProgram[] programs) {
         boolean gw = Settings.settings.runtime.gravitationalWaves;
         boolean ra = Settings.settings.runtime.relativisticAberration;
-        boolean vb = Settings.settings.postprocess.motionBlur.active;
         boolean ssr = Settings.settings.postprocess.ssr.active;
-        int num = (gw ? 8 : 0) + (ra ? 4 : 0) + (vb ? 2 : 0) + (ssr ? 1 : 0);
+        int num = (gw ? 4 : 0) + (ra ? 2 : 0) + (ssr ? 1 : 0);
         if (SysUtils.isMac() && num == 0) {
             // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
             num = 2;

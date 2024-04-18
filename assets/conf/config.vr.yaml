@@ -563,7 +563,10 @@ postprocess:
     amount: 0.0
   # Motion blur effect
   motionBlur:
+    # Is it active?
     active: false
+    # Strength in [0,2]
+    strength: 0.0
   # Screen space reflections
   ssr:
     active: false

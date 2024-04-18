@@ -1,7 +1,6 @@
 #ifndef GLSL_LIB_PARALLAXMAPPING
 #define GLSL_LIB_PARALLAXMAPPING
 
-
 #define HEIGHT_FACTOR 70.0
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
     // number of depth layers

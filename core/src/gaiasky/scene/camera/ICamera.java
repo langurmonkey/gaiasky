@@ -59,6 +59,12 @@ public interface ICamera {
 
     void setPreviousPos(Vector3b pos);
 
+    Vector3b getDPos();
+
+    void setDPos(Vector3d dPos);
+
+    void setDPos(Vector3b dPos);
+
     Vector3b getInversePos();
 
     Vector3d getDirection();

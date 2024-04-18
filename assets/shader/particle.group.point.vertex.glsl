@@ -36,10 +36,6 @@ out float v_textureIndex;
  #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
-
 void main() {
     vec3 particlePos = a_position.xyz;
     if (u_transformFlag) {
@@ -76,8 +72,4 @@ void main() {
     vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;
     gl_PointSize = min(max(viewAngle * u_sizeFactor * cubemapSizeFactor, u_sizeLimits.x), u_sizeLimits.y);
-
-    #ifdef velocityBufferFlag
-    velocityBuffer(gpos, a_position.xyz, dist, vec2(1e10, 1e12), 1.0);
-    #endif // velocityBufferFlag
 }

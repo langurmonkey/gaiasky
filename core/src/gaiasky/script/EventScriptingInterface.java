@@ -3474,8 +3474,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setMotionBlur(boolean state) {
-        postRunnable(() -> em.post(Event.MOTION_BLUR_CMD, this, state));
+    public void setMotionBlur(boolean active) {
+        var strength = active ? 0.8f : 0f;
+        postRunnable(() -> em.post(Event.MOTION_BLUR_CMD, this, strength));
+    }
+
+    @Override
+    public void setMotionBlur(double strength) {
+        postRunnable(() -> em.post(Event.MOTION_BLUR_CMD, this, (float) strength));
     }
 
     @Override

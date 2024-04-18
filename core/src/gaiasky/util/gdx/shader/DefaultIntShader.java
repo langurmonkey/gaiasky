@@ -53,9 +53,6 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_cameraNearFar;
     public final int u_cameraK;
     public final int u_time;
-    // Vel buffer
-    public final int u_prevProjView;
-    public final int u_dCamPos;
     // VR
     public final int u_vrScale;
     public final int u_vrOffset;
@@ -260,8 +257,6 @@ public class DefaultIntShader extends BaseIntShader {
         u_cameraNearFar = register(Inputs.cameraNearFar, Setters.cameraNearFar);
         u_cameraK = register(Inputs.cameraK, Setters.cameraK);
         u_time = register(Inputs.time, Setters.time);
-        u_prevProjView = register(Inputs.prevProjView, Setters.prevProjView);
-        u_dCamPos = register(Inputs.dCamPos, Setters.dCamPos);
         u_vrScale = register(Inputs.vrScale, Setters.vrScale);
         u_vrOffset = register(Inputs.vrOffset, Setters.vrOffset);
         // Eclipses
@@ -490,9 +485,6 @@ public class DefaultIntShader extends BaseIntShader {
         if (attributes.has(FloatAttribute.Shininess))
             prefix.append("#define " + FloatAttribute.ShininessAlias + "Flag\n");
 
-        if (attributes.has(Matrix4Attribute.PrevProjView)) {
-            prefix.append("#define velocityBufferFlag\n");
-        }
         if (attributes.has(ColorAttribute.Metallic) || attributes.has(TextureAttribute.Metallic)) {
             prefix.append("#define metallicFlag\n");
             if (attributes.has(CubemapAttribute.ReflectionCubemap)) {
@@ -900,8 +892,6 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform cameraNearFar = new Uniform("u_cameraNearFar");
         public final static Uniform cameraK = new Uniform("u_cameraK");
 
-        public final static Uniform prevProjView = new Uniform("u_prevProjView");
-        public final static Uniform dCamPos = new Uniform("u_dCamPos");
         public final static Uniform vrScale = new Uniform("u_vrScale");
         public final static Uniform vrOffset = new Uniform("u_vrOffset");
 
@@ -1074,16 +1064,6 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, tmpM.set(renderable.worldTransform).inv().transpose());
             }
         };
-        public final static Setter prevProjView = new LocalSetter() {
-            @Override
-            public void set(BaseIntShader shader,
-                            int inputID,
-                            IntRenderable renderable,
-                            Attributes combinedAttributes) {
-                if (combinedAttributes.has(Matrix4Attribute.PrevProjView))
-                    shader.set(inputID, ((Matrix4Attribute) (Objects.requireNonNull(combinedAttributes.get(Matrix4Attribute.PrevProjView)))).value);
-            }
-        };
         public final static Setter eclipseOutlines = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
@@ -1112,16 +1092,6 @@ public class DefaultIntShader extends BaseIntShader {
                             Attributes combinedAttributes) {
                 if (combinedAttributes.has(FloatAttribute.EclipsingBodyRadius))
                     shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.EclipsingBodyRadius)))).value);
-            }
-        };
-        public final static Setter dCamPos = new LocalSetter() {
-            @Override
-            public void set(BaseIntShader shader,
-                            int inputID,
-                            IntRenderable renderable,
-                            Attributes combinedAttributes) {
-                if (combinedAttributes.has(Vector3Attribute.DCamPos))
-                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.DCamPos)))).value);
             }
         };
         public final static Setter vrScale = new LocalSetter() {

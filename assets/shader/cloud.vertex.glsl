@@ -111,7 +111,7 @@ out vec3 v_shadowMapUv;
 #endif //shadowMapFlag
 
 // GEOMETRY (QUATERNIONS)
-#if defined(velocityBufferFlag) || defined(relativisticEffects)
+#if defined(relativisticEffects)
 #include <shader/lib/geometry.glsl>
 #endif
 
@@ -251,10 +251,6 @@ out vec3 v_lightCol;
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 void main() {
     v_opacity = u_opacity;
     v_alphaTest = u_alphaTest;
@@ -278,12 +274,6 @@ void main() {
     v_fragPosWorld = pos.xyz;
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
-
-    #ifdef velocityBufferFlag
-    vec4 prevPos = pos + vec4(u_prevCamPos, 0.0);
-    vec4 gprevpos = u_prevProjView * prevPos;
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
-    #endif// velocityBufferFlag
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

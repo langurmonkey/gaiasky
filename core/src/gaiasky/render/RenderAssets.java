@@ -40,7 +40,6 @@ public class RenderAssets {
      * Shader name parts.
      */
     public static final String SUFFIX_SSR = "SSR";
-    public static final String SUFFIX_VELBUFF = "Velbuff";
     public static final String SUFFIX_REL = "Rel";
     public static final String SUFFIX_GRAV = "Grav";
     public static final String SUFFIX_COLMAP = "Colmap";
@@ -73,8 +72,8 @@ public class RenderAssets {
         // Build arrays of names and defines.
         var namesSource = new Array<String>(String.class);
         var definesSource = new Array<String>(String.class);
-        namesSource.add(SUFFIX_SSR, SUFFIX_VELBUFF);
-        definesSource.add("#define ssrFlag\n", "#define velocityBufferFlag\n");
+        namesSource.add(SUFFIX_SSR);
+        definesSource.add("#define ssrFlag\n");
         if (Settings.settings.runtime.relativisticAberration && Settings.settings.runtime.gravitationalWaves) {
             namesSource.add(SUFFIX_REL, SUFFIX_GRAV);
             definesSource.add("#define relativisticEffects\n", "#define gravitationalWaves\n");

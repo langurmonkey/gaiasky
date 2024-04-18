@@ -15,18 +15,10 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif
-
 void main() {
     fragColor = texture(u_diffuseCubemap, v_texCoords) * u_opacity;
 
     #ifdef ssrFlag
     ssrBuffers();
     #endif // ssrFlag
-
-    #ifdef velocityBufferFlag
-    velocityBuffer();
-    #endif
 }

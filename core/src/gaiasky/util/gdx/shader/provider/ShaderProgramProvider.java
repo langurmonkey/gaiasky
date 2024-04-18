@@ -117,7 +117,6 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
         boolean lazyLoad = parameter != null && parameter.name != null
                 && (parameter.name.contains(RenderAssets.SUFFIX_REL)
                 || parameter.name.contains(RenderAssets.SUFFIX_GRAV)
-                || (parameter.name.contains(RenderAssets.SUFFIX_VELBUFF) && !Settings.settings.postprocess.motionBlur.active)
                 || (parameter.name.contains(RenderAssets.SUFFIX_SSR) && !Settings.settings.postprocess.ssr.active)
         );
 

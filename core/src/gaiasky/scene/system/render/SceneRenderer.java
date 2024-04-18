@@ -915,7 +915,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                       final int h) {
         final int key = getKey(w, h);
         if (!frameBufferMap.containsKey(key)) {
-            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, true, Format.RGB888, true);
+            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, Format.RGB888, true);
             frameBufferMap.put(key, fb);
         }
         return frameBufferMap.get(key);

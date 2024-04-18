@@ -22,10 +22,6 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif // velocityBufferFlag
-
 vec4 programmatic(float dist) {
     float profile =  1.0 - pow(abs(sin(PI * dist / 2.0)), u_falloff);
     return vec4(v_col.rgb * profile, 1.0) * v_col.a;
@@ -55,8 +51,4 @@ void main() {
     #ifdef ssrFlag
     ssrBuffers();
     #endif // ssrFlag
-
-    #ifdef velocityBufferFlag
-    velocityBuffer(fragColor.a);
-    #endif // velocityBufferFlag
 }

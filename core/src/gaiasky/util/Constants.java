@@ -188,6 +188,8 @@ public class Constants {
     public static final float BACKBUFFER_SCALE_MIN = 0.1f;
     public static final float BACKBUFFER_SCALE_MAX = 4.0f;
     public static final float BACKBUFFER_SCALE_STEP = 0.1f;
+    public static final float MOTIONBLUR_MIN = 0.0f;
+    public static final float MOTIONBLUR_MAX = 2.0f;
     // Max time for VSOP87 algorithms
     public static final long MAX_VSOP_TIME_MS = 20000L * (long) Nature.Y_TO_MS;
     // Min time for VSOP87 algorithms

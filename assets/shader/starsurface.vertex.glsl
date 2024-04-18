@@ -113,9 +113,9 @@ out vec3 v_ambientLight;
 #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
-#if defined(relativisticEffects) || defined(velocityBufferFlag)
+#if defined(relativisticEffects)
 #include <shader/lib/geometry.glsl>
-#endif // relativisticEffects || velocityBufferFlag
+#endif // relativisticEffects
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////GRAVITATIONAL WAVES - VERTEX
@@ -125,10 +125,6 @@ out vec3 v_ambientLight;
 #endif // gravitationalWaves
 
 out float v_depth;
-
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
 
 
 void main() {
@@ -160,10 +156,6 @@ void main() {
 
 	vec4 gpos = u_projViewTrans * pos;
 	gl_Position = gpos;
-
-	#ifdef velocityBufferFlag
-	velocityBufferCam(gpos, pos);
-    #endif
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

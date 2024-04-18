@@ -143,10 +143,6 @@ float noise(vec3 position, int octaves, float frequency, float persistence) {
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif
-
 void main() {
     // Perimeter is 1 when normal faces camera, 0 when normal is 90 degrees from view.
     float perimeter = dot(normalize(v_normal), vec3(v_viewVec));
@@ -176,8 +172,4 @@ void main() {
     #ifdef ssrFlag
     ssrBuffers();
     #endif // ssrFlag
-
-    #ifdef velocityBufferFlag
-    velocityBuffer();
-    #endif
 }

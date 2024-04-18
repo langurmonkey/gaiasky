@@ -47,10 +47,6 @@ out vec4 v_col;
 #define len0 20000.0
 #define day_to_year 1.0 / 365.25
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
-
 void main() {
 	// Lengths
 	float l0 = len0 * u_vrScale;
@@ -113,10 +109,6 @@ void main() {
     vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;
     gl_PointSize = pointSize;
-
-    #ifdef velocityBufferFlag
-    velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
-    #endif // velocityBufferFlag
 
     if (dist < l0){
         // The pixels of this star will be discarded in the fragment shader

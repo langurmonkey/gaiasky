@@ -48,10 +48,6 @@ flat out int v_type;
 // Layer in the texture array
 flat out int v_layer;
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
-
 void main() {
     vec3 particlePos = a_particlePos;
     if (u_transformFlag) {
@@ -88,9 +84,5 @@ void main() {
     #include <shader/snippet/billboard.glsl>
 
     gl_Position = gpos * u_vrScale;
-
-    #ifdef velocityBufferFlag
-    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
-    #endif
 
 }

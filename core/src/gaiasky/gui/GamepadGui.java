@@ -85,12 +85,11 @@ public class GamepadGui extends AbstractGui {
     private OwnTextButton timeUp;
     private OwnTextButton timeDown;
     private OwnTextButton timeReset;
-    private OwnTextButton motionBlurButton;
     private OwnTextButton starGlowButton;
     private OwnTextButton invertYButton;
     private OwnTextButton invertXButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness,
-            magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, ambientLight, lensFlare;
+            magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, lensFlare, motionBlur;
     private OwnTextField searchField;
     private OwnLabel infoMessage, cameraModeLabel, cameraFocusLabel;
     private Actor[][] currentModel;
@@ -1012,14 +1011,12 @@ public class GamepadGui extends AbstractGui {
             });
 
             // Motion blur
-            motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
-            graphicsModel[1][2] = motionBlurButton;
-            motionBlurButton.setWidth(ww);
-            motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur.active);
-            motionBlurButton.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.MOTION_BLUR_CMD, motionBlurButton, motionBlurButton.isChecked());
-                    return true;
+            motionBlur = new OwnSliderPlus(I18n.msg("gui.motionblur"), Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+            motionBlur.setWidth(ww);
+            motionBlur.setMappedValue(Settings.settings.postprocess.motionBlur.strength);
+            motionBlur.addListener(event -> {
+                if(event instanceof ChangeEvent ce) {
+                    EventManager.publish(Event.MOTION_BLUR_CMD, motionBlur, motionBlur.getMappedValue());
                 }
                 return false;
             });
@@ -1048,7 +1045,7 @@ public class GamepadGui extends AbstractGui {
             graphicsT.add(magnitudeMultiplier).padBottom(pad10).padRight(pad40);
             graphicsT.add(starGlowButton).padBottom(pad10).row();
             graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad40);
-            graphicsT.add(motionBlurButton).padBottom(pad10).row();
+            //graphicsT.add(motionBlurButton).padBottom(pad10).row();
             graphicsT.add(pointSize).padBottom(pad10).padRight(pad40);
             graphicsT.add(resetDefaults).padBottom(pad10).row();
             graphicsT.add(starBaseLevel).padBottom(pad10).padRight(pad40);

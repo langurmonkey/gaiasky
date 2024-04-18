@@ -18,10 +18,6 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif
-
 float light(float distance_center, float decay) {
 	return 1.0 - pow(abs(sin(PI * distance_center / 2.0)), decay);
 }
@@ -48,8 +44,4 @@ void main() {
 	#ifdef ssrFlag
 	ssrBuffers();
 	#endif // ssrFlag
-
-	#ifdef velocityBufferFlag
-	velocityBuffer(fragColor.a);
-    #endif
 }

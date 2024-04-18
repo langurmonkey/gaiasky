@@ -14,8 +14,6 @@ import com.badlogic.gdx.utils.NumberUtils;
 public class Matrix4Attribute extends Attribute {
     public static final String ShadowMapProjViewTransAlias = "shadowMapProjViewTrans";
     public static final int ShadowMapProjViewTrans = register(ShadowMapProjViewTransAlias);
-    public static final String PrevProjViewAlias = "prevProjView";
-    public static final int PrevProjView = register(PrevProjViewAlias);
     public static final String EnvRotationAlias = "envRotation";
     public static final int EnvRotation = register(EnvRotationAlias);
     public Matrix4 value;

@@ -33,10 +33,6 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif
-
 void main() {
     vec4 diffuse = u_diffuseColor;
 
@@ -63,9 +59,5 @@ void main() {
         #ifdef ssrFlag
         ssrBuffers();
         #endif // ssrFlag
-
-        #ifdef velocityBufferFlag
-        velocityBuffer();
-        #endif
     }
 }

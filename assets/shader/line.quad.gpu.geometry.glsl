@@ -19,11 +19,6 @@ out vec4 v_col;
 out float v_coord;
 out vec2 v_uv;
 
-#ifdef velocityBufferFlag
-#include <shader/lib/geometry.glsl>
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 void main() {
     // Colors and coordinates.
     dvec4 col1 = gs_in[0].color;
@@ -73,9 +68,6 @@ void main() {
     v_uv = vec2(0.0, 0.0);
 
     gl_Position = u_projView * vec4(v1.xyz + c1, v1.w);
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gl_Position, vec3(v1.xyz + c1));
-    #endif
     EmitVertex();
     // =================
 
@@ -84,9 +76,6 @@ void main() {
     v_uv = vec2(0.0, 1.0);
 
     gl_Position = u_projView * vec4(v1.xyz - c1, v1.w);
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gl_Position, vec3(v1.xyz - c1));
-    #endif
     EmitVertex();
     // =================
 
@@ -96,9 +85,6 @@ void main() {
     v_uv = vec2(1.0, 0.0);
 
     gl_Position = u_projView * vec4(v2.xyz + c2, v2.w);
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gl_Position, vec3(v2.xyz + c2));
-    #endif
     EmitVertex();
     // =================
 
@@ -107,9 +93,6 @@ void main() {
     v_uv = vec2(1.0, 1.0);
 
     gl_Position = u_projView * vec4(v2.xyz - c2, v2.w);
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gl_Position, vec3(v2.xyz - c2));
-    #endif
     EmitVertex();
     // =================
 

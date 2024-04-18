@@ -109,7 +109,7 @@ uniform mat4 u_shadowMapProjViewTrans;
 #include <shader/lib/atmscattering.glsl>
 
 // GEOMETRY (QUATERNIONS)
-#if defined(velocityBufferFlag) || defined(relativisticEffects)
+#if defined(relativisticEffects)
     #include <shader/lib/geometry.glsl>
 #endif
 
@@ -211,10 +211,6 @@ struct VertexData {
 };
 out VertexData v_data;
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 void main() {
     computeAtmosphericScatteringGround();
 
@@ -233,11 +229,6 @@ void main() {
 
     v_data.fragPosWorld = pos.xyz;
     gl_Position = pos;
-
-    #ifdef velocityBufferFlag
-    vec4 gpos = u_projViewTrans * pos;
-    velocityBufferCam(gpos, pos);
-    #endif
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

@@ -29,10 +29,6 @@ uniform float u_vrScale;
 out vec4 v_color;
 out vec2 v_uv;
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
-
 void main() {
     // Solid angle threshold
     float th0 = u_th_angle_point;
@@ -61,8 +57,4 @@ void main() {
     #include <shader/snippet/billboard.glsl>
 
     gl_Position = gpos;
-
-    #ifdef velocityBufferFlag
-    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
-    #endif// velocityBufferFlag
 }

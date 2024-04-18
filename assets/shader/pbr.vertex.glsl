@@ -109,7 +109,7 @@ uniform mat4 u_shadowMapProjViewTrans;
 #include <shader/lib/atmscattering.glsl>
 
 // GEOMETRY (QUATERNIONS)
-#if defined(velocityBufferFlag) || defined(relativisticEffects)
+#if defined(relativisticEffects)
     #include <shader/lib/geometry.glsl>
 #endif
 
@@ -273,10 +273,6 @@ out vec3 o_fragPosition;
 out float o_fragHeight;
 #endif // heightFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 #if defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
     // maps the height scale in internal units to a normal strength
     float computeNormalStrength(float heightScale) {
@@ -356,10 +352,6 @@ void main() {
     v_data.fragPosWorld = pos.xyz;
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
-
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gpos, pos);
-    #endif // velocityBufferFlag
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

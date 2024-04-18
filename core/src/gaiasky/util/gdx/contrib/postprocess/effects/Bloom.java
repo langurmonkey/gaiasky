@@ -29,7 +29,7 @@ public final class Bloom extends PostProcessorEffect {
     private int sFactor, dFactor;
 
     public Bloom(int fboWidth, int fboHeight) {
-        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false, false, false, false, false);
+        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false, false, false, false);
 
         blur = new Blur(fboWidth, fboHeight);
         threshold = new Threshold();

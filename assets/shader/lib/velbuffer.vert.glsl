@@ -1,4 +1,9 @@
-#define u_to_pc 3.240779289444362E-8
+#ifndef GLSL_LIB_VELBUFF_VERT
+#define GLSL_LIB_VELBUFF_VERT
+
+#ifndef U_TO_PC
+#define U_TO_PC 3.240779289444362E-8
+#endif // U_TO_PC
 
 // Projection-View matrix in previous frame
 uniform mat4 u_prevProjView;
@@ -29,7 +34,7 @@ void velocityBuffer(vec4 gpos, vec3 pos, float dist, vec3 pm, mat4 prevTrans, ve
     prevPos = prevPos + pm;
     vec4 gprevpos = prevTrans * vec4(prevPos, 1.0);
 
-    float distpc = dist * u_vrScale * u_to_pc;
+    float distpc = dist * u_vrScale * U_TO_PC;
     float fac = 1.0;
     if(fadeScale > 0.0){
         fac = (1.0 - smoothstep(fadepc.x, fadepc.y, distpc)) * fadeScale;
@@ -76,3 +81,4 @@ void velocityBufferCam(vec4 gpos, vec4 pos){
 void velocityBufferCam(vec4 gpos, vec3 pos){
     velocityBufferCam(gpos, vec4(pos, 1.0), 1.0);
 }
+#endif // GLSL_LIB_VELBUFF_VERT

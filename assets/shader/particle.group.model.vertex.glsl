@@ -53,10 +53,6 @@ out float v_textureIndex;
 
 #define DAY_TO_YEAR 1.0 / 365.25
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
-
 #ifndef PI
 #define PI 3.141592653589793238462643383
 #endif // PI
@@ -114,8 +110,4 @@ void main() {
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;
-
-    #ifdef velocityBufferFlag
-    velocityBufferCam(gpos, vert_pos);
-    #endif // velocityBufferFlag
 }

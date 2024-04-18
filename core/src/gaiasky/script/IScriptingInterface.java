@@ -2997,11 +2997,18 @@ public interface IScriptingInterface {
     void setLensFlare(double strength);
 
     /**
-     * Enables or disables the motion blur effect.
+     * Enables or disables the camera motion blur effect.
      *
      * @param state Activate (true) or deactivate (false).
      */
     void setMotionBlur(boolean state);
+
+    /**
+     * Enables or disables the camera motion blur effect.
+     *
+     * @param strength The strength of camera the motion blur effect, in [{@link Constants#MOTIONBLUR_MIN}, {@link Constants#MOTIONBLUR_MAX}].
+     */
+    void setMotionBlur(double strength);
 
     /**
      * Enables or disables the stars glowing over objects.

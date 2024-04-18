@@ -84,4 +84,4 @@ vec3 cooktorrance_specular(in float NdL, in float NdV, in float NdH, in vec3 spe
 
     return (1.0 / rim) * specular * G * D;
 }
-#endif
+#endif // GLSL_LIB_SPECULAR

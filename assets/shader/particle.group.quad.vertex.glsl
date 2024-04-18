@@ -53,10 +53,6 @@ out float v_textureIndex;
 
 #define DAY_TO_YEAR 1.0 / 365.25
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
-
 void main() {
     vec3 particlePos = a_particlePos.xyz;
     if (u_transformFlag) {
@@ -108,8 +104,4 @@ void main() {
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;
-
-    #ifdef velocityBufferFlag
-    velocityBufferBillboard(gpos, a_particlePos, s_size, a_position, s_quat, s_quat_conj);
-    #endif // velocityBufferFlag
 }

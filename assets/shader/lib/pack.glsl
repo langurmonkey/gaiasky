@@ -1,5 +1,6 @@
 #ifndef GLSL_LIB_PACK
 #define GLSL_LIB_PACK
+
 const float c_precision = 128.0;
 const float c_precisionp1 = c_precision + 1.0;
 

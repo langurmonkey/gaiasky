@@ -41,10 +41,6 @@ out float v_textureIndex;
 #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 #define M_TO_U 1e-9
 #define D_TO_S 86400.0
 
@@ -148,8 +144,4 @@ void main() {
 
     v_uv = a_texCoord;
     v_textureIndex = a_textureIndex;
-
-    #ifdef velocityBufferFlag
-    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
-    #endif
 }

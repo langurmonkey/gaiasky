@@ -5,7 +5,7 @@ layout (triangles) in;
 #define tessellationEvaluationShader
 
 // GEOMETRY (QUATERNIONS)
-#if defined(velocityBufferFlag) || defined(relativisticEffects)
+#if defined(relativisticEffects)
 #include <shader/lib/geometry.glsl>
 #endif
 
@@ -124,10 +124,6 @@ out vec3 o_normalTan;
 out vec3 o_fragPosition;
 out float o_fragHeight;
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 #if defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
     // maps the height scale in internal units to a normal strength
     float computeNormalStrength(float heightScale) {
@@ -195,10 +191,6 @@ void main(void){
 
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
-
-    #ifdef velocityBufferFlag
-        velocityBufferCam(gpos, pos);
-    #endif// velocityBufferFlag
 
     // Plumbing
     o_fragPosition = pos.xyz;

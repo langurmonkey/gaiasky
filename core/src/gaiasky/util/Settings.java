@@ -3672,7 +3672,10 @@ public class Settings extends SettingsObject {
                     }
                     case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
                     case SSR_CMD -> ssr.active = (Boolean) data[0];
-                    case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
+                    case MOTION_BLUR_CMD -> {
+                        motionBlur.strength = (Float) data[0];
+                        motionBlur.active = motionBlur.strength > 0;
+                    }
                     case REPROJECTION_CMD -> {
                         reprojection.active = (Boolean) data[0];
                         reprojection.mode = (ReprojectionMode) data[1];
@@ -4107,6 +4110,7 @@ public class Settings extends SettingsObject {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class MotionBlurSettings extends SettingsObject {
             public boolean active;
+            public float strength;
 
             @Override
             public MotionBlurSettings clone() {

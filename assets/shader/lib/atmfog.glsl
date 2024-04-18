@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_ATMFOG
+#define GLSL_LIB_ATMFOG
+
 #ifdef atmosphereGround
     // FOG
     uniform float fInnerRadius; /* The inner (planetary) radius*/
@@ -35,4 +38,6 @@
     vec3 applyFog(in vec3 fragColor, in float NL){
         return fragColor;
     }
-#endif
+#endif // atmosphereGround
+
+#endif // GLSL_LIB_ATMFOG

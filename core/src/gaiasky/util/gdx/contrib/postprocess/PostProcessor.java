@@ -53,19 +53,19 @@ public final class PostProcessor implements Disposable {
 
     /** Construct a new PostProcessor with FBO dimensions set to the size of the screen */
     public PostProcessor(RenderType rt, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
-        this(rt, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), useDepth, useAlphaChannel, use32Bits, false, false, false, true);
+        this(rt, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), useDepth, useAlphaChannel, use32Bits, false, false, true);
     }
 
     /**
      * Construct a new PostProcessor with the given parameters, defaulting to <em>TextureWrap.ClampToEdge</em> as texture wrap
      * mode
      */
-    public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean hasDepth, boolean useAlphaChannel, boolean use32Bits, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
-        this(rt, fboWidth, fboHeight, hasDepth, useAlphaChannel, use32Bits, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+    public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean hasDepth, boolean useAlphaChannel, boolean use32Bits, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
+        this(rt, fboWidth, fboHeight, hasDepth, useAlphaChannel, use32Bits, hasNormal, hasReflectionMask, preventFloatBuffer, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
     }
 
     /** Construct a new PostProcessor with the given parameters and the specified texture wrap mode */
-    public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer, TextureWrap u, TextureWrap v) {
+    public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer, TextureWrap u, TextureWrap v) {
         if (use32Bits) {
             if (useAlphaChannel) {
                 pixmapFormat = Format.RGBA8888;
@@ -80,7 +80,7 @@ public final class PostProcessor implements Disposable {
             }
         }
 
-        composite = newPingPongBuffer(fboWidth, fboHeight, pixmapFormat, useDepth, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer);
+        composite = newPingPongBuffer(fboWidth, fboHeight, pixmapFormat, useDepth, hasNormal, hasReflectionMask, preventFloatBuffer);
         setBufferTextureWrap(u, v);
         if (rt == RenderType.screen) {
             UpscaleFilter upscaleFilter = Settings.settings.postprocess.upscaleFilter;
@@ -107,7 +107,7 @@ public final class PostProcessor implements Disposable {
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
     public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
-        return newPingPongBuffer(width, height, frameBufferFormat, hasDepth, true, false, false, true);
+        return newPingPongBuffer(width, height, frameBufferFormat, hasDepth, false, false, true);
     }
 
     /**
@@ -116,8 +116,8 @@ public final class PostProcessor implements Disposable {
      * <p>
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
-    public static PingPongBuffer newPingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
-        PingPongBuffer buffer = new PingPongBuffer(width, height, pixmapFormat, hasDepth, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer);
+    public static PingPongBuffer newPingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
+        PingPongBuffer buffer = new PingPongBuffer(width, height, pixmapFormat, hasDepth, hasNormal, hasReflectionMask, preventFloatBuffer);
         buffers.add(buffer);
         return buffer;
     }

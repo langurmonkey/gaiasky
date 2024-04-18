@@ -392,7 +392,6 @@ public class ModelEntityRenderSystem {
                     if (relativistic) {
                         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
                     }
-                    mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
                     batch.render(mc.instance, mc.env);
                 }
             }
@@ -479,7 +478,6 @@ public class ModelEntityRenderSystem {
                 mc.updateRelativisticEffects(cam, 0);
             else
                 mc.updateRelativisticEffects(cam);
-            mc.updateVelocityBufferUniforms(cam);
             batch.render(mc.instance, mc.env);
         } else {
             // Keep loading
@@ -586,7 +584,6 @@ public class ModelEntityRenderSystem {
         cloud.cloud.touch(model);
         ICamera cam = GaiaSky.instance.getICamera();
         cloud.cloud.mc.updateRelativisticEffects(cam);
-        cloud.cloud.mc.updateVelocityBufferUniforms(cam);
         cloud.cloud.mc.setTransparency(alpha * base.opacity);
         cloud.cloud.mc.updateEclipsingBodyUniforms(entity);
         batch.render(cloud.cloud.mc.instance, model.model.env);

@@ -35,4 +35,4 @@ float dist_segment_point(in vec3 v, in vec3 w, in vec3 p) {
     vec3 projection = v + aux4 * t;
     return distance(p, projection);
 }
-#endif
+#endif // GLSL_LIB_MATH

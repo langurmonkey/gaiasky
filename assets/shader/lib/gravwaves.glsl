@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_GRAVWAVES
+#define GLSL_LIB_GRAVWAVES
+
 uniform vec4 u_hterms; // hpluscos, hplussin, htimescos, htimessin
 uniform vec3 u_gw; // Location of gravitational wave, cartesian
 uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
@@ -44,3 +47,4 @@ vec3 computeGravitationalWaves(vec3 pos, vec3 gw, mat3 gwmat3, float t, float om
     pos = normalize(pos) * poslen;
     return pos;
 }
+#endif // GLSL_LIB_GRAVWAVES

@@ -26,10 +26,6 @@ uniform vec3 u_camUp;
 out vec4 v_color;
 out vec2 v_texCoords;
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif
-
 void main() {
     v_color = u_color;
     v_texCoords = a_texCoord0;
@@ -55,8 +51,4 @@ void main() {
     #include <shader/snippet/billboard.glsl>
 
     gl_Position = gpos;
-
-    #ifdef velocityBufferFlag
-    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
-    #endif// velocityBufferFlag
 }

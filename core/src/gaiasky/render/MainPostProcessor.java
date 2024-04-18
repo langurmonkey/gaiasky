@@ -68,10 +68,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
      * Aspect ratio cache.
      **/
     float ar;
-    Entity blurObject;
-    BaseView blurObjectView;
     FocusView focusView;
-    boolean blurObjectAdded = false;
 
     /**
      * The asset manager.
@@ -130,7 +127,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE,
                 Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD,
                 Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
-                Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGED_CMD,
+                Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CHANGED_CMD,
                 Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE,
                 Event.CAMERA_ORIENTATION_UPDATE, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
                 Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
@@ -168,7 +165,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, true, false, !safeMode, !safeMode, safeMode);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // LIGHT GLOW
@@ -226,6 +223,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
         ssrEffect.setEnabled(settings.postprocess.ssr.active && !vr && !safeMode);
         ppb.set(ssrEffect);
+
+        // CAMERA MOTION BLUR
+        CameraMotion cameraBlur = new CameraMotion(width, height);
+        cameraBlur.setBlurScale(Settings.settings.postprocess.motionBlur.strength);
+        cameraBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
+        cameraBlur.setEnabledOptions(false, false);
+        ppb.set(cameraBlur);
+        updateCameraBlur(ppb, gq);
 
         /*
          TODO
@@ -305,7 +310,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         bloom.setThreshold(0.3f);
         bloom.setEnabled(settings.postprocess.bloom.intensity > 0);
         ppb.set(bloom);
-
 
         // DISTORTION (STEREOSCOPIC MODE)
         Curvature curvature = new Curvature();
@@ -391,48 +395,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         return ppb;
     }
 
-    private void initializeBlurObject() {
-        if (blurObject == null) {
-            var at = scene.archetypes().get("gaiasky.scenegraph.BackgroundModel");
-            var entity = at.createEntity();
-
-            var base = Mapper.base.get(entity);
-            base.setName("BlurBackgroundSkybox");
-            base.setCt("");
-
-            var body = Mapper.body.get(entity);
-            body.setColor(new float[]{0, 0, 0, 0});
-            body.setSize(1.0);
-
-            var label = Mapper.label.get(entity);
-            label.label = false;
-
-            var graph = Mapper.graph.get(entity);
-            graph.setParent(Scene.ROOT_NAME);
-
-            var coordinates = Mapper.coordinates.get(entity);
-            StaticCoordinates sc = new StaticCoordinates();
-            sc.setPosition(new double[]{0, 0, 0});
-            coordinates.coordinates = sc;
-
-            var model = Mapper.model.get(entity);
-            ModelComponent mc = new ModelComponent(true);
-            mc.setType("sphere");
-            Map<String, Object> params = new HashMap<>();
-            params.put("quality", 50L);
-            params.put("diameter", 1.0d);
-            params.put("flip", true);
-            mc.setParams(params);
-            MaterialComponent mtc = new MaterialComponent();
-            mc.setMaterial(mtc);
-            model.model = mc;
-
-            scene.initializeEntity(entity);
-            scene.setUpEntity(entity);
-
-            blurObject = entity;
-        }
-    }
 
     /**
      * Updates the post-processing effects' attributes using the new graphics quality
@@ -974,20 +936,17 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             case MOTION_BLUR_CMD -> {
-                var enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
+                var strength = (Float) data[0];
+                var enabled = strength > 0 && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
                         if (cameraMotion != null) {
                             cameraMotion.setEnabled(enabled);
+                            cameraMotion.setBlurScale(strength);
                         }
                     }
-                }
-                if (enabled && blurObjectAdded) {
-                    blurObjectView.setVisible(true);
-                } else if (blurObject != null) {
-                    blurObjectView.setVisible(true);
                 }
             }
             case CUBEMAP_CMD -> {
@@ -1124,18 +1083,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         Levels levels = (Levels) ppb.get(Levels.class);
                         if (levels != null)
                             levels.setExposure(exposure);
-                    }
-                }
-            }
-            case FPS_INFO -> {
-                var fps = (Float) data[0];
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
-                        if (cameraMotionBlur != null) {
-                            cameraMotionBlur.setVelocityScale(fps / 60f);
-                        }
                     }
                 }
             }

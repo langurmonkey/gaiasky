@@ -70,10 +70,6 @@ out vec2 v_uv;
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
-
 float idx(vec4[N_VECS] v, int i) {
     int a = int(i / 4);
     int b = i - a * 4;
@@ -183,8 +179,4 @@ void main() {
     gl_Position = gpos;
 
     v_uv = a_texCoord0;
-
-    #ifdef velocityBufferFlag
-    velocityBufferBillboard(gpos, a_starPos, s_size, a_position, s_quat, s_quat_conj);
-    #endif // velocityBufferFlag
 }

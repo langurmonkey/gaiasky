@@ -25,8 +25,6 @@ public class Vector3Attribute extends Attribute {
     public static final int Gw = register(GwAlias);
     public static final String FogColorAlias = "fogCol";
     public static final int FogColor = register(FogColorAlias);
-    public static final String DCamPosAlias = "dCamPos";
-    public static final int DCamPos = register(DCamPosAlias);
     public static final String VrOffsetAlias = "vrOffset";
     public static final int VrOffset = register(VrOffsetAlias);
     public static final String EclipsingBodyPosAlias = "eclipsingBodyPos";

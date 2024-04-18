@@ -117,7 +117,7 @@ out vec3 v_ambientLight;
 #include <shader/lib/atmscattering.glsl>
 
 // GEOMETRY (QUATERNIONS)
-#if defined(velocityBufferFlag) || defined(relativisticEffects)
+#if defined(relativisticEffects)
 #include <shader/lib/geometry.glsl>
 #endif
 
@@ -128,10 +128,6 @@ out vec3 v_ambientLight;
 #ifdef gravitationalWaves
 #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
-
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.vert.glsl>
-#endif // velocityBufferFlag
 
 void main() {
 	computeAtmosphericScatteringGround();
@@ -162,10 +158,6 @@ void main() {
 
 	vec4 gpos = u_projViewTrans * pos;
 	gl_Position = gpos;
-
-	#ifdef velocityBufferFlag
-	velocityBufferCam(gpos, pos, 0.0);
-    #endif // velocityBufferFlag
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

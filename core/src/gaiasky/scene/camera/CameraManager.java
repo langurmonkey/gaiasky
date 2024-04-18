@@ -32,7 +32,6 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Last position, for working out velocity
      **/
-    private final Vector3d lastPos;
     private final Vector3d out;
     private final Vector3d in;
     private final Vector3b inb;
@@ -69,7 +68,6 @@ public class CameraManager implements ICamera, IObserver {
         this.focusView = new FocusView();
 
         this.mode = mode;
-        this.lastPos = new Vector3d();
         this.in = new Vector3d();
         this.inb = new Vector3b();
         this.out = new Vector3d();
@@ -218,6 +216,21 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
+    public Vector3b getDPos() {
+        return current.getDPos();
+    }
+
+    @Override
+    public void setDPos(Vector3d dPos) {
+        current.setDPos(dPos);
+    }
+
+    @Override
+    public void setDPos(Vector3b dPos) {
+        current.setDPos(dPos);
+    }
+
+    @Override
     public Vector3b getInversePos() {
         return current.getInversePos();
     }
@@ -274,16 +287,20 @@ public class CameraManager implements ICamera, IObserver {
      * @param time The time frame provider.
      */
     public void update(double dt, ITimeFrameProvider time) {
-        // Update the previous position for this frame
+        // Update the previous position for this frame.
         current.setPreviousPos(current.getPos());
-        // Update the previous projView matrix
+        // Update the previous projView matrix.
         current.setPreviousProjView(current.getProjView());
 
-        // Update the camera
+        // Update the camera.
         current.update(dt, time);
 
-        // Speed = dx/dt
-        velocity.set(lastPos).sub(current.getPos());
+        // Update delta position, for velocity buffer.
+        var dPos = current.getDPos();
+        dPos.set(current.getPreviousPos()).sub(current.getPos());
+
+        // Speed = dx/dt.
+        velocity.set(dPos);
         velocityNormalized.set(velocity).nor();
         speed = (velocity.len() * Constants.U_TO_KM) / (dt * Nature.S_TO_H);
 
@@ -295,9 +312,6 @@ public class CameraManager implements ICamera, IObserver {
         // Post event with camera motion parameters
         EventManager.publish(Event.CAMERA_MOTION_UPDATE, this, current.getPos(), speed, velocityNormalized, current.getCamera());
 
-        // Update last pos and dir
-        lastPos.set(current.getPos());
-
         int screenX = Gdx.input.getX();
         int screenY = Gdx.input.getY();
         int width = Gdx.graphics.getWidth();
@@ -307,7 +321,7 @@ public class CameraManager implements ICamera, IObserver {
         // This check is for Windows, which crashes when the window is minimized
         // as graphics.get[Width|Height]() returns 0.
         if (width > 0 && height > 0) {
-            // Update Pointer and view Alpha/Delta
+            // Update Pointer and view Alpha/Delta.
             updateRADEC(screenX, screenY, width / 2, height / 2);
         }
         // Update Pointer LAT/LON.
@@ -318,7 +332,7 @@ public class CameraManager implements ICamera, IObserver {
             current.setPointerProjectionOnFocus(intersection);
         }
 
-        // Work out and broadcast the closest objects
+        // Work out and broadcast the closest objects.
         IFocus closestBody = getClosestBody();
         if (!closestBody.isEmpty() && closestBody.getOctant() != null && !closestBody.getOctant().observed) {
             ((FocusView) closestBody).clearEntity();

@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_VELBUFF_FRAG
+#define GLSL_LIB_VELBUFF_FRAG
+
 layout (location = 1) out vec4 velMap;
 in vec2 v_vel;
 
@@ -17,3 +20,4 @@ void velocityBuffer(float scl) {
 void velocityBuffer() {
     velMap = vec4(v_vel.x, v_vel.y, 0.0, 1.0);
 }
+#endif // GLSL_LIB_VELBUFF_FRAG

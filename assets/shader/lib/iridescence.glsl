@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_IRIDESCENSE
+#define GLSL_LIB_IRIDESCENSE
+
 float sq(float t) {
     return t * t;
 }
@@ -165,3 +168,4 @@ vec3 evalIridescence(float outsideIOR, float eta2, float cosTheta1, float thinFi
     // Since out of gamut colors might be produced, negative color values are clamped to 0.
     return max(I, vec3(0.0));
 }
+#endif // GLSL_LIB_IRIDESCENSE

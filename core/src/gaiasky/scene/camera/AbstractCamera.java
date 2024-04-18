@@ -40,7 +40,7 @@ public abstract class AbstractCamera implements ICamera {
      * Camera near value.
      **/
     public double CAM_NEAR;
-    public Vector3b pos, posInv, prevPos;
+    public Vector3b pos, posInv, prevPos, dPos;
     public Vector3d tmp, shift;
     /**
      * The main camera.
@@ -99,6 +99,7 @@ public abstract class AbstractCamera implements ICamera {
         this.parent = parent;
         pos = new Vector3b();
         prevPos = new Vector3b();
+        dPos = new Vector3b();
         posInv = new Vector3b();
         shift = new Vector3d();
         tmp = new Vector3d();
@@ -173,6 +174,21 @@ public abstract class AbstractCamera implements ICamera {
     @Override
     public void setPreviousPos(Vector3d prevpos) {
         this.prevPos.set(prevpos);
+    }
+
+    @Override
+    public void setDPos(Vector3b dPos) {
+        this.dPos.set(dPos);
+    }
+
+    @Override
+    public void setDPos(Vector3d dPos) {
+        this.dPos.set(dPos);
+    }
+
+    @Override
+    public Vector3b getDPos() {
+        return dPos;
     }
 
     @Override

@@ -21,7 +21,7 @@ public final class PingPongBuffer implements Disposable {
     public final boolean ownResources;
     // save/restore state
     private final GaiaSkyFrameBuffer ownedMain, ownedExtra;
-    public Texture texture1, texture2, textureDepth, textureVel, textureNormal, textureReflectionMap;
+    public Texture texture1, texture2, textureDepth, textureNormal, textureReflectionMap;
     public int width, height;
     private GaiaSkyFrameBuffer buffer1, buffer2;
     // internal state
@@ -32,18 +32,17 @@ public final class PingPongBuffer implements Disposable {
     private int ownedW, ownedH;
 
     /** Creates a new ping-pong buffer and owns the resources. */
-    public PingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
+    public PingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
         ownResources = true;
 
         // BUFFER USED FOR THE ACTUAL RENDERING:
         // n RENDER TARGETS:
         //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
         //      1: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
-        //      2: COLOR 1 - FLOAT TEXTURE ATTACHMENT (VELOCITY BUFFER)
-        //      3: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
-        //      4: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
+        //      3: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
+        //      4: COLOR 2 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
         // 1 DEPTH TEXTURE ATTACHMENT
-        ownedMain = createMainFrameBuffer(width, height, hasDepth, hasVelocity, hasNormal, hasReflectionMask, pixmapFormat, preventFloatBuffer);
+        ownedMain = createMainFrameBuffer(width, height, hasDepth, hasNormal, hasReflectionMask, pixmapFormat, preventFloatBuffer);
 
         // EXTRA BUFFER:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
@@ -63,7 +62,7 @@ public final class PingPongBuffer implements Disposable {
         set(buffer1, buffer2);
     }
 
-    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
+    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
         int colorIndex = -1, depthIndex = -1, velIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
@@ -83,20 +82,13 @@ public final class PingPongBuffer implements Disposable {
         }
 
         // 2
-        // Velocity buffer
-        if (hasVelocity) {
-            addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-            velIndex = idx++;
-        }
-
-        // 3
         // Normal buffer
         if (hasNormal) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             normalIndex = idx++;
         }
 
-        // 4
+        // 3
         // Reflection mask buffer
         if (hasReflectionMask) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
@@ -189,7 +181,6 @@ public final class PingPongBuffer implements Disposable {
         texture1 = buffer1.getColorBufferTexture();
         texture2 = buffer2.getColorBufferTexture();
         textureDepth = buffer1.getDepthBufferTexture();
-        textureVel = buffer1.getVelocityBufferTexture();
         textureNormal = buffer1.getNormalBufferTexture();
         textureReflectionMap = buffer1.getReflectionMaskBufferTexture();
     }

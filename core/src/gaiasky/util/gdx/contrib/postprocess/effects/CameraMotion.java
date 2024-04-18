@@ -7,8 +7,10 @@
 
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
+import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.CameraBlur;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
@@ -22,16 +24,7 @@ public final class CameraMotion extends PostProcessorEffect {
         this.width = width;
         this.height = height;
         cameraBlur = new CameraBlur();
-        cameraBlur.setVelocityTexture(null);
         disposables.add(cameraBlur);
-    }
-
-    public CameraMotion(int width, int height) {
-        this((float) width, (float) height);
-    }
-
-    public void setVelocityTexture(Texture velocityTexture) {
-        cameraBlur.setVelocityTexture(velocityTexture);
     }
 
     public void setBlurMaxSamples(int samples) {
@@ -42,25 +35,32 @@ public final class CameraMotion extends PostProcessorEffect {
         cameraBlur.setBlurScale(scale);
     }
 
-    public void setVelocityScale(float scale) {
-        cameraBlur.setVelocityScale(scale);
-    }
-
     @Override
     public void rebind() {
         cameraBlur.rebind();
     }
 
+    private final Vector3 aux = new Vector3();
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+        // Viewport.
         if (dest != null) {
             cameraBlur.setViewport(dest.getWidth(), dest.getHeight());
         } else {
             cameraBlur.setViewport(width, height);
         }
+        // Delta camera pos.
+        var cam = GaiaSky.instance.getICamera();
+        cam.getDPos().put(aux);
+        cameraBlur.setDCam(aux);
+        // Zfar and K
+        cameraBlur.setZfarK((float) cam.getFar(), Constants.getCameraK());
+        // Previous projectionView inverse matrix.
+        cameraBlur.setProjView(cam.getProjView());
+        cameraBlur.setPrevProjView(cam.getPreviousProjView());
 
         restoreViewport(dest);
-        cameraBlur.setVelocityTexture(main.getVelocityBufferTexture());
+        cameraBlur.setDepthTexture(main.getDepthBufferTexture());
         cameraBlur.setInput(src).setOutput(dest).render();
     }
 }

@@ -84,8 +84,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public MaterialComponent mtc;
     // Relativistic effects.
     public RelativisticEffectsComponent rec;
-    // Velocity buffer.
-    public VelocityBufferComponent vbc;
     /**
      * Light never changes; set fixed ambient light for this model
      */
@@ -216,7 +214,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         initializeEnvironment();
 
         rec = new RelativisticEffectsComponent();
-        vbc = new VelocityBufferComponent();
 
         MaterialComponent.reflectionCubemap.initialize();
     }
@@ -382,7 +379,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             } else {
                 updateRelativisticEffects(cam);
             }
-            updateVelocityBufferUniforms(cam);
         }
     }
 
@@ -794,21 +790,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void setBlending(String blendModeString) {
         setBlendMode(blendModeString);
-    }
-
-    public void updateVelocityBufferUniforms(ICamera camera) {
-        for (Material mat : instance.materials) {
-            updateVelocityBufferUniforms(mat, camera);
-        }
-    }
-
-    public void updateVelocityBufferUniforms(Material mat,
-                                             ICamera camera) {
-        if (Settings.settings.postprocess.motionBlur.active) {
-            vbc.updateVelocityBufferMaterial(mat, camera);
-        } else if (vbc.hasVelocityBuffer(mat)) {
-            vbc.removeVelocityBufferMaterial(mat);
-        }
     }
 
     public void updateEclipsingBodyUniforms(Entity entity) {

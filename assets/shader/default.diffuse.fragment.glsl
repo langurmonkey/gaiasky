@@ -52,10 +52,6 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#ifdef velocityBufferFlag
-#include <shader/lib/velbuffer.frag.glsl>
-#endif
-
 #ifdef cubemapFlag
 #include <shader/lib/cubemap.glsl>
 #endif // cubemapFlag
@@ -100,7 +96,4 @@ void main() {
 	ssrBuffers();
 	#endif // ssrFlag
 
-	#ifdef velocityBufferFlag
-	velocityBuffer();
-	#endif
 }
