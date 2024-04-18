@@ -31,14 +31,12 @@ void main() {
     // depth buffer
     float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y);
     // H is the viewport position at this pixel in the range -1 to 1 (NDC).
-    vec4 H = vec4(v_texCoords.x * 2.0 - 1.0, (1.0 - v_texCoords.y) * 2.0 - 1.0, depth, 1.0);
+    vec4 H = vec4(v_texCoords.x * 2.0 - 1.0, (v_texCoords.y) * 2.0 - 1.0, depth, 1.0);
     // Transform by the view-projection inverse. Clip coordinates.
     vec4 D = u_projViewInverse * H;
     // Transform by the view-projection inverse.
-    //vec4 worldPos = D / D.w;
-    vec4 worldPos = D;
-    worldPos.xyz -= u_dCam;
-    worldPos /= D.w;
+    vec4 worldPos = D / D.w;
+    worldPos.xyz += u_dCam / D.w;
 
     // Current viewport position
     vec4 currentPos = H;
@@ -59,7 +57,7 @@ void main() {
     // Get color at this fragment.
     vec3 color = texture(u_texture0, v_texCoords).rgb;
     for (int i = 1; i < nSamples; ++i) {
-        vec2 offset = vel * (float(i) / float(nSamples));
+        vec2 offset = vel * (float(i) / float(nSamples) - 0.5);
         color += texture(u_texture0, v_texCoords + offset).rgb;
     }
     // Average all samples to get final color.
