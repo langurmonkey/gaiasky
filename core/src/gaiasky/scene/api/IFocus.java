@@ -259,6 +259,12 @@ public interface IFocus {
     double getRadius();
 
     /**
+     * Returns the effective temperature.
+     * @return The effective temperature of the object, in Kelvins.
+     */
+    double getTEff();
+
+    /**
      * Returns the surface elevation of the projected position of the current camera
      * on this focus object, which is usually the radius plus a value lookup
      * in the height texture (if exists).

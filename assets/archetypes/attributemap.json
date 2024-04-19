@@ -828,6 +828,11 @@
       "primitiveRenderScale": {
         "description": "Artificial scale factor for the size of this particle during rendering.",
         "units": "Double"
+      },
+      "tEff": {
+        "description": "Effective temperature of the star or body, in Kelvin.",
+        "units": "Double",
+        "aliases": ["teff"]
       }
     },
     "Mesh": {

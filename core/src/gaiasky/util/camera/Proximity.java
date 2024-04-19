@@ -424,6 +424,11 @@ public class Proximity {
         }
 
         @Override
+        public double getTEff() {
+            return 0;
+        }
+
+        @Override
         public double getElevationAt(Vector3b camPos) {
             return 0;
         }

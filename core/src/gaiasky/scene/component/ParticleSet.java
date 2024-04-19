@@ -138,12 +138,12 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Particle size limits. Applies to legacy point render (using GL_POINTS).
      */
-    public double[] particleSizeLimitsPoint = new double[]{2d, 50d};
+    public double[] particleSizeLimitsPoint = new double[] { 2d, 50d };
     /**
      * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
-    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0))};
+    public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
     /**
      * The texture attribute is an attribute in the original table that points to the texture to use. Ideally, it should
      * be an integer value from 1 to n, where n is the number of textures.
@@ -336,6 +336,7 @@ public class ParticleSet implements Component, IDisposable {
      * and computes the geometric center of this group
      *
      * @param pointData The data
+     *
      * @return An map{string,int} mapping names to indices
      */
     public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
@@ -386,7 +387,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setPosition(int[] pos) {
-        setPosition(new double[]{pos[0], pos[1], pos[2]});
+        setPosition(new double[] { pos[0], pos[1], pos[2] });
     }
 
     public void setDataFile(String dataFile) {
@@ -486,7 +487,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setTexture(String texture) {
-        this.textureFiles = new String[]{texture};
+        this.textureFiles = new String[] { texture };
     }
 
     public void setTextures(String[] textures) {
@@ -554,6 +555,7 @@ public class ParticleSet implements Component, IDisposable {
      * Returns the size of the particle at index i
      *
      * @param i The index
+     *
      * @return The size
      */
     public double getSize(int i) {
@@ -590,6 +592,10 @@ public class ParticleSet implements Component, IDisposable {
     // Radius in stars is different!
     public double getRadius(int i) {
         return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : isExtended ? getSize(i) : getRadius();
+    }
+
+    public double getTEff() {
+        return isStars ? focus.teff() : -1;
     }
 
     /**
@@ -634,6 +640,7 @@ public class ParticleSet implements Component, IDisposable {
      * Checks whether the particle with the given index is visible
      *
      * @param index The index of the particle
+     *
      * @return The visibility of the particle
      */
     public boolean isVisible(int index) {
@@ -746,6 +753,7 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @param name The name.
      * @param out  The out vector.
+     *
      * @return The absolute position in the out vector.
      */
     public Vector3b getAbsolutePosition(String name,
@@ -768,6 +776,7 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @param name The name.
      * @param out  The out vector.
+     *
      * @return The absolute position in the out vector.
      */
     public Vector3d getAbsolutePosition(String name,
@@ -792,6 +801,7 @@ public class ParticleSet implements Component, IDisposable {
      *                   reference system instead of the camera reference system.
      * @param out        The output vector
      * @param deltaYears The delta years
+     *
      * @return The vector for chaining
      */
     public Vector3d fetchPositionDouble(IParticleRecord pb,
@@ -831,6 +841,7 @@ public class ParticleSet implements Component, IDisposable {
      *                   reference system instead of the camera reference system.
      * @param out        The output vector.
      * @param deltaYears The delta years.
+     *
      * @return The vector for chaining.
      */
     public Vector3b fetchPosition(IParticleRecord pb,

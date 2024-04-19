@@ -51,11 +51,14 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Vector3d pos;
     private final Vector3b posb;
     protected Skin skin;
-    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadius;
+    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta,
+            focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera,
+            focusAbsMag, focusRadius, focusTeff;
     protected Button goTo, landOn, landAt, bookmark;
     protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
-    protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
+    protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel,
+            RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
     protected OwnLabel focusIdExpand;
     protected HorizontalGroup focusActionsGroup;
@@ -69,7 +72,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         this(skin, false);
     }
 
-    public CameraInfoInterface(Skin skin, boolean vr) {
+    public CameraInfoInterface(Skin skin,
+                               boolean vr) {
         super(skin);
         this.setBackground("bg-pane");
         this.maximized = true;
@@ -119,6 +123,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusDistSol = new OwnLabel("", skin, "hud");
         focusDistCam = new OwnLabel("", skin, "hud");
         focusRadius = new OwnLabel("", skin, "hud");
+        focusTeff = new OwnLabel("", skin, "hud");
 
         // Labels
         appMagEarthLabel = new OwnLabel(I18n.msg("gui.focusinfo.appmag.earth"), skin, "hud");
@@ -301,6 +306,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusInfo.add(focusDistCam).left().padLeft(pad15).row();
         focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.radius"), skin, "hud")).left();
         focusInfo.add(focusRadius).left().padLeft(pad15).row();
+        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.teff"), skin, "hud")).left();
+        focusInfo.add(focusTeff).left().padLeft(pad15).row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
 
         // POINTER INFO
@@ -337,7 +344,9 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         toggleSize.addListener(toggleSizeTooltip);
         toggleSize.setColor(ColorUtils.gYellowC);
         toggleSize.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
+            public void clicked(InputEvent event,
+                                float x,
+                                float y) {
                 if (maximized) {
                     // Minimize.
                     maximized = false;
@@ -391,7 +400,9 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
         pos = new Vector3d();
         posb = new Vector3b();
-        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED, Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR, Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD);
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_TRACKING_OBJECT_UPDATE,
+                                        Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED, Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR,
+                                        Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD);
     }
 
     private HorizontalGroup hg(Actor... actors) {
@@ -406,326 +417,335 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         final String deg = I18n.msg("gui.unit.deg");
         final var settings = Settings.settings;
         switch (event) {
-            case FOCUS_CHANGED -> {
-                if (data[0] instanceof String) {
-                    var entity = GaiaSky.instance.scene.getEntity((String) data[0]);
-                    view.setEntity(entity);
-                } else {
-                    FocusView v = (FocusView) data[0];
-                    view.setEntity(v.getEntity());
-                }
-                currentFocus = view;
-                final int focusFieldMaxLength = 13;
+        case FOCUS_CHANGED -> {
+            if (data[0] instanceof String) {
+                var entity = GaiaSky.instance.scene.getEntity((String) data[0]);
+                view.setEntity(entity);
+            } else {
+                FocusView v = (FocusView) data[0];
+                view.setEntity(v.getEntity());
+            }
+            currentFocus = view;
+            final int focusFieldMaxLength = 13;
 
-                // ID
-                boolean cappedId = false;
-                String id = "";
-                if (view.getExtra() != null || view.getStarSet() != null) {
-                    if (view.getId() > 0) {
-                        id = String.valueOf(view.getId());
-                    } else if (view.getHip() > 0) {
-                        id = "HIP " + view.getHip();
+            // ID
+            boolean cappedId = false;
+            String id = "";
+            if (view.getExtra() != null || view.getStarSet() != null) {
+                if (view.getId() > 0) {
+                    id = String.valueOf(view.getId());
+                } else if (view.getHip() > 0) {
+                    id = "HIP " + view.getHip();
+                }
+            }
+            if (id.isEmpty()) {
+                id = "-";
+            }
+            String idString = id;
+            if (id.length() > focusFieldMaxLength) {
+                idString = TextUtils.capString(id, focusFieldMaxLength);
+                cappedId = true;
+            }
+
+            // Link
+            boolean vis = Mapper.atmosphere.has(view.getEntity());
+            focusActionsGroup.removeActor(landOn);
+            focusActionsGroup.removeActor(landAt);
+            if (vis) {
+                focusActionsGroup.addActor(landOn);
+                focusActionsGroup.addActor(landAt);
+            }
+
+            // Type
+            try {
+                focusType.setText(I18n.msg("element." + ComponentType.values()[view.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular"));
+            } catch (Exception e) {
+                focusType.setText("");
+            }
+
+            // Coordinates
+            pointerLonLat.setText("-/-");
+
+            // Bookmark
+            bookmark.setProgrammaticChangeEvents(false);
+            bookmark.setChecked(GaiaSky.instance.getBookmarksManager().containsName(currentFocus.getName()));
+            bookmark.setProgrammaticChangeEvents(true);
+
+            // Visible
+            objectVisibility.setCheckedNoFire(!((IVisibilitySwitch) currentFocus).isVisible(true));
+            objectVisibility.addListener(new OwnTextTooltip(I18n.msg("action.visibility", currentFocus.getName()), skin));
+
+            // Force label
+            labelVisibility.setCheckedNoFire(!currentFocus.isForceLabel(currentFocus.getName().toLowerCase().trim()));
+            labelVisibility.addListener(new OwnTextTooltip(I18n.msg("action.forcelabel", currentFocus.getName()), skin));
+
+            // Id, names
+            focusId.setText(idString);
+            focusId.clearListeners();
+            if (cappedId) {
+                focusId.addListener(new OwnTextTooltip(id, skin));
+                focusIdExpand.addListener(new OwnTextTooltip(id, skin));
+                focusIdExpand.setVisible(true);
+            } else {
+                focusIdExpand.clearListeners();
+                focusIdExpand.setVisible(false);
+            }
+            String objectName = TextUtils.capString(view.getLocalizedName(), focusFieldMaxLength);
+            focusName.setText(objectName);
+            focusName.clearListeners();
+            focusName.addListener(new OwnTextTooltip(view.getLocalizedName(), skin));
+            focusNames.clearChildren();
+            String[] names = view.getNames();
+            if (names != null && names.length > 0) {
+                int chars = 0;
+                HorizontalGroup currGroup = new HorizontalGroup();
+                for (int i = 0; i < names.length; i++) {
+                    String name = names[i];
+                    String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
+                    OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
+                    if (nameCapped.length() != name.length())
+                        nl.addListener(new OwnTextTooltip(name, skin));
+                    currGroup.addActor(nl);
+                    chars += nameCapped.length() + 1;
+                    if (i < names.length - 1) {
+                        currGroup.addActor(new OwnLabel(", ", skin));
+                        chars++;
+                    }
+                    if (i < names.length - 1 && chars > 14) {
+                        focusNames.add(currGroup).left().row();
+                        currGroup = new HorizontalGroup();
+                        chars = 0;
                     }
                 }
-                if (id.isEmpty()) {
-                    id = "-";
-                }
-                String idString = id;
-                if (id.length() > focusFieldMaxLength) {
-                    idString = TextUtils.capString(id, focusFieldMaxLength);
-                    cappedId = true;
-                }
+                if (chars > 0)
+                    focusNames.add(currGroup).left();
+            } else {
+                focusNames.add(new OwnLabel("-", skin));
+            }
+            Vector2d posSph = view.getPosSph();
+            if (posSph != null && posSph.len() > 0f) {
+                focusRA.setText(nf.format(posSph.x) + deg);
+                focusDEC.setText(nf.format(posSph.y) + deg);
+            } else {
+                Coordinates.cartesianToSpherical(view.getAbsolutePosition(posb), pos);
 
-                // Link
-                boolean vis = Mapper.atmosphere.has(view.getEntity());
-                focusActionsGroup.removeActor(landOn);
-                focusActionsGroup.removeActor(landAt);
-                if (vis) {
-                    focusActionsGroup.addActor(landOn);
-                    focusActionsGroup.addActor(landAt);
-                }
-
-                // Type
-                try {
-                    focusType.setText(I18n.msg("element." + ComponentType.values()[view.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular"));
-                } catch (Exception e) {
-                    focusType.setText("");
-                }
-
-                // Coordinates
-                pointerLonLat.setText("-/-");
-
-                // Bookmark
-                bookmark.setProgrammaticChangeEvents(false);
-                bookmark.setChecked(GaiaSky.instance.getBookmarksManager().containsName(currentFocus.getName()));
-                bookmark.setProgrammaticChangeEvents(true);
-
-                // Visible
-                objectVisibility.setCheckedNoFire(!((IVisibilitySwitch) currentFocus).isVisible(true));
-                objectVisibility.addListener(new OwnTextTooltip(I18n.msg("action.visibility", currentFocus.getName()), skin));
-
-                // Force label
-                labelVisibility.setCheckedNoFire(!currentFocus.isForceLabel(currentFocus.getName().toLowerCase().trim()));
-                labelVisibility.addListener(new OwnTextTooltip(I18n.msg("action.forcelabel", currentFocus.getName()), skin));
-
-                // Id, names
-                focusId.setText(idString);
-                focusId.clearListeners();
-                if (cappedId) {
-                    focusId.addListener(new OwnTextTooltip(id, skin));
-                    focusIdExpand.addListener(new OwnTextTooltip(id, skin));
-                    focusIdExpand.setVisible(true);
+                focusRA.setText(nf.format(MathUtilsDouble.radDeg * pos.x % 360) + deg);
+                focusDEC.setText(nf.format(MathUtilsDouble.radDeg * pos.y % 360) + deg);
+            }
+            if (view.hasProperMotion()) {
+                focusMuAlpha.setText(nf.format(view.getMuAlpha()) + " " + I18n.msg("gui.unit.masyr"));
+                focusMuDelta.setText(nf.format(view.getMuDelta()) + " " + I18n.msg("gui.unit.masyr"));
+                double rv = view.getRadialVelocity();
+                if (Double.isFinite(rv)) {
+                    focusRadVel.setText(nf.format(view.getRadialVelocity()) + " " + I18n.msg("gui.unit.kms"));
                 } else {
-                    focusIdExpand.clearListeners();
-                    focusIdExpand.setVisible(false);
+                    focusRadVel.setText(I18n.msg("gui.focusinfo.na"));
                 }
-                String objectName = TextUtils.capString(view.getLocalizedName(), focusFieldMaxLength);
-                focusName.setText(objectName);
-                focusName.clearListeners();
-                focusName.addListener(new OwnTextTooltip(view.getLocalizedName(), skin));
-                focusNames.clearChildren();
-                String[] names = view.getNames();
-                if (names != null && names.length > 0) {
-                    int chars = 0;
-                    HorizontalGroup currGroup = new HorizontalGroup();
-                    for (int i = 0; i < names.length; i++) {
-                        String name = names[i];
-                        String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
-                        OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
-                        if (nameCapped.length() != name.length())
-                            nl.addListener(new OwnTextTooltip(name, skin));
-                        currGroup.addActor(nl);
-                        chars += nameCapped.length() + 1;
-                        if (i < names.length - 1) {
-                            currGroup.addActor(new OwnLabel(", ", skin));
-                            chars++;
-                        }
-                        if (i < names.length - 1 && chars > 14) {
-                            focusNames.add(currGroup).left().row();
-                            currGroup = new HorizontalGroup();
-                            chars = 0;
-                        }
-                    }
-                    if (chars > 0)
-                        focusNames.add(currGroup).left();
+            } else {
+                focusMuAlpha.setText("-");
+                focusMuDelta.setText("-");
+                focusRadVel.setText("-");
+            }
+            if (view.isCluster()) {
+                // Some star clusters have the number of stars
+                // Magnitudes make not sense
+                var cluster = Mapper.cluster.get(view.getEntity());
+                if (cluster.numStars > 0) {
+                    appMagEarthLabel.setText("# " + I18n.msg("element.stars"));
+                    focusAppMagEarth.setText(Integer.toString(cluster.numStars));
                 } else {
-                    focusNames.add(new OwnLabel("-", skin));
+                    appMagEarthLabel.setText("");
+                    focusAppMagEarth.setText("");
                 }
-                Vector2d posSph = view.getPosSph();
-                if (posSph != null && posSph.len() > 0f) {
-                    focusRA.setText(nf.format(posSph.x) + deg);
-                    focusDEC.setText(nf.format(posSph.y) + deg);
+                focusAppMagCamera.setText("");
+                appMagCameraLabel.setText("");
+                focusAbsMag.setText("");
+                absMagLabel.setText("");
+
+            } else if (view.isCelestial()) {
+                // Planets, satellites, etc.
+                // Apparent magnitude depends on absolute magnitude
+                // We need to compute the apparent magnitude from earth and camera
+
+                // Apparent magnitude (earth)
+                appMagEarthLabel.setText(I18n.msg("gui.focusinfo.appmag.earth"));
+                float appMag = view.getAppmag();
+                var appMagStr = Float.isFinite(appMag) ? nf.format(appMag) : "-";
+                focusAppMagEarth.setText(appMagStr);
+
+                // Apparent magnitude (camera)
+                appMagCameraLabel.setText(I18n.msg("gui.focusinfo.appmag.camera"));
+
+                // Absolute magnitude
+                absMagLabel.setText(I18n.msg("gui.focusinfo.absmag"));
+                focusAbsMag.setText(nf.format(view.getAbsmag()));
+
+                appMagEarthLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
+                focusAppMagEarth.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
+                appMagCameraLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
+                focusAppMagCamera.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
+                absMagLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
+                focusAbsMag.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
+            } else {
+                // Stars, particles, etc. Apparent magnitude form Earth is fixed, from camera not so much.
+
+                // Apparent magnitude (earth)
+                appMagEarthLabel.setText(I18n.msg("gui.focusinfo.appmag.earth"));
+                float appMag = view.getAppmag();
+                focusAppMagEarth.setText(nf.format(appMag));
+
+                // Apparent magnitude (cam)
+                appMagCameraLabel.setText(I18n.msg("gui.focusinfo.appmag.camera"));
+
+                // Absolute magnitude
+                absMagLabel.setText(I18n.msg("gui.focusinfo.absmag"));
+                focusAbsMag.setText(nf.format(view.getAbsmag()));
+
+                // Tooltips
+                appMagEarthLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
+                focusAppMagEarth.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
+                appMagCameraLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
+                focusAppMagCamera.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
+                absMagLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
+                focusAbsMag.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
+            }
+            if (ComponentType.values()[view.getCt().getFirstOrdinal()] == ComponentType.Stars) {
+                focusRadius.setText("-");
+                var tEff = view.getTEff();
+                if (Double.isFinite(tEff) && tEff > 0) {
+                    focusTeff.setText(GlobalResources.formatNumber(tEff) + " " + I18n.msg("gui.unit.kelvin"));
                 } else {
-                    Coordinates.cartesianToSpherical(view.getAbsolutePosition(posb), pos);
-
-                    focusRA.setText(nf.format(MathUtilsDouble.radDeg * pos.x % 360) + deg);
-                    focusDEC.setText(nf.format(MathUtilsDouble.radDeg * pos.y % 360) + deg);
+                    focusTeff.setText("-");
                 }
-                if (view.hasProperMotion()) {
-                    focusMuAlpha.setText(nf.format(view.getMuAlpha()) + " " + I18n.msg("gui.unit.masyr"));
-                    focusMuDelta.setText(nf.format(view.getMuDelta()) + " " + I18n.msg("gui.unit.masyr"));
-                    double rv = view.getRadialVelocity();
-                    if (Double.isFinite(rv)) {
-                        focusRadVel.setText(nf.format(view.getRadialVelocity()) + " " + I18n.msg("gui.unit.kms"));
-                    } else {
-                        focusRadVel.setText(I18n.msg("gui.focusinfo.na"));
-                    }
-                } else {
-                    focusMuAlpha.setText("-");
-                    focusMuDelta.setText("-");
-                    focusRadVel.setText("-");
-                }
-                if (view.isCluster()) {
-                    // Some star clusters have the number of stars
-                    // Magnitudes make not sense
-                    var cluster = Mapper.cluster.get(view.getEntity());
-                    if (cluster.numStars > 0) {
-                        appMagEarthLabel.setText("# " + I18n.msg("element.stars"));
-                        focusAppMagEarth.setText(Integer.toString(cluster.numStars));
-                    } else {
-                        appMagEarthLabel.setText("");
-                        focusAppMagEarth.setText("");
-                    }
-                    focusAppMagCamera.setText("");
-                    appMagCameraLabel.setText("");
-                    focusAbsMag.setText("");
-                    absMagLabel.setText("");
-
-                } else if (view.isCelestial()) {
-                    // Planets, satellites, etc.
-                    // Apparent magnitude depends on absolute magnitude
-                    // We need to compute the apparent magnitude from earth and camera
-
-                    // Apparent magnitude (earth)
-                    appMagEarthLabel.setText(I18n.msg("gui.focusinfo.appmag.earth"));
-                    float appMag = view.getAppmag();
-                    var appMagStr = Float.isFinite(appMag) ? nf.format(appMag) : "-";
-                    focusAppMagEarth.setText(appMagStr);
-
-                    // Apparent magnitude (camera)
-                    appMagCameraLabel.setText(I18n.msg("gui.focusinfo.appmag.camera"));
-
-                    // Absolute magnitude
-                    absMagLabel.setText(I18n.msg("gui.focusinfo.absmag"));
-                    focusAbsMag.setText(nf.format(view.getAbsmag()));
-
-                    appMagEarthLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
-                    focusAppMagEarth.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
-                    appMagCameraLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
-                    focusAppMagCamera.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
-                    absMagLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
-                    focusAbsMag.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
-                } else {
-                    // Stars, particles, etc. Apparent magnitude form Earth is fixed, from camera not so much.
-
-                    // Apparent magnitude (earth)
-                    appMagEarthLabel.setText(I18n.msg("gui.focusinfo.appmag.earth"));
-                    float appMag = view.getAppmag();
-                    focusAppMagEarth.setText(nf.format(appMag));
-
-                    // Apparent magnitude (cam)
-                    appMagCameraLabel.setText(I18n.msg("gui.focusinfo.appmag.camera"));
-
-                    // Absolute magnitude
-                    absMagLabel.setText(I18n.msg("gui.focusinfo.absmag"));
-                    focusAbsMag.setText(nf.format(view.getAbsmag()));
-
-                    // Tooltips
-                    appMagEarthLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
-                    focusAppMagEarth.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.earth.tooltip"), skin));
-                    appMagCameraLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
-                    focusAppMagCamera.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.appmag.camera.tooltip"), skin));
-                    absMagLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
-                    focusAbsMag.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
-                }
-                if (ComponentType.values()[view.getCt().getFirstOrdinal()] == ComponentType.Stars) {
-                    focusRadius.setText("-");
-                } else {
-                    focusRadius.setText(GlobalResources.formatNumber(view.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
-                }
-
-                // Update more info table
-                moreInfo.clear();
-                if (externalInfoUpdater != null)
-                    externalInfoUpdater.update(view);
+            } else {
+                focusRadius.setText(GlobalResources.formatNumber(view.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
+                focusTeff.setText("-");
             }
-            case FOCUS_INFO_UPDATED -> {
-                focusAngle.setText(GlobalResources.formatNumber(Math.toDegrees((double) data[1]) % 360) + deg);
 
-                // Dist to cam
-                Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], settings.program.ui.distanceUnits);
-                focusDistCam.setText(GlobalResources.formatNumber(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
+            // Update more info table
+            moreInfo.clear();
+            if (externalInfoUpdater != null)
+                externalInfoUpdater.update(view);
+        }
+        case FOCUS_INFO_UPDATED -> {
+            focusAngle.setText(GlobalResources.formatNumber(Math.toDegrees((double) data[1]) % 360) + deg);
 
-                // Dist to sol
-                if (data.length > 4) {
-                    Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4], settings.program.ui.distanceUnits);
-                    focusDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
-                }
+            // Dist to cam
+            Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], settings.program.ui.distanceUnits);
+            focusDistCam.setText(GlobalResources.formatNumber(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
 
-                // Apparent magnitude from camera
-                focusAppMagCamera.setText(nf.format((double) data[5]));
+            // Dist to sol
+            if (data.length > 4) {
+                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4], settings.program.ui.distanceUnits);
+                focusDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
+            }
 
-                // Apparent magnitude from Earth (for planets, etc.)
-                if (data.length > 6 && Double.isFinite((double) data[6])) {
-                    // Apparent magnitude from Earth
-                    focusAppMagEarth.setText(nf.format((double) data[6]));
-                }
-                focusRA.setText(nf.format((double) data[2] % 360) + deg);
-                focusDEC.setText(nf.format((double) data[3] % 360) + deg);
-            }
-            case CAMERA_MOTION_UPDATE -> {
-                final Vector3b campos = (Vector3b) data[0];
-                camVel.setText(GlobalResources.formatNumber((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
-                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), settings.program.ui.distanceUnits);
-                camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
-            }
-            case CAMERA_TRACKING_OBJECT_UPDATE -> {
-                final IFocus trackingObject = (IFocus) data[0];
-                final String trackingName = (String) data[1];
-                if (trackingObject == null && trackingName == null) {
-                    camTracking.setText("-");
-                } else {
-                    camTracking.setText(trackingName);
-                }
-            }
-            case CAMERA_MODE_CMD -> {
-                // Update camera mode selection
-                final CameraMode mode = (CameraMode) data[0];
-                if (mode.equals(CameraMode.FOCUS_MODE)) {
-                    displayInfo(focusInfoCell, focusInfo);
-                } else {
-                    hideInfo(focusInfoCell);
-                }
-            }
-            case LON_LAT_UPDATED -> {
-                Double lon = (Double) data[0];
-                Double lat = (Double) data[1];
-                pointerLonLat.setText(nf.format(lat) + deg + "/" + nf.format(lon) + deg);
-            }
-            case RA_DEC_UPDATED -> {
-                Double pmRa = (Double) data[0];
-                Double pmDec = (Double) data[1];
-                Double vRa = (Double) data[2];
-                Double vDec = (Double) data[3];
-                pointerRADEC.setText(nf.format(pmRa) + deg + "/" + nf.format(pmDec) + deg);
-                viewRADEC.setText(nf.format(vRa) + deg + "/" + nf.format(vDec) + deg);
-            }
-            case RULER_ATTACH_0 -> {
-                String n0 = (String) data[0];
-                rulerName0.setText(TextUtils.capString(n0, MAX_RULER_NAME_LEN));
-                displayInfo(rulerCell, rulerInfo);
-            }
-            case RULER_ATTACH_1 -> {
-                String n1 = (String) data[0];
-                rulerName1.setText(TextUtils.capString(n1, MAX_RULER_NAME_LEN));
-                displayInfo(rulerCell, rulerInfo);
-            }
-            case RULER_CLEAR -> {
-                rulerName0.setText("-");
-                rulerName1.setText("-");
-                rulerDist.setText(I18n.msg("gui.sc.distance") + ": -");
-                hideInfo(rulerCell);
-            }
-            case RULER_DIST -> {
-                String rd = (String) data[1];
-                rulerDist.setText(I18n.msg("gui.sc.distance") + ": " + rd);
-            }
-            case PER_OBJECT_VISIBILITY_CMD -> {
-                if (source != objectVisibility) {
-                    if (data[0] instanceof IVisibilitySwitch vs) {
-                        String name = (String) data[1];
-                        if (vs == currentFocus && currentFocus.hasName(name)) {
-                            boolean visible = (boolean) data[2];
-                            objectVisibility.setCheckedNoFire(!visible);
-                        }
-                    }
+            // Apparent magnitude from camera
+            focusAppMagCamera.setText(nf.format((double) data[5]));
 
-                    if (data[0] instanceof Entity entity) {
-                        String name = (String) data[1];
-                        if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
-                            boolean visible = (boolean) data[2];
-                            objectVisibility.setCheckedNoFire(!visible);
-                        }
+            // Apparent magnitude from Earth (for planets, etc.)
+            if (data.length > 6 && Double.isFinite((double) data[6])) {
+                // Apparent magnitude from Earth
+                focusAppMagEarth.setText(nf.format((double) data[6]));
+            }
+            focusRA.setText(nf.format((double) data[2] % 360) + deg);
+            focusDEC.setText(nf.format((double) data[3] % 360) + deg);
+        }
+        case CAMERA_MOTION_UPDATE -> {
+            final Vector3b campos = (Vector3b) data[0];
+            camVel.setText(GlobalResources.formatNumber((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
+            Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), settings.program.ui.distanceUnits);
+            camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
+        }
+        case CAMERA_TRACKING_OBJECT_UPDATE -> {
+            final IFocus trackingObject = (IFocus) data[0];
+            final String trackingName = (String) data[1];
+            if (trackingObject == null && trackingName == null) {
+                camTracking.setText("-");
+            } else {
+                camTracking.setText(trackingName);
+            }
+        }
+        case CAMERA_MODE_CMD -> {
+            // Update camera mode selection
+            final CameraMode mode = (CameraMode) data[0];
+            if (mode.equals(CameraMode.FOCUS_MODE)) {
+                displayInfo(focusInfoCell, focusInfo);
+            } else {
+                hideInfo(focusInfoCell);
+            }
+        }
+        case LON_LAT_UPDATED -> {
+            Double lon = (Double) data[0];
+            Double lat = (Double) data[1];
+            pointerLonLat.setText(nf.format(lat) + deg + "/" + nf.format(lon) + deg);
+        }
+        case RA_DEC_UPDATED -> {
+            Double pmRa = (Double) data[0];
+            Double pmDec = (Double) data[1];
+            Double vRa = (Double) data[2];
+            Double vDec = (Double) data[3];
+            pointerRADEC.setText(nf.format(pmRa) + deg + "/" + nf.format(pmDec) + deg);
+            viewRADEC.setText(nf.format(vRa) + deg + "/" + nf.format(vDec) + deg);
+        }
+        case RULER_ATTACH_0 -> {
+            String n0 = (String) data[0];
+            rulerName0.setText(TextUtils.capString(n0, MAX_RULER_NAME_LEN));
+            displayInfo(rulerCell, rulerInfo);
+        }
+        case RULER_ATTACH_1 -> {
+            String n1 = (String) data[0];
+            rulerName1.setText(TextUtils.capString(n1, MAX_RULER_NAME_LEN));
+            displayInfo(rulerCell, rulerInfo);
+        }
+        case RULER_CLEAR -> {
+            rulerName0.setText("-");
+            rulerName1.setText("-");
+            rulerDist.setText(I18n.msg("gui.sc.distance") + ": -");
+            hideInfo(rulerCell);
+        }
+        case RULER_DIST -> {
+            String rd = (String) data[1];
+            rulerDist.setText(I18n.msg("gui.sc.distance") + ": " + rd);
+        }
+        case PER_OBJECT_VISIBILITY_CMD -> {
+            if (source != objectVisibility) {
+                if (data[0] instanceof IVisibilitySwitch vs) {
+                    String name = (String) data[1];
+                    if (vs == currentFocus && currentFocus.hasName(name)) {
+                        boolean visible = (boolean) data[2];
+                        objectVisibility.setCheckedNoFire(!visible);
                     }
                 }
-            }
-            case FORCE_OBJECT_LABEL_CMD -> {
-                if (source != labelVisibility) {
-                    if (data[0] instanceof Entity entity) {
-                        String name = (String) data[1];
-                        if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
-                            boolean forceLabel = (boolean) data[2];
-                            labelVisibility.setCheckedNoFire(forceLabel);
-                        }
+
+                if (data[0] instanceof Entity entity) {
+                    String name = (String) data[1];
+                    if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
+                        boolean visible = (boolean) data[2];
+                        objectVisibility.setCheckedNoFire(!visible);
                     }
                 }
             }
-            default -> {
+        }
+        case FORCE_OBJECT_LABEL_CMD -> {
+            if (source != labelVisibility) {
+                if (data[0] instanceof Entity entity) {
+                    String name = (String) data[1];
+                    if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
+                        boolean forceLabel = (boolean) data[2];
+                        labelVisibility.setCheckedNoFire(forceLabel);
+                    }
+                }
             }
+        }
+        default -> {
+        }
         }
 
     }
@@ -738,13 +758,14 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         }
     }
 
-    @SuppressWarnings({"rawtypes"})
-    private void displayInfo(Cell cell, Actor info) {
+    @SuppressWarnings({ "rawtypes" })
+    private void displayInfo(Cell cell,
+                             Actor info) {
         cell.setActor(info);
         pack();
     }
 
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings({ "rawtypes" })
     private void hideInfo(Cell cell) {
         cell.clearActor();
         pack();
