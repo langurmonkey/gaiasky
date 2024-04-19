@@ -24,7 +24,7 @@ public class OrbitComponent {
     public double period;
     /** Base epoch in julian days **/
     public double epoch;
-    /** Semi major axis of the ellipse, a in Km. **/
+    /** Semi major axis of the ellipse, in Km. **/
     public double semimajoraxis;
     /** Eccentricity of the ellipse, in degrees. **/
     public double e;

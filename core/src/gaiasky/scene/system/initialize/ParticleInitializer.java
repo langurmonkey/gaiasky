@@ -205,7 +205,11 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     private void setDerivedAttributes(Entity entity, Body body, Celestial celestial, Magnitude mag, Coordinates coordinates, ParticleExtra extra, boolean isStar) {
         double distPc;
         if (coordinates.coordinates != null) {
+            var graph = Mapper.graph.get(entity);
             distPc = coordinates.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31).lenDouble() * Constants.U_TO_PC;
+            if (graph.parent != null) {
+                distPc += EntityUtils.getAbsolutePosition(graph.parent, B31).lenDouble() * Constants.U_TO_PC;
+            }
         } else {
             distPc = EntityUtils.getAbsolutePosition(entity, B31).lenDouble() * Constants.U_TO_PC;
         }
