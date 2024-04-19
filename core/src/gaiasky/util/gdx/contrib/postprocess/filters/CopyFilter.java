@@ -9,21 +9,14 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Bias extends Filter<Bias> {
-    private float bias;
-
-    public Bias() {
-        super(ShaderLoader.fromFile("screenspace", "bias"));
-        rebind();
+public class CopyFilter extends Filter<CopyFilter> {
+    public CopyFilter() {
+        super(ShaderLoader.fromFile("screenspace", "copy"));
     }
 
-    public float getBias() {
-        return bias;
-    }
-
-    public void setBias(float bias) {
-        this.bias = bias;
-        setParam(Param.Bias, this.bias);
+    @Override
+    public void rebind() {
+        setParam(Param.Texture0, u_texture0);
     }
 
     @Override
@@ -31,23 +24,17 @@ public final class Bias extends Filter<Bias> {
         inputTexture.bind(u_texture0);
     }
 
-    @Override
-    public void rebind() {
-        setParams(Param.Texture, u_texture0);
-        setBias(this.bias);
-    }
-
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0),
-        Bias("u_bias", 0);
+        Texture0("u_texture0", 0),
+        ;
         // @formatter:on
 
         private final String mnemonic;
         private final int elementSize;
 
-        Param(String mnemonic, int elementSize) {
-            this.mnemonic = mnemonic;
+        Param(String m, int elementSize) {
+            this.mnemonic = m;
             this.elementSize = elementSize;
         }
 

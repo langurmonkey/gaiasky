@@ -9,32 +9,21 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class RadialDistortion extends Filter<RadialDistortion> {
-    private float zoom, distortion;
+public final class BiasFilter extends Filter<BiasFilter> {
+    private float bias;
 
-    public RadialDistortion() {
-        super(ShaderLoader.fromFile("screenspace", "radial-distortion"));
+    public BiasFilter() {
+        super(ShaderLoader.fromFile("screenspace", "bias"));
         rebind();
-        setDistortion(0.3f);
-        setZoom(1f);
     }
 
-    public float getDistortion() {
-        return distortion;
+    public float getBias() {
+        return bias;
     }
 
-    public void setDistortion(float distortion) {
-        this.distortion = distortion;
-        setParam(Param.Distortion, this.distortion);
-    }
-
-    public float getZoom() {
-        return zoom;
-    }
-
-    public void setZoom(float zoom) {
-        this.zoom = zoom;
-        setParam(Param.Zoom, this.zoom);
+    public void setBias(float bias) {
+        this.bias = bias;
+        setParam(Param.Bias, this.bias);
     }
 
     @Override
@@ -44,25 +33,21 @@ public final class RadialDistortion extends Filter<RadialDistortion> {
 
     @Override
     public void rebind() {
-        setParams(Param.Texture0, u_texture0);
-        setParams(Param.Distortion, distortion);
-        setParams(Param.Zoom, zoom);
-
-        endParams();
+        setParams(Param.Texture, u_texture0);
+        setBias(this.bias);
     }
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture0("u_texture0", 0),
-        Distortion("distortion", 0),
-        Zoom("zoom", 0);
+        Texture("u_texture0", 0),
+        Bias("u_bias", 0);
         // @formatter:on
 
         private final String mnemonic;
         private final int elementSize;
 
-        Param(String m, int elementSize) {
-            this.mnemonic = m;
+        Param(String mnemonic, int elementSize) {
+            this.mnemonic = mnemonic;
             this.elementSize = elementSize;
         }
 

@@ -8,6 +8,7 @@
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 public final class DepthBufferFilter extends Filter<DepthBufferFilter> {
@@ -17,6 +18,7 @@ public final class DepthBufferFilter extends Filter<DepthBufferFilter> {
      * depth buffer data.
      */
     private Texture depthTexture;
+    private final Vector2 zFarK = new Vector2();
 
     public DepthBufferFilter() {
         super(ShaderLoader.fromFile("screenspace", "depthbuffer"));
@@ -28,11 +30,17 @@ public final class DepthBufferFilter extends Filter<DepthBufferFilter> {
         setParam(Param.TextureDepth, u_texture1);
     }
 
+    public void setZFarK(float zFar, float k) {
+        this.zFarK.set(zFar, k);
+        setParam(Param.ZFarK, zFarK);
+    }
+
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Texture, u_texture0);
         setParams(Param.TextureDepth, u_texture1);
+        setParams(Param.ZFarK, zFarK);
         endParams();
     }
 
@@ -45,7 +53,8 @@ public final class DepthBufferFilter extends Filter<DepthBufferFilter> {
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
-        TextureDepth("u_texture1", 0);
+        TextureDepth("u_texture1", 0),
+        ZFarK("u_zFarK", 2);
         // @formatter:on
 
         private final String mnemonic;

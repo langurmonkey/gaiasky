@@ -11,12 +11,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Combine extends Filter<Combine> {
+public final class CombineFilter extends Filter<CombineFilter> {
 
     private float s1i, s1s, s2i, s2s;
     private Texture inputTexture2 = null;
 
-    public Combine() {
+    public CombineFilter() {
         super(ShaderLoader.fromFile("screenspace", "combine"));
         s1i = 1f;
         s2i = 1f;
@@ -26,13 +26,13 @@ public final class Combine extends Filter<Combine> {
         rebind();
     }
 
-    public Combine setInput(FrameBuffer buffer1, FrameBuffer buffer2) {
+    public CombineFilter setInput(FrameBuffer buffer1, FrameBuffer buffer2) {
         this.inputTexture = buffer1.getColorBufferTexture();
         this.inputTexture2 = buffer2.getColorBufferTexture();
         return this;
     }
 
-    public Combine setInput(Texture texture1, Texture texture2) {
+    public CombineFilter setInput(Texture texture1, Texture texture2) {
         this.inputTexture = texture1;
         this.inputTexture2 = texture2;
         return this;
@@ -44,7 +44,7 @@ public final class Combine extends Filter<Combine> {
 
     public void setSource1Intensity(float intensity) {
         s1i = intensity;
-        setParam(Combine.Param.Source1Intensity, intensity);
+        setParam(CombineFilter.Param.Source1Intensity, intensity);
     }
 
     public float getSource2Intensity() {
@@ -53,7 +53,7 @@ public final class Combine extends Filter<Combine> {
 
     public void setSource2Intensity(float intensity) {
         s2i = intensity;
-        setParam(Combine.Param.Source2Intensity, intensity);
+        setParam(CombineFilter.Param.Source2Intensity, intensity);
     }
 
     public float getSource1Saturation() {
@@ -62,7 +62,7 @@ public final class Combine extends Filter<Combine> {
 
     public void setSource1Saturation(float saturation) {
         s1s = saturation;
-        setParam(Combine.Param.Source1Saturation, saturation);
+        setParam(CombineFilter.Param.Source1Saturation, saturation);
     }
 
     public float getSource2Saturation() {
@@ -71,7 +71,7 @@ public final class Combine extends Filter<Combine> {
 
     public void setSource2Saturation(float saturation) {
         s2s = saturation;
-        setParam(Combine.Param.Source2Saturation, saturation);
+        setParam(CombineFilter.Param.Source2Saturation, saturation);
     }
 
     @Override

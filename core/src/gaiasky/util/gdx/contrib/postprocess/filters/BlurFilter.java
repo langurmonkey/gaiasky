@@ -12,19 +12,19 @@ import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Blur extends MultipassFilter {
+public final class BlurFilter extends MultipassFilter {
     // fbo, textures
     private final float invWidth;
     private final float invHeight;
 
     // @formatter:on
-    private final Map<Integer, Convolve2D> convolve = new HashMap<>(Tap.values().length);
+    private final Map<Integer, Convolve2DFilter> convolve = new HashMap<>(Tap.values().length);
     // blur
     private BlurType type;
     private float amount;
     private int passes;
 
-    public Blur(int width, int height) {
+    public BlurFilter(int width, int height) {
         // precompute constants
         this.invWidth = 1f / (float) width;
         this.invHeight = 1f / (float) height;
@@ -34,14 +34,14 @@ public final class Blur extends MultipassFilter {
 
         // create filters
         for (Tap tap : Tap.values()) {
-            convolve.put(tap.radius, new Convolve2D(tap.radius));
+            convolve.put(tap.radius, new Convolve2DFilter(tap.radius));
         }
 
         setType(BlurType.Gaussian5x5);
     }
 
     public void dispose() {
-        for (Convolve2D c : convolve.values()) {
+        for (Convolve2DFilter c : convolve.values()) {
             c.dispose();
         }
     }
@@ -78,7 +78,7 @@ public final class Blur extends MultipassFilter {
 
     @Override
     public void render(PingPongBuffer buffer) {
-        Convolve2D c = convolve.get(this.type.tap.radius);
+        Convolve2DFilter c = convolve.get(this.type.tap.radius);
 
         for (int i = 0; i < this.passes; i++) {
             c.render(buffer);
@@ -87,7 +87,7 @@ public final class Blur extends MultipassFilter {
 
     private void computeBlurWeightings() {
         boolean hasdata = true;
-        Convolve2D c = convolve.get(this.type.tap.radius);
+        Convolve2DFilter c = convolve.get(this.type.tap.radius);
 
         float[] outWeights = c.weights;
         float[] outOffsetsH = c.offsetsHor;

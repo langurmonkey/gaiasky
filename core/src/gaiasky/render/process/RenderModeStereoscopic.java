@@ -31,7 +31,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.gdx.contrib.postprocess.effects.AnaglyphEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
+import gaiasky.util.gdx.contrib.postprocess.filters.CopyFilter;
 import gaiasky.util.math.Vector3d;
 
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     private final Viewport stretchViewport;
     private final SpriteBatch sb;
     private final AnaglyphEffect anaglyphEffect;
-    private final Copy copy;
+    private final CopyFilter copyFilter;
     private final Vector3 aux1;
     private final Vector3 aux2;
     private final Vector3 aux3;
@@ -84,7 +84,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         updateAnaglyphMode();
 
         // Copy
-        copy = new Copy();
+        copyFilter = new CopyFilter();
 
         // Aux vectors
         aux1 = new Vector3();
@@ -322,7 +322,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
         // To screen
         if (fb == null)
-            copy.setInput(resultBuffer).setOutput(null).render();
+            copyFilter.setInput(resultBuffer).setOutput(null).render();
 
     }
 

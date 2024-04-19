@@ -10,7 +10,7 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Vignetting extends Filter<Vignetting> {
+public final class VignettingFilter extends Filter<VignettingFilter> {
 
     private final boolean dosat;
     private final int[] lutindex;
@@ -22,7 +22,7 @@ public final class Vignetting extends Filter<Vignetting> {
     private float lutStep, lutStepOffset, lutIndexOffset;
     private float centerX, centerY;
 
-    public Vignetting(boolean controlSaturation) {
+    public VignettingFilter(boolean controlSaturation) {
         super(ShaderLoader.fromFile("screenspace", "vignetting", (controlSaturation ? "#define CONTROL_SATURATION\n#define ENABLE_GRADIENT_MAPPING" : "#define ENABLE_GRADIENT_MAPPING")));
         dolut = false;
         dosat = controlSaturation;

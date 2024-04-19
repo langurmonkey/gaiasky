@@ -9,16 +9,16 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.XBRZUpscale;
+import gaiasky.util.gdx.contrib.postprocess.filters.XBRZUpscaleFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public class XBRZ extends PostProcessorEffect {
 
-    private final XBRZUpscale filter;
+    private final XBRZUpscaleFilter filter;
 
     public XBRZ() {
         super();
-        filter = new XBRZUpscale();
+        filter = new XBRZUpscaleFilter();
         disposables.add(filter);
     }
 

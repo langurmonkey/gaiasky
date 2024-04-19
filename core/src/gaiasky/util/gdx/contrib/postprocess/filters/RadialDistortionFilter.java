@@ -9,23 +9,23 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Zoom extends Filter<Zoom> {
-    private float x, y, zoom;
+public final class RadialDistortionFilter extends Filter<RadialDistortionFilter> {
+    private float zoom, distortion;
 
-    public Zoom() {
-        super(ShaderLoader.fromFile("zoom", "zoom"));
+    public RadialDistortionFilter() {
+        super(ShaderLoader.fromFile("screenspace", "radial-distortion"));
         rebind();
-        setOrigin(0.5f, 0.5f);
+        setDistortion(0.3f);
         setZoom(1f);
     }
 
-    /** Specify the zoom origin, in normalized screen coordinates. */
-    public void setOrigin(float x, float y) {
-        this.x = x;
-        this.y = y;
-        setParams(Param.OffsetX, this.x);
-        setParams(Param.OffsetY, this.y);
-        endParams();
+    public float getDistortion() {
+        return distortion;
+    }
+
+    public void setDistortion(float distortion) {
+        this.distortion = distortion;
+        setParam(Param.Distortion, this.distortion);
     }
 
     public float getZoom() {
@@ -37,44 +37,33 @@ public final class Zoom extends Filter<Zoom> {
         setParam(Param.Zoom, this.zoom);
     }
 
-    public float getOriginX() {
-        return x;
-    }
-
-    public float getOriginY() {
-        return y;
-    }
-
-    @Override
-    public void rebind() {
-        // reimplement super to batch every parameter
-        setParams(Param.Texture, u_texture0);
-        setParams(Param.OffsetX, x);
-        setParams(Param.OffsetY, y);
-        setParams(Param.Zoom, zoom);
-        endParams();
-    }
-
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
     }
 
+    @Override
+    public void rebind() {
+        setParams(Param.Texture0, u_texture0);
+        setParams(Param.Distortion, distortion);
+        setParams(Param.Zoom, zoom);
+
+        endParams();
+    }
+
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0),
-        OffsetX("offset_x", 0),
-        OffsetY("offset_y", 0),
-        Zoom("zoom", 0),
-        ;
+        Texture0("u_texture0", 0),
+        Distortion("distortion", 0),
+        Zoom("zoom", 0);
         // @formatter:on
 
         private final String mnemonic;
         private final int elementSize;
 
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
+        Param(String m, int elementSize) {
+            this.mnemonic = m;
+            this.elementSize = elementSize;
         }
 
         @Override

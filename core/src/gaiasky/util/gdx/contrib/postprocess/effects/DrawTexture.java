@@ -9,25 +9,25 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
+import gaiasky.util.gdx.contrib.postprocess.filters.CopyFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public class DrawTexture extends PostProcessorEffect {
-    private final Copy copy;
+    private final CopyFilter copyFilter;
 
     public DrawTexture() {
-        copy = new Copy();
-        disposables.add(copy);
+        copyFilter = new CopyFilter();
+        disposables.add(copyFilter);
     }
 
     @Override
     public void rebind() {
-        copy.rebind();
+        copyFilter.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        copy.setInput(src).setOutput(dest).render();
+        copyFilter.setInput(src).setOutput(dest).render();
     }
 }

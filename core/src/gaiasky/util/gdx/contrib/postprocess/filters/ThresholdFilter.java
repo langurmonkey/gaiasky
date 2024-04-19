@@ -9,11 +9,11 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Threshold extends Filter<Threshold> {
+public final class ThresholdFilter extends Filter<ThresholdFilter> {
 
     private float threshold = 0;
 
-    public Threshold() {
+    public ThresholdFilter() {
         super(ShaderLoader.fromFile("screenspace", "threshold"));
         rebind();
     }

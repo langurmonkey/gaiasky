@@ -10,14 +10,14 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.RadialBlur;
-import gaiasky.util.gdx.contrib.postprocess.filters.Zoom;
+import gaiasky.util.gdx.contrib.postprocess.filters.RadialBlurFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.ZoomFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Zoomer extends PostProcessorEffect {
     private final boolean doRadial;
-    private final RadialBlur radialBlur;
-    private final Zoom zoom;
+    private final RadialBlurFilter radialBlurFilter;
+    private final ZoomFilter zoomFilter;
     private final float oneOnW;
     private final float oneOnH;
     private float userOriginX, userOriginY;
@@ -25,16 +25,16 @@ public final class Zoomer extends PostProcessorEffect {
     /**
      * Creating a Zoomer specifying the radial blur quality will enable radial blur
      */
-    public Zoomer(int viewportWidth, int viewportHeight, RadialBlur.Quality quality) {
-        radialBlur = quality != null ? new RadialBlur(quality) : null;
-        if (radialBlur != null) {
+    public Zoomer(int viewportWidth, int viewportHeight, RadialBlurFilter.Quality quality) {
+        radialBlurFilter = quality != null ? new RadialBlurFilter(quality) : null;
+        if (radialBlurFilter != null) {
             doRadial = true;
-            zoom = null;
-            disposables.add(radialBlur);
+            zoomFilter = null;
+            disposables.add(radialBlurFilter);
         } else {
             doRadial = false;
-            zoom = new Zoom();
-            disposables.add(zoom);
+            zoomFilter = new ZoomFilter();
+            disposables.add(zoomFilter);
         }
 
         oneOnW = 1f / (float) viewportWidth;
@@ -64,31 +64,31 @@ public final class Zoomer extends PostProcessorEffect {
         userOriginY = y;
 
         if (doRadial) {
-            radialBlur.setOrigin(x * oneOnW, 1f - y * oneOnH);
+            radialBlurFilter.setOrigin(x * oneOnW, 1f - y * oneOnH);
         } else {
-            zoom.setOrigin(x * oneOnW, 1f - y * oneOnH);
+            zoomFilter.setOrigin(x * oneOnW, 1f - y * oneOnH);
         }
     }
 
     public float getZoom() {
         if (doRadial) {
-            return 1f / radialBlur.getZoom();
+            return 1f / radialBlurFilter.getZoom();
         } else {
-            return 1f / zoom.getZoom();
+            return 1f / zoomFilter.getZoom();
         }
     }
 
     public void setZoom(float zoom) {
         if (doRadial) {
-            radialBlur.setZoom(1f / zoom);
+            radialBlurFilter.setZoom(1f / zoom);
         } else {
-            this.zoom.setZoom(1f / zoom);
+            this.zoomFilter.setZoom(1f / zoom);
         }
     }
 
     public float getBlurStrength() {
         if (doRadial) {
-            return radialBlur.getStrength();
+            return radialBlurFilter.getStrength();
         }
 
         return -1;
@@ -96,7 +96,7 @@ public final class Zoomer extends PostProcessorEffect {
 
     public void setBlurStrength(float strength) {
         if (doRadial) {
-            radialBlur.setStrength(strength);
+            radialBlurFilter.setStrength(strength);
         }
     }
 
@@ -110,16 +110,16 @@ public final class Zoomer extends PostProcessorEffect {
 
     @Override
     public void rebind() {
-        radialBlur.rebind();
+        radialBlurFilter.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
         if (doRadial) {
-            radialBlur.setInput(src).setOutput(dest).render();
+            radialBlurFilter.setInput(src).setOutput(dest).render();
         } else {
-            zoom.setInput(src).setOutput(dest).render();
+            zoomFilter.setInput(src).setOutput(dest).render();
         }
     }
 }

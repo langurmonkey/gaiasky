@@ -9,14 +9,14 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.RadialDistortion;
+import gaiasky.util.gdx.contrib.postprocess.filters.RadialDistortionFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Curvature extends PostProcessorEffect {
-    private final RadialDistortion distort;
+    private final RadialDistortionFilter distort;
 
     public Curvature() {
-        distort = new RadialDistortion();
+        distort = new RadialDistortionFilter();
         disposables.add(distort);
     }
 

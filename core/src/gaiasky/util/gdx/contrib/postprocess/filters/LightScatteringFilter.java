@@ -10,7 +10,7 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Scattering extends Filter<Scattering> {
+public final class LightScatteringFilter extends Filter<LightScatteringFilter> {
     // Number of light supported
     public static int N = 10;
     private final Vector2 viewport;
@@ -24,7 +24,7 @@ public final class Scattering extends Filter<Scattering> {
     private float weight = 0.58767f;
     private int numSamples = 100;
 
-    public Scattering(int width, int height) {
+    public LightScatteringFilter(int width, int height) {
         super(ShaderLoader.fromFile("screenspace", "lightscattering"));
         lightPositions = new float[N * 2];
         lightViewAngles = new float[N];

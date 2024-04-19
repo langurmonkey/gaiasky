@@ -26,9 +26,6 @@ import gaiasky.render.api.IPostProcessor;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
-import gaiasky.scene.record.MaterialComponent;
-import gaiasky.scene.record.ModelComponent;
-import gaiasky.scene.view.BaseView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -36,7 +33,6 @@ import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
 import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
-import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
@@ -225,11 +221,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.set(ssrEffect);
 
         // CAMERA MOTION BLUR
-        CameraMotion cameraBlur = new CameraMotion(width, height);
-        cameraBlur.setBlurScale(Settings.settings.postprocess.motionBlur.strength);
-        cameraBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
-        cameraBlur.setEnabledOptions(false, false);
-        ppb.set(cameraBlur);
+        CameraMotionBlur cameraMotionBlur = new CameraMotionBlur(width, height);
+        cameraMotionBlur.setBlurScale(Settings.settings.postprocess.motionBlur.strength);
+        cameraMotionBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
+        cameraMotionBlur.setEnabledOptions(false, false);
+        ppb.set(cameraMotionBlur);
         updateCameraBlur(ppb, gq);
 
         /*
@@ -433,7 +429,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
-        CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
+        CameraMotionBlur cameraMotionBlur = (CameraMotionBlur) ppb.get(CameraMotionBlur.class);
         if (cameraMotionBlur != null) {
             if (gq.isUltra()) {
                 cameraMotionBlur.setBlurMaxSamples(60);
@@ -941,7 +937,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
+                        CameraMotionBlur cameraMotion = (CameraMotionBlur) ppb.get(CameraMotionBlur.class);
                         if (cameraMotion != null) {
                             cameraMotion.setEnabled(enabled);
                             cameraMotion.setBlurScale(strength);
@@ -955,7 +951,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
+                        CameraMotionBlur cameraMotion = (CameraMotionBlur) ppb.get(CameraMotionBlur.class);
                         if (cameraMotion != null) {
                             cameraMotion.setEnabled(enabled);
                         }

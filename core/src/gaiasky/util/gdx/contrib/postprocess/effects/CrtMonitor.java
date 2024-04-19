@@ -15,20 +15,20 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Blur;
-import gaiasky.util.gdx.contrib.postprocess.filters.Blur.BlurType;
-import gaiasky.util.gdx.contrib.postprocess.filters.Combine;
-import gaiasky.util.gdx.contrib.postprocess.filters.CrtScreen;
-import gaiasky.util.gdx.contrib.postprocess.filters.CrtScreen.RgbMode;
+import gaiasky.util.gdx.contrib.postprocess.filters.BlurFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.BlurFilter.BlurType;
+import gaiasky.util.gdx.contrib.postprocess.filters.CombineFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.CrtScreenFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.CrtScreenFilter.RgbMode;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class CrtMonitor extends PostProcessorEffect {
-    private final CrtScreen crt;
-    private final Combine combine;
+    private final CrtScreenFilter crt;
+    private final CombineFilter combineFilter;
     private PingPongBuffer pingPongBuffer = null;
     private FrameBuffer buffer = null;
-    private Blur blur;
+    private BlurFilter blurFilter;
     private boolean blending = false;
     private int sFactor, dFactor;
 
@@ -37,20 +37,20 @@ public final class CrtMonitor extends PostProcessorEffect {
 
         if (performBlur) {
             pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
-            blur = new Blur(fboWidth, fboHeight);
-            blur.setPasses(1);
-            blur.setAmount(1f);
+            blurFilter = new BlurFilter(fboWidth, fboHeight);
+            blurFilter.setPasses(1);
+            blurFilter.setAmount(1f);
             // blur.setType( BlurType.Gaussian3x3b ); // high defocus
-            blur.setType(BlurType.Gaussian3x3); // modern machines defocus
-            disposables.addAll(pingPongBuffer, blur);
+            blurFilter.setType(BlurType.Gaussian3x3); // modern machines defocus
+            disposables.addAll(pingPongBuffer, blurFilter);
         } else {
             buffer = new FrameBuffer(PostProcessor.getFramebufferFormat(), fboWidth, fboHeight, false);
             disposables.addAll(buffer);
         }
 
-        combine = new Combine();
-        crt = new CrtScreen(barrelDistortion, mode, effectsSupport);
-        disposables.addAll(combine, crt);
+        combineFilter = new CombineFilter();
+        crt = new CrtScreenFilter(barrelDistortion, mode, effectsSupport);
+        disposables.addAll(combineFilter, crt);
     }
 
     public void enableBlending(int sFactor, int dFactor) {
@@ -93,8 +93,8 @@ public final class CrtMonitor extends PostProcessorEffect {
     }
 
     // getters
-    public Combine getCombinePass() {
-        return combine;
+    public CombineFilter getCombinePass() {
+        return combineFilter;
     }
 
     public float getOffset() {
@@ -144,7 +144,7 @@ public final class CrtMonitor extends PostProcessorEffect {
 
         Texture out;
 
-        if (blur != null) {
+        if (blurFilter != null) {
 
             pingPongBuffer.begin();
             {
@@ -152,7 +152,7 @@ public final class CrtMonitor extends PostProcessorEffect {
                 crt.setInput(in).setOutput(pingPongBuffer.getSourceBuffer()).render();
 
                 // blur pass
-                blur.render(pingPongBuffer);
+                blurFilter.render(pingPongBuffer);
             }
             pingPongBuffer.end();
 
@@ -175,7 +175,7 @@ public final class CrtMonitor extends PostProcessorEffect {
         restoreViewport(dest);
 
         // do combine pass
-        combine.setOutput(dest).setInput(in, out).render();
+        combineFilter.setOutput(dest).setInput(in, out).render();
     }
 
 }

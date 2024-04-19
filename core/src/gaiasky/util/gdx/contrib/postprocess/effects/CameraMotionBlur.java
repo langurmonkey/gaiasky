@@ -12,33 +12,33 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.CameraBlur;
+import gaiasky.util.gdx.contrib.postprocess.filters.CameraMotionBlurFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
-public final class CameraMotion extends PostProcessorEffect {
-    private final CameraBlur cameraBlur;
+public final class CameraMotionBlur extends PostProcessorEffect {
+    private final CameraMotionBlurFilter cameraMotionBlurFilter;
     private final float width;
     private final float height;
 
-    public CameraMotion(float width,
-                        float height) {
+    public CameraMotionBlur(float width,
+                            float height) {
         this.width = width;
         this.height = height;
-        cameraBlur = new CameraBlur();
-        disposables.add(cameraBlur);
+        cameraMotionBlurFilter = new CameraMotionBlurFilter();
+        disposables.add(cameraMotionBlurFilter);
     }
 
     public void setBlurMaxSamples(int samples) {
-        cameraBlur.setBlurMaxSamples(samples);
+        cameraMotionBlurFilter.setBlurMaxSamples(samples);
     }
 
     public void setBlurScale(float scale) {
-        cameraBlur.setBlurScale(scale);
+        cameraMotionBlurFilter.setBlurScale(scale);
     }
 
     @Override
     public void rebind() {
-        cameraBlur.rebind();
+        cameraMotionBlurFilter.rebind();
     }
 
     private final Vector3 aux = new Vector3();
@@ -49,22 +49,22 @@ public final class CameraMotion extends PostProcessorEffect {
                        GaiaSkyFrameBuffer main) {
         // Viewport.
         if (dest != null) {
-            cameraBlur.setViewport(dest.getWidth(), dest.getHeight());
+            cameraMotionBlurFilter.setViewport(dest.getWidth(), dest.getHeight());
         } else {
-            cameraBlur.setViewport(width, height);
+            cameraMotionBlurFilter.setViewport(width, height);
         }
         // Delta camera pos.
         var cam = GaiaSky.instance.getICamera();
         cam.getDPos().put(aux);
-        cameraBlur.setDCam(aux.scl(1f / (float) cam.getSpeedScalingCapped()));
-        // Zfar and K
-        cameraBlur.setZfarK((float) cam.getFar(), Constants.getCameraK());
+        cameraMotionBlurFilter.setDCam(aux.scl(1f / (float) cam.getSpeedScalingCapped()));
+        // Z-far and K.
+        cameraMotionBlurFilter.setZFarK((float) cam.getFar(), Constants.getCameraK());
         // Previous projectionView inverse matrix.
-        cameraBlur.setProjView(cam.getProjView());
-        cameraBlur.setPrevProjView(cam.getPreviousProjView());
+        cameraMotionBlurFilter.setProjView(cam.getProjView());
+        cameraMotionBlurFilter.setPrevProjView(cam.getPreviousProjView());
 
         restoreViewport(dest);
-        cameraBlur.setDepthTexture(main.getDepthBufferTexture());
-        cameraBlur.setInput(src).setOutput(dest).render();
+        cameraMotionBlurFilter.setDepthTexture(main.getDepthBufferTexture());
+        cameraMotionBlurFilter.setInput(src).setOutput(dest).render();
     }
 }

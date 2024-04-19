@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class CameraBlur extends Filter<CameraBlur> {
+public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter> {
 
     private final Vector2 viewport = new Vector2();
     private final Vector3 dCam = new Vector3();
@@ -24,7 +24,7 @@ public final class CameraBlur extends Filter<CameraBlur> {
     private float blurScale;
     private int samples;
 
-    public CameraBlur() {
+    public CameraMotionBlurFilter() {
         super(ShaderLoader.fromFile("screenspace", "camerablur"));
         rebind();
     }
@@ -63,9 +63,9 @@ public final class CameraBlur extends Filter<CameraBlur> {
         setParam(Param.DCam, dCam);
     }
 
-    public void setZfarK(float zfar, float k) {
+    public void setZFarK(float zfar, float k) {
         this.zFarK.set(zfar, k);
-        setParam(Param.ZfarK, this.zFarK);
+        setParam(Param.ZFarK, this.zFarK);
     }
 
     public void setViewport(float width, float height) {
@@ -81,7 +81,7 @@ public final class CameraBlur extends Filter<CameraBlur> {
         setParams(Param.ProjViewInverse, projViewInverse);
         setParams(Param.Viewport, viewport);
         setParams(Param.DCam, dCam);
-        setParams(Param.ZfarK, zFarK);
+        setParams(Param.ZFarK, zFarK);
         setParams(Param.BlurScale, blurScale);
         setParams(Param.BlurMaxSamples, samples);
         endParams();
@@ -101,7 +101,7 @@ public final class CameraBlur extends Filter<CameraBlur> {
         PrevProjView("u_prevProjView", 16),
         ProjViewInverse("u_projViewInverse", 16),
         DCam("u_dCam", 3),
-        ZfarK("u_zfark", 2),
+        ZFarK("u_zFarK", 2),
         BlurMaxSamples("u_blurSamplesMax", 0),
         BlurScale("u_blurScale", 0),
         Viewport("u_viewport", 2);

@@ -8,6 +8,8 @@
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import gaiasky.GaiaSky;
+import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.DepthBufferFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
@@ -28,6 +30,10 @@ public final class DepthBuffer extends PostProcessorEffect {
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+        // Z-far and K.
+        var cam = GaiaSky.instance.getICamera();
+        filter.setZFarK((float) cam.getFar(), Constants.getCameraK());
+
         restoreViewport(dest);
         // Get depth buffer texture from main frame buffer
         filter.setDepthTexture(main.getDepthBufferTexture());

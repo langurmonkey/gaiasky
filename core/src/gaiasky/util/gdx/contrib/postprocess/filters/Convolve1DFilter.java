@@ -9,19 +9,19 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Convolve1D extends Filter<Convolve1D> {
+public final class Convolve1DFilter extends Filter<Convolve1DFilter> {
     public int length;
     public float[] weights;
     public float[] offsets;
-    public Convolve1D(int length) {
+    public Convolve1DFilter(int length) {
         this(length, new float[length], new float[length * 2]);
     }
 
-    public Convolve1D(int length, float[] weights_data) {
+    public Convolve1DFilter(int length, float[] weights_data) {
         this(length, weights_data, new float[length * 2]);
     }
 
-    public Convolve1D(int length, float[] weights_data, float[] offsets) {
+    public Convolve1DFilter(int length, float[] weights_data, float[] offsets) {
         super(ShaderLoader.fromFile("screenspace", "convolve-1d", "#define LENGTH " + length));
         setWeights(length, weights_data, offsets);
         rebind();

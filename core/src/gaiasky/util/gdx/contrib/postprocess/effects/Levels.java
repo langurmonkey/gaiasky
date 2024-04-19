@@ -15,7 +15,7 @@ import gaiasky.GaiaSky;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.LevelsFilter;
-import gaiasky.util.gdx.contrib.postprocess.filters.Luma;
+import gaiasky.util.gdx.contrib.postprocess.filters.LumaFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class Levels extends PostProcessorEffect {
     private static final int LUMA_SIZE = 200;
-    private final Luma luma;
+    private final LumaFilter lumaFilter;
     private final FrameBuffer lumaBuffer;
     /**
      * Is the max/avg process running?
@@ -42,7 +42,7 @@ public final class Levels extends PostProcessorEffect {
      */
     public Levels() {
         levels = new LevelsFilter();
-        luma = new Luma();
+        lumaFilter = new LumaFilter();
 
         processRunning = new AtomicBoolean(false);
         lastFrame = -10;
@@ -58,14 +58,14 @@ public final class Levels extends PostProcessorEffect {
         lumaBuffer = new GaiaSkyFrameBuffer(builder, 0);
         lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
 
-        luma.setImageSize(LUMA_SIZE, LUMA_SIZE);
-        luma.setTexelSize(1f / LUMA_SIZE, 1f / LUMA_SIZE);
+        lumaFilter.setImageSize(LUMA_SIZE, LUMA_SIZE);
+        lumaFilter.setTexelSize(1f / LUMA_SIZE, 1f / LUMA_SIZE);
 
-        disposables.addAll(luma, levels, lumaBuffer);
+        disposables.addAll(lumaFilter, levels, lumaBuffer);
     }
 
-    public Luma getLuma() {
-        return luma;
+    public LumaFilter getLuma() {
+        return lumaFilter;
     }
 
     public FrameBuffer getLumaBuffer() {
@@ -195,8 +195,8 @@ public final class Levels extends PostProcessorEffect {
         if (!processRunning.get() && GaiaSky.instance.frames - lastFrame >= 4) {
             processRunning.set(true);
             // Render as is
-            luma.enableProgramLuma();
-            luma.setInput(src).setOutput(lumaBuffer).render();
+            lumaFilter.enableProgramLuma();
+            lumaFilter.setInput(src).setOutput(lumaBuffer).render();
             lumaBuffer.getColorBufferTexture().bind();
 
             // Get texture as is and compute avg/max in CPU - use with reinhardToneMapping()
@@ -256,11 +256,11 @@ public final class Levels extends PostProcessorEffect {
 
     private void computeLumaValuesMipMap(FrameBuffer src) {
         // Average using mipmap
-        luma.enableProgramAvg();
+        lumaFilter.enableProgramAvg();
         lumaAvg = renderLumaMipMap(src);
 
         // Max using mipmap
-        luma.enableProgramMax();
+        lumaFilter.enableProgramMax();
         lumaMax = renderLumaMipMap(src);
 
         lowPassFilter(0.08f, 1.0f);
@@ -271,12 +271,12 @@ public final class Levels extends PostProcessorEffect {
         float lodLevel = 0;
         int size = (int) Math.floor(LUMA_SIZE / 2f);
         while (size >= 1f) {
-            luma.setImageSize(size, size);
-            luma.setTexelSize(1f / size, 1f / size);
-            luma.setLodLevel(lodLevel);
+            lumaFilter.setImageSize(size, size);
+            lumaFilter.setTexelSize(1f / size, 1f / size);
+            lumaFilter.setLodLevel(lodLevel);
 
             // Draw to lumaBuffer, copy texture to mipmap level later
-            luma.setInput(src).setOutput(lumaBuffer).render();
+            lumaFilter.setInput(src).setOutput(lumaBuffer).render();
 
             // Copy framebuffer to specified mipmap level in texture
             GL30.glCopyTexImage2D(GL30.GL_TEXTURE_2D, mipLevel, GL30.GL_RGBA, 0, 0, size, size, 0);

@@ -11,18 +11,18 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.AccumulationBlurFilter;
-import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
+import gaiasky.util.gdx.contrib.postprocess.filters.CopyFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public class AccumulationBlur extends PostProcessorEffect {
-    private final Copy copyFilter;
+    private final CopyFilter copyFilter;
     private final AccumulationBlurFilter motionFilter;
     private final FrameBuffer fbo;
 
     public AccumulationBlur(int width, int height) {
         motionFilter = new AccumulationBlurFilter();
         motionFilter.setResolution(width, height);
-        copyFilter = new Copy();
+        copyFilter = new CopyFilter();
         fbo = new FrameBuffer(Format.RGBA8888, width, height, false);
 
         disposables.addAll(copyFilter, motionFilter, fbo);

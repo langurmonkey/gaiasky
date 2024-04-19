@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class CrtScreen extends Filter<CrtScreen> {
+public final class CrtScreenFilter extends Filter<CrtScreenFilter> {
     private final Vector2 chromaticDispersion;
     private final Vector3 vtint;
     private final Color tint;
@@ -24,7 +24,7 @@ public final class CrtScreen extends Filter<CrtScreen> {
     private float distortion;
     private RgbMode mode;
 
-    public CrtScreen(boolean barrelDistortion, RgbMode mode, int effectsSupport) {
+    public CrtScreenFilter(boolean barrelDistortion, RgbMode mode, int effectsSupport) {
         // @off
         super(ShaderLoader.fromFile("screenspace", "crt-screen",
                 (barrelDistortion ? "#define ENABLE_BARREL_DISTORTION\n" : "") + (mode == RgbMode.RgbShift ? "#define ENABLE_RGB_SHIFT\n" : "") + (mode == RgbMode.ChromaticAberrations ? "#define ENABLE_CHROMATIC_ABERRATIONS\n" : "") + (isSet(Effect.TweakContrast.v, effectsSupport) ? "#define ENABLE_TWEAK_CONTRAST\n" : "") + (isSet(Effect.Vignette.v, effectsSupport) ? "#define ENABLE_VIGNETTE\n" : "") + (isSet(Effect.Tint.v, effectsSupport) ? "#define ENABLE_TINT\n" : "")

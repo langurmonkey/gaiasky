@@ -11,14 +11,14 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public class Luma extends Filter<Luma> {
+public class LumaFilter extends Filter<LumaFilter> {
     private final Vector2 texelSize;
     private final Vector2 imageSize;
     private final ShaderProgram programLuma;
     private final ShaderProgram programAvg;
     private final ShaderProgram programMax;
     private float lodLevel = 0;
-    public Luma() {
+    public LumaFilter() {
         super(ShaderLoader.fromFile("screenspace", "luma", "#define LUMA"));
         programLuma = program;
         programAvg = ShaderLoader.fromFile("screenspace", "luma", "#define AVERAGE");

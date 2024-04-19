@@ -7,62 +7,54 @@
 
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class LensDirt extends Filter<LensDirt> {
-    private Texture lensDirtTexture;
-    private Texture lensStarburstTexture;
-    private float starburstOffset;
+public class XBRZUpscaleFilter extends Filter<XBRZUpscaleFilter> {
+    private final Vector2 inputSize;
+    private final Vector2 outputSize;
 
-    public LensDirt() {
-        this(false);
+    public XBRZUpscaleFilter() {
+        this(new Vector2(), new Vector2());
     }
 
-    public LensDirt(boolean addToBase) {
-        super(ShaderLoader.fromFile("screenspace", "lensdirt", addToBase? "#define addToBase" : ""));
+    public XBRZUpscaleFilter(Vector2 inputSize, Vector2 outputSize) {
+        super(ShaderLoader.fromFile("screenspace", "xbrz-freescale"));
+        this.inputSize = new Vector2(inputSize);
+        this.outputSize = new Vector2(outputSize);
+
         rebind();
     }
 
-    public void setLensDirtTexture(Texture tex) {
-        this.lensDirtTexture = tex;
-        setParam(Param.LensDirt, u_texture1);
+    public void setInputSize(float width, float height) {
+        this.inputSize.set(width, height);
+        setParam(Param.InputSize, this.inputSize);
     }
 
-    public void setLensStarburstTexture(Texture tex) {
-        this.lensStarburstTexture = tex;
-        setParam(Param.LensStarburst, u_texture2);
-    }
-
-    public void setStarburstOffset(float offset) {
-        this.starburstOffset = offset;
-        setParam(Param.StarburstOffset, offset);
+    public void setOutputSize(float width, float height) {
+        this.outputSize.set(width, height);
+        setParam(Param.OutputSize, this.outputSize);
     }
 
     @Override
     public void rebind() {
         // Re-implement super to batch every parameter
         setParams(Param.Texture, u_texture0);
-        setParams(Param.LensDirt, u_texture1);
-        setParams(Param.LensStarburst, u_texture2);
-        setParams(Param.StarburstOffset, starburstOffset);
+        setParams(Param.InputSize, inputSize);
+        setParams(Param.OutputSize, outputSize);
         endParams();
     }
 
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
-        lensDirtTexture.bind(u_texture1);
-        if (lensStarburstTexture != null)
-            lensStarburstTexture.bind(u_texture2);
     }
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
-        LensDirt("u_texture1", 0),
-        LensStarburst("u_texture2", 0),
-        StarburstOffset("u_starburstOffset", 0);
+        InputSize("u_inputSize", 2),
+        OutputSize("u_outputSize", 2);
         // @formatter:on
 
         private final String mnemonic;

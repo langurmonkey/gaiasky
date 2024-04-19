@@ -10,11 +10,11 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Vignetting;
+import gaiasky.util.gdx.contrib.postprocess.filters.VignettingFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Vignette extends PostProcessorEffect {
-    private final Vignetting vignetting;
+    private final VignettingFilter vignettingFilter;
     private final boolean controlSaturation;
     private final float oneOnW;
     private final float oneOnH;
@@ -23,8 +23,8 @@ public final class Vignette extends PostProcessorEffect {
         this.controlSaturation = controlSaturation;
         oneOnW = 1f / (float) viewportWidth;
         oneOnH = 1f / (float) viewportHeight;
-        vignetting = new Vignetting(controlSaturation);
-        disposables.add(vignetting);
+        vignettingFilter = new VignettingFilter(controlSaturation);
+        disposables.add(vignettingFilter);
     }
 
     public boolean doesSaturationControl() {
@@ -32,103 +32,103 @@ public final class Vignette extends PostProcessorEffect {
     }
 
     public void setCoords(float x, float y) {
-        vignetting.setCoords(x, y);
+        vignettingFilter.setCoords(x, y);
     }
 
     public void setX(float x) {
-        vignetting.setX(x);
+        vignettingFilter.setX(x);
     }
 
     public void setY(float y) {
-        vignetting.setY(y);
+        vignettingFilter.setY(y);
     }
 
     public void setLutTexture(Texture texture) {
-        vignetting.setLut(texture);
+        vignettingFilter.setLut(texture);
     }
 
     public void setLutIndexVal(int index, int value) {
-        vignetting.setLutIndexVal(index, value);
+        vignettingFilter.setLutIndexVal(index, value);
     }
 
     public void setLutIndexOffset(float value) {
-        vignetting.setLutIndexOffset(value);
+        vignettingFilter.setLutIndexOffset(value);
     }
 
     /** Specify the center, in screen coordinates. */
     public void setCenter(float x, float y) {
-        vignetting.setCenter(x * oneOnW, 1f - y * oneOnH);
+        vignettingFilter.setCenter(x * oneOnW, 1f - y * oneOnH);
     }
 
     public float getIntensity() {
-        return vignetting.getIntensity();
+        return vignettingFilter.getIntensity();
     }
 
     public void setIntensity(float intensity) {
-        vignetting.setIntensity(intensity);
+        vignettingFilter.setIntensity(intensity);
     }
 
     public float getLutIntensity() {
-        return vignetting.getLutIntensity();
+        return vignettingFilter.getLutIntensity();
     }
 
     public void setLutIntensity(float value) {
-        vignetting.setLutIntensity(value);
+        vignettingFilter.setLutIntensity(value);
     }
 
     public int getLutIndexVal(int index) {
-        return vignetting.getLutIndexVal(index);
+        return vignettingFilter.getLutIndexVal(index);
     }
 
     public Texture getLut() {
-        return vignetting.getLut();
+        return vignettingFilter.getLut();
     }
 
     public float getCenterX() {
-        return vignetting.getCenterX();
+        return vignettingFilter.getCenterX();
     }
 
     public float getCenterY() {
-        return vignetting.getCenterY();
+        return vignettingFilter.getCenterY();
     }
 
     public float getCoordsX() {
-        return vignetting.getX();
+        return vignettingFilter.getX();
     }
 
     public float getCoordsY() {
-        return vignetting.getY();
+        return vignettingFilter.getY();
     }
 
     public float getSaturation() {
-        return vignetting.getSaturation();
+        return vignettingFilter.getSaturation();
     }
 
     public void setSaturation(float saturation) {
-        vignetting.setSaturation(saturation);
+        vignettingFilter.setSaturation(saturation);
     }
 
     public float getSaturationMul() {
-        return vignetting.getSaturationMul();
+        return vignettingFilter.getSaturationMul();
     }
 
     public void setSaturationMul(float saturationMul) {
-        vignetting.setSaturationMul(saturationMul);
+        vignettingFilter.setSaturationMul(saturationMul);
     }
 
     public boolean isGradientMappingEnabled() {
-        return vignetting.isGradientMappingEnabled();
+        return vignettingFilter.isGradientMappingEnabled();
     }
 
     @Override
     public void rebind() {
-        vignetting.rebind();
+        vignettingFilter.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        vignetting.setInput(src).setOutput(dest).render();
+        vignettingFilter.setInput(src).setOutput(dest).render();
     }
 
 }

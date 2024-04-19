@@ -14,17 +14,17 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.*;
-import gaiasky.util.gdx.contrib.postprocess.filters.Blur.BlurType;
+import gaiasky.util.gdx.contrib.postprocess.filters.BlurFilter.BlurType;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class PseudoLensFlare extends PostProcessorEffect {
     private final PingPongBuffer pingPongBuffer;
     private final PseudoLensFlareFilter flare;
-    private final LensDirt dirt;
-    private final Blur blur;
-    private final Bias bias;
-    private final Combine combine;
+    private final LensDirtFilter dirt;
+    private final BlurFilter blurFilter;
+    private final BiasFilter biasFilter;
+    private final CombineFilter combineFilter;
     private Settings settings;
     private boolean blending = false;
     private int sFactor, dFactor;
@@ -33,22 +33,22 @@ public final class PseudoLensFlare extends PostProcessorEffect {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
 
         flare = new PseudoLensFlareFilter(fboWidth, fboHeight);
-        dirt = new LensDirt();
-        blur = new Blur(fboWidth, fboHeight);
-        bias = new Bias();
-        combine = new Combine();
+        dirt = new LensDirtFilter();
+        blurFilter = new BlurFilter(fboWidth, fboHeight);
+        biasFilter = new BiasFilter();
+        combineFilter = new CombineFilter();
 
-        disposables.addAll(pingPongBuffer, flare, dirt, blur, bias, combine);
+        disposables.addAll(pingPongBuffer, flare, dirt, blurFilter, biasFilter, combineFilter);
 
         setSettings(new Settings("default", 2, -0.9f, 1f, 1f, 0.7f, 1f, 8, 0.5f));
     }
 
     public void setBaseIntensity(float intensity) {
-        combine.setSource1Intensity(intensity);
+        combineFilter.setSource1Intensity(intensity);
     }
 
     public void setFlareIntensity(float intensity) {
-        combine.setSource2Intensity(intensity);
+        combineFilter.setSource2Intensity(intensity);
     }
 
     public void setHaloWidth(float haloWidth) {
@@ -82,35 +82,35 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     }
 
     public float getBias() {
-        return bias.getBias();
+        return biasFilter.getBias();
     }
 
     public void setBias(float b) {
-        bias.setBias(b);
+        biasFilter.setBias(b);
     }
 
     public float getBaseIntensity() {
-        return combine.getSource1Intensity();
+        return combineFilter.getSource1Intensity();
     }
 
     public float getBaseSaturation() {
-        return combine.getSource1Saturation();
+        return combineFilter.getSource1Saturation();
     }
 
     public void setBaseSaturation(float saturation) {
-        combine.setSource1Saturation(saturation);
+        combineFilter.setSource1Saturation(saturation);
     }
 
     public float getFlareIntensity() {
-        return combine.getSource2Intensity();
+        return combineFilter.getSource2Intensity();
     }
 
     public float getFlareSaturation() {
-        return combine.getSource2Saturation();
+        return combineFilter.getSource2Saturation();
     }
 
     public void setFlareSaturation(float saturation) {
-        combine.setSource2Saturation(saturation);
+        combineFilter.setSource2Saturation(saturation);
     }
 
     public int getGhosts() {
@@ -134,11 +134,11 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     }
 
     public BlurType getBlurType() {
-        return blur.getType();
+        return blurFilter.getType();
     }
 
     public void setBlurType(BlurType type) {
-        blur.setType(type);
+        blurFilter.setType(type);
     }
 
     public Settings getSettings() {
@@ -166,19 +166,19 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     }
 
     public int getBlurPasses() {
-        return blur.getPasses();
+        return blurFilter.getPasses();
     }
 
     public void setBlurPasses(int passes) {
-        blur.setPasses(passes);
+        blurFilter.setPasses(passes);
     }
 
     public float getBlurAmount() {
-        return blur.getAmount();
+        return blurFilter.getAmount();
     }
 
     public void setBlurAmount(float amount) {
-        blur.setAmount(amount);
+        blurFilter.setAmount(amount);
     }
 
     @Override
@@ -189,7 +189,7 @@ public final class PseudoLensFlare extends PostProcessorEffect {
         pingPongBuffer.begin();
         {
             // Apply bias.
-            bias.setInput(src.getColorBufferTexture()).setOutput(pingPongBuffer.getSourceBuffer()).render();
+            biasFilter.setInput(src.getColorBufferTexture()).setOutput(pingPongBuffer.getSourceBuffer()).render();
 
             // Apply flare.
             flare.setInput(pingPongBuffer.getSourceBuffer()).setOutput(pingPongBuffer.getResultBuffer()).render();
@@ -197,7 +197,7 @@ public final class PseudoLensFlare extends PostProcessorEffect {
             pingPongBuffer.set(pingPongBuffer.getResultBuffer(), pingPongBuffer.getSourceBuffer());
 
             // Blur pass.
-            blur.render(pingPongBuffer);
+            blurFilter.render(pingPongBuffer);
 
             // Apply lens dirt.
             dirt.setInput(pingPongBuffer.getSourceBuffer()).setOutput(pingPongBuffer.getResultBuffer()).render();
@@ -215,14 +215,14 @@ public final class PseudoLensFlare extends PostProcessorEffect {
         restoreViewport(dest);
 
         // mix original scene and blurred threshold, modulate via
-        combine.setOutput(dest).setInput(src.getColorBufferTexture(), pingPongBuffer.getResultTexture()).render();
+        combineFilter.setOutput(dest).setInput(src.getColorBufferTexture(), pingPongBuffer.getResultTexture()).render();
     }
 
     @Override
     public void rebind() {
-        blur.rebind();
-        bias.rebind();
-        combine.rebind();
+        blurFilter.rebind();
+        biasFilter.rebind();
+        combineFilter.rebind();
         pingPongBuffer.rebind();
     }
 

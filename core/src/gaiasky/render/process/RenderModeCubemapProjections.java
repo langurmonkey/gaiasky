@@ -23,7 +23,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.gdx.contrib.postprocess.effects.WarpingMesh;
-import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
+import gaiasky.util.gdx.contrib.postprocess.filters.CopyFilter;
 import gaiasky.util.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.ImageRenderer;
@@ -39,7 +39,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
     private final CubmeapProjectionEffect cubemapProjection;
     private WarpingMesh geometryWarp;
-    private final Copy copy;
+    private final CopyFilter copyFilter;
 
     public RenderModeCubemapProjections() {
         super();
@@ -54,7 +54,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         setPlanetariumAperture(Settings.settings.program.modeCubemap.planetarium.aperture);
         setProjection(Settings.settings.program.modeCubemap.projection);
         setCelestialSphereIndexOfRefraction(Settings.settings.program.modeCubemap.celestialSphereIndexOfRefraction);
-        copy = new Copy();
+        copyFilter = new CopyFilter();
 
         EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
                 Event.CUBEMAP_CMD, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.INDEXOFREFRACTION_CMD,
@@ -130,7 +130,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
         // To screen
         if (fb == null)
-            copy.setInput(resultBuffer).setOutput(null).render();
+            copyFilter.setInput(resultBuffer).setOutput(null).render();
 
         // Post render actions
         super.postRender(fb);

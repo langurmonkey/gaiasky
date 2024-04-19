@@ -9,21 +9,21 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 
-public final class Convolve2D extends MultipassFilter {
+public final class Convolve2DFilter extends MultipassFilter {
     public final int radius;
     public final int length; // NxN taps filter, w/ N=length
 
     public final float[] weights, offsetsHor, offsetsVert;
 
-    private final Convolve1D hor;
-    private final Convolve1D vert;
+    private final Convolve1DFilter hor;
+    private final Convolve1DFilter vert;
 
-    public Convolve2D(int radius) {
+    public Convolve2DFilter(int radius) {
         this.radius = radius;
         length = (radius * 2) + 1;
 
-        hor = new Convolve1D(length);
-        vert = new Convolve1D(length, hor.weights);
+        hor = new Convolve1DFilter(length);
+        vert = new Convolve1DFilter(length, hor.weights);
 
         weights = hor.weights;
         offsetsHor = hor.offsets;

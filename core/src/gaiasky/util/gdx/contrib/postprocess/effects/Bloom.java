@@ -13,32 +13,32 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Blur;
-import gaiasky.util.gdx.contrib.postprocess.filters.Blur.BlurType;
-import gaiasky.util.gdx.contrib.postprocess.filters.Combine;
-import gaiasky.util.gdx.contrib.postprocess.filters.Threshold;
+import gaiasky.util.gdx.contrib.postprocess.filters.BlurFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.BlurFilter.BlurType;
+import gaiasky.util.gdx.contrib.postprocess.filters.CombineFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.ThresholdFilter;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Bloom extends PostProcessorEffect {
     private final PingPongBuffer pingPongBuffer;
-    private final Blur blur;
-    private final Threshold threshold;
-    private final Combine combine;
+    private final BlurFilter blurFilter;
+    private final ThresholdFilter thresholdFilter;
+    private final CombineFilter combineFilter;
     private boolean blending = false;
     private int sFactor, dFactor;
 
     public Bloom(int fboWidth, int fboHeight) {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false, false, false, false);
 
-        blur = new Blur(fboWidth, fboHeight);
-        threshold = new Threshold();
-        combine = new Combine();
-        disposables.addAll(blur, threshold, combine, pingPongBuffer);
+        blurFilter = new BlurFilter(fboWidth, fboHeight);
+        thresholdFilter = new ThresholdFilter();
+        combineFilter = new CombineFilter();
+        disposables.addAll(blurFilter, thresholdFilter, combineFilter, pingPongBuffer);
 
-        blur.setAmount(0);
-        blur.setPasses(3);
-        blur.setType(BlurType.Gaussian5x5b);
+        blurFilter.setAmount(0);
+        blurFilter.setPasses(3);
+        blurFilter.setType(BlurType.Gaussian5x5b);
         setThreshold(0.3f);
         setBaseIntensity(1f);
         setBaseSaturation(0.85f);
@@ -48,19 +48,19 @@ public final class Bloom extends PostProcessorEffect {
     }
 
     public void setBaseIntensity(float intensity) {
-        combine.setSource1Intensity(intensity);
+        combineFilter.setSource1Intensity(intensity);
     }
 
     public void setBaseSaturation(float saturation) {
-        combine.setSource1Saturation(saturation);
+        combineFilter.setSource1Saturation(saturation);
     }
 
     public void setBloomIntesnity(float intensity) {
-        combine.setSource2Intensity(intensity);
+        combineFilter.setSource2Intensity(intensity);
     }
 
     public void setBloomSaturation(float saturation) {
-        combine.setSource2Saturation(saturation);
+        combineFilter.setSource2Saturation(saturation);
     }
 
     public void enableBlending(int sfactor, int dfactor) {
@@ -74,36 +74,36 @@ public final class Bloom extends PostProcessorEffect {
     }
 
     public float getThreshold() {
-        return threshold.getThreshold();
+        return thresholdFilter.getThreshold();
     }
 
     public void setThreshold(float threshold) {
-        this.threshold.setThreshold(threshold);
+        this.thresholdFilter.setThreshold(threshold);
     }
 
     public BlurType getBlurType() {
-        return blur.getType();
+        return blurFilter.getType();
     }
 
     public void setBlurType(BlurType type) {
-        blur.setType(type);
+        blurFilter.setType(type);
     }
 
 
     public int getBlurPasses() {
-        return blur.getPasses();
+        return blurFilter.getPasses();
     }
 
     public void setBlurPasses(int passes) {
-        blur.setPasses(passes);
+        blurFilter.setPasses(passes);
     }
 
     public float getBlurAmount() {
-        return blur.getAmount();
+        return blurFilter.getAmount();
     }
 
     public void setBlurAmount(float amount) {
-        blur.setAmount(amount);
+        blurFilter.setAmount(amount);
     }
 
     @Override
@@ -117,10 +117,10 @@ public final class Bloom extends PostProcessorEffect {
         {
             // threshold / high-pass filterp
             // only areas with pixels >= threshold are blit to smaller fbo
-            threshold.setInput(texsrc).setOutput(pingPongBuffer.getSourceBuffer()).render();
+            thresholdFilter.setInput(texsrc).setOutput(pingPongBuffer.getSourceBuffer()).render();
 
             // blur pass
-            blur.render(pingPongBuffer);
+            blurFilter.render(pingPongBuffer);
         }
         pingPongBuffer.end();
 
@@ -137,16 +137,16 @@ public final class Bloom extends PostProcessorEffect {
 
         // mix original scene and blurred threshold, modulate via
         // set(Base|Bloom)(Saturation|Intensity)
-        combine.setOutput(dest).setInput(texsrc, pingPongBuffer.getResultTexture()).render();
+        combineFilter.setOutput(dest).setInput(texsrc, pingPongBuffer.getResultTexture()).render();
         //copy.setInput(pingPongBuffer.getResultTexture()).setOutput(dest).render();
 
     }
 
     @Override
     public void rebind() {
-        blur.rebind();
-        threshold.rebind();
-        combine.rebind();
+        blurFilter.rebind();
+        thresholdFilter.rebind();
+        combineFilter.rebind();
         pingPongBuffer.rebind();
     }
 

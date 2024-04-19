@@ -13,8 +13,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Combine;
-import gaiasky.util.gdx.contrib.postprocess.filters.LensDirt;
+import gaiasky.util.gdx.contrib.postprocess.filters.CombineFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.LensDirtFilter;
 import gaiasky.util.gdx.contrib.postprocess.filters.LensFlareFilter;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
@@ -22,8 +22,8 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 public class LensFlare extends PostProcessorEffect {
     private PingPongBuffer pingPongBuffer;
     private final LensFlareFilter flare;
-    private LensDirt dirt;
-    private Combine combine;
+    private LensDirtFilter dirt;
+    private CombineFilter combineFilter;
     private final boolean useLensDirt;
 
     /**
@@ -41,9 +41,9 @@ public class LensFlare extends PostProcessorEffect {
         disposables.add(flare);
         if (useLensDirt) {
             pingPongBuffer = PostProcessor.newPingPongBuffer(width, height, PostProcessor.getFramebufferFormat(), false);
-            dirt = new LensDirt(true);
-            combine = new Combine();
-            disposables.addAll(pingPongBuffer, dirt, combine);
+            dirt = new LensDirtFilter(true);
+            combineFilter = new CombineFilter();
+            disposables.addAll(pingPongBuffer, dirt, combineFilter);
         }
         this.useLensDirt = useLensDirt;
     }
@@ -86,7 +86,7 @@ public class LensFlare extends PostProcessorEffect {
     public void rebind() {
         flare.rebind();
         if (useLensDirt) {
-            combine.rebind();
+            combineFilter.rebind();
             pingPongBuffer.rebind();
         }
     }
@@ -116,7 +116,7 @@ public class LensFlare extends PostProcessorEffect {
             restoreViewport(dest);
 
             // Mix original with flare.
-            combine.setOutput(dest).setInput(sourceTexture, pingPongBuffer.getResultTexture()).render();
+            combineFilter.setOutput(dest).setInput(sourceTexture, pingPongBuffer.getResultTexture()).render();
         } else {
             restoreViewport(dest);
             flare.setInput(src).setOutput(dest).render();
