@@ -109,7 +109,7 @@ public interface IParticleRecord {
     /**
      * Distance in internal units. Beware, does the computation on the fly.
      *
-     * @return The distance, in internal units
+     * @return The distance, in internal units.
      */
     double distance();
 
@@ -123,44 +123,50 @@ public interface IParticleRecord {
     /**
      * Right ascension in degrees. Beware, does the conversion on the fly.
      *
-     * @return The right ascension, in degrees
+     * @return The right ascension, in degrees.
      **/
     double ra();
 
     /**
      * Declination in degrees. Beware, does the conversion on the fly.
      *
-     * @return The declination, in degrees
+     * @return The declination, in degrees.
      **/
     double dec();
 
     /**
      * Ecliptic longitude in degrees.
      *
-     * @return The ecliptic longitude, in degrees
+     * @return The ecliptic longitude, in degrees.
      */
     double lambda();
 
     /**
      * Ecliptic latitude in degrees.
      *
-     * @return The ecliptic latitude, in degrees
+     * @return The ecliptic latitude, in degrees.
      */
     double beta();
 
     /**
      * Galactic longitude in degrees.
      *
-     * @return The galactic longitude, in degrees
+     * @return The galactic longitude, in degrees.
      */
     double l();
 
     /**
      * Galactic latitude in degrees.
      *
-     * @return The galactic latitude, in degrees
+     * @return The galactic latitude, in degrees.
      */
     double b();
+
+    /**
+     * Returns the effective temperature, in K.
+     * @return The effective temperature in K.
+     */
+    float teff();
 
     void setExtraAttributes(ObjectMap<UCD, Object> extra);
 

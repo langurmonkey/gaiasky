@@ -273,6 +273,11 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
+    public float teff() {
+        return 0;
+    }
+
+    @Override
     public void setExtraAttributes(ObjectMap<UCD, Object> extra) {
 
     }

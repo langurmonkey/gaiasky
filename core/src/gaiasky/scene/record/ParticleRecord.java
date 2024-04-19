@@ -31,7 +31,7 @@ public class ParticleRecord implements IParticleRecord {
         /** Simple positional particles. **/
         PARTICLE(3, 0, new int[]{0, 1, 2}, new int[]{}),
         /** Stars. **/
-        STAR(3, 11, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}),
+        STAR(3, 12, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}),
         /** Extended particles, with proper motions, colors and sizes. **/
         PARTICLE_EXT(3, 10, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
         /** Fake particle record, not implemented by this class! **/
@@ -68,6 +68,7 @@ public class ParticleRecord implements IParticleRecord {
     public static final int I_FSIZE = 9;
     /* HIP number is still in float array. */
     public static final int I_FHIP = 10;
+    public static final int I_FTEFF = 11;
 
     // Aux vectors.
     protected static TLV3D aux3d1 = new TLV3D();
@@ -509,6 +510,15 @@ public class ParticleRecord implements IParticleRecord {
         Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.y;
+    }
+
+    @Override
+    public float teff() {
+        if (type.floatIndexIndirection.length > I_FTEFF) {
+            return (int) dataF[type.floatIndexIndirection[I_FTEFF]];
+        } else {
+            return Float.NaN;
+        }
     }
 
     @Override

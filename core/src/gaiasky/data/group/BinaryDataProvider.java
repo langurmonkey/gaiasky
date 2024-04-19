@@ -25,7 +25,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     /** The default output format version to use for writing **/
-    public static int DEFAULT_OUTPUT_VERSION = 2;
+    public static int DEFAULT_OUTPUT_VERSION = 3;
 
     public static int MIN_OUTPUT_VERSION = 0;
     public static int MAX_OUTPUT_VERSION = DEFAULT_OUTPUT_VERSION;
@@ -39,10 +39,11 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     public BinaryDataProvider() {
         super();
 
-        binaryVersions = new BinaryIO[3];
+        binaryVersions = new BinaryIO[4];
         binaryVersions[0] = new BinaryVersion0();
         binaryVersions[1] = new BinaryVersion1();
         binaryVersions[2] = new BinaryVersion2();
+        binaryVersions[3] = new BinaryVersion3();
     }
 
     @Override

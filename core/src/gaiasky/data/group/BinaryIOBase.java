@@ -14,10 +14,12 @@ import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.record.ParticleRecord;
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.util.Constants;
+import gaiasky.util.parse.Parser;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
+import java.util.Arrays;
 
 public abstract class BinaryIOBase implements BinaryIO {
     protected final int nDoubles;
@@ -70,8 +72,11 @@ public abstract class BinaryIOBase implements BinaryIO {
             if (idx == ParticleRecord.I_FSIZE)
                 dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
-        // HIP
-        dataF[ParticleRecord.I_FHIP] = in.readInt();
+        // Version 2: we have the HIP number in the data file.
+        if (nFloats == 10) {
+            // HIP
+            dataF[ParticleRecord.I_FHIP] = in.readInt();
+        }
 
         // TYCHO
         if (tychoIds) {
@@ -88,12 +93,33 @@ public abstract class BinaryIOBase implements BinaryIO {
         int nameLength = in.readInt();
         String[] names;
         if (nameLength == 0) {
-            names = new String[] { id.toString() };
+            names = new String[]{id.toString()};
         } else {
             StringBuilder namesConcat = new StringBuilder();
             for (int i = 0; i < nameLength; i++)
                 namesConcat.append(in.readChar());
             names = namesConcat.toString().split(Constants.nameSeparatorRegex);
+        }
+
+        // Version 3: we take the HIP number from the names array.
+        if (nFloats == 11) {
+            // HIP from names.
+            var hipName = Arrays.stream(names).filter(name -> name.startsWith("HIP ")).toList();
+            if (!hipName.isEmpty()) {
+                var name = hipName.get(0).trim();
+                // We parse the hip id from the string (e.g. we take "2334" from "HIP 2334").
+                if (name.length() > 4) {
+                    try {
+                        dataF[ParticleRecord.I_FHIP] = Parser.parseIntException(name.substring(4));
+                    } catch (NumberFormatException e) {
+                        dataF[ParticleRecord.I_FHIP] = -1;
+                    }
+                } else {
+                    dataF[ParticleRecord.I_FHIP] = -1;
+                }
+            } else {
+                dataF[ParticleRecord.I_FHIP] = -1;
+            }
         }
 
         return new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names);
