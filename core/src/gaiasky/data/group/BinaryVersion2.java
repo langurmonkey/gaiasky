@@ -15,7 +15,7 @@ import java.io.IOException;
 public class BinaryVersion2 extends BinaryIOBase {
 
     protected BinaryVersion2() {
-        super(3, 10, false);
+        super(3, 10,  true, false);
     }
 
     @Override

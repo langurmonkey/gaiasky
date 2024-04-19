@@ -25,11 +25,14 @@ public abstract class BinaryIOBase implements BinaryIO {
     protected final int nDoubles;
     protected final int nFloats;
 
+    protected boolean hipId;
     protected boolean tychoIds;
 
     protected BinaryIOBase(int nDoubles,
                            int nFloats,
+                           boolean hipId,
                            boolean tychoIds) {
+        this.hipId = hipId;
         this.tychoIds = tychoIds;
         this.nDoubles = nDoubles;
         this.nFloats = nFloats;
@@ -73,7 +76,7 @@ public abstract class BinaryIOBase implements BinaryIO {
                 dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
         // Version 2: we have the HIP number in the data file.
-        if (nFloats == 10) {
+        if (hipId) {
             // HIP
             dataF[ParticleRecord.I_FHIP] = in.readInt();
         }
@@ -102,7 +105,7 @@ public abstract class BinaryIOBase implements BinaryIO {
         }
 
         // Version 3: we take the HIP number from the names array.
-        if (nFloats == 11) {
+        if (!hipId) {
             // HIP from names.
             var hipName = Arrays.stream(names).filter(name -> name.startsWith("HIP ")).toList();
             if (!hipName.isEmpty()) {

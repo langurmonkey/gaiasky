@@ -15,7 +15,7 @@ import java.io.IOException;
 public class BinaryVersion0 extends BinaryIOBase {
 
     public BinaryVersion0() {
-        super(9, 4, true);
+        super(9, 4,  true, true);
     }
 
     @Override
