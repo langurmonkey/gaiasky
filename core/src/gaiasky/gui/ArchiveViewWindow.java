@@ -27,6 +27,8 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
@@ -195,7 +197,7 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     private String[][] isToArray(InputStream is, String format) {
-        String data = slurp(is, 2046);
+        String data = slurp(is, 2064);
 
         if (format.equalsIgnoreCase("csv")) {
             // Parse CSV.
@@ -288,17 +290,23 @@ public class ArchiveViewWindow extends GenericDialog {
                 table.add(new OwnLabel(st.getName(), skin, "big")).padLeft(pad * 2).padRight(pad * 2).left();
                 table.row().padTop(pad * 2);
                 for (int col = 0; col < data[0].length; col++) {
-                    Actor first = null;
+                    Actor first;
 
                     if (data.length <= 2) {
                         first = new OwnLabel(data[0][col], skin, "big");
                     } else {
                         HorizontalGroup hg = new HorizontalGroup();
-                        hg.space(5);
+                        hg.space(8);
                         ImageButton tooltip = new ImageButton(skin, "tooltip");
-                        tooltip.addListener(new OwnTextTooltip(data[2][col], skin));
+                        tooltip.addListener(new OwnTextTooltip(data[0][col], skin));
+                        // Label.
+                        var text = TextUtils.capString(data[2][col], 43);
+                        var label = new OwnLabel(text, skin, "header-blue");
+                        label.addListener(new OwnTextTooltip(data[2][col], skin));
+                        label.setWidth(Math.max(label.getWidth(), 710f));
+
+                        hg.addActor(label);
                         hg.addActor(tooltip);
-                        hg.addActor(new OwnLabel(data[0][col], skin, "big"));
 
                         first = hg;
 
@@ -340,7 +348,7 @@ public class ArchiveViewWindow extends GenericDialog {
         private void finish() {
             table.pack();
             scroll.setWidth(table.getWidth() + scroll.getStyle().vScroll.getMinWidth());
-            scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.8f) + pad);
+            scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.95f) + pad);
             pack();
             updating = false;
         }
