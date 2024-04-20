@@ -3,7 +3,7 @@
 This directory includes an implementation of the [OptFlowCam](https://livelyliz.github.io/OptFlowCam/) technique described in the paper:
 
 - *Piotrowski, Motejat, Roessl, Theisel. "OptFlowCam: A 3D-Image-Flow-Based Metric in Camera Space
-for Camera Paths in Scenes with Extreme Scale Variations", 1467-8659, Computer Graphics Forum 2024*, [10.1111/cgf.15056](https://doi.org/10.1111/cgf.15056), [link](https://diglib.eg.org:443/handle/10.1111/cgf15056).
+for Camera Paths in Scenes with Extreme Scale Variations", Computer Graphics Forum, 2024*, [10.1111/cgf.15056](https://doi.org/10.1111/cgf.15056), [link](https://diglib.eg.org:443/handle/10.1111/cgf15056).
 
 The Optical Flow Camera is used in Gaia Sky as an additional export method for keyframes. The technique produces very good results for keyframed camera paths with large scale variations. The script
  itself processes Gaia Sky keyframe files (``.gkf``) and converts them to camera path files (``.gsc``).
