@@ -19,27 +19,32 @@ public class MappedBufferDataReader implements IDataReader {
     }
 
     @Override
-    public float readFloat() throws IOException {
+    public float readFloat() {
         return is.getFloat();
     }
 
     @Override
-    public double readDouble() throws IOException {
+    public double readDouble() {
         return is.getDouble();
     }
 
     @Override
-    public char readChar() throws IOException {
+    public char readChar() {
         return is.getChar();
     }
 
     @Override
-    public int readInt() throws IOException {
+    public int readInt() {
         return is.getInt();
     }
 
     @Override
-    public long readLong() throws IOException {
+    public long readLong() {
         return is.getLong();
+    }
+
+    @Override
+    public byte readByte() {
+        return is.get();
     }
 }

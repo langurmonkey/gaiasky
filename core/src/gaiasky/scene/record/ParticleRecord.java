@@ -29,11 +29,11 @@ public class ParticleRecord implements IParticleRecord {
      */
     public enum ParticleRecordType {
         /** Simple positional particles. **/
-        PARTICLE(3, 0, new int[]{0, 1, 2}, new int[]{}),
+        PARTICLE(3, 0, new int[] { 0, 1, 2 }, new int[] {}),
         /** Stars. **/
-        STAR(3, 11, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}),
+        STAR(3, 12, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }),
         /** Extended particles, with proper motions, colors and sizes. **/
-        PARTICLE_EXT(3, 10, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
+        PARTICLE_EXT(3, 10, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }),
         /** Fake particle record, not implemented by this class! **/
         FAKE(0, 0, null, null);
 
@@ -68,7 +68,7 @@ public class ParticleRecord implements IParticleRecord {
     public static final int I_FSIZE = 9;
     /* HIP number is still in float array. */
     public static final int I_FHIP = 10;
-    public static final int I_FTEFF = 10;
+    public static final int I_FTEFF = 11;
 
     // Aux vectors.
     protected static TLV3D aux3d1 = new TLV3D();
@@ -159,7 +159,7 @@ public class ParticleRecord implements IParticleRecord {
                           float[] dataF,
                           Long id,
                           String name) {
-        this(type, dataD, dataF, id, name == null ? new String[]{} : new String[]{name});
+        this(type, dataD, dataF, id, name == null ? new String[] {} : new String[] { name });
     }
 
     public ParticleRecord(ParticleRecordType type,
@@ -168,7 +168,7 @@ public class ParticleRecord implements IParticleRecord {
                           Long id,
                           String name,
                           ObjectMap<UCD, Object> extra) {
-        this(type, dataD, dataF, id, name == null ? new String[]{} : new String[]{name}, extra);
+        this(type, dataD, dataF, id, name == null ? new String[] {} : new String[] { name }, extra);
     }
 
     @Override
@@ -365,7 +365,7 @@ public class ParticleRecord implements IParticleRecord {
         if (names != null)
             names[0] = name;
         else
-            names = new String[]{name};
+            names = new String[] { name };
     }
 
     @Override
@@ -402,7 +402,7 @@ public class ParticleRecord implements IParticleRecord {
     @Override
     public double[] rgb() {
         Color c = new Color(NumberUtils.floatToIntColor(dataF[type.floatIndexIndirection[I_FCOL]]));
-        return new double[]{c.r, c.g, c.b};
+        return new double[] { c.r, c.g, c.b };
     }
 
     @Override
@@ -510,6 +510,13 @@ public class ParticleRecord implements IParticleRecord {
         Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.y;
+    }
+
+    @Override
+    public void setTeff(float teff) {
+        if (type.floatIndexIndirection.length > I_FTEFF) {
+            dataF[type.floatIndexIndirection[I_FTEFF]] = teff;
+        }
     }
 
     @Override

@@ -42,4 +42,9 @@ public class InputStreamDataReader implements IDataReader {
     public long readLong() throws IOException {
         return is.readLong();
     }
+
+    @Override
+    public byte readByte() throws IOException {
+        return is.readByte();
+    }
 }

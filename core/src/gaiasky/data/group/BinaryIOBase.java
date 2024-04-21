@@ -104,27 +104,6 @@ public abstract class BinaryIOBase implements BinaryIO {
             names = namesConcat.toString().split(Constants.nameSeparatorRegex);
         }
 
-        // Version 3: we take the HIP number from the names array.
-        if (!hipId) {
-            // HIP from names.
-            var hipName = Arrays.stream(names).filter(name -> name.startsWith("HIP ")).toList();
-            if (!hipName.isEmpty()) {
-                var name = hipName.get(0).trim();
-                // We parse the hip id from the string (e.g. we take "2334" from "HIP 2334").
-                if (name.length() > 4) {
-                    try {
-                        dataF[ParticleRecord.I_FHIP] = Parser.parseIntException(name.substring(4));
-                    } catch (NumberFormatException e) {
-                        dataF[ParticleRecord.I_FHIP] = -1;
-                    }
-                } else {
-                    dataF[ParticleRecord.I_FHIP] = -1;
-                }
-            } else {
-                dataF[ParticleRecord.I_FHIP] = -1;
-            }
-        }
-
         return new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names);
     }
 }

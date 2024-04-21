@@ -640,9 +640,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     UCD tEffUCD = new UCD("phys.temperature.effective", "teff", "K", -1);
                                     extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(tEffUCD, tEff);
+                                    pr.setTeff(tEff);
                                 } else {
                                     extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(ucdParser.TEFF.first(), tEff);
+                                    pr.setTeff(tEff);
                                 }
                                 pr.setExtraAttributes(extraAttributes);
 

@@ -162,6 +162,8 @@ public interface IParticleRecord {
      */
     double b();
 
+    void setTeff(float teff);
+
     /**
      * Returns the effective temperature, in K.
      * @return The effective temperature in K.

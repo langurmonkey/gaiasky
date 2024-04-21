@@ -115,7 +115,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     /**
      * The version of the data to load - before version 2, the data
      * format was not annotated with the version, so this info must come
-     * from outside
+     * from outside.
      */
     private int dataVersionHint;
     /**

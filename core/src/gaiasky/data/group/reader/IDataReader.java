@@ -19,4 +19,6 @@ public interface IDataReader {
     int readInt() throws IOException;
 
     long readLong() throws IOException;
+
+    byte readByte() throws IOException;
 }
