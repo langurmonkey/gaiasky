@@ -84,10 +84,10 @@ public class BinaryVersion3 implements BinaryIO {
         float teff = Float.NaN;
 
         // Read values.
-        if (bs.get(0)) {
+        if (bs.get(7)) {
             radvel = in.readFloat();
         }
-        if (bs.get(1)) {
+        if (bs.get(7 - 1)) {
             teff = in.readFloat();
         }
         dataF[ParticleRecord.I_FRADVEL] = radvel;
@@ -151,10 +151,10 @@ public class BinaryVersion3 implements BinaryIO {
         // Extra floats mask.
         BitSet bs = new BitSet(8);
         if (Float.isFinite(sb.radvel())) {
-            bs.set(0);
+            bs.set(7);
         }
         if (Float.isFinite(sb.teff())) {
-            bs.set(1);
+            bs.set(7 - 1);
         }
         out.writeByte(bs.toByteArray()[0]);
         // Write extra floats.
