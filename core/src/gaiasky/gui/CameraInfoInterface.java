@@ -27,6 +27,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -53,7 +54,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta,
             focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera,
-            focusAbsMag, focusRadius, focusTeff;
+            focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
     protected Button goTo, landOn, landAt, bookmark;
     protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
@@ -122,8 +123,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusAngle = new OwnLabel("", skin, "hud");
         focusDistSol = new OwnLabel("", skin, "hud");
         focusDistCam = new OwnLabel("", skin, "hud");
-        focusRadius = new OwnLabel("", skin, "hud");
-        focusTeff = new OwnLabel("", skin, "hud");
+        focusRadiusSpt = new OwnLabel("", skin, "hud");
+        focusTEff = new OwnLabel("", skin, "hud");
 
         // Labels
         appMagEarthLabel = new OwnLabel(I18n.msg("gui.focusinfo.appmag.earth"), skin, "hud");
@@ -304,10 +305,10 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusInfo.add(focusDistSol).left().padLeft(pad15).row();
         focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.cam"), skin, "hud")).left();
         focusInfo.add(focusDistCam).left().padLeft(pad15).row();
-        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.radius"), skin, "hud")).left();
-        focusInfo.add(focusRadius).left().padLeft(pad15).row();
-        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.teff"), skin, "hud")).left();
-        focusInfo.add(focusTeff).left().padLeft(pad15).row();
+        focusInfo.add(radiusSptLabel = new OwnLabel(I18n.msg("gui.focusinfo.radius"), skin, "hud")).left();
+        focusInfo.add(focusRadiusSpt).left().padLeft(pad15).row();
+        focusInfo.add(tEffLabel = new OwnLabel(I18n.msg("gui.focusinfo.teff"), skin, "hud")).left();
+        focusInfo.add(focusTEff).left().padLeft(pad15).row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
 
         // POINTER INFO
@@ -616,16 +617,25 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 focusAbsMag.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
             }
             if (ComponentType.values()[view.getCt().getFirstOrdinal()] == ComponentType.Stars) {
-                focusRadius.setText("-");
+                tEffLabel.setVisible(true);
+                focusTEff.setVisible(true);
+
+                radiusSptLabel.setText(I18n.msg("gui.focusinfo.sptype"));
+
                 var tEff = view.getTEff();
                 if (Double.isFinite(tEff) && tEff > 0) {
-                    focusTeff.setText(GlobalResources.formatNumber(tEff) + " " + I18n.msg("gui.unit.kelvin"));
+                    focusTEff.setText(GlobalResources.formatNumber(tEff) + " " + I18n.msg("gui.unit.kelvin"));
+                    focusRadiusSpt.setText(AstroUtils.getSpectralType((float) tEff));
                 } else {
-                    focusTeff.setText("-");
+                    focusRadiusSpt.setText("?");
+                    focusTEff.setText("?");
                 }
             } else {
-                focusRadius.setText(GlobalResources.formatNumber(view.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
-                focusTeff.setText("-");
+                radiusSptLabel.setText(I18n.msg("gui.focusinfo.radius"));
+                focusRadiusSpt.setText(GlobalResources.formatNumber(view.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
+
+                tEffLabel.setVisible(false);
+                focusTEff.setVisible(false);
             }
 
             // Update more info table

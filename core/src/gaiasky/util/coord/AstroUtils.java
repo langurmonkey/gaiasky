@@ -10,6 +10,7 @@ package gaiasky.util.coord;
 import gaiasky.util.Constants;
 import gaiasky.util.LruCache;
 import gaiasky.util.Nature;
+import gaiasky.util.Pair;
 import gaiasky.util.coord.moon.MoonMeeusCoordinates;
 import gaiasky.util.math.ITrigonometry;
 import gaiasky.util.math.MathManager;
@@ -19,6 +20,8 @@ import gaiasky.util.math.Vector3d;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AstroUtils {
 
@@ -487,6 +490,97 @@ public class AstroUtils {
         double pseudoL = Math.pow(10, -0.4 * absMag);
         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
         return Math.min((Math.pow(pseudoL, 0.5) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
+    }
+
+    /**
+     * Get the spectral type from the effective temperature for main sequence stars.
+     * More info: <a href="https://sites.uni.edu/morgans/astro/course/Notes/section2/spectraltemps.html">see here</a>.
+     */
+    public static String getSpectralType(final float tEff) {
+        initSpectralTypeTable();
+
+        int n = spTypeTable.size();
+        for (int i = n - 1; i >= 0; i--) {
+            var p = spTypeTable.get(i);
+            if (tEff <= p.getFirst()) {
+                return p.getSecond();
+            }
+        }
+        return null;
+    }
+
+    private static List<Pair<Float, String>> spTypeTable;
+
+    /**
+     * Initializes the spectral type table for main sequence stars.
+     * More info: <a href="https://sites.uni.edu/morgans/astro/course/Notes/section2/spectraltemps.html">see here</a>.
+     */
+    private static void initSpectralTypeTable() {
+        if (spTypeTable == null) {
+            spTypeTable = new ArrayList<>();
+            addToSpTable(54000f, "O5");
+            addToSpTable(45000f, "O6");
+            addToSpTable(43300f, "O7");
+            addToSpTable(40600f, "O8");
+            addToSpTable(37800f, "O9");
+            addToSpTable(29200f, "B0");
+            addToSpTable(23000f, "B1");
+            addToSpTable(21000f, "B2");
+            addToSpTable(17600f, "B3");
+            addToSpTable(15200f, "B5");
+            addToSpTable(14300f, "B6");
+            addToSpTable(13500f, "B7");
+            addToSpTable(12300f, "B8");
+            addToSpTable(11400f, "B9");
+            addToSpTable(9600f, "A0");
+            addToSpTable(9330f, "A1");
+            addToSpTable(9040f, "A2");
+            addToSpTable(8750f, "A3");
+            addToSpTable(8480f, "A4");
+            addToSpTable(8310f, "A5");
+            addToSpTable(7920f, "A7");
+            addToSpTable(7350f, "F0");
+            addToSpTable(7050f, "F2");
+            addToSpTable(6850f, "F3");
+            addToSpTable(6700f, "F5");
+            addToSpTable(6550f, "F6");
+            addToSpTable(6400f, "F7");
+            addToSpTable(6300f, "F8");
+            addToSpTable(6050f, "G0");
+            addToSpTable(5930f, "G1");
+            addToSpTable(5800f, "G2");
+            addToSpTable(5660f, "G5");
+            addToSpTable(5440f, "G8");
+            addToSpTable(5240f, "K0");
+            addToSpTable(5110f, "K1");
+            addToSpTable(4960f, "K2");
+            addToSpTable(4800f, "K3");
+            addToSpTable(4600f, "K4");
+            addToSpTable(4400f, "K5");
+            addToSpTable(4000f, "K7");
+            addToSpTable(3750f, "M0");
+            addToSpTable(3700f, "M1");
+            addToSpTable(3600f, "M2");
+            addToSpTable(3500f, "M3");
+            addToSpTable(3400f, "M4");
+            addToSpTable(3200f, "M5");
+            addToSpTable(3100f, "M6");
+            addToSpTable(2900f, "M7");
+            addToSpTable(2700f, "M8");
+            addToSpTable(2600f, "L0");
+            addToSpTable(2200f, "L3");
+            addToSpTable(1500f, "L8");
+            addToSpTable(1400f, "T2");
+            addToSpTable(1000f, "T6");
+            addToSpTable(800f, "T8");
+        }
+
+    }
+
+    private static void addToSpTable(float tEff, String spType) {
+        if (spTypeTable != null) {
+            spTypeTable.add(new Pair<>(tEff, spType));
+        }
     }
 
 }
