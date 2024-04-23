@@ -9,6 +9,8 @@ package gaiasky.data;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -531,7 +533,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
         var datasetDesc = Mapper.datasetDescription.get(octreeWrapper);
         var octree = Mapper.octree.get(octreeWrapper);
-        var root = Mapper.octant.get(octreeWrapper);
 
         List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
         Entity sg = utils.getDefaultStarSet("stargroup-%%SGID%%", data, baseInitializer, setInitializer, fullInit);

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -42,7 +43,6 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
     private final Vector3 aux1;
     private final Colormap cmap;
-    private final ParticleUtils utils;
     private StarSetQuadComponent triComponent;
 
     public StarSetInstancedRenderer(SceneRenderer sceneRenderer,
@@ -50,7 +50,6 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                                     float[] alphas,
                                     ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
-        utils = new ParticleUtils();
         cmap = new Colormap();
 
         aux1 = new Vector3();
@@ -135,7 +134,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                             model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
                         } else {
                             // Plain color.
-                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.saturateColor(i, set, hl);
                         }
 
                         // SIZE

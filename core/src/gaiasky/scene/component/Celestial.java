@@ -15,9 +15,6 @@ public class Celestial implements Component, ICopy {
     /** Name to pull info from wikipedia **/
     public String wikiName;
 
-    /** Red, green and blue colors and their revamped cousins **/
-    public float[] colorPale;
-
     /** B-V color index **/
     public float colorBv;
 

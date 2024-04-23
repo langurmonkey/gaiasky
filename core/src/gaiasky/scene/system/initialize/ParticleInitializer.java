@@ -252,7 +252,6 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     private void setRGB(Body body, Celestial celestial) {
         if (body.color == null)
             body.color = ColorUtils.BVtoRGB(celestial.colorBv);
-        EntityUtils.setColor2Data(body, celestial, 0.1f);
     }
 
     @Override

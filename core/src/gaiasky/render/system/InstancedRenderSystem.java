@@ -16,8 +16,8 @@ import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.component.AffineTransformations;
 import gaiasky.scene.component.ParticleSet;
+import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Bits;
 import gaiasky.util.ModelCache;
@@ -37,6 +37,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * Instanced model list, one per particle group.
      */
     protected Array<InstancedModel> models = new Array<>(50);
+    /** Particle utils instance. **/
+    protected final ParticleUtils utils;
 
     /**
      * Holds temporary instanced model data.
@@ -101,6 +103,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                                  ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         meshes = new Array<>(20);
+        utils = new ParticleUtils();
     }
 
     @Override
@@ -502,5 +505,6 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             shaderProgram.end();
         }
     }
+
 
 }

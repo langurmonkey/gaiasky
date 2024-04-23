@@ -71,7 +71,6 @@ public class BillboardEntityRenderSystem implements IObserver {
         var entity = view.getEntity();
         var base = view.base;
         var body = view.body;
-        var celestial = view.celestial;
         /*
          *  BILLBOARD GALAXIES
          */
@@ -81,7 +80,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_pos", view.graph.translation.put(F31));
         shader.setUniformf("u_size", size);
 
-        shader.setUniformf("u_color", view.celestial.colorPale[0], celestial.colorPale[1], celestial.colorPale[2], alpha);
+        shader.setUniformf("u_color", body.color[0], body.color[1], body.color[2], alpha);
         shader.setUniformf("u_alpha", alpha * base.opacity);
         shader.setUniformf("u_distance", (float) body.distToCamera);
         shader.setUniformf("u_apparent_angle", (float) body.solidAngleApparent);
@@ -270,7 +269,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_size", fuzzySize);
 
         // Models use the regular color
-        float[] color = isModel ? body.color : celestial.colorPale;
+        float[] color = body.color;
 
         // Alpha channel:
         // - models:    alpha * (1 - fadeOpacity) * base.opacity

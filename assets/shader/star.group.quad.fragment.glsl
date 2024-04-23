@@ -40,7 +40,7 @@ void main() {
     // White core
     float core = saturate(1.0 - smoothstep(0.0, 0.04, distance(vec2(0.5), uv) * 2.0));
     // Final color
-    fragColor = saturate(alpha * (vec4(v_col.rgb, 1.0) + core * 2.0));
+    fragColor = saturate(alpha * (vec4(v_col.rgb + core * 2.0, 1.0)));
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     // Add outline

@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
@@ -41,6 +42,10 @@ import java.util.TreeMap;
 public class ParticleUtils {
 
     private final Vector3d D31 = new Vector3d();
+    /** Auxiliary color. **/
+    protected final Color c = new Color();
+    /** Auxiliary HSV array. **/
+    protected final float[] hsv = new float[3];
 
     public ParticleUtils() {
     }
@@ -86,6 +91,28 @@ public class ParticleUtils {
         return 1;
     }
 
+    /**
+     * Saturates the color of the particle with the given index in the given set.
+     *
+     * @param index     Particle index.
+     * @param set       Particle set.
+     * @param highlight Highlight component.
+     * @return The color, saturated if necessary.
+     */
+    public float saturateColor(int index, ParticleSet set, Highlight highlight) {
+        var saturate = Settings.settings.scene.star.saturate;
+        var colorPacked = getColor(index, set, highlight);
+        if (!highlight.highlighted && saturate != 0) {
+            // Saturate colors a bit.
+            Color.abgr8888ToColor(c, colorPacked);
+            c.toHsv(hsv);
+            hsv[1] = MathUtils.clamp(hsv[1] + saturate, 0.0f, 1.0f);
+            c.fromHsv(hsv);
+            colorPacked = c.toFloatBits();
+        }
+        return colorPacked;
+    }
+
     public float getColor(int index, ParticleSet set, Highlight highlight) {
         return highlight.highlighted ? Color.toFloatBits(highlight.hlc[0], highlight.hlc[1], highlight.hlc[2], highlight.hlc[3]) : set.pointData.get(index).col();
     }
@@ -98,7 +125,6 @@ public class ParticleUtils {
      * Evaluates the filter of this dataset (if any) for the given particle index
      *
      * @param index The index to filter
-     *
      * @return The result of the filter evaluation, true if the particle passed the filtering, false otherwise
      */
     public boolean filter(int index, ParticleSet particleSet, DatasetDescription datasetDescription) {

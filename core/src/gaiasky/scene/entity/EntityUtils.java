@@ -119,19 +119,6 @@ public class EntityUtils {
         }
     }
 
-    /**
-     * Sets the pale color of this body.
-     *
-     * @param body      The body component.
-     * @param celestial The celestial component.
-     * @param plus      The addition.
-     */
-    public static void setColor2Data(final Body body,
-                                     final Celestial celestial,
-                                     final float plus) {
-        celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
-    }
-
     public static Entity getParticleSet(Scene scene,
                                         String name,
                                         String file,

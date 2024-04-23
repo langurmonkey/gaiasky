@@ -144,6 +144,8 @@ scene:
     power: 1.0
     # Base screen size of stars.
     pointSize: 6.2
+    # Saturate star colors by this amount.
+    saturate: 0.16
     # Control the glow amount when close to stars.
     # Should be set rather low, i.e., in [0.01, 0.5].
     glowFactor: 0.06

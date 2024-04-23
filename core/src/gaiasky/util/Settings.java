@@ -1480,6 +1480,7 @@ public class Settings extends SettingsObject {
             public float brightness;
             public float power;
             public float pointSize;
+            public float saturate = 0.16f;
             /**
              * When close to the stars, this factor controls the amount of glow.
              * It should be set rather low, i.e., in [0.01,0.2].

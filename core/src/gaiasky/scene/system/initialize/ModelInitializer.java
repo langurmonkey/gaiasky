@@ -137,9 +137,6 @@ public class ModelInitializer extends AbstractInitSystem {
         if (isPlanet) {
             // Initialize planet
             initializePlanet(base, body, model, scaffolding, sa, label, atmosphere, cloud);
-            EntityUtils.setColor2Data(body, celestial, 0.6f);
-        } else {
-            EntityUtils.setColor2Data(body, celestial, 0.1f);
         }
 
         if (orientation != null) {

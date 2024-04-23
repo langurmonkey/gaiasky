@@ -43,7 +43,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     protected static final Log logger = Logger.getLogger(VariableSetInstancedRenderer.class);
     private final Vector3 aux1;
     private final Colormap cmap;
-    private final ParticleUtils utils;
     private StarSetQuadComponent triComponent;
 
     public VariableSetInstancedRenderer(SceneRenderer sceneRenderer,
@@ -51,7 +50,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                                         float[] alphas,
                                         ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
-        utils = new ParticleUtils();
         cmap = new Colormap();
 
         aux1 = new Vector3();
@@ -150,7 +148,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                             model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
                         } else {
                             // Plain
-                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.saturateColor(i, set, hl);
                         }
 
                         // VARIABLE STARS (magnitudes and times)

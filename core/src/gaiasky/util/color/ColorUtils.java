@@ -355,7 +355,6 @@ public class ColorUtils {
      * @return The RGB color in a float array.
      *
      * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
-     * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
      */
     public static float[] tEffToRGB_rough(double tEff) {
         double r, g, b;

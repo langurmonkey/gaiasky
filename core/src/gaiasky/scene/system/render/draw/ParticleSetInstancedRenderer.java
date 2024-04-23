@@ -53,7 +53,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     private final Vector3 aux1 = new Vector3();
     private final Random rand;
     private final Colormap cmap;
-    private final ParticleUtils utils;
 
     /**
      * Constructs a particle set instanced renderer using the given model
@@ -70,7 +69,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                         float[] alphas,
                                         ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
-        utils = new ParticleUtils();
         extended = rg.toString().contains("PARTICLE_GROUP_EXT");
 
         rand = new Random(123);
