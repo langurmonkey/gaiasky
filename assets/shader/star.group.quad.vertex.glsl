@@ -105,7 +105,7 @@ void main() {
     }
 
     float boundaryFade = smoothstep(l0, l1, dist);
-    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
+    v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
 
     // Performance trick: If the star is not seen, set it very small so that there is only one fragment, and
     // set the color to 0 to discard it in the fragment shader.
