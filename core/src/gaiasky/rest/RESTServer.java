@@ -435,7 +435,8 @@ public class RESTServer {
 
         if (rest_port < 1024) {
             logger.error("You are trying to bind a reserved port (" + rest_port + " < 1024). Please, choose a port greater than 1024 and try again.");
-            rest_port = -1;
+            logger.error("You need superuser permissions to bind reserved ports, but running Gaia Sky with root privileges is STRONGLY DISCOURAGED!");
+            logger.error("Proceed at your own risk.");
         }
         /* Check for valid TCP port (otherwise considered as "disabled") */
         port = rest_port;
