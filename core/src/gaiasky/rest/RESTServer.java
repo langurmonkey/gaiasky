@@ -21,8 +21,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
-import static spark.Spark.*;
-
 public class RESTServer {
 
     /* Class variables: */
@@ -435,6 +433,10 @@ public class RESTServer {
      */
     public static void initialize(Integer rest_port) {
 
+        if (rest_port < 1024) {
+            logger.error("You are trying to bind a reserved port (" + rest_port + " < 1024). Please, choose a port greater than 1024 and try again.");
+            rest_port = -1;
+        }
         /* Check for valid TCP port (otherwise considered as "disabled") */
         port = rest_port;
         printStartupInfo();
@@ -446,7 +448,7 @@ public class RESTServer {
         try {
             logger.info("Starting REST API server on http://localhost:{}/api/", port);
             logger.info("   See available calls at http://localhost:{}/api/help", port);
-            port(port);
+            Spark.port(port);
             logger.info("Setting routes");
 
             /*
@@ -455,17 +457,17 @@ public class RESTServer {
              * Note: this logs the value of spark.staticfiles.StaticFilesFolder
              * on warn level for information.
              */
-            staticFiles.externalLocation(rest_static_location);
+            Spark.staticFiles.externalLocation(rest_static_location);
 
             /* Scripting API mapping */
-            get("/api", (request, response) -> {
+            Spark.get("/api", (request, response) -> {
                 response.redirect("/api/help");
                 return response;
             });
 
-            get("/api/:cmd", RESTServer::handleApiCall);
+            Spark.get("/api/:cmd", RESTServer::handleApiCall);
 
-            post("/api/:cmd", RESTServer::handleApiCall);
+            Spark.post("/api/:cmd", RESTServer::handleApiCall);
 
 
             /* Initialize method index */
@@ -508,7 +510,7 @@ public class RESTServer {
             if (!shutdownTriggered) {
                 shutdownTriggered = true;
                 logger.info("Stopping server gracefully...");
-                stop();
+                Spark.stop();
                 logger.info("Server now stopped.");
             }
         } catch (Exception e) {
