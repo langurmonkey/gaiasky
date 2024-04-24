@@ -217,10 +217,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         boolean ra = Settings.settings.runtime.relativisticAberration;
         boolean ssr = Settings.settings.postprocess.ssr.active;
         int num = (gw ? 4 : 0) + (ra ? 2 : 0) + (ssr ? 1 : 0);
-        if (SysUtils.isMac() && num == 0) {
-            // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
-            num = 2;
-        }
         var program = programs[num];
         if (!program.isCompiled()) {
             // Compile shader
