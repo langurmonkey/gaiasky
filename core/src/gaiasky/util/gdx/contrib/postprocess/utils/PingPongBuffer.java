@@ -39,8 +39,8 @@ public final class PingPongBuffer implements Disposable {
         // n RENDER TARGETS:
         //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
         //      1: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
-        //      3: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
-        //      4: COLOR 2 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
+        //      2: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
+        //      3: COLOR 2 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
         // 1 DEPTH TEXTURE ATTACHMENT
         ownedMain = createMainFrameBuffer(width, height, hasDepth, hasNormal, hasReflectionMask, pixmapFormat, preventFloatBuffer);
 
@@ -65,7 +65,7 @@ public final class PingPongBuffer implements Disposable {
     public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
-        int colorIndex = -1, depthIndex = -1, velIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+        int colorIndex = -1, depthIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
         int idx = 0;
 
         // 0
@@ -95,7 +95,7 @@ public final class PingPongBuffer implements Disposable {
             reflectionMaskIndex = idx;
         }
 
-        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, velIndex, normalIndex, reflectionMaskIndex);
+        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, normalIndex, reflectionMaskIndex);
 
     }
 

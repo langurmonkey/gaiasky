@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 public class GaiaSkyFrameBuffer extends FrameBuffer {
 
     // Indices for all buffers
-    private int colorIndex = -1, depthIndex = -1, velocityIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+    private int colorIndex = -1, depthIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
 
     /**
      * Creates a buffer. Contains the builder and the indices for color, depth, velocity, normal and reflection buffers.
@@ -30,11 +30,9 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
         if (indices.length > 1)
             depthIndex = indices[1];
         if (indices.length > 2)
-            velocityIndex = indices[2];
+            normalIndex = indices[2];
         if (indices.length > 3)
-            normalIndex = indices[3];
-        if (indices.length > 4)
-            reflectionMaskIndex = indices[4];
+            reflectionMaskIndex = indices[3];
     }
 
     public Texture getColorBufferTexture() {
@@ -47,13 +45,6 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
     public Texture getDepthBufferTexture() {
         if (depthIndex >= 0)
             return textureAttachments.get(depthIndex);
-        else
-            return null;
-    }
-
-    public Texture getVelocityBufferTexture() {
-        if (velocityIndex >= 0)
-            return textureAttachments.get(velocityIndex);
         else
             return null;
     }
