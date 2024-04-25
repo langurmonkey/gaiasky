@@ -286,7 +286,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             addColorToMaterial();
         }
         // Subscribe to new graphics quality setting event
-        EventManager.instance.subscribe(this, Event.SSR_CMD, Event.ECLIPSES_CMD);
+        EventManager.instance.subscribe(this, Event.ECLIPSES_CMD);
 
         this.modelInitialised = this.modelInitialised || !Settings.settings.scene.initialization.lazyMesh;
         this.modelLoading = false;

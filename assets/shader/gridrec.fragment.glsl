@@ -33,7 +33,6 @@ in vec4 v_color;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 velMap;
 
 #define PI 3.141592
 #define N 10.0
@@ -159,5 +158,4 @@ void main() {
     fragColor.a = max(fragColor.a, (1.0 - distCenter) * 0.1) * v_opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
-    velMap = vec4(0.0, 0.0, 0.0, 1.0);
 }

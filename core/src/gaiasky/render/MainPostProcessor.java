@@ -80,7 +80,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private Scene scene;
     private String starLensTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    final Vector3b v3b1 = new Vector3b(), v3b2 = new Vector3b(), prevCampos = new Vector3b();
+    final Vector3b v3b1 = new Vector3b(), v3b2 = new Vector3b();
     final Vector3 v3f1 = new Vector3();
     final Matrix4 prevViewProj = new Matrix4();
     final Matrix4 projection = new Matrix4(), combined = new Matrix4(), view = new Matrix4();
@@ -389,19 +389,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
 
         return ppb;
-    }
-
-
-    /**
-     * Updates the post-processing effects' attributes using the new graphics quality
-     *
-     * @param ppb The post process bean
-     * @param gq  The graphics quality
-     */
-    private void updateGraphicsQuality(PostProcessBean ppb, GraphicsQuality gq) {
-        updateGlow(ppb, gq);
-        // updateCameraBlur(ppb, gq);
-        updateFxaa(ppb, gq);
     }
 
     private void updateGlow(PostProcessBean ppb, GraphicsQuality gq) {

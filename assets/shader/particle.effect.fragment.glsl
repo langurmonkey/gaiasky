@@ -5,7 +5,6 @@ uniform float u_ar;
 in vec4 v_col;
 
 layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 velMap;
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -18,6 +17,4 @@ void main() {
     #ifdef ssrFlag
     ssrBuffers();
     #endif // ssrFlag
-
-    velMap = vec4(0.0);
 }

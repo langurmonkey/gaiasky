@@ -23,7 +23,6 @@ in float v_eclipseFactor;
 #endif // eclipsingBodyFlag
 
 layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 velMap;
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -55,6 +54,4 @@ void main(void) {
     #ifdef ssrFlag
     ssrBuffers();
     #endif // ssrFlag
-
-    velMap = vec4(0.0);
 }

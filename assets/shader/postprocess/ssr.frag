@@ -247,7 +247,7 @@ void main(void) {
         fragColor = vec4(col, 1.0);
     }
     // View normal buffer
-    //fragColor = vec4(texture(u_texture2, v_texCoords).xyz, 1.0);
+    //fragColor = vec4(normalize(texture(u_texture2, v_texCoords).xyz), 1.0);
     // View reflection mask
-    //fragColor = vec4(metallic, 1.0);
+    //fragColor = vec4(maskColor, 1.0);
 }
