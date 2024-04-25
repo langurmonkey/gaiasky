@@ -264,12 +264,20 @@ public class RESTServer {
                 methodNameMatches = true;
                 Parameter[] methodParams = matchMethods.get(i).getParameters();
 
+                // check number of parameters
+                boolean numParametersMatch = methodParams.length == queryParams.size();
+                if (!numParametersMatch) {
+                    logger.debug(" [+] number of parameters does not match");
+                    continue; // not the right method
+                }
+
                 // check if parameters present (and optionally type fits?)
-                boolean allParamsFound = true;
+                boolean allMethodParamsFullfilled = true;
+
                 int pi = 0;
                 for (Parameter p : methodParams) {
                     if (!queryParams.contains(p.getName()) && !queryParams.contains("arg" + pi)) {
-                        allParamsFound = false;
+                        allMethodParamsFullfilled = false;
                         logger.debug("  [+] method parameters not present");
                         break; // no need to continue checking
                     }
@@ -277,8 +285,8 @@ public class RESTServer {
                     // could test for parameter type here...
                 }
 
-                if (allParamsFound) {
-                    logger.debug("  [+] method parameters ok");
+                if (allMethodParamsFullfilled) {
+                    logger.debug("  [+] all method parameters present");
                     matchMethod = m;
                     break; // no need to continue checking: the first match
                 }
