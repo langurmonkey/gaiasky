@@ -65,16 +65,16 @@ public final class PingPongBuffer implements Disposable {
     public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
-        int colorIndex = -1, depthIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+        int colorIndex, depthIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
         int idx = 0;
 
         // 0
-        // Main color render target
+        // Main color render target.
         addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
         colorIndex = idx++;
 
         // 1
-        // Depth buffer
+        // Depth buffer.
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
             if (!preventFloatBuffer)
@@ -82,14 +82,14 @@ public final class PingPongBuffer implements Disposable {
         }
 
         // 2
-        // Normal buffer
+        // Normal buffer.
         if (hasNormal) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             normalIndex = idx++;
         }
 
         // 3
-        // Reflection mask buffer
+        // Reflection mask buffer.
         if (hasReflectionMask) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             reflectionMaskIndex = idx;
