@@ -2179,16 +2179,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 } else {
                     // Try again
                     FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(settings.data.location) + "/gaiasky-data.json");
-                    DownloadHelper.downloadFile(settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null, (digest) -> {
-                        DataDescriptor dd = DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor);
-                        DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
-                        ddw.setModal(true);
-                        ddw.show(stage);
-                    }, () -> {
-                        // Fail?
-                        logger.error("No internet connection or server is down!");
-                        GuiUtils.addNoConnectionWindow(skin, stage);
-                    }, null);
+                    DownloadHelper.downloadFile(settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null,
+                            (digest) -> {
+                                DataDescriptor dd = DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor);
+                                DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
+                                ddw.setModal(true);
+                                ddw.show(stage);
+                            },
+                            () -> {
+                                // Fail?
+                                logger.error("No internet connection or server is down!");
+                                GuiUtils.addNoConnectionWindow(skin, stage);
+                            }, null);
                 }
                 return true;
             }

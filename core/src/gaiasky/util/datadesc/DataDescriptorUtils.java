@@ -39,6 +39,7 @@ public class DataDescriptorUtils {
     private static DataDescriptorUtils instance;
     private final JsonReader reader;
     private FileHandle fh;
+
     private DataDescriptorUtils() {
         super();
         this.reader = new JsonReader();
@@ -108,30 +109,11 @@ public class DataDescriptorUtils {
 
     }
 
-    public int getTypeWeight(String type) {
-        return switch (type) {
-            case "data-pack" -> -2;
-            case "texture-pack" -> -1;
-            case "catalog-lod" -> 0;
-            case "catalog-gaia" -> 1;
-            case "catalog-star" -> 2;
-            case "catalog-gal" -> 3;
-            case "catalog-cluster" -> 4;
-            case "catalog-other" -> 5;
-            case "mesh" -> 6;
-            case "satellites" -> 7;
-            case "systems" -> 8;
-            case "other" -> 9;
-            default -> 10;
-        };
-    }
-
     /**
      * Constructs a data descriptor from a server JSON file. If the file is null and <code>fh</code> is also null,
      * it returns null.
      *
      * @param fh The pointer to the server JSON file.
-     *
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildServerDatasets(FileHandle fh) {
@@ -157,78 +139,84 @@ public class DataDescriptorUtils {
                 return null;
             }
 
-            JsonValue dataDesc = reader.parse(inputStream);
+            try {
+                JsonValue dataDesc = reader.parse(inputStream);
 
-            Map<String, JsonValue> bestDs = new HashMap<>();
-            Map<String, List<JsonValue>> typeMap = new HashMap<>();
-            // We don't want repeated elements but want to keep insertion order
-            Set<String> types = new LinkedHashSet<>();
+                Map<String, JsonValue> bestDs = new HashMap<>();
+                Map<String, List<JsonValue>> typeMap = new HashMap<>();
+                // We don't want repeated elements but want to keep insertion order
+                Set<String> types = new LinkedHashSet<>();
 
-            JsonValue dst = dataDesc.child().child();
-            while (dst != null) {
-                boolean hasMinGsVersion = dst.has("mingsversion");
-                int minGsVersion = VersionChecker.correctVersionNumber(dst.getInt("mingsversion", 0));
-                int thisVersion = dst.getInt("version", 0);
+                JsonValue dst = dataDesc.child().child();
+                while (dst != null) {
+                    boolean hasMinGsVersion = dst.has("mingsversion");
+                    int minGsVersion = VersionChecker.correctVersionNumber(dst.getInt("mingsversion", 0));
+                    int thisVersion = dst.getInt("version", 0);
 
-                // Only datasets with minGsVersion are supported.
-                // Only datasets with new format in 3.3.1 supported.
-                if (hasMinGsVersion && Settings.SOURCE_VERSION >= minGsVersion && minGsVersion >= 3030100) {
-                    // Dataset type
-                    String type = dst.getString("type");
+                    // Only datasets with minGsVersion are supported.
+                    // Only datasets with new format in 3.3.1 supported.
+                    if (hasMinGsVersion && Settings.SOURCE_VERSION >= minGsVersion && minGsVersion >= 3030100) {
+                        // Dataset type
+                        String type = dst.getString("type");
 
-                    // Check if better option already exists
-                    String dsKey = dst.has("key") ? dst.getString("key") : dst.getString("name");
-                    if (bestDs.containsKey(dsKey)) {
-                        JsonValue other = bestDs.get(dsKey);
-                        int otherVersion = other.getInt("version", 0);
-                        if (otherVersion >= thisVersion) {
-                            // Ignore this version
-                            dst = dst.next();
-                            continue;
-                        } else {
-                            // Remove other version, use this
-                            typeMap.get(type).remove(other);
-                            bestDs.remove(dsKey);
+                        // Check if better option already exists
+                        String dsKey = dst.has("key") ? dst.getString("key") : dst.getString("name");
+                        if (bestDs.containsKey(dsKey)) {
+                            JsonValue other = bestDs.get(dsKey);
+                            int otherVersion = other.getInt("version", 0);
+                            if (otherVersion >= thisVersion) {
+                                // Ignore this version
+                                dst = dst.next();
+                                continue;
+                            } else {
+                                // Remove other version, use this
+                                typeMap.get(type).remove(other);
+                                bestDs.remove(dsKey);
+                            }
                         }
+
+                        // Add to map
+                        if (typeMap.containsKey(type)) {
+                            typeMap.get(type).add(dst);
+                        } else {
+                            List<JsonValue> aux = new ArrayList<>();
+                            aux.add(dst);
+                            typeMap.put(type, aux);
+                        }
+
+                        // Add to set
+                        types.add(type);
+                        // Add to bestDs
+                        bestDs.put(dsKey, dst);
                     }
+                    // Next
+                    dst = dst.next();
+                }
 
-                    // Add to map
-                    if (typeMap.containsKey(type)) {
-                        typeMap.get(type).add(dst);
-                    } else {
-                        List<JsonValue> aux = new ArrayList<>();
-                        aux.add(dst);
-                        typeMap.put(type, aux);
+
+                // Convert to model
+                List<DatasetType> typesList = new ArrayList<>(types.size());
+                List<DatasetDesc> datasetsList = new ArrayList<>();
+                for (String typeStr : types) {
+                    List<JsonValue> datasets = typeMap.get(typeStr);
+                    DatasetType currentType = new DatasetType(typeStr);
+
+                    for (JsonValue dataset : datasets) {
+                        DatasetDesc dd = new DatasetDesc(reader, dataset);
+                        dd.datasetType = currentType;
+                        currentType.addDataset(dd);
+                        datasetsList.add(dd);
                     }
-
-                    // Add to set
-                    types.add(type);
-                    // Add to bestDs
-                    bestDs.put(dsKey, dst);
+                    typesList.add(currentType);
                 }
-                // Next
-                dst = dst.next();
+
+                DataDescriptor desc = new DataDescriptor(typesList, datasetsList);
+                DataDescriptor.serverDataDescriptor = desc;
+                return desc;
+            } catch (Exception e) {
+                logger.error(e);
+                return null;
             }
-
-            // Convert to model
-            List<DatasetType> typesList = new ArrayList<>(types.size());
-            List<DatasetDesc> datasetsList = new ArrayList<>();
-            for (String typeStr : types) {
-                List<JsonValue> datasets = typeMap.get(typeStr);
-                DatasetType currentType = new DatasetType(typeStr);
-
-                for (JsonValue dataset : datasets) {
-                    DatasetDesc dd = new DatasetDesc(reader, dataset);
-                    dd.datasetType = currentType;
-                    currentType.addDataset(dd);
-                    datasetsList.add(dd);
-                }
-                typesList.add(currentType);
-            }
-
-            DataDescriptor desc = new DataDescriptor(typesList, datasetsList);
-            DataDescriptor.serverDataDescriptor = desc;
-            return desc;
         } else {
             return null;
         }
@@ -241,7 +229,6 @@ public class DataDescriptorUtils {
      * or 'dataset-'.
      *
      * @param server The server data descriptor, for combining with the local catalogs.
-     *
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {

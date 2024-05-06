@@ -50,8 +50,12 @@ public class DownloadHelper {
                     finish.run("");
                 } catch (IOException e) {
                     logger.error(I18n.msg("error.file.copy", srcString, to.path()));
+                } catch (Exception e) {
+                    logger.error(e);
+                    if (fail != null) {
+                        fail.run();
+                    }
                 }
-
             } else {
                 logger.error(I18n.msg("error.loading.notexistent", srcString));
                 if (fail != null)
@@ -69,7 +73,7 @@ public class DownloadHelper {
             // Check temp file last modified date, and remove it if it is older than Constants#PART_FILE_MAX_AGE_MS.
             long age = TimeUtils.millis() - to.lastModified();
             if (age > Constants.getPartFileMaxAgeMs() && to.exists()) {
-               to.delete();
+                to.delete();
             }
             final boolean resume = to.exists() && to.name().endsWith(".part");
             final long startSize;
