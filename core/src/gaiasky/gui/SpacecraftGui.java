@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -165,8 +164,6 @@ public class SpacecraftGui extends AbstractGui {
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
         aiViewport = new ExtendViewport(indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale, aiCam);
-
-        buildGui();
 
         EventManager.instance.subscribe(this, gaiasky.event.Event.SPACECRAFT_STABILISE_CMD, gaiasky.event.Event.SPACECRAFT_STOP_CMD, gaiasky.event.Event.SPACECRAFT_INFO, gaiasky.event.Event.SPACECRAFT_NEAREST_INFO, gaiasky.event.Event.SPACECRAFT_THRUST_INFO);
         EventManager.instance.unsubscribe(this, gaiasky.event.Event.SPACECRAFT_LOADED);
@@ -489,7 +486,7 @@ public class SpacecraftGui extends AbstractGui {
     }
 
     protected void rebuildGui() {
-        if (stage != null) {
+        if (stage != null && main != null) {
             stage.clear();
             stage.addActor(main);
 
@@ -599,6 +596,7 @@ public class SpacecraftGui extends AbstractGui {
                 this.view.setEntity(this.sc);
                 this.qf = view.getRotationQuaternion();
                 this.vel = view.vel();
+                buildGui();
             }
             case SPACECRAFT_STABILISE_CMD -> {
                 Boolean state = (Boolean) data[0];
