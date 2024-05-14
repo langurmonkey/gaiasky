@@ -109,9 +109,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private Map<Integer, FrameBuffer> frameBufferMap;
 
     private final ShadowMapRenderPass shadowMapPass;
-    private final CascadedShadowMapRenderPass cascadedShadowMapRenderPass;
     private final LightGlowRenderPass lightGlowPass;
-    private final SVTRenderPass svtPass;
 
     private final List<RenderPass> renderPasses;
 
@@ -128,15 +126,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.renderAssets = new RenderAssets(globalResources);
 
         this.shadowMapPass = new ShadowMapRenderPass(this);
-        this.cascadedShadowMapRenderPass = new CascadedShadowMapRenderPass(this);
+        CascadedShadowMapRenderPass cascadedShadowMapRenderPass = new CascadedShadowMapRenderPass(this);
         this.lightGlowPass = new LightGlowRenderPass(this);
-        this.svtPass = new SVTRenderPass(this);
+        SVTRenderPass svtPass = new SVTRenderPass(this);
 
         this.shadowMapPass.setCondition(() -> Settings.settings.scene.renderer.shadow.active);
-        this.cascadedShadowMapRenderPass.setCondition(() -> Settings.settings.scene.renderer.shadow.active);
+        cascadedShadowMapRenderPass.setCondition(() -> Settings.settings.scene.renderer.shadow.active);
         this.lightGlowPass.setCondition(() -> !Settings.settings.program.isStereoOrCubemap());
 
-        this.cascadedShadowMapRenderPass.setEnabled(false);
+        cascadedShadowMapRenderPass.setEnabled(false);
 
         this.renderPasses = new ArrayList<>();
         this.renderPasses.add(shadowMapPass);
@@ -834,14 +832,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     public RenderAssets getRenderAssets() {
         return this.renderAssets;
-    }
-
-    public ShadowMapRenderPass getShadowMapPass() {
-        return this.shadowMapPass;
-    }
-
-    public CascadedShadowMapRenderPass getCascadedShadowMapPass() {
-        return this.cascadedShadowMapRenderPass;
     }
 
     public LightGlowRenderPass getLightGlowPass() {

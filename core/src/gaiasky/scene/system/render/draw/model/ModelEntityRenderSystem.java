@@ -522,7 +522,7 @@ public class ModelEntityRenderSystem {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
                 float atmOpacity = (float) MathUtilsDouble.flint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
-                if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0) {
+                if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0 && rc != null) {
                     var graph = Mapper.graph.get(entity);
                     var rotation = Mapper.orientation.get(entity).rigidRotation;
                     atmosphere.atmosphere.updateAtmosphericScatteringParams(model.model.instance.materials.first(), alpha * atmOpacity, true, graph,
