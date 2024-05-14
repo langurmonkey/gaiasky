@@ -55,12 +55,12 @@ public class BoundingBoxDouble implements Serializable {
         this.set(minimum, maximum);
     }
 
-    static final double min(final double a, final double b) {
-        return a > b ? b : a;
+    static double min(final double a, final double b) {
+        return Math.min(a, b);
     }
 
-    static final double max(final double a, final double b) {
-        return a > b ? a : b;
+    static double max(final double a, final double b) {
+        return Math.max(a, b);
     }
 
     /**

@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -35,9 +34,8 @@ import java.util.List;
 
 import static gaiasky.render.RenderGroup.*;
 
-public class LightGlowRenderPass implements Disposable {
+public class LightGlowRenderPass extends RenderPass {
 
-    private final SceneRenderer sceneRenderer;
     // Light glow pre-render
     private FrameBuffer occlusionFrameBuffer;
     private final List<IRenderable> stars;
@@ -48,9 +46,14 @@ public class LightGlowRenderPass implements Disposable {
     private boolean uiViewCreated = true;
 
     public LightGlowRenderPass(final SceneRenderer sceneRenderer) {
-        this.sceneRenderer = sceneRenderer;
+        super(sceneRenderer);
         this.stars = new ArrayList<>();
         this.lpu = new LightPositionUpdater();
+    }
+
+    @Override
+    protected void initializeRenderPass() {
+        buildLightGlowData();
     }
 
     public void buildLightGlowData() {
@@ -62,10 +65,13 @@ public class LightGlowRenderPass implements Disposable {
         }
     }
 
-    public void renderGlowPass(ICamera camera,
-                               FrameBuffer frameBuffer) {
-        if (frameBuffer == null) {
+    protected void renderPass(ICamera camera,
+                           Object... params) {
+        FrameBuffer frameBuffer;
+        if (params == null || params.length == 0) {
             frameBuffer = occlusionFrameBuffer;
+        } else {
+            frameBuffer = (FrameBuffer) params[0];
         }
         if (Settings.settings.postprocess.lightGlow.active && frameBuffer != null) {
             var renderLists = sceneRenderer.getRenderLists();

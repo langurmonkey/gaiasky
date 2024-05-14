@@ -126,7 +126,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     private void initNearFar() {
-        CAM_NEAR = 0.5d * Constants.M_TO_U;
+        CAM_NEAR = 0.5 * Constants.M_TO_U;
         CAM_FAR = Constants.MPC_TO_U;
     }
 
@@ -404,6 +404,10 @@ public abstract class AbstractCamera implements ICamera {
             cam.far = (float) CAM_FAR;
             cam.update();
         }
+    }
+
+    public FrustumDouble getFrustum() {
+        return frustum;
     }
 
     public double getNear() {

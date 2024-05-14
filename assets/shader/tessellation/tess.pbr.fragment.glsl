@@ -163,54 +163,8 @@ uniform float u_shininess;
 
 // ECLIPSES
 #include <shader/lib/eclipses.glsl>
-
-//////////////////////////////////////////////////////
-////// SHADOW MAPPING
-//////////////////////////////////////////////////////
-#ifdef shadowMapFlag
-#define bias 0.030
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
-
-float getShadowness(vec2 uv, vec2 offset, float compare){
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
-    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset), bitShifts)); //+(1.0/255.0));
-}
-
-
-float textureShadowLerp(vec2 size, vec2 uv, float compare){
-    vec2 texelSize = vec2(1.0) / size;
-    vec2 f = fract(uv * size + 0.5);
-    vec2 centroidUV = floor(uv * size + 0.5) / size;
-
-    float lb = getShadowness(centroidUV, texelSize * vec2(0.0, 0.0), compare);
-    float lt = getShadowness(centroidUV, texelSize * vec2(0.0, 1.0), compare);
-    float rb = getShadowness(centroidUV, texelSize * vec2(1.0, 0.0), compare);
-    float rt = getShadowness(centroidUV, texelSize * vec2(1.0, 1.0), compare);
-    float a = mix(lb, lt, f.y);
-    float b = mix(rb, rt, f.y);
-    float c = mix(a, b, f.x);
-    return c;
-}
-
-float getShadow(vec3 shadowMapUv) {
-    // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
-    vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
-    float result = 0.0;
-    for(int x=-2; x<=2; x++) {
-        for(int y=-2; y<=2; y++) {
-            vec2 offset = vec2(float(x), float(y)) / size;
-            result += textureShadowLerp(size, shadowMapUv.xy + offset, shadowMapUv.z);
-        }
-    }
-    return result / 25.0;
-
-    // Simple lookup
-    //return getShadowness(o_data.shadowMapUv.xy, vec2(0.0), o_data.shadowMapUv.z);
-}
-#endif // shadowMapFlag
-//////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
+// SHADOW MAPPING
+#include <shader/lib/shadowmap.glsl>
 
 //////////////////////////////////////////////////////
 ////// CUBEMAPS

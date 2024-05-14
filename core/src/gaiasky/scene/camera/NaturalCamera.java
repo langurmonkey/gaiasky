@@ -656,6 +656,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             posBak.set(pos);
         }
 
+        update(camera, aux1.set(pos), direction, up);
         updatePerspectiveCamera();
     }
 

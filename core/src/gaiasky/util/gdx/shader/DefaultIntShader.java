@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.AmbientCubemap;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
-import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
@@ -26,10 +25,8 @@ import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
-import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRFloatAttribute;
-import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRIridescenceAttribute;
-import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRTextureAttribute;
-import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRVolumeAttribute;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.*;
+import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
@@ -132,6 +129,11 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_generic1;
     protected final int u_generic2;
 
+    // Cascaded shadow maps.
+    public int u_csmSamplers;
+    public int u_csmPCFClip;
+    public int u_csmTransforms;
+
     // Lighting uniforms.
     protected final int u_ambientCubemap;
     protected final int u_dirLights0color;
@@ -141,13 +143,6 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_pointLights0position;
     protected final int u_pointLights0intensity;
     protected final int u_pointLights1color;
-    protected final int u_spotLights0color;
-    protected final int u_spotLights0position;
-    protected final int u_spotLights0intensity;
-    protected final int u_spotLights0direction;
-    protected final int u_spotLights0cutoffAngle;
-    protected final int u_spotLights0exponent;
-    protected final int u_spotLights1color;
     protected final int u_fogColor;
     protected final int u_shadowMapProjViewTrans;
     protected final int u_shadowTexture;
@@ -156,7 +151,6 @@ public class DefaultIntShader extends BaseIntShader {
     protected final boolean shadowMap;
     protected final DirectionalLight[] directionalLights;
     protected final PointLight[] pointLights;
-    protected final SpotLight[] spotLights;
     protected final Bits attributesMask;
     protected final Config config;
     private final long vertexMask;
@@ -169,14 +163,6 @@ public class DefaultIntShader extends BaseIntShader {
     protected int pointLightsPositionOffset;
     protected int pointLightsIntensityOffset;
     protected int pointLightsSize;
-    protected int spotLightsLoc;
-    protected int spotLightsColorOffset;
-    protected int spotLightsPositionOffset;
-    protected int spotLightsDirectionOffset;
-    protected int spotLightsIntensityOffset;
-    protected int spotLightsCutoffAngleOffset;
-    protected int spotLightsExponentOffset;
-    protected int spotLightsSize;
     /**
      * The renderable used to create this shader, invalid after the call to init
      */
@@ -226,9 +212,6 @@ public class DefaultIntShader extends BaseIntShader {
         this.pointLights = new PointLight[lighting && config.numPointLights > 0 ? config.numPointLights : 0];
         for (int i = 0; i < pointLights.length; i++)
             pointLights[i] = new PointLight();
-        this.spotLights = new SpotLight[lighting && config.numSpotLights > 0 ? config.numSpotLights : 0];
-        for (int i = 0; i < spotLights.length; i++)
-            spotLights[i] = new SpotLight();
 
         // Global uniforms
         u_dirLights0color = register(new Uniform("u_dirLights[0].color"));
@@ -238,17 +221,13 @@ public class DefaultIntShader extends BaseIntShader {
         u_pointLights0position = register(new Uniform("u_pointLights[0].position"));
         u_pointLights0intensity = register(new Uniform("u_pointLights[0].intensity"));
         u_pointLights1color = register(new Uniform("u_pointLights[1].color"));
-        u_spotLights0color = register(new Uniform("u_spotLights[0].color"));
-        u_spotLights0position = register(new Uniform("u_spotLights[0].position"));
-        u_spotLights0intensity = register(new Uniform("u_spotLights[0].intensity"));
-        u_spotLights0direction = register(new Uniform("u_spotLights[0].direction"));
-        u_spotLights0cutoffAngle = register(new Uniform("u_spotLights[0].cutoffAngle"));
-        u_spotLights0exponent = register(new Uniform("u_spotLights[0].exponent"));
-        u_spotLights1color = register(new Uniform("u_spotLights[1].color"));
         u_fogColor = register(new Uniform("u_fogColor"));
         u_shadowMapProjViewTrans = register(new Uniform("u_shadowMapProjViewTrans"));
         u_shadowTexture = register(new Uniform("u_shadowTexture"));
         u_shadowPCFOffset = register(new Uniform("u_shadowPCFOffset"));
+        u_csmSamplers = register(new Uniform("u_csmSamplers[0]"));
+        u_csmTransforms = register(new Uniform("u_csmTransforms[0]"));
+        u_csmPCFClip = register(new Uniform("u_csmPCFClip[0]"));
         u_projTrans = register(Inputs.projTrans, Setters.projTrans);
         u_projViewTrans = register(Inputs.projViewTrans, Setters.projViewTrans);
         u_cameraPosition = register(Inputs.cameraPosition, Setters.cameraPosition);
@@ -319,6 +298,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_volumeColor = register(Inputs.volumeColorUniform, Setters.volumeColorSetter);
         u_thicknessTexture = register(Inputs.thicknessTextureUniform, Setters.thicknessTextureSetter);
 
+        // SVT.
         u_svtId = register(Inputs.svtId, Setters.svtId);
         u_svtDetectionFactor = register(Inputs.svtDetectionFactor, Setters.svtDetectionFactor);
         u_svtBufferTexture = register(Inputs.svtCacheTexture, Setters.svtBufferTexture);
@@ -331,6 +311,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtIndirectionRoughnessTexture = register(Inputs.svtIndirectionRoughnessTexture, Setters.svtIndirectionRoughnessTexture);
         u_svtIndirectionAoTexture = register(Inputs.svtIndirectionAoTexture, Setters.svtIndirectionAoTexture);
 
+        // Generic.
         u_generic1 = register(Inputs.generic1, Setters.generic1);
         u_generic2 = register(Inputs.generic2, Setters.generic2);
     }
@@ -401,8 +382,19 @@ public class DefaultIntShader extends BaseIntShader {
                 if (attributes.has(ColorAttribute.Fog)) {
                     prefix.append("#define fogFlag\n");
                 }
-                if (renderable.environment.shadowMap != null)
+
+                // Regular shadow mapping.
+                if (renderable.environment.shadowMap != null) {
                     prefix.append("#define shadowMapFlag\n");
+                }
+
+                // Cascade shadow mapping.
+                if (renderable.environment.has(CascadeShadowMapAttribute.Type)) {
+                    CascadeShadowMapAttribute csm = renderable.environment.get(CascadeShadowMapAttribute.class, CascadeShadowMapAttribute.Type);
+                    if (csm != null) {
+                        prefix.append("#define numCSM ").append(csm.cascadeShadowMap.lights.size).append("\n");
+                    }
+                }
             }
         }
 
@@ -627,17 +619,6 @@ public class DefaultIntShader extends BaseIntShader {
         pointLightsSize = loc(u_pointLights1color) - pointLightsLoc;
         if (pointLightsSize < 0)
             pointLightsSize = 0;
-
-        spotLightsLoc = loc(u_spotLights0color);
-        spotLightsColorOffset = loc(u_spotLights0color) - spotLightsLoc;
-        spotLightsPositionOffset = loc(u_spotLights0position) - spotLightsLoc;
-        spotLightsDirectionOffset = loc(u_spotLights0direction) - spotLightsLoc;
-        spotLightsIntensityOffset = has(u_spotLights0intensity) ? loc(u_spotLights0intensity) - spotLightsLoc : -1;
-        spotLightsCutoffAngleOffset = loc(u_spotLights0cutoffAngle) - spotLightsLoc;
-        spotLightsExponentOffset = loc(u_spotLights0exponent) - spotLightsLoc;
-        spotLightsSize = loc(u_spotLights1color) - spotLightsLoc;
-        if (spotLightsSize < 0)
-            spotLightsSize = 0;
     }
 
     @Override
@@ -672,8 +653,6 @@ public class DefaultIntShader extends BaseIntShader {
             dirLight.set(0, 0, 0, 0, -1, 0);
         for (final PointLight pointLight : pointLights)
             pointLight.set(0, 0, 0, 0, 0, 0, 0);
-        for (final SpotLight spotLight : spotLights)
-            spotLight.set(0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0);
         lightsSet = false;
 
         if (has(u_time)) {
@@ -791,10 +770,28 @@ public class DefaultIntShader extends BaseIntShader {
             set(u_fogColor, ((ColorAttribute) Objects.requireNonNull(attributes.get(ColorAttribute.Fog))).color);
         }
 
+        // Default shadow map
         if (lights != null && lights.shadowMap != null) {
             set(u_shadowMapProjViewTrans, lights.shadowMap.getProjViewTrans());
             set(u_shadowTexture, lights.shadowMap.getDepthMap());
             set(u_shadowPCFOffset, 1.f / (2f * lights.shadowMap.getDepthMap().texture.getWidth()));
+        }
+
+        // Cascaded shadow maps.
+        CascadeShadowMapAttribute csmAttrib = attributes.get(CascadeShadowMapAttribute.class, CascadeShadowMapAttribute.Type);
+        if (csmAttrib != null && u_csmSamplers >= 0) {
+            Array<DirectionalShadowLight> csmLights = csmAttrib.cascadeShadowMap.lights;
+            for (int i = 0; i < csmLights.size; i++) {
+                DirectionalShadowLight light = csmLights.get(i);
+                float mapSize = light.getDepthMap().texture.getWidth();
+                float pcf = 1.f / (2 * mapSize);
+                float clip = 3.f / (2 * mapSize);
+
+                int unit = context.textureBinder.bind(light.getDepthMap());
+                program.setUniformi(u_csmSamplers + i, unit);
+                program.setUniformMatrix(u_csmTransforms + i, light.getProjViewTrans());
+                program.setUniformf(u_csmPCFClip + i, pcf, clip);
+            }
         }
 
         lightsSet = true;
@@ -932,9 +929,6 @@ public class DefaultIntShader extends BaseIntShader {
 
         public final static Uniform time = new Uniform("u_time", FloatAttribute.Time);
         public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
-        public final static Uniform dirLights = new Uniform("u_dirLights");
-        public final static Uniform pointLights = new Uniform("u_pointLights");
-        public final static Uniform spotLights = new Uniform("u_spotLights");
 
         public final static Uniform reflectionCubemap = new Uniform("u_reflectionCubemap");
 

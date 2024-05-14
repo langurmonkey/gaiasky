@@ -9,12 +9,14 @@ package gaiasky.scene.system.render.pass;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -33,16 +35,13 @@ import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
-import javax.print.attribute.HashAttributeSet;
 import java.util.*;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
 
-public class ShadowMapRenderPass implements Disposable {
+public class ShadowMapRenderPass extends RenderPass {
     /** Number of *shadow casting* lights supported. */
     private final static int NUM_SHADOW_CASTING_LIGHTS = 1;
-    /** The scene renderer object. **/
-    private final SceneRenderer sceneRenderer;
     /** Contains the code to render models. **/
     private final ModelEntityRenderSystem modelRenderer;
     // Camera at light position, with same direction. For shadow mapping
@@ -62,11 +61,11 @@ public class ShadowMapRenderPass implements Disposable {
     private Vector3b aux1b, aux2b;
 
     public ShadowMapRenderPass(final SceneRenderer sceneRenderer) {
-        this.sceneRenderer = sceneRenderer;
+        super(sceneRenderer);
         this.modelRenderer = new ModelEntityRenderSystem(sceneRenderer);
     }
 
-    public void initialize() {
+    protected void initializeRenderPass() {
         // Shadow map camera
         cameraLight = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
         shadowMapEntities = new HashSet<>();
@@ -110,9 +109,9 @@ public class ShadowMapRenderPass implements Disposable {
         shadowMapEntities.add(entity);
         // Create frame buffer.
         return new FrameBuffer(Pixmap.Format.RGBA8888,
-                               Settings.settings.scene.renderer.shadow.resolution,
-                               Settings.settings.scene.renderer.shadow.resolution,
-                               true);
+                Settings.settings.scene.renderer.shadow.resolution,
+                Settings.settings.scene.renderer.shadow.resolution,
+                true);
     }
 
     private void renderShadowMapCandidates(List<Entity> candidates,
@@ -288,7 +287,7 @@ public class ShadowMapRenderPass implements Disposable {
         }
     }
 
-    public void render(ICamera camera) {
+    protected void renderPass(ICamera camera, Object... params) {
         /*
          * Shadow mapping here?
          * <ul>

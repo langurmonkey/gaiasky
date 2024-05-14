@@ -777,12 +777,13 @@ public class PBRShader extends DefaultIntShader
 		
 		super.bindLights(renderable, attributes);
 			
-		// XXX
-		ColorAttribute ambiantLight = attributes.get(ColorAttribute.class, ColorAttribute.AmbientLight);
-		if(ambiantLight != null){
-			program.setUniformf(u_ambientLight, ambiantLight.color.r, ambiantLight.color.g, ambiantLight.color.b);
+		// Ambient light.
+		ColorAttribute ambientLight = attributes.get(ColorAttribute.class, ColorAttribute.AmbientLight);
+		if(ambientLight != null){
+			program.setUniformf(u_ambientLight, ambientLight.color.r, ambientLight.color.g, ambientLight.color.b);
 		}
-		
+
+		// Cascaded shadow maps.
 		CascadeShadowMapAttribute csmAttrib = attributes.get(CascadeShadowMapAttribute.class, CascadeShadowMapAttribute.Type);
 		if(csmAttrib != null && u_csmSamplers >= 0){
 			Array<DirectionalShadowLight> lights = csmAttrib.cascadeShadowMap.lights;

@@ -7,145 +7,119 @@
 
 package gaiasky.scene.system.render.pass;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.RenderGroup;
-import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
-import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
+import gaiasky.util.gdx.model.gltf.scene3d.scene.CascadeShadowMap;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.util.List;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
 import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
 
-public class CascadedShadowMapRenderPass implements Disposable {
+public class CascadedShadowMapRenderPass extends RenderPass {
     /** Number of *shadow casting* lights supported. */
-    private final static int NUM_LEVELS = 4;
-    private final Array<FrameBuffer> frameBuffers;
-    /** The scene renderer object. **/
-    private final SceneRenderer sceneRenderer;
+    private final static int CASCADE_COUNT = 4;
     /** Contains the code to render models. **/
     private final ModelEntityRenderSystem modelRenderer;
-    // Camera at light position, with same direction. For shadow mapping
-    private Camera cameraLight, cameraLight2;
+    private final CascadeShadowMap cascadeShadowMap;
+    private DirectionalShadowLight baseLight;
+    private final Vector3b auxb = new Vector3b();
+    private final Vector3 aux = new Vector3();
+    private final Color color = new Color();
 
     // Are the textures displaying in the UI already?
     private boolean uiViewCreated = true;
 
-    private Array<Vector3d> frustumCorners;
-    private Matrix4d maux;
-    private Vector3 aux1;
-    private Vector3d aux1d, aux2d, aux3d;
-    private Vector3b aux1b, aux2b;
-
     public CascadedShadowMapRenderPass(final SceneRenderer sceneRenderer) {
-        this.sceneRenderer = sceneRenderer;
+        super(sceneRenderer);
         this.modelRenderer = new ModelEntityRenderSystem(sceneRenderer);
-        this.frameBuffers = new Array<>(NUM_LEVELS);
+        this.cascadeShadowMap = new CascadeShadowMap(CASCADE_COUNT);
     }
 
-    public void initialize() {
-        // Shadow map camera.
-        cameraLight = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
-        cameraLight2 = new OrthographicCamera(Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
-
-        // 4 frustum corners.
-        frustumCorners = new Array<>();
-        frustumCorners.add(new Vector3d());
-        frustumCorners.add(new Vector3d());
-        frustumCorners.add(new Vector3d());
-        frustumCorners.add(new Vector3d());
-
-        // Aux matrix.
-        maux = new Matrix4d();
-
-        // Aux vectors.
-        aux1 = new Vector3();
-        for (int i = 0; i < 8; i++)
-            aux1d = new Vector3d();
-
-        // Build frame buffers and arrays
-        buildShadowMapData();
-    }
-
-    /**
-     * Builds the shadow map data.
-     */
-    public void buildShadowMapData() {
-        for (int i = 0; i < NUM_LEVELS; i++) {
-            frameBuffers.add(newShadowMapFrameBuffer());
-        }
-    }
-
-    private FrameBuffer newShadowMapFrameBuffer() {
-        // Create frame buffer.
-        return new FrameBuffer(Pixmap.Format.RGBA8888,
+    protected void initializeRenderPass() {
+        this.baseLight = new DirectionalShadowLight(
                 Settings.settings.scene.renderer.shadow.resolution,
-                Settings.settings.scene.renderer.shadow.resolution,
-                true);
+                Settings.settings.scene.renderer.shadow.resolution);
     }
 
-    private final double[] values = new double[]{0, 0, 0};
+    protected void renderPass(ICamera camera, Object... params) {
+        var renderAssets = sceneRenderer.getRenderAssets();
 
-    public void render(ICamera camera) {
-        /*
-         * Cascaded shadow mapping:
-         * <ul>
-         * <li>Partition view frustum into NUM_LEVELS subfrusta.</li>
-         * <li>Gather all models.</li>
-         * <li>Compute orthographic projection for each subfrustum.</li>
-         * <li>Render shadow map for each subfrustum.</li>
-         * </ul>
-         */
+        // Prepare base light camera: direction and up.
+        IFocus l = camera.getCloseLightSource(0);
+        l.getAbsolutePosition(auxb);
+        auxb.sub(camera.getPos()).nor().put(aux).scl(-1);
+        var cameraLight = baseLight.getCamera();
+        baseLight.direction.set(aux);
+        cameraLight.direction.set(aux);
+        // Shadow camera up is perpendicular to dir
+        if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
+            aux.set(1, 0, 0);
+        else
+            aux.set(0, 1, 0);
+        cameraLight.up.set(cameraLight.direction).crs(aux);
+        // Color
+        var col = l.getColor();
+        color.set(col[0], col[1], col[2], 1);
+        baseLight.baseColor.set(color);
+        baseLight.color.set(color);
+        // Prepare cascading.
+        cascadeShadowMap.setCascades(camera, baseLight, 1, 3);
+
         List<IRenderable> models = sceneRenderer.getRenderLists().get(MODEL_PIX.ordinal());
         List<IRenderable> modelsTess = sceneRenderer.getRenderLists().get(MODEL_PIX_TESS.ordinal());
 
-        // Frustum. Camera position is (0 0 0) always.
-        // Get frustum corners in world space (assuming camera is at 0).
-        maux.set(camera.getCamera().combined).inv();
-        int i = 0;
-        for (int x = 0; x < 2; x++) {
-            for (int y = 0; y < 2; y++) {
-                for (int z = 0; z < 2; z++) {
-                    values[0] = 2.0 * x - 1.0;
-                    values[1] = 2.0 * y - 1.0;
-                    values[2] = 2.0 * z - 1.0;
-                    Matrix4d.prj(maux.val, values);
-                    frustumCorners.get(i).set(values);
-                    i++;
-                }
+        for (DirectionalShadowLight light : cascadeShadowMap.lights) {
+            light.begin();
+            renderDepth(light, camera, renderAssets.mbPixelLightingDepth, models);
+            renderDepth(light, camera, renderAssets.mbPixelLightingDepthTessellation, modelsTess);
+            light.end();
+
+
+            if (!uiViewCreated) {
+                GaiaSky.postRunnable(() -> {
+                    // Create UI view
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", light.getDepthMap().texture, 0.2f);
+                });
+                uiViewCreated = true;
             }
         }
+    }
 
+    /**
+     * Render only depth (packed 32 bits) with custom camera.
+     * Useful to render shadow maps.
+     */
+    public void renderDepth(DirectionalShadowLight light, ICamera camera, IntModelBatch batch, List<IRenderable> list) {
+        batch.begin(light.getCamera());
+        for (var r : list) {
+            var entity = ((Render) r).entity;
+            var model = Mapper.model.get(entity);
+            if (model.model.hasPointLight(0)) {
+                modelRenderer.render(entity, batch, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                model.model.env.set(cascadeShadowMap.attribute);
+            }
+        }
+        batch.end();
     }
 
     public void disposeCachedFrameBuffers() {
-        if (!frameBuffers.isEmpty()) {
-            frameBuffers.forEach(GLFrameBuffer::dispose);
-            frameBuffers.clear();
-        }
+        cascadeShadowMap.dispose();
     }
 
     public void dispose() {

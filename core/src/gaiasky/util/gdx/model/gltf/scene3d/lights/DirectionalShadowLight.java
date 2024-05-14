@@ -7,11 +7,8 @@
 package gaiasky.util.gdx.model.gltf.scene3d.lights;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.environment.ShadowMap;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -19,6 +16,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Disposable;
+import gaiasky.util.Settings;
+import gaiasky.util.math.Vector3d;
 
 public class DirectionalShadowLight extends DirectionalLightEx implements ShadowMap, Disposable
 {
@@ -26,7 +25,6 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 	
 	protected FrameBuffer fbo;
 	protected Camera cam;
-	protected final Vector3 tmpV = new Vector3();
 	protected final TextureDescriptor textureDesc;
 	protected final Vector3 center = new Vector3();
 
@@ -62,7 +60,13 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 	protected FrameBuffer createFrameBuffer(int width, int height){
 		return new FrameBuffer(Format.RGBA8888, width, height, true);
 	}
-	
+
+	public void setViewport(double shadowViewportWidth, double shadowViewportHeight, double shadowNear, double shadowFar){
+		cam.viewportWidth = (float) shadowViewportWidth;
+		cam.viewportHeight = (float) shadowViewportHeight;
+		cam.near = (float) shadowNear;
+		cam.far = (float) shadowFar;
+	}
 	public DirectionalShadowLight setViewport(float shadowViewportWidth, float shadowViewportHeight, float shadowNear, float shadowFar){
 		cam.viewportWidth = shadowViewportWidth;
 		cam.viewportHeight = shadowViewportHeight;
@@ -75,15 +79,11 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 		this.center.set(center);
 		return this;
 	}
-	public Vector3 getCenter(Vector3 center){
-		return center.set(this.center);
-	}
-	
-	public DirectionalShadowLight setCenter(float x, float y, float z) {
-		this.center.set(x, y, z);
+	public DirectionalShadowLight setCenter(Vector3d center) {
+		center.put(this.center);
 		return this;
 	}
-	
+
 	public DirectionalShadowLight setBounds(BoundingBox box){
 		float w = box.getWidth();
 		float h = box.getHeight();
@@ -150,10 +150,10 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 	
 	@Override
 	public boolean equals(DirectionalLightEx other) {
-		return (other instanceof DirectionalShadowLight) ? equals((DirectionalShadowLight)other) : false;
+		return other instanceof DirectionalShadowLight && equals((DirectionalShadowLight) other);
 	}
 	
 	public boolean equals(DirectionalShadowLight other) {
-		return (other != null) && (other == this); // No comparison, same as identity ==
+		return (other == this); // No comparison, same as identity ==
 	}
 }

@@ -147,7 +147,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
                                  FrameBuffer frameBuffer,
                                  int viewIndex) {
         rc.ppb = null;
-        sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
+        sgr.getLightGlowPass().render(camera, sgr.getGlowFrameBuffer());
 
         // Update camera.
         viewManager.updateCamera(layerView, camera.getCamera(), (NaturalCamera) camera.getCurrent(), rc);

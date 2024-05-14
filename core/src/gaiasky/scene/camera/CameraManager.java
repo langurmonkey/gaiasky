@@ -23,6 +23,7 @@ import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.FrustumDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -651,57 +652,9 @@ public class CameraManager implements ICamera, IObserver {
         return current.getFar();
     }
 
-    /**
-     * Stores the normalized rays representing the camera frustum in world space in a 4x4 matrix.  Each row is a vector.
-     *
-     * @param frustumCorners The matrix to fill
-     * @return The same matrix
-     */
-    public Matrix4 getFrustumCornersWorld(Matrix4 frustumCorners) {
-        PerspectiveCamera cam = this.getCamera();
-        float camFov = cam.fieldOfView;
-        float camAspect = cam.viewportHeight / cam.viewportWidth;
-
-        float fovW = camFov * 0.5f;
-        float fovH = camFov * camAspect * 0.5f;
-
-        Vector3 dir = new Vector3(cam.direction);
-
-        Vector3 aux = new Vector3();
-
-        Vector3 topLeft = (new Vector3(dir)).rotate(cam.up, fovW);
-        topLeft.rotate(aux.set(cam.up).crs(topLeft), fovH).nor();
-
-        Vector3 topRight = (new Vector3(dir)).rotate(cam.up, -fovW);
-        topRight.rotate(aux.set(cam.up).crs(topLeft), fovH).nor();
-
-        Vector3 bottomRight = (new Vector3(dir)).rotate(cam.up, -fovW);
-        bottomRight.rotate(aux.set(cam.up).crs(topLeft), -fovH).nor();
-
-        Vector3 bottomLeft = (new Vector3(dir)).rotate(cam.up, fovW);
-        bottomLeft.rotate(aux.set(cam.up).crs(topLeft), -fovH).nor();
-
-        // Store in column-major order, the glsl way
-        // Top left
-        frustumCorners.val[Matrix4.M00] = topLeft.x;
-        frustumCorners.val[Matrix4.M10] = topLeft.y;
-        frustumCorners.val[Matrix4.M20] = topLeft.z;
-
-        // Top right
-        frustumCorners.val[Matrix4.M01] = topRight.x;
-        frustumCorners.val[Matrix4.M11] = topRight.y;
-        frustumCorners.val[Matrix4.M21] = topRight.z;
-
-        // Bottom right
-        frustumCorners.val[Matrix4.M02] = bottomRight.x;
-        frustumCorners.val[Matrix4.M12] = bottomRight.y;
-        frustumCorners.val[Matrix4.M22] = bottomRight.z;
-
-        // Bottom left
-        frustumCorners.val[Matrix4.M03] = bottomLeft.x;
-        frustumCorners.val[Matrix4.M13] = bottomLeft.y;
-        frustumCorners.val[Matrix4.M23] = bottomLeft.z;
-        return frustumCorners;
+    @Override
+    public FrustumDouble getFrustum() {
+        return current.getFrustum();
     }
 
     /**

@@ -61,26 +61,12 @@ in vec3 v_lightDiffuse;
 in vec3 v_lightSpecular;
 #endif //specularFlag
 
+
+// SHADOW MAPPING
+#include <shader/lib/shadowmap.glsl>
 #ifdef shadowMapFlag
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
 in vec3 v_shadowMapUv;
 #define separateAmbientFlag
-
-float getShadowness(vec2 offset)
-{
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
-    return step(v_shadowMapUv.z, dot(texture(u_shadowTexture, v_shadowMapUv.xy + offset, TEXTURE_LOD_BIAS), bitShifts));//+(1.0/255.0));
-}
-
-float getShadow() 
-{
-	return (//getShadowness(vec2(0,0)) + 
-			getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
-			getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
-			getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
-			getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))) * 0.25;
-}
 #endif //shadowMapFlag
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
@@ -132,13 +118,13 @@ void main() {
 	#elif (!defined(specularFlag))
 		#if defined(ambientFlag) && defined(separateAmbientFlag)
 			#ifdef shadowMapFlag
-				fragColor.rgb = (diffuse.rgb * (v_ambientLight + getShadow() * v_lightDiffuse));
+				fragColor.rgb = (diffuse.rgb * (v_ambientLight + getShadow(v_shadowMapUv) * v_lightDiffuse));
 			#else
 				fragColor.rgb = (diffuse.rgb * (v_ambientLight + v_lightDiffuse));
 			#endif //shadowMapFlag
 		#else
 			#ifdef shadowMapFlag
-				fragColor.rgb = getShadow() * (diffuse.rgb * v_lightDiffuse);
+				fragColor.rgb = getShadow(v_shadowMapUv) * (diffuse.rgb * v_lightDiffuse);
 			#else
 				fragColor.rgb = (diffuse.rgb * v_lightDiffuse);
 			#endif //shadowMapFlag
@@ -156,13 +142,13 @@ void main() {
 
 		#if defined(ambientFlag) && defined(separateAmbientFlag)
 			#ifdef shadowMapFlag
-			fragColor.rgb = (diffuse.rgb * (getShadow() * v_lightDiffuse + v_ambientLight)) + specular;
+			fragColor.rgb = (diffuse.rgb * (getShadow(v_shadowMapUv) * v_lightDiffuse + v_ambientLight)) + specular;
 			#else
 				fragColor.rgb = (diffuse.rgb * (v_lightDiffuse + v_ambientLight)) + specular;
 			#endif //shadowMapFlag
 		#else
 			#ifdef shadowMapFlag
-				fragColor.rgb = getShadow() * ((diffuse.rgb * v_lightDiffuse) + specular);
+				fragColor.rgb = getShadow(v_shadowMapUv) * ((diffuse.rgb * v_lightDiffuse) + specular);
 			#else
 				fragColor.rgb = (diffuse.rgb * v_lightDiffuse) + specular;
 			#endif //shadowMapFlag

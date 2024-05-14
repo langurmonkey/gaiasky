@@ -15,6 +15,8 @@ import gaiasky.util.gdx.shader.attribute.DirectionalLightsAttribute;
 import gaiasky.util.gdx.shader.attribute.PointLightsAttribute;
 import gaiasky.util.gdx.shader.attribute.SpotLightsAttribute;
 
+import java.util.Objects;
+
 public class Environment extends Attributes {
 
     /** Shadow map used to render shadows */
@@ -99,7 +101,7 @@ public class Environment extends Attributes {
     public Environment remove(DirectionalLight light) {
         if (has(DirectionalLightsAttribute.Type)) {
             DirectionalLightsAttribute dirLights = ((DirectionalLightsAttribute) get(DirectionalLightsAttribute.Type));
-            dirLights.lights.removeValue(light, false);
+            Objects.requireNonNull(dirLights).lights.removeValue(light, false);
             if (dirLights.lights.size == 0)
                 remove(DirectionalLightsAttribute.Type);
         }
@@ -109,7 +111,7 @@ public class Environment extends Attributes {
     public Environment remove(PointLight light) {
         if (has(PointLightsAttribute.Type)) {
             PointLightsAttribute pointLights = ((PointLightsAttribute) get(PointLightsAttribute.Type));
-            pointLights.lights.removeValue(light, false);
+            Objects.requireNonNull(pointLights).lights.removeValue(light, false);
             if (pointLights.lights.size == 0)
                 remove(PointLightsAttribute.Type);
         }
@@ -119,7 +121,7 @@ public class Environment extends Attributes {
     public Environment remove(SpotLight light) {
         if (has(SpotLightsAttribute.Type)) {
             SpotLightsAttribute spotLights = ((SpotLightsAttribute) get(SpotLightsAttribute.Type));
-            spotLights.lights.removeValue(light, false);
+            Objects.requireNonNull(spotLights).lights.removeValue(light, false);
             if (spotLights.lights.size == 0)
                 remove(SpotLightsAttribute.Type);
         }

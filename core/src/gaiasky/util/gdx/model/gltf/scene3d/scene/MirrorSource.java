@@ -66,7 +66,7 @@ public class MirrorSource implements Disposable
 	}
 	
 	/**
-	 * set mirror plane
+	 * Set mirror plane.
 	 * @param nx normal x
 	 * @param ny normal y
 	 * @param nz normal z

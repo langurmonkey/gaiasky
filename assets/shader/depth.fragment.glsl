@@ -51,8 +51,8 @@ layout (location = 0) out vec4 fragColor;
 void main() {
     // Fetch opacity value from diffuse color.
     vec4 diffuse = fetchColorDiffuse(v_data.color, v_data.texCoords, vec4(1.0, 1.0, 1.0, 1.0));
-    float opacity = diffuse.a;
 
     // Fill buffer with depth and transparency.
-    fragColor = vec4(gl_FragCoord.z, opacity, 0.0, 1.0);
+    fragColor = vec4(gl_FragCoord.z, diffuse.a, 1.0, 1.0);
+    //fragColor = vec4(v_data.texCoords.x, v_data.texCoords.y, 0.0, 1.0);
 }

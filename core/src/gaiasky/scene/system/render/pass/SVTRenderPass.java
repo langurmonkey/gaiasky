@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -44,16 +43,13 @@ import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
  * Render pass for the sparse virtual textures. The operation is distributed over 5 consecutive frames
  * to even out the contributions and achieve regular frame pacing.
  */
-public class SVTRenderPass implements Disposable {
+public class SVTRenderPass extends RenderPass {
     /**
      * The tile detection buffer is smaller than the main window by this factor.
      * Should match the constant with the same name in svt.detection.fragment.glsl
      * and tess.svt.detection.fragment.glsl.
      **/
     public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor;
-
-    /** The scene renderer object. **/
-    private final SceneRenderer sceneRenderer;
 
     /** The model view object. **/
     private final ModelView view;
@@ -79,14 +75,15 @@ public class SVTRenderPass implements Disposable {
     private boolean uiViewCreated = true;
 
     public SVTRenderPass(final SceneRenderer sceneRenderer) {
-        this.sceneRenderer = sceneRenderer;
+        super(sceneRenderer);
         this.view = new ModelView();
         this.candidates = new Array<>();
         this.candidatesTess = new Array<>();
         this.candidatesCloud = new Array<>();
     }
 
-    public void initialize() {
+    @Override
+    protected void initializeRenderPass() {
         // Initialize frame buffer with 16 bits per channel.
         int w = (int) (Gdx.graphics.getWidth() / SVT_TILE_DETECTION_REDUCTION_FACTOR);
         int h = (int) (Gdx.graphics.getHeight() / SVT_TILE_DETECTION_REDUCTION_FACTOR);
@@ -99,6 +96,7 @@ public class SVTRenderPass implements Disposable {
         pixels = BufferUtils.createFloatBuffer(w * h * 4);
     }
 
+    @Override
     public void doneLoading(AssetManager manager) {
         svtManager = manager.get("gaiasky-assets", GaiaSkyAssets.class).svtManager;
     }
@@ -145,22 +143,24 @@ public class SVTRenderPass implements Disposable {
         });
     }
 
-    private final RenderGroup[] renderGroups = new RenderGroup[] { MODEL_PIX, MODEL_PIX_TESS };
+    private final RenderGroup[] renderGroups = new RenderGroup[]{MODEL_PIX, MODEL_PIX_TESS};
 
     /**
      * We distribute the operation into five frames to distribute the load a bit.
      *
      * @param camera The camera.
+     * @param params Empty.
      */
-    public void render(ICamera camera) {
+    @Override
+    protected void renderPass(ICamera camera, Object... params) {
         // We use three stages.
         final long f = GaiaSky.instance.frames % 5;
         switch ((int) f) {
-        case 0 -> stage0();
-        case 1 -> stage1(camera);
-        case 2 -> stage2();
-        case 3 -> stage3();
-        case 4 -> stage4();
+            case 0 -> stage0();
+            case 1 -> stage1(camera);
+            case 2 -> stage2();
+            case 3 -> stage3();
+            case 4 -> stage4();
         }
     }
 

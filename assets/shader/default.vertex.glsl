@@ -106,6 +106,10 @@ uniform PointLight u_pointLights[numPointLights];
 uniform mat4 u_shadowMapProjViewTrans;
 out vec3 v_shadowMapUv;
 #define separateAmbientFlag
+#ifdef numCSM
+uniform mat4 u_csmTransforms[numCSM];
+out vec3 v_csmUVs[numCSM];
+#endif // numCSM
 #endif // shadowMapFlag
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
@@ -163,6 +167,12 @@ void main() {
 		vec4 spos = u_shadowMapProjViewTrans * pos;
 		v_shadowMapUv.xy = (spos.xy / spos.w) * 0.5 + 0.5;
 		v_shadowMapUv.z = min(spos.z * 0.5 + 0.5, 0.998);
+		#ifdef numCSM
+		for(int i=0 ; i<numCSM ; i++){
+			vec4 csmPos = u_csmTransforms[i] * pos;
+			v_csmUVs[i].xyz = (csmPos.xyz / csmPos.w) * 0.5 + 0.5;
+		}
+		#endif
 	#endif // shadowMapFlag
 
 	#if defined(normalFlag)
