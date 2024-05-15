@@ -6,7 +6,6 @@
 
 package gaiasky.util.gdx.model.gltf.scene3d.scene;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.scene.camera.ICamera;
@@ -60,18 +59,18 @@ public class CascadeShadowMap implements Disposable {
     /**
      * Setup base light and extra cascades based on scene camera frustum. With automatic split rates.
      *
-     * @param sceneCamera   The camera used to render the scene (frustum should be up-to-date).
-     * @param base          The default shadow light, used for far shadows.
-     * @param minLightDepth Minimum shadow box depth, depends on the scene, big value means more objects cast but less
-     *                      precision.
-     *                      A zero value restricts shadow box depth to the frustum (only visible objects by the scene
-     *                      camera).
-     * @param splitDivisor  Describe how to split scene camera frustum. . With a value of 4, far cascade covers the
-     *                      range: 1/4 to 1/1, next cascade, the range 1/16 to 1/4, and so on. The closest one covers
-     *                      the remaining starting
-     *                      from 0. When used with 2 extra cascades (3 areas), split points are: 0.0, 1/16, 1/4, 1.0.
+     * @param sceneCamera      The camera used to render the scene (frustum should be up-to-date).
+     * @param baseLight        The default shadow light, used for far shadows.
+     * @param lightDepthFactor Shadow box depth factor, depends on the scene. Must be >= 1. Greater than 1 means more
+     *                         objects cast shadows but less precision.
+     *                         A 1 value restricts shadow box depth to the frustum (only visible objects by the scene
+     *                         camera).
+     * @param splitDivisor     Describe how to split scene camera frustum. . With a value of 4, far cascade covers the
+     *                         range: 1/4 to 1/1, next cascade, the range 1/16 to 1/4, and so on. The closest one covers
+     *                         the remaining starting
+     *                         from 0. When used with 2 extra cascades (3 areas), split points are: 0.0, 1/16, 1/4, 1.0.
      */
-    public void setCascades(ICamera sceneCamera, DirectionalShadowLight base, double minLightDepth, double splitDivisor) {
+    public void setCascades(ICamera sceneCamera, DirectionalShadowLight baseLight, double lightDepthFactor, double splitDivisor) {
         splitRates.clear();
         double rate = 1.0;
         for (int i = 0; i < cascadeCount + 1; i++) {
@@ -81,25 +80,27 @@ public class CascadeShadowMap implements Disposable {
         splitRates.add(0);
         splitRates.reverse();
 
-        setCascades(sceneCamera, base, minLightDepth, splitRates);
+        setCascades(sceneCamera, baseLight, lightDepthFactor, splitRates);
     }
 
     /**
      * Setup base light and extra cascades based on scene camera frustum. With user defined split rates.
      *
-     * @param sceneCamera   The camera used to render the scene (frustum should be up to date).
-     * @param base          The default shadow light, used for far shadows.
-     * @param minLightDepth Minimum shadow box depth, depends on the scene, big value means more objects casted but
-     *                      less precision.
-     *                      A zero value restricts shadow box depth to the frustum (only visible objects by the scene
-     *                      camera).
-     * @param splitRates    Describe how to split scene camera frustum. The first 2 values define near and far rate for
-     *                      the closest cascade,
-     *                      Second and third value define near and far rate for the second cascade, and so on.
-     *                      When used with 2 extra cascades (3 areas), 4 split rates are expected. Eg: [0.0, 0.1, 0.3,
-     *                      1.0].
+     * @param sceneCamera      The camera used to render the scene (frustum should be up-to-date).
+     * @param base             The default shadow light, used for far shadows.
+     * @param lightDepthFactor Shadow box depth factor, depends on the scene. Must be >= 1. Greater than 1 means more
+     *                         objects cast shadows but less precision.
+     *                         A 1 value restricts shadow box depth to the frustum (only visible objects by the scene
+     *                         camera).
+     * @param splitRates       Describe how to split scene camera frustum. The first 2 values define near and far rate
+     *                         for
+     *                         the closest cascade,
+     *                         Second and third value define near and far rate for the second cascade, and so on.
+     *                         When used with 2 extra cascades (3 areas), 4 split rates are expected. Eg: [0.0, 0.1,
+     *                         0.3,
+     *                         1.0].
      */
-    public void setCascades(ICamera sceneCamera, DirectionalShadowLight base, double minLightDepth, DoubleArray splitRates) {
+    public void setCascades(ICamera sceneCamera, DirectionalShadowLight base, double lightDepthFactor, DoubleArray splitRates) {
         if (splitRates.size != cascadeCount + 2) {
             throw new IllegalArgumentException("Invalid splitRates, expected " + (cascadeCount + 2) + " items.");
         }
@@ -114,11 +115,11 @@ public class CascadeShadowMap implements Disposable {
                 light.direction.set(base.direction);
                 light.getCamera().up.set(base.getCamera().up);
             }
-            setCascades(light, sceneCamera, splitNear, splitFar, minLightDepth);
+            setCascades(light, sceneCamera, splitNear, splitFar, lightDepthFactor);
         }
     }
 
-    private void setCascades(DirectionalShadowLight shadowLight, ICamera cam, double splitNear, double splitFar, double minLightDepth) {
+    private void setCascades(DirectionalShadowLight shadowLight, ICamera cam, double splitNear, double splitFar, double lightDepthFactor) {
 
         for (int i = 0; i < 4; i++) {
             a.set(cam.getFrustum().planePoints[i]);
@@ -139,7 +140,7 @@ public class CascadeShadowMap implements Disposable {
         }
         double halfFrustumDepth = box.getDepth() / 2;
 
-        double lightDepth = Math.max(minLightDepth, box.getDepth());
+        double lightDepth = Math.max(box.getDepth(), box.getDepth() * lightDepthFactor);
 
         box.getCenter(center);
         center.mul(lightMatrix.tra());

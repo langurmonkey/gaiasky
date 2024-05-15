@@ -30,16 +30,18 @@ import gaiasky.util.math.Vector3d;
 public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
-    private static final Matrix4d invProjectionView = new Matrix4d();
     private static final double VIEW_ANGLE = Math.toRadians(0.05);
-    /**
-     * Camera far value.
-     **/
-    public double CAM_FAR;
-    /**
-     * Camera near value.
-     **/
+    /** Inverse projection view matrix. **/
+    private final Matrix4d invProjectionView = new Matrix4d();
+    /** Camera near value. **/
     public double CAM_NEAR;
+    /** Camera far value. **/
+    public double CAM_FAR;
+    /** Camera near value for the cascaded shadow maps. **/
+    public double CAM_NEAR_CSM;
+    /** Camera far value for the cascaded shadow maps. **/
+    public double CAM_FAR_CSM;
+
     public Vector3b pos, posInv, prevPos, dPos;
     public Vector3d tmp, shift;
     /**
@@ -128,6 +130,8 @@ public abstract class AbstractCamera implements ICamera {
     private void initNearFar() {
         CAM_NEAR = 0.5 * Constants.M_TO_U;
         CAM_FAR = Constants.MPC_TO_U;
+        CAM_NEAR_CSM = 4 * Constants.M_TO_U;
+        CAM_FAR_CSM = 0.2 * Constants.AU_TO_U;
     }
 
     @Override
@@ -287,9 +291,9 @@ public abstract class AbstractCamera implements ICamera {
         this.shift.set(shift);
     }
 
-    public void update(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
+    public void updateCSM(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
         double aspect = cam.viewportWidth / cam.viewportHeight;
-        projection.setToProjection(cam.near, cam.far, cam.fieldOfView, aspect);
+        projection.setToProjection(CAM_NEAR_CSM, CAM_FAR_CSM, cam.fieldOfView, aspect);
         view.setToLookAt(position, tmp.set(position).add(direction), up);
         combined.set(projection);
         Matrix4d.mul(combined.val, view.val);
