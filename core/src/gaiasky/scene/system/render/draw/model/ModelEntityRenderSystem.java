@@ -26,6 +26,7 @@ import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
@@ -595,30 +596,33 @@ public class ModelEntityRenderSystem {
     protected void prepareShadowEnvironment(Entity entity,
                                             Model model,
                                             ModelScaffolding scaffolding) {
-        if (Settings.settings.scene.renderer.shadow.active && scaffolding.shadowMapValues != null) {
-            Environment env = model.model.env;
-            if (scaffolding.shadow > 0
-                    && scaffolding.shadowMapFb != null
-                    && scaffolding.shadowMapCombined != null) {
-                Matrix4 combined = scaffolding.shadowMapCombined;
-                Texture tex = scaffolding.shadowMapFb.getColorBufferTexture();
+        if (!model.model.env.has(CascadeShadowMapAttribute.Type)) {
+            // Only for regular shadow maps (no CSM!).
+            if (Settings.settings.scene.renderer.shadow.active && scaffolding.shadowMapValues != null) {
+                Environment env = model.model.env;
+                if (scaffolding.shadow > 0
+                        && scaffolding.shadowMapFb != null
+                        && scaffolding.shadowMapCombined != null) {
+                    Matrix4 combined = scaffolding.shadowMapCombined;
+                    Texture tex = scaffolding.shadowMapFb.getColorBufferTexture();
 
-                // Gather info.
-                if (scaffolding.shadowMap == null) {
-                    scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
+                    // Gather info.
+                    if (scaffolding.shadowMap == null) {
+                        scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
+                    }
+                    scaffolding.shadowMap.setProjViewTrans(combined);
+                    scaffolding.shadowMap.setDepthMap(tex);
+
+                    // Set to environment.
+                    env.shadowMap = scaffolding.shadowMap;
+
+                    scaffolding.shadow--;
+                } else {
+                    env.shadowMap = null;
                 }
-                scaffolding.shadowMap.setProjViewTrans(combined);
-                scaffolding.shadowMap.setDepthMap(tex);
-
-                // Set to environment.
-                env.shadowMap = scaffolding.shadowMap;
-
-                scaffolding.shadow--;
             } else {
-                env.shadowMap = null;
+                model.model.env.shadowMap = null;
             }
-        } else {
-            model.model.env.shadowMap = null;
         }
     }
 }

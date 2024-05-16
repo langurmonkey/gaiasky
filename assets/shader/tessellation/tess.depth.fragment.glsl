@@ -48,13 +48,16 @@ struct VertexData {
     vec3 ambientLight;
     float opacity;
     vec4 color;
-#ifdef shadowMapFlag
+    #ifdef shadowMapFlag
     vec3 shadowMapUv;
-#endif// shadowMapFlag
+    #ifdef numCSM
+    vec3 csmUVs[numCSM];
+    #endif // numCSM
+    #endif// shadowMapFlag
     vec3 fragPosWorld;
-#ifdef metallicFlag
+    #ifdef metallicFlag
     vec3 reflect;
-#endif// metallicFlag
+    #endif// metallicFlag
     mat3 tbn;
 };
 in VertexData v_data;

@@ -330,6 +330,9 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef numCSM
+    vec3 csmUVs[numCSM];
+    #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
     #ifdef metallicFlag
@@ -421,10 +424,16 @@ void main() {
         #endif // metallicFlag
     #endif // normalTextureFlag
 
-    // Shadow
+    // Shadow mapping.
     #ifdef shadowMapFlag
-        float transparency = 1.0 - texture(u_shadowTexture, o_data.shadowMapUv.xy).g;
-        float shdw = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
+        #ifdef numCSM
+            // Cascaded shadow mapping.
+            float shdw = clamp(getShadow(o_data.shadowMapUv, o_data.csmUVs), 0.0, 1.0);
+        #else
+            // Regular shadow mapping.
+            float transparency = 1.0 - texture(u_shadowTexture, o_data.shadowMapUv.xy).g;
+            float shdw = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
+        #endif // numCSM
     #else
         float shdw = 1.0;
     #endif // shadowMapFlag

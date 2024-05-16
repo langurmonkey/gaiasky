@@ -202,6 +202,9 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef numCSM
+    vec3 csmUVs[numCSM];
+    #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
     #ifdef reflectionCubemapFlag

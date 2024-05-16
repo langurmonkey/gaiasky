@@ -770,7 +770,7 @@ public class DefaultIntShader extends BaseIntShader {
             set(u_fogColor, ((ColorAttribute) Objects.requireNonNull(attributes.get(ColorAttribute.Fog))).color);
         }
 
-        // Default shadow map
+        // Default shadow map.
         if (lights != null && lights.shadowMap != null) {
             set(u_shadowMapProjViewTrans, lights.shadowMap.getProjViewTrans());
             set(u_shadowTexture, lights.shadowMap.getDepthMap());

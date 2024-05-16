@@ -54,7 +54,7 @@ public class ShadowMapRenderPass extends RenderPass {
     private Set<Entity> shadowMapEntities;
 
     // Are the textures displaying in the UI already?
-    private boolean uiViewCreated = true;
+    private static boolean UI_VIEW_CREATED = true;
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
@@ -179,12 +179,12 @@ public class ShadowMapRenderPass extends RenderPass {
                 scaffolding.shadowMapCombined.set(cameraLight.combined);
                 fb.end();
 
-                if (!uiViewCreated) {
+                if (!UI_VIEW_CREATED) {
                     GaiaSky.postRunnable(() -> {
                         // Create UI view
                         EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", fb.getColorBufferTexture(), 0.2f);
                     });
-                    uiViewCreated = true;
+                    UI_VIEW_CREATED = true;
                 }
             }
         }

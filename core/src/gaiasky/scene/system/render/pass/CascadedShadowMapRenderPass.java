@@ -33,13 +33,13 @@ import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
 
 public class CascadedShadowMapRenderPass extends RenderPass {
     /** Number of cascade buffers. */
-    private final static int CASCADE_COUNT = 5;
+    private final static int CASCADE_COUNT = 4;
     /**
      * Describe how to split scene camera frustum. . With a value of 4, far cascade covers the
      * range: 1/4 to 1/1, next cascade, the range 1/16 to 1/4, and so on. The closest one covers
      * the remaining starting from 0. When used with 2 extra cascades (3 areas), split points are: 0.0, 1/16, 1/4, 1.0.
      */
-    private final static int SPLIT_DIVISOR = 14;
+    private final static int SPLIT_DIVISOR = 4;
     /**
      * Shadow box depth factor, depends on the scene. Must be >= 1. Greater than 1 means more objects cast shadows but
      * less precision. A value of 1 restricts shadow box depth to the frustum (only visible objects by the scene
@@ -55,8 +55,8 @@ public class CascadedShadowMapRenderPass extends RenderPass {
     private final Color color = new Color();
 
     // Are the textures displaying in the UI already?
-    private boolean uiViewCreated = false;
-    private final int numUiView = 1;
+    private static boolean UI_VIEW_CREATED = true;
+    private static final int NUM_UI_VIEW = 1;
 
     public CascadedShadowMapRenderPass(final SceneRenderer sceneRenderer) {
         super(sceneRenderer);
@@ -105,19 +105,19 @@ public class CascadedShadowMapRenderPass extends RenderPass {
             renderDepth(light, camera, renderAssets.mbPixelLightingDepthTessellation, modelsTess);
             light.end();
         }
-        if (!uiViewCreated) {
+        if (!UI_VIEW_CREATED) {
             GaiaSky.postRunnable(() -> {
                 int i = 0;
                 for (DirectionalShadowLight light : cascadeShadowMap.lights) {
                     // Create UI view(s)
                     EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "CSM " + i, light.getDepthMap().texture, 0.15f);
                     i++;
-                    if (i >= numUiView) {
+                    if (i >= NUM_UI_VIEW) {
                         break;
                     }
                 }
             });
-            uiViewCreated = true;
+            UI_VIEW_CREATED = true;
         }
     }
 
@@ -132,7 +132,9 @@ public class CascadedShadowMapRenderPass extends RenderPass {
             var model = Mapper.model.get(entity);
             if (model.model.hasPointLight(0)) {
                 modelRenderer.render(entity, batch, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                // Set properties to environment.
                 model.model.env.set(cascadeShadowMap.attribute);
+                model.model.env.shadowMap = light;
             }
         }
         batch.end();

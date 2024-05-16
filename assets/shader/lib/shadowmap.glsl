@@ -11,7 +11,6 @@ uniform float u_shadowPCFOffset;
 
 uniform sampler2D u_csmSamplers[numCSM];
 uniform vec2 u_csmPCFClip[numCSM];
-in vec3 v_csmUVs[numCSM];
 
 float getCSMShadowness(sampler2D sampler, vec3 uv, vec2 offset) {
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
@@ -25,12 +24,12 @@ float getCSMShadow(sampler2D sampler, vec3 uv, float pcf) {
     getCSMShadowness(sampler, uv, vec2(pcf,-pcf)) +
     getCSMShadowness(sampler, uv, vec2(-pcf,-pcf)) ) * 0.25;
 }
-float getShadow(vec3 shadowMapUv) {
+float getShadow(vec3 shadowMapUv, vec3 csmUVs[numCSM]) {
     for(int i=0; i < numCSM; i++){
         vec2 pcfClip = u_csmPCFClip[i];
         float pcf = pcfClip.x;
         float clip = pcfClip.y;
-        vec3 uv = v_csmUVs[i];
+        vec3 uv = csmUVs[i];
         if(uv.x >= clip && uv.x <= 1.0 - clip &&
         uv.y >= clip && uv.y <= 1.0 - clip &&
         uv.z >= 0.0 && uv.z <= 1.0){

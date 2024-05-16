@@ -101,10 +101,11 @@ uniform vec3 u_vrOffset = vec3(0.0);
 ////// SHADOW MAPPING
 //////////////////////////////////////////////////////
 #ifdef shadowMapFlag
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
 uniform mat4 u_shadowMapProjViewTrans;
-#endif //shadowMapFlag
+#ifdef numCSM
+uniform mat4 u_csmTransforms[numCSM];
+#endif // numCSM
+#endif // shadowMapFlag
 
 #include <shader/lib/atmscattering.glsl>
 
@@ -259,6 +260,9 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef numCSM
+    vec3 csmUVs[numCSM];
+    #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
     #ifdef metallicFlag
@@ -356,8 +360,13 @@ void main() {
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;
 	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
+    #ifdef numCSM
+    for(int i=0 ; i<numCSM ; i++){
+        vec4 csmPos = u_csmTransforms[i] * pos;
+        v_data.csmUVs[i].xyz = (csmPos.xyz / csmPos.w) * 0.5 + 0.5;
+    }
+    #endif // numCSM
     #endif // shadowMapFlag
-
 
 
     #ifdef ambientLightFlag
