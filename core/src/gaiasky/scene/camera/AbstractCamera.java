@@ -130,8 +130,8 @@ public abstract class AbstractCamera implements ICamera {
     private void initNearFar() {
         CAM_NEAR = 0.5 * Constants.M_TO_U;
         CAM_FAR = Constants.MPC_TO_U;
-        CAM_NEAR_CSM = 4 * Constants.M_TO_U;
-        CAM_FAR_CSM = 0.2 * Constants.AU_TO_U;
+        CAM_NEAR_CSM = 10000.0 * Constants.M_TO_U;
+        CAM_FAR_CSM = 0.1 * Constants.AU_TO_U;
     }
 
     @Override
@@ -301,6 +301,21 @@ public abstract class AbstractCamera implements ICamera {
         invProjectionView.set(combined);
         Matrix4d.inv(invProjectionView.val);
         frustum.update(invProjectionView);
+    }
+
+    @Override
+    public Matrix4d getView() {
+        return view;
+    }
+
+    @Override
+    public Matrix4d getProjection() {
+        return projection;
+    }
+
+    @Override
+    public Matrix4d getCombined() {
+        return combined;
     }
 
     @Override

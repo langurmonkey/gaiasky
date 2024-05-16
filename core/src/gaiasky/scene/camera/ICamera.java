@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.math.FrustumDouble;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -77,6 +78,10 @@ public interface ICamera {
     Vector3d getUp();
 
     Vector3d[] getDirections();
+
+    Matrix4d getView();
+    Matrix4d getProjection();
+    Matrix4d getCombined();
 
     int getNCameras();
 

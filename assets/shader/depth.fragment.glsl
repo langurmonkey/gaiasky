@@ -36,7 +36,7 @@ struct VertexData {
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
     #ifdef numCSM
-        vec3 csmUVs[numCSM];
+    vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;

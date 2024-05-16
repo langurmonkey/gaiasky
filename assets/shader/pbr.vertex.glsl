@@ -261,7 +261,7 @@ struct VertexData {
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
     #ifdef numCSM
-    vec3 csmUVs[numCSM];
+    vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
@@ -361,9 +361,9 @@ void main() {
 	vec4 spos = u_shadowMapProjViewTrans * pos;
 	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
     #ifdef numCSM
-    for(int i=0 ; i<numCSM ; i++){
+    for(int i = 0 ; i < numCSM ; i++){
         vec4 csmPos = u_csmTransforms[i] * pos;
-        v_data.csmUVs[i].xyz = (csmPos.xyz / csmPos.w) * 0.5 + 0.5;
+        v_data.csmLightSpacePos[i].xyz = (csmPos.xyz / csmPos.w) * 0.5 + 0.5;
     }
     #endif // numCSM
     #endif // shadowMapFlag

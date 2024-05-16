@@ -6,6 +6,7 @@
 
 package gaiasky.util.gdx.model.gltf.scene3d.scene;
 
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.scene.camera.ICamera;
@@ -32,6 +33,7 @@ public class CascadeShadowMap implements Disposable {
     private final Vector3d b = new Vector3d();
     private final Vector3d dir = new Vector3d();
     private final Vector3d up = new Vector3d();
+    private final Matrix4 view = new Matrix4();
 
 
     /**
@@ -54,6 +56,22 @@ public class CascadeShadowMap implements Disposable {
             light.dispose();
         }
         lights.clear();
+    }
+
+    public double getSplitDistance(int layer) {
+        if(layer < 0 || layer > cascadeCount) {
+            return 1.0;
+        }
+
+        return splitRates.get(layer+1);
+    }
+
+    public void setView(Matrix4 view) {
+        this.view.set(view);
+    }
+
+    public Matrix4 getView() {
+        return this.view;
     }
 
     /**
@@ -104,6 +122,8 @@ public class CascadeShadowMap implements Disposable {
         if (splitRates.size != cascadeCount + 2) {
             throw new IllegalArgumentException("Invalid splitRates, expected " + (cascadeCount + 2) + " items.");
         }
+        // Update CSM view-projection matrix.
+        sceneCamera.getView().putIn(view);
 
         syncExtraCascades(base);
 
@@ -119,11 +139,11 @@ public class CascadeShadowMap implements Disposable {
         }
     }
 
-    private void setCascades(DirectionalShadowLight shadowLight, ICamera cam, double splitNear, double splitFar, double lightDepthFactor) {
+    private void setCascades(DirectionalShadowLight shadowLight, ICamera sceneCamera, double splitNear, double splitFar, double lightDepthFactor) {
 
         for (int i = 0; i < 4; i++) {
-            a.set(cam.getFrustum().planePoints[i]);
-            b.set(cam.getFrustum().planePoints[i + 4]);
+            a.set(sceneCamera.getFrustum().planePoints[i]);
+            b.set(sceneCamera.getFrustum().planePoints[i + 4]);
 
             splitPoints[i].set(a).lerp(b, splitNear);
             splitPoints[i + 4].set(a).lerp(b, splitFar);

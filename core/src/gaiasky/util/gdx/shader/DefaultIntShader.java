@@ -133,6 +133,7 @@ public class DefaultIntShader extends BaseIntShader {
     public int u_csmSamplers;
     public int u_csmPCFClip;
     public int u_csmTransforms;
+    public int u_csmView;
 
     // Lighting uniforms.
     protected final int u_ambientCubemap;
@@ -228,6 +229,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_csmSamplers = register(new Uniform("u_csmSamplers[0]"));
         u_csmTransforms = register(new Uniform("u_csmTransforms[0]"));
         u_csmPCFClip = register(new Uniform("u_csmPCFClip[0]"));
+        u_csmView = register(new Uniform("u_csmView"));
         u_projTrans = register(Inputs.projTrans, Setters.projTrans);
         u_projViewTrans = register(Inputs.projViewTrans, Setters.projViewTrans);
         u_cameraPosition = register(Inputs.cameraPosition, Setters.cameraPosition);
@@ -784,13 +786,13 @@ public class DefaultIntShader extends BaseIntShader {
             for (int i = 0; i < csmLights.size; i++) {
                 DirectionalShadowLight light = csmLights.get(i);
                 float mapSize = light.getDepthMap().texture.getWidth();
-                float pcf = 1.f / (2 * mapSize);
-                float clip = 3.f / (2 * mapSize);
+                float pcf = 1.0f / (2.0f * mapSize);
 
                 int unit = context.textureBinder.bind(light.getDepthMap());
                 program.setUniformi(u_csmSamplers + i, unit);
                 program.setUniformMatrix(u_csmTransforms + i, light.getProjViewTrans());
-                program.setUniformf(u_csmPCFClip + i, pcf, clip);
+                program.setUniformf(u_csmPCFClip + i, pcf, (float) csmAttrib.cascadeShadowMap.getSplitDistance(i));
+                program.setUniformMatrix(u_csmView, csmAttrib.cascadeShadowMap.getView());
             }
         }
 
