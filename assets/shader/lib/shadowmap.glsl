@@ -6,23 +6,23 @@
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
 
+float getShadowness(sampler2D sampler, vec2 uv, vec2 offset, float compare) {
+    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
+    return step(compare, dot(texture2D(sampler, uv.xy + offset), bitShifts) + bias); // (1.0/255.0)
+}
+
 #ifdef numCSM
 // CASCADED SHADOW MAPS.
 
 uniform sampler2D u_csmSamplers[numCSM];
 uniform vec2 u_csmPCFClip[numCSM];
 
-float getCSMShadowness(sampler2D sampler, vec3 uv, vec2 offset) {
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(uv.z, dot(texture2D(sampler, uv.xy + offset), bitShifts) + bias); // (1.0/255.0)
-}
-
 float getCSMShadow(sampler2D sampler, vec3 uv, float pcf) {
     return (
-    getCSMShadowness(sampler, uv, vec2(pcf,pcf)) +
-    getCSMShadowness(sampler, uv, vec2(-pcf,pcf)) +
-    getCSMShadowness(sampler, uv, vec2(pcf,-pcf)) +
-    getCSMShadowness(sampler, uv, vec2(-pcf,-pcf)) ) * 0.25;
+    getShadowness(sampler, uv.xy, vec2(pcf,pcf), uv.z) +
+    getShadowness(sampler, uv.xy, vec2(-pcf,pcf), uv.z) +
+    getShadowness(sampler, uv.xy, vec2(pcf,-pcf), uv.z) +
+    getShadowness(sampler, uv.xy, vec2(-pcf,-pcf), uv.z) ) * 0.25;
 }
 float getShadow(vec3 shadowMapUv, vec3 csmUVs[numCSM]) {
     for(int i=0; i < numCSM; i++){
@@ -68,21 +68,15 @@ float getShadow(vec3 shadowMapUv, vec3 csmUVs[numCSM]) {
 #else
 // REGULAR SHADOW MAPS.
 
-float getShadowness(vec2 uv, vec2 offset, float compare){
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
-    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset), bitShifts)); //+(1.0/255.0));
-}
-
-
 float textureShadowLerp(vec2 size, vec2 uv, float compare){
     vec2 texelSize = vec2(1.0) / size;
     vec2 f = fract(uv * size + 0.5);
     vec2 centroidUV = floor(uv * size + 0.5) / size;
 
-    float lb = getShadowness(centroidUV, texelSize * vec2(0.0, 0.0), compare);
-    float lt = getShadowness(centroidUV, texelSize * vec2(0.0, 1.0), compare);
-    float rb = getShadowness(centroidUV, texelSize * vec2(1.0, 0.0), compare);
-    float rt = getShadowness(centroidUV, texelSize * vec2(1.0, 1.0), compare);
+    float lb = getShadowness(u_shadowTexture, centroidUV, texelSize * vec2(0.0, 0.0), compare);
+    float lt = getShadowness(u_shadowTexture, centroidUV, texelSize * vec2(0.0, 1.0), compare);
+    float rb = getShadowness(u_shadowTexture, centroidUV, texelSize * vec2(1.0, 0.0), compare);
+    float rt = getShadowness(u_shadowTexture, centroidUV, texelSize * vec2(1.0, 1.0), compare);
     float a = mix(lb, lt, f.y);
     float b = mix(rb, rt, f.y);
     float c = mix(a, b, f.x);
@@ -102,7 +96,7 @@ float getShadow(vec3 shadowMapUv) {
     return result / 25.0;
 
     // Simple lookup
-    //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
+    //return getShadowness(u_shadowTexture, shadowMapUv.xy, vec2(0.0), shadowMapUv.z);
 }
 
 #endif // numCSM
