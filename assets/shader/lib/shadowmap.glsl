@@ -16,7 +16,7 @@ float getShadowness(sampler2D sampler, vec2 uv, vec2 offset, float compare) {
 
 uniform sampler2D u_csmSamplers[numCSM];
 uniform vec2 u_csmPCFClip[numCSM];
-uniform mat4 u_csmView;
+int layer = -1;
 
 float getCSMShadow(sampler2D sampler, vec3 uv, float pcf) {
     return (
@@ -26,23 +26,23 @@ float getCSMShadow(sampler2D sampler, vec3 uv, float pcf) {
     getShadowness(sampler, uv.xy, vec2(-pcf,-pcf), uv.z) ) * 0.25;
 }
 
-float getShadow(vec3 shadowMapUv, vec3 csmUVs[numCSM], vec3 fragPosWorld) {
-    vec4 fragPosView = u_csmView * vec4(fragPosWorld, 1.0);
-    float depthValue = abs(fragPosView.z);
-
-    int layer = -1;
+float getShadow(vec3 shadowMapUv, vec3 lightSpacePos[numCSM], float fragDepth) {
+    layer = -1;
     for (int i = 0; i < numCSM; ++i) {
-        // Compare depth value with clip value.
-        if (depthValue < u_csmPCFClip[i].y) {
+        // Compare depth value with layer boundary.
+        if (fragDepth < u_csmPCFClip[i].y) {
             layer = i;
             break;
         }
+    }
+    if(u_csmPCFClip[1].y == 0.0) {
+        layer = 2;
     }
     if (layer == -1) {
         return getCSMShadow(u_shadowTexture, shadowMapUv, u_shadowPCFOffset);
     } else {
         // Projected coordinates.
-        return getCSMShadow(u_csmSamplers[layer], csmUVs[layer], u_csmPCFClip[layer].x);
+        return getCSMShadow(u_csmSamplers[layer], lightSpacePos[layer], u_csmPCFClip[layer].x);
     }
 
     //for(int i = 0; i < numCSM; i++){

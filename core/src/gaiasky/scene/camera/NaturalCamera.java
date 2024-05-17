@@ -656,8 +656,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             posBak.set(pos);
         }
 
-        // This is used for the cascaded shadow maps. True camera stays at origin, hence (0 0 0).
-        updateCSM(camera, aux1.set(0, 0, 0), direction, up);
         // Real perspective camera.
         updatePerspectiveCamera();
     }

@@ -6,14 +6,16 @@
 
 package gaiasky.util.gdx.model.gltf.scene3d.scene;
 
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.util.Constants;
 import gaiasky.util.DoubleArray;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
 import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
 import gaiasky.util.math.BoundingBoxDouble;
+import gaiasky.util.math.FrustumDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
@@ -33,8 +35,17 @@ public class CascadeShadowMap implements Disposable {
     private final Vector3d b = new Vector3d();
     private final Vector3d dir = new Vector3d();
     private final Vector3d up = new Vector3d();
-    private final Matrix4 view = new Matrix4();
+    private final Vector3d tmp = new Vector3d();
 
+    /** Attributes used for the CSM camera, which does not cover the same range as the full camera. **/
+    protected Matrix4d projection, view, combined;
+    /** Inverse projection view matrix. **/
+    private final Matrix4d invProjectionView = new Matrix4d();
+    protected FrustumDouble frustum;
+    /** Camera near value for the cascaded shadow maps. **/
+    public double CAM_NEAR_CSM;
+    /** Camera far value for the cascaded shadow maps. **/
+    public double CAM_FAR_CSM;
 
     /**
      * @param cascadeCount How many extra cascades.
@@ -48,6 +59,14 @@ public class CascadeShadowMap implements Disposable {
         for (int i = 0; i < splitPoints.length; i++) {
             splitPoints[i] = new Vector3d();
         }
+
+        // Camera attributes.
+        projection = new Matrix4d();
+        view = new Matrix4d();
+        combined = new Matrix4d();
+        frustum = new FrustumDouble();
+        CAM_NEAR_CSM = 10000.0 * Constants.M_TO_U;
+        CAM_FAR_CSM = 0.1 * Constants.AU_TO_U;
     }
 
     @Override
@@ -59,19 +78,11 @@ public class CascadeShadowMap implements Disposable {
     }
 
     public double getSplitDistance(int layer) {
-        if(layer < 0 || layer > cascadeCount) {
+        if (layer < 0 || layer > cascadeCount) {
             return 1.0;
         }
 
-        return splitRates.get(layer+1);
-    }
-
-    public void setView(Matrix4 view) {
-        this.view.set(view);
-    }
-
-    public Matrix4 getView() {
-        return this.view;
+        return splitRates.get(layer + 1);
     }
 
     /**
@@ -122,8 +133,9 @@ public class CascadeShadowMap implements Disposable {
         if (splitRates.size != cascadeCount + 2) {
             throw new IllegalArgumentException("Invalid splitRates, expected " + (cascadeCount + 2) + " items.");
         }
-        // Update CSM view-projection matrix.
-        sceneCamera.getView().putIn(view);
+
+        // Generate the matrices for the CSM camera using the modified near and far planes. True camera stays at origin, hence (0 0 0).
+        updateCSM(sceneCamera.getCamera(), tmp.set(0, 0, 0), sceneCamera.getDirection(), sceneCamera.getUp());
 
         syncExtraCascades(base);
 
@@ -135,15 +147,15 @@ public class CascadeShadowMap implements Disposable {
                 light.direction.set(base.direction);
                 light.getCamera().up.set(base.getCamera().up);
             }
-            setCascades(light, sceneCamera, splitNear, splitFar, lightDepthFactor);
+            setCascades(light, splitNear, splitFar, lightDepthFactor);
         }
     }
 
-    private void setCascades(DirectionalShadowLight shadowLight, ICamera sceneCamera, double splitNear, double splitFar, double lightDepthFactor) {
+    private void setCascades(DirectionalShadowLight shadowLight, double splitNear, double splitFar, double lightDepthFactor) {
 
         for (int i = 0; i < 4; i++) {
-            a.set(sceneCamera.getFrustum().planePoints[i]);
-            b.set(sceneCamera.getFrustum().planePoints[i + 4]);
+            a.set(frustum.planePoints[i]);
+            b.set(frustum.planePoints[i + 4]);
 
             splitPoints[i].set(a).lerp(b, splitNear);
             splitPoints[i + 4].set(a).lerp(b, splitFar);
@@ -202,5 +214,17 @@ public class CascadeShadowMap implements Disposable {
      */
     protected DirectionalShadowLight createLight(int width, int height) {
         return new DirectionalShadowLight(width, height);
+    }
+
+    public void updateCSM(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
+        double aspect = cam.viewportWidth / cam.viewportHeight;
+        projection.setToProjection(CAM_NEAR_CSM, CAM_FAR_CSM, cam.fieldOfView, aspect);
+        view.setToLookAt(position, tmp.set(position).add(direction), up);
+        combined.set(projection);
+        Matrix4d.mul(combined.val, view.val);
+
+        invProjectionView.set(combined);
+        Matrix4d.inv(invProjectionView.val);
+        frustum.update(invProjectionView);
     }
 }

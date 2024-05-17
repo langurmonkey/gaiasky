@@ -79,10 +79,6 @@ public interface ICamera {
 
     Vector3d[] getDirections();
 
-    Matrix4d getView();
-    Matrix4d getProjection();
-    Matrix4d getCombined();
-
     int getNCameras();
 
     double speedScaling();
@@ -227,8 +223,6 @@ public interface ICamera {
     double getNear();
 
     double getFar();
-
-    FrustumDouble getFrustum();
 
     void swapBuffers();
 

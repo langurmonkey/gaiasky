@@ -23,8 +23,6 @@ import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.FrustumDouble;
-import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -461,21 +459,6 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Matrix4d getView() {
-        return current.getView();
-    }
-
-    @Override
-    public Matrix4d getProjection() {
-        return current.getProjection();
-    }
-
-    @Override
-    public Matrix4d getCombined() {
-        return current.getCombined();
-    }
-
-    @Override
     public int getNCameras() {
         return current.getNCameras();
     }
@@ -666,11 +649,6 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public double getFar() {
         return current.getFar();
-    }
-
-    @Override
-    public FrustumDouble getFrustum() {
-        return current.getFrustum();
     }
 
     /**

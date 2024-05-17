@@ -22,8 +22,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.camera.Proximity.NearbyRecord;
-import gaiasky.util.math.FrustumDouble;
-import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -31,16 +29,10 @@ public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
     private static final double VIEW_ANGLE = Math.toRadians(0.05);
-    /** Inverse projection view matrix. **/
-    private final Matrix4d invProjectionView = new Matrix4d();
     /** Camera near value. **/
     public double CAM_NEAR;
     /** Camera far value. **/
     public double CAM_FAR;
-    /** Camera near value for the cascaded shadow maps. **/
-    public double CAM_NEAR_CSM;
-    /** Camera far value for the cascaded shadow maps. **/
-    public double CAM_FAR_CSM;
 
     public Vector3b pos, posInv, prevPos, dPos;
     public Vector3d tmp, shift;
@@ -75,8 +67,6 @@ public abstract class AbstractCamera implements ICamera {
      * Vector with all perspective cameras.
      **/
     protected PerspectiveCamera[] cameras;
-    protected Matrix4d projection, view, combined;
-    protected FrustumDouble frustum;
     /**
      * Closest non-star body to the camera.
      **/
@@ -116,11 +106,6 @@ public abstract class AbstractCamera implements ICamera {
         camRight.near = (float) CAM_NEAR;
         camRight.far = (float) CAM_FAR;
 
-        projection = new Matrix4d();
-        view = new Matrix4d();
-        combined = new Matrix4d();
-        frustum = new FrustumDouble();
-
         closestBody = new FocusView();
         closestStarView = new FocusView();
 
@@ -130,8 +115,6 @@ public abstract class AbstractCamera implements ICamera {
     private void initNearFar() {
         CAM_NEAR = 0.5 * Constants.M_TO_U;
         CAM_FAR = Constants.MPC_TO_U;
-        CAM_NEAR_CSM = 10000.0 * Constants.M_TO_U;
-        CAM_FAR_CSM = 0.1 * Constants.AU_TO_U;
     }
 
     @Override
@@ -291,33 +274,6 @@ public abstract class AbstractCamera implements ICamera {
         this.shift.set(shift);
     }
 
-    public void updateCSM(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
-        double aspect = cam.viewportWidth / cam.viewportHeight;
-        projection.setToProjection(CAM_NEAR_CSM, CAM_FAR_CSM, cam.fieldOfView, aspect);
-        view.setToLookAt(position, tmp.set(position).add(direction), up);
-        combined.set(projection);
-        Matrix4d.mul(combined.val, view.val);
-
-        invProjectionView.set(combined);
-        Matrix4d.inv(invProjectionView.val);
-        frustum.update(invProjectionView);
-    }
-
-    @Override
-    public Matrix4d getView() {
-        return view;
-    }
-
-    @Override
-    public Matrix4d getProjection() {
-        return projection;
-    }
-
-    @Override
-    public Matrix4d getCombined() {
-        return combined;
-    }
-
     @Override
     public synchronized void checkClosestBody(IFocus cb) {
         if (cb instanceof FocusView candidate) {
@@ -423,10 +379,6 @@ public abstract class AbstractCamera implements ICamera {
             cam.far = (float) CAM_FAR;
             cam.update();
         }
-    }
-
-    public FrustumDouble getFrustum() {
-        return frustum;
     }
 
     public double getNear() {

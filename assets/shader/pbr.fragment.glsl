@@ -447,7 +447,7 @@ void main() {
     #ifdef shadowMapFlag
         #ifdef numCSM
             // Cascaded shadow mapping.
-            float shdw = clamp(getShadow(v_data.shadowMapUv, v_data.csmLightSpacePos, v_data.fragPosWorld), 0.0, 1.0);
+            float shdw = clamp(getShadow(v_data.shadowMapUv, v_data.csmLightSpacePos, length(v_data.fragPosWorld)), 0.0, 1.0);
         #else
             // Regular shadow mapping.
             float transparency = 1.0 - texture(u_shadowTexture, v_data.shadowMapUv.xy).g;
@@ -628,7 +628,38 @@ void main() {
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
-    #ifdef shadowMapFlag
-        //fragColor=vec4(1.0, 0.0, 0.0, 1.0);
-    #endif
+    // Debug CSM layer.
+    #ifdef numCSM
+        if (gl_FragCoord.x > 1400.0) {
+            if (layer < 0) {
+                // -1, red
+                fragColor=vec4(1.0, 0.0, 0.0, 1.0);
+            } else if (layer == 0) {
+                // 0, yellow
+                fragColor=vec4(1.0, 1.0, 0.0, 1.0);
+            } else if (layer == 1) {
+                // 1, blue
+                fragColor=vec4(0.0, 0.0, 1.0, 1.0);
+            } else if (layer == 2) {
+                // 2, green
+                fragColor=vec4(0.0, 1.0, 0.0, 1.0);
+            } else if (layer == 3) {
+                // 3, cyan
+                fragColor=vec4(0.0, 1.0, 1.0, 1.0);
+            } else if (layer == 4) {
+                // 4, magenta
+                fragColor=vec4(1.0, 0.0, 1.0, 1.0);
+            } else {
+                // >4, white
+                fragColor=vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        } else {
+            float depth = length(v_data.fragPosWorld);
+            if (depth < 0.069) {
+                fragColor = vec4(0.0, 1.0, 1.0, 1.0);
+            } else {
+                fragColor = vec4(vec3(depth), 1.0);
+            }
+        }
+    #endif // numCSM
 }
