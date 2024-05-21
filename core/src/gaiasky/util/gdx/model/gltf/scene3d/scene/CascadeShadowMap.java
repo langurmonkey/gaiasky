@@ -36,6 +36,7 @@ public class CascadeShadowMap implements Disposable {
     private final Vector3d dir = new Vector3d();
     private final Vector3d up = new Vector3d();
     private final Vector3d tmp = new Vector3d();
+    private final Vector3d tmp2 = new Vector3d();
 
     /** Attributes used for the CSM camera, which does not cover the same range as the full camera. **/
     protected Matrix4d projection, view, combined;
@@ -135,7 +136,7 @@ public class CascadeShadowMap implements Disposable {
         }
 
         // Generate the matrices for the CSM camera using the modified near and far planes. True camera stays at origin, hence (0 0 0).
-        updateCSM(sceneCamera.getCamera(), tmp.set(0, 0, 0), sceneCamera.getDirection(), sceneCamera.getUp());
+        updateCSM(sceneCamera.getCamera(), tmp2.set(0, 0, 0), sceneCamera.getDirection(), sceneCamera.getUp());
 
         syncExtraCascades(base);
 

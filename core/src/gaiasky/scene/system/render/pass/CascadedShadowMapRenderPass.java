@@ -18,6 +18,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Settings;
@@ -33,29 +34,30 @@ import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
 
 public class CascadedShadowMapRenderPass extends RenderPass {
     /** Number of cascade buffers. */
-    private final static int CASCADE_COUNT = 5;
+    public final static int CASCADE_COUNT = 5;
     /**
      * Describe how to split scene camera frustum. . With a value of 4, far cascade covers the
      * range: 1/4 to 1/1, next cascade, the range 1/16 to 1/4, and so on. The closest one covers
      * the remaining starting from 0. When used with 2 extra cascades (3 areas), split points are: 0.0, 1/16, 1/4, 1.0.
      */
-    private final static int SPLIT_DIVISOR = 6;
+    private final static int SPLIT_DIVISOR = 5;
     /**
      * Shadow box depth factor, depends on the scene. Must be >= 1. Greater than 1 means more objects cast shadows but
      * less precision. A value of 1 restricts shadow box depth to the frustum (only visible objects by the scene
      * camera).
      */
-    private final static double LIGHT_DEPTH_FACTOR = 1.2;
+    private final static double LIGHT_DEPTH_FACTOR = 1.6;
     /** Contains the code to render models. **/
     private final ModelEntityRenderSystem modelRenderer;
     private final CascadeShadowMap cascadeShadowMap;
     private DirectionalShadowLight baseLight;
-    private final Vector3b auxb = new Vector3b();
+    private final Vector3b aux1b = new Vector3b();
+    private final Vector3b aux2b = new Vector3b();
     private final Vector3 aux = new Vector3();
     private final Color color = new Color();
 
     // Are the textures displaying in the UI already?
-    private static boolean UI_VIEW_CREATED = false;
+    private static boolean UI_VIEW_CREATED = true;
     private static final int NUM_UI_VIEW = 6;
 
     public CascadedShadowMapRenderPass(final SceneRenderer sceneRenderer) {
@@ -79,45 +81,49 @@ public class CascadedShadowMapRenderPass extends RenderPass {
 
         // Prepare base light camera: direction and up.
         IFocus l = camera.getCloseLightSource(0);
-        l.getAbsolutePosition(auxb);
-        auxb.sub(camera.getPos()).nor().put(aux).scl(-1);
-        var cameraLight = baseLight.getCamera();
-        baseLight.direction.set(aux);
-        cameraLight.direction.set(aux);
-        // Shadow camera up is perpendicular to dir.
-        if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
-            aux.set(1, 0, 0);
-        else
-            aux.set(0, 1, 0);
-        cameraLight.up.set(cameraLight.direction).crs(aux);
+        l.getAbsolutePosition(aux1b);
+        if(!models.isEmpty()) {
+            var firstModel = ((Render)models.get(0)).getEntity();
+            EntityUtils.getAbsolutePosition(firstModel, aux2b);
+            aux1b.sub(aux2b).nor().put(aux).scl(-1);
+            var cameraLight = baseLight.getCamera();
+            baseLight.direction.set(aux);
+            cameraLight.direction.set(aux);
+            // Shadow camera up is perpendicular to dir.
+            if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
+                aux.set(1, 0, 0);
+            else
+                aux.set(0, 1, 0);
+            cameraLight.up.set(cameraLight.direction).crs(aux);
 
-        // Color
-        var col = l.getColor();
-        color.set(col[0], col[1], col[2], 1);
-        baseLight.baseColor.set(color);
-        baseLight.color.set(color);
-        // Prepare cascading.
-        cascadeShadowMap.setCascades(camera, baseLight, LIGHT_DEPTH_FACTOR, SPLIT_DIVISOR);
+            // Color
+            var col = l.getColor();
+            color.set(col[0], col[1], col[2], 1);
+            baseLight.baseColor.set(color);
+            baseLight.color.set(color);
+            // Prepare cascading.
+            cascadeShadowMap.setCascades(camera, baseLight, LIGHT_DEPTH_FACTOR, SPLIT_DIVISOR);
 
-        for (DirectionalShadowLight light : cascadeShadowMap.lights) {
-            light.begin();
-            renderDepth(light, camera, renderAssets.mbPixelLightingDepth, models);
-            renderDepth(light, camera, renderAssets.mbPixelLightingDepthTessellation, modelsTess);
-            light.end();
-        }
-        if (!UI_VIEW_CREATED) {
-            GaiaSky.postRunnable(() -> {
-                int i = 0;
-                for (DirectionalShadowLight light : cascadeShadowMap.lights) {
-                    // Create UI view(s)
-                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "CSM " + i, light.getDepthMap().texture, 0.15f);
-                    i++;
-                    if (i >= NUM_UI_VIEW) {
-                        break;
+            for (DirectionalShadowLight light : cascadeShadowMap.lights) {
+                light.begin();
+                renderDepth(light, camera, renderAssets.mbPixelLightingDepth, models);
+                renderDepth(light, camera, renderAssets.mbPixelLightingDepthTessellation, modelsTess);
+                light.end();
+            }
+            if (!UI_VIEW_CREATED) {
+                GaiaSky.postRunnable(() -> {
+                    int i = 0;
+                    for (DirectionalShadowLight light : cascadeShadowMap.lights) {
+                        // Create UI view(s)
+                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "CSM " + i, light.getDepthMap().texture, 0.15f);
+                        i++;
+                        if (i >= NUM_UI_VIEW) {
+                            break;
+                        }
                     }
-                }
-            });
-            UI_VIEW_CREATED = true;
+                });
+                UI_VIEW_CREATED = true;
+            }
         }
     }
 

@@ -40,7 +40,7 @@ public class GaiaSkyShaderCompileException extends RuntimeException {
     }
 
     private static String getMessage(ExtShaderProgram program) {
-        final String nl = System.getProperty("line.separator");
+        final String nl = System.lineSeparator();
         final StringBuilder buff = new StringBuilder();
         if (program.getName() == null || program.getName().isEmpty()) {
             buff.append(I18n.msg("notif.shader.compile.fail")).append(nl);
@@ -70,22 +70,6 @@ public class GaiaSkyShaderCompileException extends RuntimeException {
     }
 
     private void writeShader(String name, String code) {
-        if (name == null || name.isEmpty() || code == null || code.isEmpty()) {
-            return;
-        }
-        var dir = SysUtils.getCrashShadersDir();
-        try {
-            Files.createDirectories(dir);
-        } catch (IOException e) {
-            logger.error("Creating " + dir + " directory crashed (inception level 1 achieved!)");
-        }
-
-        Path crashReportFile = dir.resolve(name);
-        try (PrintWriter out = new PrintWriter(crashReportFile.toFile())) {
-            out.println(code);
-        } catch (Exception e) {
-            logger.error("Writing crashed shader crashed (inception level 1 achieved!)");
-        }
-
+        ExtShaderProgram.writeShader(name, code);
     }
 }

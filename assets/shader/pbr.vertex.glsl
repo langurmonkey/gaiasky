@@ -104,6 +104,9 @@ uniform vec3 u_vrOffset = vec3(0.0);
 uniform mat4 u_shadowMapProjViewTrans;
 #ifdef numCSM
 uniform mat4 u_csmTransforms[numCSM];
+uniform sampler2D u_csmSamplers[numCSM];
+uniform float u_csmClip[numCSM];
+uniform float u_csmPCF;
 #endif // numCSM
 #endif // shadowMapFlag
 

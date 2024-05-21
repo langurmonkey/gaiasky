@@ -9,19 +9,12 @@ package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.render.GaiaSkyShaderCompileException;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL41;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 
 public class TessellationShaderProgram extends ExtShaderProgram {
     private static final Logger.Log logger = Logger.getLogger(ExtShaderProgram.class);
@@ -31,7 +24,8 @@ public class TessellationShaderProgram extends ExtShaderProgram {
      **/
     private final static ObjectMap<Application, Array<TessellationShaderProgram>> shaders = new ObjectMap<>();
     /**
-     * Code that is always added to the tessellation shaders, typically used to inject a #version line. Note that this is added
+     * Code that is always added to the tessellation shaders, typically used to inject a #version line. Note that this
+     * is added
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependControlCode = "";
@@ -65,7 +59,8 @@ public class TessellationShaderProgram extends ExtShaderProgram {
      * @param controlShaderCode    The tessellation control shader code.
      * @param evaluationShaderCode The tessellation evaluation shader code.
      * @param fragmentShaderCode   The fragment shader code.
-     * @param lazyLoading          Whether to use lazy loading, only preparing the data without actually compiling the shaders.
+     * @param lazyLoading          Whether to use lazy loading, only preparing the data without actually compiling the
+     *                             shaders.
      */
     public TessellationShaderProgram(String name, String vertexFile, String tessControlFile, String tessEvaluationFile, String fragmentFile, String vertexShaderCode, String controlShaderCode, String evaluationShaderCode, String fragmentShaderCode, boolean lazyLoading) {
         if (vertexShaderCode == null) throw new IllegalArgumentException("vertex shader must not be null");
@@ -231,5 +226,12 @@ public class TessellationShaderProgram extends ExtShaderProgram {
 
             isDisposed = true;
         }
+    }
+
+    @Override
+    public void writeShaders() {
+        super.writeShaders();
+        writeShader(getControlShaderFileName(), getControlShaderSource());
+        writeShader(getEvaluationShaderFileName(), getEvaluationShaderSource());
     }
 }

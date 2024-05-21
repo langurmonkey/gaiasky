@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.scene.system.render.pass.CascadedShadowMapRenderPass;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -130,9 +131,10 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_generic2;
 
     // Cascaded shadow maps.
-    public int u_csmSamplers;
-    public int u_csmPCFClip;
-    public int u_csmTransforms;
+    public int[] u_csmTransforms = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
+    public int[] u_csmSamplers = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
+    public int[] u_csmClip = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
+    public int u_csmPCF;
 
     // Lighting uniforms.
     protected final int u_ambientCubemap;
@@ -225,9 +227,18 @@ public class DefaultIntShader extends BaseIntShader {
         u_shadowMapProjViewTrans = register(new Uniform("u_shadowMapProjViewTrans"));
         u_shadowTexture = register(new Uniform("u_shadowTexture"));
         u_shadowPCFOffset = register(new Uniform("u_shadowPCFOffset"));
-        u_csmSamplers = register(new Uniform("u_csmSamplers[0]"));
-        u_csmTransforms = register(new Uniform("u_csmTransforms[0]"));
-        u_csmPCFClip = register(new Uniform("u_csmPCFClip[0]"));
+
+        for (int i = 0; i < CascadedShadowMapRenderPass.CASCADE_COUNT; i++) {
+            u_csmTransforms[i] = register(new Uniform("u_csmTransforms[" + i + "]"));
+        }
+        for (int i = 0; i < CascadedShadowMapRenderPass.CASCADE_COUNT; i++) {
+            u_csmSamplers[i] = register(new Uniform("u_csmSamplers[" + i + "]"));
+        }
+        for (int i = 0; i < CascadedShadowMapRenderPass.CASCADE_COUNT; i++) {
+            u_csmClip[i] = register(new Uniform("u_csmClip[" + i + "]"));
+        }
+        u_csmPCF = register(new Uniform("u_csmPCF"));
+
         u_projTrans = register(Inputs.projTrans, Setters.projTrans);
         u_projViewTrans = register(Inputs.projViewTrans, Setters.projViewTrans);
         u_cameraPosition = register(Inputs.cameraPosition, Setters.cameraPosition);
@@ -780,19 +791,22 @@ public class DefaultIntShader extends BaseIntShader {
             double near = csmAttrib.cascadeShadowMap.CAM_NEAR_CSM;
             double far = csmAttrib.cascadeShadowMap.CAM_FAR_CSM;
             double farNear = far - near;
-            if (u_csmSamplers >= 0) {
+            if (u_csmSamplers[0] >= 0) {
                 Array<DirectionalShadowLight> csmLights = csmAttrib.cascadeShadowMap.lights;
+
                 for (int i = 0; i < csmLights.size; i++) {
                     DirectionalShadowLight light = csmLights.get(i);
-                    float mapSize = light.getDepthMap().texture.getWidth();
-                    float pcf = 1.0f / (2.0f * mapSize);
 
                     var splitDistCam = near + farNear * csmAttrib.cascadeShadowMap.getSplitDistance(i);
                     int unit = context.textureBinder.bind(light.getDepthMap());
-                    program.setUniformi(u_csmSamplers + i, unit);
-                    program.setUniformMatrix(u_csmTransforms + i, light.getProjViewTrans());
-                    program.setUniformf(u_csmPCFClip + i, pcf, (float) splitDistCam);
+
+                    set(u_csmTransforms[i], light.getProjViewTrans());
+                    set(u_csmSamplers[i], unit);
+                    set(u_csmClip[i], (float) splitDistCam);
                 }
+
+                float pcf = 1.0f / (2.0f * csmLights.get(0).getDepthMap().texture.getWidth());
+                set(u_csmPCF, pcf);
             }
         }
 

@@ -18,18 +18,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.render.GaiaSkyShaderCompileException;
-import gaiasky.util.ChecksumRunnable;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL33;
-import org.lwjgl.opengl.GL42;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.StringBuilder;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ExtShaderProgram implements Disposable {
     private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
@@ -60,17 +63,20 @@ public class ExtShaderProgram implements Disposable {
      **/
     public static boolean pedantic = true;
     /**
-     * Code that is always added to the vertex shader code, typically used to inject a #version line. Note that this is added
+     * Code that is always added to the vertex shader code, typically used to inject a #version line. Note that this is
+     * added
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependVertexCode = "";
     /**
-     * Code that is always added to the geometry shader code, typically used to inject a #version line. Note that this is added
+     * Code that is always added to the geometry shader code, typically used to inject a #version line. Note that this
+     * is added
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependGeometryCode = "";
     /**
-     * Code that is always added to every fragment shader code, typically used to inject a #version line. Note that this is added
+     * Code that is always added to every fragment shader code, typically used to inject a #version line. Note that this
+     * is added
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependFragmentCode = "";
@@ -231,7 +237,8 @@ public class ExtShaderProgram implements Disposable {
      * @param fragmentFile       The fragment shader file.
      * @param vertexShaderCode   The vertex shader code.
      * @param fragmentShaderCode The fragment shader code.
-     * @param lazyLoading        Whether to use lazy loading, only preparing the data without actually compiling the shaders.
+     * @param lazyLoading        Whether to use lazy loading, only preparing the data without actually compiling the
+     *                           shaders.
      */
     public ExtShaderProgram(String name,
                             String vertexFile,
@@ -252,7 +259,8 @@ public class ExtShaderProgram implements Disposable {
      * @param vertexShaderCode   The vertex shader code.
      * @param geometryShaderCode The geometry shader code.
      * @param fragmentShaderCode The fragment shader code.
-     * @param lazyLoading        Whether to use lazy loading, only preparing the data without actually compiling the shaders.
+     * @param lazyLoading        Whether to use lazy loading, only preparing the data without actually compiling the
+     *                           shaders.
      */
     public ExtShaderProgram(String name,
                             String vertexFile,
@@ -392,7 +400,6 @@ public class ExtShaderProgram implements Disposable {
             } else {
                 throw new GaiaSkyShaderCompileException(this);
             }
-
         }
     }
 
@@ -443,7 +450,8 @@ public class ExtShaderProgram implements Disposable {
     }
 
     /**
-     * @return the log info for the shader compilation and program linking stage. The shader needs to be bound for this method to
+     * @return the log info for the shader compilation and program linking stage. The shader needs to be bound for this
+     * method to
      * have an effect.
      */
     public String getLog() {
@@ -853,7 +861,8 @@ public class ExtShaderProgram implements Disposable {
     }
 
     /**
-     * Sets an array of uniform matrices with the given name. The {@link ExtShaderProgram} must be bound for this to work.
+     * Sets an array of uniform matrices with the given name. The {@link ExtShaderProgram} must be bound for this to
+     * work.
      *
      * @param name      the name of the uniform
      * @param buffer    buffer containing the matrix data
@@ -871,7 +880,8 @@ public class ExtShaderProgram implements Disposable {
     }
 
     /**
-     * Sets an array of uniform matrices with the given name. The {@link ExtShaderProgram} must be bound for this to work.
+     * Sets an array of uniform matrices with the given name. The {@link ExtShaderProgram} must be bound for this to
+     * work.
      *
      * @param name      the name of the uniform
      * @param buffer    buffer containing the matrix data
@@ -1035,7 +1045,8 @@ public class ExtShaderProgram implements Disposable {
     }
 
     /**
-     * Disables this shader. Must be called when one is done with the shader. Don't mix it with dispose, that will release the
+     * Disables this shader. Must be called when one is done with the shader. Don't mix it with dispose, that will
+     * release the
      * shader resources.
      */
     public void end() {
@@ -1294,5 +1305,31 @@ public class ExtShaderProgram implements Disposable {
 
             isDisposed = true;
         }
+    }
+
+    public void writeShaders() {
+        writeShader(getVertexShaderFileName(), getVertexShaderSource());
+        writeShader(getGeometryShaderFileName(), getGeometryShaderSource());
+        writeShader(getFragmentShaderFileName(), getFragmentShaderSource());
+    }
+
+    public static void writeShader(String name, String code) {
+        if (name == null || name.isEmpty() || code == null || code.isEmpty()) {
+            return;
+        }
+        var dir = SysUtils.getCrashShadersDir();
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            logger.error("Creating " + dir + " directory crashed (inception level 1 achieved!)");
+        }
+
+        Path crashReportFile = dir.resolve(name);
+        try (PrintWriter out = new PrintWriter(crashReportFile.toFile())) {
+            out.println(code);
+        } catch (Exception e) {
+            logger.error("Writing crashed shader crashed (inception level 1 achieved!)");
+        }
+
     }
 }
