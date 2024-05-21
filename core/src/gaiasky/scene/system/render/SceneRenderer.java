@@ -134,7 +134,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         cascadedShadowMapRenderPass.setCondition(() -> Settings.settings.scene.renderer.shadow.active);
         this.lightGlowPass.setCondition(() -> !Settings.settings.program.isStereoOrCubemap());
 
-        shadowMapPass.setEnabled(false);
+        cascadedShadowMapRenderPass.setEnabled(false);
 
         this.renderPasses = new ArrayList<>();
         this.renderPasses.add(shadowMapPass);
