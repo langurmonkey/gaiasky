@@ -349,6 +349,9 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef shadowMapGlobalFlag
+    vec3 shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
     vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
@@ -451,7 +454,12 @@ void main() {
         #else
             // Regular shadow mapping.
             float transparency = 1.0 - texture(u_shadowTexture, v_data.shadowMapUv.xy).g;
-            float shdw = clamp(getShadow(v_data.shadowMapUv) + transparency, 0.0, 1.0);
+
+            #ifdef shadowMapGlobalFlag
+                float shdw = clamp(getShadow(v_data.shadowMapUv, v_data.shadowMapUvGlobal) + transparency, 0.0, 1.0);
+            #else
+                float shdw = clamp(getShadow(v_data.shadowMapUv) + transparency, 0.0, 1.0);
+            #endif // shadowMapGlobalFlag
         #endif // numCSM
     #else
         float shdw = 1.0;

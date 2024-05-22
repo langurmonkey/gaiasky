@@ -635,8 +635,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // SHADOW MAP RESOLUTION
         OwnLabel smResolutionLabel = new OwnLabel(I18n.msg("gui.graphics.shadows.resolution"), skin);
         smResolutionLabel.setDisabled(!settings.scene.renderer.shadow.active);
-        IntValidator smResValidator = new IntValidator(128, 4096);
-        smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(settings.scene.renderer.shadow.resolution, 128, 4096)), skin, smResValidator);
+        IntValidator smResValidator = new IntValidator(128, 8192);
+        smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(settings.scene.renderer.shadow.resolution, 128, 8192)), skin, smResValidator);
         smResolution.setWidth(inputWidth);
         smResolution.setDisabled(!settings.scene.renderer.shadow.active);
 

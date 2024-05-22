@@ -16,22 +16,37 @@ import com.badlogic.gdx.math.Matrix4;
 
 public class ShadowMapImpl implements ShadowMap {
 
-    private final Matrix4 trans;
-    private final TextureDescriptor<Texture> td;
+    private final Matrix4 combined, combinedGlobal;
+    private final TextureDescriptor<Texture> td, tdGlobal;
 
-    public ShadowMapImpl(Matrix4 trans, Texture tex) {
+    public ShadowMapImpl(Matrix4 combined, Texture td, Matrix4 combinedGlobal, Texture tdGlobal) {
         super();
-        this.trans = trans;
-        this.td = new TextureDescriptor<>(tex);
+        this.combined = combined;
+        this.td = new TextureDescriptor<>(td, TextureFilter.Linear, TextureFilter.Linear, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+        this.combinedGlobal = combinedGlobal;
+        this.tdGlobal = new TextureDescriptor<>(tdGlobal, TextureFilter.Linear, TextureFilter.Linear, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+    }
+
+
+    public void setProjViewTrans(Matrix4 mat) {
+        this.combined.set(mat);
     }
 
     @Override
     public Matrix4 getProjViewTrans() {
-        return trans;
+        return combined;
     }
 
-    public void setProjViewTrans(Matrix4 mat) {
-        this.trans.set(mat);
+    public void setProjViewTransGlobal(Matrix4 mat) {
+        this.combinedGlobal.set(mat);
+    }
+
+    public Matrix4 getProjViewTransGlobal() {
+        return combinedGlobal;
+    }
+
+    public void setDepthMap(Texture tex) {
+        this.td.set(tex, TextureFilter.Linear, TextureFilter.Linear, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
     }
 
     @Override
@@ -39,8 +54,12 @@ public class ShadowMapImpl implements ShadowMap {
         return td;
     }
 
-    public void setDepthMap(Texture tex) {
-        this.td.set(tex, TextureFilter.Nearest, TextureFilter.Nearest, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+    public void setDepthMapGlobal(Texture tex) {
+        this.tdGlobal.set(tex, TextureFilter.Linear, TextureFilter.Linear, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+    }
+
+    public TextureDescriptor<Texture> getDepthMapGlobal() {
+        return tdGlobal;
     }
 
 }

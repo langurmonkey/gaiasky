@@ -102,6 +102,9 @@ uniform vec3 u_vrOffset = vec3(0.0);
 //////////////////////////////////////////////////////
 #ifdef shadowMapFlag
 uniform mat4 u_shadowMapProjViewTrans;
+#ifdef shadowMapGlobalFlag
+uniform mat4 u_shadowMapProjViewTransGlobal;
+#endif // shadowMapGlobalFlag
 #ifdef numCSM
 uniform mat4 u_csmTransforms[numCSM];
 uniform sampler2D u_csmSamplers[numCSM];
@@ -263,6 +266,9 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef shadowMapGlobalFlag
+    vec3 shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
     vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
@@ -361,8 +367,12 @@ void main() {
     gl_Position = gpos;
 
     #ifdef shadowMapFlag
-	vec4 spos = u_shadowMapProjViewTrans * pos;
-	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
+	vec4 posShadow = u_shadowMapProjViewTrans * pos;
+	v_data.shadowMapUv.xyz = (posShadow.xyz / posShadow.w) * 0.5 + 0.5;
+    #ifdef shadowMapGlobalFlag
+    vec4 posShadowGlobal = u_shadowMapProjViewTransGlobal * pos;
+    v_data.shadowMapUvGlobal.xyz = (posShadowGlobal.xyz / posShadowGlobal.w) * 0.5 + 0.5;
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
     for(int i = 0 ; i < numCSM ; i++){
         vec4 csmPos = u_csmTransforms[i] * pos;

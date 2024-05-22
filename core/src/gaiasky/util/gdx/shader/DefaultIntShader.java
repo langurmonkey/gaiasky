@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.render.ShadowMapImpl;
 import gaiasky.scene.system.render.pass.CascadedShadowMapRenderPass;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
@@ -147,7 +148,9 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_pointLights1color;
     protected final int u_fogColor;
     protected final int u_shadowMapProjViewTrans;
+    protected final int u_shadowMapProjViewTransGlobal;
     protected final int u_shadowTexture;
+    protected final int u_shadowTextureGlobal;
     protected final int u_shadowPCFOffset;
     protected final boolean lighting;
     protected final boolean shadowMap;
@@ -226,6 +229,8 @@ public class DefaultIntShader extends BaseIntShader {
         u_fogColor = register(new Uniform("u_fogColor"));
         u_shadowMapProjViewTrans = register(new Uniform("u_shadowMapProjViewTrans"));
         u_shadowTexture = register(new Uniform("u_shadowTexture"));
+        u_shadowMapProjViewTransGlobal = register(new Uniform("u_shadowMapProjViewTransGlobal"));
+        u_shadowTextureGlobal = register(new Uniform("u_shadowTextureGlobal"));
         u_shadowPCFOffset = register(new Uniform("u_shadowPCFOffset"));
 
         for (int i = 0; i < CascadedShadowMapRenderPass.CASCADE_COUNT; i++) {
@@ -396,6 +401,10 @@ public class DefaultIntShader extends BaseIntShader {
                 // Regular shadow mapping.
                 if (renderable.environment.shadowMap != null) {
                     prefix.append("#define shadowMapFlag\n");
+
+                    if (renderable.environment.shadowMap instanceof ShadowMapImpl smi && smi.getProjViewTransGlobal() != null) {
+                        prefix.append("#define shadowMapGlobalFlag\n");
+                    }
                 }
 
                 // Cascade shadow mapping.
@@ -780,8 +789,13 @@ public class DefaultIntShader extends BaseIntShader {
 
         // Default shadow map.
         if (lights != null && lights.shadowMap != null) {
-            set(u_shadowMapProjViewTrans, lights.shadowMap.getProjViewTrans());
-            set(u_shadowTexture, lights.shadowMap.getDepthMap());
+            var sm = lights.shadowMap;
+            set(u_shadowMapProjViewTrans, sm.getProjViewTrans());
+            set(u_shadowTexture, sm.getDepthMap());
+            if (sm instanceof ShadowMapImpl smi && smi.getProjViewTransGlobal() != null) {
+                set(u_shadowMapProjViewTransGlobal, smi.getProjViewTransGlobal());
+                set(u_shadowTextureGlobal, smi.getDepthMapGlobal());
+            }
             set(u_shadowPCFOffset, 1.f / (2f * lights.shadowMap.getDepthMap().texture.getWidth()));
         }
 

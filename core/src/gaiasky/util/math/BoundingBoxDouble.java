@@ -190,6 +190,10 @@ public class BoundingBoxDouble implements Serializable {
         return dim.z;
     }
 
+    public double getGreatestDim() {
+       return Math.max(Math.max(getWidth(), getHeight()), getDepth());
+    }
+
     /**
      * @return The minimum vector
      *

@@ -27,7 +27,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
-import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
@@ -97,7 +96,7 @@ public class ModelEntityRenderSystem {
         if (mc != null && mc.instance != null && mc.isModelInitialised()) {
             if (scaffolding != null) {
                 if (shadow) {
-                    prepareShadowEnvironment(entity, model, scaffolding);
+                    prepareShadowEnvironment(model, scaffolding);
                 }
                 mc.update(alpha * scaffolding.fadeOpacity);
                 modelBatch.render(mc.instance, mc.env);
@@ -158,7 +157,7 @@ public class ModelEntityRenderSystem {
             var base = Mapper.base.get(entity);
             var body = Mapper.body.get(entity);
             if (scaffolding != null && shadow) {
-                prepareShadowEnvironment(entity, model, scaffolding);
+                prepareShadowEnvironment(model, scaffolding);
             }
 
             float alphaFactor;
@@ -471,7 +470,7 @@ public class ModelEntityRenderSystem {
         if (mc.isModelInitialised()) {
             // Good, render
             if (shadow) {
-                prepareShadowEnvironment(entity, model, scaffolding);
+                prepareShadowEnvironment(model, scaffolding);
             }
             mc.setTransparency(alpha * scaffolding.fadeOpacity);
             if (cam.getMode().isSpacecraft())
@@ -534,7 +533,7 @@ public class ModelEntityRenderSystem {
             }
             // Regular planet, render model normally
             if (shadow) {
-                prepareShadowEnvironment(entity, model, scaffolding);
+                prepareShadowEnvironment(model, scaffolding);
             }
             model.model.updateEclipsingBodyUniforms(entity);
             model.model.update(alpha * base.opacity, relativistic);
@@ -593,25 +592,36 @@ public class ModelEntityRenderSystem {
     /**
      * Prepares the shadow environment for shadow mapping.
      */
-    protected void prepareShadowEnvironment(Entity entity,
-                                            Model model,
+    protected void prepareShadowEnvironment(Model model,
                                             ModelScaffolding scaffolding) {
         if (!model.model.env.has(CascadeShadowMapAttribute.Type)) {
+            var env = model.model.env;
             // Only for regular shadow maps (no CSM!).
             if (Settings.settings.scene.renderer.shadow.active && scaffolding.shadowMapValues != null) {
-                Environment env = model.model.env;
                 if (scaffolding.shadow > 0
                         && scaffolding.shadowMapFb != null
                         && scaffolding.shadowMapCombined != null) {
+                    boolean global = scaffolding.shadowMapFbGlobal != null;
                     Matrix4 combined = scaffolding.shadowMapCombined;
                     Texture tex = scaffolding.shadowMapFb.getColorBufferTexture();
+                    Matrix4 combinedGlobal = global ? scaffolding.shadowMapCombinedGlobal : null;
+                    Texture texGlobal = global ? scaffolding.shadowMapFbGlobal.getColorBufferTexture() : null;
 
                     // Gather info.
                     if (scaffolding.shadowMap == null) {
-                        scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
+                        scaffolding.shadowMap = new ShadowMapImpl(
+                                combined,
+                                tex,
+                                combinedGlobal,
+                                texGlobal);
+                    } else {
+                        scaffolding.shadowMap.setProjViewTrans(combined);
+                        scaffolding.shadowMap.setDepthMap(tex);
+                        if (global) {
+                            scaffolding.shadowMap.setProjViewTransGlobal(combinedGlobal);
+                            scaffolding.shadowMap.setDepthMapGlobal(texGlobal);
+                        }
                     }
-                    scaffolding.shadowMap.setProjViewTrans(combined);
-                    scaffolding.shadowMap.setDepthMap(tex);
 
                     // Set to environment.
                     env.shadowMap = scaffolding.shadowMap;

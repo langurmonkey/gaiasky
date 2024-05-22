@@ -56,8 +56,8 @@ public class ModelScaffolding implements Component {
     /** The factor to apply to the size when rendered as billboard. **/
     public float billboardSizeFactor;
 
-    public FrameBuffer shadowMapFb;
-    public Matrix4 shadowMapCombined;
+    public FrameBuffer shadowMapFb, shadowMapFbGlobal;
+    public Matrix4 shadowMapCombined, shadowMapCombinedGlobal;
 
     /**
      * Whether shadows should be rendered for this object

@@ -67,7 +67,7 @@ public class CascadeShadowMap implements Disposable {
         combined = new Matrix4d();
         frustum = new FrustumDouble();
         CAM_NEAR_CSM = 1000.0 * Constants.M_TO_U;
-        CAM_FAR_CSM = 0.01 * Constants.AU_TO_U;
+        CAM_FAR_CSM = Constants.AU_TO_U;
     }
 
     @Override

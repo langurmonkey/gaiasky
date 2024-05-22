@@ -9,7 +9,6 @@ package gaiasky.scene.system.render.pass;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -31,9 +30,11 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
+import gaiasky.util.math.BoundingBoxDouble;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.*;
 
@@ -42,19 +43,25 @@ import static gaiasky.render.RenderGroup.MODEL_PIX;
 public class ShadowMapRenderPass extends RenderPass {
     /** Number of *shadow casting* lights supported. */
     private final static int NUM_SHADOW_CASTING_LIGHTS = 1;
+    private final static boolean GLOBAL_SM = false;
     /** Contains the code to render models. **/
     private final ModelEntityRenderSystem modelRenderer;
-    // Camera at light position, with same direction. For shadow mapping
-    private Camera cameraLight;
+    /** Individual camera light. **/
+    private PerspectiveCamera cameraLightIndividual;
+    /** Global camera light. **/
+    private PerspectiveCamera cameraLightGlobal;
     /** Contains the candidates for regular and tessellated shadow maps. **/
     private List<Entity> shadowCandidates/*, shadowCandidatesTess */;
     /**
      * Cache with all the entities that have used shadow map frame buffers to date, for disposing.
      */
     private Set<Entity> shadowMapEntities;
+    private final BoundingBoxDouble box = new BoundingBoxDouble();
+    private FrameBuffer globalFrameBuffer;
 
     // Are the textures displaying in the UI already?
-    private static boolean UI_VIEW_CREATED = true;
+    private static boolean UI_VIEW_GLOBAL_CREATED = true;
+    private static boolean UI_VIEW_LOCAL_CREATED = true;
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
@@ -67,7 +74,8 @@ public class ShadowMapRenderPass extends RenderPass {
 
     protected void initializeRenderPass() {
         // Shadow map camera
-        cameraLight = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
+        cameraLightIndividual = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
+        cameraLightGlobal = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
         shadowMapEntities = new HashSet<>();
 
         // Aux vectors
@@ -106,12 +114,123 @@ public class ShadowMapRenderPass extends RenderPass {
 
     private FrameBuffer newShadowMapFrameBuffer(Entity entity) {
         // Add to cache for disposing.
-        shadowMapEntities.add(entity);
+        if (entity != null) {
+            shadowMapEntities.add(entity);
+        }
         // Create frame buffer.
         return new FrameBuffer(Pixmap.Format.RGBA8888,
                 Settings.settings.scene.renderer.shadow.resolution,
                 Settings.settings.scene.renderer.shadow.resolution,
                 true);
+    }
+
+    int prevCandidates = 0;
+
+    private void renderShadowMapGlobal(List<IRenderable> candidates,
+                                       ICamera camera) {
+        if (!candidates.isEmpty()) {
+            if (prevCandidates != candidates.size()) {
+                System.out.println("Candidates: " + candidates.size());
+                prevCandidates = candidates.size();
+            }
+            var renderAssets = sceneRenderer.getRenderAssets();
+            var first = ((Render) candidates.get(0)).entity;
+            var model = Mapper.model.get(first);
+
+            // Find bounding box in world space.
+            box.inf();
+            double greatestRadius = 0.0;
+            for (var render : candidates) {
+                var entity = ((Render) render).entity;
+                var entityAbsPos = EntityUtils.getAbsolutePosition(entity, aux1b);
+                box.ext(entityAbsPos.put(aux1d));
+
+                // Find the greatest radius amongst all objects.
+                double entityRadius = EntityUtils.getRadius(entity) * 2;
+                if (greatestRadius < entityRadius) {
+                    greatestRadius = entityRadius;
+                }
+            }
+
+            // Position, factor of radius
+            Vector3d boxCenterAbsPos = box.getCenter(aux1d);
+            // Light direction depends on light.
+            Vector3 lightDir = aux1;
+            if (model.model.hasDirLight(0)) {
+                lightDir.set(model.model.dirLight(0).direction);
+            } else if (model.model.hasPointLight(0)) {
+                lightDir.set(model.model.pointLight(0).position);
+                aux2b.set(boxCenterAbsPos).sub(lightDir).nor().put(lightDir);
+            }
+            // Find distance given fov and box side.
+            var boxDimension = candidates.size() == 1 ? box.getGreatestDim() + greatestRadius : box.getGreatestDim();
+            var distCamCenter = (boxDimension / FastMath.tan(FastMath.toRadians(cameraLightGlobal.fieldOfView))) * 1.2;
+
+            // Direction is that of the light.
+            cameraLightGlobal.direction.set(lightDir);
+            // Position is from the box center, a distance dist in the opposite light direction.
+            var camLightAbsPos = aux3d.set(lightDir).scl(-distCamCenter).add(boxCenterAbsPos);
+            aux2d.set(camLightAbsPos).sub(camera.getPos()).put(cameraLightGlobal.position);
+            // Find out distance to closest object.
+            double minDist = Double.MAX_VALUE;
+            double maxDist = 0;
+            for (var render : candidates) {
+                var entity = ((Render) render).entity;
+                var entityAbsPos = EntityUtils.getAbsolutePosition(entity, aux1b);
+                var r = EntityUtils.getRadius(entity) * 2;
+                var d = camLightAbsPos.dst(entityAbsPos);
+                var dMin = d - r;
+                var dMax = d + r;
+                if (minDist > dMin) {
+                    minDist = dMin;
+                }
+                if (maxDist < dMax) {
+                    maxDist = dMax;
+                }
+            }
+
+            // Up is perpendicular to dir
+            if (cameraLightGlobal.direction.y != 0 || cameraLightGlobal.direction.z != 0)
+                aux1.set(1, 0, 0);
+            else
+                aux1.set(0, 1, 0);
+            cameraLightGlobal.up.set(cameraLightGlobal.direction).crs(aux1);
+
+            // Near and far use the box width and the greatest radius.
+            var near = distCamCenter - boxDimension;
+            var far = distCamCenter + boxDimension;
+            cameraLightGlobal.near = (float) Math.max(100.0 * Constants.M_TO_U, minDist);
+            cameraLightGlobal.far = (float) Math.min(Constants.AU_TO_U, maxDist);
+
+            // Update cam
+            cameraLightGlobal.update(false);
+
+            // Render model depth map to global frame buffer.
+            final var fb = globalFrameBuffer == null ? newShadowMapFrameBuffer(null) : globalFrameBuffer;
+
+            fb.begin();
+            Gdx.gl.glClearColor(0, 0, 0, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+            // No tessellation
+            renderAssets.mbPixelLightingDepth.begin(cameraLightGlobal);
+            for (var entity : candidates) {
+                modelRenderer.render(((Render) entity).entity, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+            }
+            renderAssets.mbPixelLightingDepth.end();
+
+            fb.end();
+
+            globalFrameBuffer = fb;
+
+            if (!UI_VIEW_GLOBAL_CREATED) {
+                GaiaSky.postRunnable(() -> {
+                    // Create UI view
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map (GLOBAL)", globalFrameBuffer.getColorBufferTexture(), 0.2f);
+                });
+                UI_VIEW_GLOBAL_CREATED = true;
+            }
+        }
     }
 
     private void renderShadowMapCandidates(List<Entity> candidates,
@@ -140,51 +259,58 @@ public class ShadowMapRenderPass extends RenderPass {
                     aux2b.set(objPos).sub(lightDir).nor().put(lightDir);
                 }
                 // Direction is that of the light
-                cameraLight.direction.set(lightDir);
+                cameraLightIndividual.direction.set(lightDir);
                 objPos.sub(camera.getPos()).sub(lightDir.nor().scl((float) distance));
-                objPos.put(cameraLight.position);
+                objPos.put(cameraLightIndividual.position);
                 // Up is perpendicular to dir
-                if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
+                if (cameraLightIndividual.direction.y != 0 || cameraLightIndividual.direction.z != 0)
                     aux1.set(1, 0, 0);
                 else
                     aux1.set(0, 1, 0);
-                cameraLight.up.set(cameraLight.direction).crs(aux1);
+                cameraLightIndividual.up.set(cameraLightIndividual.direction).crs(aux1);
 
                 // Near is sv[1]*radius before the object
-                cameraLight.near = (float) (distance - radius * scaffolding.shadowMapValues[1]);
+                cameraLightIndividual.near = (float) (distance - radius * scaffolding.shadowMapValues[1]);
                 // Far is sv[2]*radius after the object
-                cameraLight.far = (float) (distance + radius * scaffolding.shadowMapValues[2]);
+                cameraLightIndividual.far = (float) (distance + radius * scaffolding.shadowMapValues[2]);
 
                 // Update cam
-                cameraLight.update(false);
+                cameraLightIndividual.update(false);
 
                 // Render model depth map to frame buffer.
                 final var fb = scaffolding.shadowMapFb == null ? newShadowMapFrameBuffer(candidate) : scaffolding.shadowMapFb;
 
                 scaffolding.shadowMapFb = fb;
+                if (GLOBAL_SM) {
+                    scaffolding.shadowMapFbGlobal = globalFrameBuffer;
+                }
                 if (scaffolding.shadowMapCombined == null) {
                     scaffolding.shadowMapCombined = new Matrix4();
                 }
 
                 fb.begin();
+                Gdx.gl.glClearColor(1, 1, 1, 1);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // No tessellation
-                renderAssets.mbPixelLightingDepth.begin(cameraLight);
+                renderAssets.mbPixelLightingDepth.begin(cameraLightIndividual);
                 modelRenderer.render(candidate, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
                 renderAssets.mbPixelLightingDepth.end();
 
                 // Save frame buffer and combined matrix
                 scaffolding.shadow = shadowNRender;
-                scaffolding.shadowMapCombined.set(cameraLight.combined);
+                scaffolding.shadowMapCombined.set(cameraLightIndividual.combined);
+                if (GLOBAL_SM) {
+                    scaffolding.shadowMapCombinedGlobal = cameraLightGlobal.combined;
+                }
                 fb.end();
 
-                if (!UI_VIEW_CREATED) {
+                if (!UI_VIEW_LOCAL_CREATED) {
                     GaiaSky.postRunnable(() -> {
                         // Create UI view
-                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map", fb.getColorBufferTexture(), 0.2f);
+                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map (LOCAL)", fb.getColorBufferTexture(), 0.2f);
                     });
-                    UI_VIEW_CREATED = true;
+                    UI_VIEW_LOCAL_CREATED = true;
                 }
             }
         }
@@ -233,11 +359,11 @@ public class ShadowMapRenderPass extends RenderPass {
                 Vector3 shadowCameraDir = aux1.set(model.model.dirLight(0).direction);
 
                 // Shadow camera direction is that of the light
-                cameraLight.direction.set(shadowCameraDir);
+                cameraLightIndividual.direction.set(shadowCameraDir);
 
                 Vector3 shadowCamDir = aux1.set(model.model.dirLight(0).direction);
                 // Direction is that of the light
-                cameraLight.direction.set(shadowCamDir);
+                cameraLightIndividual.direction.set(shadowCamDir);
 
                 // Distance from camera to object, radius * sv[0]
                 float distance = (float) (radius * scaffolding.shadowMapValues[0] * 0.01);
@@ -253,28 +379,28 @@ public class ShadowMapRenderPass extends RenderPass {
                 Vector3d objCam = aux2d.set(camPos).sub(objPos).nor().scl(-(body.distToCamera - radius)).add(camDir);
 
                 objCam.add(shadowCamDir.nor().scl(-distance));
-                objCam.put(cameraLight.position);
+                objCam.put(cameraLightIndividual.position);
 
                 // Shadow camera up is perpendicular to dir
-                if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
+                if (cameraLightIndividual.direction.y != 0 || cameraLightIndividual.direction.z != 0)
                     aux1.set(1, 0, 0);
                 else
                     aux1.set(0, 1, 0);
-                cameraLight.up.set(cameraLight.direction).crs(aux1);
+                cameraLightIndividual.up.set(cameraLightIndividual.direction).crs(aux1);
 
                 // Near is sv[1]*radius before the object
-                cameraLight.near = distance * 0.98f;
+                cameraLightIndividual.near = distance * 0.98f;
                 // Far is sv[2]*radius after the object
-                cameraLight.far = distance * 1.02f;
+                cameraLightIndividual.far = distance * 1.02f;
 
                 // Update cam
-                cameraLight.update(false);
+                cameraLightIndividual.update(false);
 
                 // Render model depth map to frame buffer
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // Tessellation
-                renderAssets.mbPixelLightingDepthTessellation.begin(cameraLight);
+                renderAssets.mbPixelLightingDepthTessellation.begin(cameraLightIndividual);
                 modelRenderer.render(candidate, renderAssets.mbPixelLightingDepthTessellation, camera, 1, 0, rc, RenderGroup.MODEL_PIX, true);
                 renderAssets.mbPixelLightingDepthTessellation.end();
 
@@ -307,13 +433,18 @@ public class ShadowMapRenderPass extends RenderPass {
         //List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
         models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 
+        // Global shadow map.
+        if (GLOBAL_SM) {
+            renderShadowMapGlobal(models, camera);
+        }
+
         final int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openXr) ?
                 2 :
                 Settings.settings.program.modeCubemap.active ? 6 : 1;
 
+        // Shadow candidates.
         addCandidates(models, shadowCandidates);
         //addCandidates(modelsTess, shadowCandidatesTess);
-
         renderShadowMapCandidates(shadowCandidates, shadowNRender, camera);
         //renderShadowMapCandidatesTess(shadowCandidatesTess, shadowNRender, camera);
     }

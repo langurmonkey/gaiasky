@@ -4,6 +4,9 @@
 #ifdef shadowMapFlag
 #define bias 0.03
 uniform sampler2D u_shadowTexture;
+#ifdef shadowMapGlobalFlag
+uniform sampler2D u_shadowTextureGlobal;
+#endif //shadowMapGlobalFlag
 uniform float u_shadowPCFOffset;
 
 float getShadowness(sampler2D sampler, vec2 uv, vec2 offset, float compare) {
@@ -37,7 +40,7 @@ float getShadow(vec3 shadowMapUv, vec3 lightSpacePos[numCSM], float fragDepth) {
         }
     }
     if (layer == -1) {
-        return getCSMShadow(u_shadowTexture, shadowMapUv, u_shadowPCFOffset);
+        return 1.0;
     } else {
         // Projected coordinates.
         return getCSMShadow(u_csmSamplers[layer], lightSpacePos[layer], u_csmPCF);
@@ -101,14 +104,14 @@ float textureShadowLerp(sampler2D sampler, vec2 size, vec2 uv, float compare){
     return c;
 }
 
-float getShadow(vec3 shadowMapUv) {
+float getShadowSingular(sampler2D shadowMap, vec3 shadowMapUv) {
     // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
     vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
     float result = 0.0;
     for(int x=-2; x<=2; x++) {
         for(int y=-2; y<=2; y++) {
             vec2 offset = vec2(float(x), float(y)) / size;
-            result += textureShadowLerp(u_shadowTexture, size, shadowMapUv.xy + offset, shadowMapUv.z);
+            result += textureShadowLerp(shadowMap, size, shadowMapUv.xy + offset, shadowMapUv.z);
         }
     }
     return result / 25.0;
@@ -116,6 +119,25 @@ float getShadow(vec3 shadowMapUv) {
     // Simple lookup
     //return getShadowness(u_shadowTexture, shadowMapUv.xy, vec2(0.0), shadowMapUv.z);
 }
+
+#ifdef shadowMapGlobalFlag
+// With global shadow map
+float getShadow(vec3 shadowMapUv, vec3 shadowMapUvGlobal) {
+    float individual = getShadowSingular(u_shadowTexture, shadowMapUv);
+    float global = getShadowSingular(u_shadowTextureGlobal, shadowMapUvGlobal);
+    return individual * global;
+
+    // Simple lookup
+    //return getShadowness(u_shadowTexture, shadowMapUv.xy, vec2(0.0), shadowMapUv.z);
+}
+#else
+float getShadow(vec3 shadowMapUv) {
+    return getShadowSingular(u_shadowTexture, shadowMapUv);
+
+    // Simple lookup
+    //return getShadowness(u_shadowTexture, shadowMapUv.xy, vec2(0.0), shadowMapUv.z);
+}
+#endif // shadowMapGlobalFlag
 
 #endif // numCSM
 
