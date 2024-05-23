@@ -17,12 +17,9 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.CatalogInfo;
 import gaiasky.util.math.Vector3b;
 import uk.ac.starlink.table.ColumnInfo;
 
@@ -35,7 +32,6 @@ public class EntityUtils {
      *
      * @param entity The entity.
      * @param out    Auxiliary vector to put the result in.
-     *
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(final Entity entity,
@@ -62,7 +58,6 @@ public class EntityUtils {
      * @param entity The entity.
      * @param name   The name.
      * @param out    Auxiliary vector to put the result in.
-     *
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(Entity entity,
@@ -128,12 +123,12 @@ public class EntityUtils {
                                         boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
         double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
-        double[] particleColor = datasetOptions == null || datasetOptions.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.particleColor;
+        double[] particleColor = datasetOptions == null || datasetOptions.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : datasetOptions.particleColor;
         double colorNoise = datasetOptions == null ? 0 : datasetOptions.particleColorNoise;
-        double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
+        double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : datasetOptions.labelColor;
         double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
         double[] particleSizeLimits =
-                datasetOptions == null || datasetOptions.particleSizeLimits == null ? new double[] { 0.00474, 0.2047 } : datasetOptions.particleSizeLimits;
+                datasetOptions == null || datasetOptions.particleSizeLimits == null ? new double[]{0.00474, 0.2047} : datasetOptions.particleSizeLimits;
         double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
         String modelType = datasetOptions == null ? "quad" : datasetOptions.modelType;
         String modelPrimitive = datasetOptions == null ? "GL_TRIANGLES" : datasetOptions.modelPrimitive;
@@ -191,7 +186,7 @@ public class EntityUtils {
                                     boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
         double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
-        double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
+        double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : datasetOptions.labelColor;
         boolean renderSetLabel = datasetOptions == null || datasetOptions.renderSetLabel;
 
         var archetype = scene.archetypes().get("StarGroup");
@@ -203,7 +198,7 @@ public class EntityUtils {
         base.setComponentType(ComponentType.Stars);
 
         var body = Mapper.body.get(entity);
-        body.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
+        body.setColor(new double[]{1.0, 1.0, 1.0, 0.25});
         body.setLabelColor(labelColor);
         body.setSize(6.0);
 
@@ -215,7 +210,7 @@ public class EntityUtils {
         fade.setFadeOut(fadeOut);
 
         var label = Mapper.label.get(entity);
-        label.setLabelPosition(new double[] { 0.0, -5.0e7, -4e8 });
+        label.setLabelPosition(new double[]{0.0, -5.0e7, -4e8});
 
         var set = Mapper.starSet.get(entity);
         set.setData(data);
@@ -239,7 +234,6 @@ public class EntityUtils {
      * Re-implementation of {@link FocusView#getRadius()} in a static context.
      *
      * @param entity The entity.
-     *
      * @return The radius of the entity.
      */
     public static double getRadius(Entity entity) {
@@ -250,6 +244,26 @@ public class EntityUtils {
             var extra = Mapper.extra.get(entity);
             var body = Mapper.body.get(entity);
             return extra != null ? extra.radius : body.size / 2.0;
+        }
+    }
+
+    /**
+     * Gets the total span of the entity model after transformation, taking into account the original model span (length
+     * of
+     * the furthest vertex from the origin) plus the scaling in its local transform (size and sizeScaleFactor).
+     *
+     * @param entity The entity.
+     * @return The total span of the entity, in internal units.
+     */
+    public static double getModelSpan(Entity entity) {
+        var set = getSet(entity);
+        if (set != null) {
+            return set.getRadius() * (set.model != null ? set.model.span : 1);
+        } else {
+            var scaffolding = Mapper.modelScaffolding.get(entity);
+            var body = Mapper.body.get(entity);
+            var model = Mapper.model.get(entity);
+            return (scaffolding != null ? body.size * scaffolding.sizeScaleFactor : body.size) * (model.model.instance != null ? model.model.instance.span : 1);
         }
     }
 

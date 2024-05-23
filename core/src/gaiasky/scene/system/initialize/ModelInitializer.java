@@ -21,7 +21,6 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.SpacecraftRadio;
@@ -431,7 +430,7 @@ public class ModelInitializer extends AbstractInitSystem {
         engine.thrustMagnitude = machine.getPower() * MotorEngine.thrustBase;
         engine.fullPowerTime = machine.getFullpowertime();
         engine.mass = machine.getMass();
-        scaffolding.shadowMapValues = machine.getShadowvalues();
+        scaffolding.selfShadow = machine.isSelfShadow();
         engine.drag = machine.getDrag();
         engine.responsiveness = MathUtilsDouble.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         engine.machineName = machine.getName();

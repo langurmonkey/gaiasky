@@ -29,20 +29,22 @@ public class IntModelInstance implements IntRenderableProvider {
     public static boolean defaultShareKeyframes = true;
 
     /**
-     * the materials of the model, used by nodes that have a graphical representation FIXME not sure if superfluous, allows
-     * modification of materials without having to traverse the nodes
+     * The materials of the model, used by nodes that have a graphical representation FIXME not sure if superfluous, allows
+     * modification of materials without having to traverse the nodes.
      **/
     public final Array<Material> materials = new Array<>();
-    /** root nodes of the model **/
+    /** Root nodes of the model. **/
     public final Array<IntNode> nodes = new Array<>();
-    /** animations of the model, modifying node transformations **/
+    /** Animations of the model, modifying node transformations. **/
     public final Array<IntAnimation> animations = new Array<>();
-    /** the {@link IntModel} this instances derives from **/
+    /** The {@link IntModel} this instances derives from. **/
     public final IntModel model;
-    /** the world transform **/
+    /** The world transform. **/
     public Matrix4 transform;
-    /** user definable value, which is passed to the {@link IntShader}. */
+    /** User definable value, which is passed to the {@link IntShader}. */
     public Object userData;
+     /** Length of the furthest vertex from the origin. **/
+    public double span;
 
     /**
      * Constructs a new IntModelInstance with all nodes and materials of the given model.
@@ -164,6 +166,7 @@ public class IntModelInstance implements IntRenderableProvider {
             copyNodes(model.nodes, rootNodeIds);
         copyAnimations(model.animations, defaultShareKeyframes);
         calculateTransforms();
+        this.span = model.span;
     }
 
     /** Constructs a new IntModelInstance with only the specified nodes and materials of the given model. */
@@ -183,6 +186,7 @@ public class IntModelInstance implements IntRenderableProvider {
         copyNodes(model.nodes, rootNodeIds);
         copyAnimations(model.animations, shareKeyframes);
         calculateTransforms();
+        this.span = model.span;
     }
 
     /** Constructs a new IntModelInstance at the specified position. */
@@ -219,6 +223,7 @@ public class IntModelInstance implements IntRenderableProvider {
         copyNodes(copyFrom.nodes);
         copyAnimations(copyFrom.animations, shareKeyframes);
         calculateTransforms();
+        this.span = copyFrom.span;
     }
 
     /** @return A newly created IntModelInstance which is a copy of this IntModelInstance */

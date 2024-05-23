@@ -90,6 +90,7 @@ public class IntModelBuilder {
         result.nodes.add(node);
         result.meshParts.add(meshPart);
         result.manageDisposable(mesh);
+        result.computeSpan();
         return result;
     }
 
@@ -138,6 +139,7 @@ public class IntModelBuilder {
         builders.clear();
 
         rebuildReferences(result);
+        result.computeSpan();
         return result;
     }
 

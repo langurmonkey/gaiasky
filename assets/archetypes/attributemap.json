@@ -351,8 +351,12 @@
           "locthoverfactor"
         ]
       },
+      "selfShadow": {
+        "description": "Whether to render self-shadows for this object.",
+        "units": "Boolean"
+      },
       "shadowValues": {
-        "description": "Override the distance, the camera near and the camera far values of the light camera for this object in the shadow mapping pass. All are given in units of the radius of the object.",
+        "description": "Deprecated as of Gaia Sky 3.6.1.",
         "units": "Double[3]",
         "aliases": [
           "shadowvalues"

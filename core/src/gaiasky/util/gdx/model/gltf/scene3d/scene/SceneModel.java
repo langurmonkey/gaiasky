@@ -13,8 +13,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntNode;
 
-public class SceneModel implements Disposable
-{
+public class SceneModel implements Disposable {
 	public String name;
 	public IntModel model;
 	public ObjectMap<IntNode, Camera> cameras = new ObjectMap<>();

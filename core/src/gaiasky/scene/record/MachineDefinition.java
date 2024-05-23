@@ -22,8 +22,8 @@ public class MachineDefinition {
     private double fullpowertime;
     /** The model **/
     private ModelComponent model;
-    /** Shadow mapping values (distance, near, far) **/
-    private double[] shadowvalues;
+    /** Whether to render self-shadow for this object. **/
+    private boolean selfShadow = true;
     /** Responsiveness in [0,1] **/
     private double responsiveness;
     /** Drag in [0,1] **/
@@ -96,12 +96,19 @@ public class MachineDefinition {
         this.model = model;
     }
 
-    public double[] getShadowvalues() {
-        return shadowvalues;
+    public boolean isSelfShadow() {
+        return selfShadow;
     }
 
-    public void setShadowvalues(double[] shadowvalues) {
-        this.shadowvalues = shadowvalues;
+    public void setSelfShadow(boolean selfShadow) {
+        this.selfShadow = selfShadow;
+    }
+
+    public void setShadowValues(double[] shadowValues) {
+        this.selfShadow = shadowValues != null;
+    }
+    public void setShadowvalues(double[] shadowValues) {
+        this.setShadowValues(shadowValues);
     }
 
     @Override

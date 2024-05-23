@@ -254,6 +254,7 @@ public class GLTFLoaderBase implements Disposable {
 		copy(meshSet, sceneModel.model.meshes);
 		copy(meshPartSet, sceneModel.model.meshParts);
 		copy(materialSet, sceneModel.model.materials);
+		sceneModel.model.computeSpan();
 		
 		meshSet.clear();
 		meshPartSet.clear();

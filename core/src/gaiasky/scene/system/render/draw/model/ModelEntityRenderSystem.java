@@ -597,7 +597,7 @@ public class ModelEntityRenderSystem {
         if (!model.model.env.has(CascadeShadowMapAttribute.Type)) {
             var env = model.model.env;
             // Only for regular shadow maps (no CSM!).
-            if (Settings.settings.scene.renderer.shadow.active && scaffolding.shadowMapValues != null) {
+            if (Settings.settings.scene.renderer.shadow.active && scaffolding.isSelfShadow()) {
                 if (scaffolding.shadow > 0
                         && scaffolding.shadowMapFb != null
                         && scaffolding.shadowMapCombined != null) {

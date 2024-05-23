@@ -83,9 +83,9 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
                     break;
 
                 if (tokens[0].isEmpty()) {
-                    continue;
+                    // Nothing.
                 } else if ((firstChar = tokens[0].toLowerCase().charAt(0)) == '#') {
-                    continue;
+                    // Nothing.
                 } else if (firstChar == 'v') {
                     if (tokens[0].length() == 1) {
                         verts.add(Float.parseFloat(tokens[1]));

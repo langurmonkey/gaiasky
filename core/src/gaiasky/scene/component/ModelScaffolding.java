@@ -42,10 +42,9 @@ public class ModelScaffolding implements Component {
     public String inverseRefPlaneTransform;
 
     /**
-     * Array with shadow camera distance, camera near and camera far as a function of
-     * the radius of the object.
+     * Whether we should render self-shadows for this object.
      */
-    public double[] shadowMapValues;
+    public boolean selfShadow = false;
 
     /** The seed for random components **/
     public List<Long> seed = List.of(1L);
@@ -60,23 +59,32 @@ public class ModelScaffolding implements Component {
     public Matrix4 shadowMapCombined, shadowMapCombinedGlobal;
 
     /**
-     * Whether shadows should be rendered for this object
+     * Whether self-shadows should be rendered for this object.
      *
-     * @return Whether shadows should be rendered for this object
+     * @return Whether self-shadows should be rendered for this object.
      */
-    public boolean isShadow() {
-        return shadowMapValues != null;
+    public boolean isSelfShadow() {
+        return selfShadow;
+    }
+
+    public void setSelfShadow(boolean selfShadow) {
+        this.selfShadow = selfShadow;
     }
 
     /**
      * Sets the shadow mapping values for this object
      *
      * @param shadowMapValues The values
+     * @deprecated We determine the shadow values automatically now.
      */
+    @Deprecated
     public void setShadowValues(double[] shadowMapValues) {
-        this.shadowMapValues = shadowMapValues;
+        if (shadowMapValues != null) {
+            selfShadow = true;
+        }
     }
 
+    @Deprecated
     public void setShadowvalues(double[] shadowMapValues) {
         this.setShadowValues(shadowMapValues);
     }
@@ -147,7 +155,6 @@ public class ModelScaffolding implements Component {
      * the position in the randomize vector.
      *
      * @param component The component name.
-     *
      * @return The seed.
      */
     public long getSeed(String component) {

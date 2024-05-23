@@ -32,17 +32,19 @@ import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 
 public class IntModel implements Disposable {
-    /** the materials of the model, used by nodes that have a graphical representation **/
+    /** The materials of the model, used by nodes that have a graphical representation. **/
     public final Array<Material> materials = new Array<>();
-    /** root nodes of the model **/
+    /** Root nodes of the model. **/
     public final Array<IntNode> nodes = new Array<>();
-    /** animations of the model, modifying node transformations **/
+    /** Animations of the model, modifying node transformations. **/
     public final Array<IntAnimation> animations = new Array<>();
-    /** the meshes of the model **/
+    /** The meshes of the model. **/
     public final Array<IntMesh> meshes = new Array<>();
-    /** parts of meshes, used by nodes that have a graphical representation **/
+    /** Parts of meshes, used by nodes that have a graphical representation. **/
     public final Array<IntMeshPart> meshParts = new Array<>();
-    /** Array of disposable resources like textures or meshes the Model is responsible for disposing **/
+    /** Length of the furthest vertex from the origin. **/
+    public double span;
+    /** Array of disposable resources like textures or meshes the Model is responsible for disposing. **/
     protected final Array<Disposable> disposables = new Array<>();
     private final ObjectMap<IntNodePart, ArrayMap<String, Matrix4>> nodePartBones = new ObjectMap<>();
 
@@ -54,7 +56,8 @@ public class IntModel implements Disposable {
     }
 
     /**
-     * Constructs a new Model based on the {@link IntModelData}. Texture files will be loaded from the internal file storage via an
+     * Constructs a new Model based on the {@link IntModelData}. Texture files will be loaded from the internal file
+     * storage via an
      * {@link FileTextureProvider}.
      *
      * @param modelData the {@link IntModelData} got from e.g. {@link ModelLoader}
@@ -79,6 +82,7 @@ public class IntModel implements Disposable {
         loadNodes(modelData.nodes);
         loadAnimations(modelData.animations);
         calculateTransforms();
+        computeSpan();
     }
 
     protected void loadAnimations(Iterable<ModelAnimation> modelAnimations) {
@@ -316,7 +320,8 @@ public class IntModel implements Disposable {
     }
 
     /**
-     * Adds a {@link Disposable} to be managed and disposed by this Model. Can be used to keep track of manually loaded textures
+     * Adds a {@link Disposable} to be managed and disposed by this Model. Can be used to keep track of manually loaded
+     * textures
      * for {@link IntModelInstance}.
      *
      * @param disposable the Disposable
@@ -340,11 +345,14 @@ public class IntModel implements Disposable {
 
     /**
      * <p>Calculates the local and world transform of all {@link Node} instances in this model, recursively. First each
-     * {@link Node#localTransform} transform is calculated based on the translation, rotation and scale of each Node. Then each
-     * {@link Node#calculateWorldTransform()} is calculated, based on the parent's world transform and the local transform of each
+     * {@link Node#localTransform} transform is calculated based on the translation, rotation and scale of each Node.
+     * Then each
+     * {@link Node#calculateWorldTransform()} is calculated, based on the parent's world transform and the local
+     * transform of each
      * Node. Finally, the animation bone matrices are updated accordingly.</p>
      * <p>
-     * This method can be used to recalculate all transforms if any of the Node's local properties (translation, rotation, scale)
+     * This method can be used to recalculate all transforms if any of the Node's local properties (translation,
+     * rotation, scale)
      * was modified.</p>
      */
     public void calculateTransforms() {
@@ -358,10 +366,10 @@ public class IntModel implements Disposable {
     }
 
     /**
-     * Calculate the bounding box of this model instance. This is a potential slow operation, it is advised to cache the result.
+     * Calculate the bounding box of this model instance. This is a potential slow operation, it is advised to cache the
+     * result.
      *
      * @param out the {@link BoundingBox} that will be set with the bounds.
-     *
      * @return the out parameter for chaining
      */
     public BoundingBox calculateBoundingBox(final BoundingBox out) {
@@ -370,11 +378,11 @@ public class IntModel implements Disposable {
     }
 
     /**
-     * Extends the bounding box with the bounds of this model instance. This is a potential slow operation, it is advised to cache
+     * Extends the bounding box with the bounds of this model instance. This is a potential slow operation, it is
+     * advised to cache
      * the result.
      *
      * @param out the {@link BoundingBox} that will be extended with the bounds.
-     *
      * @return the out parameter for chaining
      */
     public BoundingBox extendBoundingBox(final BoundingBox out) {
@@ -386,7 +394,6 @@ public class IntModel implements Disposable {
 
     /**
      * @param id The ID of the animation to fetch (case sensitive).
-     *
      * @return The {@link Animation} with the specified id, or null if not available.
      */
     public IntAnimation getAnimation(final String id) {
@@ -396,7 +403,6 @@ public class IntModel implements Disposable {
     /**
      * @param id         The ID of the animation to fetch.
      * @param ignoreCase whether to use case sensitivity when comparing the animation id.
-     *
      * @return The {@link Animation} with the specified id, or null if not available.
      */
     public IntAnimation getAnimation(final String id, boolean ignoreCase) {
@@ -416,7 +422,6 @@ public class IntModel implements Disposable {
 
     /**
      * @param id The ID of the material to fetch.
-     *
      * @return The {@link Material} with the specified id, or null if not available.
      */
     public Material getMaterial(final String id) {
@@ -426,7 +431,6 @@ public class IntModel implements Disposable {
     /**
      * @param id         The ID of the material to fetch.
      * @param ignoreCase whether to use case sensitivity when comparing the material id.
-     *
      * @return The {@link Material} with the specified id, or null if not available.
      */
     public Material getMaterial(final String id, boolean ignoreCase) {
@@ -446,7 +450,6 @@ public class IntModel implements Disposable {
 
     /**
      * @param id The ID of the node to fetch.
-     *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
     public IntNode getNode(final String id) {
@@ -456,7 +459,6 @@ public class IntModel implements Disposable {
     /**
      * @param id        The ID of the node to fetch.
      * @param recursive false to fetch a root node only, true to search the entire node tree for the specified node.
-     *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
     public IntNode getNode(final String id, boolean recursive) {
@@ -467,10 +469,91 @@ public class IntModel implements Disposable {
      * @param id         The ID of the node to fetch.
      * @param recursive  false to fetch a root node only, true to search the entire node tree for the specified node.
      * @param ignoreCase whether to use case sensitivity when comparing the node id.
-     *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
     public IntNode getNode(final String id, boolean recursive, boolean ignoreCase) {
         return IntNode.getNode(nodes, id, recursive, ignoreCase);
+    }
+
+    private final Vector3 v = new Vector3();
+    private final Vector3 scale = new Vector3();
+    private final Matrix4 transform = new Matrix4();
+
+    /**
+     * Once the model is fully loaded, this method computes its span, which is the length of the furthest vertex
+     * from the origin in this model.
+     */
+    public void computeSpan() {
+        span = 0;
+        transform.idt();
+        if (!nodes.isEmpty()) {
+            for (var node : nodes) {
+                if (node.scale.len2() != 1)
+                    transform.scale(node.scale.x, node.scale.y, node.scale.z);
+                if (!node.rotation.isIdentity())
+                    transform.rotate(node.rotation);
+                if (node.translation.len2() != 0)
+                    transform.translate(node.translation);
+
+                for (var nodePart : node.parts) {
+                    var meshPart = nodePart.meshPart;
+                    var meshSpan2 = meshSpan2(meshPart.mesh, node.globalTransform);
+                    if (meshSpan2 > span) {
+                        span = meshSpan2;
+                    }
+                }
+            }
+        }
+        if (!meshParts.isEmpty()) {
+            for (var meshPart : meshParts) {
+                var meshSpan2 = meshSpan2(meshPart.mesh, transform);
+                if (meshSpan2 > span) {
+                    span = meshSpan2;
+                }
+            }
+        }
+        if (!meshes.isEmpty()) {
+            for (var mesh : meshes) {
+                var meshSpan2 = meshSpan2(mesh, transform);
+                if (meshSpan2 > span) {
+                    span = meshSpan2;
+                }
+            }
+        }
+
+        span = Math.sqrt(span);
+    }
+
+    private double meshSpan2(IntMesh mesh, Matrix4 transform) {
+        if (mesh == null) {
+            return 0;
+        }
+        double span = 0;
+        var positionAttrib = mesh.getVertexAttribute(VertexAttributes.Usage.Position);
+        if (positionAttrib == null) {
+            // No position!
+            return 0;
+        }
+        var offset = positionAttrib.offset / 4;
+        var num = mesh.getNumVertices();
+        var size = mesh.getVertexSize() / 4;
+        var length = num * size;
+        float[] vertices = new float[length];
+        mesh.getVertices(vertices);
+        for (int i = 0; i < num; i++) {
+            v.set(
+                    vertices[i * size + offset],
+                    vertices[i * size + offset + 1],
+                    vertices[i * size + offset + 2]
+            );
+            if (transform != null) {
+                v.mul(transform);
+            }
+            var l2 = v.len2();
+            if (span < l2) {
+                span = l2;
+            }
+        }
+        return span;
     }
 }

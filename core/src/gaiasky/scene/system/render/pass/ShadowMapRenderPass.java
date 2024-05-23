@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -61,7 +62,8 @@ public class ShadowMapRenderPass extends RenderPass {
 
     // Are the textures displaying in the UI already?
     private static boolean UI_VIEW_GLOBAL_CREATED = true;
-    private static boolean UI_VIEW_LOCAL_CREATED = true;
+    private static final boolean UI_VIEW_LOCAL = false;
+    private static final IntSet UI_VIEW_LOCAL_SET = new IntSet();
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
@@ -139,16 +141,16 @@ public class ShadowMapRenderPass extends RenderPass {
 
             // Find bounding box in world space.
             box.inf();
-            double greatestRadius = 0.0;
+            double greatestSpan = 0.0;
             for (var render : candidates) {
                 var entity = ((Render) render).entity;
                 var entityAbsPos = EntityUtils.getAbsolutePosition(entity, aux1b);
                 box.ext(entityAbsPos.put(aux1d));
 
                 // Find the greatest radius amongst all objects.
-                double entityRadius = EntityUtils.getRadius(entity) * 2;
-                if (greatestRadius < entityRadius) {
-                    greatestRadius = entityRadius;
+                double entitySpan = EntityUtils.getModelSpan(entity);
+                if (greatestSpan < entitySpan) {
+                    greatestSpan = entitySpan;
                 }
             }
 
@@ -163,7 +165,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 aux2b.set(boxCenterAbsPos).sub(lightDir).nor().put(lightDir);
             }
             // Find distance given fov and box side.
-            var boxDimension = candidates.size() == 1 ? box.getGreatestDim() + greatestRadius : box.getGreatestDim();
+            var boxDimension = candidates.size() == 1 ? box.getGreatestDim() + greatestSpan : box.getGreatestDim();
             var distCamCenter = (boxDimension / FastMath.tan(FastMath.toRadians(cameraLightGlobal.fieldOfView))) * 1.2;
 
             // Direction is that of the light.
@@ -197,8 +199,8 @@ public class ShadowMapRenderPass extends RenderPass {
             cameraLightGlobal.up.set(cameraLightGlobal.direction).crs(aux1);
 
             // Near and far use the box width and the greatest radius.
-            var near = distCamCenter - boxDimension;
-            var far = distCamCenter + boxDimension;
+            //var near = distCamCenter - boxDimension;
+            //var far = distCamCenter + boxDimension;
             cameraLightGlobal.near = (float) Math.max(100.0 * Constants.M_TO_U, minDist);
             cameraLightGlobal.far = (float) Math.min(Constants.AU_TO_U, maxDist);
 
@@ -240,13 +242,11 @@ public class ShadowMapRenderPass extends RenderPass {
         int nShadows = Math.min(candidates.size(), Settings.settings.scene.renderer.shadow.number);
         for (int i = 0; i < nShadows; i++) {
             var candidate = candidates.get(i);
-            var body = Mapper.body.get(candidate);
             var model = Mapper.model.get(candidate);
             var scaffolding = Mapper.modelScaffolding.get(candidate);
 
-            double radius = (body.size / 2.0) * scaffolding.sizeScaleFactor;
-            // Distance from camera to object, radius * sv[0]
-            double distance = radius * scaffolding.shadowMapValues[0];
+            double entitySpan = EntityUtils.getModelSpan(candidate);
+            var distCamCenter = (entitySpan * 2.0 / FastMath.tan(FastMath.toRadians(cameraLightIndividual.fieldOfView)));
             // Position, factor of radius
             Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
             for (int j = 0; j < NUM_SHADOW_CASTING_LIGHTS; j++) {
@@ -260,7 +260,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 }
                 // Direction is that of the light
                 cameraLightIndividual.direction.set(lightDir);
-                objPos.sub(camera.getPos()).sub(lightDir.nor().scl((float) distance));
+                objPos.sub(camera.getPos()).sub(lightDir.nor().scl((float) distCamCenter));
                 objPos.put(cameraLightIndividual.position);
                 // Up is perpendicular to dir
                 if (cameraLightIndividual.direction.y != 0 || cameraLightIndividual.direction.z != 0)
@@ -270,9 +270,9 @@ public class ShadowMapRenderPass extends RenderPass {
                 cameraLightIndividual.up.set(cameraLightIndividual.direction).crs(aux1);
 
                 // Near is sv[1]*radius before the object
-                cameraLightIndividual.near = (float) (distance - radius * scaffolding.shadowMapValues[1]);
+                cameraLightIndividual.near = (float) (distCamCenter - entitySpan);
                 // Far is sv[2]*radius after the object
-                cameraLightIndividual.far = (float) (distance + radius * scaffolding.shadowMapValues[2]);
+                cameraLightIndividual.far = (float) (distCamCenter + entitySpan);
 
                 // Update cam
                 cameraLightIndividual.update(false);
@@ -289,7 +289,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 }
 
                 fb.begin();
-                Gdx.gl.glClearColor(1, 1, 1, 1);
+                Gdx.gl.glClearColor(0, 0, 0, 1);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // No tessellation
@@ -305,12 +305,14 @@ public class ShadowMapRenderPass extends RenderPass {
                 }
                 fb.end();
 
-                if (!UI_VIEW_LOCAL_CREATED) {
+                var base = Mapper.base.get(candidate);
+                var hash = base.getName().hashCode();
+                if (UI_VIEW_LOCAL && !UI_VIEW_LOCAL_SET.contains(hash)) {
                     GaiaSky.postRunnable(() -> {
                         // Create UI view
-                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map (LOCAL)", fb.getColorBufferTexture(), 0.2f);
+                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map (LOCAL): " + base.getName(), fb.getColorBufferTexture(), 0.2f);
                     });
-                    UI_VIEW_LOCAL_CREATED = true;
+                    UI_VIEW_LOCAL_SET.add(hash);
                 }
             }
         }
@@ -325,7 +327,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 Render render = (Render) model;
                 var scaffolding = Mapper.modelScaffolding.get(render.entity);
                 if (scaffolding != null) {
-                    if (scaffolding.isShadow()) {
+                    if (scaffolding.isSelfShadow()) {
                         candidates.add(num, render.entity);
                         scaffolding.shadow = 0;
                         num++;
@@ -365,8 +367,8 @@ public class ShadowMapRenderPass extends RenderPass {
                 // Direction is that of the light
                 cameraLightIndividual.direction.set(shadowCamDir);
 
-                // Distance from camera to object, radius * sv[0]
-                float distance = (float) (radius * scaffolding.shadowMapValues[0] * 0.01);
+                double entitySpan = EntityUtils.getModelSpan(candidate);
+                var distCamCenter = (entitySpan * 2.0 / FastMath.tan(FastMath.toRadians(cameraLightIndividual.fieldOfView)));
                 // Position, factor of radius
                 Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
                 Vector3b camPos = camera.getPos();
@@ -378,7 +380,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 }
                 Vector3d objCam = aux2d.set(camPos).sub(objPos).nor().scl(-(body.distToCamera - radius)).add(camDir);
 
-                objCam.add(shadowCamDir.nor().scl(-distance));
+                objCam.add(shadowCamDir.nor().scl((float) -distCamCenter));
                 objCam.put(cameraLightIndividual.position);
 
                 // Shadow camera up is perpendicular to dir
@@ -389,9 +391,9 @@ public class ShadowMapRenderPass extends RenderPass {
                 cameraLightIndividual.up.set(cameraLightIndividual.direction).crs(aux1);
 
                 // Near is sv[1]*radius before the object
-                cameraLightIndividual.near = distance * 0.98f;
+                cameraLightIndividual.near = (float) (distCamCenter - entitySpan);
                 // Far is sv[2]*radius after the object
-                cameraLightIndividual.far = distance * 1.02f;
+                cameraLightIndividual.far = (float) (distCamCenter + entitySpan);
 
                 // Update cam
                 cameraLightIndividual.update(false);

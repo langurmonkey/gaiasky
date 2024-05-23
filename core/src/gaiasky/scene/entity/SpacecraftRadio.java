@@ -82,7 +82,7 @@ public class SpacecraftRadio extends EntityRadio {
         engine.thrustMagnitude = machine.getPower() * MotorEngine.thrustBase;
         engine.fullPowerTime = machine.getFullpowertime();
         engine.mass = machine.getMass();
-        scaffolding.shadowMapValues = machine.getShadowvalues();
+        scaffolding.selfShadow = machine.isSelfShadow();
         engine.drag = machine.getDrag();
         engine.responsiveness = MathUtilsDouble.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         engine.machineName = machine.getName();
