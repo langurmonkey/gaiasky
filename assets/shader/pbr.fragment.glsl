@@ -174,7 +174,7 @@ uniform float u_shininess;
 // ECLIPSES
 #include <shader/lib/eclipses.glsl>
 // SHADOW MAPPING
-#include <shader/lib/shadowmap.glsl>
+#include <shader/lib/shadowmap.frag.glsl>
 
 //////////////////////////////////////////////////////
 ////// CUBEMAPS
@@ -546,8 +546,8 @@ void main() {
             selfShadow *= saturate(4.0 * NL);
 
             specularColor += specular * min(1.0, pow(NH, 40.0));
-            shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
-            diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
+            shadowColor += col * night * max(0.0, 0.5 - NL);
+            diffuseColor = saturate(diffuseColor + col * NL + ambient * (1.0 - NL));
         }
     #endif // directionalLightsFlag
 
@@ -577,8 +577,8 @@ void main() {
             selfShadow *= saturate(4.0 * NL);
 
             specularColor += specular * min(1.0, pow(NH, 40.0));
-            shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
-            diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
+            shadowColor += col * night * max(0.0, 0.5 - NL);
+            diffuseColor = saturate(diffuseColor + col * NL + ambient * (1.0 - NL));
         }
     #endif // pointLightsFlag
 
@@ -602,18 +602,18 @@ void main() {
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag
         vec3 diffuseScattering = fetchColorDiffuseScattering();
-        diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion * shdw;
+        diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion;
     #else
         vec3 diffuseScattering = vec3(0.0);
     #endif // diffuseScatteringColorFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor + diffuseScattering + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_data.opacity);
+    fragColor = vec4(diffuseColor * shdw + diffuseScattering * shdw + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_data.opacity);
     fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround
         #define exposure 1.0
-        fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor, 0.0, 1.0);
+        fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * v_fadeFactor, 0.0, 1.0);
         #if defined(heightFlag)
             fragColor.rgb = applyFog(fragColor.rgb, v_data.viewDir, L0 * -1.0, NL0);
         #endif // heightFlag

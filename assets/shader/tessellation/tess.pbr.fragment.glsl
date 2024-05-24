@@ -164,7 +164,7 @@ uniform float u_shininess;
 // ECLIPSES
 #include <shader/lib/eclipses.glsl>
 // SHADOW MAPPING
-#include <shader/lib/shadowmap.glsl>
+#include <shader/lib/shadowmap.frag.glsl>
 
 //////////////////////////////////////////////////////
 ////// CUBEMAPS
@@ -330,8 +330,11 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef shadowMapGlobalFlag
+    vec3 shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
-    vec3 csmUVs[numCSM];
+    vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
@@ -428,11 +431,16 @@ void main() {
     #ifdef shadowMapFlag
         #ifdef numCSM
             // Cascaded shadow mapping.
-            float shdw = clamp(getShadow(o_data.shadowMapUv, o_data.csmUVs), 0.0, 1.0);
+            float shdw = clamp(getShadow(o_data.shadowMapUv, o_data.csmLightSpacePos, length(o_data.fragPosWorld)), 0.0, 1.0);
         #else
             // Regular shadow mapping.
             float transparency = 1.0 - texture(u_shadowTexture, o_data.shadowMapUv.xy).g;
-            float shdw = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
+
+            #ifdef shadowMapGlobalFlag
+                float shdw = clamp(getShadow(o_data.shadowMapUv, o_data.shadowMapUvGlobal) + transparency, 0.0, 1.0);
+            #else
+                float shdw = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
+            #endif // shadowMapGlobalFlag
         #endif // numCSM
     #else
         float shdw = 1.0;

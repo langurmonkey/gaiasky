@@ -97,22 +97,7 @@ uniform float u_vrScale;
 // Use this slot for VROffset
 uniform vec3 u_vrOffset = vec3(0.0);
 
-//////////////////////////////////////////////////////
-////// SHADOW MAPPING
-//////////////////////////////////////////////////////
-#ifdef shadowMapFlag
-uniform mat4 u_shadowMapProjViewTrans;
-#ifdef shadowMapGlobalFlag
-uniform mat4 u_shadowMapProjViewTransGlobal;
-#endif // shadowMapGlobalFlag
-#ifdef numCSM
-uniform mat4 u_csmTransforms[numCSM];
-uniform sampler2D u_csmSamplers[numCSM];
-uniform float u_csmClip[numCSM];
-uniform float u_csmPCF;
-#endif // numCSM
-#endif // shadowMapFlag
-
+#include <shader/lib/shadowmap.vert.glsl>
 #include <shader/lib/atmscattering.glsl>
 
 // GEOMETRY (QUATERNIONS)
@@ -367,17 +352,12 @@ void main() {
     gl_Position = gpos;
 
     #ifdef shadowMapFlag
-	vec4 posShadow = u_shadowMapProjViewTrans * pos;
-	v_data.shadowMapUv.xyz = (posShadow.xyz / posShadow.w) * 0.5 + 0.5;
+    getShadowMapUv(pos, v_data.shadowMapUv);
     #ifdef shadowMapGlobalFlag
-    vec4 posShadowGlobal = u_shadowMapProjViewTransGlobal * pos;
-    v_data.shadowMapUvGlobal.xyz = (posShadowGlobal.xyz / posShadowGlobal.w) * 0.5 + 0.5;
+    getShadowMapUvGlobal(pos, v_data.shadowMapUvGlobal);
     #endif // shadowMapGlobalFlag
     #ifdef numCSM
-    for(int i = 0 ; i < numCSM ; i++){
-        vec4 csmPos = u_csmTransforms[i] * pos;
-        v_data.csmLightSpacePos[i].xyz = (csmPos.xyz / csmPos.w) * 0.5 + 0.5;
-    }
+    getCsmLightSpacePos(pos, v_data.csmLightSpacePos);
     #endif // numCSM
     #endif // shadowMapFlag
 

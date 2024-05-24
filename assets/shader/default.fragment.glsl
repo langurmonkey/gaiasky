@@ -81,11 +81,20 @@ in vec3 v_lightSpecular;
 #endif // emissiveTextureFlag && emissiveColorFlag
 
 // SHADOW MAPPING
-#include <shader/lib/shadowmap.glsl>
+#include <shader/lib/shadowmap.frag.glsl>
 #ifdef shadowMapFlag
-in vec3 v_shadowMapUv;
 #define separateAmbientFlag
+in vec3 v_shadowMapUv;
+#ifdef shadowMapGlobalFlag
+in vec3 v_shadowMapUvGlobal;
+#endif // shadowMapGlobalFlag
+#ifdef numCSM
+in vec3 v_csmLightSpacePos[numCSM];
+#endif // numCSM
+#endif // shadowMapFlag
 #endif //shadowMapFlag
+
+in vec3 v_fragPosWorld;
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
 in vec3 v_ambientLight;
@@ -139,21 +148,32 @@ void main() {
 		vec4 diffuse = vec4(1.0);
 	#endif
 
+	// Shadow mapping.
+	#ifdef shadowMapFlag
+		#ifdef numCSM
+			// Cascaded shadow mapping.
+			float shdw = clamp(getShadow(v_shadowMapUv, v_csmLightSpacePos, length(v_fragPosWorld)), 0.0, 1.0);
+		#else
+			// Regular shadow mapping.
+			float transparency = 1.0 - texture(u_shadowTexture, v_shadowMapUv.xy).g;
+
+			#ifdef shadowMapGlobalFlag
+				float shdw = clamp(getShadow(v_shadowMapUv, v_shadowMapUvGlobal) + transparency, 0.0, 1.0);
+			#else
+				float shdw = clamp(getShadow(v_shadowMapUv) + transparency, 0.0, 1.0);
+			#endif // shadowMapGlobalFlag
+		#endif // numCSM
+	#else
+		float shdw = 1.0;
+	#endif // shadowMapFlag
+
 	#if (!defined(lightingFlag))  
 		fragColor.rgb = diffuse.rgb;
 	#elif (!defined(specularFlag))
 		#if defined(ambientFlag) && defined(separateAmbientFlag)
-			#ifdef shadowMapFlag
-				fragColor.rgb = (diffuse.rgb * (v_ambientLight + getShadow(u_shadowMapUv) * v_lightDiffuse));
-			#else
-				fragColor.rgb = (diffuse.rgb * (v_ambientLight + v_lightDiffuse));
-			#endif //shadowMapFlag
+			fragColor.rgb = (diffuse.rgb * (v_ambientLight + shdw * v_lightDiffuse));
 		#else
-			#ifdef shadowMapFlag
-				fragColor.rgb = getShadow(u_shadowMapUv) * (diffuse.rgb * v_lightDiffuse);
-			#else
-				fragColor.rgb = (diffuse.rgb * v_lightDiffuse);
-			#endif //shadowMapFlag
+			fragColor.rgb = shwd * (diffuse.rgb * v_lightDiffuse);
 		#endif
 	#else
 		#if defined(specularTextureFlag) && defined(specularColorFlag)
@@ -167,17 +187,9 @@ void main() {
 		#endif
 
 		#if defined(ambientFlag) && defined(separateAmbientFlag)
-			#ifdef shadowMapFlag
-				fragColor.rgb = (diffuse.rgb * (getShadow(u_shadowMapUv) * v_lightDiffuse + v_ambientLight)) + emissive.rgb + specular;
-			#else
-				fragColor.rgb = (diffuse.rgb * (v_lightDiffuse + v_ambientLight)) + emissive.rgb + specular;
-			#endif //shadowMapFlag
+			fragColor.rgb = (diffuse.rgb * (shwd * v_lightDiffuse + v_ambientLight)) + emissive.rgb + specular;
 		#else
-			#ifdef shadowMapFlag
-				fragColor.rgb = getShadow(u_shadowMapUv) * ((diffuse.rgb * v_lightDiffuse) + specular) + emissive.rgb;
-			#else
-				fragColor.rgb = (diffuse.rgb * v_lightDiffuse) + (night.rgb * (max(0.0, (0.6 - length(v_lightDiffuse))))) + emissive.rgb + specular;
-			#endif //shadowMapFlag
+			fragColor.rgb = shwd * ((diffuse.rgb * v_lightDiffuse) + specular) + emissive.rgb;
 		#endif
 	#endif //lightingFlag
 

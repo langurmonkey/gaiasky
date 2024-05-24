@@ -97,15 +97,7 @@ uniform float u_vrScale;
 // Use this slot for VROffset
 uniform vec3 u_vrOffset = vec3(0.0);
 
-//////////////////////////////////////////////////////
-////// SHADOW MAPPING
-//////////////////////////////////////////////////////
-#ifdef shadowMapFlag
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
-uniform mat4 u_shadowMapProjViewTrans;
-#endif //shadowMapFlag
-
+#include <shader/lib/shadowmap.vert.glsl>
 #include <shader/lib/atmscattering.glsl>
 
 // GEOMETRY (QUATERNIONS)
@@ -202,8 +194,11 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef shadowMapGlobalFlag
+    vec3 shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
-    vec3 csmUVs[numCSM];
+    vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
@@ -234,8 +229,13 @@ void main() {
     gl_Position = pos;
 
     #ifdef shadowMapFlag
-	vec4 spos = u_shadowMapProjViewTrans * pos;
-	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
+    getShadowMapUv(pos, v_data.shadowMapUv);
+    #ifdef shadowMapGlobalFlag
+    getShadowMapUvGlobal(pos, v_data.shadowMapUvGlobal);
+    #endif // shadowMapGlobalFlag
+    #ifdef numCSM
+    getCsmLightSpacePos(pos, v_data.csmLightSpacePos);
+    #endif // numCSM
     #endif // shadowMapFlag
 
     // Tangent space transform

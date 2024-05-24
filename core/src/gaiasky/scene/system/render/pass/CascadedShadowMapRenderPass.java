@@ -56,8 +56,8 @@ public class CascadedShadowMapRenderPass extends RenderPass {
     private final Vector3 aux = new Vector3();
     private final Color color = new Color();
 
-    // Are the textures displaying in the UI already?
-    private static boolean UI_VIEW_CREATED = true;
+    // Display depth textures in an window, for debugging.
+    private static boolean DEBUG_UI_VIEW = false;
     private static final int NUM_UI_VIEW = 9;
 
     public CascadedShadowMapRenderPass(final SceneRenderer sceneRenderer) {
@@ -110,7 +110,7 @@ public class CascadedShadowMapRenderPass extends RenderPass {
                 renderDepth(light, camera, renderAssets.mbPixelLightingDepthTessellation, modelsTess);
                 light.end();
             }
-            if (!UI_VIEW_CREATED) {
+            if (DEBUG_UI_VIEW) {
                 GaiaSky.postRunnable(() -> {
                     int i = 0;
                     for (DirectionalShadowLight light : cascadeShadowMap.lights) {
@@ -122,7 +122,7 @@ public class CascadedShadowMapRenderPass extends RenderPass {
                         }
                     }
                 });
-                UI_VIEW_CREATED = true;
+                DEBUG_UI_VIEW = false;
             }
         }
     }

@@ -60,10 +60,10 @@ public class ShadowMapRenderPass extends RenderPass {
     private final BoundingBoxDouble box = new BoundingBoxDouble();
     private FrameBuffer globalFrameBuffer;
 
-    // Are the textures displaying in the UI already?
-    private static boolean UI_VIEW_GLOBAL_CREATED = true;
-    private static final boolean UI_VIEW_LOCAL = false;
-    private static final IntSet UI_VIEW_LOCAL_SET = new IntSet();
+    // Display the depth textures in UI windows, for debugging.
+    private static boolean DEBUG_UI_VIEW_GLOBAL = false;
+    private static final boolean DEBUG_UI_VIEW_LOCAL = false;
+    private static final IntSet DEBUG_UI_VIEW_LOCAL_SET = new IntSet();
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
@@ -225,12 +225,12 @@ public class ShadowMapRenderPass extends RenderPass {
 
             globalFrameBuffer = fb;
 
-            if (!UI_VIEW_GLOBAL_CREATED) {
+            if (!DEBUG_UI_VIEW_GLOBAL) {
                 GaiaSky.postRunnable(() -> {
                     // Create UI view
                     EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map (GLOBAL)", globalFrameBuffer.getColorBufferTexture(), 0.2f);
                 });
-                UI_VIEW_GLOBAL_CREATED = true;
+                DEBUG_UI_VIEW_GLOBAL = false;
             }
         }
     }
@@ -307,12 +307,12 @@ public class ShadowMapRenderPass extends RenderPass {
 
                 var base = Mapper.base.get(candidate);
                 var hash = base.getName().hashCode();
-                if (UI_VIEW_LOCAL && !UI_VIEW_LOCAL_SET.contains(hash)) {
+                if (DEBUG_UI_VIEW_LOCAL && !DEBUG_UI_VIEW_LOCAL_SET.contains(hash)) {
                     GaiaSky.postRunnable(() -> {
                         // Create UI view
                         EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Shadow map (LOCAL): " + base.getName(), fb.getColorBufferTexture(), 0.2f);
                     });
-                    UI_VIEW_LOCAL_SET.add(hash);
+                    DEBUG_UI_VIEW_LOCAL_SET.add(hash);
                 }
             }
         }

@@ -1,5 +1,5 @@
-#ifndef GLSL_LIB_SHADOWMAP
-#define GLSL_LIB_SHADOWMAP
+#ifndef GLSL_LIB_SHADOWMAP_FRAG
+#define GLSL_LIB_SHADOWMAP_FRAG
 
 #ifdef shadowMapFlag
 #define bias 0.03
@@ -142,4 +142,4 @@ float getShadow(vec3 shadowMapUv) {
 #endif // numCSM
 
 #endif // shadowMapFlag
-#endif // GLSL_LIB_SHADOWMAP
+#endif // GLSL_LIB_SHADOWMAP_FRAG

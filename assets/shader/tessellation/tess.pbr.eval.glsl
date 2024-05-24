@@ -100,6 +100,12 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef shadowMapGlobalFlag
+    vec3 shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
+    #ifdef numCSM
+    vec3 csmLightSpacePos[numCSM];
+    #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
     #ifdef reflectionCubemapFlag
@@ -213,6 +219,14 @@ void main(void){
 
     #ifdef shadowMapFlag
         o_data.shadowMapUv = (u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv);
+        #ifdef shadowMapGlobalFlag
+            o_data.shadowMapUvGlobal = (u * l_data[0].shadowMapUvGlobal + v * l_data[1].shadowMapUvGlobal + w * l_data[2].shadowMapUvGlobal);
+        #endif // shadowMapGlobalFlag
+        #ifdef numCSM
+            for (int i = 0; i < numCSM; i++) {
+                o_data.csmLightSpacePos[i] = (u * l_data[0].csmLightSpacePos[i] + v * l_data[1].csmLightSpacePos[i] + w * l_data[2].csmLightSpacePos[i]);
+            }
+        #endif // numCSM
     #endif // shadowMapFlag
 
     o_data.tbn = (u * l_data[0].tbn + v * l_data[1].tbn + w * l_data[2].tbn);

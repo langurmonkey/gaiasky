@@ -18,8 +18,11 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef shadowMapGlobalFlag
+    vec3 shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
-    vec3 csmUVs[numCSM];
+    vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
     #endif // shadowMapFlag
     vec3 fragPosWorld;
@@ -104,7 +107,15 @@ void main(){
 
     #ifdef shadowMapFlag
     l_data[id].shadowMapUv = v_data[id].shadowMapUv;
-    #endif
+    #ifdef shadowMapGlobalFlag
+    l_data[id].shadowMapUvGlobal = v_data[id].shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
+    #ifdef numCSM
+    for (int i = 0; i < numCSM; i++) {
+        l_data[id].csmLightSpacePos[i] = v_data[id].csmLightSpacePos[i];
+    }
+    #endif // numCSM
+    #endif // shadowMapFlag
 
     l_data[id].tbn = v_data[id].tbn;
 }

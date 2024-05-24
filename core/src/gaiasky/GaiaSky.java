@@ -160,6 +160,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     public long frames;
     public InputMultiplexer inputMultiplexer;
+
+    /** Maximum texture size. **/
+    public int maxTextureSize;
+    /** Maximum number of vertex attributes. **/
+    public int maxVertexAttributes;
     /**
      * The user interfaces.
      */
@@ -466,8 +471,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         logger.info(I18n.msg("notif.glversion", GL30.glGetString(GL30.GL_VERSION)));
         logger.info(I18n.msg("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
         logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
-        logger.info(I18n.msg("notif.info.maxattribs", GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
-        logger.info(I18n.msg("notif.info.maxtexsize", GL30.glGetInteger(GL30.GL_MAX_TEXTURE_SIZE)));
+        logger.info(I18n.msg("notif.info.maxattribs", maxVertexAttributes = GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
+        logger.info(I18n.msg("notif.info.maxtexsize", maxTextureSize = GL30.glGetInteger(GL30.GL_MAX_TEXTURE_SIZE)));
 
         // Disable all kinds of input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);

@@ -102,19 +102,9 @@ uniform PointLight u_pointLights[numPointLights];
 #define ambientFlag
 #endif // ambientFlag
 
-#ifdef shadowMapFlag
-uniform mat4 u_shadowMapProjViewTrans;
-out vec3 v_shadowMapUv;
-#ifdef shadowMapGlobalFlag
-uniform mat4 u_shadowMapProjViewTransGlobal;
-out vec3 v_shadowMapUvGlobal;
-#endif // shadowMapGlobalFlag
-#define separateAmbientFlag
-#ifdef numCSM
-uniform mat4 u_csmTransforms[numCSM];
-out vec3 v_csmUVs[numCSM];
-#endif // numCSM
-#endif // shadowMapFlag
+#include <shader/lib/shadowmap.vert.glsl>
+
+out vec3 v_fragPosWorld;
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
 out vec3 v_ambientLight;
@@ -164,22 +154,19 @@ void main() {
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
+	v_fragPosWorld = pos.xyz;
+
 	vec4 gpos = u_projViewTrans * pos;
 	gl_Position = gpos;
 
 	#ifdef shadowMapFlag
-		vec4 posShadow = u_shadowMapProjViewTrans * pos;
-		v_shadowMapUv.xyz = (posShadow.xyz / posShadow.w) * 0.5 + 0.5;
-		#ifdef shadowMapGlobalFlag
-			vec4 posShadowGlobal = u_shadowMapProjViewTransGlobal * pos;
-			v_shadowMapUvGlobal.xyz = (posShadowGlobal.xyz / posShadowGlobal.w) * 0.5 + 0.5;
-		#endif // shadowMpagGlobalFlag
-		#ifdef numCSM
-		for(int i=0 ; i<numCSM ; i++){
-			vec4 csmPos = u_csmTransforms[i] * pos;
-			v_csmUVs[i].xyz = (csmPos.xyz / csmPos.w) * 0.5 + 0.5;
-		}
-		#endif // numCSM
+	getShadowMapUv(pos, v_shadowMapUv);
+	#ifdef shadowMapGlobalFlag
+	getShadowMapUvGlobal(pos, v_shadowMapUvGlobal);
+	#endif // shadowMapGlobalFlag
+	#ifdef numCSM
+	getCsmLightSpacePos(pos, v_csmLightSpacePos);
+	#endif // numCSM
 	#endif // shadowMapFlag
 
 	#if defined(normalFlag)

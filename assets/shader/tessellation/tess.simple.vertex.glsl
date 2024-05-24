@@ -113,18 +113,17 @@ vec2 g_texCoord0 = a_texCoord0;
 vec2 g_texCoord0 = vec2(0.0, 0.0);
 #endif // texCoord0Flag
 
+#include <shader/lib/shadowmap.vert.glsl>
 
-//////////////////////////////////////////////////////
-////// SHADOW MAPPING
-//////////////////////////////////////////////////////
 #ifdef shadowMapFlag
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
-uniform mat4 u_shadowMapProjViewTrans;
-
 out vec3 v_shadowMapUv;
-#endif //shadowMapFlag
-
+#ifdef shadowMapGlobalFlag
+out vec3 v_shadowMapUvGlobal;
+#endif // shadowMapGlobalFlag
+#ifdef numCSM
+out vec3 v_csmLightSpacePos[numCSM];
+#endif // numCSM
+#endif // shadowMapFlag
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// GROUND ATMOSPHERIC SCATTERING - VERTEX
@@ -389,11 +388,14 @@ void main() {
     gl_Position = pos;
 
     #ifdef shadowMapFlag
-    vec4 spos = u_shadowMapProjViewTrans * pos;
-
-    v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
-    //v_shadowMapUv.z = min(spos.z * 0.5 + 0.5, 0.998);
-    #endif //shadowMapFlag
+    getShadowMapUv(pos, v_shadowMapUv);
+    #ifdef shadowMapGlobalFlag
+    getShadowMapUvGlobal(pos, v_shadowMapUvGlobal);
+    #endif // shadowMapGlobalFlag
+    #ifdef numCSM
+    getCsmLightSpacePos(pos, v_csmLightSpacePos);
+    #endif // numCSM
+    #endif // shadowMapFlag
 
 
     // Tangent space transform

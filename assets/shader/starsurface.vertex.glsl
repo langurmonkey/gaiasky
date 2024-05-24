@@ -94,11 +94,7 @@ uniform PointLight u_pointLights[numPointLights];
 #define ambientFlag
 #endif //ambientFlag
 
-#ifdef shadowMapFlag
-uniform mat4 u_shadowMapProjViewTrans;
-out vec3 v_shadowMapUv;
-#define separateAmbientFlag
-#endif //shadowMapFlag
+#include <shader/lib/shadowmap.vert.glsl>
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
 out vec3 v_ambientLight;
@@ -158,10 +154,14 @@ void main() {
 	gl_Position = gpos;
 
 	#ifdef shadowMapFlag
-		vec4 spos = u_shadowMapProjViewTrans * pos;
-		v_shadowMapUv.xy = (spos.xy / spos.w) * 0.5 + 0.5;
-		v_shadowMapUv.z = min(spos.z * 0.5 + 0.5, 0.998);
-	#endif //shadowMapFlag
+	getShadowMapUv(pos, v_shadowMapUv);
+	#ifdef shadowMapGlobalFlag
+	getShadowMapUvGlobal(pos, v_shadowMapUvGlobal);
+	#endif // shadowMapGlobalFlag
+	#ifdef numCSM
+	getCsmLightSpacePos(pos, v_csmLightSpacePos);
+	#endif // numCSM
+	#endif // shadowMapFlag
 
 	#if defined(normalFlag)
 		vec3 normal = normalize(u_normalMatrix * a_normal);

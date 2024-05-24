@@ -10,6 +10,7 @@ package gaiasky.util;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import org.apfloat.Apfloat;
+import org.lwjgl.opengl.GL30;
 
 public class Constants {
 
