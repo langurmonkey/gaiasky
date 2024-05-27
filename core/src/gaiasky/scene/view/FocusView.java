@@ -463,6 +463,14 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return time.getHdiff() != 0;
     }
 
+    @Override
+    public Vector3b getPredictedPosition(Vector3b out,
+                                         ITimeFrameProvider time,
+                                         ICamera unused,
+                                         boolean force) {
+        return getPredictedPosition(out, null, time, force);
+    }
+
     public Vector3b getPredictedPosition(Vector3b out,
                                          String name,
                                          ITimeFrameProvider time,
@@ -480,34 +488,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             if (!mustUpdatePosition(time) && !force) {
                 return getAbsolutePosition(out);
             } else {
-                // Get a line copy of focus and update it.
-                var copy = scene.getLineCopy(entity);
-
-                // Get root of line copy.
-                var copyGraph = Mapper.graph.get(copy);
-                var root = copyGraph.getRoot(copy);
-                // This updates the graph node for all entities in the line.
-                scene.updateEntity(root, (float) time.getHdiff());
-
-                // This updates the rest of components of our entity.
-                scene.updateEntity(copy, (float) time.getHdiff());
-
-                EntityUtils.getAbsolutePosition(copy, out);
-
-                // Return to pool.
-                scene.returnCopyObject(copy);
-
-                return out;
+                return getPredictedPosition(out, time.getHdiff());
             }
         }
-    }
-
-    @Override
-    public Vector3b getPredictedPosition(Vector3b out,
-                                         ITimeFrameProvider time,
-                                         ICamera unused,
-                                         boolean force) {
-        return getPredictedPosition(out, null, time, force);
     }
 
     @Override
