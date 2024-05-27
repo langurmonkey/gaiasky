@@ -138,11 +138,11 @@ public class GraphUpdater extends AbstractUpdateSystem {
             // Update translation.
             graph.translation.set(parentTranslation).add(body.pos);
 
-            // Update the spherical position.
+            // Update position in spherical coordinates.
             gaiasky.util.coord.Coordinates.cartesianToSpherical(B31.set(graph.translation).add(camera.getPos()), D31);
             body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
 
-            // Update opacity
+            // Update opacity.
             if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
                 // If the bottom part of our fade in is mapped to a value
                 // greater than zero, we do not use the parent opacity; the

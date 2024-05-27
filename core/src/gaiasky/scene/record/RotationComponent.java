@@ -12,7 +12,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.time.ITimeFrameProvider;
 
-public class RotationComponent implements IUpdatable<RotationComponent>, Cloneable {
+public class RotationComponent implements IUpdatable<RotationComponent> {
     /**
      * Angular velocity [deg/hour] around the rotation axis.
      **/
@@ -21,6 +21,10 @@ public class RotationComponent implements IUpdatable<RotationComponent>, Cloneab
      * Current angle with respect to the rotationAxis in degrees.
      **/
     public double angle;
+    /**
+     * Current delta angle.
+     */
+    public double deltaAngle;
 
     /**
      * The rotation period in hours.
@@ -59,8 +63,10 @@ public class RotationComponent implements IUpdatable<RotationComponent>, Cloneab
     }
 
     public void update(ITimeFrameProvider time) {
+        var prevAngle = angle;
         long t = time.getTime().toEpochMilli() - AstroUtils.J2000_MS;
         angle = (meridianAngle + angularVelocity * t * Nature.MS_TO_H) % 360.0;
+        deltaAngle = angle - prevAngle;
     }
 
     /**
@@ -158,12 +164,16 @@ public class RotationComponent implements IUpdatable<RotationComponent>, Cloneab
         copyFrom(object);
     }
 
-    @Override
-    public RotationComponent clone() {
-        try {
-            return (RotationComponent) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+    public RotationComponent copy() {
+        var clone = new RotationComponent();
+        clone.deltaAngle = deltaAngle;
+        clone.angularVelocity = angularVelocity;
+        clone.angle = angle;
+        clone.axialTilt = axialTilt;
+        clone.ascendingNode = ascendingNode;
+        clone.inclination = inclination;
+        clone.meridianAngle = meridianAngle;
+        clone.period = period;
+        return clone;
     }
 }

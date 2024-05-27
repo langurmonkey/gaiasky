@@ -701,7 +701,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 Vector3b cart = B31;
                 if (nextPos != null) {
                     cart.set(nextPos);
-                    getPredictedPosition(cart, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
                     dCam = D32.set(camPos).sub(cart).len();
                 } else {
                     getAbsolutePosition(cart);

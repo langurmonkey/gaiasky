@@ -63,12 +63,12 @@ public class LVLHOrientationServer implements OrientationServer {
     }
 
     @Override
-    public QuaternionDouble getOrientation(Date date) {
-        return getOrientation(date.toInstant());
+    public QuaternionDouble updateOrientation(Date date) {
+        return updateOrientation(date.toInstant());
     }
 
     @Override
-    public QuaternionDouble getOrientation(Instant instant) {
+    public QuaternionDouble updateOrientation(Instant instant) {
         lazyInitialize();
         if(object != null && parent != null) {
             // Position of object in local reference system.

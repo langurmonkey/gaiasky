@@ -8,7 +8,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 
-public class QuaternionOrientation implements Cloneable {
+public class QuaternionOrientation {
 
     /** Attitude provider. */
     public String provider;
@@ -30,16 +30,13 @@ public class QuaternionOrientation implements Cloneable {
         setOrientationProvider(provider);
     }
 
-    public QuaternionOrientation clone() {
-        try {
-            var copy = (QuaternionOrientation) super.clone();
-            copy.provider = provider;
-            copy.orientationSource = orientationSource;
-            copy.orientationServer = orientationServer;
-            return copy;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+    public QuaternionOrientation copy() {
+        var copy = new QuaternionOrientation();
+        copy.provider = provider;
+        copy.orientationSource = orientationSource;
+        copy.orientationServer = orientationServer;
+        copy.nonRotatedPos = new Vector3d(nonRotatedPos);
+        return copy;
     }
 
     public void initialize(AssetManager manager) {
@@ -56,15 +53,14 @@ public class QuaternionOrientation implements Cloneable {
         }
     }
 
-    public QuaternionDouble getQuaternion(Instant instant) {
-        if(orientationServer != null) {
-            return orientationServer.getOrientation(instant);
+    public void updateOrientation(Instant instant) {
+        if (orientationServer != null) {
+            orientationServer.updateOrientation(instant);
         }
-        return null;
     }
 
     public QuaternionDouble getCurrentQuaternion() {
-        if(orientationServer != null) {
+        if (orientationServer != null) {
             return orientationServer.getCurrentOrientation();
         }
         return null;

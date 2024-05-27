@@ -49,12 +49,12 @@ public class GaiaAttitudeServer implements OrientationServer {
     }
 
     @Override
-    public QuaternionDouble getOrientation(Date date) {
-        return getOrientation(date.toInstant());
+    public QuaternionDouble updateOrientation(Date date) {
+        return updateOrientation(date.toInstant());
     }
 
     @Override
-    public QuaternionDouble getOrientation(Instant instant) {
+    public QuaternionDouble updateOrientation(Instant instant) {
         if (attitude != null && attitude.getTime() == instant.toEpochMilli()) {
             return attitude.getQuaternion();
         } else {
@@ -65,6 +65,16 @@ public class GaiaAttitudeServer implements OrientationServer {
                 return null;
             }
         }
+    }
+
+    @Override
+    public QuaternionDouble getCurrentOrientation() {
+        return hasOrientation() ? attitude.getQuaternion() : null;
+    }
+
+    @Override
+    public boolean hasOrientation() {
+        return attitude != null;
     }
 
     /**
@@ -109,16 +119,6 @@ public class GaiaAttitudeServer implements OrientationServer {
 
         return result;
 
-    }
-
-    @Override
-    public QuaternionDouble getCurrentOrientation() {
-        return hasOrientation() ? attitude.getQuaternion() : null;
-    }
-
-    @Override
-    public boolean hasOrientation() {
-        return attitude != null;
     }
 
     public synchronized String getCurrentAttitudeName() {

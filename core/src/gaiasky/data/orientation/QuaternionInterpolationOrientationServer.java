@@ -128,12 +128,12 @@ public abstract class QuaternionInterpolationOrientationServer implements Orient
     }
 
     @Override
-    public QuaternionDouble getOrientation(Date date) {
-        return getOrientation(date.toInstant());
+    public QuaternionDouble updateOrientation(Date date) {
+        return updateOrientation(date.toInstant());
     }
 
     @Override
-    public QuaternionDouble getOrientation(Instant instant) {
+    public QuaternionDouble updateOrientation(Instant instant) {
         var idx = findStartIndex(instant);
         if (idx >= 0) {
             if (idx == data.size - 1) {

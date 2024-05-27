@@ -49,7 +49,10 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.*;
+import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.math.QuaternionDouble;
+import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import org.lwjgl.opengl.GL30;
@@ -93,10 +96,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public double[] hudScales;
     public Color[] hudColors;
     public float hudWidth, hudHeight;
-    /**
-     * Previous angle in orientation lock.
-     **/
-    double previousOrientationAngle = 0;
     /**
      * Previous and aux quaternions, for focus lock.
      */
@@ -418,12 +417,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI.
-        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD, Event.CAMERA_POS_CMD,
-                Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN,
-                Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD,
-                Event.FREE_MODE_COORD_CMD, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD,
-                Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR,
-                Event.CAMERA_TRACKING_OBJECT_CMD);
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD,
+                Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD,
+                Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN,
+                Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD,
+                Event.FREE_MODE_COORD_CMD, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD,
+                Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO,
+                Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -498,23 +498,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                 RotationComponent rc = focus.getRotationComponent();
                                 if (rc != null) {
                                     // Rotation component present - planets, etc.
-                                    double angleBak = rc.angle;
-                                    double angle = previousOrientationAngle != 0 ? (angleBak - previousOrientationAngle) : 0;
-                                    // aux5 <- focus (future) position.
-                                    aux5b.set(aux4b);
+                                    double deltaAngle = rc.deltaAngle;
+                                    System.out.println(deltaAngle);
+                                    // aux5 <- focus position.
+                                    aux5b.set(focusPos);
                                     // aux3 <- focus to camera vector.
                                     aux3b.set(pos).sub(aux5b);
                                     // aux2 <- spin axis.
                                     aux2.set(0, 1, 0).mul(focus.getOrientation());
                                     // rotate aux3 around focus spin axis.
-                                    aux3b.rotate(aux2, angle);
+                                    aux3b.rotate(aux2, deltaAngle);
                                     // aux3 <- camera pos after rotating.
                                     aux3b.add(aux5b);
                                     // pos <- aux3.
                                     pos.set(aux3b);
-                                    direction.rotate(aux2, angle);
-                                    up.rotate(aux2, angle);
-                                    previousOrientationAngle = angleBak;
+                                    direction.rotate(aux2, deltaAngle);
+                                    up.rotate(aux2, deltaAngle);
                                 } else if (focus.getOrientationQuaternion() != null) {
                                     // Compute partial rotation from qPrev to q.
                                     var q = focus.getOrientationQuaternion();
@@ -1043,8 +1042,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void posDistanceCheck() {
         // Check terrain collision.
         if (!closestBody.isEmpty()) {
-            // New position
-            closestBody.getPredictedPosition(aux5b, GaiaSky.instance.time, this, false);
+            // Future position of closest object.
+            aux5b.set(nextClosestPosition);
 
             double elevation =
                     closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / Math.max(4.0, 20.0 - Settings.settings.scene.renderer.elevation.multiplier);
@@ -1465,11 +1464,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         rotate(up, 0.01);
                         updatePerspectiveCamera();
                     });
-                }
-            }
-            case ORIENTATION_LOCK_CMD -> {
-                synchronized (updateLock) {
-                    previousOrientationAngle = 0;
                 }
             }
             case FREE_MODE_COORD_CMD -> {

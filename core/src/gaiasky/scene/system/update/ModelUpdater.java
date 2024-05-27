@@ -119,7 +119,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
                         .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
                 // Update attitude from server if needed.
                 if (quaternionOrientation.orientationServer != null) {
-                    quaternionOrientation.orientationServer.getOrientation(time.getTime());
+                    quaternionOrientation.orientationServer.updateOrientation(time.getTime());
                 }
             }
         }
@@ -131,7 +131,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
             // Update quaternion orientation if needed.
             if (quaternionOrientation != null) {
-                quaternionOrientation.getQuaternion(time.getTime());
+                quaternionOrientation.updateOrientation(time.getTime());
             }
 
             // Do actual update.
@@ -157,11 +157,25 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 if (engine.qf != null) {
                     engine.rotationMatrix.getRotation(engine.qf);
                 }
+
+            } else if (rigidRotation != null) {
+                // Planets and moons have rotation components
+                graph.translation.setToTranslation(localTransform)
+                        .scl(size * sizeFactor)
+                        .rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
+                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
+                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt))
+                        .rotate(0, 1, 0, (float) rigidRotation.angle);
+                graph.orientation.idt().rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
+                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
+                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt));
+
             } else if (quaternionOrientation != null) {
                 // Satellites have quaternion orientations, typically.
 
                 graph.translation.setToTranslation(localTransform).scl(size * sizeFactor);
-                var hasOrientationServer = quaternionOrientation.orientationServer != null && quaternionOrientation.orientationServer.hasOrientation();
+                var hasOrientationServer = quaternionOrientation.orientationServer != null
+                        && quaternionOrientation.orientationServer.hasOrientation();
                 if (hasOrientationServer) {
                     QD.set(quaternionOrientation.getCurrentQuaternion());
                     QF.set((float) QD.x, (float) QD.y, (float) QD.z, (float) QD.w);
@@ -179,17 +193,6 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 MD4.set(localTransform).mul(graph.orientation);
                 MD4.putIn(localTransform);
 
-            } else if (rigidRotation != null) {
-                // Planets and moons have rotation components
-                graph.translation.setToTranslation(localTransform)
-                        .scl(size * sizeFactor)
-                        .rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
-                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
-                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt))
-                        .rotate(0, 1, 0, (float) rigidRotation.angle);
-                graph.orientation.idt().rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
-                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
-                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt));
             } else {
                 // The rest of bodies are just sitting there, in their reference system
                 graph.translation.setToTranslation(localTransform)

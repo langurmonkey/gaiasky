@@ -68,12 +68,12 @@ public class Orientation implements Component, ICopy {
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(Orientation.class);
         if (rigidRotation != null) {
-            copy.rigidRotation = rigidRotation.clone();
+            copy.rigidRotation = rigidRotation.copy();
         } else {
             copy.rigidRotation = null;
         }
         if (quaternionOrientation != null) {
-            copy.quaternionOrientation = quaternionOrientation.clone();
+            copy.quaternionOrientation = quaternionOrientation.copy();
         } else {
             copy.quaternionOrientation = null;
         }
