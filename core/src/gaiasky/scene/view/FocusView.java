@@ -35,8 +35,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
-import java.time.Instant;
-
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     private final Vector3d D31 = new Vector3d();
@@ -800,7 +798,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public QuaternionDouble getOrientationQuaternion() {
         if (Mapper.orientation.has(entity)) {
             var orientation = Mapper.orientation.get(entity);
-            if (orientation.hasQuaternions()) {
+            if (orientation.quaternionOrientation != null) {
                 return orientation.quaternionOrientation.getCurrentQuaternion();
             }
         }

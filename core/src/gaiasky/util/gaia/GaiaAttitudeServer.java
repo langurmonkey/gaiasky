@@ -112,7 +112,7 @@ public class GaiaAttitudeServer implements OrientationServer {
     }
 
     @Override
-    public QuaternionDouble getLastOrientation() {
+    public QuaternionDouble getCurrentOrientation() {
         return hasOrientation() ? attitude.getQuaternion() : null;
     }
 

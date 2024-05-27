@@ -99,7 +99,7 @@ public class LVLHOrientationServer implements OrientationServer {
     }
 
     @Override
-    public QuaternionDouble getLastOrientation() {
+    public QuaternionDouble getCurrentOrientation() {
         return lastOrientation;
     }
 

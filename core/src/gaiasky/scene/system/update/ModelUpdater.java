@@ -117,6 +117,10 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 // Undo rotation.
                 quaternionOrientation.nonRotatedPos.mul(Coordinates.eqToEcl())
                         .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
+                // Update attitude from server if needed.
+                if (quaternionOrientation.orientationServer != null) {
+                    quaternionOrientation.orientationServer.getOrientation(time.getTime());
+                }
             }
         }
 

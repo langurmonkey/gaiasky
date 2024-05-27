@@ -69,19 +69,15 @@ public class Orientation implements Component, ICopy {
         var copy = engine.createComponent(Orientation.class);
         if (rigidRotation != null) {
             copy.rigidRotation = rigidRotation.clone();
+        } else {
+            copy.rigidRotation = null;
         }
         if (quaternionOrientation != null) {
             copy.quaternionOrientation = quaternionOrientation.clone();
+        } else {
+            copy.quaternionOrientation = null;
         }
         return copy;
-    }
-
-    public boolean hasRotation() {
-        return rigidRotation != null;
-    }
-
-    public boolean hasQuaternions() {
-        return quaternionOrientation != null && quaternionOrientation.orientationServer != null;
     }
 
     public void initialize(AssetManager manager) {
@@ -94,14 +90,6 @@ public class Orientation implements Component, ICopy {
     public void setUp(AssetManager manager) {
         if (quaternionOrientation != null) {
             quaternionOrientation.setUp(manager);
-        }
-    }
-
-    public boolean isReady(AssetManager manager) {
-        if (quaternionOrientation != null) {
-            return quaternionOrientation.isReady(manager);
-        } else {
-            return true;
         }
     }
 

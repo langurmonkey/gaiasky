@@ -15,6 +15,6 @@ import java.util.Date;
 public interface OrientationServer {
     QuaternionDouble getOrientation(final Date date);
     QuaternionDouble getOrientation(final Instant instant);
-    QuaternionDouble getLastOrientation();
+    QuaternionDouble getCurrentOrientation();
     boolean hasOrientation();
 }

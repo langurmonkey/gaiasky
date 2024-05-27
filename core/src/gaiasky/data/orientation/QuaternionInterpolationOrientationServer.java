@@ -157,7 +157,7 @@ public abstract class QuaternionInterpolationOrientationServer implements Orient
     protected abstract QuaternionDouble interpolate(QuaternionDouble q0, QuaternionDouble q1, double alpha);
 
     @Override
-    public QuaternionDouble getLastOrientation() {
+    public QuaternionDouble getCurrentOrientation() {
         return lastOrientation;
     }
 

@@ -65,7 +65,7 @@ public class QuaternionOrientation implements Cloneable {
 
     public QuaternionDouble getCurrentQuaternion() {
         if(orientationServer != null) {
-            return orientationServer.getLastOrientation();
+            return orientationServer.getCurrentOrientation();
         }
         return null;
     }
