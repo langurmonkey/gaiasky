@@ -492,14 +492,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                             // Get focus dx.
                             dx.set(nextFocusPosition).sub(focusPos);
 
-                            // Lock orientation - FOR NOW THIS ONLY WORKS WITH
-                            // PLANETS and MOONS.
+                            // Lock orientation.
                             if (Settings.settings.scene.camera.focusLock.orientation && time.getHdiff() != 0 && focus.getOrientation() != null) {
-                                RotationComponent rc = focus.getRotationComponent();
-                                if (rc != null) {
+                                if (focus.getRotationComponent() != null) {
+                                    var rc = focus.getRotationComponent();
                                     // Rotation component present - planets, etc.
                                     double deltaAngle = rc.deltaAngle;
-                                    System.out.println(deltaAngle);
                                     // aux5 <- focus position.
                                     aux5b.set(focusPos);
                                     // aux3 <- focus to camera vector.
