@@ -609,6 +609,7 @@ public class DataInfoWindow extends GenericDialog {
                 ko(I18n.msg("gui.wiki.attributemissing", "displaytitle"));
                 return;
             }
+
             String title = TextUtils.html2text(root.getString("displaytitle"));
             getTitleLabel().setText(I18n.msg("gui.wiki.title", title));
 
