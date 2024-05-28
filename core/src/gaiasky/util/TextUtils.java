@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.util.i18n.I18n;
-import org.jsoup.parser.Parser;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -123,11 +122,6 @@ public class TextUtils {
         return str.chars().filter(ch -> ch == '\n' || ch == '\r').count();
     }
 
-    public static String breakSpaces(CharSequence in,
-                                     int breakSpaces) {
-        return breakSpaces(in.toString(), breakSpaces);
-    }
-
     public static String breakSpaces(String in,
                                      int breakSpaces) {
         // Warp text if breakSpaces <= 0
@@ -149,38 +143,6 @@ public class TextUtils {
         return in;
     }
 
-    public static void capLabelWidth(Label l,
-                                     float targetWidth) {
-        while (l.getWidth() > targetWidth) {
-            StringBuilder currText = l.getText();
-            currText.deleteCharAt(currText.length);
-            l.setText(currText);
-            l.pack();
-        }
-        l.setText(l.getText() + "...");
-    }
-
-    public static CharSequence limitWidth(CharSequence text,
-                                          float width,
-                                          float letterWidth) {
-        int lettersPerLine = (int) (width / letterWidth);
-        StringBuilder out = new StringBuilder();
-        int currentLine = 0;
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (c == ' ' && Math.abs(currentLine - lettersPerLine) <= 5) {
-                c = '\n';
-                currentLine = 0;
-            } else if (c == '\n') {
-                currentLine = 0;
-            } else {
-                currentLine++;
-            }
-            out.append(c);
-        }
-
-        return out;
-    }
 
     public static String capString(String in,
                                    int targetLength) {
@@ -251,26 +213,6 @@ public class TextUtils {
                                      String... strings) {
         if (strings == null || strings.length == 0)
             return null;
-        java.lang.StringBuilder out = new java.lang.StringBuilder();
-        for (String str : strings) {
-            if (str != null && !str.isEmpty()) {
-                if (!out.isEmpty())
-                    out.append(split);
-                out.append(str);
-            }
-        }
-        return out.toString();
-    }
-
-    /**
-     * Concatenates the strings using the given split
-     *
-     * @param split   The split
-     * @param strings The strings
-     * @return The concatenation
-     */
-    public static String concatenate(final String split,
-                                     final Array<String> strings) {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strings) {
             if (str != null && !str.isEmpty()) {
@@ -431,21 +373,17 @@ public class TextUtils {
         return result;
     }
 
-    public static String[] concatAll(String base,
-                                     String[] suffixes,
-                                     String suffixAdditional) {
-        String[] suffixesNew = new String[suffixes.length + 1];
-        for (int i = 0; i < suffixes.length; i++)
-            suffixesNew[i] = suffixes[1];
-        suffixesNew[suffixes.length] = suffixAdditional;
-        return concatAll(base, suffixesNew);
-    }
-
+    /**
+     * Returns a new array with the given element inserted at the beginning (index 0).
+     * @param elements The array.
+     * @param element The new element to insert.
+     * @return The new array.
+     * @param <T> The type of objects contained in the arrays.
+     */
     public static <T> T[] addToBeginningOfArray(T[] elements, T element) {
         T[] newArray = Arrays.copyOf(elements, elements.length + 1);
         newArray[0] = element;
         System.arraycopy(elements, 0, newArray, 1, elements.length);
-
         return newArray;
     }
 

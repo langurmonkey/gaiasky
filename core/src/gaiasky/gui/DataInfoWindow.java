@@ -436,7 +436,7 @@ public class DataInfoWindow extends GenericDialog {
         String localizedName = object.getLocalizedName();
         String[] names = object.getNames();
         if (!TextUtils.contains(names, localizedName, true)) {
-            TextUtils.addToBeginningOfArray(names, localizedName);
+            names = TextUtils.addToBeginningOfArray(names, localizedName);
         }
         if (names != null && names.length > 0) {
             int chars = 0;
