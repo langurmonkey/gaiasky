@@ -8,9 +8,12 @@ import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 
-public class QuaternionOrientation {
+/**
+ * Component that contains an attitude provider that spits out a quaternion for each time.
+ */
+public class AttitudeComponent {
 
-    /** Attitude provider. */
+    /** Quaternion orientation provider. */
     public String provider;
 
     /**
@@ -30,8 +33,8 @@ public class QuaternionOrientation {
         setOrientationProvider(provider);
     }
 
-    public QuaternionOrientation copy() {
-        var copy = new QuaternionOrientation();
+    public AttitudeComponent copy() {
+        var copy = new AttitudeComponent();
         copy.provider = provider;
         copy.orientationSource = orientationSource;
         copy.orientationServer = orientationServer;

@@ -170,7 +170,7 @@ public class ModelInitializer extends AbstractInitSystem {
         if (parentOrientation != null) {
             // Satellites.
             if (parentOrientation.parentOrientation) {
-                parentOrientation.setRigidRotation(graph.parent.getComponent(Orientation.class).rigidRotation);
+                parentOrientation.setRigidRotation(graph.parent.getComponent(Orientation.class).rotationComponent);
             }
             parentOrientation.orientationf = new Matrix4();
         }

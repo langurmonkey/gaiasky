@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
+import gaiasky.scene.component.AttitudeComponent;
 import gaiasky.scene.component.RigidRotation;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
@@ -895,7 +896,7 @@ public interface IScriptingInterface {
      * <p>
      * Sets the given quaternions file (CSV with times and quaternions) as the orientation provider
      * for this object. This call removes the previous orientation model from the object (either
-     * {@link RigidRotation} or {@link gaiasky.scene.component.QuaternionOrientation}.
+     * {@link RigidRotation} or {@link AttitudeComponent}.
      * </p>
      * <p>
      * The interpolation between quaternions is done using slerp (spherical linear interpolation).
@@ -916,7 +917,7 @@ public interface IScriptingInterface {
      * <p>
      * Sets the given quaternions file (CSV with times and quaternions) as the orientation provider
      * for this object. This call removes the previous orientation model from the object (either
-     * {@link RigidRotation} or {@link gaiasky.scene.component.QuaternionOrientation}.
+     * {@link RigidRotation} or {@link AttitudeComponent}.
      * </p>
      * <p>
      * The interpolation between quaternions is done using nlerp (normalized linear interpolation).

@@ -109,9 +109,9 @@ public class ModelUpdater extends AbstractUpdateSystem {
         var orientation = Mapper.orientation.get(entity);
         if (Mapper.tagHeliotropic.has(entity)
                 && orientation != null
-                && orientation.quaternionOrientation != null
+                && orientation.attitudeComponent != null
                 && (time.getHdiff() != 0 || forceUpdate)) {
-            var quaternionOrientation = (QuaternionOrientation) orientation.quaternionOrientation;
+            var quaternionOrientation = (AttitudeComponent) orientation.attitudeComponent;
             if (quaternionOrientation.nonRotatedPos != null) {
                 quaternionOrientation.nonRotatedPos.set(body.pos);
                 // Undo rotation.
@@ -126,8 +126,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
         if (sizeFactor != 1 || forceUpdate) {
             var scaffolding = Mapper.modelScaffolding.get(entity);
-            var quaternionOrientation = orientation != null ? orientation.quaternionOrientation : null;
-            var rigidRotation = orientation != null ? orientation.rigidRotation : null;
+            var quaternionOrientation = orientation != null ? orientation.attitudeComponent : null;
+            var rigidRotation = orientation != null ? orientation.rotationComponent : null;
 
             // Update quaternion orientation if needed.
             if (quaternionOrientation != null) {

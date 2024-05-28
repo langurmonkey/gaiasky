@@ -125,8 +125,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
             // Update rotation.
             if (time.getHdiff() != 0) {
                 var orientation = Mapper.orientation.get(entity);
-                if (orientation != null && orientation.rigidRotation != null) {
-                    orientation.rigidRotation.update(time);
+                if (orientation != null && orientation.rotationComponent != null) {
+                    orientation.rotationComponent.update(time);
                 }
             }
 

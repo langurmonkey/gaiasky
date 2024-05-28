@@ -48,7 +48,7 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.NaturalCamera;
-import gaiasky.scene.component.QuaternionOrientation;
+import gaiasky.scene.component.AttitudeComponent;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.ModelComponent;
@@ -938,19 +938,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     try {
                         // Set new quaternion orientation.
-                        var quatOri = new QuaternionOrientation();
+                        var quatOri = new AttitudeComponent();
                         if (slerp) {
                             quatOri.orientationServer = new QuaternionSlerpOrientationServer(file);
                         } else {
                             quatOri.orientationServer = new QuaternionNlerpOrientationServer(file);
                         }
-                        orientation.quaternionOrientation = quatOri;
+                        orientation.attitudeComponent = quatOri;
                     } catch (Exception e) {
                         logger.error(e);
                     } finally {
                         // Remove rigid rotation, if it has one.
-                        if (orientation.rigidRotation != null) {
-                            orientation.rigidRotation = null;
+                        if (orientation.rotationComponent != null) {
+                            orientation.rotationComponent = null;
                         }
                     }
                 });

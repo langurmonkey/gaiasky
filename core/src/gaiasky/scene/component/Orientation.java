@@ -6,29 +6,33 @@ import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.scene.record.RotationComponent;
 import gaiasky.util.math.Vector3d;
 
+/**
+ * The orientation is either a rigid rotation represented by {@link RotationComponent}, or
+ * a quaternion orientation, represented by {@link AttitudeComponent}.
+ */
 public class Orientation implements Component, ICopy {
 
-    /** Holds information about the rotation of the body **/
-    public RotationComponent rigidRotation;
-
-    public QuaternionOrientation quaternionOrientation;
+    /** Holds information about the rotation of the body, represented as rotation parameters. **/
+    public RotationComponent rotationComponent;
+    /** Holds the guy that returns a quaternion for each time. **/
+    public AttitudeComponent attitudeComponent;
 
     /**
      * Sets the rotation period in hours
      */
     public void setRotation(RotationComponent rigidRotation) {
-        this.rigidRotation = rigidRotation;
+        this.rotationComponent = rigidRotation;
     }
 
-    public void setRigidRotation(RotationComponent rigidRotation) {
-        setRotation(rigidRotation);
+    public void setRigidRotation(RotationComponent rotationComponent) {
+        setRotation(rotationComponent);
     }
 
     public void updateRotation(RotationComponent rigidRotation) {
-        if (this.rigidRotation != null) {
-            this.rigidRotation.updateWith(rigidRotation);
+        if (this.rotationComponent != null) {
+            this.rotationComponent.updateWith(rigidRotation);
         } else {
-            this.rigidRotation = rigidRotation;
+            this.rotationComponent = rigidRotation;
         }
     }
 
@@ -37,11 +41,11 @@ public class Orientation implements Component, ICopy {
     }
 
     public void setOrientationProvider(String provider) {
-        if (this.quaternionOrientation == null) {
-            this.quaternionOrientation = new QuaternionOrientation();
+        if (this.attitudeComponent == null) {
+            this.attitudeComponent = new AttitudeComponent();
         }
 
-        this.quaternionOrientation.setProvider(provider);
+        this.attitudeComponent.setProvider(provider);
     }
 
     public void setProvider(String provider) {
@@ -53,11 +57,11 @@ public class Orientation implements Component, ICopy {
     }
 
     public void setOrientationSource(String source) {
-        if (this.quaternionOrientation == null) {
-            this.quaternionOrientation = new QuaternionOrientation();
+        if (this.attitudeComponent == null) {
+            this.attitudeComponent = new AttitudeComponent();
         }
 
-        this.quaternionOrientation.orientationSource = source;
+        this.attitudeComponent.orientationSource = source;
     }
 
     public void setAttitudeLocation(String source) {
@@ -67,35 +71,29 @@ public class Orientation implements Component, ICopy {
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(Orientation.class);
-        if (rigidRotation != null) {
-            copy.rigidRotation = rigidRotation.copy();
-        } else {
-            copy.rigidRotation = null;
-        }
-        if (quaternionOrientation != null) {
-            copy.quaternionOrientation = quaternionOrientation.copy();
-        } else {
-            copy.quaternionOrientation = null;
+        copy.rotationComponent = rotationComponent;
+        if (attitudeComponent != null) {
+            copy.attitudeComponent = attitudeComponent.copy();
         }
         return copy;
     }
 
     public void initialize(AssetManager manager) {
-        if (quaternionOrientation != null) {
-            quaternionOrientation.initialize(manager);
+        if (attitudeComponent != null) {
+            attitudeComponent.initialize(manager);
         }
 
     }
 
     public void setUp(AssetManager manager) {
-        if (quaternionOrientation != null) {
-            quaternionOrientation.setUp(manager);
+        if (attitudeComponent != null) {
+            attitudeComponent.setUp(manager);
         }
     }
 
     public Vector3d getNonRotatedPos() {
-        if (quaternionOrientation != null) {
-            return quaternionOrientation.nonRotatedPos;
+        if (attitudeComponent != null) {
+            return attitudeComponent.nonRotatedPos;
         }
         return null;
     }
