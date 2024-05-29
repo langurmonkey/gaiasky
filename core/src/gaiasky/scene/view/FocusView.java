@@ -659,7 +659,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public double getElevationAt(Vector3b camPos,
                                  boolean useFuturePosition) {
-        if (isModel()) {
+        if (isBillboard()) {
+            return 0;
+        } else if (isModel()) {
             if (useFuturePosition) {
                 Vector3b nextPos = getPredictedPosition(B33, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
                 return getElevationAt(camPos, nextPos);
@@ -674,7 +676,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public double getElevationAt(Vector3b camPos,
                                  Vector3b nextPos) {
-        if (isModel()) {
+        if (isBillboard()) {
+            return 0;
+        } else if (isModel()) {
             var model = Mapper.model.get(entity);
             var mc = model.model;
             double multiplier = Settings.settings.scene.renderer.elevation.multiplier;
@@ -729,7 +733,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getHeightScale() {
-        if (isModel()) {
+        if (isModel() && !isBillboard()) {
             var model = Mapper.model.get(entity);
             var mc = model.model;
             if (mc != null && mc.mtc != null && mc.mtc.heightData != null) {
@@ -976,6 +980,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public boolean isModel() {
         return isValid() && Mapper.modelScaffolding.has(entity);
+    }
+
+    public boolean isBillboard() {
+        return isValid() && (Mapper.tagBillboard.has(entity) || Mapper.tagBillboardGalaxy.has(entity));
     }
 
     public boolean isCluster() {

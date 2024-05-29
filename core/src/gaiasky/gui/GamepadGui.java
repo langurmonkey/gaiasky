@@ -1307,7 +1307,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     private void updateFocusedBookmark() {
-        if (((vr && selectedTab == 2) || selectedTab == 1) && fi < maxBookmarkDepth - 1) {
+        if (((vr && selectedTab == 2) || (!vr && selectedTab == 1)) && fi < maxBookmarkDepth - 1) {
             if(currentModel[fi][fj] instanceof BookmarkButton selectedBookmark) {
                 // Move scroll position.
                 var scroll = GuiUtils.getScrollPaneAncestor(selectedBookmark);
