@@ -18,6 +18,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.view.FocusView;
+import gaiasky.util.Constants;
 import gaiasky.util.TextUtils;
 
 public class BookmarkButton extends OwnTextIconButton {
@@ -59,7 +60,7 @@ public class BookmarkButton extends OwnTextIconButton {
                             var d = bookmark.direction;
                             var u = bookmark.up;
                             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE, true);
-                            EventManager.publish(Event.CAMERA_POS_CMD, this, (Object) new double[]{p.x, p.y, p.z});
+                            EventManager.publish(Event.CAMERA_POS_CMD, this, (Object) new double[]{p.x * Constants.DISTANCE_SCALE_FACTOR, p.y * Constants.DISTANCE_SCALE_FACTOR, p.z * Constants.DISTANCE_SCALE_FACTOR});
                             EventManager.publish(Event.CAMERA_DIR_CMD, this, (Object) new double[]{d.x, d.y, d.z});
                             EventManager.publish(Event.CAMERA_UP_CMD, this, (Object) new double[]{u.x, u.y, u.z});
                             EventManager.publish(Event.TIME_CHANGE_CMD, this, bookmark.time);
