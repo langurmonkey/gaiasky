@@ -79,7 +79,6 @@ public class ConsoleLogger implements IObserver {
      *
      * @param date  The date
      * @param level The logging level
-     *
      * @return The tag
      */
     private String tag(Instant date, LoggerLevel level) {
@@ -196,7 +195,10 @@ public class ConsoleLogger implements IObserver {
             case ORBIT_DATA_LOADED ->
                     addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), LoggerLevel.DEBUG);
             case SCREENSHOT_INFO -> addMessage(I18n.msg("notif.screenshot", data[0]));
-            case STEREOSCOPIC_CMD -> addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
+            case STEREOSCOPIC_CMD -> {
+                if (!Settings.settings.runtime.openXr)
+                    addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
+            }
             case DISPLAY_GUI_CMD -> {
                 boolean displayGui = (Boolean) data[0];
                 addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));

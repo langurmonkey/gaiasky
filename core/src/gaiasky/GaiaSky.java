@@ -1534,36 +1534,38 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
             }
             case STEREOSCOPIC_CMD -> {
-                final boolean stereoMode = (Boolean) data[0];
-                if (stereoMode && guiRegistry.current != stereoGui) {
-                    guiRegistry.change(stereoGui);
-                } else if (!stereoMode && guiRegistry.previous != stereoGui) {
-                    IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
-                    guiRegistry.change(guiRegistry.previous, prev);
-                }
+                if(!isVR()) {
+                    final boolean stereoMode = (Boolean) data[0];
+                    if (stereoMode && guiRegistry.current != stereoGui) {
+                        guiRegistry.change(stereoGui);
+                    } else if (!stereoMode && guiRegistry.previous != stereoGui) {
+                        IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
+                        guiRegistry.change(guiRegistry.previous, prev);
+                    }
 
-                // Disable dynamic resolution.
-                // Post a message to the screen.
-                if (stereoMode) {
-                    resetDynamicResolution();
+                    // Disable dynamic resolution.
+                    // Post a message to the screen.
+                    if (stereoMode) {
+                        resetDynamicResolution();
 
-                    var keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
-                    var keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
-                    final var mpi = new ModePopupInfo();
-                    mpi.title = I18n.msg("gui.stereo.title");
-                    mpi.header = I18n.msg("gui.stereo.notice.header");
+                        var keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
+                        var keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
+                        final var mpi = new ModePopupInfo();
+                        mpi.title = I18n.msg("gui.stereo.title");
+                        mpi.header = I18n.msg("gui.stereo.notice.header");
 
-                    mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
-                    mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
+                        mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
+                        mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
 
-                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
-                } else {
-                    EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
+                        EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
+                    } else {
+                        EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
+                    }
                 }
             }
             case CUBEMAP_CMD -> {
                 var cubemapMode = (Boolean) data[0];
-                if (cubemapMode) {
+                if (!isVR() && cubemapMode) {
                     resetDynamicResolution();
                 }
             }

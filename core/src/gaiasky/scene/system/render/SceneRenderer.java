@@ -657,11 +657,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case LINE_RENDERER_UPDATE -> GaiaSky.postRunnable(this::updateLineRenderSystems);
             case STEREOSCOPIC_CMD -> {
-                boolean stereo = (Boolean) data[0];
-                if (stereo) renderMode = sgrList[SGR_STEREO_IDX];
-                else {
-                    if (Settings.settings.runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
-                    else renderMode = sgrList[SGR_DEFAULT_IDX];
+                if (!isVR()) {
+                    boolean stereo = (Boolean) data[0];
+                    if (stereo) renderMode = sgrList[SGR_STEREO_IDX];
+                    else {
+                        if (Settings.settings.runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
+                        else renderMode = sgrList[SGR_DEFAULT_IDX];
+                    }
                 }
             }
             case CUBEMAP_CMD -> {

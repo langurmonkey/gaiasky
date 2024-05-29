@@ -57,7 +57,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     /**
      * Contains a map by name with
-     * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for ray-marching post-processors.
+     * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string},
+     * 5:texture3{string}]] for ray-marching post-processors.
      */
     private final Map<String, Object[]> rayMarchingDefinitions;
     /**
@@ -950,9 +951,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            case STEREOSCOPIC_CMD -> updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);
-            case STEREO_PROFILE_CMD ->
+            case STEREOSCOPIC_CMD -> {
+                if (!Settings.settings.runtime.openXr)
+                    updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);
+            }
+            case STEREO_PROFILE_CMD -> {
+                if (!Settings.settings.runtime.openXr)
                     updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
+            }
             case ANTIALIASING_CMD -> {
                 final AntialiasSettings antiAliasingValue = (AntialiasSettings) data[0];
                 GaiaSky.postRunnable(() -> {
