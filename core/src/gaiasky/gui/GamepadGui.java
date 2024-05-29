@@ -1308,25 +1308,24 @@ public class GamepadGui extends AbstractGui {
 
     private void updateFocusedBookmark() {
         if (((vr && selectedTab == 2) || selectedTab == 1) && fi < maxBookmarkDepth - 1) {
-            // Bookmarks.
-            var selectedBookmark = (BookmarkButton) currentModel[fi][fj];
-
-            // Move scroll position.
-            var scroll = GuiUtils.getScrollPaneAncestor(selectedBookmark);
-            if (scroll != null) {
-                var coordinates = selectedBookmark.localToAscendantCoordinates(scroll.getActor(), new Vector2(selectedBookmark.getX(), selectedBookmark.getY()));
-                scroll.scrollTo(coordinates.x, coordinates.y, selectedBookmark.getWidth(), selectedBookmark.getHeight() + 250f);
-            }
+            if(currentModel[fi][fj] instanceof BookmarkButton selectedBookmark) {
+                // Move scroll position.
+                var scroll = GuiUtils.getScrollPaneAncestor(selectedBookmark);
+                if (scroll != null) {
+                    var coordinates = selectedBookmark.localToAscendantCoordinates(scroll.getActor(), new Vector2(selectedBookmark.getX(), selectedBookmark.getY()));
+                    scroll.scrollTo(coordinates.x, coordinates.y, selectedBookmark.getWidth(), selectedBookmark.getHeight() + 250f);
+                }
 
 
-            if (selectedBookmark.bookmark.folder) {
-                // If it is a folder, we need to populate the next.
-                fillBookmarksColumn(bookmarkColumns, fi + 1, selectedBookmark.bookmark.children, currentModel, bw, bh, false);
-            } else {
-                // Clear all columns right of current.
-                for (int i = fi + 1; i < maxBookmarkDepth; i++) {
-                    bookmarkColumns[i].clearActor();
-                    currentModel[i] = null;
+                if (selectedBookmark.bookmark.folder) {
+                    // If it is a folder, we need to populate the next.
+                    fillBookmarksColumn(bookmarkColumns, fi + 1, selectedBookmark.bookmark.children, currentModel, bw, bh, false);
+                } else {
+                    // Clear all columns right of current.
+                    for (int i = fi + 1; i < maxBookmarkDepth; i++) {
+                        bookmarkColumns[i].clearActor();
+                        currentModel[i] = null;
+                    }
                 }
             }
         }
