@@ -100,7 +100,7 @@ public class MachineDefinition {
         return selfShadow;
     }
 
-    public void setSelfShadow(boolean selfShadow) {
+    public void setSelfShadow(Boolean selfShadow) {
         this.selfShadow = selfShadow;
     }
 
