@@ -175,7 +175,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackBufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
-        lightGlow.setEnabledOptions(false, true);
+        lightGlow.setEnabledOptions(true, true);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
@@ -935,7 +935,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
             case CUBEMAP_CMD -> {
                 var cubemap = (Boolean) data[0];
-                var enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openXr;
+                var enabled = cubemap && !Settings.settings.runtime.openXr;
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];

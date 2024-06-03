@@ -106,7 +106,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        // This renders the cubemap to [x|y|z][pos|neg]fb
+        // Projects the cubemap.
         super.renderCubemapSides(sgr, camera, t, rw, rh, ppb);
 
         if (cubemapProjection.getProjection().isSphericalMirror() && geometryWarp != null) {

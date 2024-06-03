@@ -283,7 +283,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
 
         // Whether light scattering is enabled or not
-        shader.setUniformi("u_lightScattering", (isStar && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
+        shader.setUniformi("u_lightScattering", (isStar && Settings.settings.postprocess.lightGlow.active) ? 1 : 0);
 
         shader.setUniformf("u_radius", radius);
 

@@ -109,8 +109,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean moveCam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
 
-        PerspectiveCamera cam = camera.getCamera();
-        // Vector of 1 meter length pointing to the side of the camera
+        PerspectiveCamera perspectiveCam = camera.getCamera();
+        // Vector of 1 meter length pointing to the side of the camera.
         double separation = Constants.M_TO_U * Settings.settings.program.modeStereo.eyeSeparation;
         double separationCapped;
         double dirAngleDeg = 0;
@@ -131,37 +131,37 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             } else {
                 separation = Math.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
             }
-            // Lets cap it
+            // Let's cap it.
             separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
             dirAngleDeg = EYE_ANGLE_DEG;
         } else {
             separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
         }
 
-        // Aux5d contains the direction to the side of the camera, normalised
+        // Aux5d contains the direction to the side of the camera, normalized.
         aux5d.set(camera.getDirection()).crs(camera.getUp()).nor();
 
         Vector3d side = aux4d.set(aux5d).nor().scl(separation);
         Vector3d sideRemainder = aux2d.set(aux5d).scl(separation - separationCapped);
         Vector3d sideCapped = aux3d.set(aux5d).nor().scl(separationCapped);
-        Vector3 backupPos = aux2.set(cam.position);
-        Vector3 backupDir = aux3.set(cam.direction);
+        Vector3 backupPos = aux2.set(perspectiveCam.position);
+        Vector3 backupDir = aux3.set(perspectiveCam.direction);
         Vector3d backupPosd = aux1d.set(camera.getPos());
 
         if (Settings.settings.program.modeStereo.profile.isAnaglyph()) {
-            // Update viewport
+            // Update viewport.
             extendViewport.setCamera(camera.getCamera());
             extendViewport.setWorldSize(rw, rh);
             extendViewport.setScreenBounds(0, 0, rw, rh);
             extendViewport.apply();
 
-            // LEFT EYE
+            // LEFT EYE.
 
-            // Camera to the left
+            // Camera to the left.
             if (moveCam) {
                 moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, false);
             }
-            camera.setCameraStereoLeft(cam);
+            camera.setCameraStereoLeft(perspectiveCam);
 
             sgr.getLightGlowPass().render(camera);
 
@@ -170,19 +170,19 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             try {
                 sgr.renderScene(camera, t, rc);
             } finally {
-                sendOrientationUpdate(cam, rw, rh);
+                sendOrientationUpdate(perspectiveCam, rw, rh);
                 postProcessRender(ppb, fb1, postProcess, camera, rw, rh);
             }
             Texture texLeft = fb1.getColorBufferTexture();
 
-            // RIGHT EYE
+            // RIGHT EYE.
 
-            // Camera to the right
+            // Camera to the right.
             if (moveCam) {
-                restoreCameras(camera, cam, backupPosd, backupPos, backupDir);
+                restoreCameras(camera, perspectiveCam, backupPosd, backupPos, backupDir);
                 moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, true);
             }
-            camera.setCameraStereoRight(cam);
+            camera.setCameraStereoRight(perspectiveCam);
 
             sgr.getLightGlowPass().render(camera);
 
@@ -191,12 +191,12 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             try {
                 sgr.renderScene(camera, t, rc);
             } finally {
-                sendOrientationUpdate(cam, rw, rh);
+                sendOrientationUpdate(perspectiveCam, rw, rh);
                 postProcessRender(ppb, fb2, postProcess, camera, rw, rh);
             }
             Texture texRight = fb2.getColorBufferTexture();
 
-            // We have left and right images to texLeft and texRight
+            // We have left and right images to texLeft and texRight.
             updateAnaglyphMode();
             anaglyphEffect.setTextureLeft(texLeft);
             anaglyphEffect.setTextureRight(texRight);
@@ -205,11 +205,11 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             anaglyphEffect.render(null, resultBuffer, null);
             resultBuffer.end();
 
-            // ensure default texture unit #0 is active
+            // ensure default texture unit #0 is active.
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
         } else {
 
-            int srw, srh, boundsw, boundsh, start2w, start2h;
+            double srw, srh, boundsw, boundsh, start2w, start2h;
 
             boolean stretch = Settings.settings.program.modeStereo.profile == StereoProfile.HORIZONTAL_3DTV || Settings.settings.program.modeStereo.profile == StereoProfile.VERTICAL_3DTV;
             boolean changeSides = Settings.settings.program.modeStereo.profile == StereoProfile.CROSSEYE;
@@ -251,64 +251,64 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             Viewport viewport = stretch ? stretchViewport : extendViewport;
 
             viewport.setCamera(camera.getCamera());
-            viewport.setWorldSize(srw, srh);
+            viewport.setWorldSize((float) srw, (float) srh);
 
             // LEFT EYE
 
-            viewport.setScreenBounds(0, 0, boundsw, boundsh);
+            viewport.setScreenBounds(0, 0, (int) boundsw, (int) boundsh);
             viewport.apply();
 
             // Camera to left
             if (moveCam) {
                 moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, changeSides);
             }
-            camera.setCameraStereoLeft(cam);
+            camera.setCameraStereoLeft(perspectiveCam);
 
             sgr.getLightGlowPass().render(camera);
 
-            FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh, 3);
-            boolean postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh, ppb::capture);
+            FrameBuffer fb3d = getFrameBuffer((int) boundsw, (int) boundsh, 3);
+            boolean postProcess = postProcessCapture(ppb, fb3d, (int) boundsw, (int) boundsh, ppb::capture);
             sgr.renderScene(camera, t, rc);
 
-            sendOrientationUpdate(cam, rw, rh);
+            sendOrientationUpdate(perspectiveCam, rw, rh);
             Texture tex;
-            postProcessRender(ppb, fb3d, postProcess, camera, boundsw, boundsh);
+            postProcessRender(ppb, fb3d, postProcess, camera, (int) boundsw, (int) boundsh);
             tex = fb3d.getColorBufferTexture();
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
             resultBuffer.begin();
             sb.begin();
             sb.setColor(1f, 1f, 1f, 1f);
-            sb.draw(tex, 0, 0, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
+            sb.draw(tex, 0f, 0f, 0f, 0f, (float) boundsw, (float) boundsh, 1f, 1f, 0f, 0, 0, (int) boundsw, (int) boundsh, false, true);
             sb.end();
             resultBuffer.end();
 
             // RIGHT EYE
 
-            viewport.setScreenBounds(start2w, start2h, boundsw, boundsh);
+            viewport.setScreenBounds((int) start2w, (int) start2h, (int) boundsw, (int) boundsh);
             viewport.apply();
 
             // Camera to right
             if (moveCam) {
-                restoreCameras(camera, cam, backupPosd, backupPos, backupDir);
+                restoreCameras(camera, perspectiveCam, backupPosd, backupPos, backupDir);
                 moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, !changeSides);
             }
-            camera.setCameraStereoRight(cam);
+            camera.setCameraStereoRight(perspectiveCam);
 
             sgr.getLightGlowPass().render(camera);
 
-            postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh, ppb::capture);
+            postProcess = postProcessCapture(ppb, fb3d, (int) boundsw, (int) boundsh, ppb::capture);
             sgr.renderScene(camera, t, rc);
 
-            sendOrientationUpdate(cam, rw, rh);
-            postProcessRender(ppb, fb3d, postProcess, camera, boundsw, boundsh);
+            sendOrientationUpdate(perspectiveCam, rw, rh);
+            postProcessRender(ppb, fb3d, postProcess, camera, (int) boundsw, (int) boundsh);
             tex = fb3d.getColorBufferTexture();
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
             resultBuffer.begin();
             sb.begin();
             sb.setColor(1f, 1f, 1f, 1f);
-            sb.draw(tex, start2w, start2h, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
+            sb.draw(tex, (float) start2w, (float) start2h, 0f, 0f, (float) boundsw, (float) boundsh, 1f, 1f, 0f, 0, 0, (int) boundsw, (int) boundsh, false, true);
             sb.end();
             resultBuffer.end();
 
@@ -318,7 +318,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         }
 
         // RESTORE
-        restoreCameras(camera, cam, backupPosd, backupPos, backupDir);
+        restoreCameras(camera, perspectiveCam, backupPosd, backupPos, backupDir);
 
         // To screen
         if (fb == null)

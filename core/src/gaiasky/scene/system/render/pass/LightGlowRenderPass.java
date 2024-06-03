@@ -42,8 +42,9 @@ public class LightGlowRenderPass extends RenderPass {
     private final LightPositionUpdater lpu;
     private final Array<Entity> controllers = new Array<>();
     private BillboardRenderer billboardStarsRenderer = null;
-    // Disable texture view.
-    private boolean uiViewCreated = true;
+
+    // Debug occlusion texture.
+    private boolean DEBUG_UI_VIEW = false;
 
     public LightGlowRenderPass(final SceneRenderer sceneRenderer) {
         super(sceneRenderer);
@@ -147,12 +148,12 @@ public class LightGlowRenderPass extends RenderPass {
 
             frameBuffer.end();
 
-            if (!uiViewCreated) {
+            if (DEBUG_UI_VIEW) {
                 GaiaSky.postRunnable(() -> {
                     // Create UI view
                     EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", occlusionFrameBuffer, 0.5f, false, true);
                 });
-                uiViewCreated = true;
+                DEBUG_UI_VIEW = false;
             }
         }
 

@@ -2256,6 +2256,16 @@ public class Settings extends SettingsObject {
             return modeStereo.active || modeCubemap.active;
         }
 
+        @JsonIgnore
+        public boolean isCubemap() {
+            return modeCubemap.active;
+        }
+
+        @JsonIgnore
+        public boolean isStereo() {
+            return modeStereo.active;
+        }
+
         @JsonProperty("timeZone")
         public void setTimeZone(String timeZone) {
             if (timeZone == null || timeZone.isEmpty()) {
