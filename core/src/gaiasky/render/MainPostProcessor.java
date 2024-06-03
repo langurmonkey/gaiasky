@@ -530,59 +530,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 this.scene = (Scene) data[0];
                 initializeOffScreenPostProcessors();
             }
-            case RAYMARCHING_CMD -> {
-                var name = (String) data[0];
-                var status = (Boolean) data[1];
-                var entity = (Entity) data[2];
-                if (data.length > 3) {
-                    // Add effect description for later initialization.
-                    String shader = (String) data[3];
-                    Object[] l;
-                    if (data.length > 4) {
-                        float[] additional = data[4] != null ? (float[]) data[4] : null;
-                        if (data.length > 5) {
-                            Texture rmTexture = (Texture) data[5];
-                            // Contains texture.
-                            l = new Object[]{shader, false, entity, additional, rmTexture};
-                        } else {
-                            // No texture.
-                            l = new Object[]{shader, false, entity, additional};
-                        }
-                    } else {
-                        // No additional data.
-                        l = new Object[]{shader, false, entity};
-                    }
-                    addRayMarchingDef(name, l);
-                    logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
-                } else {
-                    for (int i = 0; i < RenderType.values().length; i++) {
-                        if (pps[i] != null) {
-                            PostProcessBean ppb = pps[i];
-                            PostProcessorEffect effect = ppb.get(name, Raymarching.class);
-                            if (effect != null) {
-                                effect.setEnabled(status);
-                                logger.info("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
-                            }
-                        }
-                    }
-                }
-            }
-            case RAYMARCHING_ADDITIONAL_CMD -> {
-                var name = (String) data[0];
-                var additional = (float[]) data[1];
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        // Update ray marching additional data
-                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
-                        if (rms != null) {
-                            PostProcessorEffect ppe = rms.get(name);
-                            if (ppe != null)
-                                ((Raymarching) ppe).setAdditional(additional);
-                        }
-                    }
-                }
-            }
             case STAR_BRIGHTNESS_CMD -> {
                 var brightness = (Float) data[0];
                 GaiaSky.postRunnable(() -> {
@@ -817,11 +764,75 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
                 }
             }
+            case RAYMARCHING_CMD -> {
+                var name = (String) data[0];
+                var status = (Boolean) data[1];
+                var entity = (Entity) data[2];
+                if (data.length > 3) {
+                    // Add effect description for later initialization.
+                    String shader = (String) data[3];
+                    Object[] l;
+                    if (data.length > 4) {
+                        float[] additional = data[4] != null ? (float[]) data[4] : null;
+                        if (data.length > 5) {
+                            Texture rmTexture = (Texture) data[5];
+                            // Contains texture.
+                            l = new Object[]{shader, false, entity, additional, rmTexture};
+                        } else {
+                            // No texture.
+                            l = new Object[]{shader, false, entity, additional};
+                        }
+                    } else {
+                        // No additional data.
+                        l = new Object[]{shader, false, entity};
+                    }
+                    addRayMarchingDef(name, l);
+                    logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
+                } else {
+                    var rmTime = getRaymarchingTime();
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                        if (pps[i] != null) {
+                            PostProcessBean ppb = pps[i];
+                            Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                            if (rms != null)
+                                rms.forEach((key, rmEffect) -> {
+                                    Raymarching raymarching = (Raymarching) rmEffect;
+                                    raymarching.setEnabled(status);
+                                    logger.info("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
+
+                                    // We also update time and object position for the first time here.
+                                    var rmEntity = (Entity) rayMarchingDefinitions.get(key)[2];
+                                    focusView.setScene(scene);
+                                    focusView.setEntity(rmEntity);
+                                    focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
+                                    var camPos = v3b1.set(GaiaSky.instance.getCameraManager().getPos()).sub(v3b2).put(v3f1);
+                                    raymarching.setTime(rmTime);
+                                    raymarching.setPos(camPos);
+                                });
+                        }
+                    }
+                }
+            }
+            case RAYMARCHING_ADDITIONAL_CMD -> {
+                var name = (String) data[0];
+                var additional = (float[]) data[1];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        // Update ray marching additional data
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        if (rms != null) {
+                            PostProcessorEffect ppe = rms.get(name);
+                            if (ppe != null)
+                                ((Raymarching) ppe).setAdditional(additional);
+                        }
+                    }
+                }
+            }
             case CAMERA_MOTION_UPDATE -> {
                 var camera = (PerspectiveCamera) data[3];
                 var campos = (Vector3b) data[0];
-                var zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
-                float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
+                var rmTime = getRaymarchingTime();
                 float cameraOffset = (camera.direction.x + camera.direction.y + camera.direction.z);
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -844,7 +855,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                     focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
                                     var camPos = v3b1.set(campos).sub(v3b2).put(v3f1);
                                     Raymarching raymarching = (Raymarching) rmEffect;
-                                    raymarching.setTime(secs);
+                                    raymarching.setTime(rmTime);
                                     raymarching.setPos(camPos);
                                 }
                             });
@@ -1094,6 +1105,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             default -> {
             }
         }
+    }
+
+    private float getRaymarchingTime() {
+        var zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
+        return (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
     }
 
     private Antialiasing getAA(PostProcessBean ppb) {
