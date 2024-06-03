@@ -125,17 +125,12 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             // If we have focus, we adapt the eye separation
             double distToFocus = currentFocus.getDistToCamera() - currentFocus.getRadius();
             // Let's calculate the separation
-            if (camera.getMode() == CameraMode.SPACECRAFT_MODE) {
-                // In spacecraft mode, the separation is tiny, otherwise we see no spacecraft
-                separation = (5000 * Constants.M_TO_U);
-            } else {
-                separation = Math.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
-            }
+            separation = Math.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
             // Let's cap it.
-            separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
+            separationCapped = Math.min(separation, 10.0 * Constants.M_TO_U);
             dirAngleDeg = EYE_ANGLE_DEG;
         } else {
-            separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
+            separationCapped = Math.min(separation, 10.0 * Constants.M_TO_U);
         }
 
         // Aux5d contains the direction to the side of the camera, normalized.
