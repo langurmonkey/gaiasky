@@ -63,7 +63,7 @@ public abstract class RenderPass implements Disposable {
     protected abstract void initializeRenderPass();
 
     public void initialize() {
-        if (enabled && (condition != null && condition.get())) {
+        if (enabled && (condition == null || condition.get())) {
             initializeRenderPass();
         }
     }
@@ -79,7 +79,7 @@ public abstract class RenderPass implements Disposable {
     protected abstract void renderPass(ICamera camera, Object... params);
 
     public final void render(ICamera camera, Object... params) {
-        if (enabled && (condition != null && condition.get())) {
+        if (enabled && (condition == null || condition.get())) {
             renderPass(camera, params);
         }
     }
