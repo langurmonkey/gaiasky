@@ -187,6 +187,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             float k = Constants.getCameraK();
             var entity = (Entity) list[2];
             var body = Mapper.body.get(entity);
+            var raymarch = Mapper.raymarching.get(entity);
             // We normalize the size.
             rm.setSize(body.size * 0.1f);
             rm.setZfarK(zFar, k);
@@ -203,7 +204,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     logger.error(e);
                 }
             }
-            rm.setEnabled((boolean) list[1]);
+            rm.setEnabled(raymarch.isOn);
             ppb.set(key, rm);
         });
 
