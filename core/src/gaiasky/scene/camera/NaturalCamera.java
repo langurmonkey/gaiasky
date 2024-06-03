@@ -426,15 +426,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
     }
 
+    /**
+     * Computes the future positions at the given time of the closest and focus objects.
+     * @param time The time.
+     */
     private void computeNextPositions(ITimeFrameProvider time) {
+        // Next focus position.
         if (getMode().isFocus() && focus != null) {
             focus.getPredictedPosition(nextFocusPosition, time, this, false);
         }
-        if (!getMode().isFocus() && closestBody != null && !closestBody.isEmpty()) {
-            if (closestBody != focus)
+        // Next closest position.
+        if (closestBody != null && !closestBody.isEmpty()) {
+            if (closestBody != focus) {
                 closestBody.getPredictedPosition(nextClosestPosition, time, this, false);
-            else
+            } else {
                 nextClosestPosition.set(nextFocusPosition);
+            }
 
         }
     }
