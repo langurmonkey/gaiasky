@@ -118,6 +118,7 @@ public class GlobalResources {
     /**
      * Formats a given double number. Uses scientific notation for numbers in [-9999,9999], and
      * regular numbers elsewhere.
+     *
      * @param number The number to format.
      * @return The string representation.
      */
@@ -138,7 +139,6 @@ public class GlobalResources {
      *
      * @param d  Distance in internal units
      * @param du The distance units to use
-     *
      * @return An array containing the float number and the string units
      */
     public static Pair<Double, String> doubleToDistanceString(double d, DistanceUnits du) {
@@ -165,7 +165,6 @@ public class GlobalResources {
      *
      * @param d  Distance in internal units
      * @param du The distance units to use
-     *
      * @return Array containing the number and the units
      */
     public static Pair<Double, String> doubleToVelocityString(double d, DistanceUnits du) {
@@ -179,7 +178,6 @@ public class GlobalResources {
      *
      * @param f  Distance in internal units
      * @param du The distance units to use
-     *
      * @return An array containing the float number and the string units
      */
     public static Pair<Float, String> floatToDistanceString(float f, DistanceUnits du) {
@@ -192,7 +190,6 @@ public class GlobalResources {
      * its numbers
      *
      * @param array The array of doubles
-     *
      * @return The array of floats
      */
     public static float[] toFloatArray(double[] array) {
@@ -212,7 +209,6 @@ public class GlobalResources {
      * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
-     *
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3b point, double len, float coneAngle, Vector3d dir) {
@@ -229,7 +225,6 @@ public class GlobalResources {
      * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
-     *
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
@@ -244,7 +239,6 @@ public class GlobalResources {
      * @param points    The array of points to check
      * @param coneAngle The cone angle of the camera (field of view)
      * @param dir       The direction
-     *
      * @return True if any of the points is in the camera view cone
      */
     public static boolean isAnyInView(Vector3d[] points, float coneAngle, Vector3d dir) {
@@ -262,7 +256,6 @@ public class GlobalResources {
      * @param buf       Buffer to compare against
      * @param compareTo Buffer to compare to (content should be ASCII lowercase if
      *                  possible)
-     *
      * @return True if the buffers compare favourably, false otherwise
      */
     public static boolean equal(String buf, char[] compareTo, boolean ignoreCase) {
@@ -337,7 +330,6 @@ public class GlobalResources {
      * {@link Constants#getPartFileMaxAgeMs()}.
      *
      * @param path the path to delete.
-     *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static void deleteRecursively(Path path) throws IOException {
@@ -385,9 +377,7 @@ public class GlobalResources {
      * Recursively count files in a directory
      *
      * @param dir The directory
-     *
      * @return The number of files
-     *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static long fileCount(Path dir) throws IOException {
@@ -398,9 +388,7 @@ public class GlobalResources {
      * Count files matching a certain ending in a directory, recursively
      *
      * @param dir The directory
-     *
      * @return The number of files
-     *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static long fileCount(Path dir, String[] extensions) throws IOException {
@@ -414,7 +402,6 @@ public class GlobalResources {
      *
      * @param s       The string
      * @param endings The endings
-     *
      * @return True if the string ends with any of the endings
      */
     public static boolean endsWith(String s, String[] endings) {
@@ -480,7 +467,6 @@ public class GlobalResources {
      *
      * @param bytes The bytes
      * @param si    Whether to use SI units (1000-multiples) or binary (1024-multiples)
-     *
      * @return The size in a human-readable form
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
@@ -566,7 +552,6 @@ public class GlobalResources {
      * str = '"a" "bc" "d" "efghi"'
      *
      * @param str The string
-     *
      * @return The resulting array
      */
     public static String[] parseWhitespaceSeparatedList(String str) {
@@ -600,7 +585,6 @@ public class GlobalResources {
      * where each element is double-quoted.
      *
      * @param l The string array
-     *
      * @return The resulting string
      */
     public static String toWhitespaceSeparatedList(String[] l) {
@@ -614,7 +598,6 @@ public class GlobalResources {
      * @param l         The list
      * @param quote     The quote string to use
      * @param separator The separator
-     *
      * @return The resulting string
      */
     public static String toString(String[] l, String quote, String separator) {
@@ -669,8 +652,60 @@ public class GlobalResources {
         }
     }
 
+    public static String unpackAssetPath(String path, GraphicsQuality gq, String... extensions) {
+        if (!path.contains(Constants.STAR_SUBSTITUTE)) {
+            for (String extension : extensions) {
+                String tex = path + extension;
+                if (Settings.settings.data.dataFileHandle(tex).exists()) {
+                    return tex;
+                }
+            }
+        } else {
+            // Try all graphics qualities.
+            for (String extension : extensions) {
+                for (int i = gq.ordinal(); i >= 0; i--) {
+                    GraphicsQuality quality = GraphicsQuality.values()[i];
+                    String suffix = quality.suffix;
+
+                    String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix) + extension;
+                    if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
+                        return texSuffix;
+                    }
+                }
+            }
+            // Try with no suffix.
+            for (String extension : extensions) {
+                String texNoSuffix = path.replace(Constants.STAR_SUBSTITUTE, "") + extension;
+                if (Settings.settings.data.dataFileHandle(texNoSuffix).exists()) {
+                    return texNoSuffix;
+                }
+            }
+            // Try higher qualities.
+            for (String extension : extensions) {
+                int n = GraphicsQuality.values().length;
+                for (int i = gq.ordinal(); i < n; i++) {
+                    GraphicsQuality quality = GraphicsQuality.values()[i];
+                    String suffix = quality.suffix;
+
+                    String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix) + extension;
+                    if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
+                        return texSuffix;
+                    }
+                }
+            }
+        }
+
+        // Not found.
+        logger.warn("Texture not found: " + path);
+        return null;
+    }
+
     public static String unpackAssetPath(String tex) {
         return GlobalResources.unpackAssetPath(tex, Settings.settings.graphics.quality);
+    }
+
+    public static String unpackAssetPathExtensions(String tex, String... extensions) {
+        return GlobalResources.unpackAssetPath(tex, Settings.settings.graphics.quality, extensions);
     }
 
     public static String resolveCubemapSide(String baseLocation, String... sideSuffixes) throws RuntimeException {
@@ -704,7 +739,6 @@ public class GlobalResources {
      * Generates all combinations of all sizes of all the strings given in values.
      *
      * @param values The input strings to combine.
-     *
      * @return The resulting combinations.
      */
     public static String[] combinations(String[] values) {
@@ -738,7 +772,6 @@ public class GlobalResources {
      * @param values The elements to combine
      * @param size   The size of the combinations
      * @param <T>    The type
-     *
      * @return The combinations
      */
     public static <T> List<List<T>> combination(List<T> values, int size) {

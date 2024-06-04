@@ -442,7 +442,7 @@ public class Settings extends SettingsObject {
                 } else {
                     return this.name();
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 return this.name();
             }
         }
@@ -896,11 +896,15 @@ public class Settings extends SettingsObject {
         }
 
         public String dataFile(String path) {
+            if (path == null)
+                return null;
             return dataFile(path, Constants.DEFAULT_DATASET_KEY);
         }
 
         public FileHandle dataFileHandle(String path,
                                          String dsLocation) {
+            if (path == null)
+                return null;
             return new FileHandle(dataFile(path, dsLocation));
         }
 
@@ -1526,14 +1530,14 @@ public class Settings extends SettingsObject {
             public String getStarTexture(int textureIndex) {
                 String starTexIdx = String.format("%02d", textureIndex);
                 String texture = settings.data.dataFile(
-                        GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
-                if (!Files.exists(Path.of(texture))) {
-                    // Fall back to whatever available
+                        GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE, ".jpg", ".png"));
+                if (texture == null) {
+                    // Fall back to whatever is available.
                     for (int i = 1; i < 9; i++) {
                         starTexIdx = String.format("%02d", i);
                         texture = settings.data.dataFile(
-                                GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
-                        if (Files.exists(Path.of(texture)))
+                                GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE, ".jpg", ".png"));
+                        if (texture != null)
                             return texture;
                     }
                 } else {

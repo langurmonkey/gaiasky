@@ -394,27 +394,23 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     private void updateGlow(PostProcessBean ppb, GraphicsQuality gq) {
-        int samples, lgw, lgh;
+        int lgw, lgh;
         if (gq.isUltra()) {
-            samples = 15;
             lgw = 1920;
         } else if (gq.isHigh()) {
-            samples = 12;
             lgw = 1500;
         } else if (gq.isNormal()) {
-            samples = 10;
             lgw = 1280;
         } else {
-            samples = 4;
             lgw = 1000;
         }
         lgh = Math.round(lgw / ar);
         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
         if (lightglow != null) {
-            lightglow.setNSamples(samples);
+            lightglow.setNSamples(1);
             lightglow.setViewportSize(lgw, lgh);
         }
-        Settings.settings.postprocess.lightGlow.samples = samples;
+        Settings.settings.postprocess.lightGlow.samples = 1;
     }
 
     private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
