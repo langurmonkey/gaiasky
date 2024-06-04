@@ -157,7 +157,7 @@ public class GamepadGui extends AbstractGui {
         EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
         EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD, Event.TOGGLE_VISIBILITY_CMD);
-        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.INVERT_X_CMD, Event.INVERT_Y_CMD);
         EventManager.instance.subscribe(this, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
         EventManager.instance.subscribe(this, Event.CROSSHAIR_CLOSEST_CMD, Event.CROSSHAIR_FOCUS_CMD, Event.CROSSHAIR_HOME_CMD);
     }
@@ -849,7 +849,7 @@ public class GamepadGui extends AbstractGui {
             invertXButton.setChecked(Settings.settings.controls.gamepad.invertX);
             invertXButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.INVERT_X_CMD, invertXButton, invertXButton.isChecked());
+                    EventManager.publish(Event.INVERT_X_CMD, this, invertXButton.isChecked());
                     return true;
                 }
                 return false;
@@ -863,7 +863,7 @@ public class GamepadGui extends AbstractGui {
             invertYButton.setChecked(Settings.settings.controls.gamepad.invertY);
             invertYButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.INVERT_Y_CMD, invertYButton, invertYButton.isChecked());
+                    EventManager.publish(Event.INVERT_Y_CMD, this, invertYButton.isChecked());
                     return true;
                 }
                 return false;
@@ -1786,6 +1786,20 @@ public class GamepadGui extends AbstractGui {
                         crosshairHome.setProgrammaticChangeEvents(true);
                     }
 
+                }
+                case INVERT_X_CMD -> {
+                   if (source != this && invertXButton != null) {
+                       invertXButton.setProgrammaticChangeEvents(false);
+                       invertXButton.setChecked((Boolean) data[0]);
+                       invertXButton.setProgrammaticChangeEvents(true);
+                   }
+                }
+                case INVERT_Y_CMD -> {
+                    if (source != this && invertYButton != null) {
+                        invertYButton.setProgrammaticChangeEvents(false);
+                        invertYButton.setChecked((Boolean) data[0]);
+                        invertYButton.setProgrammaticChangeEvents(true);
+                    }
                 }
                 default -> {
                 }

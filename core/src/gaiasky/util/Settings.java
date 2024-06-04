@@ -3144,6 +3144,7 @@ public class Settings extends SettingsObject {
 
         @Override
         protected void setupListeners() {
+            gamepad.setupListeners();
         }
 
         @Override

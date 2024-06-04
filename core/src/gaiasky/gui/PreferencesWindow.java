@@ -151,6 +151,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         buildSuper();
 
         EventManager.instance.subscribe(this, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO);
+        EventManager.instance.subscribe(this, Event.INVERT_Y_CMD, Event.INVERT_X_CMD);
     }
 
     private OwnTextIconButton createTab(String title,
@@ -2532,14 +2533,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     @Override
     protected boolean accept() {
         saveCurrentPreferences();
-        unsubscribe();
         return true;
     }
 
     @Override
     protected void cancel() {
         revertLivePreferences();
-        unsubscribe();
     }
 
     @Override
@@ -3044,6 +3043,20 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                        final Object... data) {
         switch (event) {
             case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateGamepadsList(controllersTable);
+            case INVERT_X_CMD -> {
+                if (source != this && invertX != null) {
+                    invertX.setProgrammaticChangeEvents(false);
+                    invertX.setChecked((Boolean) data[0]);
+                    invertX.setProgrammaticChangeEvents(true);
+                }
+            }
+            case INVERT_Y_CMD -> {
+                if (source != this && invertY != null) {
+                    invertY.setProgrammaticChangeEvents(false);
+                    invertY.setChecked((Boolean) data[0]);
+                    invertY.setProgrammaticChangeEvents(true);
+                }
+            }
             default -> {
             }
         }
