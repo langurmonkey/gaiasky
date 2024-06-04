@@ -2533,16 +2533,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     @Override
     protected boolean accept() {
         saveCurrentPreferences();
+        unsubscribe();
         return true;
     }
 
     @Override
     protected void cancel() {
         revertLivePreferences();
+        unsubscribe();
     }
 
     @Override
     public void dispose() {
+        unsubscribe();
     }
 
     private void reloadDefaultPreferences() {

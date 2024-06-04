@@ -391,9 +391,11 @@ public class GuiRegistry implements IObserver {
                 case SHOW_PREFERENCES_ACTION -> {
                     Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
                     if (prefs.isEmpty()) {
-                        if (preferencesWindow == null) {
-                            preferencesWindow = new PreferencesWindow(stage, skin, GaiaSky.instance.getGlobalResources());
+                        if (preferencesWindow != null) {
+                            preferencesWindow.dispose();
+                            preferencesWindow = null;
                         }
+                        preferencesWindow = new PreferencesWindow(stage, skin, GaiaSky.instance.getGlobalResources());
                         if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
                             preferencesWindow.show(stage);
                         }
