@@ -113,7 +113,7 @@ public class SVTManager implements IObserver {
     private FloatBuffer floatBuffer;
 
     // Are the textures displaying in the UI already?
-    private boolean uiViewCreated = true;
+    private boolean DEBUG_UI_VIEW = false;
 
     public SVTManager() {
         super();
@@ -310,16 +310,14 @@ public class SVTManager implements IObserver {
             logger.debug("Paged out " + removedTiles + " virtual tiles.");
         }
 
-        if (!uiViewCreated && (addedTiles > 0 || removedTiles > 0)) {
+        if (DEBUG_UI_VIEW && (addedTiles > 0 || removedTiles > 0)) {
             final var lastTile = finalTile;
             GaiaSky.postRunnable(() -> {
                 // Create UI views with SVT cache and indirection textures.
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.05f);
-                if (lastTile != null) {
-                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", ((VirtualTextureComponent) lastTile.tree.aux).indirectionBuffer, 0.5f);
-                }
+                //EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", ((VirtualTextureComponent) lastTile.tree.aux).indirectionBuffer, 0.5f);
             });
-            uiViewCreated = true;
+            DEBUG_UI_VIEW = false;
         }
 
     }

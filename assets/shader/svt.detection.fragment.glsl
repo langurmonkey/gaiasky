@@ -20,8 +20,11 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
+    #ifdef shadowMapGlobalFlag
+    vec3 shadowMapUvGlobal;
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
-        vec3 csmUVs[numCSM];
+    vec3 csmLightSpacePos[numCSM];
     #endif // numCSM
     #endif// shadowMapFlag
     vec3 fragPosWorld;
@@ -55,15 +58,15 @@ void main() {
     // u_svtDepth is also the maximum mip level, u_svtDepth = log2(svtTextureSize/u_svtTileSize)
     float mip = clamp(floor(mipmapLevel(v_data.texCoords * u_svtResolution, svtDetectionScaleFactor)), 0.0, u_svtDepth);
     float svtLevel = u_svtDepth - mip;
-    fragColor.x = svtLevel;
+    fragColor.r = svtLevel;
 
     // Tile XY at the current level.
     float nTilesLevel = pow(2.0, svtLevel);
     vec2 nTilesDimension =  ar * nTilesLevel;
-    fragColor.yz = floor(v_data.texCoords * nTilesDimension);
+    fragColor.gb = floor(v_data.texCoords * nTilesDimension);
 
     // ID.
-    fragColor.w = u_svtId;
+    fragColor.a = u_svtId;
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

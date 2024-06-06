@@ -72,7 +72,7 @@ public class SVTRenderPass extends RenderPass {
     /** Marks the pixels array as ready for the SVT manager to consume. **/
     private final AtomicBoolean pixelsReady = new AtomicBoolean(false);
 
-    private boolean uiViewCreated = true;
+    private boolean DEBUG_UI_VIEW = false;
 
     public SVTRenderPass(final SceneRenderer sceneRenderer) {
         super(sceneRenderer);
@@ -189,6 +189,7 @@ public class SVTRenderPass extends RenderPass {
         var renderAssets = sceneRenderer.getRenderAssets();
         frameBuffer.begin();
         Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
+        Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         // Non-tessellated models.
@@ -248,12 +249,12 @@ public class SVTRenderPass extends RenderPass {
         frameBuffer.getColorBufferTexture().bind();
         GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
 
-        if (!uiViewCreated) {
+        if (DEBUG_UI_VIEW) {
             GaiaSky.postRunnable(() -> {
                 // Create UI view
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
             });
-            uiViewCreated = true;
+            DEBUG_UI_VIEW = false;
         }
 
         // Flip pixels flag.
