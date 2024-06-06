@@ -11,7 +11,7 @@ uniform float u_shadowPCFOffset;
 
 float getShadowness(sampler2D sampler, vec2 uv, vec2 offset, float compare) {
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(compare, dot(texture2D(sampler, uv.xy + offset), bitShifts) + bias); // (1.0/255.0)
+    return step(compare, dot(texture(sampler, uv.xy + offset), bitShifts) + bias); // (1.0/255.0)
 }
 
 #ifdef numCSM

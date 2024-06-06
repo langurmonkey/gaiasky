@@ -1,3 +1,19 @@
+<a name="3.6.2"></a>
+## [3.6.2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.1) (2024-06-05)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.1...3.6.2)
+
+### Bug Fixes
+- use a new instance of the preferences dialog each time it is open, so that all preferences are reinitialized correctly. 
+- invert-x/-y button in gamepad GUI does not work/update correctly. 
+- ray-marching effects in cubemap modes. Probably a source of unforeseen consequences. 
+- remove blank frame produced when activating a ray-marching effect for the first time. 
+- never skip future closest body position computation. 
+- restore light glow effect in cubemap modes (360, planetarium, orthosphere). 
+- restore light glow effect in stereoscopic mode. 
+
+### Features
+- enable ray-marching effects in stereoscopic mode.
+
 <a name="3.6.1"></a>
 ## [3.6.1](https://codeberg.org/gaiasky/gaiasky/tree/3.6.0-3) (2024-05-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.0-3...3.6.1)
