@@ -1,3 +1,10 @@
+<a name="3.6.2-2"></a>
+## [3.6.2-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.2) (2024-06-06)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.2...3.6.2-2)
+
+### Bug Fixes
+- shadow map GLSL library crash due to use of old, unsupported  call. Fixes [#773](https://codeberg.org/gaiasky/gaiasky/issues/773).
+
 <a name="3.6.2"></a>
 ## [3.6.2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.1) (2024-06-05)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.1...3.6.2)
