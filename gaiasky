@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #
-# This is a script to bypass gradle in running Gaia Sky
+# Utility script to run gaia sky through gradle without knowing gradle exists.
 #
 
 print_usage() {
   echo "$0 launcher script"
-  echo "3D Universe simulation focused on Gaia"
+  echo "3D Universe software with support for more than a billion stars"
   echo
   echo "Usage: $0 [OPTION]"
   echo
