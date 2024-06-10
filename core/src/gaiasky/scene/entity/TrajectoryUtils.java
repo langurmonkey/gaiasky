@@ -139,6 +139,7 @@ public class TrajectoryUtils {
                     iniTime = Date.from(currentTime);
                 }
                 trajectory.params.setIni(iniTime);
+                trajectory.params.setForce(force);
 
                 // Add to queue
                 if (!trajectory.refreshing) {

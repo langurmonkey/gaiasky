@@ -61,6 +61,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         public String name;
         public OrbitComponent orbitalParamaters;
         public Entity entity;
+        public boolean force = false;
         Class<? extends IOrbitDataProvider> providerClass;
 
         public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass) {
@@ -107,6 +108,10 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
 
         public void setOrbitalPeriod(double period) {
             this.orbitalPeriod = period;
+        }
+
+        public void setForce(Boolean force) {
+            this.force = force;
         }
     }
 }

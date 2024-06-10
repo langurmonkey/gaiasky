@@ -81,7 +81,11 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                 long stepMs = orbitalMs / numSamples;
 
                 Instant d;
-                if (trajectory.refreshRate >= 0) {
+                if (parameter.force) {
+                    // Forcing, use orbit starting now.
+                    d = Instant.ofEpochMilli(parameter.ini.getTime());
+                    parameter.setForce(false);
+                } else if (trajectory.refreshRate >= 0) {
                     // User-defined refresh rate.
                     d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * trajectory.refreshRate));
                 } else if (period > 40000) {

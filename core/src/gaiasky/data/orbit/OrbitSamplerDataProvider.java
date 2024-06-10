@@ -17,12 +17,10 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.gui.ConsoleLogger;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
-import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
@@ -108,10 +106,14 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
         var trajectory = parameter.entity != null ? Mapper.trajectory.get(parameter.entity) : null;
         Instant d;
-        if (trajectory != null && trajectory.refreshRate >= 0) {
+        if (parameter.force) {
+            // Forcing, use orbit starting now.
+            d = Instant.ofEpochMilli(parameter.ini.getTime());
+            parameter.setForce(false);
+        } else if (trajectory != null && trajectory.refreshRate >= 0) {
             // User-defined refresh rate.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * trajectory.refreshRate));
-        }else if (period > 40000) {
+        } else if (period > 40000) {
             // For long-period, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.8));
         } else if (parameter.entity != null && Mapper.base.get(parameter.entity).ct.isEnabled(ComponentType.Moons)) {
