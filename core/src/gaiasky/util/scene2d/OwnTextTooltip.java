@@ -48,11 +48,6 @@ public class OwnTextTooltip extends Tooltip<Label> {
         label = new OwnLabel(text, style.label);
 
         getContainer().setActor(label);
-        getContainer().width(new Value() {
-            public float get(Actor context) {
-                return Math.min(manager.maxWidth, label.getGlyphLayout().width);
-            }
-        });
 
         setStyle(style);
 
