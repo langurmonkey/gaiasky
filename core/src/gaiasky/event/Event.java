@@ -712,6 +712,8 @@ public enum Event {
     ORBIT_DATA_LOADED,
     /** Sets the solid angle threshold for orbits and trajectories. **/
     ORBIT_SOLID_ANGLE_TH_CMD,
+    /** Refresh orbit command. Contains the focus view. **/
+    ORBIT_REFRESH_CMD,
     /**
      * Contains the name, the lock orientation boolean value.
      */

@@ -309,6 +309,10 @@
       "fadeDistanceDown": {
         "description": "Override the distance at which the orbit starts to fade out. In internal units. If not overridden, this is computed internally from the radius of the attached body.",
         "units": "Double"
+      },
+      "refreshRate": {
+        "description": "For orbits that need to be refreshed (i.e. not implemented as orbital elements, but via samples), this is the orbit refresh rate, in [0,1]. Set to 0 to recompute only every period, and set to 1 to recompute as often as possible. Set to negative to use the default re-computation heuristic. This can help reduce the visible seams that occur in the transitions from the trajectory lines computed in the period to the current period in orbits which are very open.",
+        "units": "Double"
       }
     },
     "ModelScaffolding": {

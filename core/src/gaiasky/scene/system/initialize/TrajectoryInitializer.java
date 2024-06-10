@@ -35,7 +35,7 @@ public class TrajectoryInitializer extends AbstractInitSystem {
     public TrajectoryInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
         utils = new TrajectoryUtils();
-        TrajectoryUtils.initRefresher();
+        TrajectoryUtils.initRefresher(utils);
     }
 
     @Override

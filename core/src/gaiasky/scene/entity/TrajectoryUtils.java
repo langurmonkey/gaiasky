@@ -43,9 +43,9 @@ public class TrajectoryUtils {
     /**
      * Initialize the trajectory refresher daemon.
      **/
-    public static void initRefresher() {
+    public static void initRefresher(TrajectoryUtils utils) {
         if (orbitRefresher == null) {
-            orbitRefresher = new OrbitRefresher("gaiasky-worker-trajectoryupdate");
+            orbitRefresher = new OrbitRefresher("gaiasky-worker-trajectoryupdate", utils);
         }
     }
 

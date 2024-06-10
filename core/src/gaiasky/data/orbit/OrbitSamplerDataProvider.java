@@ -101,20 +101,20 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         numSamples = Math.max(200, Math.min(2000, numSamples));
         data = new PointCloudData();
         String bodyDesc = parameter.name;
-        double last = 0, accum = 0;
 
         // Milliseconds of this orbit in one revolution
         double orbitalMs = period * 86400000.0;
         double stepMs = orbitalMs / (double) numSamples;
 
+        var trajectory = parameter.entity != null ? Mapper.trajectory.get(parameter.entity) : null;
         Instant d;
-        if (period > 40000) {
+        if (trajectory != null && trajectory.refreshRate >= 0) {
+            // User-defined refresh rate.
+            d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * trajectory.refreshRate));
+        }else if (period > 40000) {
             // For long-period, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.8));
         } else if (parameter.entity != null && Mapper.base.get(parameter.entity).ct.isEnabled(ComponentType.Moons)) {
-            // For moon orbits, it is better to recompute more often because they can deviate significantly.
-            d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.4));
-        } else if (parameter.entity != null && parameter.entity.getComponent(Base.class).ct.isEnabled(ComponentType.Moons)) {
             // For moon orbits, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.4));
         } else {

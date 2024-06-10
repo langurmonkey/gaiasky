@@ -36,10 +36,13 @@ public class OrbitRefresher implements IObserver {
     private static final int LOAD_QUEUE_MAX_SIZE = 15;
     private final Queue<OrbitDataLoaderParameters> toLoadQueue;
     private final OrbitUpdaterThread daemon;
+    private final TrajectoryUtils utils;
 
-    public OrbitRefresher(String threadName) {
+    public OrbitRefresher(String threadName, TrajectoryUtils utils) {
         super();
         toLoadQueue = new ArrayBlockingQueue<>(LOAD_QUEUE_MAX_SIZE);
+
+        this.utils = utils;
 
         // Start daemon
         daemon = new OrbitUpdaterThread(this);
@@ -48,11 +51,7 @@ public class OrbitRefresher implements IObserver {
         daemon.setPriority(Thread.MIN_PRIORITY);
         daemon.start();
 
-        EventManager.instance.subscribe(this, Event.DISPOSE);
-    }
-
-    public OrbitRefresher() {
-        this("gaiasky-worker-orbitupdate");
+        EventManager.instance.subscribe(this, Event.DISPOSE, Event.ORBIT_REFRESH_CMD);
     }
 
     public void queue(OrbitDataLoaderParameters params) {
@@ -71,6 +70,11 @@ public class OrbitRefresher implements IObserver {
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.DISPOSE && daemon != null) {
             daemon.stopDaemon(false);
+        } else if (event == Event.ORBIT_REFRESH_CMD && utils != null) {
+            var entity = (Entity) data[0];
+            var trajectory = Mapper.trajectory.get(entity);
+            var verts = Mapper.verts.get(entity);
+            utils.refreshOrbit(trajectory, verts, true);
         }
     }
 

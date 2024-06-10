@@ -93,7 +93,8 @@ public class Trajectory implements Component {
 
     public OrbitDataLoaderParameters params;
     /**
-     * Body color. Color to use to represent the body in orbital elements trajectories, when the {@link #bodyRepresentation}
+     * Body color. Color to use to represent the body in orbital elements trajectories, when the
+     * {@link #bodyRepresentation}
      * attribute enables the representation of the body for this trajectory.
      **/
     public float[] bodyColor;
@@ -115,6 +116,15 @@ public class Trajectory implements Component {
      * This attribute only has effect if this trajectory has a body.
      **/
     public float distDown = 20;
+
+    /**
+     * For orbits that need to be refreshed (i.e. not implemented as orbital elements, but via samples),
+     * this is the orbit refresh rate, in [0,1]. Set to 0 to recompute only every period, and set to 1 to recompute as often
+     * as possible. Set to negative to use the default re-computation heuristic.
+     * This can help reduce the seams between the trajectory lines computed in the past cycle and the current cycle in
+     * orbits which are very open.
+     */
+    public double refreshRate = -1.0;
 
     /**
      * Sets the orientation model as a string.
@@ -262,6 +272,10 @@ public class Trajectory implements Component {
         this.distDown = distDown.floatValue();
     }
 
+    public void setRefreshRate(Double refhreshRate) {
+        this.refreshRate = refhreshRate;
+    }
+
     public void setBody(Entity entity, double radius) {
         setBody(entity, radius, 20, 200);
     }
@@ -283,7 +297,8 @@ public class Trajectory implements Component {
 
         /**
          * Extrasolar systems are typically specified using elements in a special reference system. In this reference
-         * system, the reference plane is the plane whose normal is the line of sight vector from the Sun to the planet or
+         * system, the reference plane is the plane whose normal is the line of sight vector from the Sun to the planet
+         * or
          * star for whom the orbit is defined. The reference direction is the direction from the object to the north
          * celestial pole projected on the reference plane.
          */

@@ -81,7 +81,10 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                 long stepMs = orbitalMs / numSamples;
 
                 Instant d;
-                if (period > 40000) {
+                if (trajectory.refreshRate >= 0) {
+                    // User-defined refresh rate.
+                    d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * trajectory.refreshRate));
+                } else if (period > 40000) {
                     // For long-period, it is better to recompute more often because they can deviate significantly.
                     d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.8));
                 } else if (parameter.entity != null && Mapper.base.get(parameter.entity).ct.isEnabled(ComponentTypes.ComponentType.Moons)) {
@@ -122,7 +125,7 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                 data.x.add(data.x.get(0));
                 data.y.add(data.y.get(0));
                 data.z.add(data.z.get(0));
-                d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);
+                d = Instant.ofEpochMilli(d.toEpochMilli() + stepMs);
                 data.time.add(Instant.ofEpochMilli(d.toEpochMilli()));
 
                 if (writeData) {
