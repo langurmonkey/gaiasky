@@ -257,7 +257,7 @@ def main():
             continue
 
         coord = {}
-        coord["impl"] = "gaiasky.scenegraph.StaticCoordinates"
+        coord["impl"] = "gaiasky.util.coord.StaticCoordinates"
         coord["positionEquatorial"] = [ra, dec, dist]
 
         smap["coordinates"] = coord
@@ -407,7 +407,7 @@ def main():
                 "inclination": 8.0,
                 "meridianangle": 150.0
             }
-            plmap["rigidRotation"] = rot
+            plmap["rotation"] = rot
 
             # model
             model = {
