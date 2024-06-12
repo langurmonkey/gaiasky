@@ -12,6 +12,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
@@ -194,6 +195,13 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             if (!actualFilePaths.isEmpty()) {
                 manager.load(base.getName() + " Textures", TextureArray.class, new TextureArrayParameter(actualFilePaths));
             }
+        }
+
+        // Proximity descriptors.
+        if (set.proximityDescriptorsLocation != null && !set.proximityDescriptorsLocation.isEmpty()) {
+            set.proximityLoadingFlag = true;
+            set.proximityDescriptorsPath = Settings.settings.data.dataPath(set.proximityDescriptorsLocation);
+            set.proximityLoaded = new IntSet(10);
         }
     }
 

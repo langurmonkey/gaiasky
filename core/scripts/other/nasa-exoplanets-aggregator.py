@@ -254,7 +254,7 @@ def main():
 
         # names
         names = []
-        names.append(star[2])
+        names.append(star[2] + " system")
         if gaia:
             names.append(gaia)
         hip = star[5]
@@ -414,7 +414,7 @@ def main():
                 plmap["componentType"] = "Planets"
 
                 # parent
-                plmap["parent"] = star[2]
+                plmap["parent"] = names[0]
 
                 # archetype
                 plmap["archetype"] = "Planet"
@@ -494,7 +494,7 @@ def main():
                 plomap["componentTypes"] = [ "Orbits", "Planets" ]
 
                 # parent
-                plomap["parent"] = star[2]
+                plomap["parent"] = names[0]
 
                 # archetype
                 plomap["archetype"] = "Orbit"
@@ -572,7 +572,7 @@ def main():
         }
 
         # Save to file
-        filename = star[2].replace(" ", "_") + "-system.json"
+        filename = star[2] + ".json"
         abspath = os.path.join(args.DEST, filename)
 
         print(f"Writing file: {abspath}")

@@ -103,14 +103,14 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         var localTransformD = trajectory.localTransformD;
         var transformFunction = transform.matrix;
 
-        var parentGraph = Mapper.graph.get(graph.parent);
+        var parentGraph = graph.parent != null ? Mapper.graph.get(graph.parent) : null;
 
         graph.translation.setToTranslation(localTransformD);
         if (trajectory.newMethod) {
             if (transformFunction != null) {
                 localTransformD.mul(transformFunction);
             }
-            if (transformFunction == null && parentGraph.orientation != null) {
+            if (transformFunction == null && parentGraph != null && parentGraph.orientation != null) {
                 localTransformD.mul(parentGraph.orientation);
             }
             if (trajectory.model.isExtrasolar()) {
@@ -119,7 +119,7 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         } else if (trajectory.oc != null) {
             OrbitComponent oc = trajectory.oc;
 
-            if (transformFunction == null && parentGraph.orientation != null)
+            if (transformFunction == null && parentGraph != null && parentGraph.orientation != null)
                 localTransformD.mul(parentGraph.orientation);
             if (transformFunction != null)
                 localTransformD.mul(transformFunction);

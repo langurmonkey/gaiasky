@@ -93,6 +93,8 @@ public class TrajectoryUtils {
 
     public void computeExtrasolarSystemTransformMatrix(GraphNode graph, RefSysTransform transform) {
         Entity parent = graph.parent;
+        if (parent == null)
+            return;
         Coordinates coord = Mapper.coordinates.get(parent);
         // Compute new transform function from the orbit's parent position
         Vector3b barycenter = B31;

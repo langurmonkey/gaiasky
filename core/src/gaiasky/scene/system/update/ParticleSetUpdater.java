@@ -20,6 +20,8 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 
+import java.nio.file.Files;
+
 public class ParticleSetUpdater extends AbstractUpdateSystem {
 
     private final ParticleUtils utils;
@@ -40,10 +42,41 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
     public void updateEntity(Entity entity,
                              float deltaTime) {
         var camera = GaiaSky.instance.cameraManager;
-        if (Mapper.starSet.has(entity)) {
-            updateStarSet(camera, Mapper.starSet.get(entity), Mapper.datasetDescription.get(entity));
-        } else if (Mapper.particleSet.has(entity)) {
-            updateParticleSet(camera, Mapper.particleSet.get(entity));
+        var set = Mapper.particleSet.has(entity) ? Mapper.particleSet.get(entity) : Mapper.starSet.get(entity);
+        if (set != null) {
+            updateCommon(set);
+            if (set instanceof StarSet ss) {
+                updateStarSet(camera, ss, Mapper.datasetDescription.get(entity));
+            } else {
+                updateParticleSet(camera, set);
+            }
+        }
+    }
+
+    private void updateCommon(ParticleSet set) {
+        // Update proximity loading.
+        if (set.proximityLoadingFlag) {
+            int idxNearest = set.active[0];
+            var bean = set.pointData.get(idxNearest);
+            if (bean != null) {
+                if (!set.proximityLoaded.contains(idxNearest)) {
+                    var sa = set.getSolidAngleApparent(idxNearest);
+                    // About 4 degrees.
+                    if (sa > 0.069) {
+                        // Load descriptor file, if it exists.
+                        var name = bean.names()[0];
+                        var path = set.proximityDescriptorsPath.resolve(name + ".json");
+                        if (Files.exists(path)) {
+                            GaiaSky.postRunnable(()->{
+                                GaiaSky.instance.scripting().loadJsonDataset(name, path.toString());
+                            });
+                            set.proximityLoaded.add(idxNearest);
+                        } else {
+                            set.proximityLoaded.add(idxNearest);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -68,24 +101,24 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
     }
 
     private void updateStarSet(ICamera camera,
-                               StarSet starSet,
+                               StarSet set,
                                DatasetDescription datasetDesc) {
         // Fade node visibility
-        if (starSet.active != null && starSet.active.length > 0 && starSet.pointData != null) {
-            updateParticleSet(camera, starSet);
+        if (set.active != null && set.active.length > 0 && set.pointData != null) {
+            updateParticleSet(camera, set);
 
             // Update close stars
             int j = 0;
-            for (int i = 0; i < Math.min(starSet.proximity.updating.length, starSet.pointData.size()); i++) {
-                if (utils.filter(starSet.active[i], starSet, datasetDesc)
-                        && starSet.isVisible(starSet.active[i])) {
-                    IParticleRecord closeStar = starSet.pointData.get(starSet.active[i]);
-                    starSet.proximity.set(j, starSet.active[i], closeStar, camera, starSet.currDeltaYears);
-                    camera.checkClosestParticle(starSet.proximity.updating[j]);
+            for (int i = 0; i < Math.min(set.proximity.updating.length, set.pointData.size()); i++) {
+                if (utils.filter(set.active[i], set, datasetDesc)
+                        && set.isVisible(set.active[i])) {
+                    IParticleRecord closeStar = set.pointData.get(set.active[i]);
+                    set.proximity.set(j, set.active[i], closeStar, camera, set.currDeltaYears);
+                    camera.checkClosestParticle(set.proximity.updating[j]);
 
                     // Model distance
                     if (j == 0) {
-                        starSet.modelDist = 172.4643429 * closeStar.radius();
+                        set.modelDist = 172.4643429 * closeStar.radius();
                     }
                     j++;
                 }

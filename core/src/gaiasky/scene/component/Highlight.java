@@ -65,4 +65,8 @@ public class Highlight implements Component {
     public boolean isHlAllVisible() {
         return hlallvisible;
     }
+
+    public void setPointScaling(Double pointScaling) {
+        this.pointscaling = pointScaling.floatValue();
+    }
 }

@@ -732,7 +732,15 @@
       "modelPrimitive": {
         "description": "The GL primitive to use. |brsp| **Values:** |br| ``GL_TRIANGLES`` |br| ``GL_TRIANGLE_STRIP`` |br| ``GL_TRIANGLE_FAN`` |br| ``GL_LINES`` |br| ``GL_LINE_STRIP`` |br| ``GL_LINE_LOOP`` |brsp| Defaults to ``GL_TRIANGLES``. The ``GL_LINE`` primitives enable wireframe rendering, which is currently only supported by sphere and ico-sphere model types. This is only used in extended particle groups.",
         "units": "String"
-      }
+      },
+      "proximityDescriptorsLocation": {
+        "description": "Location of directory that contains descriptor JSON files that bear the names of objects in the dataset. These get loaded whenever the camera gets close to a particle.",
+        "units":  "String",
+        "aliases": [
+          "proximityDescriptors",
+          "descriptorsLocation"
+        ]
+      },
     },
     "StarSet": {
       "description": "Defines attributes related to star set objects, which contain a star catalog or group.",
@@ -879,6 +887,13 @@
         "aliases": [
           "raymarchingTexture"
         ]
+      }
+    },
+    "Highlight": {
+      "description": "Defines attributes that apply to the visual representation of particle and star sets.",
+      "pointScaling": {
+        "description": "Scale factor taht applies to the the visual representation for each object of this dataset.",
+        "units": "Double"
       }
     }
   }

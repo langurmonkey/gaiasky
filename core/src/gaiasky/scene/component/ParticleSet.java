@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.TextureArray;
+import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -30,6 +31,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import uk.ac.starlink.table.ColumnInfo;
 
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,44 +55,54 @@ public class ParticleSet implements Component, IDisposable {
      * List that contains the point data. It contains only [x y z].
      */
     public List<IParticleRecord> pointData;
+
     /**
      * List of {@link uk.ac.starlink.table.ColumnInfo} objects for the data in this set.
      */
     public List<ColumnInfo> columnInfoList;
+
     /**
      * This flag enables muting particle rendering.
      **/
     public boolean renderParticles = true;
+
     /**
      * Flag indicating whether the particle set holds stars or particles (extended or not).
      **/
     public boolean isStars;
+
     /**
      * Flag indicating whether the particle set holds extended particles.
      **/
     public boolean isExtended;
+
     /**
      * Whether to render the global set label or not.
      **/
     public boolean renderSetLabel = true;
+
     /**
      * Whether to render particle labels at all for this set.
      **/
     public boolean renderParticleLabels = true;
+
     /**
      * Number of labels to render for this group.
      **/
     public int numLabels = -1;
+
     /**
      * Fully qualified name of data provider class.
      */
     public String provider;
+
+    /** Parameters for the data provider. **/
+    public Map<String, Object> providerParams;
+
     /**
      * Path of data file.
      */
     public String datafile;
-    // Parameters for the data provider
-    public Map<String, Object> providerParams;
 
     /**
      * Model file to use (obj, g3db, g3dj, gltf, glb). If present, modelType and modelParams are ignored.
@@ -99,28 +111,46 @@ public class ParticleSet implements Component, IDisposable {
      * Only the first mesh of the model is used. Textures, lighting and material are ignored.
      */
     public String modelFile;
+
     /**
      * The loaded model pointed by modelFile.
      */
     public IntModel model;
+
     /**
      * Default model type to use for the particles of this set.
      * Typically, this should be set to quad, but allows for other model types.
      **/
     public String modelType = "quad";
+
     /**
      * Parameters for the model, in case 'modelType' is used.
      */
     public Map<String, Object> modelParams;
+
     /**
      * Render primitive. Triangles by default.
      */
     public int modelPrimitive = GL30.GL_TRIANGLES;
 
     /**
+     * Proximity loading location, the location of the directory that contains descriptor JSON files with the
+     * name of objects in the dataset. These get loaded whenever the camera gets close to a particle with the
+     * given name.
+     */
+    public String proximityDescriptorsLocation;
+    /** The path for proximity loading. **/
+    public Path proximityDescriptorsPath;
+    /** Flag that indicates whether this particle set has proximity loading. **/
+    public boolean proximityLoadingFlag = false;
+    /** Set that contains the indexes of the particles whose descriptors have already been loaded. **/
+    public IntSet proximityLoaded;
+
+    /**
      * Profile decay of the particles in the shader, when using quads.
      */
     public float profileDecay = 0.2f;
+
     /**
      * Noise factor for the color in [0,1].
      */
@@ -135,37 +165,45 @@ public class ParticleSet implements Component, IDisposable {
      * Fixed angular size for all particles in this set, in radians. Applies only to quads. Negative to disable.
      */
     public double fixedAngularSize = -1;
+
     /**
      * Particle size limits. Applies to legacy point render (using GL_POINTS).
      */
-    public double[] particleSizeLimitsPoint = new double[] { 2d, 50d };
+    public double[] particleSizeLimitsPoint = new double[]{2d, 50d};
+
     /**
      * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
-    public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
+    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0))};
+
     /**
      * The texture attribute is an attribute in the original table that points to the texture to use. Ideally, it should
      * be an integer value from 1 to n, where n is the number of textures.
      */
     public String textureAttribute;
+
     /**
      * Texture files to use for rendering the particles, at random. Applies only to quads.
      **/
     public String[] textureFiles = null;
+
     /**
      * Reference to the texture array containing the textures for this set, if any. Applies only to quads.
      **/
     public TextureArray textureArray;
+
     /**
      * Temporary storage for the mean position of this particle set, if it is given externally.
      * If this is set, the mean position is not computed from the positions of all the particles automatically.
      **/
     public Vector3d meanPosition;
+
     /**
      * Factor to apply to the data points, usually to normalise distances.
      */
     public Double factor = null;
+
     /**
      * Mapping colors.
      */
@@ -175,6 +213,7 @@ public class ParticleSet implements Component, IDisposable {
      * Particles for which forceLabel is enabled.
      **/
     public Set<Integer> forceLabel;
+
     /**
      * Particles with special label colors.
      **/
@@ -184,44 +223,54 @@ public class ParticleSet implements Component, IDisposable {
      * Stores the time when the last sort operation finished, in ms.
      */
     public long lastSortTime;
+
     /**
      * The mean distance from the origin of all points in this group.
      * Gives a sense of the scale.
      */
     public double meanDistance;
     public double maxDistance, minDistance;
+
     /**
      * Epoch for positions/proper motions in julian days.
      **/
     public double epochJd;
+
     /**
      * Current computed epoch time.
      **/
     public double currDeltaYears = 0;
+
     /**
      * Reference to the current focus.
      */
     public IParticleRecord focus;
+
     /**
      * Index of the particle acting as focus. Negative if we have no focus here.
      */
     public int focusIndex = -1;
+
     /**
      * Candidate to focus.
      */
     public int candidateFocusIndex = -1;
+
     /**
      * Position of the current focus.
      */
     public Vector3b focusPosition;
+
     /**
      * Position in equatorial coordinates of the current focus in radians.
      */
     public Vector2d focusPositionSph;
+
     /**
      * FOCUS_MODE attributes.
      */
     public double focusDistToCamera, focusSolidAngle, focusSolidAngleApparent, focusSize;
+
     /**
      * Proximity particles.
      */
@@ -387,7 +436,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setPosition(int[] pos) {
-        setPosition(new double[] { pos[0], pos[1], pos[2] });
+        setPosition(new double[]{pos[0], pos[1], pos[2]});
     }
 
     public void setDataFile(String dataFile) {
@@ -487,7 +536,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setTexture(String texture) {
-        this.textureFiles = new String[] { texture };
+        this.textureFiles = new String[]{texture};
     }
 
     public void setTextures(String[] textures) {
@@ -544,6 +593,18 @@ public class ParticleSet implements Component, IDisposable {
             case "GL_LINE_STRIP", "gl_line_strip" -> GL30.GL_LINE_STRIP;
             default -> GL30.GL_TRIANGLES;
         };
+    }
+
+    public void setProximityDescriptorsLocation(String loc) {
+        this.proximityDescriptorsLocation = loc;
+    }
+
+    public void setProximityDescriptors(String loc) {
+        setProximityDescriptorsLocation(loc);
+    }
+
+    public void setDescriptorsLocation(String loc) {
+        setProximityDescriptorsLocation(loc);
     }
 
     // FOCUS_MODE size
@@ -740,7 +801,7 @@ public class ParticleSet implements Component, IDisposable {
      * Returns the current focus position, if any, in the out vector.
      **/
     public Vector3b getAbsolutePosition(Vector3b out) {
-        if (entity != null && Mapper.affine.has(entity)) {
+        if (entity != null && Mapper.affine.has(entity) && focusIndex >= 0 && focusIndex < pointData.size()) {
             IParticleRecord focus = pointData.get(focusIndex);
             return fetchPosition(focus, null, out, currDeltaYears);
         } else {
@@ -941,8 +1002,12 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public double getCandidateSolidAngleApparent() {
-        if (candidateFocusIndex >= 0) {
-            IParticleRecord candidate = pointData.get(candidateFocusIndex);
+        return getSolidAngleApparent(candidateFocusIndex);
+    }
+
+    public double getSolidAngleApparent(int idx) {
+        if (idx >= 0 && idx < pointData.size()) {
+            IParticleRecord candidate = pointData.get(idx);
             Vector3d aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
             float size = candidate.hasSize() ? candidate.size() : 0.5e2f;
