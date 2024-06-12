@@ -266,9 +266,9 @@ public class NoiseComponent extends NamedComponent {
         // Fractal type
         setFractaltype(ModuleFractal.FractalType.values()[rand.nextInt(6)].name());
         // Frequency
-        setFrequency(gaussian(rand, 2.5, 5.0, 0.1));
+        setFrequency(gaussian(rand, 10.0, 5.0, 2.0));
         // Lacunarity
-        setLacunarity(gaussian(rand, 2.0, 5.0, 0.1));
+        setLacunarity(gaussian(rand, 10.0, 5.0, 6.0));
         // Octaves [1,9]
         setOctaves(Math.abs(rand.nextLong()) % 8 + 1L);
         // Range

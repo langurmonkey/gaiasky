@@ -119,7 +119,7 @@ def teff_to_rgba(teff):
 
     # Green
     if temp <= 66:
-        x = temp - 2
+        x = max(0.01, temp - 2)
         g = -155.25485562709179 - 0.44596950469579133 * x + 104.49216199393888 * math.log(x)
     else:
         x = temp - 50
@@ -133,7 +133,7 @@ def teff_to_rgba(teff):
         if temp <= 19:
             b = 0
         else:
-            x = temp - 10
+            x = max(0.01, temp - 10)
             b = -254.76935184120902 + 0.8274096064007395 * x + 115.67994401066147 * math.log(x)
     b = clamp(b, 0, 255)
 
@@ -231,7 +231,7 @@ def main():
 
             systems[system_name] = system
 
-            print(f"System {system_name} has {len(planets)} planets (snum: {star[9]}, pnum: {star[10]}).")
+            print(f"System '{system_name}' has {len(planets)} planets (snum: {star[9]}, pnum: {star[10]}).")
 
     # Construct a JSON file for each system
     for system_name in systems:
@@ -247,8 +247,10 @@ def main():
         # id
         gaia = star[7]
         if gaia:
-            sourceid = int(gaia.split()[2])
-            smap["id"] = sourceid
+            tokens = gaia.split()
+            if len(tokens) >= 3:
+                sourceid = int(tokens[2])
+                smap["id"] = sourceid
 
         # names
         names = []
