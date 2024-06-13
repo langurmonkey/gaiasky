@@ -60,6 +60,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         float buttonPadHor = 6f;
         float buttonPadVert = 6f;
         int visTableCols = 4;
+        int row = 1;
         final Table visibilityTable = new Table(skin);
 
         visibilityTable.setName("visibility table");
@@ -102,10 +103,11 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                         }
                         return false;
                     });
-                    Cell<Button> c = visibilityTable.add(button).padBottom(buttonPadVert);
+                    Cell<Button> c = visibilityTable.add(button).padBottom(buttonPadVert + (row % 3 == 0 ? pad12 : 0));
 
                     if ((i + 1) % visTableCols == 0) {
                         visibilityTable.row();
+                        row++;
                     } else {
                         c.padRight(buttonPadHor);
                     }
