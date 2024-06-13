@@ -436,7 +436,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             focus.getPredictedPosition(nextFocusPosition, time, this, false);
         }
         // Next closest position.
-        if (closestBody != null && !closestBody.isEmpty()) {
+        if (!getMode().isFocus() && closestBody != null && !closestBody.isEmpty()) {
             if (closestBody != focus) {
                 closestBody.getPredictedPosition(nextClosestPosition, time, this, false);
             } else {
