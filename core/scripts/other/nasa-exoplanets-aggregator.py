@@ -8,6 +8,9 @@ from dataclasses import dataclass
 # This table needs to be cross-matched with the full table to get the Gaia, HIP, HD and TIC ids,
 # which are expected in columns 3, 4, 5, and 6 respectively.
 
+def clamp(x, minimum, maximum):
+    return max(minimum, min(x, maximum))
+
 def get_biome_lut():
     i = random.randint(0, 4)
     file = "biome-lut.png"
@@ -282,7 +285,7 @@ def main():
         smap["appMag"] = mag
 
         # component type
-        smap["componentType"] = "Stars"
+        smap["componentType"] = "Systems"
 
         # parent
         smap["parent"] = "Universe"
@@ -431,7 +434,10 @@ def main():
             plomap["name"] = planet[1] + " orbit"
 
             # color
-            plomap["color"] = pl_color
+            r = clamp(random.gauss(0.25, 0.1), 0.0, 1.0)
+            g = clamp(random.gauss(0.85, 0.2), 0.0, 1.0)
+            b = clamp(random.gauss(0.3, 0.1), 0.0, 1.0)
+            plomap["color"] = [r, g, b, 0.6]
 
             # component types
             plomap["componentTypes"] = [ "Orbits", "Planets" ]

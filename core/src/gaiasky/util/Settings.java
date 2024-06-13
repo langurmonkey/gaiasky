@@ -1176,6 +1176,9 @@ public class Settings extends SettingsObject {
                 String key = ct.name();
                 if (map.containsKey(key)) {
                     visibility.put(key, (Boolean) map.get(key));
+                } else {
+                    // Default.
+                    visibility.put(key, false);
                 }
             }
         }

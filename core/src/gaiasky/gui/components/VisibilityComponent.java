@@ -59,7 +59,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         float space2 = 3.2f;
         float buttonPadHor = 6f;
         float buttonPadVert = 6f;
-        int visTableCols = 5;
+        int visTableCols = 4;
         final Table visibilityTable = new Table(skin);
 
         visibilityTable.setName("visibility table");

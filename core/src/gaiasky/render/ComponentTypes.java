@@ -98,6 +98,7 @@ public class ComponentTypes extends BitSet {
         Galaxies("icon-elem-galaxies"),
         Nebulae("icon-elem-nebulae"),
         Meshes("icon-elem-meshes"),
+        Systems("icon-elem-systems"),
 
         Labels("icon-elem-labels"),
         Orbits("icon-elem-orbits"),
