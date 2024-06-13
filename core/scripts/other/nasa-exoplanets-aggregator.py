@@ -373,7 +373,7 @@ def main():
             elif not math.isnan(radj):
                 radius = radj * 71492.0
             else:
-                radius = 20000.0
+                radius = clamp(random.gauss(30000.0, 20000.0), 450.0, 150000.0)
             plmap["size"] = radius
 
             # absmag
