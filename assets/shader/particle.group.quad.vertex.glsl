@@ -13,6 +13,7 @@ uniform float u_alpha;
 uniform float u_sizeFactor;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
+uniform float u_proximityThreshold;
 #ifdef extendedParticlesFlag
 // time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
@@ -81,6 +82,13 @@ void main() {
     // Downscale before computing length()
     float dist = length(pos * 1e-14) * 1e14;
 
+    // Proximity.
+    float fadeFactor = 1.0;
+    if (u_proximityThreshold > 0.0) {
+        float solidAngle = a_size / dist;
+        fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
+    }
+
     #ifdef relativisticEffects
     pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif// relativisticEffects
@@ -89,7 +97,7 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    v_col = vec4(a_color.rgb, a_color.a * u_alpha);
+    v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
     float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
 

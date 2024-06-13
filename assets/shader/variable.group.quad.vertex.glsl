@@ -18,6 +18,7 @@ uniform vec3 u_camUp;
 uniform vec2 u_solidAngleMap;
 // VR scale factor
 uniform float u_vrScale;
+uniform float u_proximityThreshold;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -157,8 +158,14 @@ void main() {
         quadSize = (tan(solidAngle) * dist) * u_alphaSizeBr.y * 0.25e-5;
     }
 
+    // Proximity.
+    float fadeFactor = 1.0;
+    if (u_proximityThreshold > 0.0) {
+        fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
+    }
+
     float boundaryFade = smoothstep(l0, l1, dist);
-    v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
+    v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade * fadeFactor, 0.0, 1.0));
 
     // Performance trick: If the star is not seen, set it very small so that there is only one fragment, and
     // set the color to 0 to discard it in the fragment shader.

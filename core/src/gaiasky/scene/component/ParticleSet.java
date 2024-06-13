@@ -141,10 +141,14 @@ public class ParticleSet implements Component, IDisposable {
     public String proximityDescriptorsLocation;
     /** The path for proximity loading. **/
     public Path proximityDescriptorsPath;
+    /** Threshold solid angle when loading happens. About 4 degrees (0.069 rad). **/
+    public double proximityThreshold = 0.064;
     /** Flag that indicates whether this particle set has proximity loading. **/
     public boolean proximityLoadingFlag = false;
     /** Set that contains the indexes of the particles whose descriptors have already been loaded. **/
     public IntSet proximityLoaded;
+    /** Contains the indices of the particles whose descriptors are not present. **/
+    public IntSet proximityMissing;
 
     /**
      * Profile decay of the particles in the shader, when using quads.
@@ -607,6 +611,16 @@ public class ParticleSet implements Component, IDisposable {
         setProximityDescriptorsLocation(loc);
     }
 
+    public void setProximityThreshold(Double thRadians) {
+        this.proximityThreshold = thRadians;
+    }
+    public void setProximityThresholdRad(Double thRadians) {
+        setProximityThreshold(thRadians);
+    }
+    public void setProximityThresholdDeg(Double thDegrees) {
+        setProximityThreshold(Math.toRadians(thDegrees));
+    }
+
     // FOCUS_MODE size
     public double getSize() {
         return focusSize;
@@ -977,6 +991,28 @@ public class ParticleSet implements Component, IDisposable {
         if (focus != null && focus.names() != null)
             return focus.names();
         return null;
+    }
+
+    public boolean hasName(String candidate) {
+        return hasName(candidate, false);
+    }
+
+    public boolean hasName(String candidate, boolean matchCase) {
+        if (focus == null || focus.names() == null) {
+            return false;
+        } else {
+            var names = focus.names();
+            for (String name : names) {
+                if (matchCase) {
+                    if (name.equals(candidate))
+                        return true;
+                } else {
+                    if (name.equalsIgnoreCase(candidate))
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 
     public String getLocalizedName() {

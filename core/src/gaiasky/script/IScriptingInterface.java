@@ -3678,6 +3678,23 @@ public interface IScriptingInterface {
                             boolean sync);
 
     /**
+     * Loads a Gaia Sky JSON dataset file in a synchronous or asynchronous manner.
+     * The Gaia Sky JSON data format is described
+     * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
+     *
+     * @param dsName The name of the dataset.
+     * @param path   The absolute path, or the path in the data directory, of the dataset file.
+     * @param select If true, focus the first object in the dataset after loading.
+     * @param sync   If true, the call does not return until the dataset is loaded and available in Gaia Sky.
+     *
+     * @return False if the dataset could not be loaded. True otherwise.
+     */
+    boolean loadJsonDataset(String dsName,
+                            String path,
+                            boolean select,
+                            boolean sync);
+
+    /**
      * Removes the dataset identified by the given name, if it exists.
      *
      * @param dsName The name of the dataset to remove.

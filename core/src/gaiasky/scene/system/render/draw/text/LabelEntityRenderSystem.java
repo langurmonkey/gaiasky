@@ -359,6 +359,14 @@ public class LabelEntityRenderSystem {
                         shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
                         float textSize = (float) FastMath.tanh(solidAngle) * distToCamera * 1e5f;
                         float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+
+                        // Also fade labels in proximity.
+                        var size = pb.hasSize() ? pb.size() : view.body.size;
+                        var sa = size / distToCamera;
+                        if (set.proximityLoadingFlag && set.proximityLoaded.contains(active[i]) && sa > set.proximityThreshold * 0.5) {
+                            alpha *= (float) MathUtilsDouble.lint(sa, set.proximityThreshold * 0.5f, set.proximityThreshold * 1.5f, 1.0, 0.0);
+                        }
+
                         textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
                         render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, pb.names()[0], labelPosition, distToCamera,
                                 view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
@@ -449,6 +457,14 @@ public class LabelEntityRenderSystem {
                 shader.setUniform4fv("u_color", view.textColour(star.names()[0]), 0, 4);
                 double textSize = FastMath.tanh(solidAngle) * distToCamera * 1e5d;
                 float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+
+                // Also fade labels in proximity.
+                var size = star.size() * Constants.STAR_SIZE_FACTOR;
+                var sa = size / distToCamera;
+                if (set.proximityLoadingFlag && set.proximityLoaded.contains(idx) && sa > set.proximityThreshold * 0.5) {
+                    alpha *= (float) MathUtilsDouble.lint(sa, set.proximityThreshold * 0.5f, set.proximityThreshold * 1.5f, 1.0, 0.0);
+                }
+
                 textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
                 return render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, star.names()[0], labelPosition, distToCamera,
                         view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);

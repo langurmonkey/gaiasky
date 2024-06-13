@@ -219,12 +219,20 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public boolean hasName(String name) {
+        var set = getSet();
+        if (set != null) {
+            return set.hasName(name);
+        }
         return base.hasName(name);
     }
 
     @Override
     public boolean hasName(String name,
                            boolean matchCase) {
+        var set = getSet();
+        if (set != null) {
+            return set.hasName(name, matchCase);
+        }
         return base.hasName(name, matchCase);
     }
 
@@ -632,7 +640,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public double getTEff(){
+    public double getTEff() {
         if (!isValid()) {
             return 0;
         }

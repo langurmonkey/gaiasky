@@ -4314,6 +4314,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean loadJsonDataset(String dsName,
                                    String pathString,
                                    boolean sync) {
+        return loadJsonDataset(dsName, pathString, false, sync);
+    }
+
+    public boolean loadJsonDataset(String dsName,
+                                   String pathString,
+                                   boolean select,
+                                   boolean sync) {
         // Load internal JSON dataset file.
         try {
             logger.info(I18n.msg("notif.catalog.loading", pathString));
@@ -4345,6 +4352,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             objects.forEach(scene::setUpEntity);
                             GaiaSky.instance.touchSceneGraph();
 
+                            if (select) {
+                                focusView.setEntity(objects.get(0));
+                                setCameraFocus(focusView.getName());
+                            }
                         });
                     });
                 });

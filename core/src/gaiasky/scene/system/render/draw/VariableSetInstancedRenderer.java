@@ -215,6 +215,9 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 // Opacity limits.
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
+                // Proximity descriptor loading.
+                shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
+
                 try {
                     curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numVertices, getCount(render));
                 } catch (IllegalArgumentException e) {

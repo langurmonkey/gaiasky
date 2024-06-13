@@ -16,6 +16,7 @@ uniform vec2 u_thAnglePoint;
 uniform float u_brightnessPower;
 // VR scale factor
 uniform float u_vrScale;
+uniform float u_proximityThreshold;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -95,7 +96,7 @@ void main() {
     float opacity;
     float pointSize;
     if (u_fixedAngularSize <= 0.0) {
-        solidAngle = atan((a_size * u_alphaSizeBrRc.z) / dist);
+        solidAngle = (a_size * u_alphaSizeBrRc.z) / dist;
         opacity = lint(solidAngle, u_thAnglePoint.x, u_thAnglePoint.y, u_opacityLimits.x, u_opacityLimits.y);
         pointSize = max(3.3 * u_alphaSizeBrRc.w, pow(solidAngle * 0.5e8, u_brightnessPower) * u_alphaSizeBrRc.y * cubemapFactor);
     } else {
@@ -103,8 +104,15 @@ void main() {
         opacity = 1.0;
         pointSize = 0.2e4 * solidAngle * u_alphaSizeBrRc.y * cubemapFactor;
     }
+
+    // Proximity.
+    float fadeFactor = 1.0;
+    if (u_proximityThreshold > 0.0) {
+        fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
+    }
+
     float boundaryFade = smoothstep(l0, l1, dist);
-    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeBrRc.x * boundaryFade, 0.0, 1.0));
+    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeBrRc.x * boundaryFade * fadeFactor, 0.0, 1.0));
 
     vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;

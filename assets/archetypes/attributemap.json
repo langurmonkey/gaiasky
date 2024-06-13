@@ -741,6 +741,14 @@
           "descriptorsLocation"
         ]
       },
+      "proximityThreshold": {
+        "description": "Solid angle above which the proximity descriptor loading is triggered.",
+        "units": "Double",
+        "aliases": [
+          "proximityThresholdDeg",
+          "proximityThresholdRad"
+        ]
+      },
     },
     "StarSet": {
       "description": "Defines attributes related to star set objects, which contain a star catalog or group.",

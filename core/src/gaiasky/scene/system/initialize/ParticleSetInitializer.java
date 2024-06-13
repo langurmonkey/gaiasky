@@ -202,6 +202,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             set.proximityLoadingFlag = true;
             set.proximityDescriptorsPath = Settings.settings.data.dataPath(set.proximityDescriptorsLocation);
             set.proximityLoaded = new IntSet(10);
+            set.proximityMissing = new IntSet(10);
+        } else {
+            set.proximityThreshold = -1;
         }
     }
 

@@ -201,6 +201,12 @@ public class Index {
     public void remove(String key) {
         index.remove(key);
     }
+    /** Removes the given keys from the index. **/
+    public void remove(String[] keys) {
+        for(var key : keys) {
+            index.remove(key);
+        }
+    }
 
     /**
      * Removes the given entity from the index.

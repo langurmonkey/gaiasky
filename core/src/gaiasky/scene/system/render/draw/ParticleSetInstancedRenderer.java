@@ -307,6 +307,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                     shaderProgram.setUniformf("u_sizeFactor",
                             (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                 }
+                shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 

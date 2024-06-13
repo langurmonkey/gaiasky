@@ -4,6 +4,10 @@ import argparse, os, sys, math, json, random
 import numpy as np
 from dataclasses import dataclass
 
+# The input to this script is the Composite table of NASA expolanet archive.
+# This table needs to be cross-matched with the full table to get the Gaia, HIP, HD and TIC ids,
+# which are expected in columns 3, 4, 5, and 6 respectively.
+
 def get_biome_lut():
     i = random.randint(0, 4)
     file = "biome-lut.png"
@@ -139,25 +143,11 @@ def teff_to_rgba(teff):
 
     return [r / 255.0, g / 255.0, b / 255.0, 1.0]
     
-def get_float(planet, candidates, idx):
-    value = float(planet[idx])
-    if math.isnan(value):
-        # try candidates
-        for candidate in candidates:
-            value = float(candidate[idx])
-            if not math.isnan(value):
-                return value
-    return value
+def get_float(row, idx):
+    return float(row[idx])
 
-def get_string(planet, candidates, idx):
-    value = planet[idx]
-    if not value:
-        # try candidates
-        for candidate in candidates:
-            value = candidate[idx]
-            if value:
-                return value
-    return value
+def get_string(row, idx):
+    return row[idx]
     
 # constants
 mearth_kg = 5.976E24
@@ -202,28 +192,12 @@ def main():
             # Star
             star = system_entry[1][0]
             planets = {}
-            letters = []
-            # first, get planets with default_flag = 1 (index 8)
+            letters = set()
+
             for component in system_entry[1]:
                 pl_letter = component[3]
-                letters.append(pl_letter)
-                if planets.get("#" + pl_letter) is None:
-                    planets["#" + pl_letter] = []
-
-                # append all to *letter
-                planets["#" + pl_letter].append(component)
-
-                # save default to letter
-                if int(component[8]) == 1:
-                    planets[pl_letter] = component
-
-            # if we have no planet with default_flag=1, just get first
-            for pl_letter in letters:
-                if planets.get(pl_letter) is None:
-                    for component in system_entry[1]:
-                        if pl_letter == component[3]:
-                            planets[pl_letter] = component
-
+                letters.add(pl_letter)
+                planets[pl_letter] = component
 
             system['star'] = star
             system['planets'] = planets
@@ -231,7 +205,7 @@ def main():
 
             systems[system_name] = system
 
-            print(f"System '{system_name}' has {len(planets)} planets (snum: {star[9]}, pnum: {star[10]}).")
+            print(f"System '{system_name}' has {len(planets)/2} planets (snum: {star[9]}, pnum: {star[10]}).")
 
     # Construct a JSON file for each system
     for system_name in systems:
@@ -245,7 +219,7 @@ def main():
 
 
         # id
-        gaia = star[7]
+        gaia = star[3]
         if gaia:
             tokens = gaia.split()
             if len(tokens) >= 3:
@@ -254,13 +228,13 @@ def main():
 
         # names
         names = []
-        names.append(star[2] + " system")
+        names.append(star[2])
         if gaia:
             names.append(gaia)
-        hip = star[5]
+        hip = star[4]
         if hip:
             names.append(hip)
-        hd = star[4]
+        hd = star[5]
         if hd:
             names.append(hd)
         tic = star[6]
@@ -268,65 +242,40 @@ def main():
             names.append(tic)
         smap["names"] = names
 
-        dist = float(star[92])
-        plx = float(star[93])
+        dist = float(star[33])
 
         # skip if there are no distances
-        if math.isnan(dist) and math.isnan(plx):
-            continue
-
-        # compute distance from parallax if needed
         if math.isnan(dist):
-            dist = plx / 1000.0
+            continue
         
         # color
-        b = float(star[94])
-        v = float(star[95])
-        j = float(star[96])
-        h = float(star[97])
-        k = float(star[98])
-        col = b - v
-        if math.isnan(col):
-            col = v - j
-        if math.isnan(col):
-            col = v - h
-        if math.isnan(col):
-            col = j - h
-        if math.isnan(col):
-            col = h - k
+        v = float(star[34])
+        k = float(star[35])
+        col = v - k
         if math.isnan(col):
             # default
             col = 0.656
         smap["colorBV"] = col
 
         # teff
-        teff = float(star[68])
+        teff = float(star[25])
         if not math.isnan(teff):
             smap["tEff"] = teff
 
         # rgba
-        if math.isnan(teff):
-            smap["color"] = bv_to_rgba(col)
-        else:
+        if not math.isnan(teff):
             smap["color"] = teff_to_rgba(teff)
 
         # mag
-        gaia_mag = float(star[108])
-        g_mag = float(star[100])
-        t_mag = float(star[110])
-        kep_mag = float(star[111])
+        v_mag = float(star[34])
+        k_mag = float(star[35])
+        gaia_mag = float(star[36])
 
         mag = gaia_mag
         if math.isnan(mag):
-            mag = g_mag
+            mag = v_mag
         if math.isnan(mag):
-            mag = t_mag
-        if math.isnan(mag):
-            mag = kep_mag
-        if math.isnan(mag):
-            mag = b
-        if math.isnan(mag):
-            mag = v
+            mag = k_mag
         if math.isnan(mag):
             # default
             mag = 14.0
@@ -342,8 +291,8 @@ def main():
         smap["archetype"] = "Star"
 
         # coordinates
-        ra = float(star[82])
-        dec = float(star[84])
+        ra = float(star[31])
+        dec = float(star[32])
 
         if math.isnan(ra) or math.isnan(dec):
             continue
@@ -356,34 +305,30 @@ def main():
 
         # other star attributes
         # radius
-        rad = float(star[69])
+        rad = float(star[26])
         if not math.isnan(rad):
             smap["rad_Rsun"] = rad
         # mass
-        mass = float(star[70])
+        mass = float(star[27])
         if math.isnan(mass):
             mass = random.uniform(0.7, 20.0)
         smap["mass_Msun"] = mass
         # metallicity
-        met = float(star[71])
+        met = float(star[28])
         if not math.isnan(met):
             smap["metallicity"] = met
-        # luminosity
-        lum = float(star[73])
-        if not math.isnan(lum):
-            smap["luminosity"] = lum
+        # spectral type
+        sptype = star[24]
+        if sptype:
+            smap["sp_type"] = sptype
         # log(G)
-        logg = float(star[74])
+        logg = float(star[30])
         if not math.isnan(logg):
             smap["log_G"] = logg
-        # age
-        age = float(star[75])
-        if not math.isnan(age):
-            smap["age"] = age
-        # density
-        dens = float(star[76])
-        if not math.isnan(dens):
-            smap["density"] = dens
+        # met
+        met = float(star[28])
+        if not math.isnan(met):
+            smap["metallicity"] = met
 
 
         json_list.append(smap)
@@ -392,178 +337,172 @@ def main():
         planets = system['planets']
         for planet_letter in planets:
 
-            if not planet_letter.startswith("#"):
-                planet = planets[planet_letter]
-                candidates = planets["#" + planet_letter]
+            planet = planets[planet_letter]
 
-                # ======= Planet
-                plmap = {}
+            # ======= Planet
+            plmap = {}
 
-                # name
-                plmap["name"] = planet[1]
+            # name
+            plmap["name"] = planet[1]
 
-                # color
-                eqt = get_float(planet, candidates, 50)
-                if not math.isnan(eqt):
-                    pl_color = teff_to_rgba(eqt)
-                else:
-                    pl_color = [0.4, 0.5, 0.98, 1.0]
-                plmap["color"] = pl_color
+            # color
+            eqt = get_float(planet, 22)
+            if not math.isnan(eqt):
+                pl_color = teff_to_rgba(eqt)
+            else:
+                pl_color = [0.4, 0.5, 0.98, 1.0]
+            plmap["color"] = pl_color
 
-                # component type
-                plmap["componentType"] = "Planets"
+            # component type
+            plmap["componentType"] = "Planets"
 
-                # parent
-                plmap["parent"] = names[0]
+            # parent
+            plmap["parent"] = names[0]
 
-                # archetype
-                plmap["archetype"] = "Planet"
+            # archetype
+            plmap["archetype"] = "Planet"
 
-                # size
-                rade = get_float(planet, candidates, 36)
-                radj = get_float(planet, candidates, 37)
-                if not math.isnan(rade):
-                    radius = rade * 6378.0
-                elif not math.isnan(radj):
-                    radius = radj * 71492.0
-                else:
-                    radius = 20000.0
-                plmap["size"] = radius
+            # size
+            rade = get_float(planet, 15)
+            radj = get_float(planet, 16)
+            if not math.isnan(rade):
+                radius = rade * 6378.0
+            elif not math.isnan(radj):
+                radius = radj * 71492.0
+            else:
+                radius = 20000.0
+            plmap["size"] = radius
 
-                # absmag
-                plmap["absMag"] = random.uniform(15.0, 29.0)
+            # absmag
+            plmap["absMag"] = random.uniform(15.0, 29.0)
 
-                # coordinates
-                coord = {
-                    "impl" : "gaiasky.util.coord.OrbitLintCoordinates",
-                    "orbitname" : planet[1] + " orbit"
-                }
-                plmap["coordinates"] = coord
+            # coordinates
+            coord = {
+                "impl" : "gaiasky.util.coord.OrbitLintCoordinates",
+                "orbitname" : planet[1] + " orbit"
+            }
+            plmap["coordinates"] = coord
 
-                # rigid rotation
-                rot = {
-                    "period": 5.0,
-                    "axialtilt": 5.0,
-                    "inclination": 8.0,
-                    "meridianangle": 150.0
-                }
-                plmap["rotation"] = rot
+            # rigid rotation
+            rot = {
+                "period": random.uniform(1.0, 50.0),
+                "axialtilt": random.uniform(0.0, 50.0),
+                "inclination": random.uniform(0.0, 10.0),
+                "meridianangle": random.uniform(0.0, 180.0)
+            }
+            plmap["rotation"] = rot
 
-                # randomize
-                randomize = ["model", "cloud", "atmosphere"]
-                plmap["randomize"] = randomize
+            # randomize
+            randomize = ["model", "cloud", "atmosphere"]
+            plmap["randomize"] = randomize
 
-                # seeds
-                seeds = [random.randint(-999999, 999999), random.randint(-999999, 999999), random.randint(-999999, 999999)]
-                plmap["seed"] = seeds
+            # seeds
+            seeds = [random.randint(-999999, 999999), random.randint(-999999, 999999), random.randint(-999999, 999999)]
+            plmap["seed"] = seeds
 
 
-                # other planet attributes
-                # radius (Earth)
-                if not math.isnan(rade):
-                    plmap["radius_Rearth"] = rade
-                # radius (Jupiter)
-                if not math.isnan(radj):
-                    plmap["radius_Rjupiter"] = radj
-                # mass (in Earth and Jupiter units)
-                masse = get_float(planet, candidates, 38)
-                massj = get_float(planet, candidates, 39)
-                if math.isnan(masse) and math.isnan(massj):
-                    masse = random.uniform(0.5, 500.0)
-                elif not math.isnan(massj) and math.isnan(masse):
-                    masse = massj * 317.82838
-                if not math.isnan(masse):
-                    plmap["mass_Mearth"] = masse
-                if not math.isnan(massj):
-                    plmap["mass_Mjupiter"] = massj
-                dens = get_float(planet, candidates, 47)
-                if not math.isnan(dens):
-                    plmap["density"] = dens
+            # other planet attributes
+            # radius (Earth)
+            if not math.isnan(rade):
+                plmap["radius_Rearth"] = rade
+            # radius (Jupiter)
+            if not math.isnan(radj):
+                plmap["radius_Rjupiter"] = radj
+            # mass (in Earth and Jupiter units)
+            masse = get_float(planet, 17)
+            massj = get_float(planet, 18)
+            if math.isnan(masse) and math.isnan(massj):
+                masse = random.uniform(0.5, 500.0)
+            elif not math.isnan(massj) and math.isnan(masse):
+                masse = massj * 317.82838
+            if not math.isnan(masse):
+                plmap["mass_Mearth"] = masse
+            if not math.isnan(massj):
+                plmap["mass_Mjupiter"] = massj
+            insol = get_float(planet, 21)
+            if not math.isnan(insol):
+                plmap["insol"] = insol
 
 
-                # ======= Planet orbit
-                plomap = {}
+            # ======= Planet orbit
+            plomap = {}
 
-                # name
-                plomap["name"] = planet[1] + " orbit"
+            # name
+            plomap["name"] = planet[1] + " orbit"
 
-                # color
-                plomap["color"] = pl_color
+            # color
+            plomap["color"] = pl_color
 
-                # component types
-                plomap["componentTypes"] = [ "Orbits", "Planets" ]
+            # component types
+            plomap["componentTypes"] = [ "Orbits", "Planets" ]
 
-                # parent
-                plomap["parent"] = names[0]
+            # parent
+            plomap["parent"] = names[0]
 
-                # archetype
-                plomap["archetype"] = "Orbit"
+            # archetype
+            plomap["archetype"] = "Orbit"
 
-                # provider
-                plomap["provider"] = "gaiasky.data.orbit.OrbitalParametersProvider"
+            # provider
+            plomap["provider"] = "gaiasky.data.orbit.OrbitalParametersProvider"
 
-                # model
-                plomap["model"] = "extrasolar_system"
+            # model
+            plomap["model"] = "extrasolar_system"
 
-                # method
-                plomap["newMethod"] = True
+            # method
+            plomap["newMethod"] = True
 
-                # orbital elements
-                orbit = {}
-                # period and semi-major axis
-                period = get_float(planet, candidates, 34)
-                sma = get_float(planet, candidates, 35) * au_km
+            # orbital elements
+            orbit = {}
+            # period and semi-major axis
+            period = get_float(planet, 13)
+            sma = get_float(planet, 14) * au_km
 
-                if math.isnan(sma) and math.isnan(period):
-                    # both are nan, invent period
-                    period = random.uniform(10.0, 2000.0)
+            if math.isnan(sma) and math.isnan(period):
+                # both are nan, invent period
+                period = random.uniform(10.0, 2000.0)
 
-                if math.isnan(sma) and not math.isnan(period):
-                    # compute sma from period and masses using Kepler's third law
-                    mp_kg = masse * mearth_kg
-                    ms_kg = mass * msun_kg 
-                    sma = ((math.pow(period, 2.0) * 4 * math.pow(math.pi, 2.0)) / (G * (mp_kg + ms_kg))) ** (1.0 / 3.0)
-                    # m to km
-                    sma = sma / 1000.0
-                elif math.isnan(period) and not math.isnan(sma):
-                    # compute period from sma and masses using Kepler's third law
-                    mp_kg = masse * mearth_kg
-                    ms_kg = mass * msun_kg
-                    period = ((math.pow(sma, 3.0) * G * (mp_kg + ms_kg)) / (4 * math.pow(math.pi, 2.0))) ** (1.0 / 2.0)
-                    # seconds to days
-                    period = period / 86400.0
+            if math.isnan(sma) and not math.isnan(period):
+                # compute sma from period and masses using Kepler's third law
+                mp_kg = masse * mearth_kg
+                ms_kg = mass * msun_kg 
+                sma = ((math.pow(period, 2.0) * 4 * math.pow(math.pi, 2.0)) / (G * (mp_kg + ms_kg))) ** (1.0 / 3.0)
+                # m to km
+                sma = sma / 1000.0
+            elif math.isnan(period) and not math.isnan(sma):
+                # compute period from sma and masses using Kepler's third law
+                mp_kg = masse * mearth_kg
+                ms_kg = mass * msun_kg
+                period = ((math.pow(sma, 3.0) * G * (mp_kg + ms_kg)) / (4 * math.pow(math.pi, 2.0))) ** (1.0 / 2.0)
+                # seconds to days
+                period = period / 86400.0
 
-                orbit["period"] = period
-                orbit["semimajoraxis"] = sma
-                # epoch is J2010.0
-                epoch = 2455197.5
-                orbit["epoch"] = epoch
-                # eccentricity
-                e = get_float(planet, candidates, 48)
-                if math.isnan(e):
-                    e = random.uniform(0.0, 0.4)
-                orbit["eccentricity"] = e
-                # inclination
-                i = get_float(planet, candidates, 51)
-                if math.isnan(i):
-                    i = random.uniform(0.0, 40.0)
-                orbit["inclination"] = i
-                # ascending node
-                anode = random.uniform(0.0, 180.0)
-                orbit["ascendingnode"] = anode
-                # argument of pericenter
-                argper = get_float(planet, candidates, 62)
-                if math.isnan(argper):
-                    argper = random.uniform(0.0, 90.0)
-                orbit["argofpericenter"] = argper
-                # mean anomaly
-                orbit["meananomaly"] = 0.0
+            orbit["period"] = period
+            orbit["semimajoraxis"] = sma
+            # epoch is J2010.0
+            epoch = 2455197.5
+            orbit["epoch"] = epoch
+            # eccentricity
+            e = get_float(planet, 20)
+            if math.isnan(e):
+                e = random.uniform(0.0, 0.4)
+            orbit["eccentricity"] = e
+            # inclination
+            i = random.gauss(0.0, 9.0)
+            orbit["inclination"] = i
+            # ascending node
+            anode = random.uniform(0.0, 180.0)
+            orbit["ascendingnode"] = anode
+            # argument of pericenter
+            argper = random.uniform(0.0, 90.0)
+            orbit["argofpericenter"] = argper
+            # mean anomaly
+            orbit["meananomaly"] = 0.0
 
-                plomap["orbit"] = orbit
+            plomap["orbit"] = orbit
 
-                # add to JSON objects list
-                json_list.append(plomap)
-                json_list.append(plmap)
+            # add to JSON objects list
+            json_list.append(plomap)
+            json_list.append(plmap)
 
 
         # final data object

@@ -222,6 +222,9 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                         // Affine transformation.
                         addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
+                        // Proximity descriptor loading.
+                        shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
+
                         try {
                             curr.mesh.render(shaderProgram, GL20.GL_POINTS);
                         } catch (IllegalArgumentException e) {

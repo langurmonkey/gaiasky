@@ -11,6 +11,7 @@ uniform float u_sizeFactor;
 uniform int u_cubemap;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
+uniform float u_proximityThreshold;
 // Arbitrary affine transformation(s)
 uniform bool u_transformFlag = false;
 uniform mat4 u_transform;
@@ -47,6 +48,7 @@ void main() {
     // Distance to point - watch out, if position contains large values, this produces overflow!
     // Downscale before computing length()
     float dist = length(pos * 1e-14) * 1e14;
+    float solidAngle = a_additional.x / dist;
 
     float cubemapSizeFactor = 1.0;
     if (u_cubemap == 1) {
@@ -54,6 +56,12 @@ void main() {
         // Correct point primitive size error due to perspective projection
         float cosphi = pow(dot(u_camDir, pos) / dist, 2.0);
         cubemapSizeFactor = 1.0 - cosphi * 0.65;
+    }
+
+    // Proximity.
+    float fadeFactor = 1.0;
+    if (u_proximityThreshold > 0.0) {
+        fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
     }
 
     #ifdef relativisticEffects
@@ -64,12 +72,10 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    v_col = vec4(a_color.rgb, a_color.a * u_alpha);
+    v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
     v_textureIndex = a_textureIndex;
-
-    float viewAngle = a_additional.x / dist;
 
     vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = min(max(viewAngle * u_sizeFactor * cubemapSizeFactor, u_sizeLimits.x), u_sizeLimits.y);
+    gl_PointSize = min(max(solidAngle * u_sizeFactor * cubemapSizeFactor, u_sizeLimits.x), u_sizeLimits.y);
 }

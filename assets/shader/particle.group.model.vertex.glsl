@@ -13,6 +13,7 @@ uniform float u_alpha;
 uniform float u_sizeFactor;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
+uniform float u_proximityThreshold;
 #ifdef extendedParticlesFlag
 // time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
@@ -88,6 +89,12 @@ void main() {
     float solidAngleDeg = (a_size / (dist * u_vrScale)) * 180.0 / PI;
     // When angle goes from 3 to 0.1 degrees, fade factor goes from 1 to 0.15.
     float fadeFactor = smoothstep(0.1, 3.0, solidAngleDeg) * 0.85 + 0.15;
+
+    // Proximity.
+    if (u_proximityThreshold > 0.0) {
+        float thDeg = u_proximityThreshold * PI / 180.0;
+        fadeFactor *= smoothstep(thDeg * 1.5, thDeg * 0.5, solidAngleDeg);
+    }
 
     #ifdef relativisticEffects
     pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);

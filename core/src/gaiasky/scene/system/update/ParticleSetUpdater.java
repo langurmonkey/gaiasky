@@ -17,6 +17,7 @@ import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 
@@ -44,7 +45,7 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
         var camera = GaiaSky.instance.cameraManager;
         var set = Mapper.particleSet.has(entity) ? Mapper.particleSet.get(entity) : Mapper.starSet.get(entity);
         if (set != null) {
-            updateCommon(set);
+            updateCommon(camera, set);
             if (set instanceof StarSet ss) {
                 updateStarSet(camera, ss, Mapper.datasetDescription.get(entity));
             } else {
@@ -53,28 +54,41 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void updateCommon(ParticleSet set) {
+    private void updateCommon(ICamera camera, ParticleSet set) {
         // Update proximity loading.
         if (set.proximityLoadingFlag) {
             int idxNearest = set.active[0];
             var bean = set.pointData.get(idxNearest);
             if (bean != null) {
+                var sa = set.getSolidAngleApparent(idxNearest);
+                var beanSelected = camera.getMode().isFocus()
+                        && camera.getFocus().isValid()
+                        && ((FocusView) camera.getFocus()).getSet() == set
+                        && camera.getFocus().hasName(bean.names()[0]);
                 if (!set.proximityLoaded.contains(idxNearest)) {
-                    var sa = set.getSolidAngleApparent(idxNearest);
                     // About 4 degrees.
-                    if (sa > 0.069) {
+                    if (sa > set.proximityThreshold) {
                         // Load descriptor file, if it exists.
                         var name = bean.names()[0];
                         var path = set.proximityDescriptorsPath.resolve(name + ".json");
                         if (Files.exists(path)) {
-                            GaiaSky.postRunnable(()->{
-                                GaiaSky.instance.scripting().loadJsonDataset(name, path.toString());
-                            });
+                            // Remove current bean from index.
+                            for (var key : bean.names()) {
+                                var k = key.toLowerCase().trim();
+                                GaiaSky.instance.scene.index().remove(k);
+                            }
+                            // Load descriptor.
+                            // Only re-focus (select) if our current focus is the object in question.
+                            GaiaSky.postRunnable(() -> GaiaSky.instance.scripting().loadJsonDataset(name, path.toString(), beanSelected, true));
                             set.proximityLoaded.add(idxNearest);
                         } else {
                             set.proximityLoaded.add(idxNearest);
+                            set.proximityMissing.add(idxNearest);
                         }
                     }
+                } else if (!set.proximityMissing.contains(idxNearest) && beanSelected) {
+                    // Already loaded. Do focus transition.
+                    GaiaSky.instance.scripting().setCameraFocus(bean.names()[0]);
                 }
             }
         }

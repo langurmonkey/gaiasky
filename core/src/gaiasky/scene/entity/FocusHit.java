@@ -280,6 +280,16 @@ public class FocusHit {
                         double dist = pos.len();
                         double angle = set.getRadius(i) / dist / camera.getFovFactor();
 
+                        // If proximity is active for this set,
+                        // and it is loaded,
+                        // and we are closer than the threshold,
+                        // then, deactivate selecting.
+                        if(set.proximityLoadingFlag) {
+                            if (set.proximityLoadingFlag && set.proximityLoaded.contains(i) && angle >= set.proximityThreshold) {
+                                continue;
+                            }
+                        }
+
                         PerspectiveCamera perspectiveCamera;
                         if (Settings.settings.program.modeStereo.active) {
                             if (screenX < w / 2f) {
