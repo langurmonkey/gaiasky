@@ -260,10 +260,6 @@ public class ModelEntityRenderSystem {
         mc.setFloatExtAttribute(FloatAttribute.ElevationMultiplier, (float) Settings.settings.program.recursiveGrid.style.ordinal());
         // Line width.
         mc.setFloatExtAttribute(FloatAttribute.Ts, Settings.settings.scene.renderer.line.width);
-        // Time.
-        mc.setFloatExtAttribute(FloatAttribute.Time, (float) GaiaSky.instance.getRunTimeSeconds());
-        // Animation goes into generic1 (>0 yes, <0 no).
-        mc.setFloatExtAttribute(FloatAttribute.Generic1, Settings.settings.program.recursiveGrid.animate ? 1f : -1f);
 
         // Render.
         modelBatch.render(mc.instance, mc.env);

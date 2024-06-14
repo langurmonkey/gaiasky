@@ -310,16 +310,12 @@ public enum Event {
      * with the resolution.
      **/
     CUBEMAP_RESOLUTION_CMD,
-    /** Enable/disable animation in recursive grid. Contains a boolean with the state. **/
-    RECURSIVE_GRID_ANIMATE_CMD,
     /** Enable/disable displaying frame coordinates in UV grid. **/
     UV_GRID_FRAME_COORDINATES_CMD,
     DEBUG_OBJECTS,
     DEBUG_QUEUE,
     DEBUG_RAM,
-    /**
-     * Debug info.
-     **/
+    // Debug info below.
     /** The time. **/
     DEBUG_TIME,
     /** Contains the used graphics memory and total graphics memory in bytes. **/

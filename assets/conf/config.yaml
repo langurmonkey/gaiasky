@@ -365,8 +365,6 @@ program:
   recursiveGrid:
     # Origin of the recursive grid in [FOCUS|REFSYS].
     origin: REFSYS
-    # Animate the grid
-    animate: false
     # If origin is refsys, this option adds projection lines to the current focus.
     projectionLines: true
     # Recursive grid style [CIRCULAR|SQUARE].

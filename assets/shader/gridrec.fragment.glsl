@@ -12,10 +12,6 @@ uniform float u_heightScale;
 uniform float u_ts;
 // Grid style encoded in u_elevationMultiplier: 0 - concentric rings; 1 - uniform square grid
 uniform float u_elevationMultiplier = 1.0;
-// Time in seconds.
-uniform float u_time;
-// Animation: active >0, inactive <0.
-uniform float u_generic1;
 
 // Depth
 #include <shader/lib/logdepthbuff.glsl>
@@ -38,7 +34,7 @@ layout (location = 0) out vec4 fragColor;
 #define N 10.0
 #define BASE_LINE_WIDTH 5.0
 #define RAD PI / 180.0
-#define BASE_COL_DIAG vec4(1.0, 0.792, 0.09, 0.3)
+#define BASE_COL_DIAG vec4(1.0, 0.492, 0.09, 0.3)
 
 #include <shader/lib/simple_noise.glsl>
 
@@ -71,18 +67,11 @@ vec4 circle_rec(vec2 tc, float lw, float d, float f, float alpha, vec4 col, vec4
     vec4 col_cross = lcol * max(lines_cross.x, lines_cross.y);
 
     // Lines (diagonal)
-    vec2 tc_rotated1 = rotateUV(tc, 30.0 * RAD);
-    vec2 lines_diag1 = smoothstep(factor, 1.0, pow(1.0 - abs(tc_rotated1), vec2(5.0)));
-    vec4 col_diag1 = BASE_COL_DIAG * max(lines_diag1.x, lines_diag1.y);
-
-    vec2 tc_rotated2 = rotateUV(tc, 60.0 * RAD);
-    vec2 lines_diag2 = smoothstep(factor, 1.0, pow(1.0 - abs(tc_rotated2), vec2(5.0)));
-    vec4 col_diag2 = BASE_COL_DIAG * max(lines_diag2.x, lines_diag2.y);
-
-    vec4 col_diag = max(col_diag1, col_diag2);
+    vec2 tc_rotated = rotateUV(tc, 45.0 * RAD);
+    vec2 lines_diag = smoothstep(factor, 1.0, pow(1.0 - abs(tc_rotated), vec2(3.0)));
+    vec4 col_diag = BASE_COL_DIAG * max(lines_diag.x, lines_diag.y);
 
     vec4 col_lines = max(col_cross, col_diag);
-
 
     vec4 result = max(col * smoothstep(factor, 1.0, func), col_lines);
     result.a *= alpha;
@@ -138,24 +127,7 @@ void main() {
     } else {
         fragColor = square(v_texCoords0);
     }
-    // Add background color.
-    fragColor.rgb = max(fragColor.rgb, u_diffuseColor.rgb);
-
-    vec2 uv = abs((v_texCoords0 - 0.5) * 2.0);
-    float distCenter = length(uv);
-
-    // Animate with pulse and noise.
-    if (u_generic1 > 0.0) {
-        // Add travelling pulse.
-        float fac = clamp(pow(abs(sin(u_time * 1.5 - distCenter * 8.0)), 0.2), 0.5, 1.0);
-        fragColor.rgb *= fac;
-
-        // Noise.
-        fragColor = saturate(fragColor + (0.2 * rand(1.0e2 * uv + u_time * 0.0001) - 0.1));
-    }
-
-    // Fade background with distance from center.
-    fragColor.a = max(fragColor.a, (1.0 - distCenter) * 0.1) * v_opacity;
+    fragColor.a *= v_opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

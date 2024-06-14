@@ -121,7 +121,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak,
             aberrationBak, lensFlareBak, filmGrainBak;
-    private boolean lightGlowBak, debugInfoBak, recGridAnimateBak, frameCoordinatesBak;
+    private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
 
@@ -433,7 +433,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         aa = new OwnSelectBox<>(skin);
         aa.setItems(aas);
         aa.setWidth(selectWidth);
-        aa.setSelected(aas[idxAa(2, settings.postprocess.antialias)]);
+        aa.setSelected(aas[idxAa(settings.postprocess.antialias)]);
 
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
         aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
@@ -1020,19 +1020,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
 
         // ANIMATION
-        OwnLabel animationLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.animate"), skin);
-        var animation = new OwnCheckBox("", skin);
-        animation.setChecked(settings.program.recursiveGrid.animate);
-        animation.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                // Enable or disable animation.
-                EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, animation, animation.isChecked());
-                return true;
-            }
-            return false;
-        });
+        //OwnLabel animationLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.animate"), skin);
+        //var animation = new OwnCheckBox("", skin);
+        //animation.setChecked(settings.program.recursiveGrid.animate);
+        //animation.addListener((event) -> {
+        //    if (event instanceof ChangeEvent) {
+        //        // Enable or disable animation.
+        //        EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, animation, animation.isChecked());
+        //        return true;
+        //    }
+        //    return false;
+        //});
 
-        labels.add(originLabel, styleLabel, recGridProjectionLinesLabel, animationLabel);
+        labels.add(originLabel, styleLabel, recGridProjectionLinesLabel);
 
         // Add to table.
         rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
@@ -1041,8 +1041,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         rg.add(recGridStyle).left().padBottom(pad10).row();
         rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
         rg.add(recGridProjectionLines).left().padBottom(pad10).row();
-        rg.add(animationLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(animation).left().padBottom(pad10);
+        //rg.add(animationLabel).left().padBottom(pad10).padRight(pad34);
+        //rg.add(animation).left().padBottom(pad10);
 
         // Add to content.
         addContentGroup(contentSceneTable, titleRecgrid, rg, 0f);
@@ -2449,7 +2449,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         debugInfoBak = settings.program.debugInfo;
         reprojectionBak = settings.postprocess.reprojection.mode;
         upscaleFilterBak = settings.postprocess.upscaleFilter;
-        recGridAnimateBak = settings.program.recursiveGrid.animate;
         frameCoordinatesBak = settings.program.uvGrid.frameCoordinates;
     }
 
@@ -2702,7 +2701,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // SSR
         if (ssr != null) {
             var reloadSSR = settings.postprocess.ssr.active != ssr.isChecked();
-            resetRenderFlags = resetRenderFlags || reloadSSR;
+            resetRenderFlags = reloadSSR;
             if (reloadSSR) {
                 GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
             }
@@ -2948,7 +2947,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.SHOW_DEBUG_CMD, this, debugInfoBak);
         EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
         EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
-        EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, this, recGridAnimateBak);
         EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinatesBak);
     }
 
@@ -2991,15 +2989,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         enableComponents(fullscreen, fullScreenResolutions);
     }
 
-    private int idxAa(int base,
-                      AntialiasSettings x) {
+    private int idxAa(AntialiasSettings x) {
         if (x.getAACode() == -1)
             return 1;
         if (x.getAACode() == -2)
             return 2;
         if (x.getAACode() == 0)
             return 0;
-        return (int) (Math.log(x.getAACode()) / Math.log(base) + 1e-10) + 2;
+        return (int) (Math.log(x.getAACode()) / Math.log(2) + 1e-10) + 2;
     }
 
     private int idxLang(String code,

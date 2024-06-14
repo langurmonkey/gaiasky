@@ -2370,11 +2370,6 @@ public class Settings extends SettingsObject {
                             }
                         }
                     }
-                    case RECURSIVE_GRID_ANIMATE_CMD -> {
-                        if (data.length > 0 && data[0] != null) {
-                            recursiveGrid.animate = (boolean) data[0];
-                        }
-                    }
                     case UV_GRID_FRAME_COORDINATES_CMD -> {
                         if (data.length > 0 && data[0] != null) {
                             uvGrid.frameCoordinates = (boolean) data[0];
@@ -2424,7 +2419,7 @@ public class Settings extends SettingsObject {
                     Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
                     Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
                     Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
-                    Event.UI_SCALE_CMD, Event.RECURSIVE_GRID_ANIMATE_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD);
+                    Event.UI_SCALE_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD);
 
             minimap.setupListeners();
             fileChooser.setupListeners();
@@ -2459,7 +2454,6 @@ public class Settings extends SettingsObject {
             EventManager.publish(Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, this, modeCubemap.planetarium.sphericalMirrorWarp);
             EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, modeCubemap.planetarium.angle);
             EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointer.guides.active, pointer.guides.color, pointer.guides.width);
-            EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, this, recursiveGrid.animate);
 
             // Those need to run in the main thread, as they may need the OpenGL context.
             GaiaSky.postRunnable(() -> {
@@ -2604,7 +2598,6 @@ public class Settings extends SettingsObject {
         public static class RecursiveGridSettings extends SettingsObject {
             public OriginType origin;
             public GridStyle style;
-            public boolean animate = false;
 
             public boolean projectionLines;
 
