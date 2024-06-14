@@ -21,6 +21,7 @@ import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 import uk.ac.starlink.table.ColumnInfo;
 
 import java.util.List;
@@ -34,11 +35,34 @@ public class EntityUtils {
      * @param out    Auxiliary vector to put the result in.
      * @return The vector with the position.
      */
-    public static Vector3b getAbsolutePosition(final Entity entity,
-                                               Vector3b out) {
+    public static Vector3b getAbsolutePosition(final Entity entity, Vector3b out) {
         if (entity != null) {
             var body = Mapper.body.get(entity);
             out.set(body.pos);
+
+            var e = entity;
+            var graph = Mapper.graph.get(e);
+            while (graph.parent != null) {
+                e = graph.parent;
+                graph = Mapper.graph.get(e);
+                out.add(Mapper.body.get(e).pos);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * This is a faster version of {@link EntityUtils#getAbsolutePosition(Entity, Vector3b)} that uses double-precision
+     * vectors instead of arbitrary precision.
+     *
+     * @param entity The entity.
+     * @param out    Auxiliary vector to put the result in.
+     * @return The vector with the position.
+     */
+    public static Vector3d getAbsolutePosition(final Entity entity, Vector3d out) {
+        if (entity != null) {
+            var body = Mapper.body.get(entity);
+            body.pos.put(out);
 
             var e = entity;
             var graph = Mapper.graph.get(e);
@@ -60,9 +84,26 @@ public class EntityUtils {
      * @param out    Auxiliary vector to put the result in.
      * @return The vector with the position.
      */
-    public static Vector3b getAbsolutePosition(Entity entity,
-                                               String name,
-                                               Vector3b out) {
+    public static Vector3b getAbsolutePosition(Entity entity, String name, Vector3b out) {
+        if (Mapper.particleSet.has(entity)) {
+            return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
+        } else if (Mapper.starSet.has(entity)) {
+            return Mapper.starSet.get(entity).getAbsolutePosition(name, out);
+        } else {
+            return getAbsolutePosition(entity, out);
+        }
+    }
+
+    /**
+     * This is a faster version of {@link EntityUtils#getAbsolutePosition(Entity, String, Vector3b)} that uses double-precision
+     * vectors instead of arbitrary precision.
+     *
+     * @param entity The entity.
+     * @param name   The name.
+     * @param out    Auxiliary vector to put the result in.
+     * @return The vector with the position.
+     */
+    public static Vector3d getAbsolutePosition(Entity entity, String name, Vector3d out) {
         if (Mapper.particleSet.has(entity)) {
             return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
         } else if (Mapper.starSet.has(entity)) {
@@ -114,21 +155,14 @@ public class EntityUtils {
         }
     }
 
-    public static Entity getParticleSet(Scene scene,
-                                        String name,
-                                        String file,
-                                        List<IParticleRecord> data,
-                                        List<ColumnInfo> columnInfoList,
-                                        DatasetOptions datasetOptions,
-                                        boolean addToCatalogManager) {
+    public static Entity getParticleSet(Scene scene, String name, String file, List<IParticleRecord> data, List<ColumnInfo> columnInfoList, DatasetOptions datasetOptions, boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
         double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
         double[] particleColor = datasetOptions == null || datasetOptions.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : datasetOptions.particleColor;
         double colorNoise = datasetOptions == null ? 0 : datasetOptions.particleColorNoise;
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : datasetOptions.labelColor;
         double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
-        double[] particleSizeLimits =
-                datasetOptions == null || datasetOptions.particleSizeLimits == null ? new double[]{0.00474, 0.2047} : datasetOptions.particleSizeLimits;
+        double[] particleSizeLimits = datasetOptions == null || datasetOptions.particleSizeLimits == null ? new double[]{0.00474, 0.2047} : datasetOptions.particleSizeLimits;
         double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
         String modelType = datasetOptions == null ? "quad" : datasetOptions.modelType;
         String modelPrimitive = datasetOptions == null ? "GL_TRIANGLES" : datasetOptions.modelPrimitive;
@@ -177,13 +211,7 @@ public class EntityUtils {
         return entity;
     }
 
-    public static Entity getStarSet(Scene scene,
-                                    String name,
-                                    String file,
-                                    List<IParticleRecord> data,
-                                    List<ColumnInfo> columnInfoList,
-                                    DatasetOptions datasetOptions,
-                                    boolean addToCatalogManager) {
+    public static Entity getStarSet(Scene scene, String name, String file, List<IParticleRecord> data, List<ColumnInfo> columnInfoList, DatasetOptions datasetOptions, boolean addToCatalogManager) {
         double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
         double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : datasetOptions.labelColor;

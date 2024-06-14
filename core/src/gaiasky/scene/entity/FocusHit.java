@@ -87,7 +87,7 @@ public class FocusHit {
             var entity = view.getEntity();
 
             Vector3 pos = F31;
-            Vector3b posDouble = EntityUtils.getAbsolutePosition(entity, B31).add(camera.getInversePos());
+            Vector3d posDouble = EntityUtils.getAbsolutePosition(entity, D31).add(camera.getInversePos());
             pos.set(posDouble.valuesf());
 
             if (camera.direction.dot(posDouble) > 0) {
@@ -247,7 +247,7 @@ public class FocusHit {
                                      int pixelDist,
                                      NaturalCamera camera,
                                      Array<Entity> hits) {
-        addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness * 1e3f, this::computeHitSolidAngleStar, camera, hits);
+        addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness, this::computeHitSolidAngleStar, camera, hits);
     }
 
     public void addHitCoordinateParticleSet(FocusView view,
@@ -284,10 +284,8 @@ public class FocusHit {
                         // and it is loaded,
                         // and we are closer than the threshold,
                         // then, deactivate selecting.
-                        if(set.proximityLoadingFlag) {
-                            if (set.proximityLoadingFlag && set.proximityLoaded.contains(i) && angle >= set.proximityThreshold) {
-                                continue;
-                            }
+                        if (set.proximityLoadingFlag && set.proximityLoaded.contains(i) && angle >= set.proximityThreshold) {
+                            continue;
                         }
 
                         PerspectiveCamera perspectiveCamera;
