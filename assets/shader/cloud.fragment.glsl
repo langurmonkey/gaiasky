@@ -72,11 +72,9 @@ uniform vec3 u_eclipsingBodyPos;
 //////////////////////////////////////////////////////
 ////// DIRECTIONAL LIGHTS
 //////////////////////////////////////////////////////
-#ifdef lightingFlag
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
 #endif // numDirectionalLights
-#endif //lightingFlag
 
 #ifdef directionalLightsFlag
 struct DirectionalLight
@@ -85,16 +83,30 @@ struct DirectionalLight
     vec3 direction;
 };
 uniform DirectionalLight u_dirLights[numDirectionalLights];
-#endif
+#endif // directionalLightsFlag
 
-in vec3 v_lightDir;
-in vec3 v_lightCol;
+#if defined(numPointLights) && (numPointLights > 0)
+#define pointLightsFlag
+#endif// numPointLights
+
+#ifdef pointLightsFlag
+struct PointLight {
+    vec3 color;
+    vec3 position;
+    float intensity;
+};
+uniform PointLight u_pointLights[numPointLights];
+#endif // numPointLights
+
 in vec3 v_viewDir;
 in vec3 v_fragPosWorld;
+in mat3 v_tbn;
 
 layout (location = 0) out vec4 fragColor;
 
 #include <shader/lib/logdepthbuff.glsl>
+
+#define saturate(x) clamp(x, 0.0, 1.0)
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -105,11 +117,6 @@ void main() {
 
     vec4 cloud = fetchCloudColor(g_texCoord0, vec4(0.0, 0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
-
-    // Normal in pixel space
-    vec3 N = vec3(0.0, 0.0, 1.0);
-    vec3 L = normalize(v_lightDir);
-    float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
 
     float shdw = 1.0;
     // Eclipses
@@ -124,9 +131,38 @@ void main() {
     }
     #endif // eclipsingBodyFlag
 
-    vec3 cloudColor = clamp(v_lightCol * cloud.rgb, 0.0, 1.0) * shdw;
-    float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0) * 1.3;
-    fragColor = vec4(cloudColor, cloud.a) * opacity;
+    vec3 cloudColor = vec3(0.0, 0.0, 0.0);
+
+    // DIRECTIONAL LIGHTS
+    #ifdef directionalLightsFlag
+    // Loop for directional light contributions.
+    for (int i = 0; i < numDirectionalLights; i++) {
+        // Normal in pixel space.
+        vec3 col = u_dirLights[i].color;
+        vec3 N = vec3(0.0, 0.0, 1.0);
+        vec3 L = normalize(u_dirLights[i].direction * v_tbn);
+        float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
+
+        cloudColor = saturate(cloudColor + col * NL + ambient * (1.0 - NL));
+    }
+    #endif // directionalLightsFlag
+
+    // POINT LIGHTS
+    #ifdef pointLightsFlag
+    // Loop for point light contributions.
+    for (int i = 0; i < numPointLights; i++) {
+        // Normal in pixel space.
+        vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
+        vec3 N = vec3(0.0, 0.0, 1.0);
+        vec3 L = normalize((u_pointLights[i].position - v_fragPosWorld) * v_tbn);
+        float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
+
+        cloudColor = saturate(cloudColor + col * NL + ambient * (1.0 - NL));
+    }
+    #endif // pointLightsFlag
+
+    cloudColor *= cloud.rgb;
+    fragColor = vec4(cloudColor * shdw, cloud.a) * v_opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 

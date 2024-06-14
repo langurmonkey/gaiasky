@@ -246,10 +246,9 @@ struct DirectionalLight {
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif
 
-out vec3 v_lightDir;
-out vec3 v_lightCol;
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
+out mat3 v_tbn;
 
 void main() {
     v_opacity = u_opacity;
@@ -285,10 +284,8 @@ void main() {
     #endif // numCSM
     #endif // shadowMapFlag
 
-    mat3 worldToTangent;
-    worldToTangent[0] = g_tangent;
-    worldToTangent[1] = g_binormal;
-    worldToTangent[2] = g_normal;
+    mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
+    v_tbn = TBN;
 
     #ifdef ambientLightFlag
 	v_ambientLight = u_ambientLight;
@@ -304,23 +301,8 @@ void main() {
 	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
-    #if defined(directionalLightsFlag) && defined(pointLightsFlag)
-    if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
-        v_lightDir = normalize(-u_dirLights[0].direction * worldToTangent);
-        v_lightCol = u_dirLights[0].color;
-    } else {
-        v_lightDir = normalize(-pos.xyz + u_pointLights[0].position * worldToTangent);
-        v_lightCol = u_pointLights[0].color;
-    }
-    #endif // directionalLightsFlag && pointLightsFlag
-
-    #if !defined(directionalLightsFlag) && !defined(pointLightsFlag)
-        v_lightDir = vec3(0.0, 0.0, 0.0);
-        v_lightCol = vec3(0.0);
-    #endif // directionalLightsFlag
-    
     vec3 viewDir = (u_cameraPosition.xyz - pos.xyz);
-    v_viewDir = normalize(viewDir * worldToTangent);
+    v_viewDir = normalize(viewDir * TBN);
 
     pushTexCoord0(g_texCoord0);
 }
