@@ -10,6 +10,7 @@ package gaiasky.util;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.StringBuilder;
+import net.jafama.FastMath;
 
 import java.util.Arrays;
 
@@ -272,7 +273,7 @@ public class DoubleArray {
         if (ordered)
             System.arraycopy(items, start + count, items, start, n - (start + count));
         else {
-            int i = Math.max(lastIndex, end + 1);
+            int i = FastMath.max(lastIndex, end + 1);
             System.arraycopy(items, i, items, start, n - i);
         }
         size = n - count;
@@ -375,7 +376,7 @@ public class DoubleArray {
     protected double[] resize(int newSize) {
         double[] newItems = new double[newSize];
         double[] items = this.items;
-        System.arraycopy(items, 0, newItems, 0, Math.min(size, newItems.length));
+        System.arraycopy(items, 0, newItems, 0, FastMath.min(size, newItems.length));
         this.items = newItems;
         return newItems;
     }

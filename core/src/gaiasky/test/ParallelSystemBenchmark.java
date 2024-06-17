@@ -14,6 +14,7 @@ import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.SingleMatrix;
 import gaiasky.scene.system.ParallelSystem;
+import net.jafama.FastMath;
 
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
@@ -72,7 +73,7 @@ public class ParallelSystemBenchmark {
             body.distToCamera = 20;
             double value = 0;
             for (int i = 0; i < body.distToCamera; i++) {
-                value += Math.atan(ThreadLocalRandom.current().nextDouble()) * Math.log(i) * Math.pow(body.distToCamera, 12);
+                value += FastMath.atan(ThreadLocalRandom.current().nextDouble()) * FastMath.log(i) * FastMath.pow(body.distToCamera, 12);
             }
             SingleMatrix m = entity.getComponent(SingleMatrix.class);
             m.matrix.idt().rotate(3, 1, 0, 32).scl(23);
@@ -170,9 +171,9 @@ public class ParallelSystemBenchmark {
         double sum = 0;
         double n = array.length;
         for (long l : array) {
-            sum += Math.pow(l / 1_000_000d - mean, 2.0);
+            sum += FastMath.pow(l / 1_000_000d - mean, 2.0);
         }
-        return Math.sqrt(sum / n);
+        return FastMath.sqrt(sum / n);
     }
 
     private String pad(String str, int len) {

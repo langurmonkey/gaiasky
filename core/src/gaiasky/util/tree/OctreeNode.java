@@ -139,7 +139,7 @@ public class OctreeNode implements ILineRenderable {
         this.depth = depth;
         this.observed = false;
         this.status = LoadStatus.NOT_LOADED;
-        this.radius = Math.sqrt(hsx * hsx + hsy * hsy + hsz * hsz);
+        this.radius = FastMath.sqrt(hsx * hsx + hsy * hsy + hsz * hsz);
     }
 
     /**
@@ -161,7 +161,7 @@ public class OctreeNode implements ILineRenderable {
         this.depth = depth;
         this.observed = false;
         this.status = LoadStatus.NOT_LOADED;
-        this.radius = Math.sqrt(hsx * hsx + hsy * hsy + hsz * hsz);
+        this.radius = FastMath.sqrt(hsx * hsx + hsy * hsy + hsz * hsz);
     }
 
     /**
@@ -624,7 +624,7 @@ public class OctreeNode implements ILineRenderable {
         // Compute distance and view angle
         distToCamera = auxD1.set(centre).add(cam.getInversePos()).len();
         // View angle is normalized to 40 degrees when the octant is exactly the size of the screen height, regardless of the camera fov
-        viewAngle = Math.atan(radius / distToCamera) * 2;
+        viewAngle = FastMath.atan(radius / distToCamera) * 2;
 
         float cf = MathUtilsDouble.clamp(cam.getFovFactor() * 2.5f, 0.15f, 1f);
         float th0 = Settings.settings.scene.octree.threshold[0] * cf;

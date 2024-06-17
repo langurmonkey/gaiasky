@@ -7,6 +7,8 @@
 
 package gaiasky.test;
 
+import net.jafama.FastMath;
+
 import java.text.DecimalFormat;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -48,9 +50,9 @@ public class AbstractBenchmark {
         double sum = 0;
         double n = array.length;
         for (long l : array) {
-            sum += Math.pow(l / 1_000_000d - mean, 2.0);
+            sum += FastMath.pow(l / 1_000_000d - mean, 2.0);
         }
-        return Math.sqrt(sum / n);
+        return FastMath.sqrt(sum / n);
     }
 
     protected String pad(String str,

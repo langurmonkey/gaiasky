@@ -11,6 +11,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class ConcreteAttitude implements IAttitude {
 
@@ -19,7 +20,7 @@ public class ConcreteAttitude implements IAttitude {
     private static final Vector3d[] fovDirections = new Vector3d[] { new Vector3d(), new Vector3d() };
     private static final Vector3d aux = new Vector3d();
     // half the conventional basic angle Gamma [rad]
-    private final double halfGamma = Math.toRadians(.5 * BASICANGLE_DEGREE);
+    private final double halfGamma = FastMath.toRadians(.5 * BASICANGLE_DEGREE);
     /**
      * time to which the attitude refers, in elapsed ns since the reference epoch
      */
@@ -118,14 +119,14 @@ public class ConcreteAttitude implements IAttitude {
 
         // k is a unit vector (in ICRS) towards the north ecliptic pole:
         double obliquity = Coordinates.OBLIQUITY_RAD_J2000;
-        double cosObliquity = Math.cos(obliquity);
-        double sinObliquity = Math.sin(obliquity);
+        double cosObliquity = FastMath.cos(obliquity);
+        double sinObliquity = FastMath.sin(obliquity);
         Vector3d k = new Vector3d(0.0, -sinObliquity, cosObliquity);
 
         // s is a unit vector (in ICRS) towards the nominal sun:
         NslSun sun = new NslSun();
-        double cosLSun = Math.cos(sun.getSolarLongitude());
-        double sinLSun = Math.sin(sun.getSolarLongitude());
+        double cosLSun = FastMath.cos(sun.getSolarLongitude());
+        double sinLSun = FastMath.sin(sun.getSolarLongitude());
         Vector3d s = new Vector3d(cosLSun, sinLSun * cosObliquity, sinLSun
                 * sinObliquity);
 
@@ -207,7 +208,7 @@ public class ConcreteAttitude implements IAttitude {
     @Override
     public Vector3d[] getFovDirections() {
         // half the nominal basic angle:
-        double halfBasicAngle = 0.5 * Math.toRadians(BASICANGLE_DEGREE);
+        double halfBasicAngle = 0.5 * FastMath.toRadians(BASICANGLE_DEGREE);
 
         // xyz[0], xyz[1], xyz[2] are unit vectors (in ICRS) along the SRS axes:
         getSrsAxes(xyz);
@@ -242,9 +243,9 @@ public class ConcreteAttitude implements IAttitude {
     @Override
     public double[] getAlAcRates(double alInstrumentAngle, double acFieldAngle) {
         // Formulas (11) and (12) from GAIA-LL-056 : valid for any scanning law
-        double cphi = Math.cos(alInstrumentAngle);
-        double sphi = Math.sin(alInstrumentAngle);
-        double tzeta = Math.tan(acFieldAngle);
+        double cphi = FastMath.cos(alInstrumentAngle);
+        double sphi = FastMath.sin(alInstrumentAngle);
+        double tzeta = FastMath.tan(acFieldAngle);
 
         // The inertial rate in SRS in [rad/s]:
         Vector3d spinRate = getSpinVectorInSrs().scl(86400.);

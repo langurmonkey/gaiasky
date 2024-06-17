@@ -201,7 +201,7 @@ public class LabelEntityRenderSystem {
         var transform = Mapper.transform.get(view.getEntity());
 
         var label = view.label;
-        var size = (float) Math.min(0.0005, dist * 2.5e-3d * camera.getFovFactor());
+        var size = (float) FastMath.min(0.0005, dist * 2.5e-3d * camera.getFovFactor());
         // +X
         label.labelPosition.set(dist, 0d, 0d);
         if (transform.matrix != null)
@@ -338,7 +338,7 @@ public class LabelEntityRenderSystem {
         if (view.particleSet.renderParticleLabels && active != null) {
             float thresholdLabel = 1f;
             var pointData = view.particleSet.pointData;
-            int n = Math.min(pointData.size(), view.particleSet.numLabels);
+            int n = FastMath.min(pointData.size(), view.particleSet.numLabels);
             for (int i = 0; i < n; i++) {
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     IParticleRecord pb = pointData.get(active[i]);
@@ -351,14 +351,14 @@ public class LabelEntityRenderSystem {
                         if (view.particleSet.isWireframe()) {
                             textPosition(camera, labelPosition, distToCamera, solidAngle * 0.3e-6, 0);
                         } else {
-                            textPosition(camera, labelPosition, distToCamera, Math.min(view.particleSet.particleSizeLimits[1], solidAngle) * 1e-6, 0);
+                            textPosition(camera, labelPosition, distToCamera, FastMath.min(view.particleSet.particleSizeLimits[1], solidAngle) * 1e-6, 0);
                         }
 
                         shader.setUniformf("u_viewAngle", solidAngle);
                         shader.setUniformf("u_viewAnglePow", 1f);
                         shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
                         float textSize = (float) FastMath.tanh(solidAngle) * distToCamera * 1e5f;
-                        float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+                        float alpha = FastMath.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
 
                         // Also fade labels in proximity.
                         var size = pb.hasSize() ? pb.size() : view.body.size;
@@ -402,7 +402,7 @@ public class LabelEntityRenderSystem {
             var active = set.active;
 
             Vector3b starPosition = B31;
-            int n = Math.min(pointData.size(), set.numLabels);
+            int n = FastMath.min(pointData.size(), set.numLabels);
             for (int i = 0; i < n; i++) {
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     int idx = active[i];
@@ -440,7 +440,7 @@ public class LabelEntityRenderSystem {
         double distToCamera = starPosition.lenDouble();
         float radius = (float) set.getRadius(idx);
         if (forceLabel) {
-            radius = Math.max(radius, 1e4f);
+            radius = FastMath.max(radius, 1e4f);
         }
         float solidAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
 
@@ -456,7 +456,7 @@ public class LabelEntityRenderSystem {
                 // Override object color
                 shader.setUniform4fv("u_color", view.textColour(star.names()[0]), 0, 4);
                 double textSize = FastMath.tanh(solidAngle) * distToCamera * 1e5d;
-                float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+                float alpha = FastMath.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
 
                 // Also fade labels in proximity.
                 var size = star.size() * Constants.STAR_SIZE_FACTOR;
@@ -530,14 +530,14 @@ public class LabelEntityRenderSystem {
         // North-south line.
         for (float angle = -90; angle <= 90; angle += stepAngle) {
             if (angle != 0) {
-                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), distToCamera, D31).valuesf()).mul(grid.annotTransform);
+                F31.set(Coordinates.sphericalToCartesian(0, FastMath.toRadians(angle), distToCamera, D31).valuesf()).mul(grid.annotTransform);
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                     D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
                     render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera,
                             view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
                 }
-                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(-angle), -distToCamera, D31).valuesf()).mul(grid.annotTransform);
+                F31.set(Coordinates.sphericalToCartesian(0, FastMath.toRadians(-angle), -distToCamera, D31).valuesf()).mul(grid.annotTransform);
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                     D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
@@ -590,7 +590,7 @@ public class LabelEntityRenderSystem {
                 // World coordinates to spherical coordinates.
                 Coordinates.cartesianToSpherical(vecDouble, out);
 
-                var text = angle((float) Math.toDegrees(out.x)) + "/" + angleSign((float) Math.toDegrees(out.y));
+                var text = angle((float) FastMath.toDegrees(out.x)) + "/" + angleSign((float) FastMath.toDegrees(out.y));
                 render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, text, x - 50, y, 0.45f * labelSize, Align.center);
             }
 
@@ -608,7 +608,7 @@ public class LabelEntityRenderSystem {
                 // World coordinates to spherical coordinates.
                 Coordinates.cartesianToSpherical(vecDouble, out);
 
-                var text = angle((float) Math.toDegrees(out.x)) + "/" + angleSign((float) Math.toDegrees(out.y));
+                var text = angle((float) FastMath.toDegrees(out.x)) + "/" + angleSign((float) FastMath.toDegrees(out.y));
                 render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, text, x - 145, y + offsetY, 0.45f * labelSize, Align.right);
             }
         }
@@ -710,8 +710,8 @@ public class LabelEntityRenderSystem {
         RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
     }
 
-    private final double rad02 = Math.toRadians(2);
-    private final double rad40 = Math.toRadians(40);
+    private final double rad02 = FastMath.toRadians(2);
+    private final double rad40 = FastMath.toRadians(40);
 
     /**
      * Text position for star sets.

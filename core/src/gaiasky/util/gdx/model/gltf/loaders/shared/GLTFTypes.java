@@ -24,6 +24,7 @@ import gaiasky.util.gdx.model.gltf.scene3d.model.CubicQuaternion;
 import gaiasky.util.gdx.model.gltf.scene3d.model.CubicVector3;
 import gaiasky.util.gdx.model.gltf.scene3d.model.CubicWeightVector;
 import gaiasky.util.gdx.model.gltf.scene3d.model.WeightVector;
+import net.jafama.FastMath;
 
 public class GLTFTypes {
 
@@ -194,7 +195,7 @@ public class GLTFTypes {
             // convert scale ratio to canvas size
             float canvasRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
             float aspectRatio = glCamera.perspective.aspectRatio != null ? glCamera.perspective.aspectRatio : canvasRatio;
-            float yfov = (float) Math.atan(Math.tan(glCamera.perspective.yfov * 0.5) * aspectRatio / canvasRatio) * 2.0f;
+            float yfov = (float) FastMath.atan(Math.tan(glCamera.perspective.yfov * 0.5) * aspectRatio / canvasRatio) * 2.0f;
 
             PerspectiveCamera camera = new PerspectiveCamera();
 

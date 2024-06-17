@@ -10,6 +10,7 @@ package gaiasky.util.gdx.shader.attribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.jafama.FastMath;
 
 public class Matrix4Attribute extends Attribute {
     public static final String ShadowMapProjViewTransAlias = "shadowMapProjViewTrans";
@@ -52,7 +53,7 @@ public class Matrix4Attribute extends Attribute {
 
     @Override
     public int hashCode() {
-        double result = Math.pow(2, index);
+        double result = FastMath.pow(2, index);
         result = 977 * result + NumberUtils.floatToRawIntBits(value.val[Matrix4.M00]) + NumberUtils.floatToRawIntBits(value.val[Matrix4.M11]) + NumberUtils.floatToRawIntBits(value.val[Matrix4.M22]) + NumberUtils.floatToRawIntBits(value.val[Matrix4.M33]);
         return (int) result;
     }

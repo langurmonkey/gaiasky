@@ -36,6 +36,7 @@ import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
+import net.jafama.FastMath;
 import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;
@@ -283,7 +284,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                     int nInvalidParallaxes = 0;
                     long i = 0L;
-                    long step = Math.max(1L, Math.round(count / 100d));
+                    long step = FastMath.max(1L, FastMath.round(count / 100d));
 
                     RowSequence rs = table.getRowSequence();
                     while (rs.next()) {
@@ -391,7 +392,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                             // Solid angle in radians.
                                             double sa = new Angle(sizePair.getSecond(), sizePair.getFirst().unit).get(AngleUnit.RAD);
                                             // Size in parsecs = tan(sa) * distPc
-                                            sizePc = Math.tan(sa) * p.realPosition.len();
+                                            sizePc = FastMath.tan(sa) * p.realPosition.len();
                                         } else if (Length.isLength(sizeUcd.unit)) {
                                             // Size in parsecs, directly.
                                             sizePc = new Length(sizePair.getSecond(), sizePair.getFirst().unit).get(LengthUnit.PC);

@@ -17,6 +17,7 @@
 package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.graphics.Texture;
+import net.jafama.FastMath;
 
 /**
  * Defines a rectangular area of a texture. The coordinate system used has its origin in the upper left corner with the X axis
@@ -111,14 +112,14 @@ public class TextureRegion {
         float invTexWidth = 1f / texture.getWidth();
         float invTexHeight = 1f / texture.getHeight();
         setRegion(x * invTexWidth, y * invTexHeight, (x + width) * invTexWidth, (y + height) * invTexHeight);
-        regionWidth = Math.abs(width);
-        regionHeight = Math.abs(height);
+        regionWidth = FastMath.abs(width);
+        regionHeight = FastMath.abs(height);
     }
 
     public void setRegion(float u, float v, float u2, float v2) {
         int texWidth = texture.getWidth(), texHeight = texture.getHeight();
-        regionWidth = Math.round(Math.abs(u2 - u) * texWidth);
-        regionHeight = Math.round(Math.abs(v2 - v) * texHeight);
+        regionWidth = FastMath.round(Math.abs(u2 - u) * texWidth);
+        regionHeight = FastMath.round(Math.abs(v2 - v) * texHeight);
 
         // For a 1x1 region, adjust UVs toward pixel center to avoid filtering artifacts on AMD GPUs when drawing very stretched.
         if (regionWidth == 1 && regionHeight == 1) {
@@ -162,7 +163,7 @@ public class TextureRegion {
 
     public void setU(float u) {
         this.u = u;
-        regionWidth = Math.round(Math.abs(u2 - u) * texture.getWidth());
+        regionWidth = FastMath.round(Math.abs(u2 - u) * texture.getWidth());
     }
 
     public float getV() {
@@ -171,7 +172,7 @@ public class TextureRegion {
 
     public void setV(float v) {
         this.v = v;
-        regionHeight = Math.round(Math.abs(v2 - v) * texture.getHeight());
+        regionHeight = FastMath.round(Math.abs(v2 - v) * texture.getHeight());
     }
 
     public float getU2() {
@@ -180,7 +181,7 @@ public class TextureRegion {
 
     public void setU2(float u2) {
         this.u2 = u2;
-        regionWidth = Math.round(Math.abs(u2 - u) * texture.getWidth());
+        regionWidth = FastMath.round(Math.abs(u2 - u) * texture.getWidth());
     }
 
     public float getV2() {
@@ -189,11 +190,11 @@ public class TextureRegion {
 
     public void setV2(float v2) {
         this.v2 = v2;
-        regionHeight = Math.round(Math.abs(v2 - v) * texture.getHeight());
+        regionHeight = FastMath.round(Math.abs(v2 - v) * texture.getHeight());
     }
 
     public int getRegionX() {
-        return Math.round(u * texture.getWidth());
+        return FastMath.round(u * texture.getWidth());
     }
 
     public void setRegionX(int x) {
@@ -201,7 +202,7 @@ public class TextureRegion {
     }
 
     public int getRegionY() {
-        return Math.round(v * texture.getHeight());
+        return FastMath.round(v * texture.getHeight());
     }
 
     public void setRegionY(int y) {

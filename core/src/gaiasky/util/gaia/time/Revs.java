@@ -7,6 +7,8 @@
 
 package gaiasky.util.gaia.time;
 
+import net.jafama.FastMath;
+
 public class Revs extends ConcreteDuration {
 
     /**
@@ -30,7 +32,7 @@ public class Revs extends ConcreteDuration {
      * @return revs expressed in nanosecs
      */
     public static long asNanoSecs(final double revs) {
-        return Math.round(revs * Duration.NS_PER_REV);
+        return FastMath.round(revs * Duration.NS_PER_REV);
     }
 
     /**
@@ -93,7 +95,7 @@ public class Revs extends ConcreteDuration {
      */
     @Override
     public long asNanoSecs() {
-        return Math.round(value * Duration.NS_PER_REV);
+        return FastMath.round(value * Duration.NS_PER_REV);
     }
 
     /**

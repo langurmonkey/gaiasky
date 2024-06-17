@@ -24,6 +24,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;
@@ -231,7 +232,7 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
         // VELOCITY VECTOR
-        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, Math.toRadians(alphaDeg), Math.toRadians(deltaDeg), distPc, aux3d2);
+        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg), FastMath.toRadians(deltaDeg), distPc, aux3d2);
 
         // MAGNITUDE
         float appMag;

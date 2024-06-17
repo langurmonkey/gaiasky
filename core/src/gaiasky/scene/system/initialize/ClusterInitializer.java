@@ -38,6 +38,7 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import net.jafama.FastMath;
 
 public class ClusterInitializer extends AbstractInitSystem {
 
@@ -62,8 +63,8 @@ public class ClusterInitializer extends AbstractInitSystem {
         focus.hitRayConsumer = FocusHit::addHitRayCluster;
 
         // Solid angle.
-        sa.thresholdQuad = Math.toRadians(2.0);
-        sa.thresholdPoint = Math.toRadians(1.5);
+        sa.thresholdQuad = FastMath.toRadians(2.0);
+        sa.thresholdPoint = FastMath.toRadians(1.5);
         sa.thresholdLabel = sa.thresholdPoint;
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());

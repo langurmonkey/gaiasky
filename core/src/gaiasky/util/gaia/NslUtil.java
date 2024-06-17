@@ -7,6 +7,8 @@
 
 package gaiasky.util.gaia;
 
+import net.jafama.FastMath;
+
 public class NslUtil {
 
     /**
@@ -23,8 +25,8 @@ public class NslUtil {
      */
     public static double calcSNom(double xi, double precRate) {
 
-        double sx = Math.sin(xi);
-        double cx = Math.cos(xi);
+        double sx = FastMath.sin(xi);
+        double cx = FastMath.cos(xi);
         double c2 = cx * cx;
         double ks = precRate * sx;
         double f = 1 / (4 * ks * ks);

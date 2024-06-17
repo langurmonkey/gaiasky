@@ -389,7 +389,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 if (engine.rollv != 0) {
                     engine.rollp = -Math.signum(engine.rollv) * MathUtilsDouble.clamp(Math.abs(engine.rollv), 0, 1);
                 }
-                if (Math.abs(engine.yawv) < 1e-3 && Math.abs(engine.pitchv) < 1e-3 && Math.abs(engine.rollv) < 1e-3) {
+                if (Math.abs(engine.yawv) < 1e-3 && FastMath.abs(engine.pitchv) < 1e-3 && FastMath.abs(engine.rollv) < 1e-3) {
                     engine.setYawPower(0);
                     engine.setPitchPower(0);
                     engine.setRollPower(0);
@@ -404,12 +404,12 @@ public class GraphUpdater extends AbstractUpdateSystem {
             double rollDiff = view.computeDirectionUp(dt, engine.dirup);
 
             double len = engine.direction.len();
-            engine.pitch = Math.asin(engine.direction.y / len);
-            engine.yaw = Math.atan2(engine.direction.z, engine.direction.x);
+            engine.pitch = FastMath.asin(engine.direction.y / len);
+            engine.yaw = FastMath.atan2(engine.direction.z, engine.direction.x);
             engine.roll += rollDiff;
 
-            engine.pitch = Math.toDegrees(engine.pitch);
-            engine.yaw = Math.toDegrees(engine.yaw);
+            engine.pitch = FastMath.toDegrees(engine.pitch);
+            engine.yaw = FastMath.toDegrees(engine.yaw);
         }
         // Update float vectors
         Vector3b camPos = B31.set(view.body.pos).add(camera.getInversePos());

@@ -10,6 +10,7 @@ package gaiasky.util.gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 
 public class RingCreator extends ModelCreator {
 
@@ -84,7 +85,7 @@ public class RingCreator extends ModelCreator {
     }
 
     private boolean equals(float one, float two) {
-        return Math.abs(one - two) < 0.0001f;
+        return FastMath.abs(one - two) < 0.0001f;
     }
 
     protected void addNormals() {

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.model.Animation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Pool;
+import net.jafama.FastMath;
 
 public class IntAnimationController extends BaseIntAnimationController {
 
@@ -61,11 +62,11 @@ public class IntAnimationController extends BaseIntAnimationController {
 					if (speed < 0) {
 						float invTime = duration - time;
 						loops = (int)Math.abs(invTime / duration);
-						invTime = Math.abs(invTime % duration);
+						invTime = FastMath.abs(invTime % duration);
 						time = duration - invTime;
 					} else {
 						loops = (int)Math.abs(time / duration);
-						time = Math.abs(time % duration);
+						time = FastMath.abs(time % duration);
 					}
 				} else
 					loops = 1;

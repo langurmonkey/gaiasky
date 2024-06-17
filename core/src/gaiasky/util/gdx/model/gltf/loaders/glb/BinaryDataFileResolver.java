@@ -20,6 +20,7 @@ import gaiasky.util.gdx.model.gltf.loaders.exceptions.GLTFRuntimeException;
 import gaiasky.util.gdx.model.gltf.loaders.shared.GLTFLoaderBase;
 import gaiasky.util.gdx.model.gltf.loaders.shared.data.DataFileResolver;
 import gaiasky.util.gdx.model.gltf.loaders.shared.texture.PixmapBinaryLoaderHack;
+import net.jafama.FastMath;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -76,7 +77,7 @@ public class BinaryDataFileResolver implements DataFileResolver
 				bufferData.order(ByteOrder.LITTLE_ENDIAN);
 				int bytesToRead = chunkLen;
 				int bytesRead;
-				while (bytesToRead > 0 && (bytesRead = stream.read(buffer, 0, Math.min(buffer.length, bytesToRead))) != -1) {
+				while (bytesToRead > 0 && (bytesRead = stream.read(buffer, 0, FastMath.min(buffer.length, bytesToRead))) != -1) {
 					bufferData.put(buffer, 0, bytesRead);
 					bytesToRead -= bytesRead;
 				}

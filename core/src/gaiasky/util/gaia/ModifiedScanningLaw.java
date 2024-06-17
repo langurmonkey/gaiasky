@@ -15,12 +15,13 @@ import gaiasky.util.gaia.utils.*;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.Arrays;
 
 public class ModifiedScanningLaw {
 
-    protected static final double PI = Math.PI;
+    protected static final double PI = FastMath.PI;
     protected static final double TWO_PI = 2.0 * PI;
     protected static final double FOUR_PI = 4.0 * PI;
     protected final static double DEG = PI / 180.0;
@@ -185,8 +186,8 @@ public class ModifiedScanningLaw {
         // default MSL parameters (speed reduction factor, AC extent of speed
         // reduction, minimum parallax factor)
         sFactor = 0.15;
-        zMax = Math.toRadians(0.50);
-        zMin = Math.toRadians(0.30);
+        zMax = FastMath.toRadians(0.50);
+        zMin = FastMath.toRadians(0.30);
         s1min = 0.5;
 
         // default complex areas (none)
@@ -222,8 +223,8 @@ public class ModifiedScanningLaw {
         sRed = sFactor * sNom;
 
         // calculate other constants
-        sinXi = Math.sin(xi);
-        cosXi = Math.cos(xi);
+        sinXi = FastMath.sin(xi);
+        cosXi = FastMath.cos(xi);
 
         // reference solar longitude
         sun.setTime(refEpoch);
@@ -335,8 +336,8 @@ public class ModifiedScanningLaw {
     public void setMslParameters(double factor, double zMaxDeg, double zMinDeg, double s1Min) {
         sFactor = factor;
         s1min = s1Min;
-        zMax = Math.toRadians(zMaxDeg);
-        zMin = Math.toRadians(zMinDeg);
+        zMax = FastMath.toRadians(zMaxDeg);
+        zMin = FastMath.toRadians(zMinDeg);
         initialized = false;
     }
 
@@ -474,7 +475,7 @@ public class ModifiedScanningLaw {
      * {@link #advanceScanningTo(long)} call.
      */
     public double getNuMod4Pi() {
-        double rev = Math.floor(nu / FOUR_PI);
+        double rev = FastMath.floor(nu / FOUR_PI);
         return nu - FOUR_PI * rev;
     }
 
@@ -551,9 +552,9 @@ public class ModifiedScanningLaw {
      * @return speed of z axis [-]
      */
     public double getCurrentS() {
-        double cosNu = Math.cos(nu);
-        double sinNu = Math.sin(nu);
-        return Math.sqrt(Math.pow(cosNu, 2) + Math.pow(getKappa() * sinXi - cosXi * sinNu, 2));
+        double cosNu = FastMath.cos(nu);
+        double sinNu = FastMath.sin(nu);
+        return FastMath.sqrt(Math.pow(cosNu, 2) + FastMath.pow(getKappa() * sinXi - cosXi * sinNu, 2));
     }
 
     /**
@@ -756,10 +757,10 @@ public class ModifiedScanningLaw {
                 kappa = kappaR * (1.0 - x) + kappaN * x;
                 break;
             case COSINE:
-                kappa = 0.5 * ((kappaN + kappaR) - (kappaN - kappaR) * Math.cos(Math.PI * x));
+                kappa = 0.5 * ((kappaN + kappaR) - (kappaN - kappaR) * FastMath.cos(Math.PI * x));
                 break;
             case SQUAREROOT:
-                kappa = Math.sqrt((1 - x) * kappaR * kappaR + x * kappaN * kappaN);
+                kappa = FastMath.sqrt((1 - x) * kappaR * kappaR + x * kappaN * kappaN);
                 break;
             case FANCY:
                 double p;
@@ -768,7 +769,7 @@ public class ModifiedScanningLaw {
                 } else {
                     p = 1 - (1 - x) * (1 - x) * (1 + 2 * x);
                 }
-                kappa = Math.sqrt((1 - p) * kappaR * kappaR + p * kappaN * kappaN);
+                kappa = FastMath.sqrt((1 - p) * kappaR * kappaR + p * kappaN * kappaN);
                 break;
         }
         return kappa;
@@ -782,7 +783,7 @@ public class ModifiedScanningLaw {
      * @return The sigmoid.
      */
     protected double sigmoid(double x) {
-        double e = Math.exp(x);
+        double e = FastMath.exp(x);
         return (1 + (e - 1 / e) / (e + 1 / e)) / 2;
     }
 
@@ -832,8 +833,8 @@ public class ModifiedScanningLaw {
             Vector3d sunDir = new Vector3d();
             sun.getSolarDirection(sunDir);
             double sLonDot = sun.getSolarLongitudeDot();
-            double cosNu = Math.cos(y[0]);
-            double sinNu = Math.sin(y[0]);
+            double cosNu = FastMath.cos(y[0]);
+            double sinNu = FastMath.sin(y[0]);
 
             // calculate nominal kappa
             double kappaN = (Math.sqrt(sNom * sNom - cosNu * cosNu) + cosXi * sinNu) / sinXi;
@@ -864,9 +865,9 @@ public class ModifiedScanningLaw {
                 double s0 = Vector3d.crs(eclPole, spinAxis).dot(refDir[indexAltMin]);
                 double s1 = Vector3d.crs(sunDir, spinAxis).dot(refDir[indexAltMin]);
                 if (s1 > 0) {
-                    kappaR = Math.min(kappaN, (sRed - s0) / s1);
+                    kappaR = FastMath.min(kappaN, (sRed - s0) / s1);
                 } else if (s1 < 0) {
-                    kappaR = Math.min(kappaN, (sRed + s0) / (-s1));
+                    kappaR = FastMath.min(kappaN, (sRed + s0) / (-s1));
                 }
                 if (kappaR < 0)
                     kappaR = 0.0;

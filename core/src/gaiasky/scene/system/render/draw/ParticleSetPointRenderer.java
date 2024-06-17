@@ -33,6 +33,7 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.parse.Parser;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Random;
@@ -183,7 +184,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
                             } else {
                                 if (colorMin != null && colorMax != null) {
-                                    double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                    double dist = FastMath.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
                                     // fac = 0 -> colorMin,  fac = 1 -> colorMax
                                     double fac = (dist - minDistance) / (maxDistance - minDistance);
                                     interpolateColor(colorMin, colorMax, c, fac);

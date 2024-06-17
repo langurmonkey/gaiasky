@@ -135,7 +135,7 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
             for (int k = 0; k < 16; k++) {
                 VSOP2000Coordinate c = d[coord];
                 // Number of terms.
-                int n_k = Math.min(c.numTerms[k], maxTerms);
+                int n_k = FastMath.min(c.numTerms[k], maxTerms);
                 if (n_k == 0) {
                     break;
                 }

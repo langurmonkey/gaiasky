@@ -10,13 +10,14 @@ package gaiasky.util.coord;
 import gaiasky.util.Nature;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class NslSun {
 
     // the zero point for mission reference
     static final double missionReferenceEpoch = 0L;
 
-    static final double piHalf = Math.PI / 2.0;
+    static final double piHalf = FastMath.PI / 2.0;
     static final double NOMINALSUN_ORBITALECCENTRICITY_J2000 = 0.01671;
     static final double NOMINALSUN_MEANLONGITUDE_J2000 = 280.4665;// [deg] 
     static final double NOMINALSUN_MEANLONGITUDERATE_J2000 = 0.98560903; // [deg day^-1] 
@@ -30,10 +31,10 @@ public class NslSun {
 
     static final double OBLIQUITY_DEG = Coordinates.OBLIQUITY_DEG_J2000;
     static final double e = NOMINALSUN_ORBITALECCENTRICITY_J2000;
-    static final double d2e = Math.toDegrees(2. * e);
-    static final double d5_2e2 = Math.toDegrees(2.5 * e * e);
-    static final double sineObliquity = Math.sin(Coordinates.OBLIQUITY_RAD_J2000);
-    static final double cosineObliquity = Math.cos(Coordinates.OBLIQUITY_RAD_J2000);
+    static final double d2e = FastMath.toDegrees(2. * e);
+    static final double d5_2e2 = FastMath.toDegrees(2.5 * e * e);
+    static final double sineObliquity = FastMath.sin(Coordinates.OBLIQUITY_RAD_J2000);
+    static final double cosineObliquity = FastMath.cos(Coordinates.OBLIQUITY_RAD_J2000);
     static final double ABERRATION_CONSTANT_J2000 = 20.49122;
     /** Unit vectors **/
     static final Vector3d X_AXIS = Vector3d.getUnitX();
@@ -83,8 +84,8 @@ public class NslSun {
                 + NOMINALSUN_ORBITALMEANANOMALYRATE_J2000
                 * daysFromJ2000;
 
-        final double sm = Math.sin(Math.toRadians(xm));
-        final double cm = Math.cos(Math.toRadians(xm));
+        final double sm = FastMath.sin(Math.toRadians(xm));
+        final double cm = FastMath.cos(Math.toRadians(xm));
 
         // Longitude accurate to O(e^3)
         final double lon = xl + sm * (d2e + d5_2e2 * cm);
@@ -92,13 +93,13 @@ public class NslSun {
         this.sLonDot = Math
                 .toRadians(NOMINALSUN_MEANLONGITUDERATE_J2000
                         + NOMINALSUN_ORBITALMEANANOMALYRATE_J2000
-                        * Math.toRadians(d2e * cm + d5_2e2
+                        * FastMath.toRadians(d2e * cm + d5_2e2
                         * (cm * cm - sm * sm)));
 
-        this.sLon = Math.toRadians(lon);
-        this.sLonMod4Pi = Math.toRadians(lon % (2. * 360.0));
-        this.sineLon = Math.sin(this.sLonMod4Pi);
-        this.cosineLon = Math.cos(this.sLonMod4Pi);
+        this.sLon = FastMath.toRadians(lon);
+        this.sLonMod4Pi = FastMath.toRadians(lon % (2. * 360.0));
+        this.sineLon = FastMath.sin(this.sLonMod4Pi);
+        this.cosineLon = FastMath.cos(this.sLonMod4Pi);
     }
 
     /**
@@ -154,10 +155,10 @@ public class NslSun {
          * 	Y -> X
          */
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(sLon)));
-        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - piHalf)));
-        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(piHalf - xi)));
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(Omega)));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(sLon)));
+        q.mul(new QuaternionDouble(Z_AXIS, FastMath.toDegrees(nu - piHalf)));
+        q.mul(new QuaternionDouble(X_AXIS, FastMath.toDegrees(piHalf - xi)));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(Omega)));
         return q;
     }
 
@@ -171,7 +172,7 @@ public class NslSun {
      */
     public double angleBase(double x, int nRev) {
         double x1 = x;
-        double base = (double) nRev * 2.0 * Math.PI;
+        double base = (double) nRev * 2.0 * FastMath.PI;
         while (x1 >= base) {
             x1 -= base;
         }

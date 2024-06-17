@@ -8,6 +8,7 @@
 package gaiasky.util.math;
 
 import com.badlogic.gdx.utils.TimeUtils;
+import net.jafama.FastMath;
 
 import java.util.Random;
 
@@ -167,9 +168,9 @@ public final class StdRandom {
             y = uniform(-1.0, 1.0);
             r = x * x + y * y;
         } while (r >= 1 || r == 0);
-        return x * Math.sqrt(-2 * Math.log(r) / r);
+        return x * FastMath.sqrt(-2 * FastMath.log(r) / r);
 
-        // Remark:  y * Math.sqrt(-2 * Math.log(r) / r)
+        // Remark:  y * FastMath.sqrt(-2 * FastMath.log(r) / r)
         // is an independent random gaussian
     }
 
@@ -203,7 +204,7 @@ public final class StdRandom {
         if (!(p >= 0.0 && p <= 1.0))
             throw new IllegalArgumentException("Probability must be between 0.0 and 1.0");
         // using algorithm given by Knuth
-        return (int) Math.ceil(Math.log(uniform()) / Math.log(1.0 - p));
+        return (int) FastMath.ceil(Math.log(uniform()) / FastMath.log(1.0 - p));
     }
 
     /**
@@ -224,7 +225,7 @@ public final class StdRandom {
         // see http://en.wikipedia.org/wiki/Poisson_distribution
         int k = 0;
         double p = 1.0;
-        double L = Math.exp(-lambda);
+        double L = FastMath.exp(-lambda);
         do {
             k++;
             p *= uniform();
@@ -255,7 +256,7 @@ public final class StdRandom {
     public static double pareto(double alpha) {
         if (!(alpha > 0.0))
             throw new IllegalArgumentException("Shape parameter alpha must be positive");
-        return Math.pow(1 - uniform(), -1.0 / alpha) - 1.0;
+        return FastMath.pow(1 - uniform(), -1.0 / alpha) - 1.0;
     }
 
     /**
@@ -264,7 +265,7 @@ public final class StdRandom {
      * @return a random real number from the Cauchy distribution.
      */
     public static double cauchy() {
-        return Math.tan(Math.PI * (uniform() - 0.5));
+        return FastMath.tan(Math.PI * (uniform() - 0.5));
     }
 
     /**
@@ -378,7 +379,7 @@ public final class StdRandom {
         if (alpha <= 0 || beta <= 0)
             throw new IllegalArgumentException("Alpha and beta must be positive and non-zero");
         double x = uniform();
-        return (Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1)) * 2.0 - 1.0;
+        return (Math.pow(x, alpha - 1) * FastMath.pow(1 - x, beta - 1)) * 2.0 - 1.0;
     }
 
     /**

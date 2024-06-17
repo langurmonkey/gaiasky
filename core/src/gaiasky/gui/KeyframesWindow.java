@@ -48,6 +48,7 @@ import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.LengthValidator;
 import gaiasky.util.validator.RegexpValidator;
+import net.jafama.FastMath;
 
 import java.nio.file.Files;
 import java.text.DateFormat;
@@ -716,7 +717,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         stepBack.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // To previous.
-                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, stepBack, Math.max(0L, manager.currentPath.i - 1L));
+                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, stepBack, FastMath.max(0L, manager.currentPath.i - 1L));
                 return true;
             }
             return false;
@@ -747,7 +748,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         stepForward.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // To previous.
-                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, stepForward, Math.min(manager.currentPath.n - 1L, manager.currentPath.i + 1L));
+                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, stepForward, FastMath.min(manager.currentPath.n - 1L, manager.currentPath.i + 1L));
                 return true;
             }
             return false;

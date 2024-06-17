@@ -18,6 +18,7 @@ import gaiasky.util.TLV3;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
+import net.jafama.FastMath;
 
 /**
  * This class updates the lights for each body according to their separation.
@@ -46,7 +47,7 @@ public class LightingUtils {
                                 float[] col = nr.getColor();
                                 double closestDist = nr.getClosestDistToCamera();
                                 // Dim light with distance.
-                                float colFactor = (float) Math.pow(MathUtilsDouble.flint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
+                                float colFactor = (float) FastMath.pow(MathUtilsDouble.flint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
                                 pointLight.position.set(nr.pos.put(F31.get()));
                                 pointLight.color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
                                 pointLight.intensity = 1;

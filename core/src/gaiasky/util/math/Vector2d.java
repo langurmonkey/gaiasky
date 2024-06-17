@@ -9,6 +9,7 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix3;
+import net.jafama.FastMath;
 
 public class Vector2d implements VectorDouble<Vector2d> {
     public final static Vector2d X = new Vector2d(1, 0);
@@ -44,7 +45,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
     }
 
     public static double len(double x, double y) {
-        return Math.sqrt(x * x + y * y);
+        return FastMath.sqrt(x * x + y * y);
     }
 
     public static double len2(double x, double y) {
@@ -58,7 +59,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
     public static double dst(double x1, double y1, double x2, double y2) {
         final double x_d = x2 - x1;
         final double y_d = y2 - y1;
-        return Math.sqrt(x_d * x_d + y_d * y_d);
+        return FastMath.sqrt(x_d * x_d + y_d * y_d);
     }
 
     public static double dst2(double x1, double y1, double x2, double y2) {
@@ -80,7 +81,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
     }
 
     public double len() {
-        return Math.sqrt(x * x + y * y);
+        return FastMath.sqrt(x * x + y * y);
     }
 
     public double len2() {
@@ -211,7 +212,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
     public double dst(Vector2d v) {
         final double x_d = v.x - x;
         final double y_d = v.y - y;
-        return Math.sqrt(x_d * x_d + y_d * y_d);
+        return FastMath.sqrt(x_d * x_d + y_d * y_d);
     }
 
     /**
@@ -223,7 +224,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
     public double dst(double x, double y) {
         final double x_d = x - this.x;
         final double y_d = y - this.y;
-        return Math.sqrt(x_d * x_d + y_d * y_d);
+        return FastMath.sqrt(x_d * x_d + y_d * y_d);
     }
 
     public double dst2(Vector2d v) {
@@ -326,7 +327,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
      * counter-clockwise) and between 0 and 360.
      */
     public double angle() {
-        double angle = Math.atan2(y, x) * MathUtils.radiansToDegrees;
+        double angle = FastMath.atan2(y, x) * MathUtils.radiansToDegrees;
         if (angle < 0)
             angle += 360;
         return angle;
@@ -337,7 +338,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
      * (typically counter-clockwise)
      */
     public double getAngleRad() {
-        return Math.atan2(y, x);
+        return FastMath.atan2(y, x);
     }
 
     /**
@@ -376,8 +377,8 @@ public class Vector2d implements VectorDouble<Vector2d> {
      * @param radians the angle in radians
      */
     public Vector2d rotateRad(double radians) {
-        double cos = Math.cos(radians);
-        double sin = Math.sin(radians);
+        double cos = FastMath.cos(radians);
+        double sin = FastMath.sin(radians);
 
         double newX = this.x * cos - this.y * sin;
         double newY = this.x * sin + this.y * cos;
@@ -447,7 +448,7 @@ public class Vector2d implements VectorDouble<Vector2d> {
     }
 
     public boolean isUnit(final double margin) {
-        return Math.abs(len2() - 1) < margin;
+        return FastMath.abs(len2() - 1) < margin;
     }
 
     public boolean isZero() {

@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Entry;
+import net.jafama.FastMath;
 
 class MeshSpliter {
 
@@ -31,7 +32,7 @@ class MeshSpliter {
 		
 		int maxIndexFound = 0;
 		for(int i=0 ; i<indices.length ; i++){
-			maxIndexFound = Math.max(maxIndexFound, indices[i]);
+			maxIndexFound = FastMath.max(maxIndexFound, indices[i]);
 		}
 		
 		IntMap<IntArray> groups = new IntMap<IntArray>();
@@ -63,19 +64,19 @@ class MeshSpliter {
 		
 		int maxGroup = 0;
 		for(Entry<IntArray> entry : groups){
-			maxGroup = Math.max(maxGroup, entry.key);
+			maxGroup = FastMath.max(maxGroup, entry.key);
 		}
 		
 		IntArray lastGroup = groups.get(maxGroup);
 		int maxIndex = 0;
 		for(int i=0 ; i<lastGroup.size ; i++){
-			maxIndex = Math.max(maxIndex, lastGroup.get(i));
+			maxIndex = FastMath.max(maxIndex, lastGroup.get(i));
 		}
 		
 		for(int i=0 ; i<=maxGroup ; i++){
 			float[] groupVertices = new float[vertexMaxSize];
 			int offset = i * size16 * stride;
-			int size = Math.min(vertices.length - offset, groupVertices.length);
+			int size = FastMath.min(vertices.length - offset, groupVertices.length);
 			System.arraycopy(vertices, offset, groupVertices, 0, size);
 			splitVertices.add(groupVertices);
 		}

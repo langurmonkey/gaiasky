@@ -32,6 +32,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
+import net.jafama.FastMath;
 
 import java.util.Comparator;
 
@@ -108,7 +109,7 @@ public class CameraGroupStrategy implements GroupStrategy, Disposable {
         this(camera, (o1, o2) -> {
             float dist1 = camera.position.dst(o1.getPosition());
             float dist2 = camera.position.dst(o2.getPosition());
-            return (int) Math.signum(dist2 - dist1);
+            return (int) FastMath.signum(dist2 - dist1);
         });
     }
 

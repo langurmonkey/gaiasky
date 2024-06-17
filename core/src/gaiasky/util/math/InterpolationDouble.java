@@ -7,6 +7,8 @@
 
 package gaiasky.util.math;
 
+import net.jafama.FastMath;
+
 public abstract class InterpolationDouble {
     static public final InterpolationDouble linear = new InterpolationDouble() {
         public double apply(double a) {
@@ -47,12 +49,12 @@ public abstract class InterpolationDouble {
     static public final PowOut fastSlow = pow2Out;
     static public final InterpolationDouble pow2InInverse = new InterpolationDouble() {
         public double apply(double a) {
-            return Math.sqrt(a);
+            return FastMath.sqrt(a);
         }
     };
     static public final InterpolationDouble pow2OutInverse = new InterpolationDouble() {
         public double apply(double a) {
-            return 1 - Math.sqrt(-(a - 1));
+            return 1 - FastMath.sqrt(-(a - 1));
         }
     };
     static public final Pow pow3 = new Pow(3);
@@ -60,12 +62,12 @@ public abstract class InterpolationDouble {
     static public final PowOut pow3Out = new PowOut(3);
     static public final InterpolationDouble pow3InInverse = new InterpolationDouble() {
         public double apply(double a) {
-            return Math.cbrt(a);
+            return FastMath.cbrt(a);
         }
     };
     static public final InterpolationDouble pow3OutInverse = new InterpolationDouble() {
         public double apply(double a) {
-            return 1 - Math.cbrt(-(a - 1));
+            return 1 - FastMath.cbrt(-(a - 1));
         }
     };
     static public final Pow pow4 = new Pow(4);
@@ -99,7 +101,7 @@ public abstract class InterpolationDouble {
         public double apply(double a) {
             if (a <= 0.5) {
                 a *= 2;
-                return (1 - Math.sqrt(1 - a * a)) / 2;
+                return (1 - FastMath.sqrt(1 - a * a)) / 2;
             }
             a--;
             a *= 2;
@@ -108,13 +110,13 @@ public abstract class InterpolationDouble {
     };
     static public final InterpolationDouble circleIn = new InterpolationDouble() {
         public double apply(double a) {
-            return 1 - Math.sqrt(1 - a * a);
+            return 1 - FastMath.sqrt(1 - a * a);
         }
     };
     static public final InterpolationDouble circleOut = new InterpolationDouble() {
         public double apply(double a) {
             a--;
-            return Math.sqrt(1 - a * a);
+            return FastMath.sqrt(1 - a * a);
         }
     };
     static public final Elastic elastic = new Elastic(2, 10, 7, 1);
@@ -146,8 +148,8 @@ public abstract class InterpolationDouble {
 
         public double apply(double a) {
             if (a <= 0.5f)
-                return Math.pow(a * 2, power) / 2;
-            return Math.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
+                return FastMath.pow(a * 2, power) / 2;
+            return FastMath.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
         }
     }
 
@@ -157,7 +159,7 @@ public abstract class InterpolationDouble {
         }
 
         public double apply(double a) {
-            return Math.pow(a, power);
+            return FastMath.pow(a, power);
         }
     }
 
@@ -167,7 +169,7 @@ public abstract class InterpolationDouble {
         }
 
         public double apply(double a) {
-            return Math.pow(a - 1, power) * (power % 2 == 0 ? -1 : 1) + 1;
+            return FastMath.pow(a - 1, power) * (power % 2 == 0 ? -1 : 1) + 1;
         }
     }
 
@@ -179,7 +181,7 @@ public abstract class InterpolationDouble {
         public Exp(double value, double power) {
             this.value = value;
             this.power = power;
-            min = Math.pow(value, -power);
+            min = FastMath.pow(value, -power);
             scale = 1 / (1 - min);
         }
 
@@ -225,11 +227,11 @@ public abstract class InterpolationDouble {
         public double apply(double a) {
             if (a <= 0.5) {
                 a *= 2;
-                return Math.pow(value, power * (a - 1)) * MathUtilsDouble.sin(a * bounces) * scale / 2;
+                return FastMath.pow(value, power * (a - 1)) * MathUtilsDouble.sin(a * bounces) * scale / 2;
             }
             a = 1 - a;
             a *= 2;
-            return 1 - Math.pow(value, power * (a - 1)) * MathUtilsDouble.sin((a) * bounces) * scale / 2;
+            return 1 - FastMath.pow(value, power * (a - 1)) * MathUtilsDouble.sin((a) * bounces) * scale / 2;
         }
     }
 
@@ -241,7 +243,7 @@ public abstract class InterpolationDouble {
         public double apply(double a) {
             if (a >= 0.99)
                 return 1;
-            return Math.pow(value, power * (a - 1)) * MathUtilsDouble.sin(a * bounces) * scale;
+            return FastMath.pow(value, power * (a - 1)) * MathUtilsDouble.sin(a * bounces) * scale;
         }
     }
 
@@ -254,7 +256,7 @@ public abstract class InterpolationDouble {
             if (a == 0)
                 return 0;
             a = 1 - a;
-            return (1 - Math.pow(value, power * (a - 1)) * MathUtilsDouble.sin(a * bounces) * scale);
+            return (1 - FastMath.pow(value, power * (a - 1)) * MathUtilsDouble.sin(a * bounces) * scale);
         }
     }
 

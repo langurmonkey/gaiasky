@@ -23,6 +23,7 @@ import gaiasky.util.gdx.shader.BaseIntShader;
 import gaiasky.util.gdx.shader.DefaultIntShader;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.attribute.*;
+import net.jafama.FastMath;
 
 public class PBRShader extends DefaultIntShader
 {
@@ -374,7 +375,7 @@ public class PBRShader extends DefaultIntShader
 			TextureAttribute a = combinedAttributes.get(PBRTextureAttribute.class, PBRTextureAttribute.TransmissionSourceTexture);
 			float mipmapFactor;
 			if(a != null){
-				mipmapFactor = (float)(Math.log(a.textureDescription.texture.getWidth()) / Math.log(2.0));
+				mipmapFactor = (float)(Math.log(a.textureDescription.texture.getWidth()) / FastMath.log(2.0));
 			}else{
 				mipmapFactor = 1;
 			}
@@ -398,7 +399,7 @@ public class PBRShader extends DefaultIntShader
 			MirrorSourceAttribute a = combinedAttributes.get(MirrorSourceAttribute.class, MirrorSourceAttribute.Type);
 			float mipmapFactor;
 			if(a != null){
-				mipmapFactor = (float)(Math.log(a.textureDescription.texture.getWidth()) / Math.log(2.0)) + 0;
+				mipmapFactor = (float)(Math.log(a.textureDescription.texture.getWidth()) / FastMath.log(2.0)) + 0;
 			}else{
 				mipmapFactor = 1;
 			}
@@ -735,7 +736,7 @@ public class PBRShader extends DefaultIntShader
 			PBRCubemapAttribute specularEnv = combinedAttributes.get(PBRCubemapAttribute.class, PBRCubemapAttribute.SpecularEnv);
 			float mipmapFactor;
 			if(specularEnv != null){
-				mipmapFactor = (float)(Math.log(specularEnv.textureDescription.texture.getWidth()) / Math.log(2.0));
+				mipmapFactor = (float)(Math.log(specularEnv.textureDescription.texture.getWidth()) / FastMath.log(2.0));
 			}else{
 				mipmapFactor = 1;
 			}

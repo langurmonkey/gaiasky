@@ -7,6 +7,8 @@
 
 package gaiasky.util;
 
+import net.jafama.FastMath;
+
 import java.util.Arrays;
 
 public class Bits {
@@ -267,7 +269,7 @@ public class Bits {
      * @param other a bit set
      */
     public Bits and(Bits other) {
-        int commonWords = Math.min(bits.length, other.bits.length);
+        int commonWords = FastMath.min(bits.length, other.bits.length);
         for (int i = 0; commonWords > i; i++) {
             bits[i] &= other.bits[i];
         }
@@ -300,7 +302,7 @@ public class Bits {
      * @param other a bit set
      */
     public Bits or(Bits other) {
-        int commonWords = Math.min(bits.length, other.bits.length);
+        int commonWords = FastMath.min(bits.length, other.bits.length);
         for (int i = 0; commonWords > i; i++) {
             bits[i] |= other.bits[i];
         }
@@ -325,7 +327,7 @@ public class Bits {
      * @param other The other instance.
      */
     public Bits xor(Bits other) {
-        int commonWords = Math.min(bits.length, other.bits.length);
+        int commonWords = FastMath.min(bits.length, other.bits.length);
 
         for (int i = 0; commonWords > i; i++) {
             bits[i] ^= other.bits[i];
@@ -350,7 +352,7 @@ public class Bits {
     public boolean intersects(Bits other) {
         long[] bits = this.bits;
         long[] otherBits = other.bits;
-        for (int i = Math.min(bits.length, otherBits.length) - 1; i >= 0; i--) {
+        for (int i = FastMath.min(bits.length, otherBits.length) - 1; i >= 0; i--) {
             if ((bits[i] & otherBits[i]) != 0) {
                 return true;
             }
@@ -377,7 +379,7 @@ public class Bits {
                 return false;
             }
         }
-        for (int i = Math.min(bitsLength, otherBitsLength) - 1; i >= 0; i--) {
+        for (int i = FastMath.min(bitsLength, otherBitsLength) - 1; i >= 0; i--) {
             if ((bits[i] & otherBits[i]) != otherBits[i]) {
                 return false;
             }
@@ -407,7 +409,7 @@ public class Bits {
         Bits other = (Bits) obj;
         long[] otherBits = other.bits;
 
-        int commonWords = Math.min(bits.length, otherBits.length);
+        int commonWords = FastMath.min(bits.length, otherBits.length);
         for (int i = 0; commonWords > i; i++) {
             if (bits[i] != otherBits[i])
                 return false;

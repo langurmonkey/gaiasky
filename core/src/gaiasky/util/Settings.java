@@ -34,6 +34,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.Cube
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;
@@ -1073,8 +1074,8 @@ public class Settings extends SettingsObject {
                     }
                     case BACKBUFFER_SCALE_CMD -> {
                         backBufferScale = (Float) data[0];
-                        backBufferResolution[0] = (int) Math.round(resolution[0] * backBufferScale);
-                        backBufferResolution[1] = (int) Math.round(resolution[1] * backBufferScale);
+                        backBufferResolution[0] = (int) FastMath.round(resolution[0] * backBufferScale);
+                        backBufferResolution[1] = (int) FastMath.round(resolution[1] * backBufferScale);
                     }
                 }
             }
@@ -1571,11 +1572,11 @@ public class Settings extends SettingsObject {
                     switch (event) {
                         case STAR_POINT_SIZE_CMD -> pointSize = (float) data[0];
                         case STAR_POINT_SIZE_INCREASE_CMD -> {
-                            float size = Math.min(this.pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
+                            float size = FastMath.min(this.pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
                             EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
                         }
                         case STAR_POINT_SIZE_DECREASE_CMD -> {
-                            float size = Math.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
+                            float size = FastMath.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
                             EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
                         }
                         case STAR_POINT_SIZE_RESET_CMD -> this.pointSize = pointSizeBak;
@@ -1865,7 +1866,7 @@ public class Settings extends SettingsObject {
             public ElevationSettings elevation;
             public VirtualTextureSettings virtualTextures;
             @JsonIgnore
-            public double orbitSolidAngleThreshold = Math.toRadians(1.5);
+            public double orbitSolidAngleThreshold = FastMath.toRadians(1.5);
 
 
             @JsonProperty("pointCloud")

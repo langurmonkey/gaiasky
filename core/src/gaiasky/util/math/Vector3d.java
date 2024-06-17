@@ -247,7 +247,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         double v = MathUtilsDouble.random();
 
         double theta = MathUtilsDouble.PI2 * u; // azimuthal angle
-        double phi = Math.acos(2f * v - 1f); // polar angle
+        double phi = FastMath.acos(2f * v - 1f); // polar angle
 
         return this.setFromSpherical(theta, phi);
     }
@@ -495,7 +495,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         final double len2 = this.len2();
         if (len2 == 0f || len2 == 1f)
             return this;
-        return this.scl(1f / Math.sqrt(len2));
+        return this.scl(1f / FastMath.sqrt(len2));
     }
 
     public double dot(final Vector3d vector) {
@@ -780,7 +780,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
     }
 
     public boolean isUnit(final double margin) {
-        return Math.abs(len2() - 1f) < margin;
+        return FastMath.abs(len2() - 1f) < margin;
     }
 
     public boolean isZero() {
@@ -877,16 +877,16 @@ public class Vector3d implements VectorDouble<Vector3d> {
             return lerp(vec, alpha);
 
         // theta0 = angle between input vectors
-        final double theta0 = Math.acos(dot);
+        final double theta0 = FastMath.acos(dot);
         // theta = angle between this vector and result
         final double theta = theta0 * alpha;
 
-        final double st = Math.sin(theta);
+        final double st = FastMath.sin(theta);
         final double tx = vec.x - x * dot;
         final double ty = vec.y - y * dot;
         final double tz = vec.z - z * dot;
         final double l2 = tx * tx + ty * ty + tz * tz;
-        final double dl = st * ((l2 < 0.0001) ? 1d : 1d / Math.sqrt(l2));
+        final double dl = st * ((l2 < 0.0001) ? 1d : 1d / FastMath.sqrt(l2));
 
         return scl(Math.cos(theta)).add(tx * dl, ty * dl, tz * dl).nor();
     }
@@ -1009,7 +1009,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3d v) {
-        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.len()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.len()), -1d, 1d));
     }
 
     public boolean hasNaN() {
@@ -1133,21 +1133,21 @@ public class Vector3d implements VectorDouble<Vector3d> {
      *         the current direction cosine as a {@link Vector2d}
      */
     public Vector2d toSphericalCoordinates() {
-        final double xy = Math.sqrt((this.x * this.x) + (this.y * this.y));
+        final double xy = FastMath.sqrt((this.x * this.x) + (this.y * this.y));
 
         if (xy <= 0.) {
-            return new Vector2d(0., .5 * Math.PI
-                    * Math.signum(this.z));
+            return new Vector2d(0., .5 * FastMath.PI
+                    * FastMath.signum(this.z));
         }
 
-        double alon = Math.atan2(this.y, this.x);
+        double alon = FastMath.atan2(this.y, this.x);
 
         // normalise to [0, 2*Pi]
         if (alon < 0.) {
-            alon += (2. * Math.PI);
+            alon += (2. * FastMath.PI);
         }
 
-        return new Vector2d(alon, Math.atan2(this.z, xy));
+        return new Vector2d(alon, FastMath.atan2(this.z, xy));
     }
 
 }

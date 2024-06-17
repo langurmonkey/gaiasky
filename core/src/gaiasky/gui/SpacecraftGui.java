@@ -52,6 +52,7 @@ import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
+import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 
@@ -278,7 +279,7 @@ public class SpacecraftGui extends AbstractGui {
         enginePower.addListener(event -> {
             if (thrustEvents)
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(gaiasky.event.Event.SPACECRAFT_THRUST_SET_CMD, enginePower, Math.round(enginePower.getValue()));
+                    EventManager.publish(gaiasky.event.Event.SPACECRAFT_THRUST_SET_CMD, enginePower, FastMath.round(enginePower.getValue()));
                     return true;
                 }
             return false;

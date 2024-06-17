@@ -10,7 +10,6 @@ package gaiasky.data.orbit;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 

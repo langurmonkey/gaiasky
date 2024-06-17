@@ -37,6 +37,7 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.util.List;
@@ -172,7 +173,7 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                                     tempVerts[curr.vertexIdx + nVariOffset] = particle.nVari;
                                     for (int k = 0; k < particle.nVari; k++) {
                                         if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor);
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = FastMath.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor);
                                         } else {
                                             tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
                                         }

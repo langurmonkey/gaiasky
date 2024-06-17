@@ -7,6 +7,8 @@
 
 package gaiasky.util.color;
 
+import net.jafama.FastMath;
+
 public class BVToTeff_ballesteros {
     private final double a;
     private final double b;
@@ -47,7 +49,7 @@ public class BVToTeff_ballesteros {
         double sqrtarg = (bp * bp) - 4.0 * ap * cp;
         //By comparison with a BB it can be verified that
         // the physical solution is this one
-        return (-bp + Math.sqrt(sqrtarg)) / (2.0 * ap);
+        return (-bp + FastMath.sqrt(sqrtarg)) / (2.0 * ap);
     }
 
 }

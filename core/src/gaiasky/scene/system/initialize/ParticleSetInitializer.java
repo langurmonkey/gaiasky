@@ -41,6 +41,7 @@ import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
+import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -334,13 +335,13 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             double dist = len(point.x(), point.y(), point.z());
             if (Double.isFinite(dist)) {
                 distances.add(dist);
-                set.maxDistance = Math.max(set.maxDistance, dist);
-                set.minDistance = Math.min(set.minDistance, dist);
+                set.maxDistance = FastMath.max(set.maxDistance, dist);
+                set.minDistance = FastMath.min(set.minDistance, dist);
             }
         }
         // Mean is computed as half of the 90th percentile to avoid outliers
         distances.sort(Double::compare);
-        int idx = (int) Math.ceil((90d / 100d) * (double) distances.size());
+        int idx = (int) FastMath.ceil((90d / 100d) * (double) distances.size());
         set.meanDistance = distances.get(idx - 1) / 2d;
     }
 
@@ -379,7 +380,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
     private double len(double x,
                        double y,
                        double z) {
-        return Math.sqrt(x * x + y * y + z * z);
+        return FastMath.sqrt(x * x + y * y + z * z);
     }
 
     private void initSortingData(Entity entity,

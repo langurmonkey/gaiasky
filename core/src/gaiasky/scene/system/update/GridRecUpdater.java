@@ -26,6 +26,7 @@ import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class GridRecUpdater extends AbstractUpdateSystem {
 
@@ -147,9 +148,9 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         res.set(au, 0d);
 
         for (int i = -25; i < 25; i++) {
-            if (au < Math.pow(10, i)) {
-                double fading = MathUtilsDouble.lint(au, Math.pow(10d, i - 1), Math.pow(10d, i), 1d, 0d);
-                res.setFirst(au * Math.pow(10, -i));
+            if (au < FastMath.pow(10, i)) {
+                double fading = MathUtilsDouble.lint(au, FastMath.pow(10d, i - 1), FastMath.pow(10d, i), 1d, 0d);
+                res.setFirst(au * FastMath.pow(10, -i));
                 res.setSecond(fading);
                 return;
             }

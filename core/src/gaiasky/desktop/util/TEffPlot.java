@@ -7,6 +7,8 @@
 
 package gaiasky.desktop.util;
 
+import net.jafama.FastMath;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +31,7 @@ public class TEffPlot {
             while (currXp < endXp) {
 
                 double logTEff = 3.999 - 0.654 * currXp + 0.709 * currXp * currXp - 0.316 * currXp * currXp * currXp;
-                double tEff = Math.pow(10, logTEff);
+                double tEff = FastMath.pow(10, logTEff);
                 writer.println(currXp + "," + logTEff + "," + tEff);
                 currXp += step;
             }

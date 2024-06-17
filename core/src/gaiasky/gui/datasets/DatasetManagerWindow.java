@@ -44,6 +44,7 @@ import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
 import gaiasky.util.scene2d.*;
+import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -1403,7 +1404,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 dataset.server.myVersion = dataset.server.serverVersion;
                 dataset.myVersion = dataset.server.serverVersion;
                 if (serverDd != null) {
-                    serverDd.numUpdates = Math.max(serverDd.numUpdates - 1, 0);
+                    serverDd.numUpdates = FastMath.max(serverDd.numUpdates - 1, 0);
                     serverDd.updatesAvailable = serverDd.numUpdates > 0;
                 }
             } else {
@@ -1588,7 +1589,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
             var coordinates = target.localToAscendantCoordinates(leftScroll.getActor(), new Vector2(target.getX(), target.getY()));
-            leftScroll.scrollTo(coordinates.x, coordinates.y, target.getWidth(), Math.min(200f, target.getHeight() * 10f));
+            leftScroll.scrollTo(coordinates.x, coordinates.y, target.getWidth(), FastMath.min(200f, target.getHeight() * 10f));
             if (selection.getFirst() != null) {
                 // Update right pane
                 GaiaSky.postRunnable(() -> reloadRightPane(right, selection.getFirst(), currentMode));

@@ -7,6 +7,8 @@
 
 package gaiasky.util.gaia.time;
 
+import net.jafama.FastMath;
+
 public class JulianYears extends ConcreteDuration {
 
     /**
@@ -30,7 +32,7 @@ public class JulianYears extends ConcreteDuration {
      * @return JulianYears expressed in nanoSec
      */
     public static long asNanoSecs(final double years) {
-        return Math.round(years * Duration.NS_PER_JULIAN_YEAR);
+        return FastMath.round(years * Duration.NS_PER_JULIAN_YEAR);
     }
 
     /**
@@ -93,7 +95,7 @@ public class JulianYears extends ConcreteDuration {
      */
     @Override
     public long asNanoSecs() {
-        return Math.round(value * Duration.NS_PER_JULIAN_YEAR);
+        return FastMath.round(value * Duration.NS_PER_JULIAN_YEAR);
     }
 
     /**

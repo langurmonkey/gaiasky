@@ -9,8 +9,6 @@ package gaiasky.data;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -41,6 +39,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
+import net.jafama.FastMath;
 
 import java.io.IOException;
 import java.util.*;
@@ -244,7 +243,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
              */
             try {
-                int depthLevel = Math.min(OctreeNode.maxDepth, PRELOAD_DEPTH);
+                int depthLevel = FastMath.min(OctreeNode.maxDepth, PRELOAD_DEPTH);
                 loadLod(depthLevel, entity);
                 flushLoadedIds();
             } catch (IOException e) {
@@ -255,7 +254,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
             // Override number of labels in case we have a compact octree (~3 octants tops).
             if (root.octant.numChildrenRec + 1 < 4 && Settings.settings.scene.star.group.numLabels <= 50) {
-                long numLabels = Math.max(Settings.settings.scene.star.group.numLabels, (long) (200.0 / (root.octant.numChildrenRec + 1)));
+                long numLabels = FastMath.max(Settings.settings.scene.star.group.numLabels, (long) (200.0 / (root.octant.numChildrenRec + 1)));
                 updateNumLabelsRecursive(root.octant, numLabels);
             }
 

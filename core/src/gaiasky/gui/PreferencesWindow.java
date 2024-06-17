@@ -42,6 +42,7 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.validator.*;
+import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -2996,7 +2997,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return 2;
         if (x.getAACode() == 0)
             return 0;
-        return (int) (Math.log(x.getAACode()) / Math.log(2) + 1e-10) + 2;
+        return (int) (Math.log(x.getAACode()) / FastMath.log(2) + 1e-10) + 2;
     }
 
     private int idxLang(String code,

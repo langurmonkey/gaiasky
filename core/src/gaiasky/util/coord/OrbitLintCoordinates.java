@@ -15,6 +15,7 @@ import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.time.Instant;
 
@@ -82,7 +83,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         int baseIndex = data.getIndex(dateWrap);
 
         int nextIndex = (baseIndex + 1) % data.getNumPoints();
-        double percent = (double) Math.abs(dateWrap - data.getDate(baseIndex).toEpochMilli()) / (double) Math.abs(data.getDate(nextIndex).toEpochMilli() - data.getDate(baseIndex).toEpochMilli());
+        double percent = (double) FastMath.abs(dateWrap - data.getDate(baseIndex).toEpochMilli()) / (double) FastMath.abs(data.getDate(nextIndex).toEpochMilli() - data.getDate(baseIndex).toEpochMilli());
 
         data.loadPoint(out, baseIndex);
         data.loadPoint(aux, nextIndex);

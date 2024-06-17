@@ -24,6 +24,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.List;
 
@@ -110,8 +111,8 @@ public class FocusHit {
                 float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                 float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
-                double pixelSize = Math.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                angle = (float) FastMath.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                double pixelSize = FastMath.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                 perspectiveCamera.project(pos);
                 pos.y = viewportHeight - pos.y;
                 if (Settings.settings.program.modeStereo.active) {
@@ -304,8 +305,8 @@ public class FocusHit {
                         float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                         float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
-                        angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / perspectiveCamera.fieldOfView);
-                        double pixelSize = Math.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                        angle = (float) FastMath.toDegrees(angle * camera.fovFactor) * (40f / perspectiveCamera.fieldOfView);
+                        double pixelSize = FastMath.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                         perspectiveCamera.project(posFloat);
                         posFloat.y = viewportHeight - posFloat.y;
                         if (Settings.settings.program.modeStereo.active) {
@@ -435,7 +436,7 @@ public class FocusHit {
                 float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                 float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                angle = (float) FastMath.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
                 double pixelSize = ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2;
                 perspectiveCamera.project(pos);
                 pos.y = viewportHeight - pos.y;

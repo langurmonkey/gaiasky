@@ -8,6 +8,7 @@
 package gaiasky.util.gaia.utils;
 
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +16,7 @@ import java.util.Random;
 
 public class ComplexArea implements Area {
 
-    private final static double piHalf = Math.PI / 2.0;
+    private final static double piHalf = FastMath.PI / 2.0;
     private final Collection<Area> listOfAreas;
     private String name;
 
@@ -32,9 +33,9 @@ public class ComplexArea implements Area {
      */
     @Override
     public double altitude(Place spinAxisPlace) {
-        double alt = Math.PI;
+        double alt = FastMath.PI;
         for (Area a : listOfAreas) {
-            alt = Math.min(alt, a.altitude(spinAxisPlace));
+            alt = FastMath.min(alt, a.altitude(spinAxisPlace));
         }
         return alt;
     }

@@ -90,6 +90,7 @@ import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.XrLoadStatus;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;
@@ -777,8 +778,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
          * Complete scene renderer loading.
          */
         sceneRenderer.doneLoading(assetManager);
-        sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale),
-                (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
+        sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) FastMath.round(graphics.getWidth() * settings.graphics.backBufferScale),
+                (int) FastMath.round(graphics.getHeight() * settings.graphics.backBufferScale));
 
         // Set up entities.
         scene.setUpEntities();
@@ -1302,7 +1303,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             dtGs = 1.0 / settings.camrecorder.targetFps;
         } else {
             // Max time step is 0.05 seconds (20 FPS). Not in RENDER_OUTPUT MODE.
-            dtGs = Math.min(dt, 0.05);
+            dtGs = FastMath.min(dt, 0.05);
         }
         return dtGs;
     }
@@ -1366,8 +1367,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
                                 boolean resizeScreenConf) {
         try {
             final var settings = Settings.settings;
-            final var renderWidth = (int) Math.round(width * settings.graphics.backBufferScale);
-            final var renderHeight = (int) Math.round(height * settings.graphics.backBufferScale);
+            final var renderWidth = (int) FastMath.round(width * settings.graphics.backBufferScale);
+            final var renderHeight = (int) FastMath.round(height * settings.graphics.backBufferScale);
 
             // Resize global UI sprite batch
             globalResources.resize(renderWidth, renderHeight);

@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import gaiasky.util.gdx.g2d.BitmapFont.Glyph;
+import net.jafama.FastMath;
 
 import java.lang.StringBuilder;
 
@@ -232,11 +233,11 @@ public class GlyphLayout implements Poolable {
                                 previous.glyphs.truncate(lastIndex + 1);
                                 previous.xAdvances.truncate(lastIndex + 2);
                                 adjustLastGlyph(fontData, previous);
-                                width = Math.max(width, previous.x + previous.width);
+                                width = FastMath.max(width, previous.x + previous.width);
                             }
                         } else {
                             next = wrap(fontData, run, glyphRunPool, wrapIndex, i);
-                            width = Math.max(width, run.x + run.width);
+                            width = FastMath.max(width, run.x + run.width);
                             if (next == null) { // All wrapped glyphs were whitespace.
                                 x = 0;
                                 y += fontData.down;
@@ -266,7 +267,7 @@ public class GlyphLayout implements Poolable {
 
                 if (newline) {
                     // Next run will be on the next line.
-                    width = Math.max(width, x);
+                    width = FastMath.max(width, x);
                     x = 0;
                     float down = fontData.down;
                     if (runEnd == runStart) { // Blank line.
@@ -282,7 +283,7 @@ public class GlyphLayout implements Poolable {
                 color = nextColor;
             }
         }
-        width = Math.max(width, x);
+        width = FastMath.max(width, x);
 
         for (int i = 1, n = colorStack.size; i < n; i++)
             colorPool.free(colorStack.get(i));
@@ -304,7 +305,7 @@ public class GlyphLayout implements Poolable {
                         runs.get(lineStart++).x += shift;
                     lineWidth = 0;
                 }
-                lineWidth = Math.max(lineWidth, run.x + run.width);
+                lineWidth = FastMath.max(lineWidth, run.x + run.width);
             }
             float shift = targetWidth - lineWidth;
             if (center)

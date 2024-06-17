@@ -20,6 +20,7 @@ import gaiasky.util.gdx.graphics.TextureView;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.mesh.IntMesh.VertexDataType;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import net.jafama.FastMath;
 
 public class ExtSpriteBatch implements ExtBatch {
     /**
@@ -622,7 +623,7 @@ public class ExtSpriteBatch implements ExtBatch {
                 remainingVertices = verticesLength;
             }
         }
-        int copyCount = Math.min(remainingVertices, count);
+        int copyCount = FastMath.min(remainingVertices, count);
 
         System.arraycopy(spriteVertices, offset, vertices, idx, copyCount);
         idx += copyCount;
@@ -630,7 +631,7 @@ public class ExtSpriteBatch implements ExtBatch {
         while (count > 0) {
             offset += copyCount;
             flush();
-            copyCount = Math.min(verticesLength, count);
+            copyCount = FastMath.min(verticesLength, count);
             System.arraycopy(spriteVertices, offset, vertices, 0, copyCount);
             idx += copyCount;
             count -= copyCount;

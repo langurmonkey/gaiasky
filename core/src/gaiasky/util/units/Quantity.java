@@ -10,6 +10,7 @@ package gaiasky.util.units;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Brightness.BrightnessUnit;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
+import net.jafama.FastMath;
 
 public class Quantity {
 
@@ -138,7 +139,7 @@ public class Quantity {
             /** Degrees **/
             DEG(1d),
             /** Radians **/
-            RAD(180d / Math.PI),
+            RAD(180d / FastMath.PI),
             /** Milliarcseconds **/
             MAS(1d / 3600000d),
             /** Arcseconds **/

@@ -12,10 +12,9 @@ import gaiasky.util.LruCache;
 import gaiasky.util.Nature;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.moon.MoonMeeusCoordinates;
-import gaiasky.util.math.ITrigonometry;
-import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -100,7 +99,7 @@ public class AstroUtils {
             double julianDate = getJulianDateCache(date);
 
             nslSun.setTime(julianDate);
-            double aux = Math.toDegrees(nslSun.getSolarLongitude()) % 360;
+            double aux = FastMath.toDegrees(nslSun.getSolarLongitude()) % 360;
 
             cacheSunLongitudeDate = Instant.ofEpochMilli(date.toEpochMilli());
             cacheSunLongitude = aux % 360;
@@ -144,16 +143,14 @@ public class AstroUtils {
      * @param out The out vector with [lambda, beta, r] in radians and kilometres.
      */
     private static void plutoEclipticCoordinates(double d, Vector3b out) {
-        ITrigonometry trigo = MathManager.instance.trigonometryInterface;
+        double S = FastMath.toRadians(50.03 + 0.033459652 * d);
+        double P = FastMath.toRadians(238.95 + 0.003968789 * d);
 
-        double S = Math.toRadians(50.03 + 0.033459652 * d);
-        double P = Math.toRadians(238.95 + 0.003968789 * d);
+        double lonEcl = 238.9508 + 0.00400703 * d - 19.799 * FastMath.sin(P) + 19.848 * FastMath.cos(P) + 0.897 * FastMath.sin(2.0 * P) - 4.956 * FastMath.cos(2.0 * P) + 0.610 * FastMath.sin(3.0 * P) + 1.211 * FastMath.cos(3.0 * P) - 0.341 * FastMath.sin(4.0 * P) - 0.190 * FastMath.cos(4.0 * P) + 0.128 * FastMath.sin(5.0 * P) - 0.034 * FastMath.cos(5.0 * P) - 0.038 * FastMath.sin(6.0 * P) + 0.031 * FastMath.cos(6.0 * P) + 0.020 * FastMath.sin(S - P) - 0.010 * FastMath.cos(S - P);
+        double latEcl = -3.9082 - 5.453 * FastMath.sin(P) - 14.975 * FastMath.cos(P) + 3.527 * FastMath.sin(2.0 * P) + 1.673 * FastMath.cos(2.0 * P) - 1.051 * FastMath.sin(3.0 * P) + 0.328 * FastMath.cos(3.0 * P) + 0.179 * FastMath.sin(4.0 * P) - 0.292 * FastMath.cos(4.0 * P) + 0.019 * FastMath.sin(5.0 * P) + 0.100 * FastMath.cos(5.0 * P) - 0.031 * FastMath.sin(6.0 * P) - 0.026 * FastMath.cos(6.0 * P) + 0.011 * FastMath.cos(S - P);
+        double r = 40.72 + 6.68 * FastMath.sin(P) + 6.90 * FastMath.cos(P) - 1.18 * FastMath.sin(2.0 * P) - 0.03 * FastMath.cos(2.0 * P) + 0.15 * FastMath.sin(3.0 * P) - 0.14 * FastMath.cos(3.0 * P);
 
-        double lonEcl = 238.9508 + 0.00400703 * d - 19.799 * trigo.sin(P) + 19.848 * trigo.cos(P) + 0.897 * trigo.sin(2.0 * P) - 4.956 * trigo.cos(2.0 * P) + 0.610 * trigo.sin(3.0 * P) + 1.211 * trigo.cos(3.0 * P) - 0.341 * trigo.sin(4.0 * P) - 0.190 * trigo.cos(4.0 * P) + 0.128 * trigo.sin(5.0 * P) - 0.034 * trigo.cos(5.0 * P) - 0.038 * trigo.sin(6.0 * P) + 0.031 * trigo.cos(6.0 * P) + 0.020 * trigo.sin(S - P) - 0.010 * trigo.cos(S - P);
-        double latEcl = -3.9082 - 5.453 * trigo.sin(P) - 14.975 * trigo.cos(P) + 3.527 * trigo.sin(2.0 * P) + 1.673 * trigo.cos(2.0 * P) - 1.051 * trigo.sin(3.0 * P) + 0.328 * trigo.cos(3.0 * P) + 0.179 * trigo.sin(4.0 * P) - 0.292 * trigo.cos(4.0 * P) + 0.019 * trigo.sin(5.0 * P) + 0.100 * trigo.cos(5.0 * P) - 0.031 * trigo.sin(6.0 * P) - 0.026 * trigo.cos(6.0 * P) + 0.011 * trigo.cos(S - P);
-        double r = 40.72 + 6.68 * trigo.sin(P) + 6.90 * trigo.cos(P) - 1.18 * trigo.sin(2.0 * P) - 0.03 * trigo.cos(2.0 * P) + 0.15 * trigo.sin(3.0 * P) - 0.14 * trigo.cos(3.0 * P);
-
-        out.set(Math.toRadians(lonEcl), Math.toRadians(latEcl), Nature.AU_TO_KM * r);
+        out.set(Math.toRadians(lonEcl), FastMath.toRadians(latEcl), Nature.AU_TO_KM * r);
     }
 
     /**
@@ -243,33 +240,33 @@ public class AstroUtils {
      */
     public static long[] getCalendarDay(double julianDate) {
         var X = julianDate + 0.5;
-        var Z = Math.floor(X); //Get day without time
+        var Z = FastMath.floor(X); //Get day without time
         var F = X - Z; //Get time
-        var Y = Math.floor((Z - 1867216.25) / 36524.25);
-        var A = Z + 1 + Y - Math.floor(Y / 4);
+        var Y = FastMath.floor((Z - 1867216.25) / 36524.25);
+        var A = Z + 1 + Y - FastMath.floor(Y / 4);
         var B = A + 1524;
-        var C = Math.floor((B - 122.1) / JD_TO_Y);
-        var D = Math.floor(JD_TO_Y * C);
-        var G = Math.floor((B - D) / 30.6001);
+        var C = FastMath.floor((B - 122.1) / JD_TO_Y);
+        var D = FastMath.floor(JD_TO_Y * C);
+        var G = FastMath.floor((B - D) / 30.6001);
         //must get number less than or equal to 12)
         var month = (G < 13.5) ? (G - 1) : (G - 13);
         //if Month is January or February, or the rest of year
         var year = (month < 2.5) ? (C - 4715) : (C - 4716);
-        var UT = B - D - Math.floor(30.6001 * G) + F;
-        var day = Math.floor(UT);
+        var UT = B - D - FastMath.floor(30.6001 * G) + F;
+        var day = FastMath.floor(UT);
         //Determine time
-        UT -= Math.floor(UT);
+        UT -= FastMath.floor(UT);
         UT *= 24;
-        var hour = Math.floor(UT);
-        UT -= Math.floor(UT);
+        var hour = FastMath.floor(UT);
+        UT -= FastMath.floor(UT);
         UT *= 60;
-        var minute = Math.floor(UT);
-        UT -= Math.floor(UT);
+        var minute = FastMath.floor(UT);
+        UT -= FastMath.floor(UT);
         UT *= 60;
-        var second = Math.floor(UT);
-        UT -= Math.floor(UT);
+        var second = FastMath.floor(UT);
+        UT -= FastMath.floor(UT);
         UT *= 1.0e9;
-        var ms = Math.round(UT);
+        var ms = FastMath.round(UT);
 
         return new long[]{(long) year, (long) month, (long) day, (long) hour, (long) minute, (long) second, ms};
 
@@ -431,10 +428,10 @@ public class AstroUtils {
         double vta = ma * distPc * 4.74d;
         double vtd = md * distPc * 4.74d;
 
-        double cosAlpha = Math.cos(ra);
-        double sinAlpha = Math.sin(ra);
-        double cosDelta = Math.cos(dec);
-        double sinDelta = Math.sin(dec);
+        double cosAlpha = FastMath.cos(ra);
+        double sinAlpha = FastMath.sin(ra);
+        double cosDelta = FastMath.cos(dec);
+        double sinDelta = FastMath.sin(dec);
 
         // +x to delta=0, alpha=0
         // +y to delta=0, alpha=90
@@ -462,7 +459,7 @@ public class AstroUtils {
      * @return The absolute magnitude.
      */
     public static double apparentToAbsoluteMagnitude(double distPc, double appMag) {
-        final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
+        final double v = 5.0 * FastMath.log10(distPc <= 0.0 ? 10.0 : distPc);
         return appMag - v + 5.0;
     }
 
@@ -474,7 +471,7 @@ public class AstroUtils {
      * @return The apparent magnitude at the given distance.
      */
     public static double absoluteToApparentMagnitude(double distPc, double absMag) {
-        final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
+        final double v = 5.0 * FastMath.log10(distPc <= 0.0 ? 10.0 : distPc);
         return absMag + v - 5.0;
     }
 
@@ -487,9 +484,9 @@ public class AstroUtils {
      */
     public static double absoluteMagnitudeToPseudoSize(final double absMag) {
         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
-        double pseudoL = Math.pow(10, -0.4 * absMag);
+        double pseudoL = FastMath.pow(10, -0.4 * absMag);
         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-        return Math.min((Math.pow(pseudoL, 0.5) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
+        return FastMath.min((Math.pow(pseudoL, 0.5) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
     }
 
     /**

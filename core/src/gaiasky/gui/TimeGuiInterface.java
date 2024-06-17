@@ -7,7 +7,6 @@
 
 package gaiasky.gui;
 
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;

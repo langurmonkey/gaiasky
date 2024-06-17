@@ -8,10 +8,11 @@
 package gaiasky.util.elements;
 
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 
 public class Anomalies {
     /** The Constant TWO_PI. */
-    public static final double TWO_PI = 2 * Math.PI;
+    public static final double TWO_PI = 2 * FastMath.PI;
 
     /**
      * Reduce the given angle to the interval <i>[0 2pi[</i>.
@@ -20,7 +21,7 @@ public class Anomalies {
      * @return the angle in the range of <i>0</i> through <i>2pi</i>.
      */
     public static double reduce(double x) {
-        return MathUtilsDouble.normalizeAngle(x, Math.PI);
+        return MathUtilsDouble.normalizeAngle(x, FastMath.PI);
     }
 
     /**
@@ -64,8 +65,8 @@ public class Anomalies {
      */
     public static double true2eccConstrained(final double v,
                                              final double ecc) {
-        double eA = 2 * Math.atan(
-                Math.sqrt((1 - ecc) / (1 + ecc)) * Math.tan(v / 2));
+        double eA = 2 * FastMath.atan(
+                Math.sqrt((1 - ecc) / (1 + ecc)) * FastMath.tan(v / 2));
 
         if (eA < 0) {
             eA += TWO_PI;

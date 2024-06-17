@@ -16,6 +16,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+import net.jafama.FastMath;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -51,8 +52,8 @@ public class LogWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        w = Math.min(1200f, Gdx.graphics.getWidth() - 200);
-        h = Math.min(860f, Gdx.graphics.getHeight() - 150);
+        w = FastMath.min(1200f, Gdx.graphics.getWidth() - 200);
+        h = FastMath.min(860f, Gdx.graphics.getHeight() - 150);
         pad = 16f;
 
         logs = new Table(skin);

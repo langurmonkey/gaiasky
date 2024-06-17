@@ -17,8 +17,6 @@ import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.input.InputUtils;
 import gaiasky.input.KeyRegister;
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
 import java.util.Objects;

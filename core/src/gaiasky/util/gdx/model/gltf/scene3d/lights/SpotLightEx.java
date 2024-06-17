@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.gdx.model.gltf.data.extensions.KHRLightsPunctual;
+import net.jafama.FastMath;
 
 public class SpotLightEx extends SpotLight {
 
@@ -54,7 +55,7 @@ public class SpotLightEx extends SpotLight {
 		// from https://github.com/KhronosGroup/glTF/blob/master/extensions/2.0/Khronos/KHR_lights_punctual/README.md#inner-and-outer-cone-angles
 		float cosOuterAngle = (float)Math.cos(outerConeAngleRad);
 		float cosInnerAngle = (float)Math.cos(innerConeAngleRad);
-		float lightAngleScale = 1.0f / Math.max(0.001f, cosInnerAngle - cosOuterAngle);
+		float lightAngleScale = 1.0f / FastMath.max(0.001f, cosInnerAngle - cosOuterAngle);
 		float lightAngleOffset = -cosOuterAngle * lightAngleScale;
 		
 		// XXX we hack libgdx cutoffAngle and exponent variables to store cached scale/offset values.

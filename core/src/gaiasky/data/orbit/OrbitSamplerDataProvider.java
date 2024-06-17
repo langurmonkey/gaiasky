@@ -23,8 +23,8 @@ import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3b;
+import net.jafama.FastMath;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -58,9 +58,6 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"), new FileHandle(ASSETS_LOC + "/i18n/objects"));
-
-            // Initialize math manager
-            MathManager.initialize();
 
             OrbitSamplerDataProvider.writeData = true;
             OrbitSamplerDataProvider me = new OrbitSamplerDataProvider();
@@ -96,7 +93,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         // Prevent overlapping by rescaling the period
         double period = parameter.orbitalPeriod * 0.999d;
         int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300.0 * period / 365.0);
-        numSamples = Math.max(200, Math.min(2000, numSamples));
+        numSamples = FastMath.max(200, FastMath.min(2000, numSamples));
         data = new PointCloudData();
         String bodyDesc = parameter.name;
 

@@ -262,7 +262,7 @@ public class GlobalResources {
         if (buf == null || compareTo == null || buf.isEmpty())
             return false;
         char a, b;
-        int len = Math.min(buf.length(), compareTo.length);
+        int len = FastMath.min(buf.length(), compareTo.length);
         if (ignoreCase) {
             for (int i = 0; i < len; i++) {
                 a = buf.charAt(i);
@@ -452,12 +452,12 @@ public class GlobalResources {
             if (vc > 0) {
                 camDir.scl(-1);
                 double cosThS = camDir.dot(pos) / pos.len();
-                double th_s = Math.acos(cosThS);
+                double th_s = FastMath.acos(cosThS);
 
                 double cosThO = (cosThS - vc) / (1 - vc * cosThS);
-                double th_o = Math.acos(cosThO);
+                double th_o = FastMath.acos(cosThO);
 
-                pos.rotate(camDir.crs(pos).nor(), Math.toDegrees(th_o - th_s));
+                pos.rotate(camDir.crs(pos).nor(), FastMath.toDegrees(th_o - th_s));
             }
         }
     }
@@ -473,9 +473,9 @@ public class GlobalResources {
         int unit = si ? 1000 : 1024;
         if (bytes < unit)
             return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        int exp = (int) (Math.log(bytes) / FastMath.log(unit));
         String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+        return String.format("%.1f %sB", bytes / FastMath.pow(unit, exp), pre);
     }
 
     private static String generateMD5(FileInputStream inputStream) {
@@ -744,7 +744,7 @@ public class GlobalResources {
     public static String[] combinations(String[] values) {
         Array<String> combinations = new Array<>();
         int n = values.length;
-        int top = (int) Math.pow(2, n);
+        int top = (int) FastMath.pow(2, n);
 
         // bits holds the integer whose binary representation indicates the state for each value (on/off).
         for (int bits = 0; bits < top; bits++) {

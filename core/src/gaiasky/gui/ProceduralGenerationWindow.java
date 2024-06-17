@@ -36,13 +36,13 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.LongValidator;
+import net.jafama.FastMath;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class ProceduralGenerationWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(ProceduralGenerationWindow.class);
@@ -918,7 +918,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             if (status) {
                 genCloudNum++;
             } else {
-                genCloudNum = Math.max(genCloudNum - 1, 0);
+                genCloudNum = FastMath.max(genCloudNum - 1, 0);
             }
             updateButtonStatus();
         }
@@ -926,7 +926,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             if (status) {
                 genSurfaceNum++;
             } else {
-                genSurfaceNum = Math.max(genSurfaceNum - 1, 0);
+                genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
             }
             updateButtonStatus();
         }

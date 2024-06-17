@@ -21,9 +21,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scene.component.Title;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
+import net.jafama.FastMath;
 
 public class CollapsiblePane extends Table {
 
@@ -366,7 +366,7 @@ public class CollapsiblePane extends Table {
 
         x = x < 0 ? stage.getWidth() / 2f - window.getWidth() / 2f : x;
         y = y < 0 ? stage.getHeight() / 2f - window.getHeight() / 2f : y;
-        window.setPosition(Math.round(x), Math.round(y));
+        window.setPosition(Math.round(x), FastMath.round(y));
         window.pack();
 
         return window;

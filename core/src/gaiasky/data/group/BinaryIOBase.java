@@ -14,12 +14,10 @@ import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.record.ParticleRecord;
 import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.util.Constants;
-import gaiasky.util.parse.Parser;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
-import java.util.Arrays;
 
 public abstract class BinaryIOBase implements BinaryIO {
     protected final int nDoubles;

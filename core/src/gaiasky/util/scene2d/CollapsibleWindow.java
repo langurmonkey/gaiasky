@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.util.i18n.I18n;
+import net.jafama.FastMath;
 
 public class CollapsibleWindow extends OwnWindow {
     protected Actor me;
@@ -178,7 +179,7 @@ public class CollapsibleWindow extends OwnWindow {
             // COLLAPSING
             if (getHeight() > collapseHeight) {
                 float currHeight = getHeight();
-                float newHeight = Math.max(collapseHeight, currHeight - pixels);
+                float newHeight = FastMath.max(collapseHeight, currHeight - pixels);
                 setHeight(newHeight);
                 setY(getY() + (currHeight - newHeight));
             } else {
@@ -192,7 +193,7 @@ public class CollapsibleWindow extends OwnWindow {
             // EXPANDING
             if (getHeight() < expandHeight) {
                 float currHeight = getHeight();
-                float newHeight = Math.min(expandHeight, currHeight + pixels);
+                float newHeight = FastMath.min(expandHeight, currHeight + pixels);
                 setHeight(newHeight);
                 setY(getY() + (currHeight - newHeight));
             } else {

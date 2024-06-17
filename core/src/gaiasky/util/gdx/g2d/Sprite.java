@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.jafama.FastMath;
 
 import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
 
@@ -67,7 +68,7 @@ public class Sprite extends TextureRegion {
         this.texture = texture;
         setRegion(srcX, srcY, srcWidth, srcHeight);
         setColor(1, 1, 1, 1);
-        setSize(Math.abs(srcWidth), Math.abs(srcHeight));
+        setSize(Math.abs(srcWidth), FastMath.abs(srcHeight));
         setOrigin(width / 2, height / 2);
     }
 
@@ -94,7 +95,7 @@ public class Sprite extends TextureRegion {
     public Sprite(TextureRegion region, int srcX, int srcY, int srcWidth, int srcHeight) {
         setRegion(region, srcX, srcY, srcWidth, srcHeight);
         setColor(1, 1, 1, 1);
-        setSize(Math.abs(srcWidth), Math.abs(srcHeight));
+        setSize(Math.abs(srcWidth), FastMath.abs(srcHeight));
         setOrigin(width / 2, height / 2);
     }
 

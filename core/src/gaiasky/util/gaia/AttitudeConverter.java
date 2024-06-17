@@ -11,10 +11,11 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class AttitudeConverter {
     /** Mathematical constants **/
-    static final double PI = Math.PI;
+    static final double PI = FastMath.PI;
     static final double PI_HALF = 0.5 * PI;
 
     /** Unit vectors **/
@@ -29,8 +30,8 @@ public class AttitudeConverter {
     /** The obliquity of the ecliptic in radians **/
     static final double OBLIQUITY = Coordinates.OBLIQUITY_RAD_J2000;
     static final double OBLIQUITY_DEG = Coordinates.OBLIQUITY_DEG_J2000;
-    static final double sinObliquity = Math.sin(OBLIQUITY);
-    static final double cosObliquity = Math.cos(OBLIQUITY);
+    static final double sinObliquity = FastMath.sin(OBLIQUITY);
+    static final double cosObliquity = FastMath.cos(OBLIQUITY);
 
     static final Vector3d[] xyz = new Vector3d[] { new Vector3d(), new Vector3d(), new Vector3d() };
 
@@ -62,17 +63,17 @@ public class AttitudeConverter {
 
         /* Calculate the attitude quaternion */
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
-        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
-        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - xi)));
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(lSun)));
+        q.mul(new QuaternionDouble(Z_AXIS, FastMath.toDegrees(nu - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, FastMath.toDegrees(PI_HALF - xi)));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(omega)));
 
         /*
          * Calculate the time derivative of the attitude quaternion using (A.17)
          * in AGIS paper, based on the rates in the ICRS:
          */
-        double sinLSun = Math.sin(lSun);
-        double cosLSun = Math.cos(lSun);
+        double sinLSun = FastMath.sin(lSun);
+        double cosLSun = FastMath.cos(lSun);
         Vector3d zInSrs = aux1;
         zInSrs.set(Y_AXIS).rotateVectorByQuaternion(q);
         double rateX = nuDot * cosLSun + omegaDot * zInSrs.x;
@@ -114,10 +115,10 @@ public class AttitudeConverter {
 
         /* Calculate the attitude quaternion */
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
-        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(nu - PI_HALF)));
-        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - xi)));
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(lSun)));
+        q.mul(new QuaternionDouble(Z_AXIS, FastMath.toDegrees(nu - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, FastMath.toDegrees(PI_HALF - xi)));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(omega)));
 
         /*
          * Calculate the inertial rate in SRS by adding the rotations around
@@ -125,8 +126,8 @@ public class AttitudeConverter {
          */
         Vector3d k = new Vector3d(0, -sinObliquity, cosObliquity);
         k.mul(q);
-        double sinLSun = Math.sin(lSun);
-        double cosLSun = Math.cos(lSun);
+        double sinLSun = FastMath.sin(lSun);
+        double cosLSun = FastMath.cos(lSun);
         Vector3d sun = new Vector3d(cosLSun, cosObliquity * sinLSun, sinObliquity * sinLSun);
         sun.mul(q);
         double rateX = k.x * lSunDot + sun.x * nuDot;
@@ -163,17 +164,17 @@ public class AttitudeConverter {
 
         /* Calculate the attitude quaternion */
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(lSun)));
-        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(h.getNu() - PI_HALF)));
-        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - h.getXi())));
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(h.getOmega())));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(lSun)));
+        q.mul(new QuaternionDouble(Z_AXIS, FastMath.toDegrees(h.getNu() - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, FastMath.toDegrees(PI_HALF - h.getXi())));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(h.getOmega())));
 
         /*
          * Calculate the time derivative of the attitude quaternion using (A.17)
          * in AGIS paper, based on the rates in the ICRS:
          */
-        double sinLSun = Math.sin(lSun);
-        double cosLSun = Math.cos(lSun);
+        double sinLSun = FastMath.sin(lSun);
+        double cosLSun = FastMath.cos(lSun);
         Vector3d zInSrs = aux1;
         zInSrs.set(Y_AXIS).mul(q);
         Vector3d sz = aux2;
@@ -209,8 +210,8 @@ public class AttitudeConverter {
         // s is a unit vector (in ICRS) towards the nominal sun:
         NslSun sun = new NslSun();
         sun.setTime(gt);
-        double cosLSun = Math.cos(sun.getSolarLongitude());
-        double sinLSun = Math.sin(sun.getSolarLongitude());
+        double cosLSun = FastMath.cos(sun.getSolarLongitude());
+        double sinLSun = FastMath.sin(sun.getSolarLongitude());
         Vector3d s = new Vector3d(cosLSun, sinLSun * cosObliquity, sinLSun
                 * sinObliquity);
 

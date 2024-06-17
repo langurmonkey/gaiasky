@@ -9,10 +9,11 @@ package gaiasky.util.gaia;
 
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class Epsl extends AnalyticalAttitudeDataServer {
     /** The unit vector towards the North Ecliptic Pole, expressed in ICRS **/
-    static final Vector3d NECLP = new Vector3d(-Math.sin(OBLIQUITY_RAD), Math.cos(OBLIQUITY_RAD), 0.0);
+    static final Vector3d NECLP = new Vector3d(-Math.sin(OBLIQUITY_RAD), FastMath.cos(OBLIQUITY_RAD), 0.0);
     static final Vector3d[] xyz = new Vector3d[] { new Vector3d(), new Vector3d(), new Vector3d() };
     /** The current mode **/
     private final Mode currentMode;
@@ -71,10 +72,10 @@ public class Epsl extends AnalyticalAttitudeDataServer {
          */
         // Calculate and set the attitude quaternion
         QuaternionDouble q = new QuaternionDouble(Z_AXIS, OBLIQUITY_DEG);
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(nslSun.getSolarLongitude())));
-        q.mul(new QuaternionDouble(Z_AXIS, Math.toDegrees(super.getNuRef() - PI_HALF)));
-        q.mul(new QuaternionDouble(X_AXIS, Math.toDegrees(PI_HALF - super.getXiRef())));
-        q.mul(new QuaternionDouble(Y_AXIS, Math.toDegrees(omega)));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(nslSun.getSolarLongitude())));
+        q.mul(new QuaternionDouble(Z_AXIS, FastMath.toDegrees(super.getNuRef() - PI_HALF)));
+        q.mul(new QuaternionDouble(X_AXIS, FastMath.toDegrees(PI_HALF - super.getXiRef())));
+        q.mul(new QuaternionDouble(Y_AXIS, FastMath.toDegrees(omega)));
 
         ConcreteAttitude att = new ConcreteAttitude(t, q, null, true);
 

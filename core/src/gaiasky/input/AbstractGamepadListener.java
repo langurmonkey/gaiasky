@@ -20,6 +20,7 @@ import gaiasky.gui.IGamepadMappings;
 import gaiasky.gui.IInputListener;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import net.jafama.FastMath;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -62,7 +63,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
 
     /** Zero-point function for the axes. **/
     protected double applyZeroPoint(double value) {
-        return Math.abs(value) >= Math.max(mappings.getZeroPoint(), MIN_ZERO_POINT) ? value : 0;
+        return FastMath.abs(value) >= FastMath.max(mappings.getZeroPoint(), MIN_ZERO_POINT) ? value : 0;
     }
 
     public IGamepadMappings getMappings() {

@@ -29,6 +29,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.gdx.g2d.GlyphLayout.GlyphRun;
+import net.jafama.FastMath;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -401,7 +402,7 @@ public class BitmapFont implements Disposable {
             Glyph g = data.getGlyph(glyphs.charAt(index));
             if (g == null)
                 continue;
-            g.xoffset += Math.round((maxAdvance - g.xadvance) / 2);
+            g.xoffset += FastMath.round((maxAdvance - g.xadvance) / 2);
             g.xadvance = maxAdvance;
             g.kerning = null;
             g.fixedWidth = true;
@@ -604,7 +605,7 @@ public class BitmapFont implements Disposable {
                 int pageCount = 1;
                 if (common.length >= 6 && common[5] != null && common[5].startsWith("pages=")) {
                     try {
-                        pageCount = Math.max(1, Integer.parseInt(common[5].substring(6)));
+                        pageCount = FastMath.max(1, Integer.parseInt(common[5].substring(6)));
                     } catch (NumberFormatException ignored) { // Use one page.
                     }
                 }
@@ -691,7 +692,7 @@ public class BitmapFont implements Disposable {
                     }
 
                     if (glyph.width > 0 && glyph.height > 0)
-                        descent = Math.min(baseLine + glyph.yoffset, descent);
+                        descent = FastMath.min(baseLine + glyph.yoffset, descent);
                 }
                 descent += padBottom;
 
@@ -757,7 +758,7 @@ public class BitmapFont implements Disposable {
                         for (Glyph glyph : page) {
                             if (glyph == null || glyph.height == 0 || glyph.width == 0)
                                 continue;
-                            capHeight = Math.max(capHeight, glyph.height);
+                            capHeight = FastMath.max(capHeight, glyph.height);
                         }
                     }
                 } else

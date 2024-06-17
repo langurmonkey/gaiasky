@@ -9,6 +9,7 @@ package gaiasky.util.gaia.utils;
 
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.Random;
 
@@ -138,7 +139,7 @@ public class Place {
         Vector3d sum = v1.cpy().add(v2);
         Vector3d dif = v1.sub(v2);
 
-        return 2. * Math.atan2(dif.len(), sum.len());
+        return 2. * FastMath.atan2(dif.len(), sum.len());
     }
 
     /**
@@ -183,10 +184,10 @@ public class Place {
 
         double tMax = getWeight(radius);
         double t = tMax * rnd.nextDouble();
-        double phi = 2.0 * Math.PI * rnd.nextDouble();
-        double s = 2.0 * Math.sqrt(t * (1.0 - t));
-        double x = s * Math.cos(phi);
-        double y = s * Math.sin(phi);
+        double phi = 2.0 * FastMath.PI * rnd.nextDouble();
+        double s = 2.0 * FastMath.sqrt(t * (1.0 - t));
+        double x = s * FastMath.cos(phi);
+        double y = s * FastMath.sin(phi);
         double z = 1.0 - 2.0 * t;
         dirICRS = c.scl(z).scaleAdd(x, p).scaleAdd(y, q);
         haveAngles = false;
@@ -198,9 +199,9 @@ public class Place {
         if (radius <= 0.0) {
             w = 0.0;
         } else if (radius < 1.0) {
-            w = 0.5 * Math.pow(Math.sin(radius), 2) / (1.0 + Math.cos(radius));
-        } else if (radius < Math.PI) {
-            w = 0.5 * (1.0 - Math.cos(radius));
+            w = 0.5 * FastMath.pow(Math.sin(radius), 2) / (1.0 + FastMath.cos(radius));
+        } else if (radius < FastMath.PI) {
+            w = 0.5 * (1.0 - FastMath.cos(radius));
         } else {
             w = 1.0;
         }

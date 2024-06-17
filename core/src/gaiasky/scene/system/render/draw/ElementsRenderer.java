@@ -35,6 +35,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
+import net.jafama.FastMath;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,7 +52,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     private int sizeOffset;
     private int textureIndexOffset;
     private boolean forceAdd = false;
-    private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0))};
+    private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), FastMath.tan(Math.toRadians(1.0))};
 
     public ElementsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -124,7 +125,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(trajectory.bodyColor[0], trajectory.bodyColor[1], trajectory.bodyColor[2], trajectory.bodyColor[3]);
 
                                 // ORBIT ELEMENTS 01
-                                tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
+                                tempVerts[curr.vertexIdx + elems01Offset] = (float) FastMath.sqrt(oc.mu / FastMath.pow(oc.semimajoraxis * 1000d, 3d));
                                 tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
                                 tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
                                 tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;

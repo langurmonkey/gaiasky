@@ -17,6 +17,7 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.LevelsFilter;
 import gaiasky.util.gdx.contrib.postprocess.filters.LumaFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import net.jafama.FastMath;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
@@ -50,7 +51,7 @@ public final class Levels extends PostProcessorEffect {
         // Compute number of lod levels based on LUMA_SIZE
         int size = LUMA_SIZE;
         while (size > 1) {
-            size = (int) Math.floor(size / 2f);
+            size = (int) FastMath.floor(size / 2f);
         }
 
         GLFrameBuffer.FrameBufferBuilder builder = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
@@ -184,7 +185,7 @@ public final class Levels extends PostProcessorEffect {
         // Run in main thread
         GaiaSky.postRunnable(() -> {
             if (levels != null) {
-                levels.setAvgMaxLuma(Math.max(currLumaAvg, baseLuma), Math.min(currLumaMax, topLuma));
+                levels.setAvgMaxLuma(Math.max(currLumaAvg, baseLuma), FastMath.min(currLumaMax, topLuma));
             }
             processRunning.set(false);
         });
@@ -201,7 +202,7 @@ public final class Levels extends PostProcessorEffect {
 
             // Get texture as is and compute avg/max in CPU - use with reinhardToneMapping()
             //GL30.glGenerateMipmap(lumaBuffer.getColorBufferTexture().glTarget);
-            //GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, Math.min(3, lumaLodLevels - 1), GL30.GL_RGB, GL30.GL_FLOAT, pixels);
+            //GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, FastMath.min(3, lumaLodLevels - 1), GL30.GL_RGB, GL30.GL_FLOAT, pixels);
             GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
 
             // Launch asynchronously.
@@ -241,13 +242,13 @@ public final class Levels extends PostProcessorEffect {
 
             if (!Double.isNaN(v)) {
                 avg = avg + (v - avg) / (i + 1);
-                max = Math.max(v, max);
+                max = FastMath.max(v, max);
                 i++;
             }
         }
 
         // Weigh the maximum with how far from it the mean value is.
-        double frac = Math.min(1.0, 8.0 * (1.0 - ((max - avg) / max)));
+        double frac = FastMath.min(1.0, 8.0 * (1.0 - ((max - avg) / max)));
 
         lumaMax = (float) (max * frac);
         lumaAvg = (float) avg;
@@ -269,7 +270,7 @@ public final class Levels extends PostProcessorEffect {
     private float renderLumaMipMap(FrameBuffer src) {
         int mipLevel = 1;
         float lodLevel = 0;
-        int size = (int) Math.floor(LUMA_SIZE / 2f);
+        int size = (int) FastMath.floor(LUMA_SIZE / 2f);
         while (size >= 1f) {
             lumaFilter.setImageSize(size, size);
             lumaFilter.setTexelSize(1f / size, 1f / size);
@@ -283,7 +284,7 @@ public final class Levels extends PostProcessorEffect {
 
             mipLevel++;
             lodLevel++;
-            size = (int) Math.floor(size / 2f);
+            size = (int) FastMath.floor(size / 2f);
         }
 
         // For HDR, we need the max and average luminance. At this point, a 1x1 rendering was made to the frame buffer.

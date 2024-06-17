@@ -7,6 +7,8 @@
 
 package gaiasky.util.math;
 
+import net.jafama.FastMath;
+
 public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
 
     public T[] controlPoints;
@@ -39,7 +41,7 @@ public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
         }
         int n = controlPoints.length;
         double step = 1d / ((double) n - 1d);
-        int i0 = (int) Math.floor(t / step);
+        int i0 = (int) FastMath.floor(t / step);
         int i1 = i0 + 1;
         double alpha = (t / step) - (double) i0;
         T p0 = controlPoints[i0];

@@ -24,6 +24,7 @@ import gaiasky.util.gdx.model.gltf.loaders.shared.data.DataResolver;
 import gaiasky.util.gdx.model.gltf.loaders.shared.scene.NodeResolver;
 import gaiasky.util.gdx.model.gltf.scene3d.animation.NodeAnimationHack;
 import gaiasky.util.gdx.model.gltf.scene3d.model.*;
+import net.jafama.FastMath;
 
 public class AnimationLoader {
 	
@@ -75,7 +76,7 @@ public class AnimationLoader {
 			}
 			
 			GLTFAccessor inputAccessor = dataResolver.getAccessor(glSampler.input);
-			animation.duration = Math.max(animation.duration, inputAccessor.max[0]);
+			animation.duration = FastMath.max(animation.duration, inputAccessor.max[0]);
 			
 			String property = glChannel.target.path;
 			if("translation".equals(property)){

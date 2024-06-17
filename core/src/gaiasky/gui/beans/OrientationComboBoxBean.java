@@ -1,6 +1,5 @@
 package gaiasky.gui.beans;
 
-import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.util.i18n.I18n;
 
 public class OrientationComboBoxBean {

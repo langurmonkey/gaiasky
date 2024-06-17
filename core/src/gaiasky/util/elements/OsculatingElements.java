@@ -8,6 +8,7 @@
 package gaiasky.util.elements;
 
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 /**
  * Represent and manipulate osculating elements of the elliptic two-body
@@ -29,10 +30,10 @@ public class OsculatingElements {
     private static final double MU_SUN = (GAUSS_CONSTANT * GAUSS_CONSTANT);
 
     /** The Constant TWO_PI. */
-    private static final double TWO_PI = 2 * Math.PI;
+    private static final double TWO_PI = 2 * FastMath.PI;
 
     /** The Constant PI_TWO. */
-    private static final double PI_TWO = Math.PI / 2;
+    private static final double PI_TWO = FastMath.PI / 2;
 
     /** Eccentricity below which the orbit is considered circular. */
     private static final double E_CIRCLE_LIMIT = 1e-6;
@@ -199,7 +200,7 @@ public class OsculatingElements {
 
         // Semi-major axis and eccentricity.
         final double semiaxis = mu / (((2 * mu) / r) - v2);
-        double eccent = Math.sqrt(Math.abs(1.0 - ((c * c) / (mu * semiaxis))));
+        double eccent = FastMath.sqrt(Math.abs(1.0 - ((c * c) / (mu * semiaxis))));
 
         // Node and inclination.
         double bomega = sigma.getLongitude();
@@ -218,9 +219,9 @@ public class OsculatingElements {
         double somega;
 
         if (gamma == 0) { // zero inclination => longitude of periastron.
-            somega = Math.atan2(runge.y(), runge.x());
+            somega = FastMath.atan2(runge.y(), runge.x());
         } else {
-            somega = Math.atan2(
+            somega = FastMath.atan2(
                     runge.z() * c,
                     (runge.y() * sigma.x()) - (runge.x() * sigma.y()));
         }
@@ -232,19 +233,19 @@ public class OsculatingElements {
         somega %= OsculatingElements.TWO_PI;
 
         // Anomalies
-        final double anomv = Math.atan2(
+        final double anomv = FastMath.atan2(
                 -c / mu * vel.dot(runge),
                 pos.dot(runge) / r);
         final double anome = Anomalies.true2ecc(anomv, eccent);
-        double anom = (anome - (eccent * Math.sin(anome))) % OsculatingElements.TWO_PI;
+        double anom = (anome - (eccent * FastMath.sin(anome))) % OsculatingElements.TWO_PI;
 
         if (eccent < OsculatingElements.E_CIRCLE_LIMIT) { // circular orbit:
             // somega = 0.
 
-            final double com = Math.cos(bomega);
-            final double som = Math.sin(bomega);
+            final double com = FastMath.cos(bomega);
+            final double som = FastMath.sin(bomega);
             eccent = 0.0;
-            anom = Math.atan2(
+            anom = FastMath.atan2(
                     ((pos.y() * com) - (pos.x() * som)) / sigma.z() * c,
                     (pos.x() * com) + (pos.y() * som));
         }
@@ -267,8 +268,8 @@ public class OsculatingElements {
      */
     public Vector3d[] toCartesian() {
         // Kepler equation.
-        final double xk = Math.sqrt(this.mu);
-        final double xn = xk / (this.semiaxis * Math.sqrt(this.semiaxis)); // radians
+        final double xk = FastMath.sqrt(this.mu);
+        final double xn = xk / (this.semiaxis * FastMath.sqrt(this.semiaxis)); // radians
         // per
         // unit
         // of
@@ -280,13 +281,13 @@ public class OsculatingElements {
                 this.eccent);
 
         // Auxiliary data.
-        final double ce = Math.cos(anex);
-        final double se = Math.sin(anex);
+        final double ce = FastMath.cos(anex);
+        final double se = FastMath.sin(anex);
 
         final double eccentce = this.eccent * ce;
         final double rsura = 1.0 - eccentce;
         final double ca = (ce - this.eccent) / (1 - eccentce);
-        final double sqrt = Math.sqrt(
+        final double sqrt = FastMath.sqrt(
                 (1.0 - this.eccent) * (1.0 + this.eccent));
         final double sa = (sqrt * se) / (1.0 - eccentce);
 
@@ -320,8 +321,8 @@ public class OsculatingElements {
      * @return a Vector3d[2] with position in [0] and velocity in [1].
      */
     public Vector3d[] advanceTwoBody(final double xanom) {
-        final double xk = Math.sqrt(this.mu);
-        final double xn = xk / this.semiaxis / Math.sqrt(this.semiaxis); // radians
+        final double xk = FastMath.sqrt(this.mu);
+        final double xn = xk / this.semiaxis / FastMath.sqrt(this.semiaxis); // radians
         // per
         // unit
         // of
@@ -333,8 +334,8 @@ public class OsculatingElements {
                 this.eccent);
 
         final double ume = 1.0 - this.eccent;
-        final double ce = Math.cos(anex);
-        final double se = Math.sin(anex);
+        final double ce = FastMath.cos(anex);
+        final double se = FastMath.sin(anex);
 
         final double f = (ce - this.eccent) / ume;
         final double g = (ume * se) / xn;
@@ -451,8 +452,8 @@ public class OsculatingElements {
      */
     private void toPericenter() {
         // Kepler equation
-        final double xk = Math.sqrt(this.mu);
-        final double xn = xk / (this.semiaxis * Math.sqrt(this.semiaxis)); // radians
+        final double xk = FastMath.sqrt(this.mu);
+        final double xn = xk / (this.semiaxis * FastMath.sqrt(this.semiaxis)); // radians
         // per
         // unit
         // of
@@ -463,7 +464,7 @@ public class OsculatingElements {
         // position and velocity vectors in the orbit
         this.posperi = new Vector3d(this.semiaxis * rsura, 0.0, 0.0);
 
-        final double y = xn * this.semiaxis * Math.sqrt(
+        final double y = xn * this.semiaxis * FastMath.sqrt(
                 (1.0 + this.eccent) / (1.0 - this.eccent));
         this.velperi = new Vector3d(0.0, y, 0.0);
 

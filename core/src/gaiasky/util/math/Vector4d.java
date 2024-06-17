@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.jafama.FastMath;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -85,7 +86,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
             s = v1 * v1 + v2 * v2;
         } while (s >= 1.0F || s == 0.0F);
 
-        double multiplier = (double) Math.sqrt(-2.0 * Math.log((double) s) / (double) s);
+        double multiplier = (double) FastMath.sqrt(-2.0 * FastMath.log((double) s) / (double) s);
         this.x = v1 * multiplier;
         this.y = v2 * multiplier;
 
@@ -97,7 +98,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
             } while (s >= 1.0F);
         } while (s == 0.0F);
 
-        multiplier = (double) Math.sqrt(-2.0 * Math.log((double) s) / (double) s);
+        multiplier = (double) FastMath.sqrt(-2.0 * FastMath.log((double) s) / (double) s);
         this.z = v1 * multiplier;
         this.w = v2 * multiplier;
         return this.nor();
@@ -160,11 +161,11 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
     }
 
     public static double len(double x, double y, double z, double w) {
-        return (double) Math.sqrt((double) (x * x + y * y + z * z + w * w));
+        return (double) FastMath.sqrt((double) (x * x + y * y + z * z + w * w));
     }
 
     public double len() {
-        return (double) Math.sqrt((double) (this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w));
+        return (double) FastMath.sqrt((double) (this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w));
     }
 
     public static double len2(double x, double y, double z, double w) {
@@ -184,7 +185,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
         double b = y2 - y1;
         double c = z2 - z1;
         double d = w2 - w1;
-        return (double) Math.sqrt((double) (a * a + b * b + c * c + d * d));
+        return (double) FastMath.sqrt((double) (a * a + b * b + c * c + d * d));
     }
 
     public double dst(Vector4d vector) {
@@ -192,7 +193,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
         double b = vector.y - this.y;
         double c = vector.z - this.z;
         double d = vector.w - this.w;
-        return (double) Math.sqrt((double) (a * a + b * b + c * c + d * d));
+        return (double) FastMath.sqrt((double) (a * a + b * b + c * c + d * d));
     }
 
     public double dst(double x, double y, double z, double w) {
@@ -200,7 +201,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
         double b = y - this.y;
         double c = z - this.z;
         double d = w - this.w;
-        return (double) Math.sqrt((double) (a * a + b * b + c * c + d * d));
+        return (double) FastMath.sqrt((double) (a * a + b * b + c * c + d * d));
     }
 
     public static double dst2(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2) {
@@ -229,7 +230,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
 
     public Vector4d nor() {
         double len2 = this.len2();
-        return len2 != 0.0F && len2 != 1.0F ? this.scl(1.0F / (double) Math.sqrt((double) len2)) : this;
+        return len2 != 0.0F && len2 != 1.0F ? this.scl(1.0F / (double) FastMath.sqrt((double) len2)) : this;
     }
 
     public static double dot(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2) {
@@ -249,7 +250,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
     }
 
     public boolean isUnit(double margin) {
-        return Math.abs(this.len2() - 1.0F) < margin;
+        return FastMath.abs(this.len2() - 1.0F) < margin;
     }
 
     public boolean isZero() {
@@ -396,7 +397,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
     public Vector4d limit2(double limit2) {
         double len2 = this.len2();
         if (len2 > limit2) {
-            this.scl((double) Math.sqrt((double) (limit2 / len2)));
+            this.scl((double) FastMath.sqrt((double) (limit2 / len2)));
         }
 
         return this;
@@ -408,7 +409,7 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
 
     public Vector4d setLength2(double len2) {
         double oldLen2 = this.len2();
-        return oldLen2 != 0.0F && oldLen2 != len2 ? this.scl((double) Math.sqrt((double) (len2 / oldLen2))) : this;
+        return oldLen2 != 0.0F && oldLen2 != len2 ? this.scl((double) FastMath.sqrt((double) (len2 / oldLen2))) : this;
     }
 
     public Vector4d clamp(double min, double max) {
@@ -418,10 +419,10 @@ public class Vector4d implements Serializable, VectorDouble<Vector4d> {
         } else {
             double max2 = max * max;
             if (len2 > max2) {
-                return this.scl((double) Math.sqrt((double) (max2 / len2)));
+                return this.scl((double) FastMath.sqrt((double) (max2 / len2)));
             } else {
                 double min2 = min * min;
-                return len2 < min2 ? this.scl((double) Math.sqrt((double) (min2 / len2))) : this;
+                return len2 < min2 ? this.scl((double) FastMath.sqrt((double) (min2 / len2))) : this;
             }
         }
     }

@@ -33,6 +33,7 @@ import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.gdx.contrib.postprocess.effects.AnaglyphEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.CopyFilter;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -125,12 +126,12 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             // If we have focus, we adapt the eye separation
             double distToFocus = currentFocus.getDistToCamera() - currentFocus.getRadius();
             // Let's calculate the separation
-            separation = Math.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
+            separation = FastMath.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
             // Let's cap it.
-            separationCapped = Math.min(separation, 10.0 * Constants.M_TO_U);
+            separationCapped = FastMath.min(separation, 10.0 * Constants.M_TO_U);
             dirAngleDeg = EYE_ANGLE_DEG;
         } else {
-            separationCapped = Math.min(separation, 10.0 * Constants.M_TO_U);
+            separationCapped = FastMath.min(separation, 10.0 * Constants.M_TO_U);
         }
 
         // Aux5d contains the direction to the side of the camera, normalized.

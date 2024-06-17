@@ -42,7 +42,6 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.entity.EntityUtils;
-import gaiasky.scene.record.RotationComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
@@ -55,6 +54,7 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -480,7 +480,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
         speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
-        speedScalingCapped = Math.max(10d * Constants.M_TO_U, speedScaling);
+        speedScalingCapped = FastMath.max(10d * Constants.M_TO_U, speedScaling);
         switch (m) {
             case FOCUS_MODE:
                 if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow()) {
@@ -712,7 +712,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double tu = speedScaling();
         if (amount <= 0) {
             // Avoid getting stuck in surface
-            tu = Math.max(10d * Constants.M_TO_U, tu);
+            tu = FastMath.max(10d * Constants.M_TO_U, tu);
         }
         if (parent.mode == CameraMode.FOCUS_MODE) {
             desired.set(focusDirection);
@@ -979,7 +979,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Half a second after we have stopped zooming, real friction kicks in
         if (fullStop && focus.isValid()) {
             double elevation = focus.getElevationAt(pos);
-            double counterAmount = lastFwdAmount < 0 && cinematic ? Math.min(speedScaling, 200) : 2;
+            double counterAmount = lastFwdAmount < 0 && cinematic ? FastMath.min(speedScaling, 200) : 2;
             if (getMode().isFocus() && lastFwdAmount > 0) {
                 counterAmount *= 1.0 / ((focus.getDistToCamera() - elevation) / elevation);
             }
@@ -1021,7 +1021,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (parent.mode.equals(CameraMode.FOCUS_MODE)) {
                 // Use direction vector as velocity so that if we turn the
                 // velocity also turns
-                double sign = Math.signum(vel.dot(focusDirection));
+                double sign = FastMath.signum(vel.dot(focusDirection));
                 vel.set(focusDirection).nor().scl(sign * velocity);
             }
 
@@ -1051,7 +1051,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             aux5b.set(nextClosestPosition);
 
             double elevation =
-                    closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / Math.max(4.0, 20.0 - Settings.settings.scene.renderer.elevation.multiplier);
+                    closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / FastMath.max(4.0, 20.0 - Settings.settings.scene.renderer.elevation.multiplier);
             double newDist = aux5b.scl(-1).add(pos).lenDouble();
             if (newDist < elevation) {
                 aux5b.nor().scl(elevation - newDist);
@@ -1154,7 +1154,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // Calculate velocity from acceleration
             angle.y += angle.x * dt;
             // Cap velocity
-            angle.y = Math.signum(angle.y) * Math.abs(angle.y);
+            angle.y = FastMath.signum(angle.y) * FastMath.abs(angle.y);
             // Update position
             angle.z = (angle.y * dt) % 360f;
             return true;
@@ -1176,7 +1176,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                    double turnVelocity) {
         desired.set(target).sub(pos).nor();
         double desiredDirectionAngle = desired.angle(direction);
-        if (desiredDirectionAngle > Math.min(0.3, 0.3 * fovFactor)) {
+        if (desiredDirectionAngle > FastMath.min(0.3, 0.3 * fovFactor)) {
             // Add desired to direction with given turn velocity (v*dt)
             desired.scl(turnVelocity * dt * movementMultiplier);
             direction.add(desired).nor();
@@ -1304,7 +1304,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     dist *= 15.0;
                 }
             } else if (proximity.effective[0] != null && !proximity.effective[0].isStar() && (proximity.effective[0].getClosestDistToCamera() + MIN_DIST) < starEdge) {
-                dist = distance * Math.pow((proximity.effective[0].getClosestDistToCamera() + MIN_DIST) / starEdge, vr ? 1.3 : 1.6);
+                dist = distance * FastMath.pow((proximity.effective[0].getClosestDistToCamera() + MIN_DIST) / starEdge, vr ? 1.3 : 1.6);
             } else {
                 dist = distance;
             }
@@ -1733,7 +1733,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // m: apparent magnitude
             // M: absolute magnitude
             // d: distance [pc]
-            return 5d * Math.log10(focus.getDistToCamera() * Constants.U_TO_PC) - 5d + focus.getAbsmag();
+            return 5d * FastMath.log10(focus.getDistToCamera() * Constants.U_TO_PC) - 5d + focus.getAbsmag();
         } else if (focus.getMag() != null) {
             // Models, and other bodies.
 
@@ -1749,7 +1749,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             double distStarAu = (starAncestor != null ?
                     starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() :
                     focus.getAbsolutePosition(aux5b).lenDouble()) * Constants.U_TO_AU;
-            return 5d * Math.log10(distStarAu * distCamAu) + focus.getAbsmag();
+            return 5d * FastMath.log10(distStarAu * distCamAu) + focus.getAbsmag();
         }
         return Double.NaN;
     }
@@ -1776,7 +1776,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             double distStarAu = (starAncestor != null ?
                     starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() :
                     focus.getAbsolutePosition(aux5b).lenDouble()) * Constants.U_TO_AU;
-            return 5d * Math.log10(distStarAu * distEarthAu) + focus.getAbsmag();
+            return 5d * FastMath.log10(distStarAu * distEarthAu) + focus.getAbsmag();
         } else {
             return Double.NaN;
         }

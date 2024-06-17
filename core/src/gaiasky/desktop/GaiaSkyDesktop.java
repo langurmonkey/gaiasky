@@ -34,10 +34,9 @@ import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathManager;
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 import org.yaml.snakeyaml.Yaml;
-import oshi.SystemInfo;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -264,9 +263,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Key mappings.
             KeyBindings.initialize();
 
-            // Math.
-            MathManager.initialize();
-
             consoleLogger.dispose();
 
             gaiaSkyDesktop.init();
@@ -441,7 +437,7 @@ public class GaiaSkyDesktop implements IObserver {
             // 3840x2160 -> 4405.8
             int[] resolution = SysUtils.getDisplayResolution();
             if (resolution != null && resolution.length == 2 && resolution[0] > 0 && resolution[1] > 0) {
-                double screenDiagonalPixels = Math.sqrt(Math.pow(resolution[0], 2) + Math.pow(resolution[1], 2));
+                double screenDiagonalPixels = FastMath.sqrt(Math.pow(resolution[0], 2) + FastMath.pow(resolution[1], 2));
                 if (screenDiagonalPixels < 1600) {
                     // Set full screen.
                     s.graphics.fullScreen.active = true;
@@ -614,8 +610,8 @@ public class GaiaSkyDesktop implements IObserver {
             h = Constants.DEFAULT_RESOLUTION_HEIGHT;
             if (wh != null && wh.length == 2 && wh[0] > 0 && wh[1] > 0) {
                 // Use retrieved resolution.
-                w = (int) Math.max(w, wh[0] * 0.85f);
-                h = (int) Math.max(h, wh[1] * 0.85f);
+                w = (int) FastMath.max(w, wh[0] * 0.85f);
+                h = (int) FastMath.max(h, wh[1] * 0.85f);
             } else {
                 // Default.
                 logger.warn(I18n.msg("error.screensize.default", w, h));

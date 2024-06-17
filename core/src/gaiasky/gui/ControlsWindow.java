@@ -12,7 +12,10 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
@@ -29,6 +32,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.*;
+import net.jafama.FastMath;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -261,9 +265,9 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /* ADD GROUPS TO VERTICAL LAYOUT */
 
-        int padBottom = Math.round(16f);
-        int padSides = Math.round(8f);
-        int padSeparator = Math.round(15f);
+        int padBottom = FastMath.round(16f);
+        int padSides = FastMath.round(8f);
+        int padSeparator = FastMath.round(15f);
 
         guiLayout.padTop(padSides);
 
@@ -299,7 +303,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /* ADD TO MAIN WINDOW */
         add(mainVertical).top().left().expand();
-        setPosition(0, Math.round(Gdx.graphics.getHeight() - getHeight()));
+        setPosition(0, FastMath.round(Gdx.graphics.getHeight() - getHeight()));
 
         setWidth(mainVertical.getWidth());
 
@@ -366,7 +370,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 float windowHeight = getHeight();
                 x = MathUtilsDouble.clamp(x * width, 0, width - windowWidth);
                 y = MathUtilsDouble.clamp(y * height - windowHeight, 0, height - windowHeight);
-                setPosition(Math.round(x), Math.round(y));
+                setPosition(Math.round(x), FastMath.round(y));
             }
             case RECALCULATE_CONTROLS_WINDOW_SIZE -> recalculateSize();
             case EXPAND_COLLAPSE_PANE_CMD ->  {

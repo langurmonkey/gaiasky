@@ -12,14 +12,15 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServer<IAttitude> {
 
     /** Mathematical constants **/
-    protected static final double PI = Math.PI;
-    protected static final double TWO_PI = 2.0 * Math.PI;
-    protected static final double FOUR_PI = 4.0 * Math.PI;
-    protected static final double PI_HALF = 0.5 * Math.PI;
+    protected static final double PI = FastMath.PI;
+    protected static final double TWO_PI = 2.0 * FastMath.PI;
+    protected static final double FOUR_PI = 4.0 * FastMath.PI;
+    protected static final double PI_HALF = 0.5 * FastMath.PI;
 
     /** Factor converting from arcsec/s to deg/day **/
     protected static final double ARCSEC_PER_S_TO_DEG_PER_DAY = 86400.D * (1d / 3600d);
@@ -36,7 +37,7 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
     /**
      * The time in ns of one rotation of the satellite around its spin axis.
      */
-    protected long targetScanPeriod = Math.round(360.0 * 3600.0 * 1.e9 / Satellite.SCANRATE);
+    protected long targetScanPeriod = FastMath.round(360.0 * 3600.0 * 1.e9 / Satellite.SCANRATE);
     /*
      * every thread gets is own local copy of the NslSun
      */
@@ -120,7 +121,7 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
      * @param targetScanRate target value in [arcsec/s]
      */
     public void setTargetScanRate(double targetScanRate) {
-        targetScanPeriod = Math.round(360.0 * 3600.0 * 1e9 / targetScanRate);
+        targetScanPeriod = FastMath.round(360.0 * 3600.0 * 1e9 / targetScanRate);
         initialized = false;
     }
 

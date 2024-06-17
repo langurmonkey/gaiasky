@@ -23,6 +23,7 @@ import gaiasky.util.Bits;
 import gaiasky.util.gdx.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
+import net.jafama.FastMath;
 
 public class IntIntMeshBuilder implements IntMeshPartBuilder {
     private final static Pool<Vector3> vectorPool = new Pool<Vector3>() {
@@ -1051,7 +1052,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         Vector3 begin = tmp(x1, y1, z1), end = tmp(x2, y2, z2);
         float length = begin.dst(end);
         float coneHeight = length * capLength;
-        float coneDiameter = 2 * (float) (coneHeight * Math.sqrt(1f / 3));
+        float coneDiameter = 2 * (float) (coneHeight * FastMath.sqrt(1f / 3));
         float stemLength = length - coneHeight;
         float stemDiameter = coneDiameter * stemThickness;
 
@@ -1123,7 +1124,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void icosphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int startFace, int nfaces) {
-        ensureTriangles(10 * (int) Math.pow(2, 2 * divisions - 1));
+        ensureTriangles(10 * (int) FastMath.pow(2, 2 * divisions - 1));
         IcoSphereCreator isc = new IcoSphereCreator();
         isc.create(radius, divisions, flipNormals, hardEdges);
 
@@ -1147,7 +1148,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void octahedronsphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int startFace, int nfaces) {
-        ensureTriangles((int) Math.pow(2, 2 * divisions + 3));
+        ensureTriangles((int) FastMath.pow(2, 2 * divisions + 3));
         OctahedronSphereCreator osc = new OctahedronSphereCreator();
         osc.create(radius, divisions, flipNormals, hardEdges);
 

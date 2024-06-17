@@ -8,6 +8,8 @@
 package gaiasky.util.gaia.time;
 
 
+import net.jafama.FastMath;
+
 public class NanoSecs extends ConcreteDuration {
 
     private long ns;
@@ -182,7 +184,7 @@ public class NanoSecs extends ConcreteDuration {
      */
     @Override
     public Duration mult(double s) {
-        ns = Math.round((double) ns * s);
+        ns = FastMath.round((double) ns * s);
 
         return this;
     }

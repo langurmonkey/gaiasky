@@ -21,6 +21,7 @@ import gaiasky.GaiaSky;
 import gaiasky.gui.GenericDialog;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+import net.jafama.FastMath;
 
 public class GuiUtils {
 
@@ -269,7 +270,7 @@ public class GuiUtils {
         if (jump) {
             index = up ? 0 : selectBox.getItems().size - 1;
         } else {
-            index = up ? Math.max(index - 1, 0) : (index + 1) % selectBox.getItems().size;
+            index = up ? FastMath.max(index - 1, 0) : (index + 1) % selectBox.getItems().size;
         }
         // Select.
         selectBox.setSelectedIndex(index);
@@ -330,7 +331,7 @@ public class GuiUtils {
             if (parent != null) {
                 var scrollPane = (ScrollPane) parent;
                 var coordinates = actor.localToAscendantCoordinates(scrollPane.getActor(), vec2.get().set(actor.getX(), actor.getY()));
-                scrollPane.scrollTo(coordinates.x, coordinates.y, actor.getWidth(), Math.min(200f, actor.getHeight() * 10f));
+                scrollPane.scrollTo(coordinates.x, coordinates.y, actor.getWidth(), FastMath.min(200f, actor.getHeight() * 10f));
             }
         }
     }

@@ -28,6 +28,7 @@ import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.List;
 
@@ -327,8 +328,8 @@ public class KeyframesView extends BaseView {
                     perspectiveCamera = camera.camera;
                 }
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
-                double pixelSize = Math.max(minPixDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                angle = (float) FastMath.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                double pixelSize = FastMath.max(minPixDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                 perspectiveCamera.project(pos);
                 pos.y = perspectiveCamera.viewportHeight - pos.y;
                 if (Settings.settings.program.modeStereo.active) {

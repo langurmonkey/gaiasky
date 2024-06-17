@@ -20,6 +20,7 @@ import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class DecalUtils {
 
@@ -66,8 +67,8 @@ public class DecalUtils {
 
         if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
             double dist = camera.position.dst(tmp3.set(x, y, z));
-            double minsize = minSizeDegrees > 0 ? Math.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
-            double maxsize = maxSizeDegrees > 0 ? Math.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
+            double minsize = minSizeDegrees > 0 ? FastMath.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
+            double maxsize = maxSizeDegrees > 0 ? FastMath.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
             size = MathUtils.clamp(size, (float) minsize, (float) maxsize);
         }
 
@@ -134,8 +135,8 @@ public class DecalUtils {
 
         if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
             double dist = camera.position.dst(tmp3.set(x, y, z));
-            double minsize = minSizeDegrees > 0 ? Math.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
-            double maxsize = maxSizeDegrees > 0 ? Math.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
+            double minsize = minSizeDegrees > 0 ? FastMath.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
+            double maxsize = maxSizeDegrees > 0 ? FastMath.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
             size = MathUtils.clamp(size, (float) minsize, (float) maxsize);
         }
 
@@ -210,7 +211,7 @@ public class DecalUtils {
 
         Vector3 right = up.crs(direction);
 
-        quaternion.w = (float) Math.sqrt(1.0f + right.x + up.y + direction.z) * 0.5f;
+        quaternion.w = (float) FastMath.sqrt(1.0f + right.x + up.y + direction.z) * 0.5f;
 
         double w4Recip = 1.0 / (4.0 * quaternion.w);
         quaternion.x = (float) ((up.z - direction.y) * w4Recip);

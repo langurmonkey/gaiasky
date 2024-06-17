@@ -201,8 +201,8 @@ public class ShadowMapRenderPass extends RenderPass {
             // Near and far use the box width and the greatest radius.
             //var near = distCamCenter - boxDimension;
             //var far = distCamCenter + boxDimension;
-            cameraLightGlobal.near = (float) Math.max(100.0 * Constants.M_TO_U, minDist);
-            cameraLightGlobal.far = (float) Math.min(Constants.AU_TO_U, maxDist);
+            cameraLightGlobal.near = (float) FastMath.max(100.0 * Constants.M_TO_U, minDist);
+            cameraLightGlobal.far = (float) FastMath.min(Constants.AU_TO_U, maxDist);
 
             // Update cam
             cameraLightGlobal.update(false);
@@ -239,7 +239,7 @@ public class ShadowMapRenderPass extends RenderPass {
                                            int shadowNRender,
                                            ICamera camera) {
         var renderAssets = sceneRenderer.getRenderAssets();
-        int nShadows = Math.min(candidates.size(), Settings.settings.scene.renderer.shadow.number);
+        int nShadows = FastMath.min(candidates.size(), Settings.settings.scene.renderer.shadow.number);
         for (int i = 0; i < nShadows; i++) {
             var candidate = candidates.get(i);
             var model = Mapper.model.get(candidate);

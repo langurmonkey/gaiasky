@@ -8,9 +8,8 @@
 package gaiasky.util.coord.moon;
 
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.ITrigonometry;
-import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 /**
  * Computation of Moon coordinates as written in "Astronomical Algorithms 2d Edition" by Jean Meeus (1998, ISBN 9780943396354).
@@ -91,7 +90,7 @@ public class MoonMeeusCoordinates {
         double beta = declination(prettyAngle((sumB * 0.000001)));
         double dist = 385000.56 + sumR * 0.001;
 
-        return out.set(Math.toRadians(lambda), Math.toRadians(beta), dist);
+        return out.set(Math.toRadians(lambda), FastMath.toRadians(beta), dist);
     }
 
     /**
@@ -110,8 +109,6 @@ public class MoonMeeusCoordinates {
      * @return Suml and Sumr
      */
     private static double[] calculateSumlSumr(double D, double M, double Mp, double F, double E, double A1, double A2, double Lp) {
-        ITrigonometry trigo = MathManager.instance.trigonometryInterface;
-
         double suml = 0.0, sumr = 0.0;
         for (double[] curr : table47a) {
             // Take into effect terms that contain M and thus depend on the
@@ -123,14 +120,14 @@ public class MoonMeeusCoordinates {
             } else if (curr[1] == 2.0 || curr[1] == -2.0) {
                 mul = E * E;
             }
-            double argument = Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F);
-            suml += curr[4] * mul * trigo.sin(argument);
-            sumr += curr[5] * mul * trigo.cos(argument);
+            double argument = FastMath.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F);
+            suml += curr[4] * mul * FastMath.sin(argument);
+            sumr += curr[5] * mul * FastMath.cos(argument);
         }
         // Addition to Suml. The terms involving A1 are due to the action of
         // Venus. The term involving A2 is due to Jupiter
         // while those involving L' are due to the flattening of the Earth.
-        double sumladd = 3958.0 * trigo.sin(Math.toRadians(A1)) + 1962.0 * trigo.sin(Math.toRadians(Lp - F)) + 318.0 * trigo.sin(Math.toRadians(A2));
+        double sumladd = 3958.0 * FastMath.sin(Math.toRadians(A1)) + 1962.0 * FastMath.sin(Math.toRadians(Lp - F)) + 318.0 * FastMath.sin(Math.toRadians(A2));
         suml += sumladd;
 
         return new double[]{suml, sumr};
@@ -138,8 +135,6 @@ public class MoonMeeusCoordinates {
     }
 
     private static double calculateSumb(double D, double M, double Mp, double F, double E, double A1, double A3, double Lp) {
-        ITrigonometry trigo = MathManager.instance.trigonometryInterface;
-
         double sumB = 0.0;
         for (double[] curr : table47b) {
             // Take into effect terms that contain M and thus depend on the
@@ -151,12 +146,12 @@ public class MoonMeeusCoordinates {
             } else if (curr[1] == 2.0 || curr[1] == -2.0) {
                 mul = E * E;
             }
-            sumB += curr[4] * mul * trigo.sin(Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F));
+            sumB += curr[4] * mul * FastMath.sin(Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F));
         }
         // Addition to SumB. The terms involving A1 are due to the action of
         // Venus. The term involving A2 is due to Jupiter
         // while those involving L are due to the flattening of the Earth.
-        double sumBAdd = -2235.0 * trigo.sin(Math.toRadians(Lp)) + 382.0 * trigo.sin(Math.toRadians(A3)) + 175.0 * trigo.sin(Math.toRadians(A1 - F)) + 175.0 * trigo.sin(Math.toRadians(A1 + F)) + 127.0 * trigo.sin(Math.toRadians(Lp - Mp)) - 115.0 * trigo.sin(Math.toRadians(Lp + Mp));
+        double sumBAdd = -2235.0 * FastMath.sin(Math.toRadians(Lp)) + 382.0 * FastMath.sin(Math.toRadians(A3)) + 175.0 * FastMath.sin(Math.toRadians(A1 - F)) + 175.0 * FastMath.sin(Math.toRadians(A1 + F)) + 127.0 * FastMath.sin(Math.toRadians(Lp - Mp)) - 115.0 * FastMath.sin(Math.toRadians(Lp + Mp));
         sumB += sumBAdd;
 
         return sumB;
@@ -167,6 +162,6 @@ public class MoonMeeusCoordinates {
     }
 
     private static double declination(double angle) {
-        return Math.abs(angle) <= 90 ? angle : angle - 360d;
+        return FastMath.abs(angle) <= 90 ? angle : angle - 360d;
     }
 }

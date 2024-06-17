@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import net.jafama.FastMath;
 
 /**
  * A 3x3 grid of texture regions. Any of the regions may be omitted. Padding may be set as a hint on how to inset content on top
@@ -250,43 +251,43 @@ public class NinePatch {
         }
         if (patches[BOTTOM_CENTER] != null) {
             bottomCenter = add(patches[BOTTOM_CENTER], color, true, false);
-            middleWidth = Math.max(middleWidth, patches[BOTTOM_CENTER].getRegionWidth());
-            bottomHeight = Math.max(bottomHeight, patches[BOTTOM_CENTER].getRegionHeight());
+            middleWidth = FastMath.max(middleWidth, patches[BOTTOM_CENTER].getRegionWidth());
+            bottomHeight = FastMath.max(bottomHeight, patches[BOTTOM_CENTER].getRegionHeight());
         }
         if (patches[BOTTOM_RIGHT] != null) {
             bottomRight = add(patches[BOTTOM_RIGHT], color, false, false);
-            rightWidth = Math.max(rightWidth, patches[BOTTOM_RIGHT].getRegionWidth());
-            bottomHeight = Math.max(bottomHeight, patches[BOTTOM_RIGHT].getRegionHeight());
+            rightWidth = FastMath.max(rightWidth, patches[BOTTOM_RIGHT].getRegionWidth());
+            bottomHeight = FastMath.max(bottomHeight, patches[BOTTOM_RIGHT].getRegionHeight());
         }
         if (patches[MIDDLE_LEFT] != null) {
             middleLeft = add(patches[MIDDLE_LEFT], color, false, true);
-            leftWidth = Math.max(leftWidth, patches[MIDDLE_LEFT].getRegionWidth());
-            middleHeight = Math.max(middleHeight, patches[MIDDLE_LEFT].getRegionHeight());
+            leftWidth = FastMath.max(leftWidth, patches[MIDDLE_LEFT].getRegionWidth());
+            middleHeight = FastMath.max(middleHeight, patches[MIDDLE_LEFT].getRegionHeight());
         }
         if (patches[MIDDLE_CENTER] != null) {
             middleCenter = add(patches[MIDDLE_CENTER], color, true, true);
-            middleWidth = Math.max(middleWidth, patches[MIDDLE_CENTER].getRegionWidth());
-            middleHeight = Math.max(middleHeight, patches[MIDDLE_CENTER].getRegionHeight());
+            middleWidth = FastMath.max(middleWidth, patches[MIDDLE_CENTER].getRegionWidth());
+            middleHeight = FastMath.max(middleHeight, patches[MIDDLE_CENTER].getRegionHeight());
         }
         if (patches[MIDDLE_RIGHT] != null) {
             middleRight = add(patches[MIDDLE_RIGHT], color, false, true);
-            rightWidth = Math.max(rightWidth, patches[MIDDLE_RIGHT].getRegionWidth());
-            middleHeight = Math.max(middleHeight, patches[MIDDLE_RIGHT].getRegionHeight());
+            rightWidth = FastMath.max(rightWidth, patches[MIDDLE_RIGHT].getRegionWidth());
+            middleHeight = FastMath.max(middleHeight, patches[MIDDLE_RIGHT].getRegionHeight());
         }
         if (patches[TOP_LEFT] != null) {
             topLeft = add(patches[TOP_LEFT], color, false, false);
-            leftWidth = Math.max(leftWidth, patches[TOP_LEFT].getRegionWidth());
-            topHeight = Math.max(topHeight, patches[TOP_LEFT].getRegionHeight());
+            leftWidth = FastMath.max(leftWidth, patches[TOP_LEFT].getRegionWidth());
+            topHeight = FastMath.max(topHeight, patches[TOP_LEFT].getRegionHeight());
         }
         if (patches[TOP_CENTER] != null) {
             topCenter = add(patches[TOP_CENTER], color, true, false);
-            middleWidth = Math.max(middleWidth, patches[TOP_CENTER].getRegionWidth());
-            topHeight = Math.max(topHeight, patches[TOP_CENTER].getRegionHeight());
+            middleWidth = FastMath.max(middleWidth, patches[TOP_CENTER].getRegionWidth());
+            topHeight = FastMath.max(topHeight, patches[TOP_CENTER].getRegionHeight());
         }
         if (patches[TOP_RIGHT] != null) {
             topRight = add(patches[TOP_RIGHT], color, false, false);
-            rightWidth = Math.max(rightWidth, patches[TOP_RIGHT].getRegionWidth());
-            topHeight = Math.max(topHeight, patches[TOP_RIGHT].getRegionHeight());
+            rightWidth = FastMath.max(rightWidth, patches[TOP_RIGHT].getRegionWidth());
+            topHeight = FastMath.max(topHeight, patches[TOP_RIGHT].getRegionHeight());
         }
         if (idx < vertices.length) {
             float[] newVertices = new float[idx];

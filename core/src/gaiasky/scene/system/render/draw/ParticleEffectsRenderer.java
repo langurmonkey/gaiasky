@@ -29,6 +29,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.util.List;
@@ -124,7 +125,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
              */
             double distToSol = cam.getFocus().getAbsolutePosition(aux1b).lenDouble() * Constants.U_TO_KM;
             double focusDistKm = cam.getFocus().getDistToCamera() * Constants.U_TO_KM;
-            double cutDistKm = 11714150000000000d + (1900.228d - 11714150000000000d) / (1d + Math.pow(distToSol / 93302269999999990000d, 1.541734d));
+            double cutDistKm = 11714150000000000d + (1900.228d - 11714150000000000d) / (1d + FastMath.pow(distToSol / 93302269999999990000d, 1.541734d));
             if (focusDistKm < cutDistKm) {
                 return;
             }

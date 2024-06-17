@@ -8,6 +8,7 @@
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import net.jafama.FastMath;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -196,7 +197,7 @@ public final class BlurFilter extends MultipassFilter {
 
     private void computeKernel(int blurRadius, float blurAmount, float[] outKernel) {
         float twoSigmaSquare = 2.0f * blurAmount * blurAmount;
-        float sigmaRoot = (float) Math.sqrt(twoSigmaSquare * Math.PI);
+        float sigmaRoot = (float) FastMath.sqrt(twoSigmaSquare * FastMath.PI);
         float total = 0.0f;
         float distance;
         int index;
@@ -204,7 +205,7 @@ public final class BlurFilter extends MultipassFilter {
         for (int i = -blurRadius; i <= blurRadius; ++i) {
             distance = i * i;
             index = i + blurRadius;
-            outKernel[index] = (float) Math.exp(-distance / twoSigmaSquare) / sigmaRoot;
+            outKernel[index] = (float) FastMath.exp(-distance / twoSigmaSquare) / sigmaRoot;
             total += outKernel[index];
         }
 

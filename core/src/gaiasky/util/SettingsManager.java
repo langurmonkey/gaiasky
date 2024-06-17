@@ -23,6 +23,7 @@ import gaiasky.util.Settings.SceneSettings.RendererSettings.LineSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.VirtualTextureSettings;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 
 import java.io.*;
 import java.net.Authenticator;
@@ -256,8 +257,8 @@ public class SettingsManager {
 
         // Limit draw distance in 32-bit JVM.
         if (arch.equals("32")) {
-            float delta = Math.abs(settings.scene.octree.threshold[1] - settings.scene.octree.threshold[0]);
-            settings.scene.octree.threshold[0] = (float) Math.toRadians(80);
+            float delta = FastMath.abs(settings.scene.octree.threshold[1] - settings.scene.octree.threshold[0]);
+            settings.scene.octree.threshold[0] = (float) FastMath.toRadians(80);
             settings.scene.octree.threshold[1] = settings.scene.octree.threshold[1] + delta;
         }
         // Limit number of stars in 32-bit JVM.

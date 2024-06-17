@@ -29,6 +29,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.LengthValidator;
+import net.jafama.FastMath;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -651,14 +652,14 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                             // Start capturing
                             capturingAxis = true;
                             lastAxisT = now;
-                            axes[axisCode] += Math.abs(value);
+                            axes[axisCode] += FastMath.abs(value);
                         } else {
                             if (now - lastAxisT < minAxisT) {
                                 // Just note the new values
-                                axes[axisCode] += Math.abs(value);
+                                axes[axisCode] += FastMath.abs(value);
                             } else {
                                 // Finish
-                                axes[axisCode] += Math.abs(value);
+                                axes[axisCode] += FastMath.abs(value);
 
                                 // Look for largest
                                 double max = 0;

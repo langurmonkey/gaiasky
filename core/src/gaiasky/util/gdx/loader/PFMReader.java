@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.Logger;
 import gaiasky.util.gdx.loader.PortableFloatMap.Mode;
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -378,7 +379,7 @@ public class PFMReader {
             double w = k1 * k1 - 4d * k0 * k2;
             if (w < 0d)
                 return new double[] { -1d, -1d };
-            w = Math.sqrt(w);
+            w = FastMath.sqrt(w);
 
             // will fail for k0=0, which is only on the ba edge
             double v = 2d * k0 / (-k1 - w);

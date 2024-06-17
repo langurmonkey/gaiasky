@@ -9,6 +9,7 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
+import net.jafama.FastMath;
 
 public final class ReprojectionFilter extends Filter<ReprojectionFilter> {
     private final Vector2 viewport;
@@ -36,7 +37,7 @@ public final class ReprojectionFilter extends Filter<ReprojectionFilter> {
      * @param fovDegrees The field of view in degrees.
      */
     public void setFov(float fovDegrees) {
-        this.fov = (float) Math.toRadians(fovDegrees);
+        this.fov = (float) FastMath.toRadians(fovDegrees);
         setParam(Param.Fov, this.fov);
     }
 

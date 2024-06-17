@@ -18,6 +18,7 @@ import gaiasky.util.math.BoundingBoxDouble;
 import gaiasky.util.math.FrustumDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class CascadeShadowMap implements Disposable {
 
@@ -173,7 +174,7 @@ public class CascadeShadowMap implements Disposable {
         }
         double halfFrustumDepth = box.getDepth() / 2;
 
-        double lightDepth = Math.max(box.getDepth(), box.getDepth() * lightDepthFactor);
+        double lightDepth = FastMath.max(box.getDepth(), box.getDepth() * lightDepthFactor);
 
         box.getCenter(center);
         center.mul(lightMatrix.tra());

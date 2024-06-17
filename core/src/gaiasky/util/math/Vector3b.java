@@ -274,7 +274,7 @@ public class Vector3b {
         double v = MathUtilsDouble.random();
 
         double theta = MathUtilsDouble.PI2 * u; // azimuthal angle
-        double phi = Math.acos(2f * v - 1f); // polar angle
+        double phi = FastMath.acos(2f * v - 1f); // polar angle
 
         return this.setFromSpherical(theta, phi);
     }
@@ -785,7 +785,7 @@ public class Vector3b {
     }
 
     public boolean isUnit(final double margin) {
-        return Math.abs(len2d() - 1f) < margin;
+        return FastMath.abs(len2d() - 1f) < margin;
     }
 
     public boolean isZero() {
@@ -902,12 +902,12 @@ public class Vector3b {
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3b v) {
-        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dotd(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3d v) {
-        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.lenDouble() * v.len()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lenDouble() * v.len()), -1d, 1d));
     }
 
     @Override

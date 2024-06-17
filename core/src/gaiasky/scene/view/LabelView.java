@@ -182,8 +182,8 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         }
     }
 
-    private final double rad02 = Math.toRadians(2);
-    private final double rad40 = Math.toRadians(40);
+    private final double rad02 = FastMath.toRadians(2);
+    private final double rad40 = FastMath.toRadians(40);
 
     /**
      * Text position for single objects (models, single stars, etc.).

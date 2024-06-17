@@ -6,6 +6,8 @@
  */
 package gaiasky.util.parse;
 
+import net.jafama.FastMath;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -247,7 +249,7 @@ public final class Parser {
         while (true) // breaks inside on pos >= len or non-digit character
         {
             if (pos >= len)
-                return sign * result * Math.pow(10.0, expSign * expResult);
+                return sign * result * FastMath.pow(10.0, expSign * expResult);
             c = input.charAt(pos++);
             if (c < '0' || c > '9')
                 break;
@@ -255,7 +257,7 @@ public final class Parser {
         }
 
         if (c != '.' && c != ',')
-            return sign * result * Math.pow(10.0, expSign * expResult);
+            return sign * result * FastMath.pow(10.0, expSign * expResult);
 
         double expExp = 0.1;
         while (pos < len) {
@@ -270,7 +272,7 @@ public final class Parser {
             expExp *= 0.1;
         }
 
-        return sign * result * Math.pow(10.0, expSign * expResult);
+        return sign * result * FastMath.pow(10.0, expSign * expResult);
     }
 
     /**
@@ -396,7 +398,7 @@ public final class Parser {
         while (true) // breaks inside on pos >= len or non-digit character
         {
             if (pos >= len)
-                return sign * result * Math.pow(10.0, expSign * expResult);
+                return sign * result * FastMath.pow(10.0, expSign * expResult);
             c = input.charAt(pos++);
             if (c < '0' || c > '9')
                 break;
@@ -404,7 +406,7 @@ public final class Parser {
         }
 
         if (c != '.' && c != ',')
-            return sign * result * Math.pow(10.0, expSign * expResult);
+            return sign * result * FastMath.pow(10.0, expSign * expResult);
 
         double expExp = 0.1;
         while (pos < len) {
@@ -419,7 +421,7 @@ public final class Parser {
             expExp *= 0.1;
         }
 
-        return sign * result * Math.pow(10.0, expSign * expResult);
+        return sign * result * FastMath.pow(10.0, expSign * expResult);
     }
 
     /**

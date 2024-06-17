@@ -11,6 +11,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.math.QuaternionDouble;
+import net.jafama.FastMath;
 
 public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
@@ -83,8 +84,8 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
         // constants:
         double xi = getXiRef();
-        double sinXi = Math.sin(xi);
-        double cosXi = Math.cos(xi);
+        double sinXi = FastMath.sin(xi);
+        double cosXi = FastMath.cos(xi);
         double Snom = NslUtil.calcSNom(xi, getTargetPrecessionRate());
         double rampDays = ramp.asDays();
 
@@ -104,7 +105,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
         // calculate acceleration to reach nominal nuDot at tEnd:
         acc = 0.0;
-        double sign = Math.cos(getNuRef());
+        double sign = FastMath.cos(getNuRef());
 
         // The loop here does not use the variable i; we just know from experience that this loop
         // converges after about 6 iterations, and possibly less. But it's fast, so we do 10 iterations
@@ -112,7 +113,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
         for (int i = 0; i < 10; i++) {
             // delta = nu (preceding) or nu - PI (following mode) at tEnd
             double delta = 0.5 * acc * rampDays * rampDays;
-            double sinNu = sign * Math.sin(delta);
+            double sinNu = sign * FastMath.sin(delta);
             acc = (Math.sqrt(Snom * Snom - 1.0 + sinNu * sinNu) + cosXi * sinNu) * lSunDotEnd / (sinXi * rampDays);
         }
 

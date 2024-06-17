@@ -29,6 +29,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
+import net.jafama.FastMath;
 import uk.ac.starlink.table.ColumnInfo;
 
 import java.nio.file.Path;
@@ -179,7 +180,7 @@ public class ParticleSet implements Component, IDisposable {
      * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
-    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0))};
+    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.07)), FastMath.tan(Math.toRadians(6.0))};
 
     /**
      * The texture attribute is an attribute in the original table that points to the texture to use. Ideally, it should
@@ -518,8 +519,8 @@ public class ParticleSet implements Component, IDisposable {
         if (sizeLimits[0] > sizeLimits[1])
             sizeLimits[0] = sizeLimits[1];
 
-        sizeLimits[0] = Math.toRadians(sizeLimits[0]);
-        sizeLimits[1] = Math.toRadians(sizeLimits[1]);
+        sizeLimits[0] = FastMath.toRadians(sizeLimits[0]);
+        sizeLimits[1] = FastMath.toRadians(sizeLimits[1]);
         this.particleSizeLimits = sizeLimits;
     }
 
@@ -560,7 +561,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setNumLabels(Long numLabels) {
-        this.numLabels = Math.toIntExact(numLabels);
+        this.numLabels = FastMath.toIntExact(numLabels);
     }
 
     public IParticleRecord get(int index) {

@@ -18,7 +18,10 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
@@ -26,6 +29,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import net.jafama.FastMath;
 
 public class CameraManager implements ICamera, IObserver {
     private final ICamera[] cameras;
@@ -96,7 +100,7 @@ public class CameraManager implements ICamera, IObserver {
 
         float fovWHalf = camFov * 0.5f;
 
-        float tan_fov = (float) Math.tan(Math.toRadians(fovWHalf));
+        float tan_fov = (float) FastMath.tan(Math.toRadians(fovWHalf));
 
         Vector3 right = Vector3.X;
         Vector3 up = Vector3.Y;
@@ -671,8 +675,6 @@ public class CameraManager implements ICamera, IObserver {
          * SPACECRAFT_MODE
          **/
         SPACECRAFT_MODE;
-
-        static TwoWayMap<String, CameraMode> equivalences;
 
         public static CameraMode getMode(int idx) {
             if (idx >= 0 && idx < CameraMode.values().length) {

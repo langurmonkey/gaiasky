@@ -10,6 +10,7 @@ package gaiasky.util.math;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
+import net.jafama.FastMath;
 
 public class IntersectorDouble {
 
@@ -58,8 +59,8 @@ public class IntersectorDouble {
             maxz = t;
         }
 
-        double min = Math.max(Math.max(minx, miny), minz);
-        double max = Math.min(Math.min(maxx, maxy), maxz);
+        double min = FastMath.max(Math.max(minx, miny), minz);
+        double max = FastMath.min(Math.min(maxx, maxy), maxz);
 
         return max >= 0 && max >= min;
     }
@@ -131,7 +132,7 @@ public class IntersectorDouble {
             return result;
         }
 
-        double t1 = (-B - Math.sqrt(D)) / (2.0 * A);
+        double t1 = (-B - FastMath.sqrt(D)) / (2.0 * A);
 
         Vector3d solution1 = auxd1.set(linePoint0.x * (1 - t1) + t1 * linePoint1.x, linePoint0.y * (1 - t1) + t1 * linePoint1.y,
                                        linePoint0.z * (1 - t1) + t1 * linePoint1.z);
@@ -140,13 +141,13 @@ public class IntersectorDouble {
             return result;
         }
 
-        double t2 = (-B + Math.sqrt(D)) / (2.0 * A);
+        double t2 = (-B + FastMath.sqrt(D)) / (2.0 * A);
         Vector3d solution2 = auxd2.set(linePoint0.x * (1 - t2) + t2 * linePoint1.x, linePoint0.y * (1 - t2) + t2 * linePoint1.y,
                                        linePoint0.z * (1 - t2) + t2 * linePoint1.z);
 
         // prefer a solution that's on the line segment itself
 
-        if (Math.abs(t1 - 0.5) < Math.abs(t2 - 0.5)) {
+        if (Math.abs(t1 - 0.5) < FastMath.abs(t2 - 0.5)) {
             result.add(solution1);
             result.add(solution2);
             return result;
@@ -306,7 +307,7 @@ public class IntersectorDouble {
                                             double b,
                                             double c,
                                             double d) {
-        double denom = Math.sqrt(a * a + b * b + c * c);
+        double denom = FastMath.sqrt(a * a + b * b + c * c);
         return (a * pointX + b * pointY + c * pointZ + d) / denom;
     }
 

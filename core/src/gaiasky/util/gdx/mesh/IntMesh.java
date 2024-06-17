@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import net.jafama.FastMath;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -1224,7 +1225,7 @@ public class IntMesh implements Disposable {
                                  int offset,
                                  int count,
                                  final Matrix4 transform) {
-        return (float) Math.sqrt(calculateRadiusSquared(centerX, centerY, centerZ, offset, count, transform));
+        return (float) FastMath.sqrt(calculateRadiusSquared(centerX, centerY, centerZ, offset, count, transform));
     }
 
     /**

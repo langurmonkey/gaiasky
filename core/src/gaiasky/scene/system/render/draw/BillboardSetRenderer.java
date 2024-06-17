@@ -41,12 +41,12 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
-import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
+import net.jafama.FastMath;
 
 import java.util.HashMap;
 import java.util.List;
@@ -475,7 +475,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     private static class DustColorGenerator implements ColorGenerator {
         @Override
         public float[] generateColor() {
-            float r = (float) Math.abs(StdRandom.uniform() * 0.2 + 0.07);
+            float r = (float) FastMath.abs(StdRandom.uniform() * 0.2 + 0.07);
             return new float[]{r, r, r};
         }
 

@@ -10,15 +10,16 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.i18n.I18n;
+import net.jafama.FastMath;
 
 public class AttributeDistance extends AttributeAbstract implements IAttribute {
     @Override
     public Object get(IParticleRecord bean) {
-        return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
+        return FastMath.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
     }
     @Override
     public double getNumber(IParticleRecord bean) {
-        return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
+        return FastMath.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
     }
 
     public String getUnit() {

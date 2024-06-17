@@ -10,6 +10,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnObjLoader;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.vr.openxr.input.XrControllerDevice;
+import net.jafama.FastMath;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWNativeGLX;
 import org.lwjgl.glfw.GLFWNativeWGL;
@@ -107,10 +108,10 @@ public final class XrHelper {
      * <b>set</b> method of a <b>Matrix4f</b> instance to copy the buffer values to that matrix.
      */
     public static FloatBuffer createProjectionMatrixBuffer(MemoryStack stack, XrFovf fov, float nearZ, float farZ, boolean zZeroToOne) {
-        float tanLeft = (float) Math.tan(fov.angleLeft());
-        float tanRight = (float) Math.tan(fov.angleRight());
-        float tanDown = (float) Math.tan(fov.angleDown());
-        float tanUp = (float) Math.tan(fov.angleUp());
+        float tanLeft = (float) FastMath.tan(fov.angleLeft());
+        float tanRight = (float) FastMath.tan(fov.angleRight());
+        float tanDown = (float) FastMath.tan(fov.angleDown());
+        float tanUp = (float) FastMath.tan(fov.angleUp());
         float tanAngleWidth = tanRight - tanLeft;
         float tanAngleHeight;
         if (zZeroToOne) {

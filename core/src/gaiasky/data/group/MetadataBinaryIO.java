@@ -14,6 +14,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
+import net.jafama.FastMath;
 
 import java.io.*;
 import java.nio.BufferUnderflowException;
@@ -92,7 +93,7 @@ public class MetadataBinaryIO {
                     int ownObjects = data_in.readInt();
                     int childrenCount = data_in.readInt();
 
-                    maxDepth = Math.max(maxDepth, depth);
+                    maxDepth = FastMath.max(maxDepth, depth);
 
                     OctreeNode node = new OctreeNode(pageId, x, y, z, hsx, hsy, hsz, childrenCount, nObjects, ownObjects, depth);
                     nodesMap.put(pageId, new Pair<>(node, childrenIds));
@@ -180,7 +181,7 @@ public class MetadataBinaryIO {
                     int ownObjects = mem.getInt();
                     int childrenCount = mem.getInt();
 
-                    maxDepth = Math.max(maxDepth, depth);
+                    maxDepth = FastMath.max(maxDepth, depth);
 
                     float hsy = hsx;
                     float hsz = hsx;

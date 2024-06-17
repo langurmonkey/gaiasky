@@ -38,6 +38,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class ParticleInitializer extends AbstractInitSystem implements IObserver {
 
@@ -124,7 +125,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
                 view.body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
                 var distPc = view.getPos().lenDouble() * Constants.U_TO_PC;
 
-                Vector3d pmv = AstroUtils.properMotionsToCartesian(pm.pmSph.x, pm.pmSph.y, pm.pmSph.z, Math.toRadians(view.getAlpha()), Math.toRadians(view.getDelta()), distPc, new Vector3d());
+                Vector3d pmv = AstroUtils.properMotionsToCartesian(pm.pmSph.x, pm.pmSph.y, pm.pmSph.z, FastMath.toRadians(view.getAlpha()), FastMath.toRadians(view.getDelta()), distPc, new Vector3d());
                 pmv.put(pm.pm);
             }
             pm.hasPm = pm.pm.len2() != 0;
@@ -236,7 +237,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         if (body.size <= 0) {
             // Calculate size - This contains arbitrary boundary values to make
             // things nice on the render side
-            double flux = Math.pow(10, -mag.absMag / 2.5f);
+            double flux = FastMath.pow(10, -mag.absMag / 2.5f);
             if (isStar) {
                 body.size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.22f), 1e9f) / discFactor);
             } else {

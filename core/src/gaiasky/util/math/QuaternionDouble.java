@@ -85,7 +85,7 @@ public class QuaternionDouble implements Serializable {
                              final double y,
                              final double z,
                              final double w) {
-        return Math.sqrt(x * x + y * y + z * z + w * w);
+        return FastMath.sqrt(x * x + y * y + z * z + w * w);
     }
 
     public static double len2(final double x,
@@ -198,7 +198,7 @@ public class QuaternionDouble implements Serializable {
      * @return the Euclidean length of this quaternion
      */
     public double len() {
-        return Math.sqrt(x * x + y * y + z * z + w * w);
+        return FastMath.sqrt(x * x + y * y + z * z + w * w);
     }
 
     @Override
@@ -234,14 +234,14 @@ public class QuaternionDouble implements Serializable {
                                               double pitch,
                                               double roll) {
         final double hr = roll * 0.5f;
-        final double shr = Math.sin(hr);
-        final double chr = Math.cos(hr);
+        final double shr = FastMath.sin(hr);
+        final double chr = FastMath.cos(hr);
         final double hp = pitch * 0.5f;
-        final double shp = Math.sin(hp);
-        final double chp = Math.cos(hp);
+        final double shp = FastMath.sin(hp);
+        final double chp = FastMath.cos(hp);
         final double hy = yaw * 0.5f;
-        final double shy = Math.sin(hy);
-        final double chy = Math.cos(hy);
+        final double shy = FastMath.sin(hy);
+        final double chy = FastMath.cos(hy);
         final double chy_shp = chy * shp;
         final double shy_chp = shy * chp;
         final double chy_chp = chy * chp;
@@ -293,7 +293,7 @@ public class QuaternionDouble implements Serializable {
      */
     public double getPitchRad() {
         final int pole = getGimbalPole();
-        return pole == 0 ? Math.asin(2f * (w * x - z * y)) : pole * MathUtilsDouble.PI * 0.5f;
+        return pole == 0 ? FastMath.asin(2f * (w * x - z * y)) : pole * MathUtilsDouble.PI * 0.5f;
     }
 
     /**
@@ -341,7 +341,7 @@ public class QuaternionDouble implements Serializable {
     public QuaternionDouble nor() {
         double len = len2();
         if (len != 0.f && (Math.abs(len - 1.0f) > NORMALIZATION_TOLERANCE)) {
-            len = Math.sqrt(len);
+            len = FastMath.sqrt(len);
             w /= len;
             x /= len;
             y /= len;
@@ -657,8 +657,8 @@ public class QuaternionDouble implements Serializable {
             return idt();
         d = 1f / d;
         double l_ang = radians;
-        double l_sin = Math.sin(l_ang / 2);
-        double l_cos = Math.cos(l_ang / 2);
+        double l_sin = FastMath.sin(l_ang / 2);
+        double l_cos = FastMath.cos(l_ang / 2);
         return this.set(d * x * l_sin, d * y * l_sin, d * z * l_sin, l_cos).nor();
     }
 
@@ -870,28 +870,28 @@ public class QuaternionDouble implements Serializable {
 
         // we protect the division by s by ensuring that s>=1
         if (t >= 0) { // |w| >= .5
-            double s = Math.sqrt(t + 1); // |s|>=1 ...
+            double s = FastMath.sqrt(t + 1); // |s|>=1 ...
             w = 0.5f * s;
             s = 0.5f / s; // so this division isn't bad
             x = (zy - yz) * s;
             y = (xz - zx) * s;
             z = (yx - xy) * s;
         } else if ((xx > yy) && (xx > zz)) {
-            double s = Math.sqrt(1.0 + xx - yy - zz); // |s|>=1
+            double s = FastMath.sqrt(1.0 + xx - yy - zz); // |s|>=1
             x = s * 0.5f; // |x| >= .5
             s = 0.5f / s;
             y = (yx + xy) * s;
             z = (xz + zx) * s;
             w = (zy - yz) * s;
         } else if (yy > zz) {
-            double s = Math.sqrt(1.0 + yy - xx - zz); // |s|>=1
+            double s = FastMath.sqrt(1.0 + yy - xx - zz); // |s|>=1
             y = s * 0.5f; // |y| >= .5
             s = 0.5f / s;
             x = (yx + xy) * s;
             z = (zy + yz) * s;
             w = (xz - zx) * s;
         } else {
-            double s = Math.sqrt(1.0 + zz - xx - yy); // |s|>=1
+            double s = FastMath.sqrt(1.0 + zz - xx - yy); // |s|>=1
             z = s * 0.5f; // |z| >= .5
             s = 0.5f / s;
             x = (xz + zx) * s;
@@ -913,7 +913,7 @@ public class QuaternionDouble implements Serializable {
     public QuaternionDouble setFromCross(final Vector3d v1,
                                          final Vector3d v2) {
         final double dot = MathUtilsDouble.clamp(v1.dot(v2), -1f, 1f);
-        final double angle = Math.acos(dot);
+        final double angle = FastMath.acos(dot);
         return setFromAxisRad(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x, angle);
     }
 
@@ -936,7 +936,7 @@ public class QuaternionDouble implements Serializable {
                                          final double y2,
                                          final double z2) {
         final double dot = MathUtilsDouble.clamp(Vector3d.dot(x1, y1, z1, x2, y2, z2), -1f, 1f);
-        final double angle = Math.acos(dot);
+        final double angle = FastMath.acos(dot);
         return setFromAxisRad(y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2, angle);
     }
 
@@ -989,8 +989,8 @@ public class QuaternionDouble implements Serializable {
         // warrant such calculations
         if ((1 - absDot) > 0.1) {// Get the angle between the 2 quaternions,
             // and then store the sin() of that angle
-            final double angle = Math.acos(absDot);
-            final double invSinTheta = 1f / Math.sin(angle);
+            final double angle = FastMath.acos(absDot);
+            final double invSinTheta = 1f / FastMath.sin(angle);
 
             // Calculate the scale for q1 and q2, according to the angle and
             // it's sine value
@@ -1184,8 +1184,8 @@ public class QuaternionDouble implements Serializable {
     public double getAxisAngleRad(Vector3d axis) {
         if (this.w > 1)
             this.nor(); // if w>1 acos and sqrt will produce errors, this can't happen if quaternion is normalised
-        double angle = (2.0 * Math.acos(this.w));
-        double s = Math.sqrt(1 - this.w * this.w); // assuming quaternion normalised then w is less than 1, so term always positive.
+        double angle = (2.0 * FastMath.acos(this.w));
+        double s = FastMath.sqrt(1 - this.w * this.w); // assuming quaternion normalised then w is less than 1, so term always positive.
         if (s < NORMALIZATION_TOLERANCE) { // test to avoid divide by zero, s is always positive due to sqrt
             // if s close to zero then direction of axis not important
             axis.x = this.x; // if it is important that axis is normalised then replace with x=1; y=z=0;
@@ -1208,7 +1208,7 @@ public class QuaternionDouble implements Serializable {
      * @return the angle in radians of the rotation
      */
     public double getAngleRad() {
-        return (2.0 * Math.acos((this.w > 1) ? (this.w / len()) : this.w));
+        return (2.0 * FastMath.acos((this.w > 1) ? (this.w / len()) : this.w));
     }
 
     /**
@@ -1290,7 +1290,7 @@ public class QuaternionDouble implements Serializable {
                                     final double axisZ) {
         final double d = Vector3d.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
         final double l2 = QuaternionDouble.len2(axisX * d, axisY * d, axisZ * d, this.w);
-        return l2 == 0f ? 0f : (2.0 * Math.acos(this.w / Math.sqrt(l2)));
+        return l2 == 0f ? 0f : (2.0 * FastMath.acos(this.w / FastMath.sqrt(l2)));
     }
 
     /**

@@ -11,9 +11,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
+import net.jafama.FastMath;
 
 public class AxesUpdater extends AbstractUpdateSystem {
-    public static final double LINE_SIZE_RAD = Math.tan(Math.toRadians(2.9));
+    public static final double LINE_SIZE_RAD = FastMath.tan(Math.toRadians(2.9));
 
     public AxesUpdater(Family family, int priority) {
         super(family, priority);

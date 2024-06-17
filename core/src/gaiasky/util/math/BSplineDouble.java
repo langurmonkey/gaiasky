@@ -8,6 +8,7 @@
 package gaiasky.util.math;
 
 import com.badlogic.gdx.utils.Array;
+import net.jafama.FastMath;
 
 public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     private final static int DEFAULT_DEGREE = 3;
@@ -305,7 +306,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
         double L1Sqr = P1.dst2(P2);
         double L2Sqr = P3.dst2(P2);
         double L3Sqr = P3.dst2(P1);
-        double L1 = Math.sqrt(L1Sqr);
+        double L1 = FastMath.sqrt(L1Sqr);
         double s = (L2Sqr + L1Sqr - L3Sqr) / (2 * L1);
         double u = MathUtilsDouble.clamp((L1 - s) / L1, 0d, 1d);
         return (n + u) / spanCount;

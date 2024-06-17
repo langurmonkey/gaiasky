@@ -16,6 +16,7 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import net.jafama.FastMath;
 
 public class MainGamepadListener extends AbstractGamepadListener {
     private static final Log logger = Logger.getLogger(MainGamepadListener.class);
@@ -88,7 +89,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
             value = (float) applyZeroPoint(value);
 
             // Apply power function to axis reading
-            double val = Math.signum(value) * Math.pow(Math.abs(value), mappings.getAxisValuePower());
+            double val = FastMath.signum(value) * FastMath.pow(Math.abs(value), mappings.getAxisValuePower());
 
             if (axisCode == mappings.getAxisLstickH()) {
                 double valMapped = val * mappings.getAxisLstickHSensitivity();
@@ -154,7 +155,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
                     t = 0;
                 }
                 double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
-                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + Math.abs(t * inc) : t + t * inc);
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + FastMath.abs(t * inc) : t + t * inc);
             } else if (lastControllerUsed.getButton(mappings.getButtonDpadDown())) {
                 var t = GaiaSky.instance.time.getWarpFactor();
                 // Slow down.
@@ -164,7 +165,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
                     t = 0;
                 }
                 double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
-                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - Math.abs(t * inc) : t - t * inc);
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - FastMath.abs(t * inc) : t - t * inc);
             }
             return true;
         }

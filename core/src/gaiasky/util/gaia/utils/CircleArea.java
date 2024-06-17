@@ -7,11 +7,13 @@
 
 package gaiasky.util.gaia.utils;
 
+import net.jafama.FastMath;
+
 public class CircleArea implements Area {
 
-    private final static double piHalf = Math.PI / 2.0;
+    private final static double piHalf = FastMath.PI / 2.0;
 
-    private final static double squareDegreesOfSphere = 129600.0 / Math.PI;
+    private final static double squareDegreesOfSphere = 129600.0 / FastMath.PI;
 
     private final Place centre;
 
@@ -33,8 +35,8 @@ public class CircleArea implements Area {
      */
     @Override
     public double altitude(Place pole) {
-        double absLat = Math.abs(piHalf - pole.getAngleTo(centre));
-        return Math.max(absLat - radius, 0.0);
+        double absLat = FastMath.abs(piHalf - pole.getAngleTo(centre));
+        return FastMath.max(absLat - radius, 0.0);
     }
 
     /**
@@ -62,9 +64,9 @@ public class CircleArea implements Area {
         if (radius <= 0.0) {
             w = 0.0;
         } else if (radius < 1.0) {
-            w = 0.5 * Math.pow(Math.sin(radius), 2) / (1.0 + Math.cos(radius));
-        } else if (radius < Math.PI) {
-            w = 0.5 * (1.0 - Math.cos(radius));
+            w = 0.5 * FastMath.pow(Math.sin(radius), 2) / (1.0 + FastMath.cos(radius));
+        } else if (radius < FastMath.PI) {
+            w = 0.5 * (1.0 - FastMath.cos(radius));
         } else {
             w = 1.0;
         }

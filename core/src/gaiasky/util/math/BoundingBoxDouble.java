@@ -8,6 +8,7 @@
 package gaiasky.util.math;
 
 import com.badlogic.gdx.math.collision.BoundingBox;
+import net.jafama.FastMath;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -56,11 +57,11 @@ public class BoundingBoxDouble implements Serializable {
     }
 
     static double min(final double a, final double b) {
-        return Math.min(a, b);
+        return FastMath.min(a, b);
     }
 
     static double max(final double a, final double b) {
-        return Math.max(a, b);
+        return FastMath.max(a, b);
     }
 
     /**
@@ -191,7 +192,7 @@ public class BoundingBoxDouble implements Serializable {
     }
 
     public double getGreatestDim() {
-       return Math.max(Math.max(getWidth(), getHeight()), getDepth());
+       return FastMath.max(Math.max(getWidth(), getHeight()), getDepth());
     }
 
     /**
@@ -312,7 +313,7 @@ public class BoundingBoxDouble implements Serializable {
      * @return This bounding box for chaining.
      */
     public BoundingBoxDouble ext(Vector3d point) {
-        return this.set(min.set(min(min.x, point.x), min(min.y, point.y), min(min.z, point.z)), max.set(Math.max(max.x, point.x), Math.max(max.y, point.y), Math.max(max.z, point.z)));
+        return this.set(min.set(min(min.x, point.x), min(min.y, point.y), min(min.z, point.z)), max.set(Math.max(max.x, point.x), FastMath.max(max.y, point.y), FastMath.max(max.z, point.z)));
     }
 
     /**
@@ -414,13 +415,13 @@ public class BoundingBoxDouble implements Serializable {
 
         // test using SAT (separating axis theorem)
 
-        double lx = Math.abs(this.cnt.x - b.cnt.x);
+        double lx = FastMath.abs(this.cnt.x - b.cnt.x);
         double sumx = (this.dim.x / 2.0f) + (b.dim.x / 2.0f);
 
-        double ly = Math.abs(this.cnt.y - b.cnt.y);
+        double ly = FastMath.abs(this.cnt.y - b.cnt.y);
         double sumy = (this.dim.y / 2.0f) + (b.dim.y / 2.0f);
 
-        double lz = Math.abs(this.cnt.z - b.cnt.z);
+        double lz = FastMath.abs(this.cnt.z - b.cnt.z);
         double sumz = (this.dim.z / 2.0f) + (b.dim.z / 2.0f);
 
         return (lx <= sumx && ly <= sumy && lz <= sumz);

@@ -30,6 +30,7 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+import net.jafama.FastMath;
 
 public class IntModel implements Disposable {
     /** The materials of the model, used by nodes that have a graphical representation. **/
@@ -521,7 +522,7 @@ public class IntModel implements Disposable {
             }
         }
 
-        span = Math.sqrt(span);
+        span = FastMath.sqrt(span);
     }
 
     private double meshSpan2(IntMesh mesh, Matrix4 transform) {

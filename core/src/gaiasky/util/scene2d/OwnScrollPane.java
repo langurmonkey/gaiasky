@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
+import net.jafama.FastMath;
 
 public class OwnScrollPane extends ScrollPane {
     private float ownWidth = 0f, ownHeight = 0f;
@@ -92,7 +93,7 @@ public class OwnScrollPane extends ScrollPane {
     public float getPrefWidth() {
         if (ownWidth != 0) {
             if (expand && getActor() instanceof Layout)
-                return Math.max(ownWidth, super.getPrefWidth());
+                return FastMath.max(ownWidth, super.getPrefWidth());
             else
                 return ownWidth;
         } else {
@@ -110,7 +111,7 @@ public class OwnScrollPane extends ScrollPane {
     public float getPrefHeight() {
         if (ownHeight != 0) {
             if (expand && getActor() instanceof Layout)
-                return Math.max(ownHeight, super.getPrefHeight());
+                return FastMath.max(ownHeight, super.getPrefHeight());
             else
                 return ownHeight;
         } else {

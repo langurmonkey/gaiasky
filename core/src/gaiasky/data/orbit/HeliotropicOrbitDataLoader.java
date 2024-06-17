@@ -17,7 +17,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3d;
 
 import java.io.*;
@@ -48,9 +47,6 @@ public class HeliotropicOrbitDataLoader {
             SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"), new FileHandle(ASSETS_LOC + "/i18n/objects"));
-
-            // Initialize math manager
-            MathManager.initialize();
 
             String inputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.heliotropic.csv";
             String outputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.dat";

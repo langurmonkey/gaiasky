@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.Logger;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
+import net.jafama.FastMath;
 
 public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 viewport;
@@ -116,7 +117,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     }
 
     public void setAdditional(float[] additional) {
-        int len = Math.min(additional.length, 4);
+        int len = FastMath.min(additional.length, 4);
         System.arraycopy(additional, 0, this.additional, 0, len);
         setParamv(Param.Additional, this.additional, 0, 4);
     }

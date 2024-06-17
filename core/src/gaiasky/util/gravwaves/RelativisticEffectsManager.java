@@ -17,10 +17,9 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.math.ITrigonometry;
-import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import net.jafama.FastMath;
 
 public class RelativisticEffectsManager implements IObserver {
 
@@ -165,7 +164,6 @@ public class RelativisticEffectsManager implements IObserver {
             float htimescos = hterms[2];
             float htimessin = hterms[3];
             float t = gwtime;
-            ITrigonometry trigo = MathManager.instance.trigonometryInterface;
 
             Vector3d p = auxd4.set(gw);
             Matrix3 P = gwmat3;
@@ -176,9 +174,9 @@ public class RelativisticEffectsManager implements IObserver {
             Matrix3 petimespt = auxm3.set(P).mul(etimes).mul(PT);
 
             // plusPhase = hpluscos * cos(omgw * t) + hplussin * sin(omgw * t);
-            double plusphase = hpluscos * trigo.cos(omgw * t) + hplussin * trigo.sin(omgw * t);
+            double plusphase = hpluscos * FastMath.cos(omgw * t) + hplussin * FastMath.sin(omgw * t);
             // timesPhase = htimescos * cos(omgw * t) + htimessin * sin(omgw * t);
-            double timesphase = htimescos * trigo.cos(omgw * t) + htimessin * trigo.sin(omgw * t);
+            double timesphase = htimescos * FastMath.cos(omgw * t) + htimessin * FastMath.sin(omgw * t);
 
             // PePlusPt = PePlusPt * plusPhase;
             pepluspt = mul(pepluspt, (float) plusphase);

@@ -9,6 +9,7 @@ package gaiasky.util.gdx;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import net.jafama.FastMath;
 
 import java.util.*;
 
@@ -31,7 +32,7 @@ public class OctahedronSphereCreator extends ModelCreator {
             p.nor();
             // UV
             float u = 0.5f + (float) (Math.atan2(p.z, p.x) / (Math.PI * 2.0));
-            float v = 0.5f - (float) (Math.asin(p.y) / Math.PI);
+            float v = 0.5f - (float) (Math.asin(p.y) / FastMath.PI);
 
             if (seam.contains(idx + 1))
                 v = 1f;

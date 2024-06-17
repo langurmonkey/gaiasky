@@ -17,6 +17,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.tree.OctreeNode;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.util.List;
@@ -24,8 +25,8 @@ import java.util.List;
 public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     protected static final Log logger = Logger.getLogger(LinePrimitiveRenderer.class);
 
-    final static double baseWidthAngle = Math.toRadians(.13);
-    final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
+    final static double baseWidthAngle = FastMath.toRadians(.13);
+    final static double baseWidthAngleTan = FastMath.tan(baseWidthAngle);
     protected ICamera camera;
 
     public LineQuadstripRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {

@@ -24,6 +24,7 @@ import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntNode;
 import gaiasky.util.gdx.model.IntNodePart;
 import gaiasky.util.gdx.shader.Material;
+import net.jafama.FastMath;
 
 public class IntModelBuilder {
     /** The mesh builders created between begin and end */
@@ -733,7 +734,7 @@ public class IntModelBuilder {
 
     public IntModel createIcoSphere(float radius, int recursion, boolean flipNormals, boolean hardEdges, int primitiveType, final Material material, final Bits attributes) {
         begin();
-        int nfaces = (int) (10 * Math.pow(2, 2 * recursion - 1));
+        int nfaces = (int) (10 * FastMath.pow(2, 2 * recursion - 1));
         if (nfaces * 3 <= Integer.MAX_VALUE) {
             // All in one part
             part("icosphere", primitiveType, attributes, material).icosphere(radius, recursion, flipNormals, hardEdges);

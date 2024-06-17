@@ -56,7 +56,7 @@ public final class MathUtilsDouble {
     }
 
     /**
-     * Returns atan2 in radians, faster but less accurate than Math.atan2. Average error of 0.00231 radians (0.1323
+     * Returns atan2 in radians, faster but less accurate than FastMath.atan2. Average error of 0.00231 radians (0.1323
      * degrees),
      * largest error of 0.00488 radians (0.2796 degrees).
      */
@@ -123,7 +123,7 @@ public final class MathUtilsDouble {
                             int max) {
         if (value < min)
             return min;
-        return Math.min(value, max);
+        return FastMath.min(value, max);
     }
 
     static public short clamp(short value,
@@ -141,7 +141,7 @@ public final class MathUtilsDouble {
                              long max) {
         if (value < min)
             return min;
-        return Math.min(value, max);
+        return FastMath.min(value, max);
     }
 
     static public float clamp(float value,
@@ -149,7 +149,7 @@ public final class MathUtilsDouble {
                               float max) {
         if (value < min)
             return min;
-        return Math.min(value, max);
+        return FastMath.min(value, max);
     }
 
     static public double clamp(double value,
@@ -157,7 +157,7 @@ public final class MathUtilsDouble {
                                double max) {
         if (value < min)
             return min;
-        return Math.min(value, max);
+        return FastMath.min(value, max);
     }
 
     /**
@@ -165,7 +165,7 @@ public final class MathUtilsDouble {
      * bound)
      */
     static public boolean isZero(double value) {
-        return Math.abs(value) <= FLOAT_ROUNDING_ERROR;
+        return FastMath.abs(value) <= FLOAT_ROUNDING_ERROR;
     }
 
     /**
@@ -176,7 +176,7 @@ public final class MathUtilsDouble {
      */
     static public boolean isZero(double value,
                                  double tolerance) {
-        return Math.abs(value) <= tolerance;
+        return FastMath.abs(value) <= tolerance;
     }
 
     /**
@@ -188,7 +188,7 @@ public final class MathUtilsDouble {
      */
     static public boolean isEqual(double a,
                                   double b) {
-        return Math.abs(a - b) <= FLOAT_ROUNDING_ERROR;
+        return FastMath.abs(a - b) <= FLOAT_ROUNDING_ERROR;
     }
 
     /**
@@ -202,7 +202,7 @@ public final class MathUtilsDouble {
     static public boolean isEqual(double a,
                                   double b,
                                   double tolerance) {
-        return Math.abs(a - b) <= tolerance;
+        return FastMath.abs(a - b) <= tolerance;
     }
 
     /**
@@ -414,8 +414,8 @@ public final class MathUtilsDouble {
      */
     public static double roundAvoid(double value,
                                     int places) {
-        double scale = Math.pow(10, places);
-        return Math.round(value * scale) / scale;
+        double scale = FastMath.pow(10, places);
+        return FastMath.round(value * scale) / scale;
     }
 
     // ---
@@ -424,9 +424,9 @@ public final class MathUtilsDouble {
 
         static {
             for (int i = 0; i < SIN_COUNT; i++)
-                table[i] = Math.sin((i + 0.5) / SIN_COUNT * radFull);
+                table[i] = FastMath.sin((i + 0.5) / SIN_COUNT * radFull);
             for (int i = 0; i < 360; i += 90)
-                table[(int) (i * degToIndex) & SIN_MASK] = Math.sin(i * degreesToRadians);
+                table[(int) (i * degToIndex) & SIN_MASK] = FastMath.sin(i * degreesToRadians);
         }
     }
 
@@ -465,9 +465,9 @@ public final class MathUtilsDouble {
     public static boolean fuzzyEquals(Double a,
                                       Double b,
                                       double epsilon) {
-        final double absA = Math.abs(a);
-        final double absB = Math.abs(b);
-        final double diff = Math.abs(a - b);
+        final double absA = FastMath.abs(a);
+        final double absB = FastMath.abs(b);
+        final double diff = FastMath.abs(a - b);
 
         if (a == b) {
             // shortcut, handles infinities
@@ -479,7 +479,7 @@ public final class MathUtilsDouble {
             return diff < (epsilon * Double.MIN_NORMAL);
         } else {
             // use relative error
-            return diff / Math.min((absA + absB), Double.MAX_VALUE) < epsilon;
+            return diff / FastMath.min((absA + absB), Double.MAX_VALUE) < epsilon;
         }
     }
 
@@ -552,7 +552,7 @@ public final class MathUtilsDouble {
      * @param x The value to sample.
      */
     public static double logit(double x) {
-        return Math.log(x / (1.0 - x));
+        return FastMath.log(x / (1.0 - x));
     }
 
     /**
@@ -564,7 +564,7 @@ public final class MathUtilsDouble {
      */
     public static double logisticSigmoid(double x, double span) {
         x = x * span - (span * 0.5);
-        return Math.exp(x) / (1.0 + Math.exp(x));
+        return FastMath.exp(x) / (1.0 + FastMath.exp(x));
     }
 
 }

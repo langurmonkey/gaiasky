@@ -20,6 +20,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -135,10 +136,10 @@ public class GalaxyGenerator {
 
     private static double generateNewSize() {
         return switch (cliArgs.particleType) {
-            case STAR, DUST -> Math.abs(StdRandom.uniform() * 20.0 + StdRandom.uniform() * 3.0);
-            case BULGE -> Math.abs(StdRandom.uniform() * 40.0 + StdRandom.uniform() * 6.0);
-            case HII -> Math.abs(StdRandom.uniform() * 70.0 + StdRandom.uniform() * 30.0);
-            case GAS -> Math.abs(StdRandom.uniform() * 100.0 + StdRandom.uniform() * 50.0);
+            case STAR, DUST -> FastMath.abs(StdRandom.uniform() * 20.0 + StdRandom.uniform() * 3.0);
+            case BULGE -> FastMath.abs(StdRandom.uniform() * 40.0 + StdRandom.uniform() * 6.0);
+            case HII -> FastMath.abs(StdRandom.uniform() * 70.0 + StdRandom.uniform() * 30.0);
+            case GAS -> FastMath.abs(StdRandom.uniform() * 100.0 + StdRandom.uniform() * 50.0);
             default -> 1;
         };
     }
@@ -277,8 +278,8 @@ public class GalaxyGenerator {
         double armOverTotal = radius / totalLength;
         double barOverTotal = (bar ? barLength / totalLength : 0);
 
-        long NperArm = Math.round(N * armOverTotal);
-        long Nbar = Math.round(N * barOverTotal);
+        long NperArm = FastMath.round(N * armOverTotal);
+        long Nbar = FastMath.round(N * barOverTotal);
 
         double armWidth = radius * armWidthRatio;
         double armHeight = radius * armHeightRatio;
@@ -286,7 +287,7 @@ public class GalaxyGenerator {
         // x, y, z, size
         List<double[]> particles = new ArrayList<>(N);
 
-        double stepAngle = bar ? 60.0 / Math.max(1.0, ((Narms / 2.0) - 1.0)) : 360.0 / Narms;
+        double stepAngle = bar ? 60.0 / FastMath.max(1.0, ((Narms / 2.0) - 1.0)) : 360.0 / Narms;
         double angle = bar ? 10.0 : 0.0;
 
         Vector3d rotAxis = new Vector3d(0, 1, 0);
@@ -297,7 +298,7 @@ public class GalaxyGenerator {
             double x = StdRandom.gaussian() * armWidth;
             double y = StdRandom.gaussian() * armHeight;
 
-            particles.add(new double[]{x, y, z, Math.abs(StdRandom.gaussian())});
+            particles.add(new double[]{x, y, z, FastMath.abs(StdRandom.gaussian())});
         }
 
         // Generate arms
@@ -312,7 +313,7 @@ public class GalaxyGenerator {
                 if (!radialDensity) {
                     z = StdRandom.uniform() * radius;
                 } else {
-                    z = Math.abs(StdRandom.gaussian()) * radius;
+                    z = FastMath.abs(StdRandom.gaussian()) * radius;
                 }
                 x = StdRandom.gaussian() * armWidth;
                 y = StdRandom.gaussian() * armHeight;
@@ -325,7 +326,7 @@ public class GalaxyGenerator {
 
                 particle.add(0.0, 0.0, zPlus);
 
-                particles.add(new double[]{particle.x, particle.y, particle.z, Math.abs(StdRandom.gaussian())});
+                particles.add(new double[]{particle.x, particle.y, particle.z, FastMath.abs(StdRandom.gaussian())});
             }
             angle += stepAngle;
         }

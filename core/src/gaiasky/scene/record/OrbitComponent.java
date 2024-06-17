@@ -12,6 +12,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -105,7 +106,7 @@ public class OrbitComponent {
             double a = semimajoraxis * Nature.KM_TO_M; // km to m
             // Compute mu from period and semi-major axis
             double T = period * Nature.D_TO_S; // d to s
-            this.mu = (4.0 * Math.PI * Math.PI * a * a * a) / (T * T);
+            this.mu = (4.0 * FastMath.PI * FastMath.PI * a * a * a) / (T * T);
         }
     }
 
@@ -129,32 +130,32 @@ public class OrbitComponent {
 
         // 1
         double dt = dtDays * Nature.D_TO_S;
-        double M = M0 + dt * Math.sqrt(mu / Math.pow(a, 3d));
+        double M = M0 + dt * FastMath.sqrt(mu / FastMath.pow(a, 3d));
 
         // 2
         double E = M;
         for (int j = 0; j < 2; j++) {
-            E = E - ((E - e * Math.sin(E) - M) / (1 - e * Math.cos(E)));
+            E = E - ((E - e * FastMath.sin(E) - M) / (1 - e * FastMath.cos(E)));
         }
         double E_t = E;
 
         // 3
-        double nu_t = 2d * Math.atan2(Math.sqrt(1.0 + e) * Math.sin(E_t / 2.0), Math.sqrt(1.0 - e) * Math.cos(E_t / 2.0));
+        double nu_t = 2d * FastMath.atan2(Math.sqrt(1.0 + e) * FastMath.sin(E_t / 2.0), FastMath.sqrt(1.0 - e) * FastMath.cos(E_t / 2.0));
 
         // 4
-        double rc_t = a * (1.0 - e * Math.cos(E_t));
+        double rc_t = a * (1.0 - e * FastMath.cos(E_t));
 
         // 5
-        double ox = rc_t * Math.cos(nu_t);
-        double oy = rc_t * Math.sin(nu_t);
+        double ox = rc_t * FastMath.cos(nu_t);
+        double oy = rc_t * FastMath.sin(nu_t);
 
         // 6
-        double sinomega = Math.sin(omega_ap);
-        double cosomega = Math.cos(omega_ap);
-        double sinOMEGA = Math.sin(omega_lan);
-        double cosOMEGA = Math.cos(omega_lan);
-        double cosi = Math.cos(ic);
-        double sini = Math.sin(ic);
+        double sinomega = FastMath.sin(omega_ap);
+        double cosomega = FastMath.cos(omega_ap);
+        double sinOMEGA = FastMath.sin(omega_lan);
+        double cosOMEGA = FastMath.cos(omega_lan);
+        double cosi = FastMath.cos(ic);
+        double sini = FastMath.sin(ic);
 
         double x = ox * (cosomega * cosOMEGA - sinomega * cosi * sinOMEGA) - oy * (sinomega * cosOMEGA + cosomega * cosi * sinOMEGA);
         double y = ox * (cosomega * sinOMEGA + sinomega * cosi * cosOMEGA) + oy * (cosomega * cosi * cosOMEGA - sinomega * sinOMEGA);

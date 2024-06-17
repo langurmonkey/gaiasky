@@ -45,6 +45,7 @@ import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+import net.jafama.FastMath;
 
 import java.nio.file.Path;
 import java.time.Instant;
@@ -176,8 +177,8 @@ public class GamepadGui extends AbstractGui {
         tabContents.clear();
         model.clear();
 
-        float tw1 = vr ? MainVRGui.WIDTH : Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
-        th = vr ? MainVRGui.HEIGHT : Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
+        float tw1 = vr ? MainVRGui.WIDTH : FastMath.min(Gdx.graphics.getWidth(), 1450f) - 60f;
+        th = vr ? MainVRGui.HEIGHT : FastMath.min(Gdx.graphics.getHeight(), 860f) - 60f;
         // Widget width
         float ww = 400f;
         float wh = 64f;

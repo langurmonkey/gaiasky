@@ -15,6 +15,7 @@ import gaiasky.util.gdx.model.gltf.data.scene.GLTFNode;
 import gaiasky.util.gdx.model.gltf.data.scene.GLTFSkin;
 import gaiasky.util.gdx.model.gltf.loaders.exceptions.GLTFIllegalException;
 import gaiasky.util.gdx.model.gltf.loaders.shared.data.DataResolver;
+import net.jafama.FastMath;
 
 import java.nio.FloatBuffer;
 
@@ -40,7 +41,7 @@ public class SkinLoader {
 		Array<Integer> joints = new Array<Integer>();
 		
 		int bonesCount = glSkin.joints.size;
-		maxBones = Math.max(maxBones, bonesCount);
+		maxBones = FastMath.max(maxBones, bonesCount);
 		
 		FloatBuffer floatBuffer = dataResolver.getBufferFloat(glSkin.inverseBindMatrices);
 		

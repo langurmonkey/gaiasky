@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.utils.Align;
+import net.jafama.FastMath;
 
 public class OwnWindow extends Table {
     static private final Vector2 tmpPosition = new Vector2();
@@ -339,7 +340,7 @@ public class OwnWindow extends Table {
     }
 
     public float getPrefWidth() {
-        return Math.max(super.getPrefWidth(), titleTable.getPrefWidth() + getPadLeft() + getPadRight());
+        return FastMath.max(super.getPrefWidth(), titleTable.getPrefWidth() + getPadLeft() + getPadRight());
     }
 
     public Table getTitleTable() {

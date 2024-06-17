@@ -9,6 +9,7 @@ package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.jafama.FastMath;
 
 public class Matrix3Attribute extends Attribute {
     public static final String Gwmat3Alias = "gwmat3";
@@ -35,7 +36,7 @@ public class Matrix3Attribute extends Attribute {
 
     @Override
     public int hashCode() {
-        double result = Math.pow(2, index);
+        double result = FastMath.pow(2, index);
         result = 977 * result + NumberUtils.floatToRawIntBits(value.val[Matrix3.M00]) + NumberUtils.floatToRawIntBits(value.val[Matrix3.M11]) + NumberUtils.floatToRawIntBits(value.val[Matrix3.M22]);
         return (int) result;
     }

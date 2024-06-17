@@ -25,7 +25,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.ScreenUtils;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.PBRCubemapAttribute;
 import gaiasky.util.gdx.model.gltf.scene3d.scene.SceneSkybox;
 

@@ -16,6 +16,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
+import net.jafama.FastMath;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -154,8 +155,8 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 dt = 1 / fps;
             }
 
-            int sign = (int) Math.signum(timeWarp);
-            double h = Math.abs(dt * timeWarp * Nature.S_TO_H);
+            int sign = (int) FastMath.signum(timeWarp);
+            double h = FastMath.abs(dt * timeWarp * Nature.S_TO_H);
             hDiff = h * sign;
 
             double ms = sign * h * Nature.H_TO_MS;
@@ -308,9 +309,9 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 return -0.5;
             }
         }
-        long a = (int) (Math.log(n) / Math.log(2.0));
+        long a = (int) (Math.log(n) / FastMath.log(2.0));
 
-        return (long) Math.pow(2.0, a + dir);
+        return (long) FastMath.pow(2.0, a + dir);
     }
 
     public void setTimeWarp(double tw) {

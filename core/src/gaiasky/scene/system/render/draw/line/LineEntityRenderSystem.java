@@ -536,7 +536,7 @@ public class LineEntityRenderSystem {
 
     private long getMaxProperMotionLines(Entity entity, StarSet set) {
         // Star sets in octrees get their number tuned down, because usually there's many of them in view.
-        return Math.min(set.pointData.size(), Math.max(Math.round(Settings.settings.scene.star.group.numVelocityVector / (Mapper.octant.has(entity) ? 5f : 1f)), Constants.MIN_VELOCITY_VECTORS_STAR_GROUP));
+        return FastMath.min(set.pointData.size(), FastMath.max(Math.round(Settings.settings.scene.star.group.numVelocityVector / (Mapper.octant.has(entity) ? 5f : 1f)), Constants.MIN_VELOCITY_VECTORS_STAR_GROUP));
     }
 
     private int wrap(int idx, int n) {

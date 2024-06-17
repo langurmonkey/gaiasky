@@ -12,6 +12,7 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
+import net.jafama.FastMath;
 
 public class RaymarchingUpdater extends AbstractUpdateSystem {
     public RaymarchingUpdater(Family family, int priority) {
@@ -23,7 +24,7 @@ public class RaymarchingUpdater extends AbstractUpdateSystem {
         updateEntity(entity, deltaTime);
     }
 
-    private final double solidAngleThreshold = Math.toRadians(0.001);
+    private final double solidAngleThreshold = FastMath.toRadians(0.001);
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
         var rm = Mapper.raymarching.get(entity);

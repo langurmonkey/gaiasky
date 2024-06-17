@@ -15,6 +15,7 @@ import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import net.jafama.FastMath;
 
 public class SpacecraftGamepadListener extends AbstractGamepadListener {
     private static final Log logger = Logger.getLogger(SpacecraftGamepadListener.class);
@@ -44,7 +45,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
             double thrustFwd = lastController.getAxis(mappings.getAxisRT());
             double thrustBwd = lastController.getAxis(mappings.getAxisLT());
 
-            if (Math.abs(thrust) < 0.05 && Math.abs(thrustFwd) < 0.05 && Math.abs(thrustBwd) < 0.05) {
+            if (Math.abs(thrust) < 0.05 && FastMath.abs(thrustFwd) < 0.05 && FastMath.abs(thrustBwd) < 0.05) {
                 cam.getSpacecraftView().setCurrentEnginePower(0);
             }
         }
@@ -119,7 +120,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
         value = (float) applyZeroPoint(value);
 
         // Apply power function to axis reading.
-        double val = Math.signum(value) * Math.pow(Math.abs(value), mappings.getAxisValuePower());
+        double val = FastMath.signum(value) * FastMath.pow(Math.abs(value), mappings.getAxisValuePower());
 
         if (axisCode == mappings.getAxisLstickH()) {
             double effValue = -val * mappings.getAxisLstickHSensitivity();

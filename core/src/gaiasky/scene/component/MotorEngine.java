@@ -18,6 +18,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
     static {
         double val = 0.01;
         for (int i = 0; i < 14; i++) {
-            thrustFactor[i] = val * Math.pow(10, i);
+            thrustFactor[i] = val * FastMath.pow(10, i);
         }
     }
 

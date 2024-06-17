@@ -10,6 +10,7 @@ package gaiasky.util.gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
+import net.jafama.FastMath;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -95,7 +96,7 @@ public class IcoSphereCreator extends ModelCreator {
     protected void addUV(final Vector3 p) {
         // UV
         float u = 0.5f + (float) (Math.atan2(p.z, p.y) / (Math.PI * 2.0));
-        float v = 0.5f - (float) (Math.asin(p.x) / Math.PI);
+        float v = 0.5f - (float) (Math.asin(p.x) / FastMath.PI);
 
         if (p.equals(new Vector3(1, 0, 0))) {
             u = 0.5f;
@@ -196,7 +197,7 @@ public class IcoSphereCreator extends ModelCreator {
         this.middlePointIndexCache = new HashMap<>();
 
         // create 12 vertices of a icosahedron
-        float t = (float) ((1.0 + Math.sqrt(5.0)) / 2.0);
+        float t = (float) ((1.0 + FastMath.sqrt(5.0)) / 2.0);
 
         vertex(new Vector3(-1, t, 0), radius);
         vertex(new Vector3(1, t, 0), radius);

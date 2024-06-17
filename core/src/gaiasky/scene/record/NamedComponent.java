@@ -9,6 +9,7 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,7 +38,7 @@ public abstract class NamedComponent implements IComponent, Disposable {
     }
 
     protected double gaussian(Random rand, double mean, double sigma, double min) {
-        return Math.max(min, rand.nextGaussian() * sigma + mean);
+        return FastMath.max(min, rand.nextGaussian() * sigma + mean);
     }
 
     protected double gaussian(Random rand, double mean, double sigma, double min, double max) {

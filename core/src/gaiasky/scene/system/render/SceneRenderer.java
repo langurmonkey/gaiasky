@@ -51,6 +51,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL40;
@@ -390,7 +391,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     system = new ModelRenderer(this, MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
                         @Override
                         public float getAlpha(IRenderable s) {
-                            return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
+                            return alphas[ComponentType.Atmospheres.ordinal()] * (float) FastMath.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
                         }
 
                         @Override

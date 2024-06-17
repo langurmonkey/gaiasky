@@ -28,6 +28,7 @@ import gaiasky.util.gdx.shader.attribute.Matrix4Attribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 import gaiasky.util.gdx.shader.provider.DepthIntShaderProvider;
+import net.jafama.FastMath;
 
 public class PBRShaderProvider extends DefaultIntShaderProvider
 {
@@ -332,77 +333,77 @@ public class PBRShaderProvider extends DefaultIntShaderProvider
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, TextureAttribute.Diffuse);
 			if(attribute != null){
 				prefix.append("#define v_diffuseUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, TextureAttribute.Emissive);
 			if(attribute != null){
 				prefix.append("#define v_emissiveUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, TextureAttribute.Normal);
 			if(attribute != null){
 				prefix.append("#define v_normalUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, PBRTextureAttribute.MetallicRoughnessTexture);
 			if(attribute != null){
 				prefix.append("#define v_metallicRoughnessUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, TextureAttribute.AO);
 			if(attribute != null){
 				prefix.append("#define v_occlusionUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, PBRTextureAttribute.TransmissionTexture);
 			if(attribute != null){
 				prefix.append("#define v_transmissionUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, PBRTextureAttribute.ThicknessTexture);
 			if(attribute != null){
 				prefix.append("#define v_thicknessUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, PBRTextureAttribute.SpecularFactorTexture);
 			if(attribute != null){
 				prefix.append("#define v_specularFactorUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, TextureAttribute.Specular);
 			if(attribute != null){
 				prefix.append("#define v_specularColorUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, PBRTextureAttribute.IridescenceTexture);
 			if(attribute != null){
 				prefix.append("#define v_iridescenceUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		{
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, PBRTextureAttribute.IridescenceThicknessTexture);
 			if(attribute != null){
 				prefix.append("#define v_iridescenceThicknessUV v_texCoord").append(attribute.uvIndex).append("\n");
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		
@@ -439,13 +440,13 @@ public class PBRShaderProvider extends DefaultIntShaderProvider
 			if(attribute.usage == Usage.ColorPacked){
 				throw new GdxRuntimeException("color packed attribute not supported");
 			}else if(attribute.usage == Usage.ColorUnpacked){
-				numColor = Math.max(numColor, attribute.unit+1);
+				numColor = FastMath.max(numColor, attribute.unit+1);
 			}else if(attribute.usage == PBRVertexAttributes.Usage.PositionTarget && attribute.unit >= PBRCommon.MAX_MORPH_TARGETS ||
 					attribute.usage == PBRVertexAttributes.Usage.NormalTarget && attribute.unit >= PBRCommon.MAX_MORPH_TARGETS ||
 					attribute.usage == PBRVertexAttributes.Usage.TangentTarget && attribute.unit >= PBRCommon.MAX_MORPH_TARGETS ){
-				numMorphTarget = Math.max(numMorphTarget, attribute.unit+1);
+				numMorphTarget = FastMath.max(numMorphTarget, attribute.unit+1);
 			}else if(attribute.usage == Usage.BoneWeight){
-				numBoneInfluence = Math.max(numBoneInfluence, attribute.unit+1);
+				numBoneInfluence = FastMath.max(numBoneInfluence, attribute.unit+1);
 			}
 		}
 		

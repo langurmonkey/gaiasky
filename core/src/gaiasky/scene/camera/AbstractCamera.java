@@ -24,11 +24,12 @@ import gaiasky.util.camera.Proximity;
 import gaiasky.util.camera.Proximity.NearbyRecord;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
-    private static final double VIEW_ANGLE = Math.toRadians(0.05);
+    private static final double VIEW_ANGLE = FastMath.toRadians(0.05);
     /** Camera near value. **/
     public double CAM_NEAR;
     /** Camera far value. **/

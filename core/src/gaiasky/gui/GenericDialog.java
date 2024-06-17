@@ -36,6 +36,7 @@ import gaiasky.util.scene2d.CollapsibleWindow;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.Separator;
+import net.jafama.FastMath;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -213,7 +214,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         // Width.
         float w = 128f;
         for (Actor button : buttonGroup.getChildren()) {
-            w = Math.max(button.getWidth() + pad18 * 4f, w);
+            w = FastMath.max(button.getWidth() + pad18 * 4f, w);
         }
         for (Actor button : buttonGroup.getChildren()) {
             button.setWidth(w);
@@ -222,7 +223,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         // Height.
         float h = 30f;
         for (Actor button : buttonGroup.getChildren()) {
-            h = Math.max(button.getHeight(), h);
+            h = FastMath.max(button.getHeight(), h);
         }
         for (Actor button : buttonGroup.getChildren()) {
             button.setHeight(h + 5);
@@ -458,9 +459,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 Actions.alpha(0f),
                 Actions.fadeIn(0.6f, Interpolation.fade)));
         if (lastPosX >= 0 && lastPosY >= 0) {
-            setPosition(Math.round(lastPosX), Math.round(lastPosY));
+            setPosition(Math.round(lastPosX), FastMath.round(lastPosY));
         } else {
-            setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
+            setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), FastMath.round((stage.getHeight() - getHeight()) / 2f));
         }
         setKeyboardFocus();
         showDialogHook(stage);
@@ -475,7 +476,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public GenericDialog show(Stage stage, float x, float y) {
         show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds(), Interpolation.fade)));
-        setPosition(Math.round(x), Math.round(y));
+        setPosition(Math.round(x), FastMath.round(y));
         setKeyboardFocus();
         return this;
     }

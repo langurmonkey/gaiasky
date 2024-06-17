@@ -7,6 +7,8 @@
 
 package gaiasky.util.elements;
 
+import net.jafama.FastMath;
+
 import java.io.Serial;
 
 /**
@@ -90,7 +92,7 @@ public class KeplerSolver {
 
         int ixend = 1;
         int i = 0;
-        double theta = Math.PI;
+        double theta = FastMath.PI;
         a[0] = theta;
         s[0] = 0;
         c[0] = -1;
@@ -102,8 +104,8 @@ public class KeplerSolver {
             for (int ix = 1; ix <= ixend; ix++) {
                 ++i;
                 a[i] = theta * ((2 * ix) - 1);
-                s[i] = Math.sin(a[i]);
-                c[i] = Math.cos(a[i]);
+                s[i] = FastMath.sin(a[i]);
+                c[i] = FastMath.cos(a[i]);
             }
         }
     }
@@ -244,7 +246,7 @@ public class KeplerSolver {
      */
     public static double meanAnomConstrained(double eA,
                                              double ecc) {
-        return eA - ecc * Math.sin(eA);
+        return eA - ecc * FastMath.sin(eA);
     }
 
     /**

@@ -20,6 +20,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.time.Instant;
 
@@ -94,15 +95,15 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             // Parameters of the ellipse
             double a = params.semimajoraxis;
             double f = params.e * params.semimajoraxis;
-            double b = Math.sqrt(Math.pow(a, 2) - Math.pow(f, 2));
+            double b = FastMath.sqrt(Math.pow(a, 2) - FastMath.pow(f, 2));
 
-            int nSamples = Math.min(Math.max(50, (int) (a * 0.01)), 100);
+            int nSamples = FastMath.min(Math.max(50, (int) (a * 0.01)), 100);
             double step = 360d / nSamples;
             Vector3d[] samples = new Vector3d[nSamples + 1];
             int i = 0;
             for (double angledeg = 0; angledeg < 360; angledeg += step) {
-                double angleRad = Math.toRadians(angledeg);
-                Vector3d point = new Vector3d(b * Math.sin(angleRad), 0d, a * Math.cos(angleRad));
+                double angleRad = FastMath.toRadians(angledeg);
+                Vector3d point = new Vector3d(b * FastMath.sin(angleRad), 0d, a * FastMath.cos(angleRad));
                 samples[i] = point;
                 i++;
             }

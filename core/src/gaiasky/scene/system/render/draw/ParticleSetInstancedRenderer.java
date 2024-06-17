@@ -26,7 +26,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
-import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -38,6 +37,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.parse.Parser;
+import net.jafama.FastMath;
 
 import java.util.Random;
 
@@ -220,7 +220,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
                                 } else {
                                     if (colorMin != null && colorMax != null) {
-                                        double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                        double dist = FastMath.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
                                         // fac = 0 -> colorMin,  fac = 1 -> colorMax
                                         double fac = (dist - minDistance) / (maxDistance - minDistance);
                                         interpolateColor(colorMin, colorMax, c, fac);

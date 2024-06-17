@@ -26,6 +26,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
+import net.jafama.FastMath;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -379,7 +380,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     }
 
     public float getMessagesWidth() {
-        return Math.max(getMessage1Width(), getMessage2Width());
+        return FastMath.max(getMessage1Width(), getMessage2Width());
     }
 
 }

@@ -8,6 +8,7 @@
 package gaiasky.util.svt;
 
 import com.badlogic.gdx.utils.LongMap;
+import net.jafama.FastMath;
 
 public class SVTQuadtree<T> {
     public final int MAX_LEVEL = 15;
@@ -182,7 +183,7 @@ public class SVTQuadtree<T> {
      * @return The resolution at the most detailed level.
      */
     public int[] getResolution() {
-        int tiles = (int) Math.pow(2, depth);
+        int tiles = (int) FastMath.pow(2, depth);
         return new int[]{tileSize * tiles * root.length, tileSize * tiles};
     }
 }

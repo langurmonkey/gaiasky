@@ -27,6 +27,7 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
+import net.jafama.FastMath;
 
 public class BillboardEntityRenderSystem implements IObserver {
 
@@ -184,7 +185,7 @@ public class BillboardEntityRenderSystem implements IObserver {
 
         // RENDER ACTUAL STARS
         boolean focusRendered = false;
-        int n = Math.min(set.numBillboards, set.pointData.size());
+        int n = FastMath.min(set.numBillboards, set.pointData.size());
         for (int i = 0; i < n; i++) {
             renderCloseUpStar(set, highlight, desc, set.active[i], fovFactor, set.cPosD, camera, shader, mesh, thPointTimesFovFactor, alpha);
             focusRendered = focusRendered || set.active[i] == set.focusIndex;
@@ -225,7 +226,7 @@ public class BillboardEntityRenderSystem implements IObserver {
             float thAngleQuad = (float) sa.thresholdQuad * camera.getFovFactor();
             double size = 0f;
             if (body.solidAngle >= sa.thresholdPoint * camera.getFovFactor()) {
-                size = Math.tan(thAngleQuad) * body.distToCamera * scaffolding.billboardSizeFactor;
+                size = FastMath.tan(thAngleQuad) * body.distToCamera * scaffolding.billboardSizeFactor;
             }
             return (float) size;
         }

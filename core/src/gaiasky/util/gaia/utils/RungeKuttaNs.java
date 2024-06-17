@@ -7,6 +7,8 @@
 
 package gaiasky.util.gaia.utils;
 
+import net.jafama.FastMath;
+
 public class RungeKuttaNs {
 
     /**
@@ -52,7 +54,7 @@ public class RungeKuttaNs {
         // Calculate the required number of steps, nStep (must be at least 1),
         // and the length of each step:
         long stepNs = tStepMax;
-        int nStep = (int) Math.rint((double) dtNs / (double) stepNs);
+        int nStep = (int) FastMath.rint((double) dtNs / (double) stepNs);
         if (nStep < 1) {
             nStep = 1;
         }

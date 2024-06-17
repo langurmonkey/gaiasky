@@ -9,6 +9,7 @@ package gaiasky.util;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.*;
+import net.jafama.FastMath;
 
 import java.lang.StringBuilder;
 import java.util.Arrays;
@@ -78,7 +79,7 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
 
     /** Creates a new map identical to the specified map. */
     public ObjectDoubleMap(ObjectDoubleMap<? extends K> map) {
-        this((int) Math.floor(map.keyTable.length * map.loadFactor), map.loadFactor);
+        this((int) FastMath.floor(map.keyTable.length * map.loadFactor), map.loadFactor);
         System.arraycopy(map.keyTable, 0, keyTable, 0, map.keyTable.length);
         System.arraycopy(map.valueTable, 0, valueTable, 0, map.valueTable.length);
         size = map.size;
@@ -88,7 +89,7 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
         if (capacity < 0) {
             throw new IllegalArgumentException("capacity must be >= 0: " + capacity);
         } else {
-            int tableSize = MathUtils.nextPowerOfTwo(Math.max(2, (int) Math.ceil((float) capacity / loadFactor)));
+            int tableSize = MathUtils.nextPowerOfTwo(Math.max(2, (int) FastMath.ceil((float) capacity / loadFactor)));
             if (tableSize > 1073741824) {
                 throw new IllegalArgumentException("The required capacity is too large: " + capacity);
             } else {
@@ -309,7 +310,7 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
         K[] keyTable = this.keyTable;
         double[] valueTable = this.valueTable;
         for (int i = valueTable.length - 1; i >= 0; i--)
-            if (keyTable[i] != null && Math.abs(valueTable[i] - value) <= epsilon)
+            if (keyTable[i] != null && FastMath.abs(valueTable[i] - value) <= epsilon)
                 return true;
         return false;
     }
@@ -344,7 +345,7 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
         double[] valueTable = this.valueTable;
         for (int i = valueTable.length - 1; i >= 0; i--) {
             K key = keyTable[i];
-            if (key != null && Math.abs(valueTable[i] - value) <= epsilon)
+            if (key != null && FastMath.abs(valueTable[i] - value) <= epsilon)
                 return key;
         }
         return null;

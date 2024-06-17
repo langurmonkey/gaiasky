@@ -37,6 +37,7 @@ import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
+import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 
@@ -244,7 +245,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             return false;
         });
 
-        bw = Math.max(landOn.getWidth(), landAt.getWidth());
+        bw = FastMath.max(landOn.getWidth(), landAt.getWidth());
         bw += 6.0f;
 
         goTo.setSize(bw, bw);

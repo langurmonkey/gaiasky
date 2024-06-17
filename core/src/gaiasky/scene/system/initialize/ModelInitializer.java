@@ -43,6 +43,7 @@ import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class ModelInitializer extends AbstractInitSystem {
     private static final Logger.Log logger = Logger.getLogger(ModelInitializer.class.getSimpleName());
@@ -295,10 +296,10 @@ public class ModelInitializer extends AbstractInitSystem {
         scaffolding.locThresholdLabel = 1000.0f;
         scaffolding.locVaMultiplier = 2.8f;
 
-        sa.thresholdPoint = Math.toRadians(0.30);
+        sa.thresholdPoint = FastMath.toRadians(0.30);
         sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
         if (isBillboardGal) {
-            sa.thresholdQuad = Math.toRadians(0.3);
+            sa.thresholdQuad = FastMath.toRadians(0.3);
         }
 
         label.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
@@ -346,8 +347,8 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     private void initializeBillboard(ModelScaffolding scaffolding, SolidAngle sa, Label label, boolean isBillboardGalaxy) {
-        double baseThreshold = Math.toRadians(0.30);
-        sa.thresholdLabel = Math.toRadians(0.2);
+        double baseThreshold = FastMath.toRadians(0.30);
+        sa.thresholdLabel = FastMath.toRadians(0.2);
         sa.thresholdNone = 0.002;
         sa.thresholdPoint = baseThreshold / 1e9;
         if (!isBillboardGalaxy) {

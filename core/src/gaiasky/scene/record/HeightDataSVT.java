@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import gaiasky.scene.record.BilinearInterpolator.GridModel;
 import gaiasky.util.svt.SVTQuadtree;
+import net.jafama.FastMath;
 
 import java.nio.file.Path;
 
@@ -39,7 +40,7 @@ public class HeightDataSVT implements IHeightData {
                     if (manager.contains(tile.object.toString())) {
                         Pixmap pm = manager.get(tile.object.toString());
                         double[] tileUV = tile.getUV();
-                        double tilesPerLevel = Math.pow(2.0, level);
+                        double tilesPerLevel = FastMath.pow(2.0, level);
                         double tileU = (u - tileUV[0]) * tilesPerLevel * svt.root.length;
                         double tileV = (v - tileUV[1]) * tilesPerLevel;
                         model.setPixmap(pm);

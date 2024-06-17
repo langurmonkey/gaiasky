@@ -7,8 +7,11 @@
 package gaiasky.util.gdx.model.gltf.scene3d.lights;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.environment.ShadowMap;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -16,8 +19,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class DirectionalShadowLight extends DirectionalLightEx implements ShadowMap, Disposable
 {
@@ -89,7 +92,7 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 		float h = box.getHeight();
 		float d = box.getDepth();
 		
-		float s = Math.max(Math.max(w, h), d);
+		float s = FastMath.max(Math.max(w, h), d);
 		
 		w = h = d = s * SQRT2;
 		

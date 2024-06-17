@@ -14,7 +14,10 @@ import gaiasky.util.units.Position.PositionType;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked

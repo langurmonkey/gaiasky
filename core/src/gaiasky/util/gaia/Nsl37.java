@@ -11,6 +11,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.QuaternionDouble;
+import net.jafama.FastMath;
 
 public class Nsl37 extends AnalyticalAttitudeDataServer {
 
@@ -71,8 +72,8 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
         double z = precRate * (lSun - lSunRef);
         double zDot = precRate * lSunDot;
 
-        double s1z = Math.sin(z);
-        double c1z = Math.cos(z);
+        double s1z = FastMath.sin(z);
+        double c1z = FastMath.cos(z);
         double s2z = 2 * c1z * s1z;
         double c2z = 2 * c1z * c1z - 1;
         double s3z = s2z * c1z + c2z * s1z;
@@ -92,7 +93,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
 
         omega = this.getOmegaRef() + omegaArg + on * (nu - nu0) + ocn * (Math.cos(nu) - c1a) + os2n * (Math.sin(2 * nu) - s2a) + oc3n * (Math.cos(3 * nu) - c3a) + os4n * (Math.sin(4 * nu) - s4a) + oc5n * (Math.cos(5 * nu) - c5a);
 
-        omegaDot = TWO_PI * 86400e9 / (double) scanPerNs + nuDot * (on - ocn * Math.sin(nu) + 2 * os2n * Math.cos(2 * nu) - 3 * oc3n * Math.sin(3 * nu) + 4 * os4n * Math.cos(4 * nu) - 5 * oc5n * Math.sin(5 * nu));
+        omegaDot = TWO_PI * 86400e9 / (double) scanPerNs + nuDot * (on - ocn * FastMath.sin(nu) + 2 * os2n * FastMath.cos(2 * nu) - 3 * oc3n * FastMath.sin(3 * nu) + 4 * os4n * FastMath.cos(4 * nu) - 5 * oc5n * FastMath.sin(5 * nu));
 
         nuRevs = 0;
         // put nu in [0, 2*pi[ and adjust number of revolutions accordingly
@@ -117,7 +118,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
             omegaRevs -= n;
         }
 
-        // EventManager.publish(Events.DEBUG_RAM, "Nu: " + (float) Math.toDegrees(getNuMod4Pi()) + ", Omega: " + (float) Math.toDegrees(getOmegaMod4Pi()));
+        // EventManager.publish(Events.DEBUG_RAM, "Nu: " + (float) FastMath.toDegrees(getNuMod4Pi()) + ", Omega: " + (float) FastMath.toDegrees(getOmegaMod4Pi()));
 
         QuaternionDouble[] qAndRate = AttitudeConverter.heliotropicToQuaternions(lSun, super.getXiRef(), getNuMod4Pi(), getOmegaMod4Pi(), lSunDot, nuDot, omegaDot);
 
@@ -141,8 +142,8 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
         sun0.setTime(getRefTime() * Nature.NS_TO_D);
         this.lSunRef = sun0.getSolarLongitude();
 
-        sx = Math.sin(xi);
-        cx = Math.cos(xi);
+        sx = FastMath.sin(xi);
+        cx = FastMath.cos(xi);
         sx2 = sx * sx;
         sx4 = sx2 * sx2;
         cx2 = cx * cx;
@@ -150,8 +151,8 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
         cx4 = cx2 * cx2;
         cx6 = cx4 * cx2;
 
-        s1a = Math.sin(nu0);
-        c1a = Math.cos(nu0);
+        s1a = FastMath.sin(nu0);
+        c1a = FastMath.cos(nu0);
         s2a = 2 * c1a * s1a;
         c2a = 2 * c1a * c1a - 1;
         s3a = s2a * c1a + c2a * s1a;
@@ -204,7 +205,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
      * @return angle modulo 4*PI
      */
     public double modFourPi(double angle) {
-        double rev = Math.floor(angle / FOUR_PI);
+        double rev = FastMath.floor(angle / FOUR_PI);
         return angle - FOUR_PI * rev;
     }
 

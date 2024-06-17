@@ -9,6 +9,7 @@ package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.jafama.FastMath;
 
 public class Vector3Attribute extends Attribute {
     public static final String PlanetPosAlias = "planetPos";
@@ -46,7 +47,7 @@ public class Vector3Attribute extends Attribute {
 
     @Override
     public int hashCode() {
-        double result = Math.pow(2, index);
+        double result = FastMath.pow(2, index);
         result = 977 * result + NumberUtils.floatToRawIntBits(value.x) + NumberUtils.floatToRawIntBits(value.y) + NumberUtils.floatToRawIntBits(value.z);
         return (int) result;
     }

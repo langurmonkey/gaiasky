@@ -20,6 +20,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);
@@ -261,7 +262,7 @@ public class Trajectory implements Component {
     }
 
     public void setNumSamples(Long numSamples) {
-        this.numSamples = Math.toIntExact(numSamples);
+        this.numSamples = FastMath.toIntExact(numSamples);
     }
 
     public void setFadeDistanceUp(Double distUp) {
@@ -282,8 +283,8 @@ public class Trajectory implements Component {
 
     public void setBody(Entity entity, double radius, float distDown, float distUp) {
         this.body = entity;
-        this.distUp = (float) Math.max(radius * distUp, 500 * Constants.KM_TO_U);
-        this.distDown = (float) Math.max(radius * distDown, 50 * Constants.KM_TO_U);
+        this.distUp = (float) FastMath.max(radius * distUp, 500 * Constants.KM_TO_U);
+        this.distDown = (float) FastMath.max(radius * distDown, 50 * Constants.KM_TO_U);
     }
 
     /**

@@ -7,6 +7,8 @@
 
 package gaiasky.scene.record;
 
+import net.jafama.FastMath;
+
 public class BilinearInterpolator {
 
     /**
@@ -53,12 +55,12 @@ public class BilinearInterpolator {
         u -= dx2;
         v -= dy2;
 
-        int i1 = (int) Math.floor(W * u);
+        int i1 = (int) FastMath.floor(W * u);
         if (i1 < 0) {
             i1 = wrapX ? W - 1 : 0;
         }
         int i2 = (i1 + 1) % W;
-        int j1 = (int) Math.floor(H * v);
+        int j1 = (int) FastMath.floor(H * v);
         if (j1 < 0) {
             j1 = wrapY ? H - 1 : 0;
         }

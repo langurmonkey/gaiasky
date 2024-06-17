@@ -7,8 +7,7 @@
 
 package gaiasky.util.gaia.time;
 
-import java.io.Serial;
-import java.io.Serializable;
+import net.jafama.FastMath;
 
 public class Days extends ConcreteDuration {
 
@@ -33,7 +32,7 @@ public class Days extends ConcreteDuration {
      * @return days expressed in nanoSec
      */
     public static long asNanoSecs(final double days) {
-        return Math.round(days * Duration.NS_PER_DAY);
+        return FastMath.round(days * Duration.NS_PER_DAY);
     }
 
     /**
@@ -102,7 +101,7 @@ public class Days extends ConcreteDuration {
      */
     @Override
     public long asNanoSecs() {
-        return Math.round(value * Duration.NS_PER_DAY);
+        return FastMath.round(value * Duration.NS_PER_DAY);
     }
 
     /**

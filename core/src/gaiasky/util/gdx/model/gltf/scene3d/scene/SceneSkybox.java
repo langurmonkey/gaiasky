@@ -27,6 +27,7 @@ import gaiasky.util.gdx.shader.attribute.CubemapAttribute;
 import gaiasky.util.gdx.shader.attribute.Matrix4Attribute;
 import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 import gaiasky.util.gdx.shader.provider.IntShaderProvider;
+import net.jafama.FastMath;
 
 public class SceneSkybox implements IntRenderableProvider, Updatable, Disposable {
 
@@ -123,7 +124,7 @@ public class SceneSkybox implements IntRenderableProvider, Updatable, Disposable
     @Override
     public void update(Camera camera, float delta) {
         // scale skybox to camera range.
-        float s = camera.far * (float) Math.sqrt(2.0);
+        float s = camera.far * (float) FastMath.sqrt(2.0);
         box.worldTransform.setToScaling(s, s, s);
         box.worldTransform.setTranslation(camera.position);
     }

@@ -7,6 +7,8 @@
 
 package gaiasky.util.comp;
 
+import net.jafama.FastMath;
+
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -28,7 +30,7 @@ public final class FilenameComparator implements Comparator<Path> {
         // Splitting both input strings by the above patterns
         String[] split1 = NUMBERS.split(o1);
         String[] split2 = NUMBERS.split(o2);
-        for (int i = 0; i < Math.min(split1.length, split2.length); i++) {
+        for (int i = 0; i < FastMath.min(split1.length, split2.length); i++) {
             char c1 = split1[i].charAt(0);
             char c2 = split2[i].charAt(0);
             int cmp = 0;

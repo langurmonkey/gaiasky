@@ -18,6 +18,7 @@ import gaiasky.event.EventManager;
 import gaiasky.gui.MessageBean;
 import gaiasky.gui.NotificationsInterface;
 import gaiasky.util.Logger.Log;
+import net.jafama.FastMath;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -80,7 +81,7 @@ public class CrashReporter {
         String crf4 = "Full log file saved to: " + (logFile != null ? logFile.toAbsolutePath() : "permission error");
         String crf2 = "Please attach these files to the bug report";
         String crf3 = "Create a bug report here: " + Settings.REPO_ISSUES;
-        int len = Math.max(crf1.length(), Math.max(crf3.length(), crf4.length()));
+        int len = FastMath.max(crf1.length(), FastMath.max(crf3.length(), crf4.length()));
         char[] chars = new char[len];
         Arrays.fill(chars, '#');
         String separatorLine = new String(chars);

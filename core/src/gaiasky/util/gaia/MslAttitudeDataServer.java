@@ -10,6 +10,7 @@ package gaiasky.util.gaia;
 import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.gaia.utils.AttitudeUtils;
 import gaiasky.util.math.QuaternionDouble;
+import net.jafama.FastMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +127,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
 
         // adjust step to be the largest integer fraction of the timeGranularity
         // less than or equal to the specified maximum step:
-        long maxStep = Math.round(maxStepSec * 1e9);
+        long maxStep = FastMath.round(maxStepSec * 1e9);
         long part = 1L;
         step = timeGranularity;
         while (step > maxStep || timeGranularity - part * step > 0L) {
@@ -213,7 +214,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
      * @param maxStepInSec maximum step in [s]
      */
     public void setMaxStepForIntegrator(double maxStepInSec) {
-        stepForIntegrator = Math.round(maxStepInSec * 1e9);
+        stepForIntegrator = FastMath.round(maxStepInSec * 1e9);
         useDefaultStepForIntegrator = false;
         initialized = false;
     }
@@ -277,7 +278,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
      */
     private void setExtraOmega(double extraOmega) {
         this.extraOmega = extraOmega;
-        this.qExtraOmega.set(0.0, 0.0, Math.sin(extraOmega / 2), Math.cos(extraOmega / 2));
+        this.qExtraOmega.set(0.0, 0.0, FastMath.sin(extraOmega / 2), FastMath.cos(extraOmega / 2));
     }
 
     /**

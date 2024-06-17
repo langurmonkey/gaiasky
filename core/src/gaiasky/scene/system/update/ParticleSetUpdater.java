@@ -20,6 +20,7 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
+import net.jafama.FastMath;
 
 import java.nio.file.Files;
 
@@ -123,7 +124,7 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
 
             // Update close stars
             int j = 0;
-            for (int i = 0; i < Math.min(set.proximity.updating.length, set.pointData.size()); i++) {
+            for (int i = 0; i < FastMath.min(set.proximity.updating.length, set.pointData.size()); i++) {
                 if (utils.filter(set.active[i], set, datasetDesc)
                         && set.isVisible(set.active[i])) {
                     IParticleRecord closeStar = set.pointData.get(set.active[i]);

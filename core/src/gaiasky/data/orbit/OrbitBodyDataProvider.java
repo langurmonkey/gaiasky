@@ -13,7 +13,6 @@ import gaiasky.data.util.OrbitDataLoader;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
@@ -21,6 +20,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -71,7 +71,7 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
             if (coordinates != null && coordinates.coordinates != null) {
                 double period = parameter.orbitalPeriod * 0.999d;
                 int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300.0 * period / 365.0);
-                numSamples = Math.max(200, Math.min(2000, numSamples));
+                numSamples = FastMath.max(200, FastMath.min(2000, numSamples));
                 data = getNextData(numSamples);
                 String bodyDesc = parameter.name;
                 double last = 0, accum = 0;
@@ -107,11 +107,11 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                     double eclX = aux2.x;
 
                     if (last == 0) {
-                        last = Math.toDegrees(eclX);
+                        last = FastMath.toDegrees(eclX);
                     }
 
-                    accum += Math.toDegrees(eclX) - last;
-                    last = Math.toDegrees(eclX);
+                    accum += FastMath.toDegrees(eclX) - last;
+                    last = FastMath.toDegrees(eclX);
 
                     if (accum > 359 || t + stepMs > period * Nature.D_TO_MS) {
                         break;

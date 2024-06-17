@@ -9,8 +9,8 @@ package gaiasky.util;
 
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import net.jafama.FastMath;
 import org.apfloat.Apfloat;
-import org.lwjgl.opengl.GL30;
 
 public class Constants {
 
@@ -198,7 +198,7 @@ public class Constants {
     // Warp steps per side (positive and negative)
     public static final int WARP_STEPS = 45;
     // Maximum time warp factor
-    public static final double MAX_WARP = Math.pow(2, WARP_STEPS);
+    public static final double MAX_WARP = FastMath.pow(2, WARP_STEPS);
     // Minimum time warp factor
     public static final double MIN_WARP = -MAX_WARP;
     // Max dataset highlight size factor

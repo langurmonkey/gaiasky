@@ -9,8 +9,6 @@ package gaiasky.util.gaia.time;
 
 import gaiasky.util.coord.AstroUtils;
 
-import java.io.Serializable;
-
 public interface Duration {
     /**
      * A few obvious constants

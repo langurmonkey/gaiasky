@@ -7,6 +7,8 @@
 
 package gaiasky.util;
 
+import net.jafama.FastMath;
+
 /**
  * Constants in nature.
  */
@@ -16,9 +18,9 @@ public class Nature {
      * ======= ANGLE UNITS =======
      */
     /** Degrees to radians **/
-    public static final double TO_RAD = Math.PI / 180;
+    public static final double TO_RAD = FastMath.PI / 180;
     /** Radians to degrees **/
-    public static final double TO_DEG = 180 / Math.PI;
+    public static final double TO_DEG = 180 / FastMath.PI;
     /** Degrees to arc-seconds **/
     public static final double DEG_TO_ARCSEC = 3600;
     /** Arc-seconds to degrees **/

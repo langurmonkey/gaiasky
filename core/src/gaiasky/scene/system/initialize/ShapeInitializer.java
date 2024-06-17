@@ -24,6 +24,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import net.jafama.FastMath;
 
 public class ShapeInitializer extends AbstractInitSystem {
     public ShapeInitializer(boolean setUp, Family family, int priority) {
@@ -80,11 +81,11 @@ public class ShapeInitializer extends AbstractInitSystem {
 
         // Solid angle.
         var sa = Mapper.sa.get(entity);
-        double baseThreshold = Math.toRadians(2.0);
+        double baseThreshold = FastMath.toRadians(2.0);
         sa.thresholdNone = 0.0;
         sa.thresholdPoint = baseThreshold / 10.0;
         sa.thresholdQuad = baseThreshold;
-        sa.thresholdLabel = Math.toRadians(0.2);
+        sa.thresholdLabel = FastMath.toRadians(0.2);
 
         initModel(entity);
     }

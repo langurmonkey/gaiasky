@@ -19,6 +19,7 @@ package gaiasky.util.gdx.g2d;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
+import net.jafama.FastMath;
 
 import static gaiasky.util.gdx.g2d.GlyphLayout.GlyphRun;
 
@@ -98,8 +99,8 @@ public class BitmapFontCache {
         if (xAmount == 0 && yAmount == 0)
             return;
         if (integer) {
-            xAmount = Math.round(xAmount);
-            yAmount = Math.round(yAmount);
+            xAmount = FastMath.round(xAmount);
+            yAmount = FastMath.round(yAmount);
         }
         x += xAmount;
         y += yAmount;
@@ -409,10 +410,10 @@ public class BitmapFontCache {
         final float u = glyph.u, u2 = glyph.u2, v = glyph.v, v2 = glyph.v2;
 
         if (integer) {
-            x = Math.round(x);
-            y = Math.round(y);
-            width = Math.round(width);
-            height = Math.round(height);
+            x = FastMath.round(x);
+            y = FastMath.round(y);
+            width = FastMath.round(width);
+            height = FastMath.round(height);
         }
         final float x2 = x + width, y2 = y + height;
 

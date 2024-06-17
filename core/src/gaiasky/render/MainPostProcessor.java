@@ -42,6 +42,7 @@ import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
+import net.jafama.FastMath;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -144,7 +145,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private int[] getSize(RenderType type) {
         return switch (type) {
             case screen ->
-                    new int[]{(int) Math.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) Math.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale)};
+                    new int[]{(int) FastMath.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) FastMath.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale)};
             case screenshot ->
                     new int[]{Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]};
             case frame -> new int[]{Settings.settings.frame.resolution[0], Settings.settings.frame.resolution[1]};
@@ -162,7 +163,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, true, false, !safeMode, !safeMode, safeMode);
+        ppb.pp = new PostProcessor(rt, FastMath.round(width), FastMath.round(height), true, true, false, !safeMode, !safeMode, safeMode);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // LIGHT GLOW
@@ -404,7 +405,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         } else {
             lgw = 1000;
         }
-        lgh = Math.round(lgw / ar);
+        lgh = FastMath.round(lgw / ar);
         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
         if (lightglow != null) {
             lightglow.setNSamples(1);
@@ -510,7 +511,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         glowFactor = glowFactor / 0.06f;
         if (cubemap) {
             float ts = (float) starBrightness * (float) glowFactor * pointSize * 7e-2f / fovFactor;
-            return Math.min(ts * 0.2f, 5e-1f);
+            return FastMath.min(ts * 0.2f, 5e-1f);
         } else {
             return (float) starBrightness * (float) glowFactor * 0.2f;
         }

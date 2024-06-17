@@ -10,6 +10,7 @@ package gaiasky.util.math;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import net.jafama.FastMath;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -777,7 +778,7 @@ public class Matrix4d implements Serializable {
      */
     public Matrix4d setToProjection(double near, double far, double fov, double aspectRatio) {
         idt();
-        double l_fd = 1.0 / Math.tan((fov * (Math.PI / 180)) / 2.0);
+        double l_fd = 1.0 / FastMath.tan((fov * (Math.PI / 180)) / 2.0);
         double l_a1 = (far + near) / (near - far);
         double l_a2 = (2 * far * near) / (near - far);
         val[M00] = l_fd / aspectRatio;
@@ -1365,19 +1366,19 @@ public class Matrix4d implements Serializable {
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleX() {
-        return (MathUtilsDouble.isZero(val[Matrix4d.M01]) && MathUtilsDouble.isZero(val[Matrix4d.M02])) ? val[Matrix4d.M00] : Math.sqrt(getScaleXSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4d.M01]) && MathUtilsDouble.isZero(val[Matrix4d.M02])) ? val[Matrix4d.M00] : FastMath.sqrt(getScaleXSquared());
     }
 
     /** @return the scale factor on the Y axis (non-negative) */
     public double getScaleY() {
-        return (MathUtilsDouble.isZero(val[Matrix4d.M10]) && MathUtilsDouble.isZero(val[Matrix4d.M12])) ? val[Matrix4d.M11] : Math.sqrt(getScaleYSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4d.M10]) && MathUtilsDouble.isZero(val[Matrix4d.M12])) ? val[Matrix4d.M11] : FastMath.sqrt(getScaleYSquared());
     }
 
     // @on
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleZ() {
-        return (MathUtilsDouble.isZero(val[Matrix4d.M20]) && MathUtilsDouble.isZero(val[Matrix4d.M21])) ? val[Matrix4d.M22] : Math.sqrt(getScaleZSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4d.M20]) && MathUtilsDouble.isZero(val[Matrix4d.M21])) ? val[Matrix4d.M22] : FastMath.sqrt(getScaleZSquared());
     }
 
     // @on

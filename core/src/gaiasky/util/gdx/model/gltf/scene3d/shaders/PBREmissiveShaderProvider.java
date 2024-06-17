@@ -13,6 +13,7 @@ import gaiasky.util.gdx.shader.IntShader;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+import net.jafama.FastMath;
 
 public class PBREmissiveShaderProvider extends PBRShaderProvider
 {
@@ -45,14 +46,14 @@ public class PBREmissiveShaderProvider extends PBRShaderProvider
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, TextureAttribute.Emissive);
 			if(attribute != null){
 				prefix += "#define v_emissiveUV v_texCoord" + attribute.uvIndex + "\n";
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		if(hasAlpha){
 			TextureAttribute attribute = renderable.material.get(TextureAttribute.class, TextureAttribute.Diffuse);
 			if(attribute != null){
 				prefix += "#define v_diffuseUV v_texCoord" + attribute.uvIndex + "\n";
-				maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex);
+				maxUVIndex = FastMath.max(maxUVIndex, attribute.uvIndex);
 			}
 		}
 		

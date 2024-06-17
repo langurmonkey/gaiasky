@@ -15,6 +15,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.StarSet;
 import gaiasky.util.Settings;
+import net.jafama.FastMath;
 
 public class ParticleSetExtractor extends AbstractExtractSystem {
     public ParticleSetExtractor(Family family,
@@ -62,7 +63,7 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
         if (renderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
             if (Mapper.tagOctreeObject.has(entity)) {
                 var octant = Mapper.octant.get(entity);
-                if (octant.octant.observed && octant.octant.viewAngle > Math.toRadians(117)) {
+                if (octant.octant.observed && octant.octant.viewAngle > FastMath.toRadians(117)) {
                     addToRender(render, RenderGroup.LINE);
                 }
             } else {

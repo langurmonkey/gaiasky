@@ -7,7 +7,6 @@
 
 package gaiasky.data.group.reader;
 
-import java.io.IOException;
 import java.nio.MappedByteBuffer;
 
 public class MappedBufferDataReader implements IDataReader {

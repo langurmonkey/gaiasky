@@ -22,8 +22,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scene.Mapper;
-import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;

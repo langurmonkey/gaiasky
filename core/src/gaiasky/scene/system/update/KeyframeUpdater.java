@@ -15,6 +15,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.VertsView;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 public class KeyframeUpdater extends AbstractUpdateSystem {
 
@@ -59,7 +60,7 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
             p1.set(p.x.get(1), p.y.get(1), p.z.get(1));
 
             Vector3d c = D33.set(camera.getPos());
-            double len = Math.max(1e-9, Math.atan(0.03) * c.dst(p0));
+            double len = FastMath.max(1e-9, FastMath.atan(0.03) * c.dst(p0));
 
             Vector3d v = c.set(p1).sub(p0).nor().scl(len);
             p.x.set(1, p0.x + v.x);

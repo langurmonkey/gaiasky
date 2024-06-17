@@ -8,15 +8,10 @@
 package gaiasky.test;
 
 import java.lang.management.ManagementFactory;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 public class ParallelSortBenchmark extends AbstractBenchmark {
 

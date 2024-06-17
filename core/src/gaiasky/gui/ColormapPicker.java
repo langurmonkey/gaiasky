@@ -28,7 +28,6 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.CatalogInfo;
-import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.Pair;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;

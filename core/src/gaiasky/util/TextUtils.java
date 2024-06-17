@@ -7,11 +7,10 @@
 
 package gaiasky.util;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.util.i18n.I18n;
+import net.jafama.FastMath;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -292,10 +291,10 @@ public class TextUtils {
     public static String getFormattedTimeWarp(double warp) {
         if (warp > 0.9 || warp < -0.9) {
             // Remove decimals
-            warp = Math.round(warp);
+            warp = FastMath.round(warp);
         } else {
             // Round to 2 decimal places
-            warp = Math.round(warp * 1000.0) / 1000.0;
+            warp = FastMath.round(warp * 1000.0) / 1000.0;
         }
         return "x" + GlobalResources.formatNumber(warp);
     }

@@ -31,6 +31,7 @@ import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import net.jafama.FastMath;
 import org.apfloat.Apfloat;
 
 public class SpacecraftCamera extends AbstractCamera implements IObserver {
@@ -404,7 +405,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public double speedScaling() {
-        return Math.max(0.001, scVel.len());
+        return FastMath.max(0.001, scVel.len());
     }
 
 }

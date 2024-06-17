@@ -8,8 +8,6 @@
 package gaiasky.util.test;
 
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.MathManager;
-import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 
@@ -29,8 +27,6 @@ public class AstroUtilsTest {
     }
 
     public static void main(String[] args) {
-        MathManager.initialize(true);
-
         julianDate("1099-12-19T12:00:00.000Z", 2122820.0);
         julianDate("1993-01-01T00:00:00.00Z", 2448988.5);
         julianDate("2000-01-01T00:00:00.00Z", 2451544.5);

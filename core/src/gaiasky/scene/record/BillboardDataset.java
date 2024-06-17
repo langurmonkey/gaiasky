@@ -16,6 +16,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
+import net.jafama.FastMath;
 
 import java.util.List;
 
@@ -142,7 +143,7 @@ public class BillboardDataset {
      */
     public void setMaxSize(Double maxSize) {
         this.maxSizes = new double[GraphicsQuality.values().length];
-        double val = Math.tan(Math.toRadians(maxSize));
+        double val = FastMath.tan(Math.toRadians(maxSize));
         for (int i = 0; i < GraphicsQuality.values().length; i++) {
             this.maxSizes[i] = val;
         }
@@ -170,7 +171,7 @@ public class BillboardDataset {
         if (maxSizes.length == len) {
             this.maxSizes = new double[GraphicsQuality.values().length];
             for (int i = 0; i < GraphicsQuality.values().length; i++) {
-                this.maxSizes[i] = Math.tan(Math.toRadians(maxSizes[i]));
+                this.maxSizes[i] = FastMath.tan(Math.toRadians(maxSizes[i]));
             }
         } else {
             // What to do?

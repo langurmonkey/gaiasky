@@ -27,7 +27,7 @@ public class Coordinates {
      * with T=0
      **/
     public static final double OBLIQUITY_DEG_J2000 = 23.4392808;
-    public static final double OBLIQUITY_RAD_J2000 = Math.toRadians(OBLIQUITY_DEG_J2000);
+    public static final double OBLIQUITY_RAD_J2000 = FastMath.toRadians(OBLIQUITY_DEG_J2000);
     /**
      * Obliquity of ecliptic in J2000 in arcsec
      **/
@@ -345,11 +345,11 @@ public class Coordinates {
      */
     public static Vector2d eclipticToEquatorial(double lambda, double beta, Vector2d out) {
 
-        double alpha = Math.atan2((Math.sin(lambda) * Math.cos(OBLIQUITY_RAD_J2000) - Math.tan(beta) * Math.sin(OBLIQUITY_RAD_J2000)), Math.cos(lambda));
+        double alpha = FastMath.atan2((Math.sin(lambda) * FastMath.cos(OBLIQUITY_RAD_J2000) - FastMath.tan(beta) * FastMath.sin(OBLIQUITY_RAD_J2000)), FastMath.cos(lambda));
         if (alpha < 0) {
-            alpha += Math.PI * 2;
+            alpha += FastMath.PI * 2;
         }
-        double delta = Math.asin(Math.sin(beta) * Math.cos(OBLIQUITY_RAD_J2000) + Math.cos(beta) * Math.sin(OBLIQUITY_RAD_J2000) * Math.sin(lambda));
+        double delta = FastMath.asin(Math.sin(beta) * FastMath.cos(OBLIQUITY_RAD_J2000) + FastMath.cos(beta) * FastMath.sin(OBLIQUITY_RAD_J2000) * FastMath.sin(lambda));
 
         return out.set(alpha, delta);
     }
@@ -409,16 +409,16 @@ public class Coordinates {
      * chaining.
      */
     public static Vector3d sphericalToCartesian(double longitude, double latitude, double radius, Vector3d out) {
-        out.x = radius * Math.cos(latitude) * Math.sin(longitude);
-        out.y = radius * Math.sin(latitude);
-        out.z = radius * Math.cos(latitude) * Math.cos(longitude);
+        out.x = radius * FastMath.cos(latitude) * FastMath.sin(longitude);
+        out.y = radius * FastMath.sin(latitude);
+        out.z = radius * FastMath.cos(latitude) * FastMath.cos(longitude);
         return out;
     }
 
     public static Vector3b sphericalToCartesian(double longitude, double latitude, Apfloat radius, Vector3b out) {
-        out.x = radius.multiply(new Apfloat(Math.cos(latitude) * Math.sin(longitude), Constants.PREC));
+        out.x = radius.multiply(new Apfloat(Math.cos(latitude) * FastMath.sin(longitude), Constants.PREC));
         out.y = radius.multiply(new Apfloat(Math.sin(latitude), Constants.PREC));
-        out.z = radius.multiply(new Apfloat(Math.cos(latitude) * Math.cos(longitude), Constants.PREC));
+        out.z = radius.multiply(new Apfloat(Math.cos(latitude) * FastMath.cos(longitude), Constants.PREC));
         return out;
     }
 
@@ -454,14 +454,14 @@ public class Coordinates {
         double zsq = vec.z * vec.z;
         double distance = FastMath.sqrt(xsq + ysq + zsq);
 
-        double alpha = Math.atan2(vec.x, vec.z);
+        double alpha = FastMath.atan2(vec.x, vec.z);
         if (alpha < 0) {
-            alpha += 2 * Math.PI;
+            alpha += 2 * FastMath.PI;
         }
 
         double delta;
         if (zsq + xsq == 0) {
-            delta = (vec.y > 0 ? Math.PI / 2 : -Math.PI / 2);
+            delta = (vec.y > 0 ? FastMath.PI / 2 : -Math.PI / 2);
         } else {
             delta = FastMath.atan(vec.y / FastMath.sqrt(zsq + xsq));
         }
@@ -512,14 +512,14 @@ public class Coordinates {
         double zsq = z * z;
         double distance = FastMath.sqrt(xsq + ysq + zsq);
 
-        double alpha = Math.atan2(x, z);
+        double alpha = FastMath.atan2(x, z);
         if (alpha < 0) {
-            alpha += 2 * Math.PI;
+            alpha += 2 * FastMath.PI;
         }
 
         double delta;
         if (zsq + xsq == 0) {
-            delta = (y > 0 ? Math.PI / 2 : -Math.PI / 2);
+            delta = (y > 0 ? FastMath.PI / 2 : -Math.PI / 2);
         } else {
             delta = FastMath.atan(y / FastMath.sqrt(zsq + xsq));
         }

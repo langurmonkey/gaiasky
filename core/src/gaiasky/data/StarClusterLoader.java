@@ -29,6 +29,7 @@ import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
+import net.jafama.FastMath;
 import org.apfloat.Apfloat;
 import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
@@ -154,9 +155,9 @@ public class StarClusterLoader extends AbstractSceneLoader {
             Object[] row = rs.getRow();
             String[] names = parseName(row[indices.get(ClusterProperties.NAME)].toString());
             double ra = getDouble(row, ClusterProperties.RA, indices, table, "deg");
-            double rarad = Math.toRadians(ra);
+            double rarad = FastMath.toRadians(ra);
             double dec = getDouble(row, ClusterProperties.DEC, indices, table, "deg");
-            double decrad = Math.toRadians(dec);
+            double decrad = FastMath.toRadians(dec);
             double distpc = 0;
             if (indices.containsKey(ClusterProperties.DIST)) {
                 distpc = getDouble(row, ClusterProperties.DIST, indices, table, "pc");
@@ -196,9 +197,9 @@ public class StarClusterLoader extends AbstractSceneLoader {
             String[] tokens = line.split(",");
             String[] names = parseName(tokens[indices.get(ClusterProperties.NAME)]);
             double ra = getDouble(tokens, ClusterProperties.RA, indices);
-            double raRad = Math.toRadians(ra);
+            double raRad = FastMath.toRadians(ra);
             double dec = getDouble(tokens, ClusterProperties.DEC, indices);
-            double decRad = Math.toRadians(dec);
+            double decRad = FastMath.toRadians(dec);
             double distPc = 0;
             if (indices.containsKey(ClusterProperties.DIST)) {
                 distPc = getDouble(tokens, ClusterProperties.DIST, indices);
@@ -220,7 +221,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
     private void addCluster(String[] names, double ra, double raRad, double dec, double decRad, double dist, double distPc, double muAlphaStar, double muDelta, double radVel, double radiusDeg, int nStars, Array<Entity> list) {
         Vector3b pos = Coordinates.sphericalToCartesian(raRad, decRad, new Apfloat(dist, Constants.PREC), new Vector3b());
 
-        Vector3d pmv = AstroUtils.properMotionsToCartesian(muAlphaStar, muDelta, radVel, Math.toRadians(ra), Math.toRadians(dec), distPc, new Vector3d());
+        Vector3d pmv = AstroUtils.properMotionsToCartesian(muAlphaStar, muDelta, radVel, FastMath.toRadians(ra), FastMath.toRadians(dec), distPc, new Vector3d());
 
         Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
         Vector3 pmSph = new Vector3((float) (muAlphaStar), (float) (muDelta), (float) radVel);

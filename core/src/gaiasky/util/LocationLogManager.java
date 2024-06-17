@@ -18,6 +18,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import net.jafama.FastMath;
 
 import java.time.Instant;
 import java.util.LinkedList;
@@ -83,7 +84,7 @@ public class LocationLogManager implements IObserver {
 
             // Check if the new record is already in the 10 most recent items
             boolean found = false;
-            int stop = Math.max(0, locations.size() - 10);
+            int stop = FastMath.max(0, locations.size() - 10);
             for (int i = locations.size() - 1; i >= stop; i--) {
                 if (locations.get(i).name.equalsIgnoreCase(name)) {
                     found = true;

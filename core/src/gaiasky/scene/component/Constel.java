@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
+import net.jafama.FastMath;
 
 public class Constel implements Component {
     public double deltaYears;
@@ -31,7 +32,7 @@ public class Constel implements Component {
         for (double[] dd : ids) {
             int[] ii = new int[dd.length];
             for (int j = 0; j < dd.length; j++)
-                ii[j] = (int) Math.round(dd[j]);
+                ii[j] = (int) FastMath.round(dd[j]);
             this.ids.add(ii);
         }
     }

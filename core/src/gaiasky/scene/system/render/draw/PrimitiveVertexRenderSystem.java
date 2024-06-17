@@ -32,6 +32,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.util.List;
@@ -39,8 +40,8 @@ import java.util.List;
 public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends ImmediateModeRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(PrimitiveVertexRenderSystem.class);
 
-    final static double baseWidthAngle = Math.toRadians(.13);
-    final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
+    final static double baseWidthAngle = FastMath.toRadians(.13);
+    final static double baseWidthAngleTan = FastMath.tan(baseWidthAngle);
 
     protected final boolean lines;
     protected final VertsView vertsView;

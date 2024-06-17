@@ -29,6 +29,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.KeyframesView;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.ViewAngleComparator;
+import net.jafama.FastMath;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -146,7 +147,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         this.comp = new ViewAngleComparator<>();
         this.register = new KeyRegister();
         // 1% of width
-        this.MOVE_PX_DIST = (float) Math.max(5, Gdx.graphics.getWidth() * 0.01);
+        this.MOVE_PX_DIST = (float) FastMath.max(5, Gdx.graphics.getWidth() * 0.01);
         this.MIN_PIX_DIST = (int) (8f);
 
         this.dragDx = 0;
@@ -533,7 +534,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     t = 0;
                 }
                 double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
-                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + Math.abs(t * inc) : t + t * inc);
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + FastMath.abs(t * inc) : t + t * inc);
             }
         } else if (allPressed(slowTimeKeys)) {
             if (now - register.lastKeyDownTime(slowTimeKeys) > slowMs) {
@@ -545,7 +546,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     t = 0;
                 }
                 double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
-                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - Math.abs(t * inc) : t - t * inc);
+                EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - FastMath.abs(t * inc) : t - t * inc);
             }
         }
 

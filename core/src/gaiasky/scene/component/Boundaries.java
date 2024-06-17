@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Component;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +42,8 @@ public class Boundaries implements Component {
             List<Vector3d> ii = new ArrayList<>(dd.length);
             for (double[] v : dd) {
                 // Convert equatorial coordinates to cartesian with a default radius.
-                double raRadians = Math.toRadians(v[0]);
-                double decRadians = Math.toRadians(v[1]);
+                double raRadians = FastMath.toRadians(v[0]);
+                double decRadians = FastMath.toRadians(v[1]);
                 Vector3d vec = Coordinates.sphericalToCartesian(raRadians, decRadians, 10 * Constants.AU_TO_U, new Vector3d());
                 ii.add(vec);
             }

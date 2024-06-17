@@ -72,6 +72,7 @@ import gaiasky.util.math.*;
 import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
+import net.jafama.FastMath;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
@@ -608,7 +609,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             synchronized (focusView) {
                 focusView.setEntity(focus);
                 double radius = focusView.getRadius();
-                double dist = radius / Math.tan(Math.toRadians(solidAngle / 2)) + radius;
+                double dist = radius / FastMath.tan(Math.toRadians(solidAngle / 2)) + radius;
 
                 // Up to ecliptic north pole
                 Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
@@ -1732,7 +1733,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             changeFocus(focusView, cam, waitTimeSeconds);
 
             /* target angle */
-            double target = Math.toRadians(solidAngle);
+            double target = FastMath.toRadians(solidAngle);
             if (target < 0) {
                 // Particles have different sizes to the rest.
                 if (focusView.isParticleSet()) {
@@ -1740,10 +1741,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     var rx1 = 2805.0; // pc
                     var y0 = 1.0;
                     var y1 = 0.001;
-                    target = Math.toRadians(y0 + (y1 - y0) * (focusView.getAbsolutePosition(aux3b1).lenDouble() * Constants.U_TO_PC - rx0) / (rx1 - rx0));
+                    target = FastMath.toRadians(y0 + (y1 - y0) * (focusView.getAbsolutePosition(aux3b1).lenDouble() * Constants.U_TO_PC - rx0) / (rx1 - rx0));
 
                 } else {
-                    target = Math.toRadians(20.0);
+                    target = FastMath.toRadians(20.0);
                 }
             }
 
@@ -1854,7 +1855,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     // Add forward movement while distance > target distance
                     boolean distanceNotMet = (focusView.getDistToCamera() - focusView.getRadius()) > target;
-                    boolean viewNotMet = Math.abs(dir.angle(camObj)) < 90;
+                    boolean viewNotMet = FastMath.abs(dir.angle(camObj)) < 90;
 
                     long prevTime = TimeUtils.millis();
                     while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
@@ -1882,7 +1883,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         }
 
                         // focus.transform.getTranslation(aux);
-                        viewNotMet = Math.abs(dir.angle(camObj)) < 90;
+                        viewNotMet = FastMath.abs(dir.angle(camObj)) < 90;
                         distanceNotMet = (focusView.getDistToCamera() - focusView.getRadius()) > target;
                     }
 
@@ -3141,9 +3142,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 return;
 
             if (isFrameOutputActive()) {
-                sleepFrames(Math.max(1, Math.round(getFrameOutputFps() * seconds)));
+                sleepFrames(Math.max(1, FastMath.round(getFrameOutputFps() * seconds)));
             } else if (Camcorder.instance.isRecording()) {
-                sleepFrames(Math.max(1, Math.round(getCamcorderFps() * seconds)));
+                sleepFrames(Math.max(1, FastMath.round(getCamcorderFps() * seconds)));
             } else {
                 try {
                     Thread.sleep(Math.round(seconds * 1000f));
@@ -4060,7 +4061,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                                        double[] fadeOut,
                                        boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize,
-                new double[]{Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0))}, ct, fadeIn, fadeOut, sync);
+                new double[]{Math.tan(Math.toRadians(0.1)), FastMath.tan(Math.toRadians(6.0))}, ct, fadeIn, fadeOut, sync);
     }
 
     public boolean loadParticleDataset(String dsName,

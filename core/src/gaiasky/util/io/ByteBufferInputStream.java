@@ -7,6 +7,8 @@
 
 package gaiasky.util.io;
 
+import net.jafama.FastMath;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -45,7 +47,7 @@ public class ByteBufferInputStream extends InputStream {
     public int read(byte[] bytes, int offset, int length) throws IOException {
         if (length == 0)
             return 0;
-        int count = Math.min(byteBuffer.remaining(), length);
+        int count = FastMath.min(byteBuffer.remaining(), length);
         if (count == 0)
             return -1;
         byteBuffer.get(bytes, offset, count);

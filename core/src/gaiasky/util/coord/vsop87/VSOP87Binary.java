@@ -11,6 +11,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -200,11 +201,11 @@ public class VSOP87Binary implements IObserver {
                     final double b = this.data[o + 1];
                     final double c = this.data[o + 2];
 
-                    eacc += a * Math.cos(b + c * t);
+                    eacc += a * FastMath.cos(b + c * t);
 
                     o += 3;
                 }
-                acc += eacc * Math.pow(t, j);
+                acc += eacc * FastMath.pow(t, j);
             }
             p[i] = (acc);
         }
