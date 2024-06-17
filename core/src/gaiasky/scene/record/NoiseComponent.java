@@ -19,6 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Trio;
+import net.jafama.FastMath;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -95,15 +96,15 @@ public class NoiseComponent extends NamedComponent {
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
 
         // Sample 3D noise using spherical coordinates on the surface of the sphere
-        double piTimesTwo = 2.0 * Math.PI;
-        double piOverTwo = Math.PI / 2.0;
+        double piTimesTwo = 2.0 * FastMath.PI;
+        double piOverTwo = FastMath.PI / 2.0;
         double phi = piOverTwo * -1.0;
         int y = 0;
 
         double thetaStep = piTimesTwo / N;
         while (phi <= piOverTwo) {
-            final double cosPhi = Math.cos(phi);
-            final double sinPhi = Math.sin(phi);
+            final double cosPhi = FastMath.cos(phi);
+            final double sinPhi = FastMath.sin(phi);
             final int yf = y;
             IntStream.range(0, N).parallel().forEach(x -> {
                 double theta = x * thetaStep;
@@ -111,7 +112,7 @@ public class NoiseComponent extends NamedComponent {
                 int idx = x % N_GEN;
                 if (baseNoise[idx] != null) {
                     synchronized (baseNoise[idx]) {
-                        n = baseNoise[idx].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                        n = baseNoise[idx].get(cosPhi * FastMath.cos(theta), cosPhi * FastMath.sin(theta), sinPhi);
                     }
                 }
 
@@ -139,23 +140,22 @@ public class NoiseComponent extends NamedComponent {
         float[][] moisture = new float[N][M];
 
         // Sample 3D noise using spherical coordinates on the surface of the sphere
-        float piTimesTwo = (float) (2 * Math.PI);
+        float piTimesTwo = (float) (2 * FastMath.PI);
         float piDivTwo = (float) (Math.PI / 2.0f);
-        float phi = piDivTwo * -1.0f;
-        int y = 0;
 
         float thetaStep = piTimesTwo / N;
         float phiStep = (float) (Math.PI / (M - 1));
-        while (phi <= piDivTwo) {
-            final double cosPhi = Math.cos(phi);
-            final double sinPhi = Math.sin(phi);
+        IntStream.range(0, M).forEach(y -> {
+            double phi = -piDivTwo + y * phiStep;
+            final double cosPhi = FastMath.cos(phi);
+            final double sinPhi = FastMath.sin(phi);
             final int yf = y;
             IntStream.range(0, N).parallel().forEach(x -> {
                 float theta = x * thetaStep;
                 double n, m;
                 synchronized (baseNoise[x % N_GEN]) {
-                    n = baseNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
-                    m = secondaryNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                    n = baseNoise[x % N_GEN].get(cosPhi * FastMath.cos(theta), cosPhi * FastMath.sin(theta), sinPhi);
+                    m = secondaryNoise[x % N_GEN].get(cosPhi * FastMath.cos(theta), cosPhi * FastMath.sin(theta), sinPhi);
                 }
                 elevation[x][yf] = (float) (n * heightScale);
                 moisture[x][yf] = (float) m;
@@ -164,13 +164,11 @@ public class NoiseComponent extends NamedComponent {
                 // Create pixmap.
                 pixmap.drawPixel(x, yf, Color.rgba8888(nf, nf, nf, 1f));
             });
-            phi += phiStep;
-            y += 1;
 
-            // Progress bar
+            // Progress bar.
             EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, (float) y / (float) (M - 1));
-        }
-        // Force end
+        });
+        // Force end.
         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, 2f);
         return new Trio<>(elevation, moisture, pixmap);
     }
@@ -207,7 +205,7 @@ public class NoiseComponent extends NamedComponent {
      * @param octaves The octaves
      */
     public void setOctaves(Long octaves) {
-        this.octaves = Math.min(9, octaves.intValue());
+        this.octaves = FastMath.min(9, octaves.intValue());
     }
 
     public void setFrequency(Double frequency) {
@@ -250,10 +248,10 @@ public class NoiseComponent extends NamedComponent {
         // Seed
         setSeed(rand.nextLong());
         // Size
-        double baseSize = Math.abs(gaussian(rand, 1.0, 1.0, 0.05));
+        double baseSize = FastMath.abs(gaussian(rand, 1.0, 1.0, 0.05));
         if (clouds) {
             // XY small, Z large
-            setScale(new double[] { Math.abs(rand.nextDouble()) * 0.3, Math.abs(rand.nextDouble()) * 0.3, baseSize + 2.0 * rand.nextDouble() });
+            setScale(new double[] { FastMath.abs(rand.nextDouble()) * 0.3, FastMath.abs(rand.nextDouble()) * 0.3, baseSize + 2.0 * rand.nextDouble() });
         } else if (rand.nextBoolean()) {
             // Single scale
             setScale(baseSize);
@@ -273,7 +271,7 @@ public class NoiseComponent extends NamedComponent {
         setOctaves(Math.abs(rand.nextLong()) % 8 + 1L);
         // Range
         double minRange = rocky ? 0.1 : gaussian(rand, -0.5, 0.3);
-        double maxRange = 0.5 + Math.abs(rand.nextDouble());
+        double maxRange = 0.5 + FastMath.abs(rand.nextDouble());
         setRange(new double[] { minRange, maxRange });
         // Power
         setPower(rocky ? 1.0 : gaussian(rand, 5.0, 3.0, 0.2));

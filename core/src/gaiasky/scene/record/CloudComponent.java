@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -36,6 +37,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.svt.SVTManager;
+import net.jafama.FastMath;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -234,7 +236,7 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
         // Set ID.
         svt.id = id;
         // Set attributes.
-        double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
+        double svtResolution = svt.tileSize * FastMath.pow(2.0, svt.tree.depth);
         material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
         material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
         material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
@@ -416,17 +418,17 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
         setDiffuse("generate");
         // Color
         if (rand.nextBoolean()) {
-            // White
+            // White.
             color[0] = 1f;
             color[1] = 1f;
             color[2] = 1f;
-            color[3] = 0.7f;
+            color[3] = 0.8f;
         } else {
-            // Random
-            color[0] = rand.nextFloat();
-            color[1] = rand.nextFloat();
-            color[2] = rand.nextFloat();
-            color[3] = rand.nextFloat();
+            // Gaussian around white-ish.
+            color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
+            color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
+            color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
+            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
         }
         // Params
         setParams(createModelParameters(200L, 1.0, false));

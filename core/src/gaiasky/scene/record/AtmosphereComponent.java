@@ -16,7 +16,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ModelScaffolding;
-import gaiasky.scene.component.RigidRotation;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger.Log;
@@ -31,6 +30,7 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -103,8 +103,8 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
      */
     public void setUpAtmosphericScatteringMaterial(Material mat) {
         float camHeight = 1f;
-        float m_Kr4PI = m_Kr * 4.0f * (float) Math.PI;
-        float m_Km4PI = m_Km * 4.0f * (float) Math.PI;
+        float m_Kr4PI = m_Kr * 4.0f * (float) FastMath.PI;
+        float m_Km4PI = m_Km * 4.0f * (float) FastMath.PI;
         float m_ESun = m_eSun; // Sun brightness (almost) constant
         float m_g = 0.97f; // The Mie phase asymmetry factor
         m_fInnerRadius = planetSize / 2f;
@@ -116,9 +116,9 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
 
         double[] m_fWavelength = wavelengths;
         float[] m_fWavelength4 = new float[3];
-        m_fWavelength4[0] = (float) Math.pow(m_fWavelength[0], 4.0);
-        m_fWavelength4[1] = (float) Math.pow(m_fWavelength[1], 4.0);
-        m_fWavelength4[2] = (float) Math.pow(m_fWavelength[2], 4.0);
+        m_fWavelength4[0] = (float) FastMath.pow(m_fWavelength[0], 4.0);
+        m_fWavelength4[1] = (float) FastMath.pow(m_fWavelength[1], 4.0);
+        m_fWavelength4[2] = (float) FastMath.pow(m_fWavelength[2], 4.0);
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.Alpha, 1f));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.ColorOpacity, 1f));
@@ -361,7 +361,7 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         // eSun
         setM_eSun(gaussian(rand, 5.0, 4.0));
         // Fog density
-        setFogdensity(gaussian(rand, 4.0, 1.0, 0.5));
+        setFogdensity(gaussian(rand, 2.0, 2.0, 0.15));
         // Fog color
         setFogcolor(new double[] { 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5 });
         // Samples

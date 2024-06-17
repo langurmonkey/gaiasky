@@ -36,6 +36,7 @@ import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.svt.SVTManager;
+import net.jafama.FastMath;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -517,7 +518,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             // Depth.
             material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
             // Resolution.
-            double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
+            double svtResolution = svt.tileSize * FastMath.pow(2.0, svt.tree.depth);
             material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
         }
 
