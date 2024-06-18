@@ -18,7 +18,7 @@ import gaiasky.scene.view.VertsView;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.IPythonCoordinatesProvider;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect;
 
 import java.util.List;
 

@@ -46,7 +46,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.vr.openxr.XrDriver;

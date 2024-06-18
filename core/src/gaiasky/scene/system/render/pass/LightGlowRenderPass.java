@@ -26,7 +26,7 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.BillboardRenderer;
 import gaiasky.util.Settings;
-import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.render.util.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL40;
 
 import java.util.ArrayList;

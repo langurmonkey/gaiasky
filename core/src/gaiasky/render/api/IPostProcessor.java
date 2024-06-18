@@ -11,8 +11,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.Logger;
-import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
-import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaiasky.render.postprocess.PostProcessor;
+import gaiasky.render.postprocess.PostProcessorEffect;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -30,8 +30,8 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
-import gaiasky.util.gdx.contrib.postprocess.effects.AnaglyphEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.CopyFilter;
+import gaiasky.render.postprocess.effects.AnaglyphEffect;
+import gaiasky.render.postprocess.filters.CopyFilter;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 

@@ -22,7 +22,7 @@ import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
-import gaiasky.util.gdx.contrib.postprocess.effects.Mosaic;
+import gaiasky.render.postprocess.effects.Mosaic;
 
 import java.util.HashMap;
 import java.util.Map;

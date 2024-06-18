@@ -585,7 +585,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
                 }
-                Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale,
+                Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, biomeLUT, biomeHueShift,
                         I18n.msg("gui.procedural.progress", I18n.msg("gui.procedural.surface"), name));
                 float[][] elevationData = trio.getFirst();
                 float[][] moistureData = trio.getSecond();

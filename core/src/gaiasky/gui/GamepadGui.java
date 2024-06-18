@@ -42,7 +42,7 @@ import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;

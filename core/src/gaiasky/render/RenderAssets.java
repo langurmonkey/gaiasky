@@ -18,7 +18,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.contrib.utils.ShaderLoader;
+import gaiasky.render.util.ShaderLoader;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.loader.BitmapFontLoader.BitmapFontParameter;

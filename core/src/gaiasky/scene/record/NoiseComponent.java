@@ -7,19 +7,28 @@
 
 package gaiasky.scene.record;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.sudoplay.joise.module.Module;
 import com.sudoplay.joise.module.*;
 import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
 import com.sudoplay.joise.module.ModuleBasisFunction.InterpolationType;
 import com.sudoplay.joise.module.ModuleFractal.FractalType;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.postprocess.effects.Noise;
+import gaiasky.render.postprocess.effects.SurfaceGen;
+import gaiasky.render.postprocess.filters.NoiseFilter;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Trio;
 import net.jafama.FastMath;
+import org.lwjgl.opengl.GL30;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -27,17 +36,21 @@ import java.util.stream.IntStream;
 
 public class NoiseComponent extends NamedComponent {
     final int N_GEN = Settings.settings.performance.getNumberOfThreads();
-    public double[] scale = new double[] { 1.0, 1.0, 1.0 };
+    public double[] scale = new double[]{1.0, 1.0, 1.0};
     public double power = 1.0;
     public int octaves = 4;
     public double frequency = 2.34;
+    public double persistence = 0.5;
     public double lacunarity = 2.0;
-    public double[] range = new double[] { 0.0, 1.0 };
+    public double[] range = new double[]{0.0, 1.0};
     public BasisType type = BasisType.SIMPLEX;
     public FractalType fractalType = FractalType.RIDGEMULTI;
     public long seed = 0L;
-    // Parallel processing, since noise modules are not thread-safe
+    // Use array for parallel processing.
+    // Joise modules are not thread-safe.
     private Module[] baseNoise, secondaryNoise;
+
+    private static boolean DEBUG_UI_VIEW = true;
 
     public NoiseComponent() {
         super();
@@ -97,12 +110,12 @@ public class NoiseComponent extends NamedComponent {
 
         // Sample 3D noise using spherical coordinates on the surface of the sphere
         double piTimesTwo = 2.0 * FastMath.PI;
-        double piOverTwo = FastMath.PI / 2.0;
-        double phi = piOverTwo * -1.0;
-        int y = 0;
+        double piDivTwo = FastMath.PI / 2.0;
 
+        double phiStep = FastMath.PI / (M - 1);
         double thetaStep = piTimesTwo / N;
-        while (phi <= piOverTwo) {
+        IntStream.range(0, M).forEach(y -> {
+            double phi = -piDivTwo + y * phiStep;
             final double cosPhi = FastMath.cos(phi);
             final double sinPhi = FastMath.sin(phi);
             final int yf = y;
@@ -120,19 +133,100 @@ public class NoiseComponent extends NamedComponent {
                 float alpha = rgba[3];
                 pixmap.drawPixel(x, yf, Color.rgba8888(nf * rgba[0] * alpha, nf * rgba[1] * alpha, nf * rgba[2] * alpha, 1f));
             });
-            phi += (Math.PI / (M - 1));
-            y += 1;
 
             // Progress bar
             EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, (float) y / (float) (M - 1));
-        }
+        });
         // Force end
         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, 2f);
 
         return pixmap;
     }
 
-    public synchronized Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale, String name) {
+    private FrameBuffer createFrameBuffer(int N, int M, int numColorTargets) {
+        GLFrameBuffer.FrameBufferBuilder builder = new GLFrameBuffer.FrameBufferBuilder(N, M);
+
+        for(int i =0; i < numColorTargets; i++) {
+            builder.addBasicColorTextureAttachment(Pixmap.Format.RGBA8888);
+        }
+
+        return builder.build();
+    }
+
+
+    private float toFloatSeed(long seed) {
+        var s = Long.toString(seed);
+        return (float) (seed / FastMath.pow(10L, s.length()));
+    }
+
+    public void generateNoiseGPU(int N, int M, String biomeLut, float biomeHueShift) {
+        // Height
+        var fbHeight = createFrameBuffer(N, M, 1);
+        float fSeed = toFloatSeed(seed);
+
+        Noise heightNoise = new Noise(N, M);
+        heightNoise.setScale(scale);
+        heightNoise.setType(NoiseFilter.NoiseType.SIMPLEX);
+        heightNoise.setSeed(fSeed);
+        heightNoise.setOctaves(octaves);
+        heightNoise.setFrequency(frequency);
+        heightNoise.setPersistence(persistence);
+        heightNoise.setLacunarity(lacunarity);
+        heightNoise.setPower(power);
+        heightNoise.setTurbulence(true);
+        heightNoise.setRidge(true);
+        fbHeight.begin();
+        heightNoise.render(null, fbHeight);
+        fbHeight.end();
+
+        // Moisture
+        var fbMoist = createFrameBuffer(N, M, 1);
+
+        Noise moistureNoise = new Noise(N, M);
+        moistureNoise.setScale(scale);
+        moistureNoise.setType(NoiseFilter.NoiseType.PERLIN);
+        moistureNoise.setSeed(fSeed + 2.023f);
+        moistureNoise.setOctaves(octaves);
+        heightNoise.setFrequency(frequency);
+        heightNoise.setPersistence(persistence);
+        heightNoise.setLacunarity(lacunarity);
+        moistureNoise.setPower(power);
+        moistureNoise.setRange(-0.2f, 1.0f);
+        moistureNoise.setTurbulence(true);
+        moistureNoise.setRidge(true);
+        fbMoist.begin();
+        moistureNoise.render(null, fbMoist);
+        fbMoist.end();
+
+        // Gen surface.
+        Texture lut = new Texture(Settings.settings.data.dataFileHandle(biomeLut));
+        var fbSurface = createFrameBuffer(N, M, 3);
+
+        SurfaceGen surfaceGen = new SurfaceGen();
+        surfaceGen.setMoistureTexture(fbMoist.getColorBufferTexture());
+        surfaceGen.setLutTexture(lut);
+        surfaceGen.setLutHueShift(biomeHueShift);
+        fbSurface.begin();
+        surfaceGen.render(fbHeight, fbSurface);
+        fbSurface.end();
+
+        if (DEBUG_UI_VIEW) {
+
+            // Create UI views.
+            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Height", fbHeight.getColorBufferTexture(), 1f);
+            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Moisture", fbMoist.getColorBufferTexture(), 1f);
+            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Diffuse", fbSurface.getColorBufferTexture(), 1f);
+            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Specular", fbSurface.getTextureAttachments().get(1), 1f);
+            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Normal", fbSurface.getTextureAttachments().get(2), 1f);
+            DEBUG_UI_VIEW = false;
+        }
+
+    }
+
+    public synchronized Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale, String biomeLut, float biomeHueShift, String name) {
+        // Generate in GPU.
+        //GaiaSky.postRunnable(() -> generateNoiseGPU(N, M, biomeLut, biomeHueShift));
+
         // Construct RAM height map from noise algorithms
         initNoise(seed, true);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
@@ -181,12 +275,16 @@ public class NoiseComponent extends NamedComponent {
         }
     }
 
-    public void setFractaltype(String fractalType) {
+    public void setFractalType(String fractalType) {
         try {
             this.fractalType = FractalType.valueOf(fractalType.toUpperCase());
         } catch (Exception e) {
             this.fractalType = FractalType.RIDGEMULTI;
         }
+    }
+
+    public void setFractaltype(String fractalType) {
+        setFractalType(fractalType);
     }
 
     public void setScale(Double scale) {
@@ -251,13 +349,13 @@ public class NoiseComponent extends NamedComponent {
         double baseSize = FastMath.abs(gaussian(rand, 1.0, 1.0, 0.05));
         if (clouds) {
             // XY small, Z large
-            setScale(new double[] { FastMath.abs(rand.nextDouble()) * 0.3, FastMath.abs(rand.nextDouble()) * 0.3, baseSize + 2.0 * rand.nextDouble() });
+            setScale(new double[]{FastMath.abs(rand.nextDouble()) * 0.3, FastMath.abs(rand.nextDouble()) * 0.3, baseSize + 2.0 * rand.nextDouble()});
         } else if (rand.nextBoolean()) {
             // Single scale
             setScale(baseSize);
         } else {
             // Different scales
-            setScale(new double[] { baseSize + rand.nextDouble() * 0.5, baseSize + rand.nextDouble() * 0.5, baseSize + 0.4 * rand.nextDouble() });
+            setScale(new double[]{baseSize + rand.nextDouble() * 0.5, baseSize + rand.nextDouble() * 0.5, baseSize + 0.4 * rand.nextDouble()});
         }
         // Type (all but WHITE)
         setType(ModuleBasisFunction.BasisType.values()[rand.nextInt(4)].name());
@@ -272,7 +370,7 @@ public class NoiseComponent extends NamedComponent {
         // Range
         double minRange = rocky ? 0.1 : gaussian(rand, -0.5, 0.3);
         double maxRange = 0.5 + FastMath.abs(rand.nextDouble());
-        setRange(new double[] { minRange, maxRange });
+        setRange(new double[]{minRange, maxRange});
         // Power
         setPower(rocky ? 1.0 : gaussian(rand, 5.0, 3.0, 0.2));
     }
