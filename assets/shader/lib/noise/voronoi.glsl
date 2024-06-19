@@ -53,17 +53,14 @@ float gln_voronoi(vec2 point, gln_tVoronoiOpts opts) {
  * @name gln_voronoi
  * @function
  * @param {vec3}  x                  Point to sample Voronoi Noise at.
- * @param {gln_tWorleyOpts} opts     Options for generating Voronoi Noise.
  * @return {float}                   Value of Voronoi Noise at point "p".
  *
- * @example
- * gln_tWorleyOpts opts = gln_tWorleyOpts(uSeed, 0.0, 0.5, false);
- *
- * float n = gln_voronoi(position.xyz, opts);
+ * float n = gln_voronoi(position.xyz);
  */
-float gln_voronoi(vec3 point, gln_tVoronoiOpts opts) {
-  vec3 p = floor(point * opts.scale);
-  vec3 f = fract(point * opts.scale);
+float gln_voronoi(in vec3 point) {
+  point *= 5.0;
+  vec3 p = floor(point);
+  vec3 f = fract(point);
 
   float id = 0.0;
   vec2 res = vec2(100.0);
@@ -88,10 +85,7 @@ float gln_voronoi(vec3 point, gln_tVoronoiOpts opts) {
     }
   }
 
-  float result = luma(vec3(sqrt(res), abs(id)));
-  if (opts.invert)
-    result = 1.0 - result;
-  return result;
+  return pow(luma(clamp(vec3(sqrt(res), abs(id)), 0.0, 1.0)), 2.0);
 }
 
 /**
@@ -157,13 +151,10 @@ float gln_vfbm(vec2 v, gln_tFBMOpts opts, gln_tVoronoiOpts vopts) {
  * gln_tFBMOpts opts =
  *      gln_tFBMOpts(1.0, 0.3, 2.0, 0.5, 1.0, 5, false, false);
  *
- * gln_tVoronoiOpts voronoiOpts =
- *     gln_tVoronoiOpts(1.0, 1.0, 3.0, false);
- *
  * float n = gln_vfbm(position.xy, voronoiOpts, opts);
  */
-float gln_vfbm(vec3 v, gln_tFBMOpts opts, gln_tVoronoiOpts vopts) {
-  v += (opts.seed * 100.0);
+float gln_vfbm(vec3 v, gln_tFBMOpts opts) {
+  v += opts.seed * 2.0;
   float result = 0.0;
   float amplitude = 1.0;
   float frequency = opts.frequency;
@@ -175,7 +166,7 @@ float gln_vfbm(vec3 v, gln_tFBMOpts opts, gln_tVoronoiOpts vopts) {
 
     vec3 p = v * frequency * opts.scale;
 
-    float noiseVal = gln_voronoi(p, vopts);
+    float noiseVal = gln_voronoi(p);
 
     result += noiseVal * amplitude;
 

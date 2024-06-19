@@ -11,43 +11,6 @@ from dataclasses import dataclass
 def clamp(x, minimum, maximum):
     return max(minimum, min(x, maximum))
 
-def get_biome_lut():
-    i = random.randint(0, 4)
-    file = "biome-lut.png"
-    if i == 0:
-        file = "biome-lut.png"
-    elif i == 1:
-        file = "biome-smooth-lut.png"
-    elif i == 2:
-        file = "brown-green-lut.png"
-    elif i == 3:
-        file = "psycho-smooth-lut.png"
-    elif i == 4:
-        file = "rock-smooth-lut.png"
-    return "$data/default-data/tex/base/" + file
-
-def get_noise_type():
-    i = random.randint(0, 3)
-    if i == 0:
-        return "gradval"
-    if i == 1:
-        return "perlin"
-    if i == 2: 
-        return "simplex"
-    if i == 3:
-        return "value"
-
-def get_fractal_type():
-    i = random.randint(0, 3)
-    if i == 0:
-        return "fbm"
-    if i == 1:
-        return "ridgemulti"
-    if i == 2: 
-        return "billow"
-    if i == 3:
-        return "multi"
-
 def check_file_exists(file_path):
     if not os.path.isfile(file_path):
         print(f"Error: The file '{file_path}' does not exist.")
@@ -75,43 +38,6 @@ def clamp(n, min, max):
         return max
     else: 
         return n
-
-def bv_to_rgba(bv): 
-    t = 4600 * ((1 / ((0.92 * bv) + 1.7)) + (1 / ((0.92 * bv) + 0.62)))
-    # t to xyY
-    x = 0
-    y = 0
-
-    if t >= 1667 and t <= 4000:
-        x = ((-0.2661239 * math.pow(10, 9)) / math.pow(t, 3)) + ((-0.2343580 * math.pow(10, 6)) / math.pow(t, 2)) + ((0.8776956 * math.pow(10, 3)) / t) + 0.179910
-    elif t > 4000 and t <= 25000:
-        x = ((-3.0258469 * math.pow(10, 9)) / math.pow(t, 3)) + ((2.1070379 * math.pow(10, 6)) / math.pow(t, 2)) + ((0.2226347 * math.pow(10, 3)) / t) + 0.240390
-    
-
-    if t >= 1667 and t <= 2222:
-        y = -1.1063814 * math.pow(x, 3) - 1.34811020 * math.pow(x, 2) + 2.18555832 * x - 0.20219683
-    elif t > 2222 and t <= 4000:
-        y = -0.9549476 * math.pow(x, 3) - 1.37418593 * math.pow(x, 2) + 2.09137015 * x - 0.16748867
-    elif t > 4000 and t <= 25000:
-        y = 3.0817580 * math.pow(x, 3) - 5.87338670 * math.pow(x, 2) + 3.75112997 * x - 0.37001483
-
-    # xyY to XYZ, Y = 1
-    Y = 0 if (y == 0) else 1
-    X = 0 if (y == 0) else (x * Y) / y
-    Z = 0 if (y == 0) else ((1 - x - y) * Y) / y
-
-    cc = [0.0, 0.0, 0.0, 1.0]
-    cc[0] = correct_gamma(3.2406 * X - 1.5372 * Y - 0.4986 * Z)
-    cc[1] = correct_gamma(-0.9689 * X + 1.8758 * Y + 0.0415 * Z)
-    cc[2] = correct_gamma(0.0557 * X - 0.2040 * Y + 1.0570 * Z)
-
-    mx = max(1.0, max(cc[2], max(cc[0], cc[1])))
-
-    cc[0] = max(cc[0] / mx, 0.0)
-    cc[1] = max(cc[1] / mx, 0.0)
-    cc[2] = max(cc[2] / mx, 0.0)
-
-    return cc
 
 def teff_to_rgba(teff):
     temp = teff / 100.0

@@ -33,6 +33,10 @@ public final class Noise extends PostProcessorEffect {
         filter.setRange(a, b);
     }
 
+    public void setColor(float[] color) {
+        filter.setColor(color[0], color[1], color[2]);
+    }
+
     public void setScale(double[] scale) {
         filter.setScale((float) scale[0], (float) scale[1], (float) scale[2]);
     }
@@ -49,12 +53,12 @@ public final class Noise extends PostProcessorEffect {
         filter.setSeed(seed);
     }
 
-    public void setFrequency(double persistence) {
-        filter.setPersistence((float) persistence);
+    public void setFrequency(double frequency) {
+        filter.setFrequency((float) frequency);
     }
 
-    public void setFrequency(float persistence) {
-        filter.setPersistence(persistence);
+    public void setFrequency(float frequency) {
+        filter.setFrequency(frequency);
     }
 
     public void setPersistence(double persistence) {

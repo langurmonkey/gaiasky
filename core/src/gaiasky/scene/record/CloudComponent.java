@@ -9,10 +9,10 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -251,46 +251,39 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
     private synchronized void initializeGenCloudData(Model model) {
         if (!generated.get()) {
             generated.set(true);
-            GaiaSky.instance.getExecutorService().execute(() -> {
-                // Begin
-                EventManager.publish(Event.PROCEDURAL_GENERATION_CLOUD_INFO, this, true);
+            GaiaSky.postRunnable(() -> {
 
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
                 long start = TimeUtils.millis();
-                GaiaSky.postRunnable(() -> logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.cloud"), N, M)));
+                logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.cloud"), N, M));
 
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
                 }
-                Pixmap cloudPixmap = nc.generateData(N, M, color, I18n.msg("gui.procedural.progress", I18n.msg("gui.procedural.cloud"), name));
+                FrameBuffer cloudFb = nc.generateNoise(N, M, color);
                 // Write to disk if necessary
                 if (Settings.settings.program.saveProceduralTextures) {
-                    SysUtils.saveProceduralPixmap(cloudPixmap, this.name + "-cloud");
+                    SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud");
                 }
-                GaiaSky.postRunnable(() -> {
-                    if (cloudPixmap != null) {
-                        cloudTex = new Texture(cloudPixmap, true);
-                        cloudTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-                        material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
-                        // Add to material of main body as ambient occlusion.
-                        if (model != null && model.model != null && model.model.mtc != null &&
-                                GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
-                            // Add occlusion clouds attributes.
-                            model.model.mtc.getMaterial().remove(OcclusionCloudsAttribute.Type);
-                            model.model.mtc.getMaterial().remove(TextureAttribute.AO);
-                            model.model.mtc.getMaterial().set(new TextureAttribute(TextureAttribute.AO, cloudTex));
-                            model.model.mtc.getMaterial().set(new OcclusionCloudsAttribute(true));
-                        }
+                if (cloudFb != null) {
+                    cloudTex = cloudFb.getColorBufferTexture();
+                    material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
+                    // Add to material of main body as ambient occlusion.
+                    if (model != null && model.model != null && model.model.mtc != null &&
+                            GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+                        // Add occlusion clouds attributes.
+                        model.model.mtc.getMaterial().remove(OcclusionCloudsAttribute.Type);
+                        model.model.mtc.getMaterial().remove(TextureAttribute.AO);
+                        model.model.mtc.getMaterial().set(new TextureAttribute(TextureAttribute.AO, cloudTex));
+                        model.model.mtc.getMaterial().set(new OcclusionCloudsAttribute(true));
                     }
-                    long elapsed = TimeUtils.millis() - start;
-                    logger.info(I18n.msg("gui.procedural.info.done", I18n.msg("gui.procedural.cloud"), elapsed / 1000d));
-                });
+                }
+                long elapsed = TimeUtils.millis() - start;
+                logger.info(I18n.msg("gui.procedural.info.done", I18n.msg("gui.procedural.cloud"), elapsed / 1000d));
 
-                // End
-                EventManager.publish(Event.PROCEDURAL_GENERATION_CLOUD_INFO, this, false);
             });
         }
     }
@@ -329,6 +322,12 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
         disposeCubemap(manager, material, CubemapAttribute.DiffuseCubemap, diffuseCubemap);
         texLoading = false;
         texInitialised = false;
+    }
+
+    public void disposeNoiseBuffers() {
+        if (nc != null) {
+            nc.dispose();
+        }
     }
 
     private void unload(Material mat, int attrIndex) {
@@ -425,14 +424,17 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
             color[3] = 0.8f;
         } else {
             // Gaussian around white-ish.
-            color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
-            color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
-            color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
-            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.9, 0.15), 0.0, 1.0);
+            color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.2), 0.0, 1.0);
+            color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.2), 0.0, 1.0);
+            color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.2), 0.0, 1.0);
+            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.7, 0.2), 0.0, 1.0);
         }
         // Params
         setParams(createModelParameters(200L, 1.0, false));
         // Noise
+        if (nc != null) {
+            nc.dispose();
+        }
         NoiseComponent nc = new NoiseComponent();
         nc.randomizeAll(rand, rand.nextBoolean(), true);
         setNoise(nc);

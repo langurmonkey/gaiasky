@@ -16,6 +16,8 @@ uniform sampler2D u_texture0;
 uniform vec2 u_viewport;
 // Scale in x, y and z.
 uniform vec3 u_scale;
+// Noise color.
+uniform vec3 u_color;
 // Final range of the noise values.
 uniform vec2 u_range;
 // Noise seed.
@@ -85,11 +87,7 @@ void main() {
 
     } else if (u_type == 2) {
         // VORONOI
-        gln_tVoronoiOpts vopts = gln_tVoronoiOpts(opts.seed,
-                                                0.01,
-                                                opts.scale,
-                                                false);
-        value = gln_vfbm(p, opts, vopts);
+        value = gln_vfbm(p, opts);
 
     } else if (u_type == 3) {
         // CURL
@@ -104,5 +102,5 @@ void main() {
     // Set in range.
     value = clamp(gln_map(value, 0.0, 1.0, u_range.x, u_range.y), 0.0, 1.0);
 
-    fragColor = vec4(value, value, value, 1.0);
+    fragColor = vec4(vec3(value) * u_color, 1.0);
 }

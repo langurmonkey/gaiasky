@@ -355,17 +355,17 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         // Wavelengths
         setWavelengths(new double[] { gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1) });
         // Kr
-        setM_Kr(0.0025);
+        setM_Kr(rand.nextDouble(0.002f, 0.0069f));
         // Km
-        setM_Km(0.0015);
+        setM_Km(rand.nextDouble(0.001f, 0.0079f));
         // eSun
         setM_eSun(gaussian(rand, 5.0, 4.0));
         // Fog density
-        setFogdensity(gaussian(rand, 2.0, 2.0, 0.15));
+        setFogdensity(gaussian(rand, 1.0, 1.0, 0.1));
         // Fog color
         setFogcolor(new double[] { 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5 });
         // Samples
-        setSamples(rand.nextInt(48) + 2L);
+        setSamples(rand.nextInt(28) + 2L);
         // Params
         setParams(createModelParameters(600L, 1.0, true));
     }

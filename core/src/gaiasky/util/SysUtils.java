@@ -8,11 +8,11 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.graphics.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import org.apache.commons.io.FilenameUtils;
+import org.lwjgl.opengl.GL30;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
@@ -21,9 +21,12 @@ import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static gaiasky.scene.Mapper.texture;
 
 /**
  * Some handy system utilities and constants.
@@ -495,6 +498,44 @@ public class SysUtils {
             PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
             logger.info(TextUtils.capitalise(name) + " texture written to " + file);
         }
+    }
+
+    public static void saveProceduralGLTexture(Texture t,
+                                               String name) {
+        Path proceduralDir = getProceduralPixmapDir();
+        Path file = proceduralDir.resolve(name + ".png");
+
+        int w = t.getWidth();
+        int h = t.getHeight();
+
+        Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+
+        final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        ByteBuffer pixels = pixmap.getPixels();
+
+        t.bind();
+        GL30.glGetTexImage(t.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
+
+        PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+
+        logger.info(TextUtils.capitalise(name) + " texture written to " + file);
+
+        pixmap.dispose();
+    }
+
+    public static Pixmap pixmapFromGLTexture(Texture t) {
+        int w = t.getWidth();
+        int h = t.getHeight();
+
+        Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+
+        final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        ByteBuffer pixels = pixmap.getPixels();
+
+        t.bind();
+        GL30.glGetTexImage(t.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
+
+        return pixmap;
     }
 
     /**

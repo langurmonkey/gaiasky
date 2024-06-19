@@ -12,17 +12,21 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
+import com.badlogic.gdx.graphics.glutils.GLOnlyTextureData;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import gaiasky.GaiaSky;
 import gaiasky.scene.record.BilinearInterpolator.GridModel;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.SysUtils;
 
 public class HeightDataPixmap implements IHeightData {
 
     private final Pixmap heightPixmap;
     private GridModel model;
+    private final float heightScale;
 
-    public HeightDataPixmap(Pixmap heightPixmap, Runnable finished) {
+    public HeightDataPixmap(Pixmap heightPixmap, Runnable finished, float heightScale) {
+        this.heightScale = heightScale;
         this.heightPixmap = heightPixmap;
 
         if (finished != null) {
@@ -31,22 +35,26 @@ public class HeightDataPixmap implements IHeightData {
         initModel();
     }
 
-    public HeightDataPixmap(String heightTexturePacked, Runnable finished) {
-        this(new Pixmap(new FileHandle(GlobalResources.unpackAssetPath(heightTexturePacked))), finished);
+    public HeightDataPixmap(String heightTexturePacked, Runnable finished, float heightScale) {
+        this(new Pixmap(new FileHandle(GlobalResources.unpackAssetPath(heightTexturePacked))), finished, heightScale);
     }
 
-    public HeightDataPixmap(Texture texture, Runnable finished) {
+    public HeightDataPixmap(Texture texture, Runnable finished, float heightScale) {
+        this.heightScale = heightScale;
         if (texture != null && texture.getTextureData() instanceof PixmapTextureData) {
             // Directly get pixmap texture data.
             heightPixmap = texture.getTextureData().consumePixmap();
             initModel();
-        } else if (texture != null && texture.getTextureData() instanceof FileTextureData) {
+        } else if (texture != null && texture.getTextureData() instanceof FileTextureData fileTextureData) {
             // Load it.
-            var fileTextureData = (FileTextureData) texture.getTextureData();
             heightPixmap = new Pixmap(fileTextureData.getFileHandle());
             initModel();
+        } else if (texture != null && texture.getTextureData() instanceof GLOnlyTextureData) {
+            // GL data.
+            heightPixmap = SysUtils.pixmapFromGLTexture(texture);
+            initModel();
         } else {
-            // No data.
+            // Nothing.
             heightPixmap = null;
         }
         if (finished != null) {
@@ -72,7 +80,7 @@ public class HeightDataPixmap implements IHeightData {
             @Override
             public double getValue(int x, int y) {
                 assert heightPixmap != null;
-                return color.set(heightPixmap.getPixel(x, y)).r;
+                return color.set(heightPixmap.getPixel(x, y)).r * heightScale;
             }
         };
     }

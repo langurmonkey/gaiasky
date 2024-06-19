@@ -18,12 +18,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
-import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.postprocess.filters.NoiseFilter.NoiseType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.record.*;
 import gaiasky.scene.view.FocusView;
@@ -35,7 +34,7 @@ import gaiasky.util.SysUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
-import gaiasky.util.validator.LongValidator;
+import gaiasky.util.validator.FloatValidator;
 import net.jafama.FastMath;
 
 import java.nio.file.Files;
@@ -260,8 +259,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(new OwnLabel(I18n.msg(key), skin, "header")).colspan(2).left().padBottom(pad34).row();
 
         // Seed
-        LongValidator lv = new LongValidator();
-        OwnTextField seedField = new OwnTextField(Long.toString(nc.seed), skin);
+        FloatValidator lv = new FloatValidator(-10000f, 10000f);
+        OwnTextField seedField = new OwnTextField(Float.toString(nc.seed), skin);
         seedField.setWidth(fieldWidth);
         seedField.setValidator(lv);
         seedField.addListener(new ChangeListener() {
@@ -280,8 +279,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(seedTooltip).padBottom(pad18).row();
 
         // Noise type
-        OwnSelectBox<BasisType> type = new OwnSelectBox<>(skin);
-        type.setItems(BasisType.values());
+        OwnSelectBox<NoiseType> type = new OwnSelectBox<>(skin);
+        type.setItems(NoiseType.values());
         type.setWidth(fieldWidth);
         type.setSelected(nc.type);
         type.addListener(new ChangeListener() {
@@ -297,25 +296,6 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(typeLabel).left().padBottom(pad18).padRight(pad18);
         content.add(type).padBottom(pad18).padRight(pad10);
         content.add(typeTooltip).padBottom(pad18).row();
-
-        // Fractal type
-        OwnSelectBox<FractalType> fractalType = new OwnSelectBox<>(skin);
-        fractalType.setItems(FractalType.values());
-        fractalType.setWidth(fieldWidth);
-        fractalType.setSelected(nc.fractalType);
-        fractalType.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                nc.fractalType = fractalType.getSelected();
-            }
-        });
-        OwnLabel fractalLabel = new OwnLabel(I18n.msg("gui.procedural.fractaltype"), skin);
-        fractalLabel.setWidth(textWidth);
-        OwnImageButton fractalTooltip = new OwnImageButton(skin, "tooltip");
-        fractalTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.fractaltype"), skin));
-        content.add(fractalLabel).left().padBottom(pad18).padRight(pad18);
-        content.add(fractalType).padBottom(pad18).padRight(pad10);
-        content.add(fractalTooltip).padBottom(pad18).row();
 
         // Scale
         OwnSliderPlus scaleX = new OwnSliderPlus(I18n.msg("gui.procedural.scale", "[x]"), 0.01f, 10.0f, 0.01f, skin);
@@ -356,8 +336,23 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(scaleGroup).colspan(2).left().padBottom(pad18).padRight(pad10);
         content.add(scaleTooltip).left().padBottom(pad18).row();
 
+        // Persistence
+        OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
+        persistence.setWidth(fieldWidthAll);
+        persistence.setValue((float) nc.persistence);
+        persistence.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                nc.persistence = persistence.getMappedValue();
+            }
+        });
+        OwnImageButton persistenceTooltip = new OwnImageButton(skin, "tooltip");
+        persistenceTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.persistence"), skin));
+        content.add(persistence).colspan(2).left().padBottom(pad18).padRight(pad10);
+        content.add(persistenceTooltip).left().padBottom(pad18).row();
+
         // Frequency
-        OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency"), 0.1f, 15.0f, 0.1f, skin);
+        OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency"), 0.01f, 3.0f, 0.01f, skin);
         frequency.setWidth(fieldWidthAll);
         frequency.setValue((float) nc.frequency);
         frequency.addListener(new ChangeListener() {
@@ -372,7 +367,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(frequencyTooltip).left().padBottom(pad18).row();
 
         // Lacunarity
-        OwnSliderPlus lacunarity = new OwnSliderPlus(I18n.msg("gui.procedural.lacunarity"), 0.1f, 15.0f, 0.1f, skin);
+        OwnSliderPlus lacunarity = new OwnSliderPlus(I18n.msg("gui.procedural.lacunarity"), 0.1f, 5.0f, 0.1f, skin);
         lacunarity.setWidth(fieldWidthAll);
         lacunarity.setValue((float) nc.lacunarity);
         lacunarity.addListener(new ChangeListener() {
@@ -387,7 +382,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(lacunarityTooltip).left().padBottom(pad18).row();
 
         // Octaves
-        OwnSliderPlus octaves = new OwnSliderPlus(I18n.msg("gui.procedural.octaves"), 1, 9, 1, skin);
+        OwnSliderPlus octaves = new OwnSliderPlus(I18n.msg("gui.procedural.octaves"), 1, 8, 1, skin);
         octaves.setWidth(fieldWidthAll);
         octaves.setValue(nc.octaves);
         octaves.addListener(new ChangeListener() {
@@ -431,7 +426,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(rangeTooltip).left().padBottom(pad18).row();
 
         // Power
-        OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.1f, 20f, 0.1f, skin);
+        OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.1f, 8f, 0.1f, skin);
         power.setWidth(fieldWidthAll);
         power.setValue((float) nc.power);
         power.addListener(new ChangeListener() {
@@ -445,6 +440,18 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(power).colspan(2).left().padBottom(pad18).padRight(pad10);
         content.add(powerTooltip).left().padBottom(pad18).row();
 
+        // Ridge
+        OwnCheckBox ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
+        ridge.setChecked(nc.ridge);
+        ridge.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        nc.ridge = ridge.isChecked();
+                    }
+                }
+        );
+        content.add(ridge).colspan(3).left().padBottom(pad18).padRight(pad10).row();
     }
 
     private void updateLutImage(Array<String> luts) {
@@ -458,7 +465,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
                         Color col = new Color(p.getPixel(x, y));
-                        float[] rgb = new float[] { col.r, col.g, col.b, 1f };
+                        float[] rgb = new float[]{col.r, col.g, col.b, 1f};
                         if (hue != 0) {
                             // Shift hue of lookup table by an amount in degrees
                             float[] hsb = ColorUtils.rgbToHsb(rgb);
@@ -496,19 +503,19 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             content.add(new OwnLabel(I18n.msg("gui.procedural.param.color"), skin, "header")).colspan(2).left().padBottom(pad34).row();
 
             // LUT
-            Path dataPath = Settings.settings.data.dataPath("default-data/tex/base");
+            Path dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
             Array<String> lookUpTables = new Array<>();
-            try (var stream = Files.list(dataPath)){
+            try (var stream = Files.list(dataPath)) {
                 java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png")).toList();
                 for (Path p : l) {
                     String name = p.toString();
-                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/base/")));
+                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/lut/")));
                 }
             } catch (Exception ignored) {
             }
             if (lookUpTables.isEmpty()) {
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-lut.png");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-smooth-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
             }
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);
@@ -592,7 +599,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             clc.setDiffuse("generate");
         }
         // Fog color
-        ColorPicker cloudColor = new ColorPicker(new float[] { clc.color[0], clc.color[1], clc.color[2], clc.color[3] }, stage, skin);
+        ColorPicker cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
         cloudColor.setSize(128f, 128f);
         cloudColor.setNewColorRunnable(() -> {
             float[] col = cloudColor.getPickedColor();
@@ -746,7 +753,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(samplesTooltip).left().padBottom(pad18).row();
 
         // Fog color
-        ColorPicker fogColor = new ColorPicker(new float[] { ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f }, stage, skin);
+        ColorPicker fogColor = new ColorPicker(new float[]{ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f}, stage, skin);
         fogColor.setSize(128f, 128f);
         fogColor.setNewColorRunnable(() -> {
             float[] col = fogColor.getPickedColor();
@@ -778,7 +785,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             rebuild();
         }
 
-        return true;
+        return generateSurface(false);
     }
 
     protected Boolean randomizeClouds(Boolean rebuild) {
@@ -793,7 +800,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             rebuild();
         }
 
-        return true;
+        return generateClouds(false);
     }
 
     protected Boolean randomizeAtmosphere(Boolean rebuild) {
@@ -808,7 +815,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             rebuild();
         }
 
-        return true;
+        return generateAtmosphere(false);
     }
 
     protected void randomizeAll() {
@@ -829,6 +836,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             var materialComponent = model.model.mtc;
             if (materialComponent != null) {
                 materialComponent.disposeTextures(GaiaSky.instance.assetManager);
+                materialComponent.disposeNoiseBuffers();
             }
             mtc.initialize(view.getName());
             model.model.setMaterial(mtc);
@@ -848,6 +856,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             CloudComponent cloudComponent = cloud.cloud;
             if (cloudComponent != null) {
                 cloudComponent.disposeTextures(GaiaSky.instance.assetManager);
+                cloudComponent.disposeNoiseBuffers();
             }
             clc.initialize(view.getName(), false);
             cloud.cloud = clc;
@@ -914,22 +923,22 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     public void notify(Event event, Object source, Object... data) {
         boolean status = (Boolean) data[0];
         switch (event) {
-        case PROCEDURAL_GENERATION_CLOUD_INFO -> {
-            if (status) {
-                genCloudNum++;
-            } else {
-                genCloudNum = FastMath.max(genCloudNum - 1, 0);
+            case PROCEDURAL_GENERATION_CLOUD_INFO -> {
+                if (status) {
+                    genCloudNum++;
+                } else {
+                    genCloudNum = FastMath.max(genCloudNum - 1, 0);
+                }
+                updateButtonStatus();
             }
-            updateButtonStatus();
-        }
-        case PROCEDURAL_GENERATION_SURFACE_INFO -> {
-            if (status) {
-                genSurfaceNum++;
-            } else {
-                genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
+            case PROCEDURAL_GENERATION_SURFACE_INFO -> {
+                if (status) {
+                    genSurfaceNum++;
+                } else {
+                    genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
+                }
+                updateButtonStatus();
             }
-            updateButtonStatus();
-        }
         }
     }
 }

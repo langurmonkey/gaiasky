@@ -3,6 +3,7 @@
 #version 330 core
 
 #include <shader/lib/colors.glsl>
+#include <shader/lib/luma.glsl>
 
 // Height texture.
 uniform sampler2D u_texture0;
@@ -27,7 +28,7 @@ void main() {
     float moisture = texture(u_texture1, v_texCoords).x;
 
     // Query LUT.
-    vec4 rgba = texture(u_texture2, vec2(moisture, height));
+    vec4 rgba = texture(u_texture2, vec2(moisture, 1.0 - height));
     // Shift hue if needed.
     if (u_lutHueShift != 0.0) {
         vec3 hsv = rgb2hsv(rgba.rgb);
@@ -39,8 +40,8 @@ void main() {
     diffuseColor = rgba;
 
     // Specular.
-    bool water = height >= 0.02;
-    bool snow = height > 0.85 && moisture > 0.6;
+    bool water = height < 0.1;
+    bool snow = luma(diffuseColor.rgb) > 0.9;
 
     vec4 spec = vec4(0.0, 0.0, 0.0, 1.0);
     if (water) {

@@ -150,9 +150,6 @@ project(":core") {
         api group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"
         api group: "com.fasterxml.jackson.datatype", name: "jackson-datatype-jsr310", version: "$jacksonVersion"
 
-        // Joise
-        api group: "com.sudoplay.joise", name: "joise", version: "$joiseVersion"
-
         // ****************
         // REST SERVER DEPS
         // ****************

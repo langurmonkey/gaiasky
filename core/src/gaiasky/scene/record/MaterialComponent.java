@@ -8,15 +8,12 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
@@ -27,20 +24,15 @@ import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.svt.SVTManager;
 import net.jafama.FastMath;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -48,7 +40,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
 
 public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
     /**
@@ -115,7 +106,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     // Occlusion clouds: ambient occlusion uses the cloud texture.
     public boolean occlusionClouds = false;
     // Biome lookup texture.
-    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-lut.png";
+    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png";
     public float biomeHueShift = 0;
     /**
      * Add also color even if texture is present
@@ -451,7 +442,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (aoCubemap != null) {
             aoCubemap.prepareCubemap(manager);
             // Only add occlusion clouds if clouds are actually visible.
-            if(!occlusionClouds || GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+            if (!occlusionClouds || GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
                 material.set(new CubemapAttribute(CubemapAttribute.AmbientOcclusionCubemap, aoCubemap.cubemap));
             }
         }
@@ -570,26 +561,23 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             addHeightTex(heightTex);
         } else {
             heightGenerated.set(true);
-            GaiaSky.instance.getExecutorService().execute(() -> {
-                // Begin
-                EventManager.publish(Event.PROCEDURAL_GENERATION_SURFACE_INFO, this, true);
-
+            GaiaSky.postRunnable(() -> {
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
-                long start = TimeUtils.millis();
-                GaiaSky.postRunnable(
-                        () -> logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.surface"), Integer.toString(N), Integer.toString(M))));
+                logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.surface"), Integer.toString(N), Integer.toString(M)));
 
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
                 }
-                Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, biomeLUT, biomeHueShift,
-                        I18n.msg("gui.procedural.progress", I18n.msg("gui.procedural.surface"), name));
-                float[][] elevationData = trio.getFirst();
-                float[][] moistureData = trio.getSecond();
-                Pixmap heightPixmap = trio.getThird();
+                FrameBuffer[] fbs = nc.generateElevation(N, M, biomeLUT, biomeHueShift);
+
+                Texture heightT = fbs[0].getColorBufferTexture();
+                Texture moistureT = fbs[1].getColorBufferTexture();
+                Texture diffuseT = fbs[2].getColorBufferTexture();
+                Texture specularT = fbs[2].getTextureAttachments().get(1);
+                Texture normalT = fbs[2].getTextureAttachments().get(2);
 
                 boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
                 boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
@@ -599,143 +587,68 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 // TODO implement metallic texture generation
                 //boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
 
-                // Create diffuse and specular textures
-                if (cDiffuse || cSpecular) {
-                    try {
-                        BufferedImage lut = ImageIO.read(Settings.settings.data.dataFileHandle(biomeLUT).file());
-                        int iw = lut.getWidth() - 1;
-                        int ih = lut.getHeight() - 1;
+                // HEIGHT.
+                if (heightT != null) {
+                    // Create texture, populate material
+                    if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                        heightData = new HeightDataPixmap(heightT, null, heightScale);
+                        heightTex = heightT;
+                        addHeightTex(heightTex);
 
-                        final Pixmap diffusePixmap;
-                        final Pixmap specularPixmap;
-                        if (cDiffuse) {
-                            diffusePixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-                        } else {
-                            diffusePixmap = null;
-                        }
-                        if (cSpecular) {
-                            specularPixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-                        } else {
-                            specularPixmap = null;
-                        }
-                        IntStream.range(0, N).parallel().forEach(i -> {
-                            final int ii = i;
-                            IntStream.range(0, M).parallel().forEach(j -> {
-                                // Normalize height
-                                float height = elevationData[ii][j] / heightScale;
-                                float moisture = moistureData[ii][j];
-
-                                int x = (int) (iw * MathUtilsDouble.clamp(moisture, 0, 1));
-                                int y = (int) (ih - ih * MathUtilsDouble.clamp(height, 0, 1));
-
-                                java.awt.Color argb = new java.awt.Color(lut.getRGB(x, y));
-                                float[] rgb = new float[]{argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f};
-                                if (biomeHueShift != 0) {
-                                    // Shift hue of lookup table by an amount in degrees
-                                    float[] hsb = ColorUtils.rgbToHsb(rgb);
-                                    hsb[0] = ((hsb[0] * 360f + biomeHueShift) % 360f) / 360f;
-                                    rgb = ColorUtils.hsbToRgb(hsb);
-                                }
-                                Color col = new Color(rgb[0], rgb[1], rgb[2], 1f);
-
-                                if (diffusePixmap != null)
-                                    diffusePixmap.drawPixel(ii, j, Color.rgba8888(col));
-
-                                boolean water = height <= 0.02f;
-                                boolean snow = height > 0.85f;
-                                if (water) {
-                                    if (specularPixmap != null) {
-                                        // White
-                                        specularPixmap.drawPixel(ii, j, Color.rgba8888(1f, 1f, 1f, 1f));
-                                    }
-                                } else if (snow) {
-                                    if (specularPixmap != null) {
-                                        // Whitish
-                                        specularPixmap.drawPixel(ii, j, Color.rgba8888(0.5f, 0.5f, 0.5f, 1f));
-                                    }
-                                } else {
-                                    if (specularPixmap != null) {
-                                        // Black
-                                        specularPixmap.drawPixel(ii, j, Color.rgba8888(0f, 0f, 0f, 1f));
-                                    }
-                                }
-                            });
-                        });
-                        // Write to disk if necessary
+                        // Write height to disk.
                         if (Settings.settings.program.saveProceduralTextures) {
-                            SysUtils.saveProceduralPixmap(heightPixmap, this.name + "-height");
-                            SysUtils.saveProceduralPixmap(diffusePixmap, this.name + "-diffuse");
-                            SysUtils.saveProceduralPixmap(specularPixmap, this.name + "-specular");
+                            SysUtils.saveProceduralGLTexture(heightT, this.name + "-height");
                         }
-
-                        GaiaSky.postRunnable(() -> {
-                            if (heightPixmap != null) {
-                                // Create texture, populate material
-                                if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
-                                    heightData = new HeightDataPixmap(heightPixmap, null);
-                                    heightTex = new Texture(heightPixmap, true);
-                                    heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-
-                                    addHeightTex(heightTex);
-                                }
-                            }
-                            if (diffusePixmap != null) {
-                                diffuseTex = new Texture(diffusePixmap, true);
-                                diffuseTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-
-                                addDiffuseTex(diffuseTex);
-                            }
-                            if (specularPixmap != null) {
-                                specularTex = new Texture(specularPixmap, true);
-                                specularTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-
-                                addSpecularTex(specularTex);
-                            }
-                        });
-                    } catch (IOException e) {
-                        logger.error(e);
                     }
                 }
-                // Generate normal texture from height data (only if tessellation is off)
-                if (cNormal && !Settings.settings.scene.renderer.elevation.type.isTessellation()) {
-                    final Pixmap normalPixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-                    float scale = 0.5f;
-                    IntStream.range(0, M).forEach(j -> {
-                        IntStream.range(0, N).forEach(i -> {
-                            int im = i > 0 ? i - 1 : i;
-                            int ip = i < N - 1 ? i + 1 : i;
-                            int jm = j > 0 ? j - 1 : j;
-                            int jp = j < M - 1 ? j + 1 : j;
-                            float vtl = elevationData[im][jm] / heightScale;
-                            float vl = elevationData[im][j] / heightScale;
-                            float vbl = elevationData[im][jp] / heightScale;
-                            float vt = elevationData[i][jm] / heightScale;
-                            float vb = elevationData[i][jp] / heightScale;
-                            float vtr = elevationData[ip][jm] / heightScale;
-                            float vr = elevationData[ip][j] / heightScale;
-                            float vbr = elevationData[ip][jp] / heightScale;
-                            float dx = (vtl + vl * 2f + vbl - vtr - vr * 2f - vbr) * scale;
-                            float dy = (vtl + vt * 2f + vtr - vbl - vb * 2f - vbr) * scale;
-                            Vector3 normal = new Vector3(dx * 255f, dy * 255f, 255f).nor();
-                            normalPixmap.drawPixel(i, j, Color.rgba8888(normal.x * 0.5f + 0.5f, normal.y * 0.5f + 0.5f, normal.z, 1f));
-                        });
-                    });
-                    // Write to disk if necessary
+
+                // MOISTURE.
+                if (moistureT != null) {
+                    // Write height to disk.
                     if (Settings.settings.program.saveProceduralTextures) {
-                        SysUtils.saveProceduralPixmap(normalPixmap, this.name + "-normal");
+                        SysUtils.saveProceduralGLTexture(moistureT, this.name + "-moisture");
                     }
-                    GaiaSky.postRunnable(() -> {
-                        normalTex = new Texture(normalPixmap, true);
-                        normalTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-
-                        addNormalTex(normalTex);
-                    });
                 }
-                long elapsed = TimeUtils.millis() - start;
-                GaiaSky.postRunnable(() -> logger.info(I18n.msg("gui.procedural.info.done", I18n.msg("gui.procedural.surface"), Double.toString(elapsed / 1000d))));
 
-                // End
-                EventManager.publish(Event.PROCEDURAL_GENERATION_SURFACE_INFO, this, false);
+                // DIFFUSE.
+                if (cDiffuse) {
+                    if (diffuseT != null) {
+                        diffuseTex = diffuseT;
+                        addDiffuseTex(diffuseTex);
+
+                        // Write to disk.
+                        if (Settings.settings.program.saveProceduralTextures) {
+                            SysUtils.saveProceduralGLTexture(diffuseT, this.name + "-diffuse");
+                        }
+                    }
+                }
+
+                // SPECULAR.
+                if (cSpecular) {
+                    if (specularT != null) {
+                        specularTex = specularT;
+                        addSpecularTex(specularTex);
+
+                        // Write to disk.
+                        if (Settings.settings.program.saveProceduralTextures) {
+                            SysUtils.saveProceduralGLTexture(specularT, this.name + "-specular");
+                        }
+                    }
+                }
+
+                // NORMAL.
+                if (cNormal) {
+                    if (normalT != null) {
+                        normalTex = normalT;
+                        addNormalTex(normalTex);
+
+                        // Write to disk.
+                        if (Settings.settings.program.saveProceduralTextures) {
+                            SysUtils.saveProceduralGLTexture(normalT, this.name + "-normal");
+                        }
+                    }
+
+                }
             });
         }
     }
@@ -756,7 +669,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             heightInitialized.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Construct RAM height map from texture
-                heightData = new HeightDataPixmap(tex, () -> addHeightTex(tex));
+                heightData = new HeightDataPixmap(tex, () -> addHeightTex(tex), heightScale);
             });
         }
     }
@@ -1181,6 +1094,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         texInitialised = false;
     }
 
+    public void disposeNoiseBuffers() {
+        if (nc != null) {
+            nc.dispose();
+        }
+    }
+
     private void unload(Material mat,
                         int attrIndex) {
         if (mat != null) {
@@ -1317,26 +1236,35 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
-        var dataPath = Settings.settings.data.dataPath("default-data/tex/base");
+        var dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
         Array<String> lookUpTables = new Array<>();
         try (var paths = Files.list(dataPath)) {
             List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).toList();
             for (Path p : l) {
                 String name = p.toString();
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/base/")));
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/lut/")));
             }
         } catch (Exception ignored) {
         }
 
         if (lookUpTables.isEmpty()) {
-            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-lut.png");
-            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/base/biome-smooth-lut.png");
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png");
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
         }
         setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
-        setBiomehueshift(rand.nextDouble() * 360.0);
+        if(rand.nextBoolean()) {
+            // Actually roll the dice for hue shift.
+            setBiomehueshift(rand.nextDouble() * 360.0);
+        } else {
+            // No hue shift.
+            setBiomehueshift(0.0);
+        }
         double sizeKm = bodySize * Constants.U_TO_KM;
         setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0));
         // Noise
+        if (nc != null) {
+            nc.dispose();
+        }
         NoiseComponent nc = new NoiseComponent();
         nc.randomizeAll(rand);
         setNoise(nc);

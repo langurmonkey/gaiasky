@@ -7,7 +7,6 @@
 
 package gaiasky.render.postprocess.filters;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.util.ShaderLoader;
@@ -19,6 +18,8 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     private final Vector3 scale = new Vector3(1, 1, 1);
     /** Final range of the noise values. **/
     private final Vector2 range = new Vector2(0, 1);
+    /** Color. **/
+    private final Vector3 color = new Vector3(1, 1, 1);
     /** RNG seed. **/
     private float seed = 1.23456f;
     /** The initial frequency. **/
@@ -66,6 +67,11 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     public void setViewportSize(float width, float height) {
         this.viewport.set(width, height);
         setParam(Param.Viewport, this.viewport);
+    }
+
+    public void setColor(float r, float g, float b) {
+        this.color.set(r, g, b);
+        setParam(Param.Color, this.color);
     }
 
     public void setRange(float a, float b) {
@@ -133,6 +139,7 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         setParams(Param.Texture, u_texture0);
         setParams(Param.Viewport, viewport);
         setParams(Param.Range, this.range);
+        setParams(Param.Color, this.color);
         setParams(Param.Scale, this.scale);
         setParams(Param.Seed, this.seed);
         setParams(Param.Frequency, this.frequency);
@@ -163,6 +170,7 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         Persistence("u_persistence", 0),
         Lacunarity("u_lacunarity", 0),
         Range("u_range", 2),
+        Color("u_color", 3),
         Scale("u_scale", 3),
         Power("u_power", 0),
         Octaves("u_octaves", 0),
