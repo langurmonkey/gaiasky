@@ -110,7 +110,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             smResolution, maxFpsInput;
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
             celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
-            chromaticAberration, filmGrain, lensFlare, velocityVectors, motionBlur;
+            chromaticAberration, filmGrain, lensFlare, velocityVectors, motionBlur, pgResolution;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
@@ -994,6 +994,26 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentScene.setFadeScrollBars(false);
         contentSceneTable.align(Align.top | Align.left);
 
+        // PROCEDURAL GENERATION
+        OwnLabel titleProcedural = new OwnLabel(I18n.msg("gui.ui.procedural"), skin, "header");
+        Table pgen = new Table();
+
+        // RESOLUTION
+        OwnLabel pgResolutionLabel = new OwnLabel(I18n.msg("gui.ui.procedural.resolution"), skin);
+        pgResolution = new OwnSliderPlus("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
+        pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
+        pgResolution.setWidth(sliderWidth);
+        pgResolution.setValue(settings.graphics.proceduralGenerationResolution[1]);
+
+        labels.add(pgResolutionLabel);
+
+        // Add to table.
+        pgen.add(pgResolutionLabel).left().padBottom(pad10).padRight(pad34);
+        pgen.add(pgResolution).left().padBottom(pad10).row();
+
+        // Add to content.
+        addContentGroup(contentSceneTable, titleProcedural, pgen, 0f);
+
         // RECURSIVE GRID
         OwnLabel titleRecgrid = new OwnLabel(I18n.msg("gui.ui.recursivegrid"), skin, "header");
         Table rg = new Table();
@@ -1020,19 +1040,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         recGridProjectionLines.setName("origin projection lines cb");
         recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
 
-        // ANIMATION
-        //OwnLabel animationLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.animate"), skin);
-        //var animation = new OwnCheckBox("", skin);
-        //animation.setChecked(settings.program.recursiveGrid.animate);
-        //animation.addListener((event) -> {
-        //    if (event instanceof ChangeEvent) {
-        //        // Enable or disable animation.
-        //        EventManager.publish(Event.RECURSIVE_GRID_ANIMATE_CMD, animation, animation.isChecked());
-        //        return true;
-        //    }
-        //    return false;
-        //});
-
         labels.add(originLabel, styleLabel, recGridProjectionLinesLabel);
 
         // Add to table.
@@ -1042,35 +1049,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         rg.add(recGridStyle).left().padBottom(pad10).row();
         rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
         rg.add(recGridProjectionLines).left().padBottom(pad10).row();
-        //rg.add(animationLabel).left().padBottom(pad10).padRight(pad34);
-        //rg.add(animation).left().padBottom(pad10);
 
         // Add to content.
-        addContentGroup(contentSceneTable, titleRecgrid, rg, 0f);
-
-        // UV GRIDS
-        OwnLabel titleUVGrids = new OwnLabel(I18n.msg("gui.ui.uvgrid"), skin, "header");
-        Table uvg = new Table();
-
-        // FRAME COORDINATES
-        OwnLabel frameCoordinatesLabel = new OwnLabel(I18n.msg("gui.ui.uvgrid.framecoords"), skin);
-        frameCoordinates = new OwnCheckBox("", skin);
-        frameCoordinates.setChecked(settings.program.uvGrid.frameCoordinates);
-        frameCoordinates.addListener((event) -> {
-            if (event instanceof ChangeEvent ce) {
-                EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinates.isChecked());
-            }
-            return false;
-        });
-
-        labels.add(frameCoordinatesLabel);
-
-        // Add to table
-        uvg.add(frameCoordinatesLabel).left().padBottom(pad10).padRight(pad34);
-        uvg.add(frameCoordinates).left().padBottom(pad10);
-
-        // Add to content.
-        addContentGroup(contentSceneTable, titleUVGrids, uvg);
+        addContentGroup(contentSceneTable, titleRecgrid, rg);
 
         // ECLIPSES
         Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
@@ -1139,9 +1120,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== UI ====
          */
 
-        final Table contentUI = new Table(skin);
+        final Table contentUITable = new Table(skin);
+        contentUITable.setWidth(contentWidth);
+        final OwnScrollPane contentUI = new OwnScrollPane(contentUITable, skin, "minimalist-nobg");
         contentUI.setWidth(contentWidth);
-        contentUI.align(Align.top | Align.left);
+        contentUI.setHeight(scrollHeight);
+        contentUI.setScrollingDisabled(true, false);
+        contentUI.setFadeScrollBars(false);
+        contentUITable.align(Align.top | Align.left);
 
         OwnLabel titleUI = new OwnLabel(I18n.msg("gui.ui.interfacesettings"), skin, "header");
 
@@ -1364,12 +1350,34 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         pg.add(pointerGuidesColorLabel).left().padBottom(pad10).padRight(pad34);
         pg.add(pointerGuidesColor).left().size(colorPickerSize).padBottom(pad10).row();
         pg.add(pointerGuidesWidthLabel).left().padBottom(pad10).padRight(pad34);
-        pg.add(pointerGuidesWidth).left().padBottom(pad10).padRight(pad34);
+        pg.add(pointerGuidesWidth).left().padBottom(pad10).padRight(pad34).row();
+
+        // UV GRIDS
+        OwnLabel titleUVGrids = new OwnLabel(I18n.msg("gui.ui.uvgrid"), skin, "header");
+        Table uvg = new Table();
+
+        // FRAME COORDINATES
+        OwnLabel frameCoordinatesLabel = new OwnLabel(I18n.msg("gui.ui.uvgrid.framecoords"), skin);
+        frameCoordinates = new OwnCheckBox("", skin);
+        frameCoordinates.setChecked(settings.program.uvGrid.frameCoordinates);
+        frameCoordinates.addListener((event) -> {
+            if (event instanceof ChangeEvent ce) {
+                EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinates.isChecked());
+            }
+            return false;
+        });
+
+        labels.add(frameCoordinatesLabel);
+
+        // Add to table
+        uvg.add(frameCoordinatesLabel).left().padBottom(pad10).padRight(pad34);
+        uvg.add(frameCoordinates).left().padBottom(pad10);
 
         // Add to content
-        addContentGroup(contentUI, titleUI, ui, 0f);
-        addContentGroup(contentUI, titleCrosshair, ch);
-        addContentGroup(contentUI, titleGuides, pg);
+        addContentGroup(contentUITable, titleUI, ui, 0f);
+        addContentGroup(contentUITable, titleCrosshair, ch);
+        addContentGroup(contentUITable, titleGuides, pg);
+        addContentGroup(contentUITable, titleUVGrids, uvg);
 
 
         /*
@@ -2668,6 +2676,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         int newShadowNumber = nShadows.getSelected().value;
         final boolean reloadShadows =
                 shadowsCb.isChecked() && (settings.scene.renderer.shadow.resolution != newShadowResolution || settings.scene.renderer.shadow.number != newShadowNumber);
+
+        // Procedural generation texture resolution
+        int pgHeight = (int) pgResolution.getValue();
+        int pgWidth = pgHeight * 2;
+        EventManager.publish(Event.PROCEDURAL_GENERATION_RESOLUTION_CMD, this, pgWidth, pgHeight);
 
         // Eclipses
         boolean eclipsesActiveBefore = settings.scene.renderer.eclipses.active;

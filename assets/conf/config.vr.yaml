@@ -70,6 +70,8 @@ graphics:
   # If this is activated, the internal format {@link GL30#GL_SRGB8_ALPHA8} is used only
   # when safe graphics mode is not active.
   useSRGB: false
+  # Resolution of the procedurally generated textures for the surfaces of planets.
+  proceduralGenerationResolution: [ 3000, 1500 ]
 
 #
 # Scene configuration.

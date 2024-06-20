@@ -253,8 +253,8 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
             generated.set(true);
             GaiaSky.postRunnable(() -> {
 
-                final int N = Settings.settings.graphics.quality.texWidthTarget;
-                final int M = Settings.settings.graphics.quality.texHeightTarget;
+                final int N = Settings.settings.graphics.proceduralGenerationResolution[0];
+                final int M = Settings.settings.graphics.proceduralGenerationResolution[1];
                 long start = TimeUtils.millis();
                 logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.cloud"), N, M));
 

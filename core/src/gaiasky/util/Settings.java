@@ -1033,6 +1033,11 @@ public class Settings extends SettingsObject {
          * when safe graphics mode is not active.
          **/
         public boolean useSRGB = false;
+        /**
+         * Resolution of the textures generated procedurally. These are the elevation, moisture,
+         * diffuse, specular and normal textures procedurally generated from noise algorithms.
+         */
+        public int[] proceduralGenerationResolution = new int[]{3000, 1500};
 
         public void setQuality(final String qualityString) {
             this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
@@ -1077,6 +1082,12 @@ public class Settings extends SettingsObject {
                         backBufferResolution[0] = (int) FastMath.round(resolution[0] * backBufferScale);
                         backBufferResolution[1] = (int) FastMath.round(resolution[1] * backBufferScale);
                     }
+                    case PROCEDURAL_GENERATION_RESOLUTION_CMD -> {
+                        int w = (Integer) data[0];
+                        int h = (Integer) data[1];
+                        proceduralGenerationResolution[0] = w;
+                        proceduralGenerationResolution[1] = h;
+                    }
                 }
             }
         }
@@ -1098,7 +1109,7 @@ public class Settings extends SettingsObject {
         @Override
         protected void setupListeners() {
             EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD,
-                    Event.BACKBUFFER_SCALE_CMD);
+                    Event.BACKBUFFER_SCALE_CMD, Event.PROCEDURAL_GENERATION_RESOLUTION_CMD);
 
             fullScreen.setupListeners();
         }

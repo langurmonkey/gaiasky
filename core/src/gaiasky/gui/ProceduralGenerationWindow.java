@@ -203,6 +203,21 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         content.add(buttonGroup).center().padBottom(pad34).row();
 
+        // Resolution
+        OwnSliderPlus pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"), Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
+        pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
+        pgResolution.setWidth(fieldWidthAll);
+        pgResolution.setValue(Settings.settings.graphics.proceduralGenerationResolution[1]);
+        pgResolution.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                int pgHeight = (int) pgResolution.getValue();
+                int pgWidth = pgHeight * 2;
+                EventManager.publish(Event.PROCEDURAL_GENERATION_RESOLUTION_CMD, this, pgWidth, pgHeight);
+            }
+        });
+        content.add(pgResolution).left().padBottom(pad18).row();
+
         // Save textures
         OwnCheckBox saveTextures = new OwnCheckBox(I18n.msg("gui.procedural.savetextures"), skin, pad10);
         saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);

@@ -310,6 +310,8 @@ public enum Event {
      * with the resolution.
      **/
     CUBEMAP_RESOLUTION_CMD,
+    /** Procedural generation resolution command. **/
+    PROCEDURAL_GENERATION_RESOLUTION_CMD,
     /** Enable/disable displaying frame coordinates in UV grid. **/
     UV_GRID_FRAME_COORDINATES_CMD,
     DEBUG_OBJECTS,
