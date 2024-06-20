@@ -8,6 +8,7 @@
 package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
@@ -52,6 +53,12 @@ public class OwnTextButton extends TextButton {
             }
             return false;
         });
+    }
+
+    @Override
+    public void setColor (Color color) {
+        super.setColor(color);
+        getLabel().setColor(color);
     }
 
     @Override

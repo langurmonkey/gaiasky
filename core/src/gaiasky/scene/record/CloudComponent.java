@@ -416,7 +416,7 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
         // Cloud
         setDiffuse("generate");
         // Color
-        if (rand.nextBoolean()) {
+        if (rand.nextDouble() > 0.3) {
             // White.
             color[0] = 1f;
             color[1] = 1f;
@@ -424,9 +424,9 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
             color[3] = 0.8f;
         } else {
             // Gaussian around white-ish.
-            color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.2), 0.0, 1.0);
-            color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.2), 0.0, 1.0);
-            color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.2), 0.0, 1.0);
+            color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
+            color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
+            color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
             color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.7, 0.2), 0.0, 1.0);
         }
         // Params

@@ -48,7 +48,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     // Selected tab persists across windows
     private static int lastTabSelected = 0;
 
-    private final Entity target;
+    private Entity target;
     private final FocusView view;
     private final Random rand;
     private MaterialComponent initMtc, mtc;
@@ -73,13 +73,29 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         this.rand = new Random(1884L);
         this.setModal(false);
 
-        EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO, Event.PROCEDURAL_GENERATION_SURFACE_INFO);
+        EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO,
+                Event.PROCEDURAL_GENERATION_SURFACE_INFO,
+                Event.FOCUS_CHANGED);
 
         setAcceptText(I18n.msg("gui.close"));
 
         // Build UI
         buildSuper();
 
+    }
+
+    private void reinitialize(Entity target) {
+        this.target = target;
+        this.view.setEntity(target);
+        this.initMtc = Mapper.model.get(this.target).model.mtc;
+        this.initClc = Mapper.cloud.get(this.target).cloud;
+        this.initAc = Mapper.atmosphere.get(this.target).atmosphere;
+        this.setModal(false);
+
+        this.getTitleLabel().setText(I18n.msg("gui.procedural.title", view.getLocalizedName()));
+
+        // Build UI
+        rebuild();
     }
 
     protected void rebuild() {
@@ -91,7 +107,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     protected void build() {
         this.textWidth = 195f;
         this.fieldWidth = 500f;
-        this.fieldWidthAll = 710f;
+        this.fieldWidthAll = 750f;
         float tabContentWidth = 400f;
         float tabWidth = 240f;
 
@@ -179,6 +195,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Randomize button
         OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin, "big");
+        randomize.setColor(ColorUtils.gYellowC);
         randomize.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -186,22 +203,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             }
         });
         randomize.pad(pad10, pad20, pad10, pad20);
-        // Generate button
-        OwnTextButton generate = new OwnTextButton(I18n.msg("gui.procedural.generate", I18n.msg("gui.procedural.all")), skin, "big");
-        generate.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                generateAll();
-            }
-        });
-        generate.pad(pad10, pad20, pad10, pad20);
 
-        HorizontalGroup buttonGroup = new HorizontalGroup();
-        buttonGroup.space(pad20);
-        buttonGroup.addActor(randomize);
-        buttonGroup.addActor(generate);
-
-        content.add(buttonGroup).center().padBottom(pad34).row();
+        content.add(randomize).center().padBottom(pad34).row();
 
         // Resolution
         OwnSliderPlus pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"), Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
@@ -237,17 +240,11 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     }
 
-    private OwnTextButton addLocalButtons(Table content, String key, Function<Boolean, Boolean> randomizeFunc, Function<Boolean, Boolean> generateFunc) {
+    private OwnTextButton addLocalButton(Table content, String key,
+                                          Function<Boolean, Boolean> generateFunc
+    ) {
         String name = I18n.msg(key);
-        // Randomize button
-        OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", name), skin);
-        randomize.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                randomizeFunc.apply(true);
-            }
-        });
-        randomize.pad(pad10, pad20, pad10, pad20);
+
         // Generate button
         OwnTextButton generate = new OwnTextButton(I18n.msg("gui.procedural.generate", name), skin);
         generate.addListener(new ChangeListener() {
@@ -257,11 +254,99 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             }
         });
         generate.pad(pad10, pad20, pad10, pad20);
+        generate.addListener(new OwnTextTooltip("Generate with current parameters", skin));
+
+        content.add(generate).center().colspan(2).padBottom(pad34).row();
+        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
+
+        return generate;
+    }
+
+    private void addLocalButtons(Table content, String key,
+                                          Function<Boolean, Boolean> randomizeFunc,
+                                          Function<Boolean, Boolean> gasGiantFunc,
+                                          Function<Boolean, Boolean> earthLikeFunc
+    ) {
+        String name = I18n.msg(key);
+
+        // Randomize parameters
+        OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", name), skin);
+        randomize.setColor(ColorUtils.gYellowC);
+        randomize.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                randomizeFunc.apply(true);
+            }
+        });
+        randomize.pad(pad10, pad20, pad10, pad20);
+        randomize.addListener(new OwnTextTooltip("Randomize all parameters and generate", skin));
+
+        // Gas giant
+        OwnTextButton gasGiant = new OwnTextButton("Gas giant", skin);
+        gasGiant.setColor(ColorUtils.gBlueC);
+        gasGiant.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gasGiantFunc.apply(true);
+            }
+        });
+        gasGiant.pad(pad10, pad20, pad10, pad20);
+        gasGiant.addListener(new OwnTextTooltip("Create a gas giant-like surface", skin));
+
+        // Earth like
+        OwnTextButton earthLike = new OwnTextButton("Earth-like", skin);
+        earthLike.setColor(ColorUtils.gBlueC);
+        earthLike.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                earthLikeFunc.apply(true);
+            }
+        });
+        earthLike.pad(pad10, pad20, pad10, pad20);
+        earthLike.addListener(new OwnTextTooltip("Create an Earth-like planet surface", skin));
 
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.space(pad20);
+        buttonGroup.addActor(earthLike);
+        buttonGroup.addActor(gasGiant);
         buttonGroup.addActor(randomize);
+
+        content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
+        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
+    }
+
+    private OwnTextButton addLocalButtons(Table content, String key,
+                                          Function<Boolean, Boolean> generateFunc,
+                                          Function<Boolean, Boolean> randomizeFunc) {
+        String name = I18n.msg(key);
+
+        // Randomize button
+        OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", name), skin);
+        randomize.setColor(ColorUtils.gYellowC);
+        randomize.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                randomizeFunc.apply(true);
+            }
+        });
+        randomize.pad(pad10, pad20, pad10, pad20);
+        randomize.addListener(new OwnTextTooltip("Randomize all parameters and generate", skin));
+
+        // Generate button
+        OwnTextButton generate = new OwnTextButton(I18n.msg("gui.procedural.generate", name), skin);
+        generate.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                generateFunc.apply(true);
+            }
+        });
+        generate.pad(pad10, pad20, pad10, pad20);
+        generate.addListener(new OwnTextTooltip("Generate with current parameters", skin));
+
+        HorizontalGroup buttonGroup = new HorizontalGroup();
+        buttonGroup.space(pad20);
         buttonGroup.addActor(generate);
+        buttonGroup.addActor(randomize);
 
         content.add(buttonGroup).center().colspan(2).padBottom(pad18).row();
         content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34);
@@ -271,7 +356,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     private void addNoiseGroup(Table content, NoiseComponent nc, String key) {
         // Title
-        content.add(new OwnLabel(I18n.msg(key), skin, "header")).colspan(2).left().padBottom(pad34).row();
+        if (key != null) {
+            content.add(new OwnLabel(I18n.msg(key), skin, "header")).colspan(2).left().padBottom(pad34).row();
+        }
 
         // Seed
         FloatValidator lv = new FloatValidator(-10000f, 10000f);
@@ -515,7 +602,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 mtc.copyFrom(initMtc);
             }
             // Title
-            content.add(new OwnLabel(I18n.msg("gui.procedural.param.color"), skin, "header")).colspan(2).left().padBottom(pad34).row();
+            content.add(new OwnLabel(I18n.msg("gui.procedural.param.surface"), skin, "header")).colspan(2).left().padBottom(pad34).row();
+
+
+            // Add button group with presets.
+            addLocalButtons(content, "gui.procedural.surface",
+                    this::randomizeSurface,
+                    this::randomizeSurfaceGasGiant,
+                    this::randomizeSurfaceEarthLike);
 
             // LUT
             Path dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
@@ -575,7 +669,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             updateLutImage(lookUpTables);
 
             // Noise
-            addNoiseGroup(content, mtc.nc, "gui.procedural.param.elev");
+            addNoiseGroup(content, mtc.nc, null);
 
             // Height scale
             OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 80.0f, 0.1f, skin);
@@ -593,8 +687,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             content.add(heightScale).colspan(2).left().padBottom(pad34).padRight(pad10);
             content.add(heightScaleTooltip).left().padBottom(pad34).row();
 
-            // Add button group
-            genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::randomizeSurface, this::generateSurface);
+            // Add generate button
+            genSurfaceButton = addLocalButton(content, "gui.procedural.surface", this::generateSurface);
 
         } else {
             // Error!
@@ -635,7 +729,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         addNoiseGroup(content, clc.nc, "gui.procedural.param.cloud");
 
         // Add button group
-        genCloudsButton = addLocalButtons(content, "gui.procedural.cloud", this::randomizeClouds, this::generateClouds);
+        genCloudsButton = addLocalButtons(content, "gui.procedural.cloud", this::generateClouds, this::randomizeClouds);
     }
 
     private void buildContentAtmosphere(Table content) {
@@ -785,7 +879,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(fogColorTooltip).left().padBottom(pad18).row();
 
         // Add button group
-        addLocalButtons(content, "gui.procedural.atmosphere", this::randomizeAtmosphere, this::generateAtmosphere);
+        addLocalButtons(content, "gui.procedural.atmosphere", this::generateAtmosphere, this::randomizeAtmosphere);
     }
 
     protected Boolean randomizeSurface(Boolean rebuild) {
@@ -802,6 +896,37 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         return generateSurface(false);
     }
+
+    protected Boolean randomizeSurfaceGasGiant(Boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeGasGiant(rand.nextLong());
+
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
+
+            rebuild();
+        }
+
+        return generateSurface(false);
+    }
+
+    protected Boolean randomizeSurfaceEarthLike(Boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeEarthLike(rand.nextLong(), view.getSize());
+
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
+
+            rebuild();
+        }
+
+        return generateSurface(false);
+    }
+
 
     protected Boolean randomizeClouds(Boolean rebuild) {
         this.initClc = new CloudComponent();
@@ -936,9 +1061,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        boolean status = (Boolean) data[0];
         switch (event) {
             case PROCEDURAL_GENERATION_CLOUD_INFO -> {
+                boolean status = (Boolean) data[0];
                 if (status) {
                     genCloudNum++;
                 } else {
@@ -947,12 +1072,23 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 updateButtonStatus();
             }
             case PROCEDURAL_GENERATION_SURFACE_INFO -> {
+                boolean status = (Boolean) data[0];
                 if (status) {
                     genSurfaceNum++;
                 } else {
                     genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
                 }
                 updateButtonStatus();
+            }
+            case FOCUS_CHANGED -> {
+                Entity entity;
+                if (data[0] instanceof String) {
+                    entity = GaiaSky.instance.scene.getEntity((String) data[0]);
+                } else {
+                    FocusView v = (FocusView) data[0];
+                    entity = v.getEntity();
+                }
+                reinitialize(entity);
             }
         }
     }

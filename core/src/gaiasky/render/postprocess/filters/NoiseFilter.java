@@ -9,6 +9,7 @@ package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector4;
 import gaiasky.render.util.ShaderLoader;
 
 public final class NoiseFilter extends Filter<NoiseFilter> {
@@ -19,7 +20,7 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     /** Final range of the noise values. **/
     private final Vector2 range = new Vector2(0, 1);
     /** Color. **/
-    private final Vector3 color = new Vector3(1, 1, 1);
+    private final Vector4 color = new Vector4(1, 1, 1, 1);
     /** RNG seed. **/
     private float seed = 1.23456f;
     /** The initial frequency. **/
@@ -69,8 +70,8 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         setParam(Param.Viewport, this.viewport);
     }
 
-    public void setColor(float r, float g, float b) {
-        this.color.set(r, g, b);
+    public void setColor(float r, float g, float b, float a) {
+        this.color.set(r, g, b, a);
         setParam(Param.Color, this.color);
     }
 
@@ -170,7 +171,7 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         Persistence("u_persistence", 0),
         Lacunarity("u_lacunarity", 0),
         Range("u_range", 2),
-        Color("u_color", 3),
+        Color("u_color", 4),
         Scale("u_scale", 3),
         Power("u_power", 0),
         Octaves("u_octaves", 0),

@@ -79,7 +79,7 @@ public class NoiseComponent extends NamedComponent {
     }
 
     public FrameBuffer generateNoise(int N, int M) {
-       return generateNoise(N, M, new float[]{1f, 1f, 1f});
+        return generateNoise(N, M, new float[]{1f, 1f, 1f});
     }
 
     public FrameBuffer generateNoise(int N, int M, float[] color) {
@@ -123,7 +123,7 @@ public class NoiseComponent extends NamedComponent {
         surfaceGen.setLutTexture(lut);
         surfaceGen.setLutHueShift(biomeHueShift);
         fbSurface.begin();
-        surfaceGen.render(fbHeight, fbSurface);
+        surfaceGen.render(fbHeight, fbSurface, null);
         fbSurface.end();
 
         if (DEBUG_UI_VIEW) {
@@ -240,14 +240,14 @@ public class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        if(clouds) {
+        if (clouds) {
             // Type for clouds: PERLIN, SIMPLEX or CURL.
             int d = rand.nextInt(3);
             d = d == 2 ? 3 : d;
             setType(NoiseType.values()[d].name());
         } else {
             // Type: all but WHITE. VORONOI is rare.
-            if(rand.nextInt(20) < 18) {
+            if (rand.nextInt(20) < 18) {
                 // PERLIN, SIMPLEX or CURL
                 int d = rand.nextInt(3);
                 d = d == 2 ? 3 : d;
@@ -262,10 +262,11 @@ public class NoiseComponent extends NamedComponent {
         double baseSize = FastMath.abs(gaussian(rand, 4.0, 1.0, 0.5));
         if (clouds) {
             // XY small, Z large.
+            double xyScale = gaussian(rand, 1.0, 1.0, 0.2);
             setScale(new double[]{
-                    FastMath.abs(gaussian(rand, 1.0, 1.0, 0.2)),
-                    FastMath.abs(gaussian(rand, 1.0, 1.0, 0.2)),
-                    FastMath.abs(gaussian(rand, 4.0, 2.0, 2.0))});
+                    FastMath.abs(xyScale),
+                    FastMath.abs(xyScale),
+                    FastMath.abs(gaussian(rand, 5.0, 2.0, xyScale + 2.0))});
         } else if (rand.nextBoolean()) {
             // Single scale.
             setScale(baseSize);
@@ -277,7 +278,7 @@ public class NoiseComponent extends NamedComponent {
         scale[1] *= scaleFac;
         scale[2] *= scaleFac;
         // Frequency.
-        if(clouds) {
+        if (clouds) {
             setFrequency(gaussian(rand, 1.0, 2.0, 0.6));
         } else {
             setFrequency(gaussian(rand, 0.5, 2.0, 0.01));
@@ -290,7 +291,7 @@ public class NoiseComponent extends NamedComponent {
         if (type == NoiseType.VORONOI) {
             setOctaves((long) rand.nextInt(1, 3));
         } else {
-            if(clouds) {
+            if (clouds) {
                 setOctaves(rand.nextLong(4, 9));
             } else {
                 setOctaves(rand.nextLong(1, 9));
@@ -301,11 +302,81 @@ public class NoiseComponent extends NamedComponent {
         double maxRange = 0.5 + FastMath.abs(rand.nextDouble());
         setRange(new double[]{minRange, maxRange});
         // Power.
-        if(clouds) {
+        if (clouds) {
             setPower(gaussian(rand, 1.0, 1.0, 0.5));
         } else {
             setPower(rocky ? 1.0 : gaussian(rand, 2.0, 2.0, 0.2));
         }
+        // Turbulence.
+        setTurbulence(true);
+        // Ridge.
+        setRidge(rand.nextBoolean());
+    }
+
+    public void randomizeEarthLike(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Type: PERLIN, SIMPLEX.
+        setType(NoiseType.values()[rand.nextInt(2)].name());
+        // Same scale for all.
+        double scale = rand.nextDouble(2.0, 8.0);
+        setScale(new double[]{scale, scale, scale});
+        // Frequency.
+        setFrequency(rand.nextDouble(0.2, 0.65));
+        // Persistence.
+        setPersistence(rand.nextDouble(0.2, 0.5));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(2.0, 5.0));
+        // Octaves [1,4].
+        setOctaves((long) rand.nextInt(3, 8));
+        // Range.
+        setRange(new double[]{
+                rand.nextDouble(-0.7, -0.4),
+                rand.nextDouble(1.0, 1.5)});
+        // Power.
+        setPower(rand.nextDouble(0.6, 3.0));
+        // Turbulence.
+        setTurbulence(true);
+        // Ridge.
+        setRidge(rand.nextInt(4) == 3);
+    }
+
+    public void randomizeGasGiant(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Type.
+        // Type: all but WHITE. VORONOI is rare.
+        if (rand.nextInt(20) < 18) {
+            // PERLIN, SIMPLEX or CURL
+            int d = rand.nextInt(3);
+            d = d == 2 ? 3 : d;
+            setType(NoiseType.values()[d].name());
+        } else {
+            // VORONOI
+            setType(NoiseType.VORONOI.name());
+        }
+        // Scale.
+        double scaleFac = type == NoiseType.CURL ? 2.5 : 1;
+        // XY small, Z large.
+        setScale(new double[]{
+                FastMath.abs(gaussian(rand, 1.0, 1.0, 0.2)),
+                FastMath.abs(gaussian(rand, 1.0, 1.0, 0.2)),
+                FastMath.abs(gaussian(rand, 7.0, 2.0, 5.0))});
+        scale[0] *= scaleFac;
+        scale[1] *= scaleFac;
+        scale[2] *= scaleFac;
+        // Frequency.
+        setFrequency(rand.nextDouble(0.5, 3.0));
+        // Persistence.
+        setPersistence(rand.nextDouble(0.4, 0.6));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(0.1, 3.0));
+        // Octaves [1,4].
+        setOctaves((long) rand.nextInt(1, 4));
+        // Range.
+        setRange(new double[]{0.2, rand.nextDouble(0.9, 1.3)});
+        // Power.
+        setPower(0.1);
         // Turbulence.
         setTurbulence(true);
         // Ridge.

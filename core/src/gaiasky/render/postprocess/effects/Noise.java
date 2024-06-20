@@ -34,7 +34,7 @@ public final class Noise extends PostProcessorEffect {
     }
 
     public void setColor(float[] color) {
-        filter.setColor(color[0], color[1], color[2]);
+        filter.setColor(color[0], color[1], color[2], color[3]);
     }
 
     public void setScale(double[] scale) {

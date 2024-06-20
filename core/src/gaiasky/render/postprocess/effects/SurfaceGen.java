@@ -39,11 +39,6 @@ public final class SurfaceGen extends PostProcessorEffect {
         filter.rebind();
     }
 
-    public void render(FrameBuffer src, FrameBuffer dest) {
-        restoreViewport(dest);
-        filter.setInput(src).setOutput(dest).render();
-    }
-
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);

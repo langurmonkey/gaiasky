@@ -10,10 +10,7 @@ package gaiasky.render.postprocess.filters;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix3;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.postprocess.util.FullscreenQuad;
 
@@ -107,6 +104,12 @@ public abstract class Filter<T> implements Disposable {
         program.setUniformf(param.mnemonic(), value);
     }
 
+    // vec4
+    protected void setParam(Parameter param, Vector4 value) {
+        program.bind();
+        program.setUniformf(param.mnemonic(), value);
+    }
+
     // mat3
     protected T setParam(Parameter param, Matrix3 value) {
         program.bind();
@@ -182,6 +185,16 @@ public abstract class Filter<T> implements Disposable {
 
     // vec3 version
     protected T setParams(Parameter param, Vector3 value) {
+        if (!programBegan) {
+            programBegan = true;
+            program.bind();
+        }
+        program.setUniformf(param.mnemonic(), value);
+        return (T) this;
+    }
+
+    // vec4 version
+    protected T setParams(Parameter param, Vector4 value) {
         if (!programBegan) {
             programBegan = true;
             program.bind();

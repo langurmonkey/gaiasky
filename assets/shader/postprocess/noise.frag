@@ -17,7 +17,7 @@ uniform vec2 u_viewport;
 // Scale in x, y and z.
 uniform vec3 u_scale;
 // Noise color.
-uniform vec3 u_color;
+uniform vec4 u_color;
 // Final range of the noise values.
 uniform vec2 u_range;
 // Noise seed.
@@ -102,5 +102,5 @@ void main() {
     // Set in range.
     value = clamp(gln_map(value, 0.0, 1.0, u_range.x, u_range.y), 0.0, 1.0);
 
-    fragColor = vec4(vec3(value) * u_color, 1.0);
+    fragColor = vec4((vec3(value) * u_color.rgb) * u_color.a, 1.0);
 }

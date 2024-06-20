@@ -47,7 +47,26 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      **/
     protected static final OwnTextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
+    private static final Array<String> lookUpTables = new Array<>();
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
+
+    private void initializeLookUpTables() {
+        if (lookUpTables.isEmpty()) {
+            var dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
+            try (var paths = Files.list(dataPath)) {
+                List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).toList();
+                for (Path p : l) {
+                    String name = p.toString();
+                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/lut/")));
+                }
+            } catch (Exception ignored) {
+            }
+            if (lookUpTables.isEmpty()) {
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
+            }
+        }
+    }
 
     // Default height scale is 4 km.
     private static final float DEFAULT_HEIGHT_SCALE = (float) (4.0 * Constants.KM_TO_U);
@@ -640,7 +659,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 if (cNormal) {
                     if (normalT != null) {
                         normalTex = normalT;
-                        addNormalTex(normalTex);
+                        // We have height texture already, do not need normal!
+                        //addNormalTex(normalTex);
 
                         // Write to disk.
                         if (Settings.settings.program.saveProceduralTextures) {
@@ -1231,34 +1251,23 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public void randomizeAll(long seed,
                              double bodySize) {
+        initializeLookUpTables();
+
         var rand = new Random(seed);
         setHeight("generate");
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
-        var dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
-        Array<String> lookUpTables = new Array<>();
-        try (var paths = Files.list(dataPath)) {
-            List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).toList();
-            for (Path p : l) {
-                String name = p.toString();
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/lut/")));
-            }
-        } catch (Exception ignored) {
-        }
 
-        if (lookUpTables.isEmpty()) {
-            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png");
-            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
-        }
         setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
-        if(rand.nextBoolean()) {
+        if (rand.nextBoolean()) {
             // Actually roll the dice for hue shift.
             setBiomehueshift(rand.nextDouble() * 360.0);
         } else {
             // No hue shift.
             setBiomehueshift(0.0);
         }
+        // Height scale
         double sizeKm = bodySize * Constants.U_TO_KM;
         setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0));
         // Noise
@@ -1267,6 +1276,68 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
         NoiseComponent nc = new NoiseComponent();
         nc.randomizeAll(rand);
+        setNoise(nc);
+    }
+
+    private String randomBiomeLut(Random rand, String... names) {
+        Array<String> candidates = new Array<>(names.length);
+
+        for(var name : names) {
+            for (var lut : lookUpTables) {
+                if (lut.contains(name)) {
+                    candidates.add(lut);
+                    break;
+                }
+            }
+        }
+        return candidates.get(rand.nextInt(candidates.size));
+    }
+
+    public void randomizeEarthLike(long seed, double bodySize) {
+        initializeLookUpTables();
+
+        var rand = new Random(seed);
+        setHeight("generate");
+        setDiffuse("generate");
+        setNormal("generate");
+        setSpecular("generate");
+
+        setBiomelut(randomBiomeLut(rand, "biome-lut", "biome-smooth-lut", "biome-vertical-lut",
+                "biomes-separate-lut", "brown-green-lut"));
+
+        // Choose randomly in [0, 30] and [330, 360].
+        setBiomehueshift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);
+        // Height scale
+        double sizeKm = bodySize * Constants.U_TO_KM;
+        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 3.0));
+        // Noise
+        if (nc != null) {
+            nc.dispose();
+        }
+        NoiseComponent nc = new NoiseComponent();
+        nc.randomizeEarthLike(rand);
+        setNoise(nc);
+    }
+
+    public void randomizeGasGiant(long seed) {
+        initializeLookUpTables();
+
+        var rand = new Random(seed);
+        setHeight("generate");
+        setDiffuse("generate");
+        setNormal("generate");
+        setSpecular("generate");
+
+        setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
+        // Actually roll the dice for hue shift.
+        setBiomehueshift(rand.nextDouble() * 360.0);
+        setHeightScale(1.0);
+        // Noise
+        if (nc != null) {
+            nc.dispose();
+        }
+        NoiseComponent nc = new NoiseComponent();
+        nc.randomizeGasGiant(rand);
         setNoise(nc);
     }
 
