@@ -37,8 +37,8 @@ public class OortGenerator {
 
             SettingsManager.initialize(new FileInputStream("../assets/conf/config.yaml"), new FileInputStream("../assets/data/dummyversion"));
 
-            I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/android/assets/i18n/gsbundle"),
-                    new FileHandle(System.getenv("PROJECTS") + "/gaiasky/android/assets/i18n/objects"));
+            I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/gsbundle"),
+                    new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/objects"));
 
             // Add notif watch
             new ConsoleLogger();

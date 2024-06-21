@@ -100,10 +100,10 @@ public class Settings extends SettingsObject {
         // Initialize icon: if running from source, use icon in assets/icon, otherwise, use global icon
         Path iconPath = Path.of(ASSETS_LOC + "/icon/gs_064.png");
         if (Files.exists(iconPath)) {
-            logger.info("Icon found: " + iconPath);
+            logger.debug("Icon found: " + iconPath);
             ICON_URL = "file://" + iconPath.toAbsolutePath();
         } else {
-            logger.info("Icon not found: " + iconPath + ", using: " + ASSETS_LOC + "/gs_icon.png");
+            logger.debug("Icon not found: " + iconPath + ", using: " + ASSETS_LOC + "/gs_icon.png");
             ICON_URL = "file://" + ASSETS_LOC + "/gs_icon.png";
         }
     }
