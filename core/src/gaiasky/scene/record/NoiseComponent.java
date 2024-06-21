@@ -94,7 +94,7 @@ public class NoiseComponent extends NamedComponent {
         return fbNoise;
     }
 
-    public FrameBuffer[] generateSurfaceTextures(int N, int M, String biomeLut, float biomeHueShift) {
+    public FrameBuffer[] generateSurfaceTextures(int N, int M, String biomeLut, float biomeHueShift, float biomeSaturation) {
         // Height
         fbHeight = fbHeight != null ? fbHeight : createFrameBuffer(N, M, 1);
 
@@ -122,6 +122,7 @@ public class NoiseComponent extends NamedComponent {
         surfaceGen.setMoistureTexture(fbMoisture.getColorBufferTexture());
         surfaceGen.setLutTexture(lut);
         surfaceGen.setLutHueShift(biomeHueShift);
+        surfaceGen.setLutSaturation(biomeSaturation);
         fbSurface.begin();
         surfaceGen.render(fbHeight, fbSurface, null);
         fbSurface.end();
@@ -141,9 +142,9 @@ public class NoiseComponent extends NamedComponent {
 
     }
 
-    public synchronized FrameBuffer[] generateElevation(int N, int M, String biomeLut, float biomeHueShift) {
+    public synchronized FrameBuffer[] generateElevation(int N, int M, String biomeLut, float biomeHueShift, float biomeSaturation) {
         // Generate in GPU.
-        return generateSurfaceTextures(N, M, biomeLut, biomeHueShift);
+        return generateSurfaceTextures(N, M, biomeLut, biomeHueShift, biomeSaturation);
     }
 
     public void setType(String noiseType) {
@@ -313,6 +314,36 @@ public class NoiseComponent extends NamedComponent {
         setRidge(rand.nextBoolean());
     }
 
+    public void randomizeRockyPlanet(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Type: PERLIN, SIMPLEX, CURL.
+        int d = rand.nextInt(3);
+        d = d == 2 ? 3 : d;
+        setType(NoiseType.values()[d].name());
+        // Same scale for all.
+        double scale = rand.nextDouble(5.0, 15.0);
+        setScale(new double[]{scale, scale, scale});
+        // Frequency.
+        setFrequency(rand.nextDouble(0.85, 3.0));
+        // Persistence.
+        setPersistence(rand.nextDouble(0.2, 0.7));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(2.0, 4.5));
+        // Octaves [1,4].
+        setOctaves((long) rand.nextInt(1, 8));
+        // Range.
+        setRange(new double[]{
+                rand.nextDouble(0.0, 0.3),
+                rand.nextDouble(0.5, 2.0)});
+        // Power.
+        setPower(rand.nextDouble(0.5, 1.2));
+        // Turbulence.
+        setTurbulence(true);
+        // Ridge.
+        setRidge(rand.nextInt(3) < 2);
+    }
+
     public void randomizeEarthLike(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
@@ -338,7 +369,7 @@ public class NoiseComponent extends NamedComponent {
         // Turbulence.
         setTurbulence(true);
         // Ridge.
-        setRidge(rand.nextInt(4) == 3);
+        setRidge(rand.nextInt(4) < 3);
     }
 
     public void randomizeGasGiant(Random rand) {
@@ -374,7 +405,7 @@ public class NoiseComponent extends NamedComponent {
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(1, 4));
         // Range.
-        setRange(new double[]{0.2, rand.nextDouble(0.9, 1.3)});
+        setRange(new double[]{0.4, rand.nextDouble(0.9, 1.3)});
         // Power.
         setPower(0.1);
         // Turbulence.

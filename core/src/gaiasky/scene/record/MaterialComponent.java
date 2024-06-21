@@ -127,6 +127,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     // Biome lookup texture.
     public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png";
     public float biomeHueShift = 0;
+    public float biomeSaturation = 1;
     /**
      * Add also color even if texture is present
      **/
@@ -590,7 +591,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
                 }
-                FrameBuffer[] fbs = nc.generateElevation(N, M, biomeLUT, biomeHueShift);
+                FrameBuffer[] fbs = nc.generateElevation(N, M, biomeLUT, biomeHueShift, biomeSaturation);
 
                 Texture heightT = fbs[0].getColorBufferTexture();
                 Texture moistureT = fbs[1].getColorBufferTexture();
@@ -869,6 +870,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public void setBiomeHueShift(Double hueShift) {
         this.biomeHueShift = hueShift.floatValue();
+    }
+
+    public void setBiomeSaturation(Double saturation) {
+        this.biomeSaturation = saturation.floatValue();
     }
 
     /**
@@ -1240,6 +1245,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         this.specular = other.specular;
         this.biomeLUT = other.biomeLUT;
         this.biomeHueShift = other.biomeHueShift;
+        this.biomeSaturation = other.biomeSaturation;
         this.heightScale = other.heightScale;
         this.nc = new NoiseComponent();
         if (other.nc != null) {
@@ -1267,9 +1273,15 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             // No hue shift.
             setBiomehueshift(0.0);
         }
+        // Saturation.
+        if (rand.nextInt(6) < 5) {
+            setBiomeSaturation(rand.nextDouble(0.5, 1.0));
+        } else {
+            setBiomeSaturation(rand.nextDouble(0.0, 0.5));
+        }
         // Height scale
         double sizeKm = bodySize * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0));
+        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0, 80.0));
         // Noise
         if (nc != null) {
             nc.dispose();
@@ -1282,7 +1294,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     private String randomBiomeLut(Random rand, String... names) {
         Array<String> candidates = new Array<>(names.length);
 
-        for(var name : names) {
+        for (var name : names) {
             for (var lut : lookUpTables) {
                 if (lut.contains(name)) {
                     candidates.add(lut);
@@ -1291,6 +1303,38 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             }
         }
         return candidates.get(rand.nextInt(candidates.size));
+    }
+
+    public void randomizeRockyPlanet(long seed, double bodySize) {
+        initializeLookUpTables();
+
+        var rand = new Random(seed);
+        setHeight("generate");
+        setDiffuse("generate");
+        setNormal("generate");
+        setSpecular("generate");
+
+        setBiomelut(randomBiomeLut(rand, "rock-smooth-lut", "brown-green-lut", "biome-water-rock-lut"));
+
+        if (rand.nextBoolean()) {
+            // In [340, 20] - close to home.
+            setBiomeHueShift((rand.nextDouble(-20.0, 20.0) + 360.0) % 360.0);
+        } else {
+            // In [100, 140] - red waters.
+            setBiomeHueShift(rand.nextDouble(100.0, 140.0));
+        }
+        // Saturation.
+        setBiomeSaturation(rand.nextDouble(0.0, 0.5));
+        // Height scale
+        double sizeKm = bodySize * Constants.U_TO_KM;
+        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 5.0, 100.0));
+        // Noise
+        if (nc != null) {
+            nc.dispose();
+        }
+        NoiseComponent nc = new NoiseComponent();
+        nc.randomizeRockyPlanet(rand);
+        setNoise(nc);
     }
 
     public void randomizeEarthLike(long seed, double bodySize) {
@@ -1306,10 +1350,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 "biomes-separate-lut", "brown-green-lut"));
 
         // Choose randomly in [0, 30] and [330, 360].
-        setBiomehueshift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);
+        setBiomeHueShift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);
+        // Saturation.
+        setBiomeSaturation(rand.nextDouble(0.8, 1.0));
         // Height scale
         double sizeKm = bodySize * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 3.0));
+        setHeightScale(gaussian(rand, sizeKm * 0.0001, sizeKm * 0.00005, 3.0, 50.0));
         // Noise
         if (nc != null) {
             nc.dispose();
@@ -1331,6 +1377,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
         // Actually roll the dice for hue shift.
         setBiomehueshift(rand.nextDouble() * 360.0);
+        // Saturation.
+        setBiomeSaturation(rand.nextDouble(0.7, 1.0));
         setHeightScale(1.0);
         // Noise
         if (nc != null) {
@@ -1347,7 +1395,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         log.debug("Specular: " + specular);
         log.debug("Normal: " + normal);
         log.debug("LUT: " + biomeLUT);
-        log.debug("Hue shift: " + biomeHueShift);
+        log.debug("Biome hue shift: " + biomeHueShift);
+        log.debug("Biome saturation: " + biomeSaturation);
         log.debug("Height scale: " + heightScale);
         log.debug("---Noise---");
         if (nc != null) {

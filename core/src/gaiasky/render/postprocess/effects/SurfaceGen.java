@@ -33,6 +33,10 @@ public final class SurfaceGen extends PostProcessorEffect {
         filter.setLutHueShift(lutHueShift);
     }
 
+    public void setLutSaturation(float lutSaturation) {
+        filter.setLutSaturation(lutSaturation);
+    }
+
 
     @Override
     public void rebind() {

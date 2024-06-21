@@ -14,6 +14,8 @@ uniform sampler2D u_texture2;
 
 // LUT hue shift.
 uniform float u_lutHueShift;
+// LUT saturation value.
+uniform float u_lutSaturation;;
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 diffuseColor;
@@ -29,10 +31,15 @@ void main() {
 
     // Query LUT.
     vec4 rgba = texture(u_texture2, vec2(moisture, 1.0 - height));
-    // Shift hue if needed.
-    if (u_lutHueShift != 0.0) {
+    // Manipulate hue and saturation.
+    if (u_lutHueShift != 0.0 || u_lutSaturation < 1.0) {
+        // Convert to HSV.
         vec3 hsv = rgb2hsv(rgba.rgb);
+        // Hue.
         hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
+        // Saturation.
+        hsv.y = hsv.y * u_lutSaturation;
+        // Back to RGB.
         rgba.rgb = hsv2rgb(hsv);
     }
 

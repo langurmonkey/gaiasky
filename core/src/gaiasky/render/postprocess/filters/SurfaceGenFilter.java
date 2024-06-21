@@ -14,6 +14,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
     private Texture moisture;
     private Texture lut;
     float lutHueShift = 0;
+    float lutSaturation = 1;
 
     public SurfaceGenFilter() {
         super(ShaderLoader.fromFile("screenspace", "surfacegen"));
@@ -36,6 +37,11 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
         setParam(Param.LutHueShift, lutHueShift);
     }
 
+    public void setLutSaturation(float hs) {
+        this.lutSaturation = hs;
+        setParam(Param.LutSaturation, lutSaturation);
+    }
+
 
     @Override
     public void rebind() {
@@ -43,6 +49,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
         setParams(Param.Texture, u_texture0);
         setParams(Param.TextureMoisture, u_texture1);
         setParams(Param.TextureLut, u_texture2);
+        setParams(Param.LutSaturation, lutSaturation);
         setParams(Param.LutHueShift, lutHueShift);
 
         endParams();
@@ -64,6 +71,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
         TextureMoisture("u_texture1", 0),
         TextureLut("u_texture2", 0),
 
+        LutSaturation("u_lutSaturation", 0),
         LutHueShift("u_lutHueShift", 0);
         // @formatter:on
 
