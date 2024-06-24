@@ -622,7 +622,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 mtc.copyFrom(initMtc);
             }
             // Title
-            content.add(new OwnLabel(I18n.msg("gui.procedural.param.surface"), skin, "header")).colspan(2).left().padBottom(pad34).row();
+            content.add(new OwnLabel(I18n.msg("gui.procedural.param.surface"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
 
 
             // Add button group with presets.
@@ -764,7 +764,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             ac.copyFrom(initAc);
         }
         // Title
-        content.add(new OwnLabel(I18n.msg("gui.procedural.param.atm"), skin, "header")).colspan(2).left().padBottom(pad34).row();
+        content.add(new OwnLabel(I18n.msg("gui.procedural.param.atm"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
 
         // Wavelengths
         OwnSliderPlus wavelength0 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "0"), 0.4f, 1.0f, 0.01f, skin);

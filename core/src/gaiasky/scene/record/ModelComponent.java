@@ -1016,7 +1016,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         // Type
         setType("sphere");
         // Parameters
-        setParams(createModelParameters(400L, 1.0, false));
+        setParams(createModelParameters(600L, 1.0, false));
         // Material
         MaterialComponent mtc = new MaterialComponent();
         mtc.randomizeAll(seed, size);

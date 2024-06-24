@@ -5,12 +5,10 @@
 #include <shader/lib/colors.glsl>
 #include <shader/lib/luma.glsl>
 
-// Height texture.
+// Biome texture (elevation in x, moisture in y).
 uniform sampler2D u_texture0;
-// Moisture texture.
-uniform sampler2D u_texture1;
 // LUT.
-uniform sampler2D u_texture2;
+uniform sampler2D u_texture1;
 
 // LUT hue shift.
 uniform float u_lutHueShift;
@@ -24,24 +22,21 @@ layout (location = 2) out vec4 normalColor;
 
 
 void main() {
-    // Get height.
-    float height = texture(u_texture0, v_texCoords).x;
-    // Get moisture.
-    float moisture = texture(u_texture1, v_texCoords).x;
+    // Get height and moisture.
+    vec4 biome = texture(u_texture0, v_texCoords);
+    float height = biome.x;
+    float moisture = biome.y;
 
     // Query LUT.
-    vec4 rgba = texture(u_texture2, vec2(moisture, 1.0 - height));
+    vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
     // Manipulate hue and saturation.
-    if (u_lutHueShift != 0.0 || u_lutSaturation < 1.0) {
-        // Convert to HSV.
-        vec3 hsv = rgb2hsv(rgba.rgb);
-        // Hue.
-        hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
-        // Saturation.
-        hsv.y = hsv.y * u_lutSaturation;
-        // Back to RGB.
-        rgba.rgb = hsv2rgb(hsv);
-    }
+    vec3 hsv = rgb2hsv(rgba.rgb);
+    // Hue.
+    hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
+    // Saturation.
+    hsv.y = hsv.y * u_lutSaturation;
+    // Back to RGB.
+    rgba.rgb = hsv2rgb(hsv);
 
     // Diffuse.
     diffuseColor = rgba;
@@ -52,7 +47,7 @@ void main() {
 
     vec4 spec = vec4(0.0, 0.0, 0.0, 1.0);
     if (water) {
-       spec.rgb = vec3(1.0, 1.0, 1.0);
+        spec.rgb = vec3(1.0, 1.0, 1.0);
     } else if (snow) {
         spec.rgb = vec3(0.5, 0.5, 0.5);
     }

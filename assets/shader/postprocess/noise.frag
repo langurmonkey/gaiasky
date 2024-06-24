@@ -1,4 +1,5 @@
 // Noise generation shader.
+// Creates a noise pattern in the red channel for elevation, and another in the green channel for moisture.
 #version 330 core
 
 #include <shader/lib/luma.glsl>
@@ -18,7 +19,7 @@ uniform vec2 u_viewport;
 uniform vec3 u_scale;
 // Noise color.
 uniform vec4 u_color;
-// Final range of the noise values.
+// Final range of the noise values for the first channel. Channels 2 and 3 default to [0, 1].
 uniform vec2 u_range;
 // Noise seed.
 uniform float u_seed;
@@ -36,6 +37,11 @@ uniform int u_octaves;
 uniform bool u_turbulence;
 // Enable/disable ridge noise in fBm. Only when turbulence is on.
 uniform bool u_ridge;
+// Different noise patterns in different channels.
+// <= 1 - in red.
+// == 2 - in red and green.
+// >= 3 - in red, green and blue.
+uniform int u_channels;
 // Noise type
 // 0- PERLIN
 // 1- SIMPLEX
@@ -48,6 +54,51 @@ uniform int u_type;
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
 
+float noise(vec3 p,
+            int type,
+            float power,
+            bool ridge,
+            vec2 range,
+            float seed) {
+    // Fill up opts.
+    gln_tFBMOpts opts = gln_tFBMOpts(seed,
+                                     u_frequency,
+                                     u_persistence,
+                                     u_lacunarity,
+                                     u_scale,
+                                     power,
+                                     u_octaves,
+                                     u_turbulence,
+                                     ridge);
+
+    float value = 0.0;
+    if (type == 0) {
+        // PERLIN
+        value = gln_pfbm(p, opts);
+
+    } else if (type == 1) {
+        // SIMPLEX
+        value = gln_sfbm(p, opts);
+
+    } else if (type == 2) {
+        // VORONOI
+        value = gln_vfbm(p, opts);
+
+    } else if (type == 3) {
+        // CURL
+        value = gln_cfbm(p, opts);
+
+    } else if (type == 4) {
+        // WHITE
+        value = gln_wfbm(p, opts);
+    }
+
+    // Set in range.
+    value = clamp(gln_map(value, 0.0, 1.0, range.x, range.y), 0.0, 1.0);
+
+    return value;
+
+}
 
 void main() {
     // Sample point.
@@ -65,42 +116,22 @@ void main() {
             sin(phi)
     );
 
-    // Fill up opts.
-    gln_tFBMOpts opts = gln_tFBMOpts(u_seed,
-                                    u_frequency,
-                                    u_persistence,
-                                    u_lacunarity,
-                                    u_scale,
-                                    u_power,
-                                    u_octaves,
-                                    u_turbulence,
-                                    u_ridge);
+    float val_ch1 = noise(p, u_type, u_power, u_ridge, u_range, u_seed);
 
-    float value = 0.0;
-    if (u_type == 0) {
-        // PERLIN
-        value = gln_pfbm(p, opts);
+    if (u_channels <= 1) {
+        // Channel 1 (elevation).
+        fragColor = vec4((vec3(val_ch1) * u_color.rgb) * u_color.a, 1.0);
 
-    } else if (u_type == 1) {
-        // SIMPLEX
-        value = gln_sfbm(p, opts);
-
-    } else if (u_type == 2) {
-        // VORONOI
-        value = gln_vfbm(p, opts);
-
-    } else if (u_type == 3) {
-        // CURL
-        value = gln_cfbm(p, opts);
-
-    } else if (u_type == 4) {
-        // WHITE
-        value = gln_wfbm(p, opts);
-
+    } else {
+        // Perlin always (0) in moisture (channel 2).
+        float val_ch2 = noise(p, 0, 1.0, u_ridge, vec2(0.0, 1.0), u_seed + 2.023);
+        if (u_channels == 2) {
+            // Channel 2 (moisture).
+            fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
+        } else {
+            // Channel 3 (temperature).
+            float val_ch3 = noise(p, u_type, 2.0, false, vec2(0.0, 1.0), u_seed + 1.4325);
+            fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
+        }
     }
-
-    // Set in range.
-    value = clamp(gln_map(value, 0.0, 1.0, u_range.x, u_range.y), 0.0, 1.0);
-
-    fragColor = vec4((vec3(value) * u_color.rgb) * u_color.a, 1.0);
 }

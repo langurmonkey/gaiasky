@@ -36,7 +36,7 @@ public class NoiseComponent extends NamedComponent {
     public boolean turbulence = true;
     public boolean ridge = true;
 
-    public FrameBuffer fbNoise, fbHeight, fbMoisture, fbSurface;
+    public FrameBuffer fbNoise, fbBiome, fbSurface;
 
     /** Open windows with the resulting frame buffers. **/
     private static boolean DEBUG_UI_VIEW = false;
@@ -62,7 +62,7 @@ public class NoiseComponent extends NamedComponent {
         return (float) (seed / FastMath.pow(10L, s.length()));
     }
 
-    private Noise getNoiseEffect(int N, int M) {
+    private Noise getNoiseEffect(int N, int M, int channels) {
         Noise noise = new Noise(N, M);
         noise.setScale(scale);
         noise.setType(type);
@@ -75,17 +75,14 @@ public class NoiseComponent extends NamedComponent {
         noise.setRange((float) range[0], (float) range[1]);
         noise.setTurbulence(turbulence);
         noise.setRidge(ridge);
+        noise.setChannels(channels);
         return noise;
     }
 
-    public FrameBuffer generateNoise(int N, int M) {
-        return generateNoise(N, M, new float[]{1f, 1f, 1f});
-    }
-
-    public FrameBuffer generateNoise(int N, int M, float[] color) {
+    public FrameBuffer generateNoise(int N, int M, int channels, float[] color) {
         fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, 1);
 
-        Noise noise = getNoiseEffect(N, M);
+        Noise noise = getNoiseEffect(N, M, channels);
         noise.setColor(color);
         fbNoise.begin();
         noise.render(null, fbNoise);
@@ -95,50 +92,38 @@ public class NoiseComponent extends NamedComponent {
     }
 
     public FrameBuffer[] generateSurfaceTextures(int N, int M, String biomeLut, float biomeHueShift, float biomeSaturation) {
-        // Height
-        fbHeight = fbHeight != null ? fbHeight : createFrameBuffer(N, M, 1);
+        // Biome noise (height, elevation, temperature).
+        fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, 1);
 
-        Noise heightNoise = getNoiseEffect(N, M);
-        fbHeight.begin();
-        heightNoise.render(null, fbHeight);
-        fbHeight.end();
-
-        // Moisture
-        fbMoisture = fbMoisture != null ? fbMoisture : createFrameBuffer(N, M, 1);
-
-        Noise moistureNoise = getNoiseEffect(N, M);
-        moistureNoise.setType(NoiseType.PERLIN);
-        moistureNoise.setSeed(seed + 2.023f);
-        moistureNoise.setRange(-0.2f, 1.0f);
-        fbMoisture.begin();
-        moistureNoise.render(null, fbMoisture);
-        fbMoisture.end();
+        // 3 channels: height, elevation, temperature.
+        Noise biomeNoise = getNoiseEffect(N, M, 2);
+        fbBiome.begin();
+        biomeNoise.render(null, fbBiome);
+        fbBiome.end();
 
         // Gen surface.
         Texture lut = new Texture(Settings.settings.data.dataFileHandle(biomeLut));
         fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, 3);
 
         SurfaceGen surfaceGen = new SurfaceGen();
-        surfaceGen.setMoistureTexture(fbMoisture.getColorBufferTexture());
         surfaceGen.setLutTexture(lut);
         surfaceGen.setLutHueShift(biomeHueShift);
         surfaceGen.setLutSaturation(biomeSaturation);
         fbSurface.begin();
-        surfaceGen.render(fbHeight, fbSurface, null);
+        surfaceGen.render(fbBiome, fbSurface, null);
         fbSurface.end();
 
         if (DEBUG_UI_VIEW) {
 
             // Create UI views.
-            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Height", fbHeight.getColorBufferTexture(), 1f);
-            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Moisture", fbMoisture.getColorBufferTexture(), 1f);
+            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Biome", fbBiome.getColorBufferTexture(), 1f);
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Diffuse", fbSurface.getColorBufferTexture(), 1f);
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Specular", fbSurface.getTextureAttachments().get(1), 1f);
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Normal", fbSurface.getTextureAttachments().get(2), 1f);
             DEBUG_UI_VIEW = false;
         }
 
-        return new FrameBuffer[]{fbHeight, fbMoisture, fbSurface};
+        return new FrameBuffer[]{fbBiome, fbSurface};
 
     }
 
@@ -365,7 +350,7 @@ public class NoiseComponent extends NamedComponent {
                 rand.nextDouble(-0.7, -0.4),
                 rand.nextDouble(1.0, 1.5)});
         // Power.
-        setPower(rand.nextDouble(0.6, 3.0));
+        setPower(rand.nextDouble(0.5, 2.2));
         // Turbulence.
         setTurbulence(true);
         // Ridge.
@@ -434,13 +419,9 @@ public class NoiseComponent extends NamedComponent {
             fbSurface.dispose();
             fbSurface = null;
         }
-        if (fbMoisture != null) {
-            fbMoisture.dispose();
-            fbMoisture = null;
-        }
-        if (fbHeight != null) {
-            fbHeight.dispose();
-            fbHeight = null;
+        if (fbBiome != null) {
+            fbBiome.dispose();
+            fbBiome = null;
         }
         if (fbNoise != null) {
             fbNoise.dispose();

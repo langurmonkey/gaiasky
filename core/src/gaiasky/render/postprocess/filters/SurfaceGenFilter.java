@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.Texture;
 import gaiasky.render.util.ShaderLoader;
 
 public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
-    private Texture moisture;
     private Texture lut;
     float lutHueShift = 0;
     float lutSaturation = 1;
@@ -24,12 +23,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
 
     public void setLutTexture(Texture lut) {
         this.lut = lut;
-        setParam(Param.TextureLut, u_texture2);
-    }
-
-    public void setMoistureTexture(Texture moisture) {
-         this.moisture = moisture;
-         setParam(Param.TextureMoisture, u_texture1);
+        setParam(Param.TextureLut, u_texture1);
     }
 
     public void setLutHueShift(float hs) {
@@ -47,8 +41,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
     public void rebind() {
         // Re-implement super to batch every parameter
         setParams(Param.Texture, u_texture0);
-        setParams(Param.TextureMoisture, u_texture1);
-        setParams(Param.TextureLut, u_texture2);
+        setParams(Param.TextureLut, u_texture1);
         setParams(Param.LutSaturation, lutSaturation);
         setParams(Param.LutHueShift, lutHueShift);
 
@@ -59,17 +52,14 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
     protected void onBeforeRender() {
         if (inputTexture != null)
             inputTexture.bind(u_texture0);
-        if (moisture != null)
-            moisture.bind(u_texture1);
         if (lut != null)
-            lut.bind(u_texture2);
+            lut.bind(u_texture1);
     }
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
-        TextureMoisture("u_texture1", 0),
-        TextureLut("u_texture2", 0),
+        TextureLut("u_texture1", 0),
 
         LutSaturation("u_lutSaturation", 0),
         LutHueShift("u_lutHueShift", 0);

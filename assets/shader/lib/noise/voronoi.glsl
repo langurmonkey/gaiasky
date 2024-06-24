@@ -134,8 +134,7 @@ float gln_vfbm(vec2 v, gln_tFBMOpts opts, gln_tVoronoiOpts vopts) {
     result = 1.0 - abs(result);
   }
 
-  float redistributed = pow(result, opts.power);
-  return redistributed / maximum;
+  return pow(result / maximum, opts.power);
 }
 
 /**
@@ -181,6 +180,5 @@ float gln_vfbm(vec3 v, gln_tFBMOpts opts) {
     result = 1.0 - abs(result);
   }
 
-  float redistributed = pow(result, opts.power);
-  return redistributed / maximum;
+  return pow(result / maximum, opts.power);
 }

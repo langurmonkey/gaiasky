@@ -263,7 +263,7 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
                 }
-                FrameBuffer cloudFb = nc.generateNoise(N, M, color);
+                FrameBuffer cloudFb = nc.generateNoise(N, M, 1, color);
                 // Write to disk if necessary
                 if (Settings.settings.program.saveProceduralTextures) {
                     SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud");
@@ -277,8 +277,10 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
                         // Add occlusion clouds attributes.
                         model.model.mtc.getMaterial().remove(OcclusionCloudsAttribute.Type);
                         model.model.mtc.getMaterial().remove(TextureAttribute.AO);
-                        model.model.mtc.getMaterial().set(new TextureAttribute(TextureAttribute.AO, cloudTex));
+                        model.model.mtc.aoTexture = cloudTex;
+                        model.model.mtc.getMaterial().set(new TextureAttribute(TextureAttribute.AO, model.model.mtc.aoTexture));
                         model.model.mtc.getMaterial().set(new OcclusionCloudsAttribute(true));
+                        model.model.mtc.setOcclusionClouds(true);
                     }
                 }
                 long elapsed = TimeUtils.millis() - start;

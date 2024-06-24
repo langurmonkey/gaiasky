@@ -7,7 +7,6 @@
 
 package gaiasky.render.postprocess.effects;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.NoiseFilter;
@@ -95,6 +94,10 @@ public final class Noise extends PostProcessorEffect {
 
     public void setRidge(boolean ridge) {
         filter.setRidge(ridge);
+    }
+
+    public void setChannels(int channels) {
+        filter.setChannels(channels);
     }
 
     public void setType(NoiseFilter.NoiseType type) {

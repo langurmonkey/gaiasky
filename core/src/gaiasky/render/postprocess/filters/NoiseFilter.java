@@ -17,7 +17,7 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     private final Vector2 viewport;
     /** Noise scale in x, y and z. **/
     private final Vector3 scale = new Vector3(1, 1, 1);
-    /** Final range of the noise values. **/
+    /** Final range of the noise values for the elevation channel. The other channels default to [0, 1]. **/
     private final Vector2 range = new Vector2(0, 1);
     /** Color. **/
     private final Vector4 color = new Vector4(1, 1, 1, 1);
@@ -37,6 +37,8 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     private boolean turbulence = true;
     /** Convert the fBm to ridge noise. **/
     private boolean ridge = false;
+    /** Create different noise patterns in each of the different RGB channels. **/
+    private int channels = 1;
 
     /**
      * <p>The type of noise:</p>
@@ -129,6 +131,11 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         setParam(Param.Ridge, this.ridge);
     }
 
+    public void setChannels(int channels) {
+        this.channels = channels;
+        setParam(Param.Channels, this.channels);
+    }
+
     public void setType(NoiseType type) {
         this.type = type;
         setParam(Param.Type, this.type.ordinal());
@@ -150,6 +157,7 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         setParams(Param.Octaves, this.octaves);
         setParams(Param.Turbulence, this.turbulence);
         setParams(Param.Ridge, this.ridge);
+        setParams(Param.Channels, this.channels);
         setParams(Param.Type, this.type.ordinal());
 
         endParams();
@@ -177,6 +185,7 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         Octaves("u_octaves", 0),
         Turbulence("u_turbulence", 0),
         Ridge("u_ridge", 0),
+        Channels("u_channels", 0),
         Type("u_type", 0);
         // @formatter:on
 

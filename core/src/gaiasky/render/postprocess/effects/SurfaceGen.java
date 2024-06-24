@@ -25,10 +25,6 @@ public final class SurfaceGen extends PostProcessorEffect {
         filter.setLutTexture(lut);
     }
 
-    public void setMoistureTexture(Texture moisture) {
-        filter.setMoistureTexture(moisture);
-    }
-
     public void setLutHueShift(float lutHueShift) {
         filter.setLutHueShift(lutHueShift);
     }

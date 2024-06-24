@@ -594,10 +594,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 FrameBuffer[] fbs = nc.generateElevation(N, M, biomeLUT, biomeHueShift, biomeSaturation);
 
                 Texture heightT = fbs[0].getColorBufferTexture();
-                Texture moistureT = fbs[1].getColorBufferTexture();
-                Texture diffuseT = fbs[2].getColorBufferTexture();
-                Texture specularT = fbs[2].getTextureAttachments().get(1);
-                Texture normalT = fbs[2].getTextureAttachments().get(2);
+                Texture diffuseT = fbs[1].getColorBufferTexture();
+                Texture specularT = fbs[1].getTextureAttachments().get(1);
+                Texture normalT = fbs[1].getTextureAttachments().get(2);
 
                 boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
                 boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
@@ -607,7 +606,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 // TODO implement metallic texture generation
                 //boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
 
-                // HEIGHT.
+                // BIOME: HEIGHT and MOISTURE.
                 if (heightT != null) {
                     // Create texture, populate material
                     if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
@@ -617,16 +616,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
                         // Write height to disk.
                         if (Settings.settings.program.saveProceduralTextures) {
-                            SysUtils.saveProceduralGLTexture(heightT, this.name + "-height");
+                            SysUtils.saveProceduralGLTexture(heightT, this.name + "-biome");
                         }
-                    }
-                }
-
-                // MOISTURE.
-                if (moistureT != null) {
-                    // Write height to disk.
-                    if (Settings.settings.program.saveProceduralTextures) {
-                        SysUtils.saveProceduralGLTexture(moistureT, this.name + "-moisture");
                     }
                 }
 
@@ -1256,7 +1247,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void randomizeAll(long seed,
-                             double bodySize) {
+                             double sizeU) {
         initializeLookUpTables();
 
         var rand = new Random(seed);
@@ -1280,8 +1271,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             setBiomeSaturation(rand.nextDouble(0.0, 0.5));
         }
         // Height scale
-        double sizeKm = bodySize * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0, 80.0));
+        double sizeKm = sizeU * Constants.U_TO_KM;
+        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 3.0, 100.0));
         // Noise
         if (nc != null) {
             nc.dispose();
@@ -1305,7 +1296,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         return candidates.get(rand.nextInt(candidates.size));
     }
 
-    public void randomizeRockyPlanet(long seed, double bodySize) {
+    public void randomizeRockyPlanet(long seed, double sizeU) {
         initializeLookUpTables();
 
         var rand = new Random(seed);
@@ -1326,7 +1317,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         // Saturation.
         setBiomeSaturation(rand.nextDouble(0.0, 0.5));
         // Height scale
-        double sizeKm = bodySize * Constants.U_TO_KM;
+        double sizeKm = sizeU * Constants.U_TO_KM;
         setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 5.0, 100.0));
         // Noise
         if (nc != null) {
@@ -1337,7 +1328,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setNoise(nc);
     }
 
-    public void randomizeEarthLike(long seed, double bodySize) {
+    public void randomizeEarthLike(long seed, double sizeU) {
         initializeLookUpTables();
 
         var rand = new Random(seed);
@@ -1354,8 +1345,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         // Saturation.
         setBiomeSaturation(rand.nextDouble(0.8, 1.0));
         // Height scale
-        double sizeKm = bodySize * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.0001, sizeKm * 0.00005, 3.0, 50.0));
+        double sizeKm = sizeU * Constants.U_TO_KM;
+        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 3.0, 100.0));
         // Noise
         if (nc != null) {
             nc.dispose();
