@@ -243,7 +243,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
                 addSeparator();
 
-                MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort), skin, skin.getDrawable("iconic-infinity"));
+                MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort), skin, skin.getDrawable("iconic-fork"));
                 proceduralSurface.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.publish(Event.SHOW_PROCEDURAL_GEN_ACTION, proceduralSurface, candidate);

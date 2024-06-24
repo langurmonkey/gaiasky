@@ -56,7 +56,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Vector3b posb;
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
-    protected Button goTo, landOn, landAt, bookmark, refreshOrbit;
+    protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralGeneration;
     protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
@@ -225,6 +225,18 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         refreshOrbit.setSize(buttonSize, buttonSize);
         // This is filled later on.
 
+        proceduralGeneration = new OwnTextIconButton("", skin, "fork");
+        proceduralGeneration.setSize(buttonSize, buttonSize);
+        proceduralGeneration.addListener((event) -> {
+            var view = (FocusView) currentFocus;
+            if (currentFocus != null && Mapper.atmosphere.has(view.getEntity()) && event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_PROCEDURAL_GEN_ACTION, proceduralGeneration, currentFocus);
+                return true;
+            }
+            return false;
+        });
+        proceduralGeneration.addListener(new OwnTextTooltip(I18n.msg("gui.ui.procedural"), skin));
+
         objectVisibility = new OwnImageButton(skin, "eye-toggle");
         objectVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -252,6 +264,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         landOn.setSize(bw, bw);
         landAt.setSize(bw, bw);
         refreshOrbit.setSize(bw, bw);
+        proceduralGeneration.setSize(bw, bw);
 
         focusActionsGroup = new HorizontalGroup();
         focusActionsGroup.space(pad5);
@@ -262,6 +275,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusActionsGroup.addActor(landOn);
         focusActionsGroup.addActor(landAt);
         focusActionsGroup.addActor(refreshOrbit);
+        focusActionsGroup.addActor(proceduralGeneration);
 
         float w = 170f;
         focusId.setWidth(w);
@@ -451,9 +465,11 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 boolean vis = Mapper.atmosphere.has(view.getEntity());
                 focusActionsGroup.removeActor(landOn);
                 focusActionsGroup.removeActor(landAt);
+                focusActionsGroup.removeActor(proceduralGeneration);
                 if (vis) {
                     focusActionsGroup.addActor(landOn);
                     focusActionsGroup.addActor(landAt);
+                    focusActionsGroup.addActor(proceduralGeneration);
                 }
 
                 // Refresh orbit

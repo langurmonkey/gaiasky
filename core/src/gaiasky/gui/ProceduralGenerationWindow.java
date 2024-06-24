@@ -959,7 +959,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeSurfaceEarthLike(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
-        this.initMtc.randomizeEarthLike(rand.nextLong(), view.getSize());
+        this.initMtc.randomizeEarthLike(rand.nextLong());
 
         if (rebuild) {
             // Others are the same
@@ -974,7 +974,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeSurfaceColdPlanet(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
-        this.initMtc.randomizeColdPlanet(rand.nextLong(), view.getSize());
+        this.initMtc.randomizeColdPlanet(rand.nextLong());
 
         if (rebuild) {
             // Others are the same
@@ -989,7 +989,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeSurfaceRockyPlanet(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
-        this.initMtc.randomizeRockyPlanet(rand.nextLong(), view.getSize());
+        this.initMtc.randomizeRockyPlanet(rand.nextLong());
 
         if (rebuild) {
             // Others are the same

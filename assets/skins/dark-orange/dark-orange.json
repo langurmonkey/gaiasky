@@ -505,6 +505,9 @@
     "reload": {
       "imageUp": "reload"
     },
+    "fork": {
+      "imageUp": "iconic-fork"
+    },
     "reset": {
       "imageUp": "iconic-reload"
     },

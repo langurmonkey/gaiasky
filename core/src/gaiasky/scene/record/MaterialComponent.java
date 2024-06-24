@@ -1273,8 +1273,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             setBiomeSaturation(rand.nextDouble(0.0, 0.5));
         }
         // Height scale
-        double sizeKm = sizeU * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 3.0, 100.0));
+        setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
         // Noise
         if (nc != null) {
             nc.dispose();
@@ -1298,7 +1297,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         return candidates.get(rand.nextInt(candidates.size));
     }
 
-    public void randomizeRockyPlanet(long seed, double sizeU) {
+    public void randomizeRockyPlanet(long seed) {
         initializeLookUpTables();
 
         var rand = new Random(seed);
@@ -1319,8 +1318,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         // Saturation.
         setBiomeSaturation(rand.nextDouble(0.0, 0.5));
         // Height scale
-        double sizeKm = sizeU * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 5.0, 100.0));
+        setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
         // Noise
         if (nc != null) {
             nc.dispose();
@@ -1330,7 +1328,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setNoise(nc);
     }
 
-    public void randomizeEarthLike(long seed, double sizeU) {
+    public void randomizeEarthLike(long seed) {
         initializeLookUpTables();
 
         var rand = new Random(seed);
@@ -1347,8 +1345,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         // Saturation.
         setBiomeSaturation(rand.nextDouble(0.8, 1.0));
         // Height scale
-        double sizeKm = sizeU * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 3.0, 100.0));
+        setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
         // Noise
         if (nc != null) {
             nc.dispose();
@@ -1358,7 +1355,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setNoise(nc);
     }
 
-    public void randomizeColdPlanet(long seed, double sizeU) {
+    public void randomizeColdPlanet(long seed) {
         initializeLookUpTables();
 
         var rand = new Random(seed);
@@ -1374,8 +1371,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         // Saturation.
         setBiomeSaturation(rand.nextDouble(0.8, 1.0));
         // Height scale
-        double sizeKm = sizeU * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 3.0, 100.0));
+        setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
         // Noise
         if (nc != null) {
             nc.dispose();

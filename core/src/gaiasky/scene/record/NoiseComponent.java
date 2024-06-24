@@ -232,16 +232,9 @@ public class NoiseComponent extends NamedComponent {
             d = d == 2 ? 3 : d;
             setType(NoiseType.values()[d].name());
         } else {
-            // Type: all but WHITE. VORONOI is rare.
-            if (rand.nextInt(20) < 18) {
-                // PERLIN, SIMPLEX or CURL
-                int d = rand.nextInt(3);
-                d = d == 2 ? 3 : d;
-                setType(NoiseType.values()[d].name());
-            } else {
-                // VORONOI
-                setType(NoiseType.VORONOI.name());
-            }
+            // PERLIN, SIMPLEX, VORONOI or CURL
+            int d = rand.nextInt(3);
+            setType(NoiseType.values()[d].name());
         }
         // Scale.
         double scaleFac = type == NoiseType.CURL ? 2.5 : 1;
