@@ -54,7 +54,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (lookUpTables.isEmpty()) {
             var dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
             try (var paths = Files.list(dataPath)) {
-                List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).toList();
+                List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.jpg") || f.toString().endsWith("-lut.png")).toList();
                 for (Path p : l) {
                     String name = p.toString();
                     lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/lut/")));
@@ -64,6 +64,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             if (lookUpTables.isEmpty()) {
                 lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png");
                 lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow1-lut.jpg");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow2-lut.jpg");
             }
         }
     }
@@ -1338,7 +1340,34 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setSpecular("generate");
 
         setBiomelut(randomBiomeLut(rand, "biome-lut", "biome-smooth-lut", "biome-vertical-lut",
-                "biomes-separate-lut", "brown-green-lut"));
+                "biomes-separate-lut", "brown-green-lut", "biome-snow2-lut"));
+
+        // Choose randomly in [0, 30] and [330, 360].
+        setBiomeHueShift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);
+        // Saturation.
+        setBiomeSaturation(rand.nextDouble(0.8, 1.0));
+        // Height scale
+        double sizeKm = sizeU * Constants.U_TO_KM;
+        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0005, 3.0, 100.0));
+        // Noise
+        if (nc != null) {
+            nc.dispose();
+        }
+        NoiseComponent nc = new NoiseComponent();
+        nc.randomizeEarthLike(rand);
+        setNoise(nc);
+    }
+
+    public void randomizeColdPlanet(long seed, double sizeU) {
+        initializeLookUpTables();
+
+        var rand = new Random(seed);
+        setHeight("generate");
+        setDiffuse("generate");
+        setNormal("generate");
+        setSpecular("generate");
+
+        setBiomelut(randomBiomeLut(rand, "biome-snow1-lut", "biome-snow2-lut"));
 
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);

@@ -302,9 +302,8 @@ public class NoiseComponent extends NamedComponent {
     public void randomizeRockyPlanet(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX, CURL.
+        // Type: PERLIN, SIMPLEX, CURL, VORONOI.
         int d = rand.nextInt(3);
-        d = d == 2 ? 3 : d;
         setType(NoiseType.values()[d].name());
         // Same scale for all.
         double scale = rand.nextDouble(5.0, 15.0);
@@ -335,7 +334,7 @@ public class NoiseComponent extends NamedComponent {
         // Type: PERLIN, SIMPLEX.
         setType(NoiseType.values()[rand.nextInt(2)].name());
         // Same scale for all.
-        double scale = rand.nextDouble(2.0, 8.0);
+        double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
         // Frequency.
         setFrequency(rand.nextDouble(0.2, 0.65));
@@ -351,6 +350,35 @@ public class NoiseComponent extends NamedComponent {
                 rand.nextDouble(1.0, 1.5)});
         // Power.
         setPower(rand.nextDouble(0.5, 2.2));
+        // Turbulence.
+        setTurbulence(true);
+        // Ridge.
+        setRidge(rand.nextInt(4) < 3);
+    }
+
+    public void randomizeSnowPlanet(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Type: PERLIN, SIMPLEX, CURL, VORONOI.
+        int d = rand.nextInt(3);
+        setType(NoiseType.values()[d].name());
+        // Same scale for all.
+        double scale = rand.nextDouble(4.0, 8.0);
+        setScale(new double[]{scale, scale, scale});
+        // Frequency.
+        setFrequency(rand.nextDouble(0.2, 0.65));
+        // Persistence.
+        setPersistence(rand.nextDouble(0.2, 0.5));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(2.0, 5.0));
+        // Octaves [1,4].
+        setOctaves((long) rand.nextInt(3, 8));
+        // Range.
+        setRange(new double[]{
+                rand.nextDouble(-0.4, 0.0),
+                rand.nextDouble(1.0, 1.5)});
+        // Power.
+        setPower(rand.nextDouble(0.5, 1.8));
         // Turbulence.
         setTurbulence(true);
         // Ridge.

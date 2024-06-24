@@ -57,7 +57,6 @@ public class OwnTextButton extends TextButton {
 
     @Override
     public void setColor (Color color) {
-        super.setColor(color);
         getLabel().setColor(color);
     }
 

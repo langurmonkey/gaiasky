@@ -266,9 +266,11 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                                  Function<Boolean, Boolean> randomizeFunc,
                                  Function<Boolean, Boolean> gasGiantFunc,
                                  Function<Boolean, Boolean> earthLikeFunc,
+                                 Function<Boolean, Boolean> coldPlanetFunc,
                                  Function<Boolean, Boolean> rockyPlanetFunc
     ) {
         String name = I18n.msg(key);
+        float w = 250f;
 
         // Randomize parameters
         OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", name), skin);
@@ -284,6 +286,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Gas giant
         OwnTextButton gasGiant = new OwnTextButton(I18n.msg("gui.procedural.button.gasgiant"), skin);
+        gasGiant.setWidth(w);
         gasGiant.setColor(ColorUtils.gBlueC);
         gasGiant.addListener(new ChangeListener() {
             @Override
@@ -296,6 +299,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Earth like
         OwnTextButton earthLike = new OwnTextButton(I18n.msg("gui.procedural.button.earthlike"), skin);
+        earthLike.setWidth(w);
         earthLike.setColor(ColorUtils.gBlueC);
         earthLike.addListener(new ChangeListener() {
             @Override
@@ -306,8 +310,22 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         earthLike.pad(pad10, pad20, pad10, pad20);
         earthLike.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.earthlike"), skin));
 
+        // Snow world
+        OwnTextButton snowWorld = new OwnTextButton(I18n.msg("gui.procedural.button.snow"), skin);
+        snowWorld.setWidth(w);
+        snowWorld.setColor(ColorUtils.gBlueC);
+        snowWorld.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                coldPlanetFunc.apply(true);
+            }
+        });
+        snowWorld.pad(pad10, pad20, pad10, pad20);
+        snowWorld.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.snow"), skin));
+
         // Rocky planet
         OwnTextButton rockyPlanet = new OwnTextButton(I18n.msg("gui.procedural.button.rocky"), skin);
+        rockyPlanet.setWidth(w);
         rockyPlanet.setColor(ColorUtils.gBlueC);
         rockyPlanet.addListener(new ChangeListener() {
             @Override
@@ -318,11 +336,15 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         rockyPlanet.pad(pad10, pad20, pad10, pad20);
         rockyPlanet.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.rocky"), skin));
 
+        Table bt = new Table(skin);
+        bt.add(earthLike).pad(5f);
+        bt.add(snowWorld).pad(5f).row();
+        bt.add(rockyPlanet).pad(5f);
+        bt.add(gasGiant).pad(5f);
+
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.space(pad20);
-        buttonGroup.addActor(earthLike);
-        buttonGroup.addActor(rockyPlanet);
-        buttonGroup.addActor(gasGiant);
+        buttonGroup.addActor(bt);
         buttonGroup.addActor(randomize);
 
         content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
@@ -630,13 +652,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                     this::randomizeSurface,
                     this::randomizeSurfaceGasGiant,
                     this::randomizeSurfaceEarthLike,
+                    this::randomizeSurfaceColdPlanet,
                     this::randomizeSurfaceRockyPlanet);
 
             // LUT
             Path dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
             Array<String> lookUpTables = new Array<>();
             try (var stream = Files.list(dataPath)) {
-                java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png")).toList();
+                java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png") || f.toString().endsWith("-lut.jpg")).toList();
                 for (Path p : l) {
                     String name = p.toString();
                     lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/lut/")));
@@ -937,6 +960,21 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     protected Boolean randomizeSurfaceEarthLike(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
         this.initMtc.randomizeEarthLike(rand.nextLong(), view.getSize());
+
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
+
+            rebuild();
+        }
+
+        return generateSurface(false);
+    }
+
+    protected Boolean randomizeSurfaceColdPlanet(Boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeColdPlanet(rand.nextLong(), view.getSize());
 
         if (rebuild) {
             // Others are the same
