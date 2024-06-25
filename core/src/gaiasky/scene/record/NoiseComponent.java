@@ -103,6 +103,7 @@ public class NoiseComponent extends NamedComponent {
 
         // Gen surface.
         Texture lut = new Texture(Settings.settings.data.dataFileHandle(biomeLut));
+        lut.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, 3);
 
         SurfaceGen surfaceGen = new SurfaceGen();

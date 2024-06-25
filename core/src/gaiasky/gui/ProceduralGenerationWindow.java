@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -263,7 +264,6 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     }
 
     private void addLocalButtons(Table content, String key,
-                                 Function<Boolean, Boolean> randomizeFunc,
                                  Function<Boolean, Boolean> gasGiantFunc,
                                  Function<Boolean, Boolean> earthLikeFunc,
                                  Function<Boolean, Boolean> coldPlanetFunc,
@@ -271,18 +271,6 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     ) {
         String name = I18n.msg(key);
         float w = 250f;
-
-        // Randomize parameters
-        OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", name), skin);
-        randomize.setColor(ColorUtils.gYellowC);
-        randomize.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                randomizeFunc.apply(true);
-            }
-        });
-        randomize.pad(pad10, pad20, pad10, pad20);
-        randomize.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.button.randomize"), skin));
 
         // Gas giant
         OwnTextButton gasGiant = new OwnTextButton(I18n.msg("gui.procedural.button.gasgiant"), skin);
@@ -345,15 +333,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.space(pad20);
         buttonGroup.addActor(bt);
-        buttonGroup.addActor(randomize);
 
         content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
-        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
     }
 
     private OwnTextButton addLocalButtons(Table content, String key,
                                           Function<Boolean, Boolean> generateFunc,
-                                          Function<Boolean, Boolean> randomizeFunc) {
+                                          Function<Boolean, Boolean> randomizeFunc,
+                                          int colspan) {
         String name = I18n.msg(key);
 
         // Randomize button
@@ -384,13 +371,12 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         buttonGroup.addActor(generate);
         buttonGroup.addActor(randomize);
 
-        content.add(buttonGroup).center().colspan(2).padBottom(pad18).row();
-        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34);
+        content.add(buttonGroup).center().colspan(colspan).padBottom(pad18).row();
 
         return generate;
     }
 
-    private void addNoiseGroup(Table content, NoiseComponent nc, String key) {
+    private void addNoiseGroup(Table content, NoiseComponent nc, String key, boolean expanded) {
 
         // Noise group table
         Table noiseTable = new Table(skin);
@@ -593,7 +579,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         CollapsiblePane groupPane = new CollapsiblePane(stage, null, I18n.msg(key),
                 noiseTable, fieldWidthAll * 1.2f, skin, "hud-header", "expand-collapse",
-                null, false, () -> me.pack(), null, (Actor) null);
+                null, expanded, () -> me.pack(), null, (Actor) null);
 
         content.add(groupPane).colspan(3).center().padBottom(pad34).row();
     }
@@ -622,8 +608,11 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 }
             }
             Texture newLutTexture = new Texture(p);
+            newLutTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             Image img = new Image(newLutTexture);
+            img.setScaling(Scaling.fill);
             lutImageCell.setActor(img);
+            lutImageCell.size(260, 260);
             if (currentLutTexture != null) {
                 currentLutTexture.dispose();
             }
@@ -646,14 +635,19 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             // Title
             content.add(new OwnLabel(I18n.msg("gui.procedural.param.surface"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
 
-
             // Add button group with presets.
             addLocalButtons(content, "gui.procedural.surface",
-                    this::randomizeSurface,
                     this::randomizeSurfaceGasGiant,
                     this::randomizeSurfaceEarthLike,
                     this::randomizeSurfaceColdPlanet,
                     this::randomizeSurfaceRockyPlanet);
+
+            // Add generate and randomize buttons
+            genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
+
+            content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad10).padTop(pad18).row();
+
+            Table scrollContent = new Table(skin);
 
             // LUT
             Path dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
@@ -686,10 +680,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             lookUpTablesLabel.setWidth(textWidth);
             OwnImageButton lutTooltip = new OwnImageButton(skin, "tooltip");
             lutTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.lut"), skin));
-            content.add(lookUpTablesLabel).left().padBottom(pad18).padRight(pad18);
-            content.add(lookUpTablesBox).left().padBottom(pad18).padRight(pad10);
-            content.add(lutTooltip).left().padBottom(pad18).row();
-            lutImageCell = content.add();
+            scrollContent.add(lookUpTablesLabel).left().padBottom(pad18).padRight(pad18);
+            scrollContent.add(lookUpTablesBox).left().padBottom(pad18).padRight(pad10);
+            scrollContent.add(lutTooltip).left().padBottom(pad18).row();
+            lutImageCell = scrollContent.add();
             lutImageCell.colspan(3).padBottom(pad18).row();
 
             // Hue shift
@@ -706,8 +700,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             });
             OwnImageButton hueShiftTooltip = new OwnImageButton(skin, "tooltip");
             hueShiftTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.hueshift"), skin));
-            content.add(hueShift).colspan(2).left().padBottom(pad34).padRight(pad10);
-            content.add(hueShiftTooltip).left().padBottom(pad34).row();
+            scrollContent.add(hueShift).colspan(2).left().padBottom(pad34).padRight(pad10);
+            scrollContent.add(hueShiftTooltip).left().padBottom(pad34).row();
 
             // Initial update
             updateLutImage(lookUpTables);
@@ -725,15 +719,25 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             });
             OwnImageButton heightScaleTooltip = new OwnImageButton(skin, "tooltip");
             heightScaleTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.heightscale"), skin));
-            content.add(heightScale).colspan(2).left().padBottom(pad34).padRight(pad10);
-            content.add(heightScaleTooltip).left().padBottom(pad34).row();
+            scrollContent.add(heightScale).colspan(2).left().padBottom(pad34).padRight(pad10);
+            scrollContent.add(heightScaleTooltip).left().padBottom(pad34).row();
 
             // Noise
-            addNoiseGroup(content, mtc.nc, "gui.procedural.noise.params");
+            addNoiseGroup(scrollContent, mtc.nc, "gui.procedural.noise.params", true);
 
+            scrollContent.pad(pad10 * 2.5f);
+            scrollContent.top();
+            OwnScrollPane scroll = new OwnScrollPane(scrollContent, skin, "default-nobg");
 
-            // Add generate button
-            genSurfaceButton = addLocalButton(content, "gui.procedural.surface", this::generateSurface);
+            scroll.setFadeScrollBars(false);
+            scroll.setScrollbarsVisible(true);
+            scroll.setScrollingDisabled(true, false);
+            scroll.setOverscroll(false, false);
+            scroll.setSmoothScrolling(false);
+            scroll.setHeight(700f);
+
+            content.add(scroll).colspan(2).center().top().row();
+            content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad10).row();
 
         } else {
             // Error!
@@ -752,6 +756,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             clc.copyFrom(initClc);
             clc.setDiffuse("generate");
         }
+        // Title
+        content.add(new OwnLabel(I18n.msg("gui.procedural.param.cloud"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
+
+        // Add button group
+        genCloudsButton = addLocalButtons(content, "gui.procedural.cloud", this::generateClouds, this::randomizeClouds, 2);
+
+        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad18).row();
+
         // Fog color
         ColorPicker cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
         cloudColor.setSize(128f, 128f);
@@ -762,19 +774,22 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             clc.color[2] = col[2];
             clc.color[3] = col[3];
         });
+
         OwnLabel cloudColorLabel = new OwnLabel(I18n.msg("gui.procedural.cloudcolor"), skin);
         cloudColorLabel.setWidth(textWidth);
         OwnImageButton cloudColorTooltip = new OwnImageButton(skin, "tooltip");
         cloudColorTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.cloudcolor"), skin));
+        HorizontalGroup cloudGroup = new HorizontalGroup();
+        cloudGroup.space(pad20);
+        cloudGroup.addActor(cloudColor);
+        cloudGroup.addActor(cloudColorTooltip);
         content.add(cloudColorLabel).left().padRight(pad18).padBottom(pad18);
-        content.add(cloudColor).left().expandX().padBottom(pad18).padRight(pad10);
-        content.add(cloudColorTooltip).left().padBottom(pad18).row();
+        content.add(cloudGroup).left().expandX().padBottom(pad18).padRight(pad10).row();
 
         // Noise
-        addNoiseGroup(content, clc.nc, "gui.procedural.param.cloud");
+        addNoiseGroup(content, clc.nc, "gui.procedural.noise.params", true);
 
-        // Add button group
-        genCloudsButton = addLocalButtons(content, "gui.procedural.cloud", this::generateClouds, this::randomizeClouds);
+        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
     }
 
     private void buildContentAtmosphere(Table content) {
@@ -787,7 +802,12 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             ac.copyFrom(initAc);
         }
         // Title
-        content.add(new OwnLabel(I18n.msg("gui.procedural.param.atm"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
+        content.add(new OwnLabel(I18n.msg("gui.procedural.param.atm"), skin, "hud-header")).colspan(3).left().padBottom(pad34).row();
+
+        // Add button group
+        addLocalButtons(content, "gui.procedural.atmosphere", this::generateAtmosphere, this::randomizeAtmosphere, 3);
+
+        content.add(new Separator(skin, "gray")).center().colspan(3).growX().padBottom(pad34).padTop(pad18).row();
 
         // Wavelengths
         OwnSliderPlus wavelength0 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "0"), 0.4f, 1.0f, 0.01f, skin);
@@ -923,8 +943,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(fogColor).left().expandX().padBottom(pad18).padRight(pad10);
         content.add(fogColorTooltip).left().padBottom(pad18).row();
 
-        // Add button group
-        addLocalButtons(content, "gui.procedural.atmosphere", this::generateAtmosphere, this::randomizeAtmosphere);
+        content.add(new Separator(skin, "gray")).center().colspan(3).growX().padTop(pad34).row();
     }
 
     protected Boolean randomizeSurface(Boolean rebuild) {

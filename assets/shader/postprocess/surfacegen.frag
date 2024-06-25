@@ -27,6 +27,8 @@ void main() {
     float height = biome.x;
     float moisture = biome.y;
 
+
+
     // Query LUT.
     vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
     // Manipulate hue and saturation.
@@ -54,7 +56,7 @@ void main() {
     specularColor = spec;
 
     // Normal.
-    float scale = 0.9;
+    float scale = 1.0;
     float dx = dFdx(height) * scale;
     float dy = dFdy(height) * scale;
     float dz = 1.0;
