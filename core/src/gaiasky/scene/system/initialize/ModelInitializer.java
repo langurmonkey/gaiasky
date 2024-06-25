@@ -160,6 +160,8 @@ public class ModelInitializer extends AbstractInitSystem {
         if (model != null && model.model != null) {
             // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
+            // Initialize tessellated.
+            model.model.tessellated = Settings.settings.scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
         }
         if (atmosphere != null && model != null) {
             initializeAtmosphere(manager, atmosphere.atmosphere, model.model, body.size);
@@ -271,9 +273,6 @@ public class ModelInitializer extends AbstractInitSystem {
                                  GraphNode graph,
                                  Focus focus,
                                  boolean isBillboardGal) {
-        // Models are tessellated if tessellation is active and their size is very large.
-        if (model.model != null)
-            model.model.tessellated = Settings.settings.scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
 
         // Billboard.
         bb.renderConsumer = isBillboardGal ? BillboardEntityRenderSystem::renderBillboardGalaxy : BillboardEntityRenderSystem::renderBillboardCelestial;

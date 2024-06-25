@@ -414,7 +414,7 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
 
         // Size
         double sizeKm = size * Constants.U_TO_KM;
-        setSize(sizeKm + gaussian(rand, 50.0, 8.0, 12.0));
+        setSize(sizeKm + gaussian(rand, 80.0, 8.0, 22.0));
         // Cloud
         setDiffuse("generate");
         // Color
