@@ -62,7 +62,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             } catch (Exception ignored) {
             }
             if (lookUpTables.isEmpty()) {
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.jpg");
                 lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
                 lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow1-lut.jpg");
                 lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow2-lut.jpg");
@@ -127,7 +127,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     // Occlusion clouds: ambient occlusion uses the cloud texture.
     public boolean occlusionClouds = false;
     // Biome lookup texture.
-    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png";
+    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.jpg";
     public float biomeHueShift = 0;
     public float biomeSaturation = 1;
     /**
