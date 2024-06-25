@@ -20,14 +20,11 @@ layout (location = 0) out vec4 diffuseColor;
 layout (location = 1) out vec4 specularColor;
 layout (location = 2) out vec4 normalColor;
 
-
 void main() {
     // Get height and moisture.
     vec4 biome = texture(u_texture0, v_texCoords);
     float height = biome.x;
     float moisture = biome.y;
-
-
 
     // Query LUT.
     vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));

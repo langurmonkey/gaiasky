@@ -35,6 +35,8 @@ public class NoiseComponent extends NamedComponent {
     public float seed = 0f;
     public boolean turbulence = true;
     public boolean ridge = true;
+    public int numTerraces = 0;
+    public float terracesExp = 17.0f;
 
     public FrameBuffer fbNoise, fbBiome, fbSurface;
 
@@ -75,6 +77,8 @@ public class NoiseComponent extends NamedComponent {
         noise.setRange((float) range[0], (float) range[1]);
         noise.setTurbulence(turbulence);
         noise.setRidge(ridge);
+        noise.setNumTerraces(numTerraces);
+        noise.setTerraceExp(terracesExp);
         noise.setChannels(channels);
         return noise;
     }
@@ -184,6 +188,14 @@ public class NoiseComponent extends NamedComponent {
         this.power = power;
     }
 
+    public void setNumTerraces(Long numTerraces) {
+        this.numTerraces = numTerraces.intValue();
+    }
+
+    public void setTerracesExp(Double terracesExp) {
+        this.terracesExp = terracesExp.floatValue();
+    }
+
     public void setRange(double[] range) {
         this.range = range;
     }
@@ -213,6 +225,8 @@ public class NoiseComponent extends NamedComponent {
         this.persistence = other.persistence;
         this.lacunarity = other.lacunarity;
         this.octaves = other.octaves;
+        this.numTerraces = other.numTerraces;
+        this.terracesExp = other.terracesExp;
         this.range = Arrays.copyOf(other.range, other.range.length);
         this.power = other.power;
         this.turbulence = other.turbulence;
@@ -277,6 +291,13 @@ public class NoiseComponent extends NamedComponent {
                 setOctaves(rand.nextLong(1, 9));
             }
         }
+        // Terraces.
+        if (!clouds && rand.nextBoolean()) {
+            setNumTerraces(rand.nextLong(3, 7));
+            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
+        } else {
+            setNumTerraces(0L);
+        }
         // Range.
         double minRange = rocky ? 0.1 : gaussian(rand, -0.5, 0.3);
         double maxRange = 0.5 + FastMath.abs(rand.nextDouble());
@@ -310,6 +331,13 @@ public class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(2.0, 4.5));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(1, 8));
+        // Terraces.
+        if (rand.nextBoolean()) {
+            setNumTerraces(rand.nextLong(3, 7));
+            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
+        } else {
+            setNumTerraces(0L);
+        }
         // Range.
         setRange(new double[]{
                 rand.nextDouble(0.0, 0.3),
@@ -338,6 +366,13 @@ public class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(2.0, 5.0));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(3, 8));
+        // Terraces.
+        if (rand.nextBoolean()) {
+            setNumTerraces(rand.nextLong(3, 7));
+            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
+        } else {
+            setNumTerraces(0L);
+        }
         // Range.
         setRange(new double[]{
                 rand.nextDouble(-0.7, -0.4),
@@ -367,6 +402,13 @@ public class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(2.0, 5.0));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(3, 8));
+        // Terraces.
+        if (rand.nextInt(5) == 4) {
+            setNumTerraces(rand.nextLong(3, 7));
+            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
+        } else {
+            setNumTerraces(0L);
+        }
         // Range.
         setRange(new double[]{
                 rand.nextDouble(-0.4, 0.0),
@@ -411,6 +453,8 @@ public class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(0.1, 3.0));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(1, 4));
+        // Terraces.
+        setNumTerraces(0L);
         // Range.
         setRange(new double[]{0.4, rand.nextDouble(0.9, 1.3)});
         // Power.
@@ -429,6 +473,8 @@ public class NoiseComponent extends NamedComponent {
         log.debug("Persistence: " + persistence);
         log.debug("Lacunarity: " + lacunarity);
         log.debug("Octaves: " + octaves);
+        log.debug("Terraces: " + numTerraces);
+        log.debug("Terraces exponent: " + terracesExp);
         log.debug("Range: " + Arrays.toString(range));
         log.debug("Power: " + power);
         log.debug("Turbulence: " + turbulence);

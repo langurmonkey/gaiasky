@@ -37,6 +37,10 @@ uniform int u_octaves;
 uniform bool u_turbulence;
 // Enable/disable ridge noise in fBm. Only when turbulence is on.
 uniform bool u_ridge;
+// Number of terraces in the height profile. 0 to disable.
+uniform int u_numTerraces;
+// Exponent for the terraces profile. Must be odd.
+uniform float u_terraceExp;
 // Different noise patterns in different channels.
 // <= 1 - in red.
 // == 2 - in red and green.
@@ -54,10 +58,20 @@ uniform int u_type;
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
 
+float terraces(float h, int n_terraces, float smoothness) {
+    if (n_terraces <= 0) {
+        return h;
+    }
+    h = h * n_terraces;
+    return (round(h) + 0.5 * clamp(pow(2.0 * (h - round(h)), smoothness), 0.0, 1.0)) / n_terraces;
+}
+
 float noise(vec3 p,
             int type,
             float power,
             bool ridge,
+            int n_terraces,
+            float terrace_exp,
             vec2 range,
             float seed) {
     // Fill up opts.
@@ -96,6 +110,9 @@ float noise(vec3 p,
     // Set in range.
     value = clamp(gln_map(value, 0.0, 1.0, range.x, range.y), 0.0, 1.0);
 
+    // Terraces.
+    value = terraces(value, n_terraces, terrace_exp);
+
     return value;
 
 }
@@ -111,12 +128,12 @@ void main() {
     float cosPhi = cos(phi);
     // P is a point in the sphere.
     vec3 p = vec3(
-            cosPhi * cos(theta),
-            cosPhi * sin(theta),
-            sin(phi)
+        cosPhi * cos(theta),
+        cosPhi * sin(theta),
+        sin(phi)
     );
 
-    float val_ch1 = noise(p, u_type, u_power, u_ridge, u_range, u_seed);
+    float val_ch1 = noise(p, u_type, u_power, u_ridge, u_numTerraces, u_terraceExp, u_range, u_seed);
 
     if (u_channels <= 1) {
         // Channel 1 (elevation).
@@ -124,13 +141,13 @@ void main() {
 
     } else {
         // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, 1.0, u_ridge, vec2(0.0, 1.0), u_seed + 2.023);
+        float val_ch2 = noise(p, 0, 1.0, u_ridge, 0, 0.0, vec2(0.0, 1.0), u_seed + 2.023);
         if (u_channels == 2) {
             // Channel 2 (moisture).
             fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
         } else {
             // Channel 3 (temperature).
-            float val_ch3 = noise(p, u_type, 2.0, false, vec2(0.0, 1.0), u_seed + 1.4325);
+            float val_ch3 = noise(p, u_type, 2.0, false, 0, 0.0, vec2(0.0, 1.0), u_seed + 1.4325);
             fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
         }
     }

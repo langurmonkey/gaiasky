@@ -96,6 +96,14 @@ public final class Noise extends PostProcessorEffect {
         filter.setRidge(ridge);
     }
 
+    public void setNumTerraces(int numTerraces) {
+        filter.setNumTerraces(numTerraces);
+    }
+
+    public void setTerraceExp(float terraceExp) {
+        filter.setTerraceExp(terraceExp);
+    }
+
     public void setChannels(int channels) {
         filter.setChannels(channels);
     }

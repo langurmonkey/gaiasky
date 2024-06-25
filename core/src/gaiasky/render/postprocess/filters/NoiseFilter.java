@@ -37,6 +37,10 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     private boolean turbulence = true;
     /** Convert the fBm to ridge noise. **/
     private boolean ridge = false;
+    /** Number of terraces to use in the height profile. Set to 0 to disable. **/
+    private int numTerraces = 0;
+    /** Exponent of terraces. Must be odd. The lower it is, the smoother the terrace transitions. **/
+    private float terraceExp = 17.0f;
     /** Create different noise patterns in each of the different RGB channels. **/
     private int channels = 1;
 
@@ -131,6 +135,16 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         setParam(Param.Ridge, this.ridge);
     }
 
+    public void setNumTerraces(int nt) {
+        this.numTerraces = nt;
+        setParam(Param.NumTerraces, this.numTerraces);
+    }
+
+    public void setTerraceExp(float te) {
+        this.terraceExp = te;
+        setParam(Param.TerraceExp, this.terraceExp);
+    }
+
     public void setChannels(int channels) {
         this.channels = channels;
         setParam(Param.Channels, this.channels);
@@ -157,6 +171,8 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         setParams(Param.Octaves, this.octaves);
         setParams(Param.Turbulence, this.turbulence);
         setParams(Param.Ridge, this.ridge);
+        setParams(Param.NumTerraces, this.numTerraces);
+        setParams(Param.TerraceExp, this.terraceExp);
         setParams(Param.Channels, this.channels);
         setParams(Param.Type, this.type.ordinal());
 
@@ -185,6 +201,8 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         Octaves("u_octaves", 0),
         Turbulence("u_turbulence", 0),
         Ridge("u_ridge", 0),
+        NumTerraces("u_numTerraces", 0),
+        TerraceExp("u_terraceExp", 0),
         Channels("u_channels", 0),
         Type("u_type", 0);
         // @formatter:on

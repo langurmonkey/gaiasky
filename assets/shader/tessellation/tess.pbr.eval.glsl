@@ -134,10 +134,10 @@ out float o_fragHeight;
     // maps the height scale in internal units to a normal strength
     float computeNormalStrength(float heightScale) {
         // The top heightScale value to map the normal strength.
-        float topHeightScaleMap = 15.0;
+        float topHeightScaleMap = 5.0;
 
         vec2 heightSpanKm = vec2(0.0, u_heightScale * topHeightScaleMap);
-        vec2 span = vec2(0.1, 1.0);
+        vec2 span = vec2(0.5, 1.0);
         heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
         // normalize to [0,1]
         heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
