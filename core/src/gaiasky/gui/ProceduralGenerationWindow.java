@@ -929,7 +929,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(kmTooltip).left().padBottom(pad18).row();
 
         // Fog density
-        OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"), 0.5f, 10.0f, 0.1f, skin);
+        OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
+                Constants.MIN_ATM_FOG_DENSITY,
+                Constants.MAX_ATM_FOG_DENSITY,
+                Constants.SLIDER_STEP_TINY, skin);
         fogDensity.setWidth(fieldWidthTotal);
         fogDensity.setValue(ac.fogDensity);
         fogDensity.addListener(new ChangeListener() {

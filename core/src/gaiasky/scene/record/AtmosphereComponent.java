@@ -10,6 +10,7 @@ package gaiasky.scene.record;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
@@ -28,6 +29,7 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
@@ -49,7 +51,7 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
     public float m_fOuterRadius;
     public float m_fAtmosphereHeight;
     public float m_Kr, m_Km;
-    public float fogDensity = 1.0f;
+    public float fogDensity = 0.3f;
     public Vector3 fogColor;
     public float m_eSun = 10f;
 
@@ -178,13 +180,13 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
             parentTranslation = Mapper.graph.get(parent).translation;
         }
         updateAtmosphericScatteringParams(mat,
-                                          alpha,
-                                          ground,
-                                          graph.translation,
-                                          rigidRotation,
-                                          scaffolding.inverseRefPlaneTransform,
-                                          parentTranslation,
-                                          vrOffset);
+                alpha,
+                ground,
+                graph.translation,
+                rigidRotation,
+                scaffolding.inverseRefPlaneTransform,
+                parentTranslation,
+                vrOffset);
     }
 
     /**
@@ -308,7 +310,9 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
     }
 
     public void setFogDensity(Double fogDensity) {
-        this.fogDensity = fogDensity.floatValue();
+        this.fogDensity = MathUtils.clamp(fogDensity.floatValue(),
+                Constants.MIN_ATM_FOG_DENSITY,
+                Constants.MAX_ATM_FOG_DENSITY);
     }
 
     public void setFogdensity(Double fogDensity) {
@@ -351,9 +355,9 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         Random rand = new Random(seed);
         // Size
         double sizeKm = size * Constants.U_TO_KM;
-        setSize(sizeKm + gaussian(rand, 120.0, 10.0, 100.0, 150.0));
+        setSize(sizeKm + 12);
         // Wavelengths
-        setWavelengths(new double[] { gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1) });
+        setWavelengths(new double[]{gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1)});
         // Kr
         setM_Kr(rand.nextDouble(0.002f, 0.0069f));
         // Km
@@ -361,9 +365,9 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         // eSun
         setM_eSun(gaussian(rand, 5.0, 4.0));
         // Fog density
-        setFogdensity(gaussian(rand, 1.0, 1.0, 0.1));
+        setFogdensity(gaussian(rand, 0.6, 0.3, 0.01));
         // Fog color
-        setFogcolor(new double[] { 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5 });
+        setFogcolor(new double[]{0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5});
         // Samples
         setSamples(rand.nextInt(28) + 2L);
         // Params

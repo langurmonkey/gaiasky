@@ -432,7 +432,7 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
             color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.7, 0.2), 0.0, 1.0);
         }
         // Params
-        setParams(createModelParameters(200L, 1.0, false));
+        setParams(createModelParameters(300L, 1.0, false));
         // Noise
         if (nc != null) {
             nc.dispose();

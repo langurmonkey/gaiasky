@@ -23,10 +23,8 @@ public class HeightDataPixmap implements IHeightData {
 
     private final Pixmap heightPixmap;
     private GridModel model;
-    private final float heightScale;
 
-    public HeightDataPixmap(Pixmap heightPixmap, Runnable finished, float heightScale) {
-        this.heightScale = heightScale;
+    public HeightDataPixmap(Pixmap heightPixmap, Runnable finished) {
         this.heightPixmap = heightPixmap;
 
         if (finished != null) {
@@ -35,12 +33,11 @@ public class HeightDataPixmap implements IHeightData {
         initModel();
     }
 
-    public HeightDataPixmap(String heightTexturePacked, Runnable finished, float heightScale) {
-        this(new Pixmap(new FileHandle(GlobalResources.unpackAssetPath(heightTexturePacked))), finished, heightScale);
+    public HeightDataPixmap(String heightTexturePacked, Runnable finished) {
+        this(new Pixmap(new FileHandle(GlobalResources.unpackAssetPath(heightTexturePacked))), finished);
     }
 
-    public HeightDataPixmap(Texture texture, Runnable finished, float heightScale) {
-        this.heightScale = heightScale;
+    public HeightDataPixmap(Texture texture, Runnable finished) {
         if (texture != null && texture.getTextureData() instanceof PixmapTextureData) {
             // Directly get pixmap texture data.
             heightPixmap = texture.getTextureData().consumePixmap();
@@ -80,7 +77,7 @@ public class HeightDataPixmap implements IHeightData {
             @Override
             public double getValue(int x, int y) {
                 assert heightPixmap != null;
-                return color.set(heightPixmap.getPixel(x, y)).r * heightScale;
+                return color.set(heightPixmap.getPixel(x, y)).r;
             }
         };
     }

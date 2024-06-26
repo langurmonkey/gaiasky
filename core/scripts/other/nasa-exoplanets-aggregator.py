@@ -8,6 +8,15 @@ from dataclasses import dataclass
 # This table needs to be cross-matched with the full table to get the Gaia, HIP, HD and TIC ids,
 # which are expected in columns 3, 4, 5, and 6 respectively.
 
+colors = [
+    [0.2588, 0.5216, 0.9569], # blue
+    [0.8588, 0.1961, 0.2118], # red
+    [0.9569, 0.7608, 0.0510], # yellow
+    [0.2353, 0.7294, 0.3294], # green
+    [1.0000, 0.4000, 1.0000], # pink
+    [0.8512, 0.5960, 0.0000]  # orange
+]
+
 def clamp(x, minimum, maximum):
     return max(minimum, min(x, maximum))
 
@@ -124,7 +133,7 @@ def main():
             letters = set()
 
             for component in system_entry[1]:
-                pl_letter = component[3]
+                pl_letter = component[1][-1]
                 letters.add(pl_letter)
                 planets[pl_letter] = component
 
@@ -299,7 +308,7 @@ def main():
             elif not math.isnan(radj):
                 radius = radj * 71492.0
             else:
-                radius = clamp(random.gauss(30000.0, 20000.0), 450.0, 150000.0)
+                radius = clamp(random.gauss(6000.0, 500.0), 450.0, 15000.0)
             plmap["size"] = radius
 
             # absmag
@@ -360,10 +369,8 @@ def main():
             plomap["name"] = planet[1] + " orbit"
 
             # color
-            r = clamp(random.gauss(0.25, 0.1), 0.0, 1.0)
-            g = clamp(random.gauss(0.85, 0.2), 0.0, 1.0)
-            b = clamp(random.gauss(0.3, 0.1), 0.0, 1.0)
-            plomap["color"] = [r, g, b, 0.6]
+            orb_color = colors[random.randint(0, 5)]
+            plomap["color"] = [orb_color[0], orb_color[1], orb_color[2], 0.6]
 
             # component types
             plomap["componentTypes"] = [ "Orbits", "Planets" ]
@@ -397,14 +404,12 @@ def main():
                 # compute sma from period and masses using Kepler's third law
                 mp_kg = masse * mearth_kg
                 ms_kg = mass * msun_kg 
-                sma = ((math.pow(period, 2.0) * 4 * math.pow(math.pi, 2.0)) / (G * (mp_kg + ms_kg))) ** (1.0 / 3.0)
-                # m to km
-                sma = sma / 1000.0
+                sma = ((math.pow(period, 2.0) * G * (mp_kg + ms_kg)) / (4 * math.pow(math.pi, 2.0))) ** (1.0 / 3.0)
             elif math.isnan(period) and not math.isnan(sma):
                 # compute period from sma and masses using Kepler's third law
                 mp_kg = masse * mearth_kg
                 ms_kg = mass * msun_kg
-                period = ((math.pow(sma, 3.0) * G * (mp_kg + ms_kg)) / (4 * math.pow(math.pi, 2.0))) ** (1.0 / 2.0)
+                period = ((math.pow(sma, 3.0) * 4 * math.pow(math.pi, 2.0)) / (G * (mp_kg + ms_kg))) ** (1.0 / 2.0)
                 # seconds to days
                 period = period / 86400.0
 

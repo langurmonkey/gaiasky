@@ -178,6 +178,8 @@ public class Constants {
     public final static int MAX_NUM_LABELS = 300;
     public final static float MIN_COLOR_NOISE = 0.0f;
     public final static float MAX_COLOR_NOISE = 1.0f;
+    public final static float MIN_ATM_FOG_DENSITY = 0.01f;
+    public final static float MAX_ATM_FOG_DENSITY = 3.5f;
     public final static float MIN_POINTER_GUIDES_WIDTH = 0.5f;
     public final static float MAX_POINTER_GUIDES_WIDTH = 20f;
     public final static int MIN_TILE_CACHE = 4;

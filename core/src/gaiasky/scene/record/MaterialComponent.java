@@ -618,7 +618,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 if (heightT != null) {
                     // Create texture, populate material
                     if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
-                        heightData = new HeightDataPixmap(heightT, null, heightScale);
+                        heightData = new HeightDataPixmap(heightT, null);
                         heightTex = heightT;
                         addHeightTex(heightTex);
 
@@ -689,7 +689,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             heightInitialized.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Construct RAM height map from texture
-                heightData = new HeightDataPixmap(tex, () -> addHeightTex(tex), heightScale);
+                heightData = new HeightDataPixmap(tex, () -> addHeightTex(tex));
             });
         }
     }
