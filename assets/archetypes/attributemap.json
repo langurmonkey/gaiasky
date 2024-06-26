@@ -748,7 +748,7 @@
           "proximityThresholdDeg",
           "proximityThresholdRad"
         ]
-      },
+      }
     },
     "StarSet": {
       "description": "Defines attributes related to star set objects, which contain a star catalog or group.",
