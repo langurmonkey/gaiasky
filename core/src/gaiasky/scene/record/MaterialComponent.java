@@ -591,7 +591,13 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
-                    nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
+                    switch(noiseRandom.nextInt(5)) {
+                        case 0 -> nc.randomizeEarthLike(noiseRandom);
+                        case 1 -> nc.randomizeRockyPlanet(noiseRandom);
+                        case 2 -> nc.randomizeGasGiant(noiseRandom);
+                        case 3 -> nc.randomizeSnowPlanet(noiseRandom);
+                        case 4 -> nc.randomizeAll(noiseRandom);
+                    }
                 }
                 FrameBuffer[] fbs = nc.generateElevation(N, M, biomeLUT, biomeHueShift, biomeSaturation);
 

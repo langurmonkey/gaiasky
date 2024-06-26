@@ -1,45 +1,97 @@
 // #name: Curl
-// #deps: Simplex, Luma
+// #deps: Luma
 
-vec2 _snois2(vec2 x) {
-  float s1 = gln_simplex(vec2(x));
-  float s2 = gln_simplex(vec2(x.y - 19.1, x.x + 33.4));
-  return vec2(s1, s2);
+vec3 mod289(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec3 _snois3(vec3 x) {
-  float s = gln_simplex(vec3(x));
-  float s1 = gln_simplex(vec3(x.y - 19.1, x.z + 33.4, x.x + 47.2));
-  float s2 = gln_simplex(vec3(x.z + 74.2, x.x - 124.5, x.y + 99.4));
-  return vec3(s, s1, s2);
+vec4 mod289(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-/**
- * Generates 2D Curl Noise.
- *
- * @name gln_curl
- * @function
- * @param {vec2} p  Point to sample Curl Noise at.
- * @return {float}  Value of Curl Noise at point "p".
- *
- * @example
- * vec2 n = gln_curl(position);
- */
-float gln_curl(vec2 p) {
-  const float e = .1;
-  vec2 dx = vec2(e, 0.0);
-  vec2 dy = vec2(0.0, e);
+float gln_simplex_curl(vec3 v)
+{
+    const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
 
-  vec2 p_x0 = _snois2(p - dx);
-  vec2 p_x1 = _snois2(p + dx);
-  vec2 p_y0 = _snois2(p - dy);
-  vec2 p_y1 = _snois2(p + dy);
+    // First corner
+    vec3 i = floor(v + dot(v, C.yyy));
+    vec3 x0 = v - i + dot(i, C.xxx);
 
-  float x = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
-  float y = p_y1.x - p_y0.x - p_x1.y + p_x0.y;
+    // Other corners
+    vec3 g = step(x0.yzx, x0.xyz);
+    vec3 l = 1.0 - g;
+    vec3 i1 = min(g.xyz, l.zxy);
+    vec3 i2 = max(g.xyz, l.zxy);
 
-  const float divisor = 1.0 / (2.0 * e);
-  return luma(vec3(normalize(vec2(x, y) * divisor), 0.0));
+    //   x0 = x0 - 0.0 + 0.0 * C.xxx;
+    //   x1 = x0 - i1  + 1.0 * C.xxx;
+    //   x2 = x0 - i2  + 2.0 * C.xxx;
+    //   x3 = x0 - 1.0 + 3.0 * C.xxx;
+    vec3 x1 = x0 - i1 + C.xxx;
+    vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
+    vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
+
+    // Permutations
+    i = mod289(i);
+    vec4 p = _permute(_permute(_permute(
+                                 i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                             + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                     + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+
+    // Gradients: 7x7 points over a square, mapped onto an octahedron.
+    // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
+    float n_ = 0.142857142857; // 1.0/7.0
+    vec3 ns = n_ * D.wyz - D.xzx;
+
+    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)
+
+    vec4 x_ = floor(j * ns.z);
+    vec4 y_ = floor(j - 7.0 * x_);    // mod(j,N)
+
+    vec4 x = x_ * ns.x + ns.yyyy;
+    vec4 y = y_ * ns.x + ns.yyyy;
+    vec4 h = 1.0 - abs(x) - abs(y);
+
+    vec4 b0 = vec4(x.xy, y.xy);
+    vec4 b1 = vec4(x.zw, y.zw);
+
+    //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;
+    //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;
+    vec4 s0 = floor(b0) * 2.0 + 1.0;
+    vec4 s1 = floor(b1) * 2.0 + 1.0;
+    vec4 sh = -step(h, vec4(0.0));
+
+    vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+    vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+    vec3 p0 = vec3(a0.xy, h.x);
+    vec3 p1 = vec3(a0.zw, h.y);
+    vec3 p2 = vec3(a1.xy, h.z);
+    vec3 p3 = vec3(a1.zw, h.w);
+
+    //Normalise gradients
+    vec4 norm = _taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+
+    // Mix final noise value
+    vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+    m = m * m;
+    return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1),
+                                  dot(p2, x2), dot(p3, x3)));
+}
+
+vec3 gln_simplex_curl3(vec3 x) {
+
+    float s = gln_simplex_curl(vec3(x));
+    float s1 = gln_simplex_curl(vec3(x.y - 19.1, x.z + 33.4, x.x + 47.2));
+    float s2 = gln_simplex_curl(vec3(x.z + 74.2, x.x - 124.5, x.y + 99.4));
+    vec3 c = vec3(s, s1, s2);
+    return c;
+
 }
 
 /**
@@ -54,70 +106,26 @@ float gln_curl(vec2 p) {
  * float n = gln_curl(position);
  */
 float gln_curl(vec3 p) {
-  const float e = .1;
-  vec3 dx = vec3(e, 0.0, 0.0);
-  vec3 dy = vec3(0.0, e, 0.0);
-  vec3 dz = vec3(0.0, 0.0, e);
 
-  vec3 p_x0 = _snois3(p - dx);
-  vec3 p_x1 = _snois3(p + dx);
-  vec3 p_y0 = _snois3(p - dy);
-  vec3 p_y1 = _snois3(p + dy);
-  vec3 p_z0 = _snois3(p - dz);
-  vec3 p_z1 = _snois3(p + dz);
+    const float e = .1;
+    vec3 dx = vec3(e, 0.0, 0.0);
+    vec3 dy = vec3(0.0, e, 0.0);
+    vec3 dz = vec3(0.0, 0.0, e);
 
-  float x = p_y1.z - p_y0.z - p_z1.y + p_z0.y;
-  float y = p_z1.x - p_z0.x - p_x1.z + p_x0.z;
-  float z = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
+    vec3 p_x0 = gln_simplex_curl3(p - dx);
+    vec3 p_x1 = gln_simplex_curl3(p + dx);
+    vec3 p_y0 = gln_simplex_curl3(p - dy);
+    vec3 p_y1 = gln_simplex_curl3(p + dy);
+    vec3 p_z0 = gln_simplex_curl3(p - dz);
+    vec3 p_z1 = gln_simplex_curl3(p + dz);
 
-  const float divisor = 1.0 / (2.0 * e);
-  return luma(normalize(vec3(x, y, z) * divisor));
-}
+    float x = p_y1.z - p_y0.z - p_z1.y + p_z0.y;
+    float y = p_z1.x - p_z0.x - p_x1.z + p_x0.z;
+    float z = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
 
-/**
- * Generates 2D Fractional Brownian motion (fBm) from Curl Noise.
- *
- * @name gln_cfbm
- * @function
- * @param {vec2} p               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Perlin Noise.
- * @return {float}               Value of fBm at point "p".
- *
- * @example
- * gln_tFBMOpts opts =
- *      gln_tFBMOpts(uSeed, 0.3, 2.0, 0.5, 1.0, 5, false, false);
- *
- * float n = gln_cfbm(position.xy, opts);
- */
-float gln_cfbm(vec2 p, gln_tFBMOpts opts) {
-  p += (opts.seed * 100.0);
-  float result = 0.0;
-  float amplitude = 1.0;
-  float frequency = opts.frequency;
-  float maximum = amplitude;
-
-  for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-    if (i >= opts.octaves)
-    break;
-
-    vec2 p = p * frequency * opts.scale.xy;
-
-    float noiseVal = gln_curl(p);
-
-    result += noiseVal * amplitude;
-
-    frequency *= opts.lacunarity;
-    amplitude *= opts.persistence;
-    maximum += amplitude;
-  }
-
-  if (opts.turbulence && !opts.ridge) {
-    result = abs(result);
-  } else if (opts.ridge) {
-    result = 1.0 - abs(result);
-  }
-
-  return pow(result / maximum, opts.power);
+    const float divisor = 1.0 / (2.0 * e);
+    return luma(normalize(vec3(x, y, z) * divisor));
+    //return acos(dot(normalize(vec3( x , y , z ) * divisor), vec3(1.0, 0.0, 0.0))) / gln_PI;
 }
 
 /**
@@ -136,32 +144,32 @@ float gln_cfbm(vec2 p, gln_tFBMOpts opts) {
  * float n = gln_cfbm(position.xy, opts);
  */
 float gln_cfbm(vec3 p, gln_tFBMOpts opts) {
-  p += (opts.seed * 100.0);
-  float result = 0.0;
-  float amplitude = 1.0;
-  float frequency = opts.frequency;
-  float maximum = amplitude;
+    p += (opts.seed * 100.0);
+    float result = 0.0;
+    float amplitude = 1.0;
+    float frequency = opts.frequency;
+    float maximum = amplitude;
 
-  for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-    if (i >= opts.octaves)
-    break;
+    for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
+        if (i >= opts.octaves)
+        break;
 
-    vec3 p = p * frequency * opts.scale;
+        vec3 p = p * frequency * opts.scale;
 
-    float noiseVal = gln_curl(p);
+        float noiseVal = gln_curl(p);
 
-    result += noiseVal * amplitude;
+        result += noiseVal * amplitude;
 
-    frequency *= opts.lacunarity;
-    amplitude *= opts.persistence;
-    maximum += amplitude;
-  }
+        frequency *= opts.lacunarity;
+        amplitude *= opts.persistence;
+        maximum += amplitude;
+    }
 
-  if (opts.turbulence && !opts.ridge) {
-    result = abs(result);
-  } else if (opts.ridge) {
-    result = 1.0 - abs(result);
-  }
+    if (opts.turbulence && !opts.ridge) {
+        result = abs(result);
+    } else if (opts.ridge) {
+        result = 1.0 - abs(result);
+    }
 
-  return pow(result / maximum, opts.power);
+    return pow(result / maximum, opts.power);
 }

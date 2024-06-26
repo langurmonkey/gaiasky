@@ -1,44 +1,6 @@
 // #name: Simplex
 
 /**
- * Generates 2D Simplex Noise.
- *
- * @name gln_simplex
- * @function
- * @param {vec2} v  Point to sample Simplex Noise at.
- * @return {float}  Value of Simplex Noise at point "p".
- *
- * @example
- * float n = gln_simplex(position.xy);
- */
-float gln_simplex(vec2 v) {
-  const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626,
-                      0.024390243902439);
-  vec2 i = floor(v + dot(v, C.yy));
-  vec2 x0 = v - i + dot(i, C.xx);
-  vec2 i1;
-  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  vec4 x12 = x0.xyxy + C.xxzz;
-  x12.xy -= i1;
-  i = mod(i, 289.0);
-  vec3 p = gln_rand3(gln_rand3(i.y + vec3(0.0, i1.y, 1.0)) + i.x +
-                     vec3(0.0, i1.x, 1.0));
-  vec3 m = max(
-      0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
-  m = m * m;
-  m = m * m;
-  vec3 x = 2.0 * fract(p * C.www) - 1.0;
-  vec3 h = abs(x) - 0.5;
-  vec3 ox = floor(x + 0.5);
-  vec3 a0 = x - ox;
-  m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
-  vec3 g;
-  g.x = a0.x * x0.x + h.x * x0.y;
-  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-  return 130.0 * dot(m, g);
-}
-
-/**
  * Generates 3D Simplex Noise.
  *
  * @name gln_simplex
@@ -117,52 +79,6 @@ float gln_simplex(vec3 v) {
   m = m * m;
   return 42.0 *
          dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
-}
-
-/**
- * Generates 2D Fractional Brownian motion (fBm) from Simplex Noise.
- *
- * @name gln_sfbm
- * @function
- * @param {vec2} v               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Simplex Noise.
- * @return {float}               Value of fBm at point "p".
- *
- * @example
- * gln_tFBMOpts opts =
- *      gln_tFBMOpts(uSeed, 0.3, 2.0, 0.5, 1.0, 5, false, false);
- *
- * float n = gln_sfbm(position.xy, opts);
- */
-float gln_sfbm(vec2 v, gln_tFBMOpts opts) {
-  v += (opts.seed * 100.0);
-  float result = 0.0;
-  float amplitude = 1.0;
-  float frequency = opts.frequency;
-  float maximum = amplitude;
-
-  for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-    if (i >= opts.octaves)
-      break;
-
-    vec2 p = v * frequency * opts.scale.xy;
-
-    float noiseVal = gln_simplex(p);
-
-    result += noiseVal * amplitude;
-
-    frequency *= opts.lacunarity;
-    amplitude *= opts.persistence;
-    maximum += amplitude;
-  }
-
-  if (opts.turbulence && !opts.ridge) {
-    result = abs(result);
-  } else if (opts.ridge) {
-    result = 1.0 - abs(result);
-  }
-
-  return pow(result / maximum, opts.power);
 }
 
 /**

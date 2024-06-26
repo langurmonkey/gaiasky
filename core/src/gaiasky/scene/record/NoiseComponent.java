@@ -195,6 +195,9 @@ public class NoiseComponent extends NamedComponent {
     public void setTerracesExp(Double terracesExp) {
         this.terracesExp = terracesExp.floatValue();
     }
+    public void setTerraceSmoothness(Double terracesExp) {
+        setTerracesExp(terracesExp);
+    }
 
     public void setRange(double[] range) {
         this.range = range;
@@ -318,8 +321,7 @@ public class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type: PERLIN, SIMPLEX, CURL, VORONOI.
-        int d = rand.nextInt(3);
-        setType(NoiseType.values()[d].name());
+        setType(NoiseType.values()[rand.nextInt(4)].name());
         // Same scale for all.
         double scale = rand.nextDouble(5.0, 15.0);
         setScale(new double[]{scale, scale, scale});
@@ -353,8 +355,8 @@ public class NoiseComponent extends NamedComponent {
     public void randomizeEarthLike(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        // Type: PERLIN, SIMPLEX, CURL, VORONOI.
+        setType(NoiseType.values()[rand.nextInt(4)].name());
         // Same scale for all.
         double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
@@ -389,8 +391,7 @@ public class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type: PERLIN, SIMPLEX, CURL, VORONOI.
-        int d = rand.nextInt(3);
-        setType(NoiseType.values()[d].name());
+        setType(NoiseType.values()[rand.nextInt(4)].name());
         // Same scale for all.
         double scale = rand.nextDouble(4.0, 8.0);
         setScale(new double[]{scale, scale, scale});
@@ -426,7 +427,7 @@ public class NoiseComponent extends NamedComponent {
         setSeed(rand.nextDouble(2.0));
         // Type.
         // Type: all but WHITE. VORONOI is rare.
-        if (rand.nextInt(20) < 18) {
+        if (rand.nextInt(20) < 17) {
             // PERLIN, SIMPLEX or CURL
             int d = rand.nextInt(3);
             d = d == 2 ? 3 : d;

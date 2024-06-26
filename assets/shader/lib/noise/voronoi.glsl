@@ -16,38 +16,6 @@ struct gln_tVoronoiOpts {
 };
 
 /**
- * Generates 2D Voronoi Noise.
- *
- * @name gln_voronoi
- * @function
- * @param {vec2}  x                  Point to sample Voronoi Noise at.
- * @param {gln_tWorleyOpts} opts     Options for generating Voronoi Noise.
- * @return {float}                   Value of Voronoi Noise at point "p".
- *
- * @example
- * gln_tWorleyOpts opts = gln_tWorleyOpts(uSeed, 0.0, 0.5, false);
- *
- * float n = gln_voronoi(position.xy, opts);
- */
-float gln_voronoi(vec2 point, gln_tVoronoiOpts opts) {
-  vec2 p = floor(point * opts.scale.xy);
-  vec2 f = fract(point * opts.scale.xy);
-  float res = 0.0;
-  for (int j = -1; j <= 1; j++) {
-    for (int i = -1; i <= 1; i++) {
-      vec2 b = vec2(i, j);
-      vec2 r = vec2(b) - f + gln_rand(p + b);
-      res += 1. / pow(dot(r, r), 8.);
-    }
-  }
-
-  float result = pow(1. / res, 0.0625);
-  if (opts.invert)
-    result = 1.0 - result;
-  return result;
-}
-
-/**
  * Generates 3D Voronoi Noise.
  *
  * @name gln_voronoi
@@ -86,55 +54,6 @@ float gln_voronoi(in vec3 point) {
   }
 
   return pow(luma(clamp(vec3(sqrt(res), abs(id)), 0.0, 1.0)), 2.0);
-}
-
-/**
- * Generates Fractional Brownian motion (fBm) from 2D Voronoi noise.
- *
- * @name gln_wfbm
- * @function
- * @param {vec2} v               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Simplex Noise.
- * @return {float}               Value of fBm at point "p".
- *
- * @example
- * gln_tFBMOpts opts =
- *      gln_tFBMOpts(1.0, 0.3, 2.0, 0.5, 1.0, 5, false, false);
- *
- * gln_tVoronoiOpts voronoiOpts =
- *     gln_tVoronoiOpts(1.0, 1.0, 3.0, false);
- *
- * float n = gln_vfbm(position.xy, voronoiOpts, opts);
- */
-float gln_vfbm(vec2 v, gln_tFBMOpts opts, gln_tVoronoiOpts vopts) {
-  v += (opts.seed * 100.0);
-  float result = 0.0;
-  float amplitude = 1.0;
-  float frequency = opts.frequency;
-  float maximum = amplitude;
-
-  for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-    if (i >= opts.octaves)
-      break;
-
-    vec2 p = v * frequency * opts.scale.xy;
-
-    float noiseVal = gln_voronoi(p, vopts);
-
-    result += noiseVal * amplitude;
-
-    frequency *= opts.lacunarity;
-    amplitude *= opts.persistence;
-    maximum += amplitude;
-  }
-
-  if (opts.turbulence && !opts.ridge) {
-    result = abs(result);
-  } else if (opts.ridge) {
-    result = 1.0 - abs(result);
-  }
-
-  return pow(result / maximum, opts.power);
 }
 
 /**
