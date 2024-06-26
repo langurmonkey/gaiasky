@@ -49,7 +49,7 @@ public class ModelScaffolding implements Component {
     /** The seed for random components **/
     public List<Long> seed = List.of(1L);
 
-    /** The components to randomize---possible values are ["model", "cloud", "atmosphere"] **/
+    /** The components to randomize---possible values are ["model", "surface", "cloud", "atmosphere"] **/
     public List<String> randomize;
 
     /** The factor to apply to the size when rendered as billboard. **/

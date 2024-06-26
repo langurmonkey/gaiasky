@@ -306,7 +306,7 @@ public class ModelInitializer extends AbstractInitSystem {
             label.labelFactor = 1;
         }
 
-        if (isRandomizeModel(scaffolding)) {
+        if (isRandomSurface(scaffolding)) {
             // Ignore current model component (if any) and create a random one
             model.model = new ModelComponent(true);
             model.model.randomizeAll(scaffolding.getSeed("model"), body.size);
@@ -408,8 +408,8 @@ public class ModelInitializer extends AbstractInitSystem {
         orientation.initialize(AssetBean.manager());
     }
 
-    public boolean isRandomizeModel(ModelScaffolding scaffolding) {
-        return scaffolding.randomize != null && scaffolding.randomize.contains("model");
+    public boolean isRandomSurface(ModelScaffolding scaffolding) {
+        return scaffolding.randomize != null && (scaffolding.randomize.contains("surface") || scaffolding.randomize.contains("model"));
     }
 
     protected boolean isRandomizeAtmosphere(ModelScaffolding scaffolding) {

@@ -46,6 +46,7 @@ import gaiasky.util.i18n.I18n;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 public class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
@@ -1016,10 +1017,19 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         // Type
         setType("sphere");
         // Parameters
-        setParams(createModelParameters(600L, 1.0, false));
+        setParams(createModelParameters(800L, 1.0, false));
         // Material
         MaterialComponent mtc = new MaterialComponent();
-        mtc.randomizeAll(seed, size);
+        // Randomize material.
+        Random rnd = new Random(seed);
+        switch(rnd.nextInt(5)) {
+            case 0 -> mtc.randomizeAll(seed, size);
+            case 1 -> mtc.randomizeEarthLike(seed);
+            case 2 -> mtc.randomizeColdPlanet(seed);
+            case 3 -> mtc.randomizeRockyPlanet(seed);
+            case 4 -> mtc.randomizeGasGiant(seed);
+        }
+
         // Set to model
         setMaterial(mtc);
     }
