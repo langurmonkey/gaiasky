@@ -28,9 +28,7 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-float luma(vec3 color) {
-    return dot(color, vec3(0.2126, 0.7152, 0.0722));
-}
+#include <shader/lib/luma.glsl>
 
 void main(void) {
     float g2 = g * g;

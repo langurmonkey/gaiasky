@@ -74,25 +74,26 @@ public final class PingPongBuffer implements Disposable {
         colorIndex = idx++;
 
         // 1
-        // Depth buffer.
-        if (hasDepth) {
-            addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
-            if (!preventFloatBuffer)
-                depthIndex = idx++;
-        }
-
-        // 2
-        // Normal buffer.
+        // Normal buffer
         if (hasNormal) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             normalIndex = idx++;
         }
 
-        // 3
-        // Reflection mask buffer.
+        // 2
+        // Reflection mask buffer
         if (hasReflectionMask) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-            reflectionMaskIndex = idx;
+            reflectionMaskIndex = idx++;
+        }
+
+        // 3
+        // Depth buffer
+        if (hasDepth) {
+            addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
+            if(!preventFloatBuffer) {
+                depthIndex = idx;
+            }
         }
 
         return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, normalIndex, reflectionMaskIndex);

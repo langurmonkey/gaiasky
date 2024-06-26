@@ -1,5 +1,14 @@
 #ifndef GLSL_LIB_RELATIVITY
 #define GLSL_LIB_RELATIVITY
+
+#ifndef GLSL_ROTATE_VERTEX_POS
+#define GLSL_ROTATE_VERTEX_POS
+vec3 rotate_vertex_position(vec3 position, vec3 axis, float angle) {
+    vec4 q = get_quat_rotation(axis, angle);
+    return position.xyz + 2.0 * cross(q.xyz, cross(q.xyz, position.xyz) + q.w * position.xyz);
+}
+#endif // GLSL_ROTATE_VERTEX_POS
+
 uniform vec3 u_velDir;// Velocity vector
 uniform float u_vc;// Fraction of the speed of light, v/c
 // This needs lib_geometry to be included in main file

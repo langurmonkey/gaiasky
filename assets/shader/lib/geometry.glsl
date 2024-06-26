@@ -123,10 +123,13 @@ vec4 rotate_angle_axis(float angle, vec3 axis) {
     return vec4(axis * sn, cs);
 }
 
+#ifndef GLSL_ROTATE_VERTEX_POS
+#define GLSL_ROTATE_VERTEX_POS
 vec3 rotate_vertex_position(vec3 position, vec3 axis, float angle) {
   vec4 q = get_quat_rotation(axis, angle);
   return position.xyz + 2.0 * cross(q.xyz, cross(q.xyz, position.xyz) + q.w * position.xyz);
 }
+#endif // GLSL_ROTATE_VERTEX_POS
 
 // Get perpendicular vector
 vec3 perpendicular_vec(vec3 vector) {

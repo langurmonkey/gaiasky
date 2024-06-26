@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
@@ -180,7 +181,7 @@ public class AtmosphereShader extends BaseIntShader {
     }
 
     // TODO: Perhaps move responsibility for combining attributes to IntRenderableProvider?
-    private static final Attributes combineAttributes(final IntRenderable renderable) {
+    private static Attributes combineAttributes(final IntRenderable renderable) {
         tmpAttributes.clear();//
         if (renderable.environment != null)
             tmpAttributes.set(renderable.environment);
@@ -189,7 +190,7 @@ public class AtmosphereShader extends BaseIntShader {
         return tmpAttributes;
     }
 
-    private static final Bits combineAttributeMasks(final IntRenderable renderable) {
+    private static Bits combineAttributeMasks(final IntRenderable renderable) {
         Bits mask = Bits.empty();
         if (renderable.environment != null)
             mask.or(renderable.environment.getMask());
@@ -200,20 +201,23 @@ public class AtmosphereShader extends BaseIntShader {
 
     public static String createPrefix(final IntRenderable renderable) {
         final Attributes attributes = combineAttributes(renderable);
-        String prefix = "";
+        StringBuilder prefix = new StringBuilder();
         if (attributes.has(AtmosphereAttribute.KmESun))
-            prefix += "#define atmosphericScattering\n";
+            prefix.append("#define atmosphericScattering\n");
         // Atmosphere ground only if camera height is set
         if (attributes.has(FloatAttribute.Vc))
-            prefix += "#define relativisticEffects\n";
+            prefix.append("#define relativisticEffects\n");
         // Gravitational waves
         if (attributes.has(FloatAttribute.Omgw))
-            prefix += "#define gravitationalWaves\n";
+            prefix.append("#define gravitationalWaves\n");
 
         if (attributes.has(Vector3Attribute.EclipsingBodyPos)) {
-            prefix += "#define eclipsingBodyFlag\n";
+            prefix.append("#define eclipsingBodyFlag\n");
         }
-        return prefix;
+        if (Settings.settings.postprocess.ssr.active) {
+            prefix.append("#define ssrFlag\n");
+        }
+        return prefix.toString();
     }
 
     @Override

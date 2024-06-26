@@ -11,7 +11,6 @@ in vec3 a_position;
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-#include <shader/lib/geometry.glsl>
 #include <shader/lib/relativity.glsl>
 #endif// relativisticEffects
 
