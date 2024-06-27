@@ -37,6 +37,7 @@ import gaiasky.input.GameMouseKbdListener;
 import gaiasky.input.MainGamepadListener;
 import gaiasky.input.MainMouseKbdListener;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IFocus;
@@ -45,7 +46,6 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
@@ -428,6 +428,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Computes the future positions at the given time of the closest and focus objects.
+     *
      * @param time The time.
      */
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -437,12 +438,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
         // Next closest position.
         if (closestBody != null && !closestBody.isEmpty()) {
-            if (closestBody != focus) {
-                closestBody.getPredictedPosition(nextClosestPosition, time, this, false);
-            } else {
+            if(getMode().isFocus() && focus.getEntity() == closestBody.getEntity()) {
                 nextClosestPosition.set(nextFocusPosition);
+            } else {
+                closestBody.getPredictedPosition(nextClosestPosition, time, this, false);
             }
-
         }
     }
 
@@ -1288,6 +1288,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * The speed scaling function.
      *
      * @param min The minimum speed.
+     *
      * @return The speed scaling.
      */
     public double speedScaling(double min) {
