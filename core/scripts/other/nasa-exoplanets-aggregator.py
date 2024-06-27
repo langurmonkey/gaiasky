@@ -421,10 +421,10 @@ def main():
             # eccentricity
             e = get_float(planet, 20)
             if math.isnan(e):
-                e = random.uniform(0.0, 0.4)
+                e = random.uniform(0.0, 0.8)
             orbit["eccentricity"] = e
             # inclination
-            i = random.gauss(0.0, 9.0)
+            i = random.gauss(0.0, 4.0)
             orbit["inclination"] = i
             # ascending node
             anode = random.uniform(0.0, 180.0)

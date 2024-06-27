@@ -237,10 +237,10 @@ public class NoiseComponent extends NamedComponent {
     }
 
     public void randomizeAll(Random rand) {
-        randomizeAll(rand, rand.nextBoolean(), false);
+        randomizeAll(rand, false);
     }
 
-    public void randomizeAll(Random rand, boolean rocky, boolean clouds) {
+    public void randomizeAll(Random rand, boolean clouds) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
@@ -302,14 +302,14 @@ public class NoiseComponent extends NamedComponent {
             setNumTerraces(0L);
         }
         // Range.
-        double minRange = rocky ? 0.1 : gaussian(rand, -0.5, 0.3);
+        double minRange = gaussian(rand, -0.5, 0.3);
         double maxRange = 0.5 + FastMath.abs(rand.nextDouble());
         setRange(new double[]{minRange, maxRange});
         // Power.
         if (clouds) {
             setPower(gaussian(rand, 1.0, 1.0, 0.5));
         } else {
-            setPower(rocky ? 1.0 : gaussian(rand, 2.0, 2.0, 0.2));
+            setPower(gaussian(rand, 2.0, 2.0, 0.2));
         }
         // Turbulence.
         setTurbulence(true);

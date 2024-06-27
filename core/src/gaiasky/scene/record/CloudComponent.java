@@ -261,7 +261,7 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
-                    nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
+                    nc.randomizeAll(noiseRandom, true);
                 }
                 FrameBuffer cloudFb = nc.generateNoise(N, M, 1, color);
                 // Write to disk if necessary
@@ -429,16 +429,16 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
             color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
             color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
             color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
-            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.7, 0.2), 0.0, 1.0);
+            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.75, 0.2), 0.0, 1.0);
         }
         // Params
-        setParams(createModelParameters(300L, 1.0, false));
+        setParams(createModelParameters(400L, 1.0, false));
         // Noise
         if (nc != null) {
             nc.dispose();
         }
         NoiseComponent nc = new NoiseComponent();
-        nc.randomizeAll(rand, rand.nextBoolean(), true);
+        nc.randomizeAll(rand, true);
         setNoise(nc);
     }
 
