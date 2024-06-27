@@ -828,7 +828,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         ac = new AtmosphereComponent();
         if (initAc == null) {
             // Generate random
-            ac.randomizeAll(rand.nextLong(), view.getSize());
+            ac.randomizeAll(rand.nextLong(), view.getRadius());
         } else {
             // Copy existing
             ac.copyFrom(initAc);
@@ -1076,7 +1076,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeAtmosphere(Boolean rebuild) {
         this.initAc = new AtmosphereComponent();
-        this.initAc.randomizeAll(rand.nextLong(), view.getSize());
+        this.initAc.randomizeAll(rand.nextLong(), view.getRadius());
 
         if (rebuild) {
             // Others are the same

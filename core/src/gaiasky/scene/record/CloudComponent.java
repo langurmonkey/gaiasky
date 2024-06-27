@@ -406,15 +406,15 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
      * Creates a random cloud component using the given seed and the base
      * body size. Generates a random cloud texture.
      *
-     * @param seed The seed to use.
-     * @param size The body size in internal units.
+     * @param seed         The seed to use.
+     * @param bodyDiameter The body diameter in internal units.
      */
-    public void randomizeAll(long seed, double size) {
+    public void randomizeAll(long seed, double bodyDiameter) {
         Random rand = new Random(seed);
 
         // Size
-        double sizeKm = size * Constants.U_TO_KM;
-        setSize(sizeKm + gaussian(rand, 80.0, 8.0, 22.0));
+        double bodyDiameterKm = bodyDiameter * Constants.U_TO_KM;
+        setSize(bodyDiameterKm + bodyDiameterKm * 0.005);
         // Cloud
         setDiffuse("generate");
         // Color

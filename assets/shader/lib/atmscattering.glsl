@@ -56,7 +56,7 @@ void computeAtmosphericScatteringGround() {
     v3Ray /= fFar;
 
     // Calculate the closest intersection of the ray with the outer atmosphere (which is the near point of the ray passing through the atmosphere)
-    float fNear = getNearIntersection (v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
+    float fNear = getNearIntersection(v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
 
     // Calculate the ray's starting position, then calculate its scattering offset
     vec3 v3Start = v3CameraPos + v3Ray * fNear;
@@ -91,8 +91,8 @@ void computeAtmosphericScatteringGround() {
     }
 
     float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.5;
-    float heightNormalized = 1.0 - clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
-    v_fadeFactor = smoothstep(0.5, 1.0, 1.0 - heightNormalized);
+    float heightNormalized = clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
+    v_fadeFactor = smoothstep(0.5, 1.0, heightNormalized);
 
     v_atmosphereColor = vec4(v3FrontColor * (v3InvWavelength * fKrESun + fKmESun), fAlpha);
 }

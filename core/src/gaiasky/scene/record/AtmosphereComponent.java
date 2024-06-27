@@ -29,7 +29,6 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
@@ -347,15 +346,15 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
      * Creates a random atmosphere component using the given seed and the base
      * body size.
      *
-     * @param seed The seed to use.
-     * @param size The body size in internal units.
+     * @param seed       The seed to use.
+     * @param bodyRadius The body size in internal units.
      */
     public void randomizeAll(long seed,
-                             double size) {
+                             double bodyRadius) {
         Random rand = new Random(seed);
         // Size
-        double sizeKm = size * Constants.U_TO_KM;
-        setSize(sizeKm + 12);
+        double bodyRadiusKm = bodyRadius * Constants.U_TO_KM;
+        setSize(bodyRadiusKm + bodyRadiusKm * 0.029);
         // Wavelengths
         setWavelengths(new double[]{gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1)});
         // Kr
@@ -363,15 +362,15 @@ public class AtmosphereComponent extends NamedComponent implements IUpdatable<At
         // Km
         setM_Km(rand.nextDouble(0.001f, 0.0079f));
         // eSun
-        setM_eSun(gaussian(rand, 5.0, 4.0));
+        setM_eSun(gaussian(rand, 7.0, 4.0, 3.0));
         // Fog density
         setFogdensity(gaussian(rand, 0.6, 0.3, 0.01));
         // Fog color
         setFogcolor(new double[]{0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5});
         // Samples
-        setSamples(rand.nextInt(28) + 2L);
+        setSamples((long) rand.nextInt(10, 20));
         // Params
-        setParams(createModelParameters(600L, 1.0, true));
+        setParams(createModelParameters(600L, 2.0, true));
     }
 
     public void copyFrom(AtmosphereComponent other) {
