@@ -8,9 +8,17 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.screenshot.JPGWriter;
 import org.apache.commons.io.FilenameUtils;
 import org.lwjgl.opengl.GL30;
 import oshi.SystemInfo;
@@ -25,8 +33,6 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static gaiasky.scene.Mapper.texture;
 
 /**
  * Some handy system utilities and constants.
@@ -341,6 +347,7 @@ public class SysUtils {
      * the user-configured data folder as input.
      *
      * @param dataLocation The user-defined data location.
+     *
      * @return A path that points to the temporary directory.
      */
     public static Path getTempDir(String dataLocation) {
@@ -484,43 +491,96 @@ public class SysUtils {
     }
 
     /**
-     * Saves the given procedurally generated pixmap as a PNG image
-     * to disk using the given name and timestamp.
+     * Saves the given texture with the given name to disk as an image file with the given format.
      *
-     * @param p    The pixmap.
-     * @param name The name of the pixmap.
+     * @param texture The texture to save.
+     * @param name    The name of the texture.
+     * @param format  The image format to use.
      */
-    public static void saveProceduralPixmap(Pixmap p,
-                                            String name) {
-        if (p != null) {
+    public static void saveProceduralGLTexture(Texture texture,
+                                               String name,
+                                               Settings.ImageFormat format) {
+        if (texture != null && name != null) {
             Path proceduralDir = getProceduralPixmapDir();
-            Path file = proceduralDir.resolve(name + ".png");
-            PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
-            logger.info(TextUtils.capitalise(name) + " texture written to " + file);
+            Path file = proceduralDir.resolve(name + "." + format.extension);
+
+            int w = texture.getWidth();
+            int h = texture.getHeight();
+
+            Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+
+            final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            ByteBuffer pixels = pixmap.getPixels();
+
+            texture.bind();
+            GL30.glGetTexImage(texture.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
+
+            GaiaSky.instance.getExecutorService().execute(() -> {
+                switch (format) {
+                    case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                    case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                }
+                logger.info(I18n.msg("gui.procedural.info.savetextures.ok", TextUtils.capitalise(name), file));
+                pixmap.dispose();
+            });
         }
     }
 
-    public static void saveProceduralGLTexture(Texture t,
-                                               String name) {
+    /**
+     * Saves all the given textures with the given names to disk as image files with the given format.
+     * This works in two steps. First, the pixmaps are prepared
+     * from the textures in the current thread. Then, the pixmaps are saved to disk in a separate thread using the
+     * executor service.
+     *
+     * @param textures The textures to save.
+     * @param names    The names of the textures.
+     * @param format   The image format to use.
+     */
+    public static void saveProceduralGLTextures(Texture[] textures,
+                                                String[] names,
+                                                Settings.ImageFormat format) {
         Path proceduralDir = getProceduralPixmapDir();
-        Path file = proceduralDir.resolve(name + ".png");
+        Array<Pixmap> pixmaps = new Array<>();
+        // Prepare pixmaps in current (main) thread.
+        for (var t : textures) {
+            if (t != null) {
+                int w = t.getWidth();
+                int h = t.getHeight();
 
-        int w = t.getWidth();
-        int h = t.getHeight();
+                Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
 
-        Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+                final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+                ByteBuffer pixels = pixmap.getPixels();
 
-        final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-        ByteBuffer pixels = pixmap.getPixels();
+                t.bind();
+                GL30.glGetTexImage(t.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
 
-        t.bind();
-        GL30.glGetTexImage(t.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
+                pixmaps.add(pixmap);
+            }
+        }
 
-        PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+        // Save textures in new thread.
+        GaiaSky.instance.getExecutorService().execute(() -> {
+            int i = 0;
+            for (var pixmap : pixmaps) {
+                var name = names[i];
+                Path file = proceduralDir.resolve(name + "." + format.extension);
+                switch (format) {
+                    case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                    case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                }
+                logger.info(I18n.msg("gui.procedural.info.savetextures.ok", TextUtils.capitalise(name), file));
+                pixmap.dispose();
+                i++;
+            }
+            // Post popup.
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, pixmaps,
+                    I18n.msg("gui.procedural.info.savetextures",
+                            SysUtils.getProceduralPixmapDir().toString()));
 
-        logger.info(TextUtils.capitalise(name) + " texture written to " + file);
+        });
 
-        pixmap.dispose();
+
     }
 
     public static Pixmap pixmapFromGLTexture(Texture t) {
@@ -542,6 +602,7 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
+     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -596,7 +657,7 @@ public class SysUtils {
         try {
             Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
             double dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-            double scale = dpi > 0.0 ?  dpi / 96.0 : 1.0;
+            double scale = dpi > 0.0 ? dpi / 96.0 : 1.0;
             w = (int) (rect.width * scale);
             h = (int) (rect.height * scale);
             if (w > 0 && h > 0) {
@@ -613,7 +674,7 @@ public class SysUtils {
         try {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
             double dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-            double scale = dpi > 0.0 ?  dpi / 96.0 : 1.0;
+            double scale = dpi > 0.0 ? dpi / 96.0 : 1.0;
             w = (int) (screenSize.getWidth() * scale);
             h = (int) (screenSize.getHeight() * scale);
             if (w > 0 && h > 0) {

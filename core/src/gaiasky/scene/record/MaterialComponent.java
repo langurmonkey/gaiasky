@@ -632,11 +632,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                         heightData = new HeightDataPixmap(heightT, null);
                         heightTex = heightT;
                         addHeightTex(heightTex);
-
-                        // Write height to disk.
-                        if (Settings.settings.program.saveProceduralTextures) {
-                            SysUtils.saveProceduralGLTexture(heightT, this.name + "-biome");
-                        }
                     }
                 }
 
@@ -645,11 +640,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                     if (diffuseT != null) {
                         diffuseTex = diffuseT;
                         addDiffuseTex(diffuseTex);
-
-                        // Write to disk.
-                        if (Settings.settings.program.saveProceduralTextures) {
-                            SysUtils.saveProceduralGLTexture(diffuseT, this.name + "-diffuse");
-                        }
                     }
                 }
 
@@ -658,11 +648,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                     if (specularT != null) {
                         specularTex = specularT;
                         addSpecularTex(specularTex);
-
-                        // Write to disk.
-                        if (Settings.settings.program.saveProceduralTextures) {
-                            SysUtils.saveProceduralGLTexture(specularT, this.name + "-specular");
-                        }
                     }
                 }
 
@@ -672,12 +657,14 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                         normalTex = normalT;
                         // We have height texture already, do not need normal!
                         addNormalTex(normalTex);
-
-                        // Write to disk.
-                        if (Settings.settings.program.saveProceduralTextures) {
-                            SysUtils.saveProceduralGLTexture(normalT, this.name + "-normal");
-                        }
                     }
+                }
+
+                // Save textures to disk as image files.
+                if (Settings.settings.program.saveProceduralTextures) {
+                    SysUtils.saveProceduralGLTextures(new Texture[]{heightT, diffuseT, specularT, normalT},
+                            new String[]{name + "-biome", name + "-diffuse", name + "-specular", name + "-normal"},
+                            Settings.ImageFormat.JPG);
                 }
             });
         }

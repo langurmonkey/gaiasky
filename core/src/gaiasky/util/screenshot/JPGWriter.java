@@ -53,22 +53,13 @@ public class JPGWriter {
     }
 
     public static void write(FileHandle file, Pixmap pix) {
-        FileImageOutputStream fios = null;
-        try {
+        try (FileImageOutputStream outputStream = new FileImageOutputStream(file.file())) {
             final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-            fios = new FileImageOutputStream(file.file());
-            writer.setOutput(fios);
+            ;
+            writer.setOutput(outputStream);
             writer.write(null, new IIOImage(pixmapToBufferedImage(pix), null, null), jpegParams);
-
         } catch (IOException e) {
             logger.error(e);
-        } finally {
-            try {
-                fios.close();
-            } catch (IOException e) {
-                logger.error(e);
-            }
-
         }
     }
 

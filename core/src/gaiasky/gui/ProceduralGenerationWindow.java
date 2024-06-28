@@ -229,7 +229,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         saveTextures.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Settings.settings.program.saveProceduralTextures = saveTextures.isChecked();
+                EventManager.publish(Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD, this, saveTextures.isChecked());
             }
         });
         OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");

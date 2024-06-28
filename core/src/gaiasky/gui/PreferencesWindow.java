@@ -95,6 +95,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox eclipseOutlines;
     private OwnCheckBox starSpheres;
     private OwnCheckBox shaderCache;
+    private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
@@ -966,8 +967,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             motionBlur.setWidth(sliderWidth);
             motionBlur.setMappedValue(settings.postprocess.motionBlur.strength);
             motionBlur.addListener(event -> {
-                if(event instanceof ChangeEvent ce) {
-                   EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.getMappedValue());
+                if (event instanceof ChangeEvent ce) {
+                    EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.getMappedValue());
                 }
                 return false;
             });
@@ -993,26 +994,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentScene.setScrollingDisabled(true, false);
         contentScene.setFadeScrollBars(false);
         contentSceneTable.align(Align.top | Align.left);
-
-        // PROCEDURAL GENERATION
-        OwnLabel titleProcedural = new OwnLabel(I18n.msg("gui.ui.procedural"), skin, "header");
-        Table pgen = new Table();
-
-        // RESOLUTION
-        OwnLabel pgResolutionLabel = new OwnLabel(I18n.msg("gui.ui.procedural.resolution"), skin);
-        pgResolution = new OwnSliderPlus("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
-        pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
-        pgResolution.setWidth(sliderWidth);
-        pgResolution.setValue(settings.graphics.proceduralGenerationResolution[1]);
-
-        labels.add(pgResolutionLabel);
-
-        // Add to table.
-        pgen.add(pgResolutionLabel).left().padBottom(pad10).padRight(pad34);
-        pgen.add(pgResolution).left().padBottom(pad10).row();
-
-        // Add to content.
-        addContentGroup(contentSceneTable, titleProcedural, pgen, 0f);
 
         // RECURSIVE GRID
         OwnLabel titleRecgrid = new OwnLabel(I18n.msg("gui.ui.recursivegrid"), skin, "header");
@@ -1051,7 +1032,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         rg.add(recGridProjectionLines).left().padBottom(pad10).row();
 
         // Add to content.
-        addContentGroup(contentSceneTable, titleRecgrid, rg);
+        addContentGroup(contentSceneTable, titleRecgrid, rg, 0f);
 
         // ECLIPSES
         Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
@@ -1115,6 +1096,45 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to content
         addContentGroup(contentSceneTable, titleStars, starsTable);
+
+        // PROCEDURAL GENERATION
+        OwnLabel titleProcedural = new OwnLabel(I18n.msg("gui.ui.procedural"), skin, "header");
+        Table pgen = new Table();
+
+        // RESOLUTION
+        OwnLabel pgResolutionLabel = new OwnLabel(I18n.msg("gui.ui.procedural.resolution"), skin);
+        pgResolution = new OwnSliderPlus("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
+        pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
+        pgResolution.setWidth(sliderWidth);
+        pgResolution.setValue(settings.graphics.proceduralGenerationResolution[1]);
+
+        labels.add(pgResolutionLabel);
+
+        // Add to table.
+        pgen.add(pgResolutionLabel).left().padBottom(pad10).padRight(pad34);
+        pgen.add(pgResolution).left().padBottom(pad10).row();
+
+        // SAVE TO DISK
+
+        // Save textures
+        OwnLabel saveTexturesLabel = new OwnLabel(I18n.msg("gui.procedural.savetextures"), skin);
+        vsync = new OwnCheckBox("", skin);
+        saveTextures = new OwnCheckBox("", skin, pad10);
+        saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
+        OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
+        saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()), skin));
+        HorizontalGroup saveTexturesGroup = new HorizontalGroup();
+        saveTexturesGroup.space(pad10);
+        saveTexturesGroup.addActor(saveTextures);
+        saveTexturesGroup.addActor(saveTexturesTooltip);
+
+        // Add to table.
+        pgen.add(saveTexturesLabel).left().padBottom(pad10).padRight(pad34);
+        pgen.add(saveTexturesGroup).left().padBottom(pad10).padRight(pad34);
+
+        // Add to content.
+        addContentGroup(contentSceneTable, titleProcedural, pgen);
+
 
         /*
          * ==== UI ====
@@ -2681,6 +2701,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         int pgHeight = (int) pgResolution.getValue();
         int pgWidth = pgHeight * 2;
         EventManager.publish(Event.PROCEDURAL_GENERATION_RESOLUTION_CMD, this, pgWidth, pgHeight);
+
+        // Procedural generation save textures.
+        EventManager.publish(Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD, this, saveTextures.isChecked());
 
         // Eclipses
         boolean eclipsesActiveBefore = settings.scene.renderer.eclipses.active;

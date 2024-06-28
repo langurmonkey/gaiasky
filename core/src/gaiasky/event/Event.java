@@ -312,6 +312,8 @@ public enum Event {
     CUBEMAP_RESOLUTION_CMD,
     /** Procedural generation resolution command. **/
     PROCEDURAL_GENERATION_RESOLUTION_CMD,
+    /** Save textures resulting from procedural generation to disk. **/
+    PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD,
     /** Enable/disable displaying frame coordinates in UV grid. **/
     UV_GRID_FRAME_COORDINATES_CMD,
     DEBUG_OBJECTS,

@@ -404,8 +404,13 @@ public class Settings extends SettingsObject {
     }
 
     public enum ImageFormat {
-        PNG,
-        JPG
+        PNG("png"),
+        JPG("jpeg");
+
+        public String extension;
+        ImageFormat(String extension) {
+           this.extension = extension;
+        }
     }
 
     public enum ReprojectionMode {
@@ -2388,6 +2393,9 @@ public class Settings extends SettingsObject {
                         }
                     }
                     case UI_SCALE_CMD -> ui.scale = (Float) data[0];
+                    case PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD -> {
+                        saveProceduralTextures = (Boolean) data[0];
+                    }
                     default -> {
                     }
                 }
@@ -2431,7 +2439,7 @@ public class Settings extends SettingsObject {
                     Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
                     Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
                     Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
-                    Event.UI_SCALE_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD);
+                    Event.UI_SCALE_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD, Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD);
 
             minimap.setupListeners();
             fileChooser.setupListeners();

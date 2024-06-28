@@ -264,9 +264,10 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
                     nc.randomizeAll(noiseRandom, true);
                 }
                 FrameBuffer cloudFb = nc.generateNoise(N, M, 1, color);
-                // Write to disk if necessary
+                // Write to disk if necessary.
                 if (Settings.settings.program.saveProceduralTextures) {
-                    SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud");
+                    SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud",
+                            Settings.ImageFormat.JPG);
                 }
                 if (cloudFb != null) {
                     cloudTex = cloudFb.getColorBufferTexture();

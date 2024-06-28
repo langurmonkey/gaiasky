@@ -94,9 +94,9 @@ public class ImageRenderer {
     }
 
     private synchronized static FileHandle getTarget(String absoluteLocation, String baseFileName, ImageFormat format) {
-        FileHandle fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.toString().toLowerCase());
+        FileHandle fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.extension);
         while (fh.exists()) {
-            fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.toString().toLowerCase());
+            fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.extension);
         }
         return fh;
     }
