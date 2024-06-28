@@ -266,6 +266,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex,
@@ -289,6 +290,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex,
@@ -586,12 +588,15 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             GaiaSky.postRunnable(() -> {
                 final int N = Settings.settings.graphics.proceduralGenerationResolution[0];
                 final int M = Settings.settings.graphics.proceduralGenerationResolution[1];
-                logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.surface"), Integer.toString(N), Integer.toString(M)));
+                logger.info(I18n.msg("gui.procedural.info.generate",
+                        I18n.msg("gui.procedural.surface"),
+                        Integer.toString(N),
+                        Integer.toString(M)));
 
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
-                    switch(noiseRandom.nextInt(5)) {
+                    switch (noiseRandom.nextInt(5)) {
                         case 0 -> nc.randomizeEarthLike(noiseRandom);
                         case 1 -> nc.randomizeRockyPlanet(noiseRandom);
                         case 2 -> nc.randomizeGasGiant(noiseRandom);
@@ -599,12 +604,18 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                         case 4 -> nc.randomizeAll(noiseRandom);
                     }
                 }
-                FrameBuffer[] fbs = nc.generateElevation(N, M, biomeLUT, biomeHueShift, biomeSaturation);
+                FrameBuffer[] fbs = nc.generateElevation(N, M,
+                        biomeLUT,
+                        biomeHueShift,
+                        biomeSaturation,
+                        false);
+
+                int nTextureAttachments = fbs[1].getTextureAttachments().size;
 
                 Texture heightT = fbs[0].getColorBufferTexture();
                 Texture diffuseT = fbs[1].getColorBufferTexture();
                 Texture specularT = fbs[1].getTextureAttachments().get(1);
-                Texture normalT = fbs[1].getTextureAttachments().get(2);
+                Texture normalT = nTextureAttachments > 2 ? fbs[1].getTextureAttachments().get(2) : null;
 
                 boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
                 boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
@@ -660,14 +671,13 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                     if (normalT != null) {
                         normalTex = normalT;
                         // We have height texture already, do not need normal!
-                        //addNormalTex(normalTex);
+                        addNormalTex(normalTex);
 
                         // Write to disk.
                         if (Settings.settings.program.saveProceduralTextures) {
                             SysUtils.saveProceduralGLTexture(normalT, this.name + "-normal");
                         }
                     }
-
                 }
             });
         }

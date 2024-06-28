@@ -16,8 +16,8 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class SurfaceGen extends PostProcessorEffect {
     private final SurfaceGenFilter filter;
 
-    public SurfaceGen() {
-        filter = new SurfaceGenFilter();
+    public SurfaceGen(boolean generateNormalMap) {
+        filter = new SurfaceGenFilter(generateNormalMap);
         disposables.add(filter);
     }
 

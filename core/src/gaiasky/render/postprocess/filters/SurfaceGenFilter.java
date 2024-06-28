@@ -15,8 +15,11 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
     float lutHueShift = 0;
     float lutSaturation = 1;
 
-    public SurfaceGenFilter() {
-        super(ShaderLoader.fromFile("screenspace", "surfacegen"));
+    public SurfaceGenFilter(boolean generateNormalMap) {
+        super(ShaderLoader.fromFile(
+                "screenspace",
+                "surfacegen",
+                generateNormalMap ? "#define normalMapFlag\n" : ""));
 
         rebind();
     }

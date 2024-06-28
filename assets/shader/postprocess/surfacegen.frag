@@ -18,7 +18,9 @@ uniform float u_lutSaturation;;
 in vec2 v_texCoords;
 layout (location = 0) out vec4 diffuseColor;
 layout (location = 1) out vec4 specularColor;
+#ifdef normalMapFlag
 layout (location = 2) out vec4 normalColor;
+#endif // normalMapFlag
 
 void main() {
     // Get height and moisture.
@@ -52,6 +54,7 @@ void main() {
     }
     specularColor = spec;
 
+    #ifdef normalMapFlag
     // Normal.
     float scale = 1.0;
     float dx = dFdx(height) * scale;
@@ -59,4 +62,5 @@ void main() {
     float dz = 1.0;
     vec3 normal = normalize(vec3(dx, dy, dz));
     normalColor = vec4(normal.x * 0.5 + 0.5, normal.y * 0.5 + 0.5, normal.z, 1.0);
+    #endif // normalMapFlag
 }

@@ -95,22 +95,27 @@ public class NoiseComponent extends NamedComponent {
         return fbNoise;
     }
 
-    public FrameBuffer[] generateSurfaceTextures(int N, int M, String biomeLut, float biomeHueShift, float biomeSaturation) {
+    public FrameBuffer[] generateSurfaceTextures(int N, int M,
+                                                 String biomeLut,
+                                                 float biomeHueShift,
+                                                 float biomeSaturation,
+                                                 boolean generateNormalMap) {
         // Biome noise (height, elevation, temperature).
         fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, 1);
 
-        // 3 channels: height, elevation, temperature.
+        // 2 channels: height, elevation.
         Noise biomeNoise = getNoiseEffect(N, M, 2);
         fbBiome.begin();
         biomeNoise.render(null, fbBiome);
         fbBiome.end();
 
-        // Gen surface.
+        // Gen surface with 2 color targets (diffuse, specular).
+        // We use 3 color targets if we need to generate the normal map.
         Texture lut = new Texture(Settings.settings.data.dataFileHandle(biomeLut));
         lut.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, 3);
+        fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, generateNormalMap ? 3 : 2);
 
-        SurfaceGen surfaceGen = new SurfaceGen();
+        SurfaceGen surfaceGen = new SurfaceGen(generateNormalMap);
         surfaceGen.setLutTexture(lut);
         surfaceGen.setLutHueShift(biomeHueShift);
         surfaceGen.setLutSaturation(biomeSaturation);
@@ -124,7 +129,7 @@ public class NoiseComponent extends NamedComponent {
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Biome", fbBiome.getColorBufferTexture(), 1f);
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Diffuse", fbSurface.getColorBufferTexture(), 1f);
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Specular", fbSurface.getTextureAttachments().get(1), 1f);
-            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Normal", fbSurface.getTextureAttachments().get(2), 1f);
+            //EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Normal", fbSurface.getTextureAttachments().get(2), 1f);
             DEBUG_UI_VIEW = false;
         }
 
@@ -132,9 +137,13 @@ public class NoiseComponent extends NamedComponent {
 
     }
 
-    public synchronized FrameBuffer[] generateElevation(int N, int M, String biomeLut, float biomeHueShift, float biomeSaturation) {
+    public synchronized FrameBuffer[] generateElevation(int N, int M,
+                                                        String biomeLut,
+                                                        float biomeHueShift,
+                                                        float biomeSaturation,
+                                                        boolean generateNormalMap) {
         // Generate in GPU.
-        return generateSurfaceTextures(N, M, biomeLut, biomeHueShift, biomeSaturation);
+        return generateSurfaceTextures(N, M, biomeLut, biomeHueShift, biomeSaturation, generateNormalMap);
     }
 
     public void setType(String noiseType) {
