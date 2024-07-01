@@ -24,7 +24,7 @@ This file contains the following sections:
 
 1. [Installation instructions and requirements](#1-installation-instructions-and-requirements)
 2. [Pre-built packages](#2-pre-built-packages)
-3. [Running from source](#3-running-from-source-repository)
+3. [Running from source](#3-development-branch)
 4. [Gaia Sky VR](#4-gaia-sky-vr)
 5. [Documentation and help](#5-documentation-and-help)
 6. [Copyright and licensing information](#6-copyright-and-licensing-information)
