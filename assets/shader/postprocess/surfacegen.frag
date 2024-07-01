@@ -56,7 +56,7 @@ void main() {
 
     #ifdef normalMapFlag
     // Normal.
-    float scale = 1.0;
+    float scale = 4.0;
     float dx = dFdx(height) * scale;
     float dy = dFdy(height) * scale;
     float dz = 1.0;

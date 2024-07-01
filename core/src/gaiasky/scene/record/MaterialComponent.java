@@ -608,7 +608,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                         biomeLUT,
                         biomeHueShift,
                         biomeSaturation,
-                        false);
+                        Settings.settings.scene.renderer.elevation.type.isNone());
 
                 int nTextureAttachments = fbs[1].getTextureAttachments().size;
 

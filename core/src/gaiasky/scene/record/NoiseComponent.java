@@ -129,7 +129,8 @@ public class NoiseComponent extends NamedComponent {
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Biome", fbBiome.getColorBufferTexture(), 1f);
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Diffuse", fbSurface.getColorBufferTexture(), 1f);
             EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Specular", fbSurface.getTextureAttachments().get(1), 1f);
-            //EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Normal", fbSurface.getTextureAttachments().get(2), 1f);
+            if (generateNormalMap)
+                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Normal", fbSurface.getTextureAttachments().get(2), 1f);
             DEBUG_UI_VIEW = false;
         }
 
@@ -204,6 +205,7 @@ public class NoiseComponent extends NamedComponent {
     public void setTerracesExp(Double terracesExp) {
         this.terracesExp = terracesExp.floatValue();
     }
+
     public void setTerraceSmoothness(Double terracesExp) {
         setTerracesExp(terracesExp);
     }
