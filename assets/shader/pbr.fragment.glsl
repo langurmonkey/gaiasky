@@ -412,12 +412,12 @@ void main() {
             if (ambientOcclusion == 0.0) {
                 ambientOcclusion = 1.0;
             }
-        #endif// occlusionMetallicRoughnessTextureFlag
+        #endif // occlusionMetallicRoughnessTextureFlag
 
         // Occlusion strength is 1 by default.
         diffuse.rgb *= ambientOcclusion;
         specular.rgb *= ambientOcclusion;
-    #endif
+    #endif // !occlusionCloudsFlag
 
     // Alpha value from textures
     float texAlpha = 1.0;
@@ -593,7 +593,7 @@ void main() {
         ambientOcclusion = clamp(1.0 - 1.7 * ambientOcclusion, 0.0, 1.0);
         diffuseColor *= ambientOcclusion;
         specularColor *= ambientOcclusion;
-        #endif
+        #endif // occlusionCloudsFlag
 
         // Regular shading.
         diffuseColor *= diffuse.rgb;
