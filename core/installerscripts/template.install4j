@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.7" transformSequenceNumber="10">
   <directoryPresets config="@gs-git-folder@/assets/cert/cert.pfx" />
-  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="15" allowBetaVM="true">
+  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="17" allowBetaVM="true">
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
     <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" />
   </application>
   <files defaultOverwriteMode="1" defaultUninstallMode="2">
     <filesets>
@@ -1325,7 +1325,7 @@ return true;</property>
         <entry filesetId="970" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" usePack200="false" overrideJdkRelease="true" />
     </windows>
     <macosArchive name="macOS Archive" id="966" includeAllDownloadableComponents="false" architecture="universal" launcherId="573">
       <exclude>
@@ -1338,7 +1338,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
     </macosArchive>
     <unixInstaller name="Unix Installer" id="28" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1370,7 +1370,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxDeb>
@@ -1388,7 +1388,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
@@ -1408,7 +1408,7 @@ return true;</property>
         <entry filesetId="970" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
     </windowsArchive>
     <unixArchive name="Unix Archive" id="952" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1422,7 +1422,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.10+7" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
     </unixArchive>
   </mediaSets>
   <buildIds>
