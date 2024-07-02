@@ -33,6 +33,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.svt.SVTManager;
 import net.jafama.FastMath;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -53,11 +54,15 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     private void initializeLookUpTables() {
         if (lookUpTables.isEmpty()) {
             var dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
+            var sep = File.separatorChar;
             try (var paths = Files.list(dataPath)) {
-                List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.jpg") || f.toString().endsWith("-lut.png")).toList();
+                List<Path> l = paths.filter(
+                        f -> f.toString().endsWith("-lut.jpg") || f.toString().endsWith("-lut.png")
+                ).toList();
                 for (Path p : l) {
                     String name = p.toString();
-                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf("default-data/tex/lut/")));
+                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN
+                            + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep)));
                 }
             } catch (Exception ignored) {
             }
