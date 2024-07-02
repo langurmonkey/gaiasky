@@ -65,7 +65,10 @@ public abstract class ParallelSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        forkJoinPool.invokeAll(runnableTasks);
+        try {
+            forkJoinPool.invokeAll(runnableTasks);
+        } catch (Exception ignored) {
+        }
     }
 
     /**
