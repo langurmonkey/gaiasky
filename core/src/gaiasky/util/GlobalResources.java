@@ -135,11 +135,11 @@ public class GlobalResources {
     }
 
     /**
-     * Converts this double to the string representation of a distance
+     * Converts this double to the string representation of a distance.
      *
-     * @param d  Distance in internal units
-     * @param du The distance units to use
-     * @return An array containing the float number and the string units
+     * @param d  Distance in internal units.
+     * @param du The distance units to use.
+     * @return An array containing the float number and the string units.
      */
     public static Pair<Double, String> doubleToDistanceString(double d, DistanceUnits du) {
         d = d * Constants.U_TO_KM;
@@ -161,15 +161,15 @@ public class GlobalResources {
 
     /**
      * Converts the double to the string representation of a velocity (always in
-     * seconds)
+     * seconds).
      *
-     * @param d  Distance in internal units
-     * @param du The distance units to use
-     * @return Array containing the number and the units
+     * @param d  Velocity in internal units per second.
+     * @param du The distance units to use.
+     * @return Array containing the number and the units.
      */
     public static Pair<Double, String> doubleToVelocityString(double d, DistanceUnits du) {
         Pair<Double, String> res = doubleToDistanceString(d, du);
-        res.setSecond(res.getSecond().concat("/s"));
+        res.setSecond(res.getSecond().concat("/").concat(I18n.msg("gui.unit.second")));
         return res;
     }
 

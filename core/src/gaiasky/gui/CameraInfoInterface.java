@@ -702,7 +702,9 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             }
             case CAMERA_MOTION_UPDATE -> {
                 final Vector3b campos = (Vector3b) data[0];
-                camVel.setText(GlobalResources.formatNumber((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
+                double velInternalPerSecond = (double) data[1] * Constants.KM_TO_U * Nature.S_TO_H;
+                Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond, Settings.settings.program.ui.distanceUnits);
+                camVel.setText(GlobalResources.formatNumber(velStr.getFirst()) + " " + velStr.getSecond());
                 Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), settings.program.ui.distanceUnits);
                 camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
             }
