@@ -27,8 +27,9 @@ public class NoiseComponent extends NamedComponent {
     public double[] scale = new double[]{1.0, 1.0, 1.0};
     public double power = 1.0;
     public int octaves = 4;
-    public double frequency = 2.34;
+    public double amplitude = 1.0;
     public double persistence = 0.5;
+    public double frequency = 2.34;
     public double lacunarity = 2.0;
     public double[] range = new double[]{0.0, 1.0};
     public NoiseType type = NoiseType.SIMPLEX;
@@ -72,8 +73,9 @@ public class NoiseComponent extends NamedComponent {
         noise.setType(type);
         noise.setSeed(seed);
         noise.setOctaves(octaves);
-        noise.setFrequency(frequency);
+        noise.setAmplitude(amplitude);
         noise.setPersistence(persistence);
+        noise.setFrequency(frequency);
         noise.setLacunarity(lacunarity);
         noise.setPower(power);
         noise.setRange((float) range[0], (float) range[1]);
@@ -208,12 +210,16 @@ public class NoiseComponent extends NamedComponent {
         this.octaves = FastMath.min(9, octaves.intValue());
     }
 
-    public void setFrequency(Double frequency) {
-        this.frequency = frequency;
+    public void setAmplitude(Double amplitude) {
+        this.amplitude = amplitude;
     }
 
     public void setPersistence(Double persistence) {
         this.persistence = persistence;
+    }
+
+    public void setFrequency(Double frequency) {
+        this.frequency = frequency;
     }
 
     public void setLacunarity(Double lacunarity) {
@@ -261,8 +267,9 @@ public class NoiseComponent extends NamedComponent {
         this.seed = other.seed;
         this.scale = Arrays.copyOf(other.scale, other.scale.length);
         this.type = other.type;
-        this.frequency = other.frequency;
+        this.amplitude = other.amplitude;
         this.persistence = other.persistence;
+        this.frequency = other.frequency;
         this.lacunarity = other.lacunarity;
         this.octaves = other.octaves;
         this.numTerraces = other.numTerraces;
@@ -312,14 +319,16 @@ public class NoiseComponent extends NamedComponent {
         scale[0] *= scaleFac;
         scale[1] *= scaleFac;
         scale[2] *= scaleFac;
+        // Amplitude.
+        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.2));
+        // Persistence.
+        setPersistence(gaussian(rand, 0.5, 0.07, 0.3));
         // Frequency.
         if (clouds) {
             setFrequency(gaussian(rand, 1.0, 2.0, 0.6));
         } else {
             setFrequency(gaussian(rand, 0.5, 2.0, 0.01));
         }
-        // Persistence.
-        setPersistence(gaussian(rand, 0.5, 0.07, 0.3));
         // Lacunarity.
         setLacunarity(gaussian(rand, 2.0, 2.0, 1.5));
         // Octaves [1,8].
@@ -371,10 +380,12 @@ public class NoiseComponent extends NamedComponent {
         // Same scale for all.
         double scale = rand.nextDouble(8.0, 15.0);
         setScale(new double[]{scale, scale, scale});
-        // Frequency.
-        setFrequency(rand.nextDouble(0.01, 0.6));
+        // Amplitude.
+        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.2));
         // Persistence.
         setPersistence(rand.nextDouble(0.4, 0.6));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.01, 0.6));
         // Lacunarity.
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
@@ -408,10 +419,12 @@ public class NoiseComponent extends NamedComponent {
         // Same scale for all.
         double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
-        // Frequency.
-        setFrequency(rand.nextDouble(0.01, 0.35));
+        // Amplitude.
+        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.0));
         // Persistence.
         setPersistence(rand.nextDouble(0.2, 0.5));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.01, 0.35));
         // Lacunarity.
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
@@ -445,10 +458,12 @@ public class NoiseComponent extends NamedComponent {
         // Same scale for all.
         double scale = rand.nextDouble(4.0, 8.0);
         setScale(new double[]{scale, scale, scale});
-        // Frequency.
-        setFrequency(rand.nextDouble(0.2, 0.65));
+        // Amplitude.
+        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.0));
         // Persistence.
         setPersistence(rand.nextDouble(0.2, 0.5));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.2, 0.65));
         // Lacunarity.
         setLacunarity(rand.nextDouble(2.0, 5.0));
         // Octaves [1,4].
@@ -498,10 +513,12 @@ public class NoiseComponent extends NamedComponent {
         scale[0] *= scaleFac;
         scale[1] *= scaleFac;
         scale[2] *= scaleFac;
-        // Frequency.
-        setFrequency(rand.nextDouble(0.5, 3.0));
+        // Amplitude.
+        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.2));
         // Persistence.
         setPersistence(rand.nextDouble(0.4, 0.6));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.5, 3.0));
         // Lacunarity.
         setLacunarity(rand.nextDouble(0.1, 3.0));
         // Octaves [1,4].
@@ -524,8 +541,9 @@ public class NoiseComponent extends NamedComponent {
         log.debug("Seed: " + seed);
         log.debug("Scale: " + Arrays.toString(scale));
         log.debug("Noise type: " + type);
-        log.debug("Frequency: " + frequency);
+        log.debug("Amplitude: " + amplitude);
         log.debug("Persistence: " + persistence);
+        log.debug("Frequency: " + frequency);
         log.debug("Lacunarity: " + lacunarity);
         log.debug("Octaves: " + octaves);
         log.debug("Terraces: " + numTerraces);

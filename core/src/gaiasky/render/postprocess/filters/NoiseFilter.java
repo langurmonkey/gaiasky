@@ -23,10 +23,12 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     private final Vector4 color = new Vector4(1, 1, 1, 1);
     /** RNG seed. **/
     private float seed = 1.23456f;
-    /** The initial frequency. **/
-    private float frequency = 1.0f;
+    /** The initial amplitude of the noise function. **/
+    private float amplitude = 1.0f;
     /** Factor by which successive noise octaves decrease in amplitude. This is in (0, 1). **/
     private float persistence = 0.5f;
+    /** The initial frequency of the noise function. **/
+    private float frequency = 1.0f;
     /** Factor by which successive noise octaves increase in frequency. This is in [1, n). **/
     private float lacunarity = 2f;
     /** Exponent to apply to the generated noise in a power function. **/
@@ -103,14 +105,19 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
         setParam(Param.Seed, this.seed);
     }
 
-    public void setFrequency(float f) {
-        this.frequency = f;
-        setParam(Param.Frequency, this.frequency);
+    public void setAmplitude(float a) {
+        this.amplitude = a;
+        setParam(Param.Amplitude, this.amplitude);
     }
 
     public void setPersistence(float p) {
         this.persistence = p;
         setParam(Param.Persistence, this.persistence);
+    }
+
+    public void setFrequency(float f) {
+        this.frequency = f;
+        setParam(Param.Frequency, this.frequency);
     }
 
     public void setLacunarity(float lacunarity) {
@@ -162,13 +169,14 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     public void rebind() {
         // Re-implement super to batch every parameter
         setParams(Param.Texture, u_texture0);
-        setParams(Param.Viewport, viewport);
+        setParams(Param.Viewport, this.viewport);
         setParams(Param.Range, this.range);
         setParams(Param.Color, this.color);
         setParams(Param.Scale, this.scale);
         setParams(Param.Seed, this.seed);
-        setParams(Param.Frequency, this.frequency);
+        setParams(Param.Amplitude, this.amplitude);
         setParams(Param.Persistence, this.persistence);
+        setParams(Param.Frequency, this.frequency);
         setParams(Param.Lacunarity, this.lacunarity);
         setParams(Param.Power, this.power);
         setParams(Param.Octaves, this.octaves);
@@ -194,8 +202,9 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
 
         Viewport("u_viewport", 2),
         Seed("u_seed", 0),
-        Frequency("u_frequency", 0),
+        Amplitude("u_amplitude", 0),
         Persistence("u_persistence", 0),
+        Frequency("u_frequency", 0),
         Lacunarity("u_lacunarity", 0),
         Range("u_range", 2),
         Color("u_color", 4),

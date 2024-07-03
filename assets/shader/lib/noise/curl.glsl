@@ -136,17 +136,11 @@ float gln_curl(vec3 p) {
  * @param {vec3} p               Point to sample fBm at.
  * @param {gln_tFBMOpts} opts    Options for generating Perlin Noise.
  * @return {float}               Value of fBm at point "p".
- *
- * @example
- * gln_tFBMOpts opts =
- *      gln_tFBMOpts(uSeed, 0.3, 2.0, 0.5, 1.0, 5, false, false);
- *
- * float n = gln_cfbm(position.xy, opts);
  */
 float gln_cfbm(vec3 p, gln_tFBMOpts opts) {
     p += (opts.seed * 100.0);
     float result = 0.0;
-    float amplitude = 1.0;
+    float amplitude = opts.amplitude;
     float frequency = opts.frequency;
     float maximum = amplitude;
 

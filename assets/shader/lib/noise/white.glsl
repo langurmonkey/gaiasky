@@ -24,17 +24,11 @@ float gln_white(vec3 p){
  * @param {vec3} v               Point to sample fBm at.
  * @param {gln_tFBMOpts} opts    Options for generating fBm Noise.
  * @return {float}               Value of fBm at point "p".
- *
- * @example
- * gln_tFBMOpts opts =
- *      gln_tFBMOpts(1.0, 0.3, 2.0, 0.5, 1.0, 5, false, false);
- *
- * float n = gln_wfbm(position.xy, opts);
  */
 float gln_wfbm(vec3 v, gln_tFBMOpts opts) {
   v += (opts.seed * 100.0);
   float result = 0.0;
-  float amplitude = 1.0;
+  float amplitude = opts.amplitude;
   float frequency = opts.frequency;
   float maximum = amplitude;
 

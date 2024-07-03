@@ -48,12 +48,12 @@ public final class Noise extends PostProcessorEffect {
         filter.setSeed(seed);
     }
 
-    public void setFrequency(double frequency) {
-        filter.setFrequency((float) frequency);
+    public void setAmplitude(double amplitude) {
+        filter.setAmplitude((float) amplitude);
     }
 
-    public void setFrequency(float frequency) {
-        filter.setFrequency(frequency);
+    public void setAmplitude(float amplitude) {
+        filter.setAmplitude(amplitude);
     }
 
     public void setPersistence(double persistence) {
@@ -62,6 +62,14 @@ public final class Noise extends PostProcessorEffect {
 
     public void setPersistence(float persistence) {
         filter.setPersistence(persistence);
+    }
+
+    public void setFrequency(double frequency) {
+        filter.setFrequency((float) frequency);
+    }
+
+    public void setFrequency(float frequency) {
+        filter.setFrequency(frequency);
     }
 
     public void setLacunarity(double lacunarity) {

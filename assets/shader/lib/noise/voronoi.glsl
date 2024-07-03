@@ -64,17 +64,11 @@ float gln_voronoi(in vec3 point) {
  * @param {vec3} v               Point to sample fBm at.
  * @param {gln_tFBMOpts} opts    Options for generating Simplex Noise.
  * @return {float}               Value of fBm at point "p".
- *
- * @example
- * gln_tFBMOpts opts =
- *      gln_tFBMOpts(1.0, 0.3, 2.0, 0.5, 1.0, 5, false, false);
- *
- * float n = gln_vfbm(position.xy, voronoiOpts, opts);
  */
 float gln_vfbm(vec3 v, gln_tFBMOpts opts) {
   v += opts.seed * 2.0;
   float result = 0.0;
-  float amplitude = 1.0;
+  float amplitude = opts.amplitude;
   float frequency = opts.frequency;
   float maximum = amplitude;
 

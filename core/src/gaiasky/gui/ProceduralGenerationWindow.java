@@ -460,6 +460,22 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         noiseTable.add(scaleGroup).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(scaleTooltip).left().padBottom(pad18).row();
 
+        // Amplitude.
+        OwnSliderPlus amplitude = new OwnSliderPlus(I18n.msg("gui.procedural.amplitude"), 0.1f, 3.0f, 0.01f, skin);
+        amplitude.setWidth(fieldWidthAll);
+        amplitude.setValue((float) nc.amplitude);
+        amplitude.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                nc.amplitude = amplitude.getMappedValue();
+            }
+        });
+        OwnImageButton amplitudeTooltip = new OwnImageButton(skin, "tooltip");
+        amplitudeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.amplitude"), skin));
+        noiseTable.add(amplitude).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(amplitudeTooltip).left().padBottom(pad18).row();
+
+
         // Persistence.
         OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
         persistence.setWidth(fieldWidthAll);
@@ -999,7 +1015,13 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeSurface(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
-        this.initMtc.randomizeAll(rand.nextLong());
+        switch (rand.nextInt(10)) {
+            case 0, 1, 2, 3 -> initMtc.randomizeEarthLike(rand.nextLong());
+            case 4 -> initMtc.randomizeRockyPlanet(rand.nextLong());
+            case 5, 6 -> initMtc.randomizeGasGiant(rand.nextLong());
+            case 7, 8 -> initMtc.randomizeColdPlanet(rand.nextLong());
+            case 9 -> initMtc.randomizeAll(rand.nextLong());
+        }
 
         if (rebuild) {
             // Others are the same

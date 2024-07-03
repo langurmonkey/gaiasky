@@ -89,17 +89,11 @@ float gln_simplex(vec3 v) {
  * @param {vec3} v               Point to sample fBm at.
  * @param {gln_tFBMOpts} opts    Options for generating Simplex Noise.
  * @return {float}               Value of fBm at point "p".
- *
- * @example
- * gln_tFBMOpts opts =
- *      gln_tFBMOpts(uSeed, 0.3, 2.0, 0.5, 1.0, 5, false, false);
- *
- * float n = gln_sfbm(position.xy, opts);
  */
 float gln_sfbm(vec3 v, gln_tFBMOpts opts) {
   v += (opts.seed * 100.0);
   float result = 0.0;
-  float amplitude = 1.0;
+  float amplitude = opts.amplitude;
   float frequency = opts.frequency;
   float maximum = amplitude;
 

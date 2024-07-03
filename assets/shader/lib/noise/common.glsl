@@ -8,9 +8,10 @@ vec4 _taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 /**
  * @typedef {struct} gln_tFBMOpts   Options for fBm generators.
  * @property {float} seed           Seed for PRNG generation.
- * @property {float} frequency      Initial frequency.
+ * @property {float} amplitude      Initial amplitude.
  * @property {float} persistence    Factor by which successive layers of noise
  *                                  decrease in amplitude.
+ * @property {float} frequency      Initial frequency.
  * @property {float} lacunarity     Factor by which successive layers of noise
  *                                  increase in frequency.
  * @property {vec3} scale           Noise scale in (x, y[, z]).
@@ -20,15 +21,16 @@ vec4 _taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
  * @property {boolean} ridge        Convert the fBm to Ridge Noise.
  */
 struct gln_tFBMOpts {
-  float seed;
-  float frequency;
-  float persistence;
-  float lacunarity;
-  vec3 scale;
-  float power;
-  int octaves;
-  bool turbulence;
-  bool ridge;
+    float seed;
+    float amplitude;
+    float persistence;
+    float frequency;
+    float lacunarity;
+    vec3 scale;
+    float power;
+    int octaves;
+    bool turbulence;
+    bool ridge;
 };
 
 /**
@@ -48,7 +50,7 @@ struct gln_tFBMOpts {
  * // n = 0.4
  */
 float gln_map(float value, float min1, float max1, float min2, float max2) {
-  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+    return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
 }
 
 /**
@@ -77,9 +79,9 @@ float gln_normalize(float v) { return gln_map(v, -1.0, 1.0, 0.0, 1.0); }
  * vec2 n = gln_rand2(vec2(1.0, -4.2));
  */
 vec2 gln_rand2(vec2 p) {
-  return fract(
-      sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) *
-      43758.5453);
+    return fract(
+        sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) *
+        43758.5453);
 }
 
 /**
@@ -133,8 +135,8 @@ float gln_rand(float n) { return fract(sin(n) * 1e4); }
  * float n = gln_rand(vec2(2.5, -1.8));
  */
 float gln_rand(vec2 p) {
-  return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) *
-               (0.1 + abs(sin(p.y * 13.0 + p.x))));
+    return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) *
+                 (0.1 + abs(sin(p.y * 13.0 + p.x))));
 }
 /**
  * Generates a random number.

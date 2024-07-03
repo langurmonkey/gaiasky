@@ -23,10 +23,12 @@ uniform vec4 u_color;
 uniform vec2 u_range;
 // Noise seed.
 uniform float u_seed;
-// The initial frequency.
-uniform float u_frequency;
+// The initial amplitude.
+uniform float u_amplitude;
 // The persistence, factor by which the amplitude decreases in successive layers.
 uniform float u_persistence;
+// The initial frequency.
+uniform float u_frequency;
 // The lacunarity, factor by which the frequency increases in successive layers.
 uniform float u_lacunarity;
 // The power, the exponent to apply to the generated noise in a power function.
@@ -76,14 +78,16 @@ float noise(vec3 p,
             bool ridge,
             int n_terraces,
             float terrace_exp,
+            vec3 scale,
             vec2 range,
             float seed) {
     // Fill up opts.
     gln_tFBMOpts opts = gln_tFBMOpts(seed,
-                                     u_frequency,
+                                     u_amplitude,
                                      u_persistence,
+                                     u_frequency,
                                      u_lacunarity,
-                                     u_scale,
+                                     scale,
                                      power,
                                      u_octaves,
                                      u_turbulence,
@@ -137,7 +141,7 @@ void main() {
         sin(phi)
     );
 
-    float val_ch1 = noise(p, u_type, u_power, u_ridge, u_numTerraces, u_terraceExp, u_range, u_seed);
+    float val_ch1 = noise(p, u_type, u_power, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_range, u_seed);
 
     if (u_channels <= 1) {
         // Channel 1 (elevation).
@@ -145,21 +149,21 @@ void main() {
 
     } else {
         // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, 1.0, u_ridge, 0, 0.0, vec2(0.0, 1.0), u_seed + 2.023);
+        float val_ch2 = noise(p, 0, 1.0, u_ridge, 0, 0.0, u_scale, vec2(0.0, 1.0), u_seed + 2.023);
         if (u_channels == 2) {
             // Channel 2 (moisture).
             fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
         } else {
             // Channel 3 (temperature).
-            float val_ch3 = noise(p, u_type, 2.0, false, 0, 0.0, vec2(0.0, 1.0), u_seed + 1.4325);
+            float val_ch3 = noise(p, u_type, 2.0, false, 0, 0.0, u_scale, vec2(0.0, 1.0), u_seed + 1.4325);
             fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
         }
     }
 
     #ifdef extraTarget
     // Generate emission pattern with white channel.
-    float white = noise(p, 4, 1.0, false, 0, 0.0, vec2(0.0, 1.0), u_seed + 1.4325) * 2.0;
-    float val_ch4 = noise(p, u_type, 1.5, false, 0, 0.0, vec2(-0.4, 1.0), u_seed + 1.4325);
+    float white = noise(p, 4, 1.0, false, 0, 0.0, vec3(1.0, 1.0, 1.0), vec2(0.0, 1.0), u_seed + 1.4325) * 4.5;
+    float val_ch4 = noise(p, u_type, 1.5, false, 0, 0.0, u_scale, vec2(-0.4, 1.0), u_seed + 1.4325);
     val_ch4 = white * step(0.1, val_ch1) * val_ch4;
     emissionColor = vec4(val_ch4, val_ch4 * 0.8, val_ch4 * 0.6, 1.0);
     #endif // extraTarget
