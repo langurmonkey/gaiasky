@@ -540,9 +540,10 @@ public class SysUtils {
                                                 String[] names,
                                                 Settings.ImageFormat format) {
         Path proceduralDir = getProceduralPixmapDir();
-        Array<Pixmap> pixmaps = new Array<>();
+        Array<Pair<Pixmap, Integer>> pixmaps = new Array<>();
         // Prepare pixmaps in current (main) thread.
-        for (var t : textures) {
+        for (int i = 0; i < textures.length; i++) {
+            var t = textures[i];
             if (t != null) {
                 int w = t.getWidth();
                 int h = t.getHeight();
@@ -555,15 +556,15 @@ public class SysUtils {
                 t.bind();
                 GL30.glGetTexImage(t.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
 
-                pixmaps.add(pixmap);
+                pixmaps.add(new Pair<>(pixmap, i));
             }
         }
 
         // Save textures in new thread.
         GaiaSky.instance.getExecutorService().execute(() -> {
-            int i = 0;
-            for (var pixmap : pixmaps) {
-                var name = names[i];
+            for (var pair : pixmaps) {
+                var pixmap = pair.getFirst();
+                var name = names[pair.getSecond()];
                 Path file = proceduralDir.resolve(name + "." + format.extension);
                 switch (format) {
                     case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
@@ -571,7 +572,6 @@ public class SysUtils {
                 }
                 logger.info(I18n.msg("gui.procedural.info.savetextures.ok", TextUtils.capitalise(name), file));
                 pixmap.dispose();
-                i++;
             }
             // Post popup.
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, pixmaps,

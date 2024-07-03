@@ -15,12 +15,8 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class Noise extends PostProcessorEffect {
     private final NoiseFilter filter;
 
-    public Noise(float viewportWidth, float viewportHeight) {
-        this((int) viewportWidth, (int) viewportHeight);
-    }
-
-    public Noise(int viewportWidth, int viewportHeight) {
-        filter = new NoiseFilter(viewportWidth, viewportHeight);
+    public Noise(int viewportWidth, int viewportHeight, int targets) {
+        filter = new NoiseFilter(viewportWidth, viewportHeight, targets);
         disposables.add(filter);
     }
 
@@ -111,7 +107,6 @@ public final class Noise extends PostProcessorEffect {
     public void setType(NoiseFilter.NoiseType type) {
         filter.setType(type);
     }
-
 
     @Override
     public void rebind() {

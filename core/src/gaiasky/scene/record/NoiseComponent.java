@@ -38,6 +38,8 @@ public class NoiseComponent extends NamedComponent {
     public int numTerraces = 0;
     public float terracesExp = 17.0f;
 
+    public boolean genEmissionMap = false;
+
     public FrameBuffer fbNoise, fbBiome, fbSurface;
 
     /** Open windows with the resulting frame buffers. **/
@@ -64,8 +66,8 @@ public class NoiseComponent extends NamedComponent {
         return (float) (seed / FastMath.pow(10L, s.length()));
     }
 
-    private Noise getNoiseEffect(int N, int M, int channels) {
-        Noise noise = new Noise(N, M);
+    private Noise getNoiseEffect(int N, int M, int channels, int targets) {
+        Noise noise = new Noise(N, M, targets);
         noise.setScale(scale);
         noise.setType(type);
         noise.setSeed(seed);
@@ -83,10 +85,10 @@ public class NoiseComponent extends NamedComponent {
         return noise;
     }
 
-    public FrameBuffer generateNoise(int N, int M, int channels, float[] color) {
-        fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, 1);
+    public FrameBuffer generateNoise(int N, int M, int channels, int targets, float[] color) {
+        fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, targets);
 
-        Noise noise = getNoiseEffect(N, M, channels);
+        Noise noise = getNoiseEffect(N, M, channels, targets);
         noise.setColor(color);
         fbNoise.begin();
         noise.render(null, fbNoise);
@@ -95,19 +97,52 @@ public class NoiseComponent extends NamedComponent {
         return fbNoise;
     }
 
-    public FrameBuffer[] generateSurfaceTextures(int N, int M,
-                                                 String biomeLut,
-                                                 float biomeHueShift,
-                                                 float biomeSaturation,
-                                                 boolean generateNormalMap) {
-        // Biome noise (height, elevation, temperature).
-        fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, 1);
+    /**
+     * Generates the biome, which is a set of two textures in a frame buffer. The first render target in the frame
+     * buffer is the elevation, the second is the moisture, and the third the emission.
+     *
+     * @param N        The width in pixels.
+     * @param M        The height in pixels.
+     *
+     * @return The biome frame buffer, with two render targets.
+     */
+    public synchronized FrameBuffer generateBiome(int N, int M) {
+        // Biome noise (height, moisture).
+        fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, genEmissionMap ? 2 : 1);
 
-        // 2 channels: height, elevation.
-        Noise biomeNoise = getNoiseEffect(N, M, 2);
+        // 3 channels: height, moisture, emission.
+        Noise biomeNoise = getNoiseEffect(N, M, 2, genEmissionMap ? 2 : 1);
         fbBiome.begin();
         biomeNoise.render(null, fbBiome);
         fbBiome.end();
+
+        return fbBiome;
+    }
+
+    /**
+     * <p>
+     * Generates the surface textures with this noise component. The main render target contains the diffuse texture,
+     * the second render target contains the specular texture, and the third render target optionally contains the
+     * normal texture.
+     * </p><p>
+     * Note that for this function to succeed, {@link NoiseComponent#generateBiome(int, int)} must have been
+     * called beforehand, and {@link NoiseComponent#fbBiome} must be available.
+     * </p>
+     *
+     * @param N                 The width in pixels.
+     * @param M                 The height in pixels.
+     * @param biomeLut          The biome look up table (LUT) path.
+     * @param biomeHueShift     The LUT hue shift as an angle in degrees.
+     * @param biomeSaturation   The LUT saturation value.
+     * @param generateNormalMap Whether to generate a normal map.
+     *
+     * @return The frame buffer with all the render targets.
+     */
+    public synchronized FrameBuffer generateSurface(int N, int M,
+                                                    String biomeLut,
+                                                    float biomeHueShift,
+                                                    float biomeSaturation,
+                                                    boolean generateNormalMap) {
 
         // Gen surface with 2 color targets (diffuse, specular).
         // We use 3 color targets if we need to generate the normal map.
@@ -134,17 +169,8 @@ public class NoiseComponent extends NamedComponent {
             DEBUG_UI_VIEW = false;
         }
 
-        return new FrameBuffer[]{fbBiome, fbSurface};
+        return fbSurface;
 
-    }
-
-    public synchronized FrameBuffer[] generateElevation(int N, int M,
-                                                        String biomeLut,
-                                                        float biomeHueShift,
-                                                        float biomeSaturation,
-                                                        boolean generateNormalMap) {
-        // Generate in GPU.
-        return generateSurfaceTextures(N, M, biomeLut, biomeHueShift, biomeSaturation, generateNormalMap);
     }
 
     public void setType(String noiseType) {
@@ -155,7 +181,7 @@ public class NoiseComponent extends NamedComponent {
         }
     }
 
-    public void setFractalType(String fractalType) {
+    public void setFractalType(String ignoredFractalType) {
         // Void.
     }
 
@@ -245,6 +271,7 @@ public class NoiseComponent extends NamedComponent {
         this.power = other.power;
         this.turbulence = other.turbulence;
         this.ridge = other.ridge;
+        this.genEmissionMap = other.genEmissionMap;
     }
 
     public void randomizeAll(Random rand) {
@@ -332,6 +359,8 @@ public class NoiseComponent extends NamedComponent {
         setTurbulence(true);
         // Ridge.
         setRidge(rand.nextBoolean());
+        // Emission.
+        genEmissionMap = rand.nextInt(10) == 9;
     }
 
     public void randomizeRockyPlanet(Random rand) {
@@ -367,6 +396,8 @@ public class NoiseComponent extends NamedComponent {
         setTurbulence(true);
         // Ridge.
         setRidge(rand.nextInt(3) < 2);
+        // Emission.
+        genEmissionMap = rand.nextInt(20) == 19;
     }
 
     public void randomizeEarthLike(Random rand) {
@@ -402,6 +433,8 @@ public class NoiseComponent extends NamedComponent {
         setTurbulence(true);
         // Ridge.
         setRidge(rand.nextInt(4) < 3);
+        // Emission.
+        genEmissionMap = rand.nextInt(4) == 3;
     }
 
     public void randomizeSnowPlanet(Random rand) {
@@ -437,6 +470,8 @@ public class NoiseComponent extends NamedComponent {
         setTurbulence(true);
         // Ridge.
         setRidge(rand.nextInt(4) < 3);
+        // Emission.
+        genEmissionMap = rand.nextInt(15) == 14;
     }
 
     public void randomizeGasGiant(Random rand) {
@@ -481,6 +516,8 @@ public class NoiseComponent extends NamedComponent {
         setTurbulence(true);
         // Ridge.
         setRidge(rand.nextBoolean());
+        // Emission.
+        genEmissionMap = rand.nextInt(10) == 9;
     }
 
     public void print(Log log) {
@@ -497,6 +534,7 @@ public class NoiseComponent extends NamedComponent {
         log.debug("Power: " + power);
         log.debug("Turbulence: " + turbulence);
         log.debug("Ridge: " + ridge);
+        log.debug("Emission: " + genEmissionMap);
     }
 
     @Override
@@ -515,3 +553,4 @@ public class NoiseComponent extends NamedComponent {
         }
     }
 }
+

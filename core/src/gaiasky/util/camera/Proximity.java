@@ -226,10 +226,18 @@ public class Proximity {
         c.type = getType(focus);
 
         float[] col = focus.getColor();
-        c.col[0] = col[0];
-        c.col[1] = col[1];
-        c.col[2] = col[2];
-        c.col[3] = 1f;
+        if (col != null) {
+            c.col[0] = col[0];
+            c.col[1] = col[1];
+            c.col[2] = col[2];
+            c.col[3] = 1f;
+        } else {
+            // White by default.
+            c.col[0] = 1f;
+            c.col[1] = 1f;
+            c.col[2] = 1f;
+            c.col[3] = 1f;
+        }
         return c;
     }
 
@@ -297,7 +305,7 @@ public class Proximity {
 
         @Override
         public String[] getNames() {
-            return new String[] { name };
+            return new String[]{name};
         }
 
         @Override

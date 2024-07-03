@@ -60,12 +60,15 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
 
     private NoiseType type = NoiseType.SIMPLEX;
 
-    public NoiseFilter(float viewportWidth, float viewportHeight) {
-        this(new Vector2(viewportWidth, viewportHeight));
+    public NoiseFilter(int viewportWidth, int viewportHeight, int targets) {
+        this(new Vector2(viewportWidth, viewportHeight), targets);
     }
 
-    public NoiseFilter(Vector2 viewportSize) {
-        super(ShaderLoader.fromFile("screenspace", "noise"));
+    public NoiseFilter(Vector2 viewportSize, int targets) {
+        super(ShaderLoader.fromFile(
+                "screenspace",
+                "noise",
+                targets > 1 ? "#define extraTarget\n" : ""));
         this.viewport = viewportSize;
 
         rebind();

@@ -121,7 +121,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public Vector2 heightSize = new Vector2();
     public IHeightData heightData;
     public NoiseComponent nc;
-    // Sparse virtual texture sets.
+    // Sparse Virtual Textures.
     public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt, normalSvt, emissiveSvt, roughnessSvt, metallicSvt, aoSvt;
     public Array<VirtualTextureComponent> svts;
     // Cubemaps.
@@ -145,7 +145,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     private Material material, ringMaterial;
     private final AtomicBoolean heightGenerated = new AtomicBoolean(false);
     private final AtomicBoolean heightInitialized = new AtomicBoolean(false);
-    private Texture heightTex, specularTex, diffuseTex, normalTex;
+    private Texture heightTex, specularTex, diffuseTex, normalTex, emissiveTex;
 
     public MaterialComponent() {
         super();
@@ -575,6 +575,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
     }
 
+    private void addEmissiveTex(Texture emissiveTex) {
+        if (emissiveTex != null && material != null) {
+            material.set(new TextureAttribute(TextureAttribute.Emissive, emissiveTex));
+        }
+    }
+
     private void addRoughnessTex(Texture roughnessTex) {
         if (roughnessTex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Roughness, roughnessTex));
@@ -591,6 +597,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         } else {
             heightGenerated.set(true);
             GaiaSky.postRunnable(() -> {
+                // 1ST FRAME - CREATE NOISE.
                 final int N = Settings.settings.graphics.proceduralGenerationResolution[0];
                 final int M = Settings.settings.graphics.proceduralGenerationResolution[1];
                 logger.info(I18n.msg("gui.procedural.info.generate",
@@ -598,79 +605,109 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                         Integer.toString(N),
                         Integer.toString(M)));
 
+                Random rand = new Random();
                 if (nc == null) {
                     nc = new NoiseComponent();
-                    Random noiseRandom = new Random();
-                    switch (noiseRandom.nextInt(5)) {
-                        case 0 -> nc.randomizeEarthLike(noiseRandom);
-                        case 1 -> nc.randomizeRockyPlanet(noiseRandom);
-                        case 2 -> nc.randomizeGasGiant(noiseRandom);
-                        case 3 -> nc.randomizeSnowPlanet(noiseRandom);
-                        case 4 -> nc.randomizeAll(noiseRandom);
-                    }
-                }
-                FrameBuffer[] fbs = nc.generateElevation(N, M,
-                        biomeLUT,
-                        biomeHueShift,
-                        biomeSaturation,
-                        Settings.settings.scene.renderer.elevation.type.isNone());
-
-                int nTextureAttachments = fbs[1].getTextureAttachments().size;
-
-                Texture heightT = fbs[0].getColorBufferTexture();
-                Texture diffuseT = fbs[1].getColorBufferTexture();
-                Texture specularT = fbs[1].getTextureAttachments().get(1);
-                Texture normalT = nTextureAttachments > 2 ? fbs[1].getTextureAttachments().get(2) : null;
-
-                boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
-                boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
-                boolean cNormal = normal != null && normal.endsWith(Constants.GEN_KEYWORD);
-                // TODO implement emissive texture generation
-                //boolean cEmissive = emissive != null && emissive.endsWith(Constants.GEN_KEYWORD);
-                // TODO implement metallic texture generation
-                //boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
-
-                // BIOME: HEIGHT and MOISTURE.
-                if (heightT != null) {
-                    // Create texture, populate material
-                    if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
-                        heightData = new HeightDataPixmap(heightT, null);
-                        heightTex = heightT;
-                        addHeightTex(heightTex);
+                    switch (rand.nextInt(10)) {
+                        case 0, 1, 2, 3 -> nc.randomizeEarthLike(rand);
+                        case 4 -> nc.randomizeRockyPlanet(rand);
+                        case 5 -> nc.randomizeGasGiant(rand);
+                        case 6, 7, 8 -> nc.randomizeSnowPlanet(rand);
+                        case 9 -> nc.randomizeAll(rand);
                     }
                 }
 
-                // DIFFUSE.
-                if (cDiffuse) {
-                    if (diffuseT != null) {
-                        diffuseTex = diffuseT;
-                        addDiffuseTex(diffuseTex);
-                    }
-                }
+                GaiaSky.postRunnable(() -> {
+                    // 2ND FRAME - BIOME.
+                    FrameBuffer fbBiome = nc.generateBiome(N, M);
 
-                // SPECULAR.
-                if (cSpecular) {
-                    if (specularT != null) {
-                        specularTex = specularT;
-                        addSpecularTex(specularTex);
-                    }
-                }
+                    GaiaSky.postRunnable(() -> {
+                        // 3RD FRAME - SURFACE.
+                        FrameBuffer fbSurface = nc.generateSurface(N, M,
+                                biomeLUT,
+                                biomeHueShift,
+                                biomeSaturation,
+                                Settings.settings.scene.renderer.elevation.type.isNone());
 
-                // NORMAL.
-                if (cNormal) {
-                    if (normalT != null) {
-                        normalTex = normalT;
-                        // We have height texture already, do not need normal!
-                        addNormalTex(normalTex);
-                    }
-                }
+                        GaiaSky.postRunnable(() -> {
+                            // 4TH FRAME - ADD TEXTURES TO MATERIAL.
+                            int nBiomeAttachments = fbBiome.getTextureAttachments().size;
+                            int nSurfaceAttachments = fbSurface.getTextureAttachments().size;
 
-                // Save textures to disk as image files.
-                if (Settings.settings.program.saveProceduralTextures) {
-                    SysUtils.saveProceduralGLTextures(new Texture[]{heightT, diffuseT, specularT, normalT},
-                            new String[]{name + "-biome", name + "-diffuse", name + "-specular", name + "-normal"},
-                            Settings.ImageFormat.JPG);
-                }
+                            Texture heightT = fbBiome.getColorBufferTexture();
+                            Texture emissiveT = nBiomeAttachments > 1 ? fbBiome.getTextureAttachments().get(1) : null;
+                            Texture diffuseT = fbSurface.getColorBufferTexture();
+                            Texture specularT = fbSurface.getTextureAttachments().get(1);
+                            Texture normalT = nSurfaceAttachments > 2 ? fbSurface.getTextureAttachments().get(2) : null;
+
+                            boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
+                            boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
+                            boolean cNormal = normal != null && normal.endsWith(Constants.GEN_KEYWORD);
+                            boolean cEmissive = emissive != null && emissive.endsWith(Constants.GEN_KEYWORD);
+                            // TODO implement metallic texture generation
+                            //boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
+
+                            // BIOME: HEIGHT and MOISTURE.
+                            if (heightT != null) {
+                                // Create texture, populate material
+                                if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                                    heightData = new HeightDataPixmap(heightT, null);
+                                    heightTex = heightT;
+                                    addHeightTex(heightTex);
+                                }
+                            }
+
+                            // DIFFUSE.
+                            if (cDiffuse) {
+                                if (diffuseT != null) {
+                                    diffuseTex = diffuseT;
+                                    addDiffuseTex(diffuseTex);
+                                }
+                            }
+
+                            // SPECULAR.
+                            if (cSpecular) {
+                                if (specularT != null) {
+                                    specularTex = specularT;
+                                    addSpecularTex(specularTex);
+                                }
+                            }
+
+                            // NORMAL.
+                            if (cNormal) {
+                                if (normalT != null) {
+                                    normalTex = normalT;
+                                    addNormalTex(normalTex);
+                                }
+                            }
+
+                            // EMISSIVE.
+                            if (cEmissive) {
+                                if (emissiveT != null) {
+                                    emissiveTex = emissiveT;
+                                    addEmissiveTex(emissiveTex);
+                                }
+                            }
+
+                            // Save textures to disk as image files.
+                            if (Settings.settings.program.saveProceduralTextures) {
+                                SysUtils.saveProceduralGLTextures(new Texture[]{
+                                                heightT,
+                                                diffuseT,
+                                                specularT,
+                                                normalT,
+                                                emissiveT},
+                                        new String[]{
+                                                name + "-biome",
+                                                name + "-diffuse",
+                                                name + "-specular",
+                                                name + "-normal",
+                                                name + "-emissive"},
+                                        Settings.ImageFormat.JPG);
+                            }
+                        });
+                    });
+                });
             });
         }
     }
@@ -1244,6 +1281,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         this.diffuse = other.diffuse;
         this.normal = other.normal;
         this.specular = other.specular;
+        this.emissive = other.emissive;
+        this.metallic = other.metallic;
+        this.roughness = other.roughness;
         this.biomeLUT = other.biomeLUT;
         this.biomeHueShift = other.biomeHueShift;
         this.biomeSaturation = other.biomeSaturation;
@@ -1256,23 +1296,24 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
     }
 
-    public void randomizeAll(long seed,
-                             double sizeU) {
+    public void randomizeAll(long seed) {
         initializeLookUpTables();
 
         var rand = new Random(seed);
         setHeight("generate");
         setDiffuse("generate");
-        setNormal("generate");
         setSpecular("generate");
+        setNormal("generate");
+        setEmissive("generate");
 
+        // Biome LUT.
         setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
         if (rand.nextBoolean()) {
             // Actually roll the dice for hue shift.
-            setBiomehueshift(rand.nextDouble() * 360.0);
+            setBiomeHueShift(rand.nextDouble() * 360.0);
         } else {
             // No hue shift.
-            setBiomehueshift(0.0);
+            setBiomeHueShift(0.0);
         }
         // Saturation.
         if (rand.nextInt(6) < 5) {
@@ -1280,9 +1321,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         } else {
             setBiomeSaturation(rand.nextDouble(0.0, 0.5));
         }
-        // Height scale
+        // Height scale.
         setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
-        // Noise
+
+        // Noise.
         if (nc != null) {
             nc.dispose();
         }
@@ -1313,6 +1355,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
+        setEmissive("generate");
 
         setBiomelut(randomBiomeLut(rand, "rock-smooth-lut", "brown-green-lut", "biome-water-rock-lut"));
 
@@ -1344,6 +1387,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
+        setEmissive("generate");
 
         setBiomelut(randomBiomeLut(rand, "biome-lut", "biome-smooth-lut", "biome-vertical-lut",
                 "biomes-separate-lut", "brown-green-lut", "biome-snow2-lut"));
@@ -1371,6 +1415,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
+        setEmissive("generate");
 
         setBiomelut(randomBiomeLut(rand, "biome-snow1-lut", "biome-snow2-lut"));
 
@@ -1397,6 +1442,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
+        setEmissive("generate");
 
         setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
         // Actually roll the dice for hue shift.

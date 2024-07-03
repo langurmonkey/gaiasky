@@ -659,7 +659,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             mtc = new MaterialComponent();
             if (initMtc == null) {
                 // Generate random material
-                mtc.randomizeAll(rand.nextLong(), view.getSize());
+                mtc.randomizeAll(rand.nextLong());
             } else {
                 // Copy existing
                 mtc.copyFrom(initMtc);
@@ -753,6 +753,20 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             heightScaleTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.heightscale"), skin));
             scrollContent.add(heightScale).colspan(2).left().padBottom(pad34).padRight(pad10);
             scrollContent.add(heightScaleTooltip).left().padBottom(pad34).row();
+
+            // Generate emission.
+            OwnCheckBox emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
+            emission.setChecked(mtc.nc.genEmissionMap);
+            emission.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    mtc.nc.genEmissionMap = emission.isChecked();
+                }
+            });
+            OwnImageButton emissionTooltip = new OwnImageButton(skin, "tooltip");
+            emissionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.emission"), skin));
+            scrollContent.add(emission).colspan(2).left().padBottom(pad34).padRight(pad10);
+            scrollContent.add(emissionTooltip).left().padBottom(pad34).row();
 
             // Noise
             addNoiseGroup(scrollContent, mtc.nc, "gui.procedural.noise.params", true);
@@ -985,7 +999,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeSurface(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
-        this.initMtc.randomizeAll(rand.nextLong(), view.getSize());
+        this.initMtc.randomizeAll(rand.nextLong());
 
         if (rebuild) {
             // Others are the same

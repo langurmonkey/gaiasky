@@ -263,7 +263,7 @@ public class CloudComponent extends NamedComponent implements IMaterialProvider,
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, true);
                 }
-                FrameBuffer cloudFb = nc.generateNoise(N, M, 1, color);
+                FrameBuffer cloudFb = nc.generateNoise(N, M, 1, 1, color);
                 // Write to disk if necessary.
                 if (Settings.settings.program.saveProceduralTextures) {
                     SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud",

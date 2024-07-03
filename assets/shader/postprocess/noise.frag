@@ -56,7 +56,11 @@ uniform int u_type;
 
 
 in vec2 v_texCoords;
+
 layout (location = 0) out vec4 fragColor;
+#ifdef extraTarget
+layout (location = 1) out vec4 emissionColor;
+#endif // extraTarget
 
 float terraces(float h, int n_terraces, float smoothness) {
     if (n_terraces <= 0) {
@@ -151,4 +155,12 @@ void main() {
             fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
         }
     }
+
+    #ifdef extraTarget
+    // Generate emission pattern with white channel.
+    float white = noise(p, 4, 1.0, false, 0, 0.0, vec2(0.0, 1.0), u_seed + 1.4325) * 2.0;
+    float val_ch4 = noise(p, u_type, 1.5, false, 0, 0.0, vec2(-0.4, 1.0), u_seed + 1.4325);
+    val_ch4 = white * step(0.1, val_ch1) * val_ch4;
+    emissionColor = vec4(val_ch4, val_ch4 * 0.8, val_ch4 * 0.6, 1.0);
+    #endif // extraTarget
 }
