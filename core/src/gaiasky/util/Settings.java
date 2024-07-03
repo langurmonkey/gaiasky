@@ -28,9 +28,9 @@ import gaiasky.gui.KeyBindings;
 import gaiasky.gui.ModePopupInfo;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.KeyframesManager;
-import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
@@ -113,6 +113,7 @@ public class Settings extends SettingsObject {
      * This method deactivates and disposes the old settings object, and activates the new one.
      *
      * @param s The settings object.
+     *
      * @return True if the given object is not null, false otherwise.
      */
     public static boolean setSettingsReference(Settings s) {
@@ -408,8 +409,9 @@ public class Settings extends SettingsObject {
         JPG("jpeg");
 
         public String extension;
+
         ImageFormat(String extension) {
-           this.extension = extension;
+            this.extension = extension;
         }
     }
 
@@ -761,6 +763,7 @@ public class Settings extends SettingsObject {
          * internal units.
          *
          * @param value The value in the units represented by this object.
+         *
          * @return The value in internal units.
          */
         public double toInternalUnits(double value) {
@@ -771,6 +774,7 @@ public class Settings extends SettingsObject {
          * Returns the given value, given in internal units, in the units represented by this object.
          *
          * @param internal The value in internal units.
+         *
          * @return The value in the units represented by this object.
          */
         public double fromInternalUnits(double internal) {
@@ -922,6 +926,7 @@ public class Settings extends SettingsObject {
          * Adds the given catalog descriptor file to the list of JSON selected files.
          *
          * @param catalog The catalog descriptor file pointer.
+         *
          * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not
          * readable, or it is already in the list.
          */
@@ -4289,6 +4294,7 @@ public class Settings extends SettingsObject {
                     }
                     case TIME_STATE_CMD -> toggleTimeOn((Boolean) data[0]);
                     case RECORD_CAMERA_CMD -> toggleRecord((Boolean) data[0], settings);
+                    case RELATIVISTIC_ABERRATION_CMD -> relativisticAberration = (Boolean) data[0];
                     case GRAV_WAVE_START -> gravitationalWaves = true;
                     case GRAV_WAVE_STOP -> gravitationalWaves = false;
                     default -> {
@@ -4308,8 +4314,10 @@ public class Settings extends SettingsObject {
 
         @Override
         protected void setupListeners() {
-            EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD, Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD,
-                    Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP, Event.DISPLAY_VR_GUI_CMD);
+            EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD,
+                    Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD,
+                    Event.RELATIVISTIC_ABERRATION_CMD, Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP,
+                    Event.DISPLAY_VR_GUI_CMD);
         }
 
         @Override

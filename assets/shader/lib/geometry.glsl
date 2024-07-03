@@ -79,6 +79,8 @@ vec4 q_look_at(vec3 forward, vec3 up) {
     return q;
 }
 
+#ifndef GLSL_GET_QUAT_ROTATION
+#define GLSL_GET_QUAT_ROTATION
 /*
  * Gets the quaternion to rotate around the given axis by the given angle in radians
  */
@@ -94,6 +96,7 @@ vec4 get_quat_rotation(vec3 axis, float radians) {
     float l_cos = cos(l_ang / 2.0);
     return  normalize(vec4(d * axis.x * l_sin, d * axis.y * l_sin, d * axis.z * l_sin, l_cos));
 }
+#endif // GLSL_GET_QUAT_ROTATION
 
 // Quaternion multiplication
 // http://mathworld.wolfram.com/Quaternion.html

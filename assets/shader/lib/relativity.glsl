@@ -1,6 +1,30 @@
 #ifndef GLSL_LIB_RELATIVITY
 #define GLSL_LIB_RELATIVITY
 
+
+#ifndef PI2
+#define PI2 3.14159265358979323846264338 * 2.0
+#endif // PI2
+
+#ifndef GLSL_GET_QUAT_ROTATION
+#define GLSL_GET_QUAT_ROTATION
+/*
+ * Gets the quaternion to rotate around the given axis by the given angle in radians
+ */
+vec4 get_quat_rotation(vec3 axis, float radians) {
+    float d = 1.0 / length(axis);
+    float l_ang;
+    if(radians < 0.0) {
+        l_ang = PI2 - (mod(-radians, PI2));
+    }else {
+        l_ang = mod(radians, PI2);
+    }
+    float l_sin = sin(l_ang / 2.0);
+    float l_cos = cos(l_ang / 2.0);
+    return  normalize(vec4(d * axis.x * l_sin, d * axis.y * l_sin, d * axis.z * l_sin, l_cos));
+}
+#endif // GLSL_GET_QUAT_ROTATION
+
 #ifndef GLSL_ROTATE_VERTEX_POS
 #define GLSL_ROTATE_VERTEX_POS
 vec3 rotate_vertex_position(vec3 position, vec3 axis, float angle) {

@@ -110,6 +110,9 @@ public enum Event {
      **/
     BACKGROUND_LOADING_INFO,
 
+    /** Enable and disable relativistic aberration. **/
+    RELATIVISTIC_ABERRATION_CMD,
+
     /**
      * Contains the intensity value in [0,1].
      **/
