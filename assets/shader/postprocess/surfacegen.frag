@@ -30,6 +30,7 @@ void main() {
 
     // Query LUT.
     vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
+    vec4 c = rgba;
     // Manipulate hue and saturation.
     vec3 hsv = rgb2hsv(rgba.rgb);
     // Hue.
@@ -43,7 +44,7 @@ void main() {
     diffuseColor = rgba;
 
     // Specular.
-    bool water = height < 0.1;
+    bool water = height < 0.1 || (c.b / c.r > 3.4 && c.b / c.g > 3.4);
     bool snow = luma(diffuseColor.rgb) > 0.9;
 
     vec4 spec = vec4(0.0, 0.0, 0.0, 1.0);

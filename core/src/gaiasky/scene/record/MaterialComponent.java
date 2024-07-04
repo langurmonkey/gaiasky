@@ -1390,7 +1390,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         setEmissive("generate");
 
         setBiomelut(randomBiomeLut(rand, "biome-lut", "biome-smooth-lut", "biome-vertical-lut",
-                "biomes-separate-lut", "brown-green-lut", "biome-snow2-lut"));
+                "biomes-separate-lut", "brown-green-lut", "biome-snow2-lut", "biome-brown-green-lut"));
 
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);
