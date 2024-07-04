@@ -47,6 +47,7 @@ import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
@@ -552,7 +553,8 @@ public class WelcomeGui extends AbstractGui {
             }
         }
         updateFocused();
-        EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_CMD);
+        EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_RECOMPUTE_CMD);
+        EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
     }
 
     private void ensureBaseDataEnabled(DataDescriptor dd) {
@@ -787,9 +789,14 @@ public class WelcomeGui extends AbstractGui {
                     reloadView();
                 });
             }
-            case UI_SCALE_CMD -> {
-                float uiScale = (Float) data[0];
-                this.updateUnitsPerPixel(1f / uiScale);
+            case UI_SCALE_RECOMPUTE_CMD -> {
+                int height;
+                if (data != null && data.length > 0) {
+                    height = (Integer) data[0];
+                } else {
+                    height = Gdx.graphics.getHeight();
+                }
+                GaiaSky.instance.applyUIScale(height, this);
             }
         }
     }

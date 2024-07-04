@@ -221,10 +221,6 @@ public class SettingsManager {
             settings.data.location = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");
         }
 
-        // UI scale mapping.
-        settings.program.ui.scale = MathUtilsDouble.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN,
-                Constants.UI_SCALE_INTERNAL_MAX);
-
         // Default distance units.
         if (settings.program.ui.distanceUnits == null) {
             settings.program.ui.distanceUnits = DistanceUnits.PC;

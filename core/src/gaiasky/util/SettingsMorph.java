@@ -60,7 +60,7 @@ public class SettingsMorph {
      * @param propertiesFile The location of the properties file.
      * @param yamlFile       The location to save the YAML settings file.
      */
-    public static void morphSettings(final Path propertiesFile, final Path yamlFile) throws FileNotFoundException, IOException {
+    public static void morphSettings(final Path propertiesFile, final Path yamlFile) throws IOException {
         // Load properties file
         Properties p = new Properties();
         p.load(new FileInputStream(propertiesFile.toFile()));
@@ -312,7 +312,7 @@ public class SettingsMorph {
         program.net.slave.blendFile = str("program.net.slave.blend", p);
         program.ui = new UiSettings();
         program.ui.theme = str("program.ui.theme", p);
-        program.ui.scale = MathUtilsDouble.lint(f32("program.ui.scale", p), Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+        program.ui.scale = f32("program.ui.scale", p);
         program.exitConfirmation = bool("program.exit.confirmation", p);
         program.locale = str("program.locale", p);
         program.update = new UpdateSettings();

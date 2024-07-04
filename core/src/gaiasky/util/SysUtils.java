@@ -194,6 +194,14 @@ public class SysUtils {
         return linux;
     }
 
+    public static boolean isX11() {
+        return System.getenv("XDG_SESSION_TYPE").equals("x11");
+    }
+
+    public static boolean isWayland() {
+        return System.getenv("XDG_SESSION_TYPE").equals("wayland");
+    }
+
     public static boolean isWindows() {
         return windows;
     }

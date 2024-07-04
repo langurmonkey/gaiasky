@@ -153,7 +153,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         buildSuper();
 
         EventManager.instance.subscribe(this, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO);
-        EventManager.instance.subscribe(this, Event.INVERT_Y_CMD, Event.INVERT_X_CMD);
+        EventManager.instance.subscribe(this, Event.INVERT_Y_CMD, Event.INVERT_X_CMD, Event.WINDOW_RESOLUTION_INFO);
     }
 
     private OwnTextIconButton createTab(String title,
@@ -1214,16 +1214,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // SCALING
         OwnLabel uiScaleLabel = new OwnLabel(I18n.msg("gui.ui.theme.scale"), skin);
-        uiScale = new OwnSliderPlus("", Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_SMALL, Constants.UI_SCALE_INTERNAL_MIN,
-                Constants.UI_SCALE_INTERNAL_MAX, skin);
+        uiScale = new OwnSliderPlus("", Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_TINY, skin);
         uiScale.setWidth(sliderWidth);
-        uiScale.setMappedValue(settings.program.ui.scale);
+        uiScale.setValue(settings.program.ui.scale);
         OwnTextButton applyUiScale = new OwnTextButton(I18n.msg("gui.apply"), skin);
         applyUiScale.pad(0, pad18, 0, pad18);
         applyUiScale.setHeight(buttonHeight);
         applyUiScale.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.UI_SCALE_CMD, uiScale, uiScale.getMappedValue());
+                EventManager.publish(Event.UI_SCALE_FACTOR_CMD, uiScale, uiScale.getValue());
+                EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, uiScale);
                 return true;
             }
             return false;
@@ -2756,7 +2756,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         StringComobBoxBean newTheme = theme.getSelected();
         // UI scale
         float factor = uiScale.getMappedValue();
-        EventManager.publish(Event.UI_SCALE_CMD, this, factor);
+        EventManager.publish(Event.UI_SCALE_FACTOR_CMD, this, factor);
+        EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
 
         boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.getLocale());
         boolean reloadUI = reloadLang ||
@@ -3092,6 +3093,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     invertY.setProgrammaticChangeEvents(false);
                     invertY.setChecked((Boolean) data[0]);
                     invertY.setProgrammaticChangeEvents(true);
+                }
+            }
+            case WINDOW_RESOLUTION_INFO -> {
+                if (source != this) {
+                    var width = (Integer) data[0];
+                    var height = (Integer) data[1];
+                    widthField.setText(width.toString());
+                    heightField.setText(height.toString());
                 }
             }
             default -> {

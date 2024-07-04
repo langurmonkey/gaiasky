@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 3050801
+configVersion: 3060300
 
 #
 # Data configuration
@@ -296,6 +296,7 @@ scene:
     Galaxies: true
     Nebulae: true
     Meshes: false
+    Systems: true
     Equatorial: false
     Ecliptic: false
     Galactic: false

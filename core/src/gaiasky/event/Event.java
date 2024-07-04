@@ -90,6 +90,9 @@ public enum Event {
      **/
     ANTIALIASING_CMD,
 
+    /** Notifies of screen resolution changes in windowed mode. Contains the new width and height as integers. **/
+    WINDOW_RESOLUTION_INFO,
+
     /** Shows window to give a name to the new position bookmark. **/
     SHOW_ADD_POSITION_BOOKMARK,
     /** Add bookmark. Contains the path and a boolean indicating if it is a folder. **/
@@ -343,7 +346,11 @@ public enum Event {
     /**
      * Change UI scale factor. Contains the new internal scale factor.
      **/
-    UI_SCALE_CMD,
+    UI_SCALE_FACTOR_CMD,
+    /**
+     * Recomputes the UI scale from the given window height (optional, if not given it uses the current window height).
+     */
+    UI_SCALE_RECOMPUTE_CMD,
 
     /**
      * Contains a boolean with the display status.

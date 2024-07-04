@@ -27,6 +27,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.vr.FixedScreenViewport;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
 import gaiasky.util.TipsGenerator;
@@ -37,6 +38,8 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 import gaiasky.util.scene2d.Separator;
+
+import java.util.Objects;
 
 public class LoadingGui extends AbstractGui {
     private static final long tipTime = 3500;
@@ -175,6 +178,8 @@ public class LoadingGui extends AbstractGui {
 
         rebuildGui();
 
+        EventManager.instance.subscribe(this, Event.UI_SCALE_RECOMPUTE_CMD);
+        EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
     }
 
     @Override
@@ -219,6 +224,20 @@ public class LoadingGui extends AbstractGui {
                 stage.addActor(screenMode);
                 stage.addActor(topLeft);
             }
+        }
+    }
+
+    @Override
+    public void notify(final Event event, Object source, final Object... data) {
+        // Empty by default
+        if (Objects.requireNonNull(event) == Event.UI_SCALE_RECOMPUTE_CMD) {
+            int height;
+            if (data != null && data.length > 0) {
+                height = (Integer) data[0];
+            } else {
+                height = Gdx.graphics.getHeight();
+            }
+            GaiaSky.instance.applyUIScale(height, this);
         }
     }
 

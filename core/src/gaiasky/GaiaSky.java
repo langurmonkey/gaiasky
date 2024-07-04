@@ -570,7 +570,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         renderBatch = globalResources.getSpriteBatch();
 
-        EventManager.instance.subscribe(this, Event.LOAD_DATA_CMD);
+        EventManager.instance.subscribe(this, Event.LOAD_DATA_CMD, Event.UI_SCALE_RECOMPUTE_CMD);
 
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -816,7 +816,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE,
                 Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
-                Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE, Event.GO_HOME_INSTANT_CMD);
+                Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE, Event.GO_HOME_INSTANT_CMD);
 
         // Re-enable input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -1146,6 +1146,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // OpenXR context.
         if (xrDriver != null)
             xrDriver.dispose();
+
+        // GLFW crashes on glfwDestroyWindow() on Wayland.
+        if(SysUtils.isLinux() && SysUtils.isWayland()) {
+            System.exit(0);
+        }
     }
 
     public void resetDynamicResolution() {
@@ -1288,6 +1293,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Gets the actual delta time for this frame taking into account the frame output system and the camcorder.
      *
      * @param dt The real frame delta time.
+     *
      * @return The actual delta time to use.
      */
     private double getDtGs(double dt) {
@@ -1333,6 +1339,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
     public void resize(final int width,
                        final int height) {
         if (width != 0 && height != 0) {
+            // Recompute UI scale with new height.
+            EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this, height);
+            if (!Gdx.graphics.isFullscreen()) {
+                // Notify of window resolution change.
+                EventManager.publish(Event.WINDOW_RESOLUTION_INFO, this, width, height);
+            }
+
             if (!initialized) {
                 resizeImmediate(width, height, true, true, true, true);
             }
@@ -1535,7 +1548,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
             }
             case STEREOSCOPIC_CMD -> {
-                if(!isVR()) {
+                if (!isVR()) {
                     final boolean stereoMode = (Boolean) data[0];
                     if (stereoMode && guiRegistry.current != stereoGui) {
                         guiRegistry.change(stereoGui);
@@ -1639,16 +1652,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     }
                 }
             }
-            case SCENE_RELOAD_NAMES_CMD -> postRunnable(() -> {
-                scene.updateLocalizedNames();
-            });
-            case UI_SCALE_CMD -> {
-                if (guis != null) {
-                    var uiScale = (Float) data[0];
-                    for (IGui gui : guis) {
-                        gui.updateUnitsPerPixel(1f / uiScale);
-                    }
+            case SCENE_RELOAD_NAMES_CMD -> postRunnable(() -> scene.updateLocalizedNames());
+            case UI_SCALE_RECOMPUTE_CMD -> {
+                int height;
+                if (data != null && data.length > 0) {
+                    height = (Integer) data[0];
+                } else {
+                    height = Gdx.graphics.getHeight();
                 }
+                applyUIScale(height, guis);
             }
             case HOME_CMD, GO_HOME_INSTANT_CMD -> goHome();
             case PARK_RUNNABLE -> {
@@ -1673,6 +1685,25 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
             }
             case SCENE_FORCE_UPDATE -> touchSceneGraph();
+        }
+    }
+
+    private float getUIScale(int height) {
+        return ((float) height / 1600f) * Settings.settings.program.ui.scale;
+
+    }
+
+    public void applyUIScale(int height, IGui gui) {
+        if (gui != null) {
+            gui.updateUnitsPerPixel(1f / getUIScale(height));
+        }
+    }
+
+    public void applyUIScale(int height, List<IGui> guis) {
+        if (guis != null) {
+            for (IGui gui : guis) {
+                gui.updateUnitsPerPixel(1f / getUIScale(height));
+            }
         }
     }
 

@@ -2397,7 +2397,7 @@ public class Settings extends SettingsObject {
                             uvGrid.frameCoordinates = (boolean) data[0];
                         }
                     }
-                    case UI_SCALE_CMD -> ui.scale = (Float) data[0];
+                    case UI_SCALE_FACTOR_CMD -> ui.scale = (Float) data[0];
                     case PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD -> {
                         saveProceduralTextures = (Boolean) data[0];
                     }
@@ -2444,7 +2444,7 @@ public class Settings extends SettingsObject {
                     Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
                     Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
                     Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
-                    Event.UI_SCALE_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD, Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD);
+                    Event.UI_SCALE_FACTOR_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD, Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD);
 
             minimap.setupListeners();
             fileChooser.setupListeners();
@@ -2487,7 +2487,7 @@ public class Settings extends SettingsObject {
                 //     EventManager.publish(Event.CUBEMAP_CMD, this, modeCubemap.active, modeCubemap.projection);
                 EventManager.publish(Event.SHOW_MINIMAP_ACTION, this, minimap.active);
 
-                EventManager.publish(Event.UI_SCALE_CMD, this, ui.scale);
+                EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
             });
 
             minimap.apply();
@@ -3023,11 +3023,8 @@ public class Settings extends SettingsObject {
             public boolean modeChangeInfo;
             public DistanceUnits distanceUnits;
 
-            /**
-             * Never use this method to get the scale, use the field itself, it is public.
-             */
-            public float getScale() {
-                return MathUtilsDouble.lint(scale, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX);
+            public void setScale(Float scale) {
+                this.scale = MathUtils.clamp(scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX);
             }
 
             @JsonIgnore
