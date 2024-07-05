@@ -611,6 +611,19 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         noiseTable.add(power).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(powerTooltip).left().padBottom(pad18).row();
 
+        // Turbulence.
+        OwnCheckBox turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
+        turbulence.setChecked(nc.turbulence);
+        turbulence.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        nc.turbulence = turbulence.isChecked();
+                    }
+                }
+        );
+        noiseTable.add(turbulence).colspan(3).left().padBottom(pad18).padRight(pad10).row();
+
         // Ridge.
         OwnCheckBox ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
         ridge.setChecked(nc.ridge);

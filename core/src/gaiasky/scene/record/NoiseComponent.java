@@ -365,9 +365,9 @@ public class NoiseComponent extends NamedComponent {
             setPower(gaussian(rand, 2.0, 2.0, 0.2));
         }
         // Turbulence.
-        setTurbulence(true);
+        setTurbulence(rand.nextBoolean());
         // Ridge.
-        setRidge(rand.nextBoolean());
+        setRidge(turbulence ? rand.nextBoolean() : false);
         // Emission.
         genEmissionMap = rand.nextInt(10) == 9;
     }
@@ -404,9 +404,9 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(rand.nextDouble(0.5, 1.1));
         // Turbulence.
-        setTurbulence(true);
+        setTurbulence(rand.nextBoolean());
         // Ridge.
-        setRidge(rand.nextInt(3) < 2);
+        setRidge(turbulence ? rand.nextInt(3) < 2 : false);
         // Emission.
         genEmissionMap = rand.nextInt(20) == 19;
     }
@@ -443,9 +443,9 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(rand.nextDouble(0.5, 1.6));
         // Turbulence.
-        setTurbulence(true);
+        setTurbulence(rand.nextBoolean());
         // Ridge.
-        setRidge(rand.nextInt(4) < 3);
+        setRidge(turbulence ? rand.nextInt(4) < 3 : false);
         // Emission.
         genEmissionMap = rand.nextInt(4) == 3;
     }
@@ -482,9 +482,9 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(rand.nextDouble(0.5, 1.8));
         // Turbulence.
-        setTurbulence(true);
+        setTurbulence(rand.nextBoolean());
         // Ridge.
-        setRidge(rand.nextInt(4) < 3);
+        setRidge(turbulence ? rand.nextInt(4) < 3 : false);
         // Emission.
         genEmissionMap = rand.nextInt(15) == 14;
     }
@@ -530,9 +530,9 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(0.1);
         // Turbulence.
-        setTurbulence(true);
+        setTurbulence(rand.nextBoolean());
         // Ridge.
-        setRidge(rand.nextBoolean());
+        setRidge(turbulence ? rand.nextBoolean() : false);
         // Emission.
         genEmissionMap = rand.nextInt(10) == 9;
     }
