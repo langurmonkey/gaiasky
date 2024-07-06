@@ -4,7 +4,7 @@ if (opts.turbulence && !opts.ridge) {
     noiseVal = pow(1.0 - abs(noiseVal), 2.0);
     result += noiseVal * amplitude;
 } else {
-    result += (0.5 * noiseVal + 0.5) * amplitude;
+    result += noiseVal * amplitude;
 }
 
 frequency *= opts.lacunarity;

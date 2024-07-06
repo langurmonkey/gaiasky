@@ -219,6 +219,7 @@ public class WelcomeGui extends AbstractGui {
     private void buildWaitingUI() {
         // Render message.
         if (!Settings.settings.program.offlineMode) {
+            this.updateUnitsPerPixel(2f);
             var table = new Table(skin);
             table.setFillParent(true);
             table.bottom().right().padBottom(40f).padRight(40f);

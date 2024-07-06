@@ -64,7 +64,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     private int genCloudNum = 0, genSurfaceNum = 0;
 
-    public ProceduralGenerationWindow(FocusView target, Stage stage, Skin skin) {
+    public ProceduralGenerationWindow(FocusView target,
+                                      Stage stage,
+                                      Skin skin) {
         super(I18n.msg("gui.procedural.title", target.getLocalizedName()), skin, stage);
         this.target = target.getEntity();
         this.view = new FocusView(target.getEntity());
@@ -75,8 +77,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         this.setModal(false);
 
         EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO,
-                Event.PROCEDURAL_GENERATION_SURFACE_INFO,
-                Event.FOCUS_CHANGED);
+                                        Event.PROCEDURAL_GENERATION_SURFACE_INFO,
+                                        Event.FOCUS_CHANGED);
 
         setAcceptText(I18n.msg("gui.close"));
 
@@ -165,7 +167,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         // Set visibility of the tab content to match the checked state
         ChangeListener tabListener = new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 contentSurface.setVisible(tabSurface.isChecked());
                 contentClouds.setVisible(tabClouds.isChecked());
                 contentAtmosphere.setVisible(tabAtmosphere.isChecked());
@@ -200,7 +203,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         randomize.setColor(ColorUtils.gYellowC);
         randomize.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 randomizeAll();
             }
         });
@@ -215,7 +219,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         pgResolution.setValue(Settings.settings.graphics.proceduralGenerationResolution[1]);
         pgResolution.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 int pgHeight = (int) pgResolution.getValue();
                 int pgWidth = pgHeight * 2;
                 EventManager.publish(Event.PROCEDURAL_GENERATION_RESOLUTION_CMD, this, pgWidth, pgHeight);
@@ -228,7 +233,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
         saveTextures.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 EventManager.publish(Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD, this, saveTextures.isChecked());
             }
         });
@@ -242,7 +248,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     }
 
-    private OwnTextButton addLocalButton(Table content, String key,
+    private OwnTextButton addLocalButton(Table content,
+                                         String key,
                                          Function<Boolean, Boolean> generateFunc
     ) {
         String name = I18n.msg(key);
@@ -251,7 +258,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         OwnTextButton generate = new OwnTextButton(I18n.msg("gui.procedural.generate", name), skin);
         generate.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 generateFunc.apply(true);
             }
         });
@@ -264,7 +272,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         return generate;
     }
 
-    private void addLocalButtons(Table content, String key,
+    private void addLocalButtons(Table content,
+                                 String key,
                                  Function<Boolean, Boolean> gasGiantFunc,
                                  Function<Boolean, Boolean> earthLikeFunc,
                                  Function<Boolean, Boolean> coldPlanetFunc,
@@ -279,7 +288,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         gasGiant.setColor(ColorUtils.gBlueC);
         gasGiant.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 gasGiantFunc.apply(true);
             }
         });
@@ -292,7 +302,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         earthLike.setColor(ColorUtils.gBlueC);
         earthLike.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 earthLikeFunc.apply(true);
             }
         });
@@ -305,7 +316,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         snowWorld.setColor(ColorUtils.gBlueC);
         snowWorld.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 coldPlanetFunc.apply(true);
             }
         });
@@ -318,7 +330,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         rockyPlanet.setColor(ColorUtils.gBlueC);
         rockyPlanet.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 rockyPlanetFunc.apply(true);
             }
         });
@@ -338,7 +351,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
     }
 
-    private OwnTextButton addLocalButtons(Table content, String key,
+    private OwnTextButton addLocalButtons(Table content,
+                                          String key,
                                           Function<Boolean, Boolean> generateFunc,
                                           Function<Boolean, Boolean> randomizeFunc,
                                           int colspan) {
@@ -349,7 +363,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         randomize.setColor(ColorUtils.gYellowC);
         randomize.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 randomizeFunc.apply(true);
             }
         });
@@ -360,7 +375,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         OwnTextButton generate = new OwnTextButton(I18n.msg("gui.procedural.generate", name), skin);
         generate.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 generateFunc.apply(true);
             }
         });
@@ -377,7 +393,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         return generate;
     }
 
-    private void addNoiseGroup(Table content, NoiseComponent nc, String key, boolean expanded) {
+    private void addNoiseGroup(Table content,
+                               NoiseComponent nc,
+                               String key,
+                               boolean expanded) {
 
         // Noise group table.
         Table noiseTable = new Table(skin);
@@ -389,7 +408,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         seedField.setValidator(lv);
         seedField.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.seed = seedField.getLongValue(1L);
             }
         });
@@ -409,7 +429,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         type.setSelected(nc.type);
         type.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.type = type.getSelected();
             }
         });
@@ -427,7 +448,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         scaleX.setValue((float) nc.scale[0]);
         scaleX.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.scale[0] = scaleX.getMappedValue();
             }
         });
@@ -436,7 +458,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         scaleY.setValue((float) nc.scale[1]);
         scaleY.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.scale[1] = scaleY.getMappedValue();
             }
         });
@@ -445,7 +468,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         scaleZ.setValue((float) nc.scale[2]);
         scaleZ.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.scale[2] = scaleZ.getMappedValue();
             }
         });
@@ -466,7 +490,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         amplitude.setValue((float) nc.amplitude);
         amplitude.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.amplitude = amplitude.getMappedValue();
             }
         });
@@ -475,14 +500,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         noiseTable.add(amplitude).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(amplitudeTooltip).left().padBottom(pad18).row();
 
-
         // Persistence.
         OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
         persistence.setWidth(fieldWidthAll);
         persistence.setValue((float) nc.persistence);
         persistence.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.persistence = persistence.getMappedValue();
             }
         });
@@ -497,7 +522,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         frequency.setValue((float) nc.frequency);
         frequency.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.frequency = frequency.getMappedValue();
             }
         });
@@ -512,7 +538,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         lacunarity.setValue((float) nc.lacunarity);
         lacunarity.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.lacunarity = lacunarity.getMappedValue();
             }
         });
@@ -527,7 +554,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         octaves.setValue(nc.octaves);
         octaves.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.octaves = (int) octaves.getMappedValue();
             }
         });
@@ -542,7 +570,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         terraces.setValue(nc.numTerraces);
         terraces.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.numTerraces = (int) terraces.getMappedValue();
             }
         });
@@ -558,7 +587,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         terracesExp.setValueLabelTransform((value) -> String.valueOf(value * 2.0 - 1.0));
         terracesExp.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.terracesExp = terracesExp.getMappedValue() * 2f - 1f;
             }
         });
@@ -573,7 +603,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         rangeMin.setValue((float) nc.range[0]);
         rangeMin.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.range[0] = rangeMin.getMappedValue();
             }
         });
@@ -582,7 +613,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         rangeMax.setValue((float) nc.range[1]);
         rangeMax.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.range[1] = rangeMax.getMappedValue();
             }
         });
@@ -602,7 +634,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         power.setValue((float) nc.power);
         power.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 nc.power = power.getMappedValue();
             }
         });
@@ -611,36 +644,59 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         noiseTable.add(power).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(powerTooltip).left().padBottom(pad18).row();
 
-        // Turbulence.
+        // Ridge and turbulence.
         OwnCheckBox turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
+        OwnCheckBox ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
+
+        // Turbulence.
         turbulence.setChecked(nc.turbulence);
         turbulence.addListener(
                 new ChangeListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
                         nc.turbulence = turbulence.isChecked();
+                        if (!nc.turbulence) {
+                            nc.ridge = false;
+                            ridge.setProgrammaticChangeEvents(false);
+                            ridge.setChecked(false);
+                            ridge.setProgrammaticChangeEvents(true);
+                        }
                     }
                 }
         );
-        noiseTable.add(turbulence).colspan(3).left().padBottom(pad18).padRight(pad10).row();
+        OwnImageButton turbulenceTooltip = new OwnImageButton(skin, "tooltip");
+        turbulenceTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.turbulence"), skin));
+
+        noiseTable.add(turbulence).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(turbulenceTooltip).left().padBottom(pad18).row();
 
         // Ridge.
-        OwnCheckBox ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
         ridge.setChecked(nc.ridge);
         ridge.addListener(
                 new ChangeListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
                         nc.ridge = ridge.isChecked();
+                        if (nc.ridge) {
+                            nc.turbulence = true;
+                            turbulence.setProgrammaticChangeEvents(false);
+                            turbulence.setChecked(true);
+                            turbulence.setProgrammaticChangeEvents(true);
+                        }
                     }
                 }
         );
-        noiseTable.add(ridge).colspan(3).left().padBottom(pad18).padRight(pad10).row();
+        OwnImageButton ridgeTooltip = new OwnImageButton(skin, "tooltip");
+        ridgeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.ridge"), skin));
 
+        noiseTable.add(ridge).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(ridgeTooltip).left().padBottom(pad18).row();
 
         CollapsiblePane groupPane = new CollapsiblePane(stage, null, I18n.msg(key),
-                noiseTable, fieldWidthAll * 1.2f, skin, "hud-header", "expand-collapse",
-                null, expanded, () -> me.pack(), null, (Actor) null);
+                                                        noiseTable, fieldWidthAll * 1.2f, skin, "hud-header", "expand-collapse",
+                                                        null, expanded, () -> me.pack(), null, (Actor) null);
 
         content.add(groupPane).colspan(3).center().padBottom(pad34).row();
     }
@@ -656,7 +712,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
                         Color col = new Color(p.getPixel(x, y));
-                        float[] rgb = new float[]{col.r, col.g, col.b, 1f};
+                        float[] rgb = new float[] { col.r, col.g, col.b, 1f };
                         if (hue != 0) {
                             // Shift hue of lookup table by an amount in degrees
                             float[] hsb = ColorUtils.rgbToHsb(rgb);
@@ -698,10 +754,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
             // Add button group with presets.
             addLocalButtons(content, "gui.procedural.surface",
-                    this::randomizeSurfaceGasGiant,
-                    this::randomizeSurfaceEarthLike,
-                    this::randomizeSurfaceColdPlanet,
-                    this::randomizeSurfaceRockyPlanet);
+                            this::randomizeSurfaceGasGiant,
+                            this::randomizeSurfaceEarthLike,
+                            this::randomizeSurfaceColdPlanet,
+                            this::randomizeSurfaceRockyPlanet);
 
             // Add generate and randomize buttons
             genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
@@ -731,7 +787,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             lookUpTablesBox.setSelected(mtc.biomeLUT);
             lookUpTablesBox.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
                     mtc.biomeLUT = lookUpTablesBox.getSelected();
                     updateLutImage(lookUpTables);
                 }
@@ -754,7 +811,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             hueShift.setValue(mtc.biomeHueShift);
             hueShift.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
                     mtc.biomeHueShift = hueShift.getMappedValue();
                     updateLutImage(lookUpTables);
                 }
@@ -774,7 +832,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
             heightScale.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
                     mtc.heightScale = (float) (heightScale.getMappedValue() * Constants.KM_TO_U);
                 }
             });
@@ -788,7 +847,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             emission.setChecked(mtc.nc.genEmissionMap);
             emission.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
                     mtc.nc.genEmissionMap = emission.isChecked();
                 }
             });
@@ -840,7 +900,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad18).row();
 
         // Fog color
-        ColorPicker cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
+        ColorPicker cloudColor = new ColorPicker(new float[] { clc.color[0], clc.color[1], clc.color[2], clc.color[3] }, stage, skin);
         cloudColor.setSize(128f, 128f);
         cloudColor.setNewColorRunnable(() -> {
             float[] col = cloudColor.getPickedColor();
@@ -890,7 +950,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         wavelength0.setValue((float) ac.wavelengths[0]);
         wavelength0.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.wavelengths[0] = wavelength0.getMappedValue();
             }
         });
@@ -899,7 +960,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         wavelength1.setValue((float) ac.wavelengths[1]);
         wavelength1.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.wavelengths[1] = wavelength1.getMappedValue();
             }
         });
@@ -908,7 +970,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         wavelength2.setValue((float) ac.wavelengths[1]);
         wavelength2.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.wavelengths[2] = wavelength2.getMappedValue();
             }
         });
@@ -929,7 +992,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         eSun.setValue(ac.m_eSun);
         eSun.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.m_eSun = eSun.getMappedValue();
             }
         });
@@ -946,7 +1010,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         kr.setValue(ac.m_Kr);
         kr.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.m_Kr = kr.getMappedValue();
             }
         });
@@ -962,7 +1027,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         km.setValue(ac.m_Km);
         km.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.m_Km = km.getMappedValue();
             }
         });
@@ -973,14 +1039,15 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Fog density
         OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
-                Constants.MIN_ATM_FOG_DENSITY,
-                Constants.MAX_ATM_FOG_DENSITY,
-                Constants.SLIDER_STEP_TINY, skin);
+                                                     Constants.MIN_ATM_FOG_DENSITY,
+                                                     Constants.MAX_ATM_FOG_DENSITY,
+                                                     Constants.SLIDER_STEP_TINY, skin);
         fogDensity.setWidth(fieldWidthTotal);
         fogDensity.setValue(ac.fogDensity);
         fogDensity.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.fogDensity = fogDensity.getMappedValue();
             }
         });
@@ -995,7 +1062,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         samples.setValue(ac.samples);
         samples.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 ac.samples = (int) samples.getValue();
             }
         });
@@ -1005,7 +1073,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(samplesTooltip).left().padBottom(pad18).row();
 
         // Fog color
-        ColorPicker fogColor = new ColorPicker(new float[]{ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f}, stage, skin);
+        ColorPicker fogColor = new ColorPicker(new float[] { ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f }, stage, skin);
         fogColor.setNewColorRunnable(() -> {
             float[] col = fogColor.getPickedColor();
             ac.fogColor.x = col[0];
@@ -1029,11 +1097,11 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     protected Boolean randomizeSurface(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
         switch (rand.nextInt(10)) {
-            case 0, 1, 2, 3 -> initMtc.randomizeEarthLike(rand.nextLong());
-            case 4 -> initMtc.randomizeRockyPlanet(rand.nextLong());
-            case 5, 6 -> initMtc.randomizeGasGiant(rand.nextLong());
-            case 7, 8 -> initMtc.randomizeColdPlanet(rand.nextLong());
-            case 9 -> initMtc.randomizeAll(rand.nextLong());
+        case 0, 1, 2, 3 -> initMtc.randomizeEarthLike(rand.nextLong());
+        case 4 -> initMtc.randomizeRockyPlanet(rand.nextLong());
+        case 5, 6 -> initMtc.randomizeGasGiant(rand.nextLong());
+        case 7, 8 -> initMtc.randomizeColdPlanet(rand.nextLong());
+        case 9 -> initMtc.randomizeAll(rand.nextLong());
         }
 
         if (rebuild) {
@@ -1106,7 +1174,6 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         return generateSurface(false);
     }
-
 
     protected Boolean randomizeClouds(Boolean rebuild) {
         this.initClc = new CloudComponent();
@@ -1218,7 +1285,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     /**
      * Sets the enabled property on the given components
      */
-    protected void enableComponents(boolean enabled, Disableable... components) {
+    protected void enableComponents(boolean enabled,
+                                    Disableable... components) {
         for (Disableable c : components) {
             if (c != null)
                 c.setDisabled(!enabled);
@@ -1240,38 +1308,40 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         switch (event) {
-            case PROCEDURAL_GENERATION_CLOUD_INFO -> {
-                boolean status = (Boolean) data[0];
-                if (status) {
-                    genCloudNum++;
-                } else {
-                    genCloudNum = FastMath.max(genCloudNum - 1, 0);
-                }
-                updateButtonStatus();
+        case PROCEDURAL_GENERATION_CLOUD_INFO -> {
+            boolean status = (Boolean) data[0];
+            if (status) {
+                genCloudNum++;
+            } else {
+                genCloudNum = FastMath.max(genCloudNum - 1, 0);
             }
-            case PROCEDURAL_GENERATION_SURFACE_INFO -> {
-                boolean status = (Boolean) data[0];
-                if (status) {
-                    genSurfaceNum++;
-                } else {
-                    genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
-                }
-                updateButtonStatus();
+            updateButtonStatus();
+        }
+        case PROCEDURAL_GENERATION_SURFACE_INFO -> {
+            boolean status = (Boolean) data[0];
+            if (status) {
+                genSurfaceNum++;
+            } else {
+                genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
             }
-            case FOCUS_CHANGED -> {
-                Entity entity;
-                if (data[0] instanceof String) {
-                    entity = GaiaSky.instance.scene.getEntity((String) data[0]);
-                } else {
-                    FocusView v = (FocusView) data[0];
-                    entity = v.getEntity();
-                }
-                if (Mapper.atmosphere.has(entity)) {
-                    reinitialize(entity);
-                }
+            updateButtonStatus();
+        }
+        case FOCUS_CHANGED -> {
+            Entity entity;
+            if (data[0] instanceof String) {
+                entity = GaiaSky.instance.scene.getEntity((String) data[0]);
+            } else {
+                FocusView v = (FocusView) data[0];
+                entity = v.getEntity();
             }
+            if (Mapper.atmosphere.has(entity)) {
+                reinitialize(entity);
+            }
+        }
         }
     }
 }
