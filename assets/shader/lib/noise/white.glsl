@@ -40,16 +40,7 @@ float gln_wfbm(vec3 v, gln_tFBMOpts opts) {
 
     float noiseVal = gln_white(p);
 
-    if (opts.turbulence && !opts.ridge) {
-      result += abs(noiseVal) * amplitude;
-    } else if (opts.ridge) {
-      noiseVal = pow(1.0 - abs(noiseVal), 2.0);
-      result += noiseVal * amplitude;
-    }
-
-    frequency *= opts.lacunarity;
-    amplitude *= opts.persistence;
-    maximum += amplitude;
+    #include <shader/lib/noise/fbm.glsl>
   }
 
   return pow(result / maximum, opts.power);
