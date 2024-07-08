@@ -499,17 +499,17 @@ public class FullGui extends AbstractGui {
             }
             case POPUP_MENU_FOCUS -> {
                 final Entity candidate = (Entity) data[0];
-                int screenX = Gdx.input.getX();
-                int screenY = Gdx.input.getY();
+                int screenX = (int) data[1];
+                int screenY = (int) data[2];
                 FocusView focusView = null;
                 if (candidate != null) {
                     view.setEntity(candidate);
                     focusView = view;
                 }
-                GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, focusView, catalogManager, scene);
+                SceneContextMenu popup = new SceneContextMenu(skin, "default", screenX, screenY, focusView, catalogManager, scene);
                 int h = (int) getGuiStage().getHeight();
-                float px = screenX / Settings.settings.program.ui.scale;
-                float py = h - screenY / Settings.settings.program.ui.scale - 32f;
+                float px = screenX * unitsPerPixel;
+                float py = h - screenY * unitsPerPixel - 32f;
                 popup.showMenu(stage, px, py);
             }
             case TOGGLE_MINIMAP -> {

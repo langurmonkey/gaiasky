@@ -39,7 +39,7 @@ import gaiasky.util.scene2d.OwnImage;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GaiaSkyContextMenu extends ContextMenu {
+public class SceneContextMenu extends ContextMenu {
 
     // The skin
     private final Skin skin;
@@ -61,7 +61,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
     // Added items
     private int nItems = 0;
 
-    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final FocusView candidate, final CatalogManager catalogManager, final Scene scene) {
+    public SceneContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final FocusView candidate, final CatalogManager catalogManager, final Scene scene) {
         super(skin, styleName);
         this.skin = skin;
         this.screenX = (int) (screenX / Settings.settings.program.ui.scale);
