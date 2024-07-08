@@ -365,7 +365,7 @@ public class NoiseComponent extends NamedComponent {
             setPower(gaussian(rand, 2.0, 2.0, 0.2));
         }
         // Turbulence.
-        setTurbulence(rand.nextBoolean());
+        setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence ? rand.nextBoolean() : false);
         // Emission.
@@ -404,7 +404,7 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(rand.nextDouble(0.5, 1.1));
         // Turbulence.
-        setTurbulence(rand.nextBoolean());
+        setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence ? rand.nextInt(3) < 2 : false);
         // Emission.
@@ -443,7 +443,7 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(rand.nextDouble(0.5, 1.6));
         // Turbulence.
-        setTurbulence(rand.nextBoolean());
+        setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence ? rand.nextInt(4) < 3 : false);
         // Emission.
@@ -482,7 +482,7 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(rand.nextDouble(0.5, 1.8));
         // Turbulence.
-        setTurbulence(rand.nextBoolean());
+        setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence ? rand.nextInt(4) < 3 : false);
         // Emission.
@@ -530,7 +530,7 @@ public class NoiseComponent extends NamedComponent {
         // Power.
         setPower(0.1);
         // Turbulence.
-        setTurbulence(rand.nextBoolean());
+        setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence ? rand.nextBoolean() : false);
         // Emission.

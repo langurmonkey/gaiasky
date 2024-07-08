@@ -229,6 +229,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private long lastDynamicResolutionChange = 0;
     /** Dynamic resolution (smoothed) FPS. **/
     private float fps;
+    /** Global units per pixel. **/
+    private float unitsPerPixel = 1;
     /**
      * Provisional console logger.
      */
@@ -1004,23 +1006,23 @@ public class GaiaSky implements ApplicationListener, IObserver {
             guis.clear();
         }
 
-        mainGui = new FullGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, globalResources, catalogManager);
+        mainGui = new FullGui(globalResources.getSkin(), graphics, unitsPerPixel, globalResources, catalogManager);
         mainGui.initialize(assetManager, globalResources.getSpriteBatch());
 
-        debugGui = new DebugGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        debugGui = new DebugGui(globalResources.getSkin(), graphics, unitsPerPixel);
         debugGui.initialize(assetManager, globalResources.getSpriteBatch());
 
-        spacecraftGui = new SpacecraftGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        spacecraftGui = new SpacecraftGui(globalResources.getSkin(), graphics, unitsPerPixel);
         spacecraftGui.initialize(assetManager, globalResources.getSpriteBatch());
 
-        stereoGui = new StereoGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        stereoGui = new StereoGui(globalResources.getSkin(), graphics, unitsPerPixel);
         stereoGui.initialize(assetManager, globalResources.getSpriteBatch());
 
-        gamepadGui = new GamepadGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        gamepadGui = new GamepadGui(globalResources.getSkin(), graphics, unitsPerPixel);
         gamepadGui.initialize(assetManager, globalResources.getSpriteBatch());
 
         // This one is special! Not affected by clean mode.
-        timeGui = new TimeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        timeGui = new TimeGui(globalResources.getSkin(), graphics, unitsPerPixel);
         timeGui.initialize(assetManager, globalResources.getSpriteBatch());
 
         if (guis != null) {
@@ -1701,17 +1703,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     public void applyUIScale(int height, List<IGui> guis) {
         if (guis != null) {
+            unitsPerPixel = 1f / getUIScale(height);
             for (IGui gui : guis) {
-                gui.updateUnitsPerPixel(1f / getUIScale(height));
+                gui.updateUnitsPerPixel(unitsPerPixel);
             }
         }
     }
 
     public float getUnitsPerPixel() {
-        if (mainGui != null) {
-            return mainGui.getUnitsPerPixel();
-        }
-        return 1;
+        return unitsPerPixel;
     }
 
     public boolean isInitialised() {
