@@ -117,10 +117,15 @@ public interface IGui extends Disposable {
     boolean mustDraw();
 
     /**
-     * Updates the units-per-pixel value of this GUI. The units-per-pixel
-     * is the same as 1/UI_SCALE.
+     * Updates the units-per-pixel value of this GUI. This defines the size of the GUI.
      */
     boolean updateUnitsPerPixel(float upp);
+
+    /**
+     * Gets the units per pixel of this GUI.
+     * @return The units per pixel value.
+     */
+    float getUnitsPerPixel();
 
     /**
      * Sets the back buffer size.

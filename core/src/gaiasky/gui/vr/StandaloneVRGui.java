@@ -317,6 +317,11 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
     }
 
     @Override
+    public float getUnitsPerPixel() {
+        return 1;
+    }
+
+    @Override
     public void setBackBufferSize(int width, int height) {
     }
 

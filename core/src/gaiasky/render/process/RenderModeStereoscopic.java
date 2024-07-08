@@ -207,6 +207,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             double srw, srh, boundsw, boundsh, start2w, start2h;
 
+            float unitsPerPixel = GaiaSky.instance.getUnitsPerPixel();
             boolean stretch = Settings.settings.program.modeStereo.profile == StereoProfile.HORIZONTAL_3DTV || Settings.settings.program.modeStereo.profile == StereoProfile.VERTICAL_3DTV;
             boolean changeSides = Settings.settings.program.modeStereo.profile == StereoProfile.CROSSEYE;
 
@@ -233,10 +234,10 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                 start2w = 0;
                 start2h = boundsh;
             }
-            boundsw /= Settings.settings.program.ui.scale;
-            boundsh /= Settings.settings.program.ui.scale;
-            start2w /= Settings.settings.program.ui.scale;
-            start2h /= Settings.settings.program.ui.scale;
+            boundsw *= unitsPerPixel;
+            boundsh *= unitsPerPixel;
+            start2w *= unitsPerPixel;
+            start2h *= unitsPerPixel;
 
             boundsw /= Settings.settings.graphics.backBufferScale;
             boundsh /= Settings.settings.graphics.backBufferScale;

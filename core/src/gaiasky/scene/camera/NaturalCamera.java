@@ -438,7 +438,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
         // Next closest position.
         if (closestBody != null && !closestBody.isEmpty()) {
-            if(getMode().isFocus() && focus.getEntity() == closestBody.getEntity()) {
+            if (getMode().isFocus() && focus.getEntity() == closestBody.getEntity()) {
                 nextClosestPosition.set(nextFocusPosition);
             } else {
                 closestBody.getPredictedPosition(nextClosestPosition, time, this, false);
@@ -1820,7 +1820,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch.begin();
 
         boolean decal = modeCubemap || modeStereo || vr;
-        float chScale = 1f;
+        float chScale = 2f / GaiaSky.instance.getUnitsPerPixel();
         if (modeCubemap) {
             chScale = 4f;
         }
@@ -1860,7 +1860,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             GlobalResources.applyRelativisticAberration(aux1, this);
             // GravitationalWavesManager.instance().gravitationalWavePos(aux1);
 
-            boolean inside = projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
+            boolean inside = projectToScreen(aux1, auxf1, rw, rh, chw2, chh2);
 
             if (inside) {
                 // Cyan
@@ -1889,7 +1889,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
         Vector3d pos = aux5;
         p.put(pos);
-        DecalUtils.drawSprite(sprite, batch, (float) pos.x, (float) pos.y, (float) pos.z, 0.0008d, 1f, this, true, 0.04f, 0.04f);
+        DecalUtils.drawSprite(sprite, batch, (float) pos.x, (float) pos.y, (float) pos.z, 0.0008d,
+                1f, this, true, 0.04f, 0.04f);
     }
 
     private void drawCrossHair(SpriteBatch batch,
@@ -1911,10 +1912,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 drawCrossHairDecal(batch, chFocus, focusMode, crosshairSprite, r, g, b, a);
             } else {
                 if (!focusMode) {
-                    drawCrossHair(chFocus.getClosestAbsolutePos(aux1b).add(posInv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(),
+                    drawCrossHair(chFocus.getClosestAbsolutePos(aux1b).add(posInv), chFocus.getClosestDistToCamera(),
+                            chFocus.getRadius(), crosshairSprite.getTexture(), crosshairScale,
                             arrowTex, rw, rh, r, g, b, a);
                 } else {
-                    drawCrossHair(chFocus.getAbsolutePosition(aux1b).add(posInv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex,
+                    drawCrossHair(chFocus.getAbsolutePosition(aux1b).add(posInv), chFocus.getDistToCamera(),
+                            chFocus.getRadius(), crosshairSprite.getTexture(), crosshairScale, arrowTex,
                             rw, rh, r, g, b, a);
                 }
             }
@@ -1924,22 +1927,24 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Draws a cross-hair given a camera-relative position
      *
-     * @param p            The position in floating camera coordinates
-     * @param distToCam    The distance to the camera
-     * @param radius       Radius of object
-     * @param crossHairTex Cross-hair texture
-     * @param arrowTex     Arrow texture
-     * @param rw           Width
-     * @param rh           Height
-     * @param r            Red
-     * @param g            Green
-     * @param b            Blue
-     * @param a            Alpha
+     * @param p              The position in floating camera coordinates
+     * @param distToCam      The distance to the camera
+     * @param radius         Radius of object
+     * @param crossHairTex   Cross-hair texture
+     * @param crossHairScale The scale of the cross-hair.
+     * @param arrowTex       Arrow texture
+     * @param rw             Width
+     * @param rh             Height
+     * @param r              Red
+     * @param g              Green
+     * @param b              Blue
+     * @param a              Alpha
      */
     private void drawCrossHair(Vector3b p,
                                double distToCam,
                                double radius,
                                Texture crossHairTex,
+                               float crossHairScale,
                                Texture arrowTex,
                                int rw,
                                int rh,
@@ -1948,8 +1953,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                float b,
                                float a) {
         if (distToCam > radius * 2) {
-            float chw = crossHairTex.getWidth();
-            float chh = crossHairTex.getHeight();
+            float chw = crossHairTex.getWidth() * crossHairScale;
+            float chh = crossHairTex.getHeight() * crossHairScale;
             float chw2 = chw / 2;
             float chh2 = chh / (vr ? 1 : 2);
 
@@ -1961,7 +1966,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (vr) {
                 pos.nor().scl(distToCam - radius);
             }
-            boolean inside = projectToScreen(pos, auxf1, rw, rh, chw, chh, chw2, chh2);
+            boolean inside = projectToScreen(pos, auxf1, rw, rh, chw2, chh2);
 
             spriteBatch.setColor(r, g, b, a);
 
@@ -1977,7 +1982,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     aux2f2.set(auxf1.x - (rw / 2f), auxf1.y - (rh / 2f));
                     aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
                     aux1.set(vrOffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
-                    projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
+                    projectToScreen(aux1, auxf1, rw, rh, chw2, chh2);
                     spriteBatch.draw(arrowTex, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
                 } else {
                     aux2f2.set(auxf1.x - (rw / 2f), auxf1.y - (rh / 2f));
@@ -1999,8 +2004,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                     Vector3 out,
                                     int rw,
                                     int rh,
-                                    float chw,
-                                    float chh,
                                     float chw2,
                                     float chh2) {
         vec.put(out);

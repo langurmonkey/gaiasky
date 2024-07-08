@@ -165,6 +165,10 @@ public abstract class AbstractGui implements IObserver, IGui {
         return false;
     }
 
+    public float getUnitsPerPixel() {
+        return unitsPerPixel;
+    }
+
     @Override
     public void setBackBufferSize(int width, int height) {
         this.backBufferHeight = height;

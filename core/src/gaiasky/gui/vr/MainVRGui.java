@@ -434,6 +434,11 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     @Override
+    public float getUnitsPerPixel() {
+        return 1;
+    }
+
+    @Override
     public void setBackBufferSize(int width,
                                   int height) {
 

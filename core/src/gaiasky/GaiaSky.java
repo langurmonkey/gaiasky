@@ -1148,7 +1148,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             xrDriver.dispose();
 
         // GLFW crashes on glfwDestroyWindow() on Wayland.
-        if(SysUtils.isLinux() && SysUtils.isWayland()) {
+        if (SysUtils.isLinux() && SysUtils.isWayland()) {
             System.exit(0);
         }
     }
@@ -1705,6 +1705,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 gui.updateUnitsPerPixel(1f / getUIScale(height));
             }
         }
+    }
+
+    public float getUnitsPerPixel() {
+        if (mainGui != null) {
+            return mainGui.getUnitsPerPixel();
+        }
+        return 1;
     }
 
     public boolean isInitialised() {
