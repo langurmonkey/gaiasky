@@ -114,6 +114,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cinematic = new OwnCheckBox(I18n.msg("gui.camera.cinematic"), skin, pad8);
         cinematic.setName("cinematic camera");
         cinematic.setChecked(Settings.settings.scene.camera.cinematic);
+        final String[] hkc = KeyBindings.instance.getStringKeys("action.toggle/camera.cinematic", true);
+        cinematic.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("gui.camera.cinematic")), hkc, skin));
         cinematic.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CAMERA_CINEMATIC_CMD, cinematic, cinematic.isChecked());
