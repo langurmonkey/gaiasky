@@ -163,7 +163,9 @@ void main() {
 
     #ifdef extraTarget
     // Generate emission pattern with white channel.
+    // High-scale: voronoi.
     float voronoi = noise(p, 2, 1.0, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
+    // Low-scale: regular noise.
     float val_ch4 = noise(p, u_type, 1.7, false, 0, 0.0, u_scale, u_octaves, vec2(-0.4, 1.0), u_seed + 1.4325);
     val_ch4 = voronoi * step(0.1, val_ch1) * val_ch4;
     emissionColor = vec4(val_ch4, val_ch4 * 0.8, val_ch4 * 0.6, 1.0);
