@@ -26,6 +26,10 @@ layout (location = 1) out vec4 specularColor;
 layout (location = 2) out vec4 normalColor;
 #endif // normalMapFlag
 
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
+
 void main() {
     // Get height and moisture.
     vec4 biome = texture(u_texture0, v_texCoords);
@@ -45,15 +49,13 @@ void main() {
     // Saturation.
     hsv.y = hsv.y * u_lutSaturation;
     #ifdef emissiveMapFlag
-    //hsv.y = hsv.y * (1.0 - emissive);
+    hsv.y = hsv.y * (1.0 - emissive);
+    hsv.z = hsv.z * mix(1.0, ((random(v_texCoords.xy * 100.0) * 0.3 + 1.4) - emissive), emissive);
     #endif // emissiveMapFlag
     // Back to RGB.
     rgba.rgb = hsv2rgb(hsv);
 
     // Diffuse.
-    #ifdef emissiveMapFlag
-    rgba.rgb = rgba.rgb * (1.0 - emissive);
-    #endif // emissiveMapFlag
     diffuseColor = rgba;
 
     // Specular.
