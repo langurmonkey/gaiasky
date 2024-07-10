@@ -844,12 +844,12 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
             // Generate emission.
             OwnCheckBox emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
-            emission.setChecked(mtc.nc.genEmissionMap);
+            emission.setChecked(mtc.nc.genEmissiveMap);
             emission.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
-                    mtc.nc.genEmissionMap = emission.isChecked();
+                    mtc.nc.genEmissiveMap = emission.isChecked();
                 }
             });
             OwnImageButton emissionTooltip = new OwnImageButton(skin, "tooltip");

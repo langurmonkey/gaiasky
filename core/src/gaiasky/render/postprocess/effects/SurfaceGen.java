@@ -16,13 +16,17 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class SurfaceGen extends PostProcessorEffect {
     private final SurfaceGenFilter filter;
 
-    public SurfaceGen(boolean generateNormalMap) {
-        filter = new SurfaceGenFilter(generateNormalMap);
+    public SurfaceGen(boolean normalMap, boolean emissiveMap) {
+        filter = new SurfaceGenFilter(normalMap, emissiveMap);
         disposables.add(filter);
     }
 
     public void setLutTexture(Texture lut) {
         filter.setLutTexture(lut);
+    }
+
+    public void setEmissiveTexture(Texture emissive) {
+        filter.setEmissiveTexture(emissive);
     }
 
     public void setLutHueShift(float lutHueShift) {

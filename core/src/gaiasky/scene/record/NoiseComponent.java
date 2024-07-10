@@ -39,7 +39,7 @@ public class NoiseComponent extends NamedComponent {
     public int numTerraces = 0;
     public float terracesExp = 17.0f;
 
-    public boolean genEmissionMap = false;
+    public boolean genEmissiveMap = false;
 
     public FrameBuffer fbNoise, fbBiome, fbSurface;
 
@@ -103,17 +103,18 @@ public class NoiseComponent extends NamedComponent {
      * Generates the biome, which is a set of two textures in a frame buffer. The first render target in the frame
      * buffer is the elevation, the second is the moisture, and the third the emission.
      *
-     * @param N        The width in pixels.
-     * @param M        The height in pixels.
+     * @param N The width in pixels.
+     * @param M The height in pixels.
      *
      * @return The biome frame buffer, with two render targets.
      */
     public synchronized FrameBuffer generateBiome(int N, int M) {
         // Biome noise (height, moisture).
-        fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, genEmissionMap ? 2 : 1);
+        fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, genEmissiveMap ? 2 : 1);
 
-        // 3 channels: height, moisture, emission.
-        Noise biomeNoise = getNoiseEffect(N, M, 2, genEmissionMap ? 2 : 1);
+        // 2 channels: height, moisture, temperature (optional).
+        // Emissive map is an additional render target.
+        Noise biomeNoise = getNoiseEffect(N, M, 2, genEmissiveMap ? 2 : 1);
         fbBiome.begin();
         biomeNoise.render(null, fbBiome);
         fbBiome.end();
@@ -152,10 +153,13 @@ public class NoiseComponent extends NamedComponent {
         lut.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, generateNormalMap ? 3 : 2);
 
-        SurfaceGen surfaceGen = new SurfaceGen(generateNormalMap);
+        SurfaceGen surfaceGen = new SurfaceGen(generateNormalMap, genEmissiveMap);
         surfaceGen.setLutTexture(lut);
         surfaceGen.setLutHueShift(biomeHueShift);
         surfaceGen.setLutSaturation(biomeSaturation);
+        if (genEmissiveMap) {
+            surfaceGen.setEmissiveTexture(fbBiome.getTextureAttachments().get(1));
+        }
         fbSurface.begin();
         surfaceGen.render(fbBiome, fbSurface, null);
         fbSurface.end();
@@ -278,7 +282,7 @@ public class NoiseComponent extends NamedComponent {
         this.power = other.power;
         this.turbulence = other.turbulence;
         this.ridge = other.ridge;
-        this.genEmissionMap = other.genEmissionMap;
+        this.genEmissiveMap = other.genEmissiveMap;
     }
 
     public void randomizeAll(Random rand) {
@@ -369,7 +373,7 @@ public class NoiseComponent extends NamedComponent {
         // Ridge.
         setRidge(turbulence ? rand.nextBoolean() : false);
         // Emission.
-        genEmissionMap = rand.nextInt(10) == 9;
+        genEmissiveMap = rand.nextInt(10) == 9;
     }
 
     public void randomizeRockyPlanet(Random rand) {
@@ -408,7 +412,7 @@ public class NoiseComponent extends NamedComponent {
         // Ridge.
         setRidge(turbulence ? rand.nextInt(3) < 2 : false);
         // Emission.
-        genEmissionMap = rand.nextInt(20) == 19;
+        genEmissiveMap = rand.nextInt(20) == 19;
     }
 
     public void randomizeEarthLike(Random rand) {
@@ -447,7 +451,7 @@ public class NoiseComponent extends NamedComponent {
         // Ridge.
         setRidge(turbulence ? rand.nextInt(4) < 3 : false);
         // Emission.
-        genEmissionMap = rand.nextInt(4) == 3;
+        genEmissiveMap = rand.nextInt(4) == 3;
     }
 
     public void randomizeSnowPlanet(Random rand) {
@@ -486,7 +490,7 @@ public class NoiseComponent extends NamedComponent {
         // Ridge.
         setRidge(turbulence ? rand.nextInt(4) < 3 : false);
         // Emission.
-        genEmissionMap = rand.nextInt(15) == 14;
+        genEmissiveMap = rand.nextInt(15) == 14;
     }
 
     public void randomizeGasGiant(Random rand) {
@@ -534,7 +538,7 @@ public class NoiseComponent extends NamedComponent {
         // Ridge.
         setRidge(turbulence ? rand.nextBoolean() : false);
         // Emission.
-        genEmissionMap = rand.nextInt(10) == 9;
+        genEmissiveMap = rand.nextInt(10) == 9;
     }
 
     public void print(Log log) {
@@ -552,7 +556,7 @@ public class NoiseComponent extends NamedComponent {
         log.debug("Power: " + power);
         log.debug("Turbulence: " + turbulence);
         log.debug("Ridge: " + ridge);
-        log.debug("Emission: " + genEmissionMap);
+        log.debug("Emission: " + genEmissiveMap);
     }
 
     @Override

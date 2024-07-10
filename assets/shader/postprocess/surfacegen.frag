@@ -9,6 +9,10 @@
 uniform sampler2D u_texture0;
 // LUT.
 uniform sampler2D u_texture1;
+// Emissive texture.
+#ifdef emissiveMapFlag
+uniform sampler2D u_texture2;
+#endif // emissiveMapFlag
 
 // LUT hue shift.
 uniform float u_lutHueShift;
@@ -25,8 +29,11 @@ layout (location = 2) out vec4 normalColor;
 void main() {
     // Get height and moisture.
     vec4 biome = texture(u_texture0, v_texCoords);
-    float height = biome.x;
-    float moisture = biome.y;
+    float height = biome.r;
+    float moisture = biome.g;
+    #ifdef emissiveMapFlag
+    float emissive = clamp(luma(texture(u_texture2, v_texCoords).rgb) * 2.0, 0.0, 1.0);
+    #endif // emissiveMapFlag
 
     // Query LUT.
     vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
@@ -37,10 +44,16 @@ void main() {
     hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
     // Saturation.
     hsv.y = hsv.y * u_lutSaturation;
+    #ifdef emissiveMapFlag
+    //hsv.y = hsv.y * (1.0 - emissive);
+    #endif // emissiveMapFlag
     // Back to RGB.
     rgba.rgb = hsv2rgb(hsv);
 
     // Diffuse.
+    #ifdef emissiveMapFlag
+    rgba.rgb = rgba.rgb * (1.0 - emissive);
+    #endif // emissiveMapFlag
     diffuseColor = rgba;
 
     // Specular.

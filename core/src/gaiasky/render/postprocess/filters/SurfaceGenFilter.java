@@ -11,15 +11,18 @@ import com.badlogic.gdx.graphics.Texture;
 import gaiasky.render.util.ShaderLoader;
 
 public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
-    private Texture lut;
+    private Texture lut, emissive;
     float lutHueShift = 0;
     float lutSaturation = 1;
 
-    public SurfaceGenFilter(boolean generateNormalMap) {
+    public SurfaceGenFilter(boolean normalMap, boolean emissiveMap) {
         super(ShaderLoader.fromFile(
                 "screenspace",
                 "surfacegen",
-                generateNormalMap ? "#define normalMapFlag\n" : ""));
+                // Generate normal map.
+                (normalMap ? "#define normalMapFlag\n" : "") +
+                        // The biome texture includes an emissive map in the blue channel.
+                        (emissiveMap ? "#define emissiveMapFlag\n" : "")));
 
         rebind();
     }
@@ -27,6 +30,11 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
     public void setLutTexture(Texture lut) {
         this.lut = lut;
         setParam(Param.TextureLut, u_texture1);
+    }
+
+    public void setEmissiveTexture(Texture emissive) {
+        this.emissive = emissive;
+        setParam(Param.TextureEmissive, u_texture2);
     }
 
     public void setLutHueShift(float hs) {
@@ -45,6 +53,8 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
         // Re-implement super to batch every parameter
         setParams(Param.Texture, u_texture0);
         setParams(Param.TextureLut, u_texture1);
+        if (emissive != null)
+            setParams(Param.TextureEmissive, u_texture2);
         setParams(Param.LutSaturation, lutSaturation);
         setParams(Param.LutHueShift, lutHueShift);
 
@@ -57,12 +67,15 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
             inputTexture.bind(u_texture0);
         if (lut != null)
             lut.bind(u_texture1);
+        if (emissive != null)
+            emissive.bind(u_texture2);
     }
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
         TextureLut("u_texture1", 0),
+        TextureEmissive("u_texture2", 0),
 
         LutSaturation("u_lutSaturation", 0),
         LutHueShift("u_lutHueShift", 0);
