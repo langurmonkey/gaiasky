@@ -17,7 +17,7 @@ uniform sampler2D u_texture2;
 // LUT hue shift.
 uniform float u_lutHueShift;
 // LUT saturation value.
-uniform float u_lutSaturation;;
+uniform float u_lutSaturation;
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 diffuseColor;
