@@ -584,7 +584,7 @@ public class Settings extends SettingsObject {
         }
     }
 
-    public enum TextureQuality {
+    public enum GraphicsQuality {
         LOW("gui.gquality.low", "-low", 1024, 512),
         NORMAL("gui.gquality.normal", "-med", 2048, 1024),
         HIGH("gui.gquality.high", "-high", 4096, 2048),
@@ -595,21 +595,21 @@ public class Settings extends SettingsObject {
         public final int texWidthTarget;
         public final int texHeightTarget;
 
-        TextureQuality(String key,
-                       String suffix,
-                       int texWidthTarget,
-                       int texHeightTarget) {
+        GraphicsQuality(String key,
+                        String suffix,
+                        int texWidthTarget,
+                        int texHeightTarget) {
             this.key = key;
             this.suffix = suffix;
             this.texWidthTarget = texWidthTarget;
             this.texHeightTarget = texHeightTarget;
         }
 
-        public boolean isAtLeast(TextureQuality gq) {
+        public boolean isAtLeast(GraphicsQuality gq) {
             return this.ordinal() >= gq.ordinal();
         }
 
-        public boolean isAtMost(TextureQuality gq) {
+        public boolean isAtMost(GraphicsQuality gq) {
             return this.ordinal() <= gq.ordinal();
         }
 
@@ -631,7 +631,7 @@ public class Settings extends SettingsObject {
 
         public int getGlowNLights() {
             if (isLow()) {
-                return 3;
+                return 4;
             } else if (isNormal()) {
                 return 5;
             } else if (isHigh()) {
@@ -993,8 +993,8 @@ public class Settings extends SettingsObject {
          **/
         @JsonIgnore
         final public double[] dynamicResolutionScale = new double[]{1f, 0.85f, 0.75f, 0.5f};
-        /** Default texture quality. **/
-        public TextureQuality quality;
+        /** Graphics texture quality. **/
+        public GraphicsQuality quality;
         public int[] resolution;
         public boolean resizable;
         public FullscreenSettings fullScreen;
@@ -1021,7 +1021,7 @@ public class Settings extends SettingsObject {
         public int[] proceduralGenerationResolution = new int[]{3000, 1500};
 
         public void setQuality(final String qualityString) {
-            this.quality = TextureQuality.valueOf(qualityString.toUpperCase());
+            this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
         }
 
         @JsonIgnore

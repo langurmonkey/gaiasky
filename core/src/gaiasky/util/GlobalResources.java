@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.DistanceUnits;
-import gaiasky.util.Settings.TextureQuality;
+import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -617,11 +617,11 @@ public class GlobalResources {
 
     }
 
-    public static String unpackAssetPath(String path, TextureQuality gq) {
+    public static String unpackAssetPath(String path, GraphicsQuality gq) {
         if (path.contains(Constants.STAR_SUBSTITUTE)) {
             // Start with current quality and scan to lower ones
             for (int i = gq.ordinal(); i >= 0; i--) {
-                TextureQuality quality = TextureQuality.values()[i];
+                GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
 
                 String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
@@ -635,9 +635,9 @@ public class GlobalResources {
                 return texNoSuffix;
             }
             // Try higher qualities
-            int n = TextureQuality.values().length;
+            int n = GraphicsQuality.values().length;
             for (int i = gq.ordinal(); i < n; i++) {
-                TextureQuality quality = TextureQuality.values()[i];
+                GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
 
                 String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
@@ -652,7 +652,7 @@ public class GlobalResources {
         }
     }
 
-    public static String unpackAssetPath(String path, TextureQuality gq, String... extensions) {
+    public static String unpackAssetPath(String path, GraphicsQuality gq, String... extensions) {
         if (!path.contains(Constants.STAR_SUBSTITUTE)) {
             for (String extension : extensions) {
                 String tex = path + extension;
@@ -664,7 +664,7 @@ public class GlobalResources {
             // Try all graphics qualities.
             for (String extension : extensions) {
                 for (int i = gq.ordinal(); i >= 0; i--) {
-                    TextureQuality quality = TextureQuality.values()[i];
+                    GraphicsQuality quality = GraphicsQuality.values()[i];
                     String suffix = quality.suffix;
 
                     String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix) + extension;
@@ -682,9 +682,9 @@ public class GlobalResources {
             }
             // Try higher qualities.
             for (String extension : extensions) {
-                int n = TextureQuality.values().length;
+                int n = GraphicsQuality.values().length;
                 for (int i = gq.ordinal(); i < n; i++) {
-                    TextureQuality quality = TextureQuality.values()[i];
+                    GraphicsQuality quality = GraphicsQuality.values()[i];
                     String suffix = quality.suffix;
 
                     String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix) + extension;

@@ -98,7 +98,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> textureQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
+    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
@@ -385,20 +385,20 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel graphicsQualityLabel = new OwnLabel(I18n.msg("gui.gquality"), skin);
         graphicsQualityLabel.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
 
-        ComboBoxBean[] gqs = new ComboBoxBean[TextureQuality.values().length];
+        ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
         int i = 0;
-        for (TextureQuality q : TextureQuality.values()) {
+        for (GraphicsQuality q : GraphicsQuality.values()) {
             gqs[i] = new ComboBoxBean(I18n.msg(q.key), q.ordinal());
             i++;
         }
-        textureQuality = new OwnSelectBox<>(skin);
-        textureQuality.setItems(gqs);
-        textureQuality.setWidth(selectWidth);
-        textureQuality.setSelected(gqs[settings.graphics.quality.ordinal()]);
-        textureQuality.addListener((event) -> {
+        graphicsQuality = new OwnSelectBox<>(skin);
+        graphicsQuality.setItems(gqs);
+        graphicsQuality.setWidth(selectWidth);
+        graphicsQuality.setSelected(gqs[settings.graphics.quality.ordinal()]);
+        graphicsQuality.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                ComboBoxBean s = textureQuality.getSelected();
-                TextureQuality gq = TextureQuality.values()[s.value];
+                ComboBoxBean s = graphicsQuality.getSelected();
+                GraphicsQuality gq = GraphicsQuality.values()[s.value];
                 if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent(Constants.HI_RES_TEXTURES_DATASET_KEY)) && (gq.isHigh()
                         || gq.isUltra())) {
                     // Show notice
@@ -424,8 +424,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        OwnImageButton texQualityInfo = new OwnImageButton(skin, "tooltip");
-        texQualityInfo.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
+        OwnImageButton gQualityTooltip = new OwnImageButton(skin, "tooltip");
+        gQualityTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
 
         // AA
         OwnLabel aaLabel = new OwnLabel(I18n.msg("gui.aa"), skin);
@@ -548,8 +548,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         fadeTimeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.fadetime.info"), skin));
 
         graphics.add(graphicsQualityLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(textureQuality).left().padRight(pad18).padBottom(pad10);
-        graphics.add(texQualityInfo).left().padBottom(pad10).padRight(pad10);
+        graphics.add(graphicsQuality).left().padRight(pad18).padBottom(pad10);
+        graphics.add(gQualityTooltip).left().padBottom(pad10).padRight(pad10);
         graphics.add(getRequiresRestartLabel()).width(40).left().padBottom(pad10).row();
         noticeHiResCell = graphics.add();
         noticeHiResCell.colspan(3).left().row();
@@ -2637,10 +2637,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.graphics.resolution[1] = Integer.parseInt(heightField.getText());
 
         // Graphics
-        ComboBoxBean bean = textureQuality.getSelected();
+        ComboBoxBean bean = graphicsQuality.getSelected();
         boolean restartDialog = settings.graphics.quality.ordinal() != bean.value;
         if (settings.graphics.quality.ordinal() != bean.value) {
-            settings.graphics.quality = TextureQuality.values()[bean.value];
+            settings.graphics.quality = GraphicsQuality.values()[bean.value];
         }
 
         bean = aa.getSelected();

@@ -23,7 +23,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.api.IPostProcessor;
+import gaiasky.render.postprocess.PostProcessor;
+import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.effects.*;
+import gaiasky.render.util.ShaderLoader;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
@@ -31,14 +34,10 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
-import gaiasky.util.Settings.PostprocessSettings.AntialiasSettings;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
 import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
 import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
-import gaiasky.render.postprocess.PostProcessor;
-import gaiasky.render.postprocess.PostProcessorEffect;
-import gaiasky.render.util.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.i18n.I18n;
@@ -159,7 +158,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         final var settings = Settings.settings;
         StarSettings ss = settings.scene.star;
-        TextureQuality tq = settings.graphics.quality;
+        GraphicsQuality gq = settings.graphics.quality;
         boolean safeMode = settings.program.safeMode;
         boolean vr = settings.runtime.openXr;
 
@@ -180,7 +179,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
         lightGlow.setEnabledOptions(true, true);
         ppb.set(lightGlow);
-        updateGlow(ppb, tq);
+        updateGlow(ppb, gq);
 
         // RAY MARCHING SHADERS
         rayMarchingDefinitions.forEach((key, list) -> {
@@ -396,7 +395,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         return ppb;
     }
 
-    private void updateGlow(PostProcessBean ppb, TextureQuality gq) {
+    private void updateGlow(PostProcessBean ppb, GraphicsQuality gq) {
         int lgw, lgh;
         if (gq.isUltra()) {
             lgw = 1920;
@@ -423,12 +422,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
     }
 
-    private void updateFxaa(PostProcessBean ppb, TextureQuality gq) {
-        Fxaa fxaa = (Fxaa) ppb.get(Fxaa.class);
-        if (fxaa != null)
-            fxaa.updateQuality(getFxaaQuality(gq));
-    }
-
     private void initLevels(PostProcessBean ppb) {
         Levels levels = new Levels();
         levels.setBrightness(Settings.settings.postprocess.levels.brightness);
@@ -452,18 +445,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.set(levels);
     }
 
-    private int getFxaaQuality(TextureQuality gq) {
-        return switch (gq) {
-            case LOW -> 0;
-            case NORMAL -> 1;
-            default -> 2;
-        };
-    }
 
     private void initAntiAliasing(AntialiasType aavalue, float width, float height, PostProcessBean ppb) {
         Antialiasing antialiasing = null;
         if (aavalue.equals(AntialiasType.FXAA)) {
-            antialiasing = new Fxaa(width, height, getFxaaQuality(Settings.settings.graphics.quality));
+            antialiasing = new Fxaa(width, height, Settings.settings.postprocess.antialiasing.quality);
             Logger.getLogger(this.getClass()).debug(I18n.msg("notif.selected", "FXAA"));
         } else if (aavalue.equals(AntialiasType.NFAA)) {
             antialiasing = new Nfaa(width, height);

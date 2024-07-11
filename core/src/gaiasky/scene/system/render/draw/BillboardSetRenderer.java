@@ -40,7 +40,7 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.TextureQuality;
+import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -99,7 +99,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         initializeTextureArray(Settings.settings.graphics.quality);
     }
 
-    private void initializeTextureArray(TextureQuality gq) {
+    private void initializeTextureArray(GraphicsQuality gq) {
         // Create TextureArray with 8 layers
         FileHandle s00 = unpack("star-00" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle s01 = unpack("star-01" + Constants.STAR_SUBSTITUTE + ".png", gq);
@@ -118,7 +118,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     }
 
     private FileHandle unpack(String texName,
-                              TextureQuality gq) {
+                              GraphicsQuality gq) {
         return Settings.settings.data.dataFileHandle(GlobalResources.unpackAssetPath(texFolder + texName, gq));
     }
 

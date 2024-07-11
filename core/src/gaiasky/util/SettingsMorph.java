@@ -93,7 +93,7 @@ public class SettingsMorph {
 
         graphics.backBufferScale = f64("graphics.backbuffer.scale", p);
         graphics.dynamicResolution = bool("graphics.dynamic.resolution", p);
-        graphics.quality = TextureQuality.valueOf(str("scene.graphics.quality", p).toUpperCase());
+        graphics.quality = GraphicsQuality.valueOf(str("scene.graphics.quality", p).toUpperCase());
         s.graphics = graphics;
 
         // Frame
