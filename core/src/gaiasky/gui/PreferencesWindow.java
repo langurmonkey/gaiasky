@@ -390,11 +390,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         high.addListener(new OwnTextTooltip(I18n.msg("gui.presets.high.info"), skin));
 
         presets.add(low).left().padRight(pad34).padBottom(pad10);
-        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.low.info"), 80), skin)).left().padBottom(pad10).row();
+        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.low.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
+        presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
         presets.add(medium).center().padRight(pad34).padBottom(pad10);
-        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.med.info"), 80), skin)).left().padBottom(pad10).row();
+        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.med.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
+        presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
         presets.add(high).center().padRight(pad34).padBottom(pad10);
-        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.high.info"), 80), skin)).left().padBottom(pad10).row();
+        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.high.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
+        presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
 
         // Add to content
         addContentGroup(contentGraphicsTable, titlePresets, presets, 0f);
