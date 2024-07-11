@@ -548,8 +548,12 @@ camrecorder:
 # Post-processing configuration
 #
 postprocess:
-  # Antialiasing mode, one of [NONE|FXAA|NFAA]
-  antialias: FXAA
+  # Antialiasing settings
+  antialiasing:
+    # Antialias type: [NONE|FXAA|NFAA]
+    type: FXAA
+    # Antialias quality, in [0, 1, 2] from worse to best.
+    quality: 1
   # Bloom settings
   bloom:
     # Intensity of bloom

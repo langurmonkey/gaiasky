@@ -15,7 +15,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
+import gaiasky.util.Settings.PostprocessSettings.AntialiasSettings;
 import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
+import gaiasky.util.Settings.ProgramSettings.UVGridSettings;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.SceneSettings.ParticleSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.EclipseSettings;
@@ -341,7 +343,7 @@ public class SettingsManager {
 
         // UV grid.
         if (settings.program.uvGrid == null) {
-            settings.program.uvGrid = new Settings.ProgramSettings.UVGridSettings();
+            settings.program.uvGrid = new UVGridSettings();
         }
 
         // Line settings.
@@ -351,6 +353,13 @@ public class SettingsManager {
             ls.width = 1;
             ls.glWidthBias = 0;
             settings.scene.renderer.line = ls;
+        }
+
+        // Antialiasing.
+        if (settings.postprocess.antialiasing == null) {
+            settings.postprocess.antialiasing = new AntialiasSettings();
+        } else if (settings.postprocess.antialiasing.type == null) {
+            settings.postprocess.antialiasing.type = Settings.PostprocessSettings.AntialiasType.FXAA;
         }
 
         settings.initialize();

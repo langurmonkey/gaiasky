@@ -15,7 +15,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.Settings.TextureQuality;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class BillboardDataset {
 
     /**
      * Maximum particle size for each graphics quality mode. It has 4 entries, from LOW to ULTRA.
-     * See {@link gaiasky.util.Settings.GraphicsQuality}.
+     * See {@link TextureQuality}.
      **/
     public double[] maxSizes;
 
@@ -114,7 +114,7 @@ public class BillboardDataset {
      * @param completion Array with the completion rate for each quality setting.
      */
     public void setCompletion(double[] completion) {
-        int len = GraphicsQuality.values().length;
+        int len = TextureQuality.values().length;
         if (completion.length == len) {
             this.completion = new float[]{(float) completion[0], (float) completion[1], (float) completion[2], (float) completion[3]};
         } else {
@@ -142,9 +142,9 @@ public class BillboardDataset {
      * @param maxSize The maximum size in degrees.
      */
     public void setMaxSize(Double maxSize) {
-        this.maxSizes = new double[GraphicsQuality.values().length];
+        this.maxSizes = new double[TextureQuality.values().length];
         double val = FastMath.tan(Math.toRadians(maxSize));
-        for (int i = 0; i < GraphicsQuality.values().length; i++) {
+        for (int i = 0; i < TextureQuality.values().length; i++) {
             this.maxSizes[i] = val;
         }
     }
@@ -167,10 +167,10 @@ public class BillboardDataset {
      * @param maxSizes The maximum size per graphics quality, in degrees.
      */
     public void setMaxSizes(double[] maxSizes) {
-        int len = GraphicsQuality.values().length;
+        int len = TextureQuality.values().length;
         if (maxSizes.length == len) {
-            this.maxSizes = new double[GraphicsQuality.values().length];
-            for (int i = 0; i < GraphicsQuality.values().length; i++) {
+            this.maxSizes = new double[TextureQuality.values().length];
+            for (int i = 0; i < TextureQuality.values().length; i++) {
                 this.maxSizes[i] = FastMath.tan(Math.toRadians(maxSizes[i]));
             }
         } else {

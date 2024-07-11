@@ -16,10 +16,7 @@ import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.CamrecorderSettings.KeyframeSettings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.Settings.GraphicsSettings.FullscreenSettings;
-import gaiasky.util.Settings.PostprocessSettings.BloomSettings;
-import gaiasky.util.Settings.PostprocessSettings.LevelsSettings;
-import gaiasky.util.Settings.PostprocessSettings.ToneMappingSettings;
-import gaiasky.util.Settings.PostprocessSettings.UnsharpMaskSettings;
+import gaiasky.util.Settings.PostprocessSettings.*;
 import gaiasky.util.Settings.ProgramSettings.*;
 import gaiasky.util.Settings.ProgramSettings.ModeCubemapSettings.PlanetariumSettings;
 import gaiasky.util.Settings.ProgramSettings.NetSettings.MasterSettings;
@@ -33,11 +30,9 @@ import gaiasky.util.Settings.SceneSettings.RendererSettings.ShadowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.GroupSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.ThresholdSettings;
 import gaiasky.util.camera.rec.KeyframesManager.PathType;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -98,7 +93,7 @@ public class SettingsMorph {
 
         graphics.backBufferScale = f64("graphics.backbuffer.scale", p);
         graphics.dynamicResolution = bool("graphics.dynamic.resolution", p);
-        graphics.quality = GraphicsQuality.valueOf(str("scene.graphics.quality", p).toUpperCase());
+        graphics.quality = TextureQuality.valueOf(str("scene.graphics.quality", p).toUpperCase());
         s.graphics = graphics;
 
         // Frame
@@ -246,7 +241,8 @@ public class SettingsMorph {
 
         // Postprocess
         var postprocess = new PostprocessSettings();
-        postprocess.antialias = AntialiasSettings.getFromCode(i32("postprocess.antialiasing", p));
+        postprocess.antialiasing = new AntialiasSettings();
+        postprocess.antialiasing.type = AntialiasType.getFromCode(i32("postprocess.antialiasing", p));
         postprocess.bloom = new BloomSettings();
         postprocess.bloom.intensity = f32("postprocess.bloom.intensity", p);
         postprocess.unsharpMask = new UnsharpMaskSettings();

@@ -65,7 +65,7 @@ public class Settings extends SettingsObject {
      *    3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static final int SOURCE_VERSION = 3060301;
+    public static final int SOURCE_VERSION = 3060300;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the
@@ -584,7 +584,7 @@ public class Settings extends SettingsObject {
         }
     }
 
-    public enum GraphicsQuality {
+    public enum TextureQuality {
         LOW("gui.gquality.low", "-low", 1024, 512),
         NORMAL("gui.gquality.normal", "-med", 2048, 1024),
         HIGH("gui.gquality.high", "-high", 4096, 2048),
@@ -595,21 +595,21 @@ public class Settings extends SettingsObject {
         public final int texWidthTarget;
         public final int texHeightTarget;
 
-        GraphicsQuality(String key,
-                        String suffix,
-                        int texWidthTarget,
-                        int texHeightTarget) {
+        TextureQuality(String key,
+                       String suffix,
+                       int texWidthTarget,
+                       int texHeightTarget) {
             this.key = key;
             this.suffix = suffix;
             this.texWidthTarget = texWidthTarget;
             this.texHeightTarget = texHeightTarget;
         }
 
-        public boolean isAtLeast(GraphicsQuality gq) {
+        public boolean isAtLeast(TextureQuality gq) {
             return this.ordinal() >= gq.ordinal();
         }
 
-        public boolean isAtMost(GraphicsQuality gq) {
+        public boolean isAtMost(TextureQuality gq) {
             return this.ordinal() <= gq.ordinal();
         }
 
@@ -662,36 +662,6 @@ public class Settings extends SettingsObject {
         }
     }
 
-    public enum AntialiasSettings {
-        NONE(0),
-        FXAA(-1),
-        NFAA(-2),
-        SSAA(1);
-
-        final int aaCode;
-
-        AntialiasSettings(int aacode) {
-            this.aaCode = aacode;
-        }
-
-        public static AntialiasSettings getFromCode(int code) {
-            return switch (code) {
-                case 0 -> NONE;
-                case -1 -> FXAA;
-                case -2 -> NFAA;
-                case 1 -> SSAA;
-                default -> throw new IllegalStateException("Unexpected value: " + code);
-            };
-        }
-
-        public int getAACode() {
-            return this.aaCode;
-        }
-
-        public boolean isPostProcessAntialias() {
-            return this.aaCode < 0;
-        }
-    }
 
     public enum ToneMapping {
         AUTO,
@@ -1023,7 +993,8 @@ public class Settings extends SettingsObject {
          **/
         @JsonIgnore
         final public double[] dynamicResolutionScale = new double[]{1f, 0.85f, 0.75f, 0.5f};
-        public GraphicsQuality quality;
+        /** Default texture quality. **/
+        public TextureQuality quality;
         public int[] resolution;
         public boolean resizable;
         public FullscreenSettings fullScreen;
@@ -1050,7 +1021,7 @@ public class Settings extends SettingsObject {
         public int[] proceduralGenerationResolution = new int[]{3000, 1500};
 
         public void setQuality(final String qualityString) {
-            this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
+            this.quality = TextureQuality.valueOf(qualityString.toUpperCase());
         }
 
         @JsonIgnore
@@ -3657,7 +3628,7 @@ public class Settings extends SettingsObject {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PostprocessSettings extends SettingsObject implements IObserver {
-        public AntialiasSettings antialias;
+        public AntialiasSettings antialiasing;
         public BloomSettings bloom;
         public UnsharpMaskSettings unsharpMask;
         public ChromaticAberrationSettings chromaticAberration;
@@ -3672,20 +3643,21 @@ public class Settings extends SettingsObject {
         public UpscaleFilter upscaleFilter = UpscaleFilter.NEAREST;
         public GeometryWarpSettings warpingMesh;
 
-        public void setAntialias(final String antialiasString) {
-            antialias = AntialiasSettings.valueOf(antialiasString.toUpperCase());
-        }
-
         public void setUpscaleFilter(final String upscaleFilterString) {
             upscaleFilter = UpscaleFilter.valueOf(upscaleFilterString.toUpperCase());
         }
 
-        public AntialiasSettings getAntialias(int code) {
+        /** This is for compatibility with the old antialias configuration. **/
+        public void setAntialias(String ignored) {
+            // Nothing.
+        }
+
+        public AntialiasType getAntialias(int code) {
             return switch (code) {
-                case -1 -> AntialiasSettings.FXAA;
-                case -2 -> AntialiasSettings.NFAA;
-                case 1 -> AntialiasSettings.SSAA;
-                default -> AntialiasSettings.NONE;
+                case -1 -> AntialiasType.FXAA;
+                case -2 -> AntialiasType.NFAA;
+                case 1 -> AntialiasType.SSAA;
+                default -> AntialiasType.NONE;
             };
         }
 
@@ -3902,6 +3874,57 @@ public class Settings extends SettingsObject {
 
             @Override
             public void apply() {
+            }
+        }
+
+        public static class AntialiasSettings extends SettingsObject {
+            public AntialiasType type = AntialiasType.FXAA;
+            public int quality = 1;
+
+            @Override
+            void apply() {
+            }
+
+            @Override
+            protected void setParentRecursive(SettingsObject s) {
+            }
+
+            @Override
+            protected void setupListeners() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+        }
+        public enum AntialiasType {
+            NONE(0),
+            FXAA(-1),
+            NFAA(-2),
+            SSAA(1);
+
+            final int aaCode;
+
+            AntialiasType(int aacode) {
+                this.aaCode = aacode;
+            }
+
+            public static AntialiasType getFromCode(int code) {
+                return switch (code) {
+                    case 0 -> NONE;
+                    case -1 -> FXAA;
+                    case -2 -> NFAA;
+                    case 1 -> SSAA;
+                    default -> throw new IllegalStateException("Unexpected value: " + code);
+                };
+            }
+
+            public int getAACode() {
+                return this.aaCode;
+            }
+
+            public boolean isPostProcessAntialias() {
+                return this.aaCode < 0;
             }
         }
 
