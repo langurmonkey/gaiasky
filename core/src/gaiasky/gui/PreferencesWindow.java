@@ -34,6 +34,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.gdx.loader.WarpMeshReader;
@@ -98,8 +99,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
-            screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean> graphicsQuality, antialias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
+            screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin, recGridStyle;
@@ -275,6 +276,129 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentGraphics.setFadeScrollBars(false);
         contentGraphicsTable.align(Align.top | Align.left);
 
+        // PRESETS
+        Label titlePresets = new OwnLabel(I18n.msg("gui.presets"), skin, "header");
+        Table presets = new Table();
+
+        float buttonWidth = 200f;
+        // Low
+        OwnTextButton low = new OwnTextButton(I18n.msg("gui.presets.low"), skin);
+        low.setWidth(buttonWidth);
+        low.setColor(ColorUtils.gBlueC);
+        low.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                /* PRESET LOW */
+
+                // Low graphics quality.
+                graphicsQuality.setSelectedIndex(GraphicsQuality.LOW.ordinal());
+                // No anti-aliasing.
+                antialias.setSelectedIndex(idxAa(AntialiasType.NONE));
+                // Legacy point style.
+                pointCloudRenderer.setSelectedIndex(PointCloudMode.POINTS.ordinal());
+                // Legacy line style.
+                lineRenderer.setSelectedIndex(LineMode.GL_LINES.ordinal());
+                // Lens flare.
+                lensFlare.setValue(0f);
+                Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
+                // No bloom.
+                bloomEffect.setValue(0f);
+                // No unsharp mask.
+                unsharpMask.setValue(0f);
+                // No chromatic aberration.
+                chromaticAberration.setValue(0f);
+                // No film grain.
+                filmGrain.setValue(0f);
+                // No elevation representation.
+                elevationSb.setSelectedIndex(ElevationType.NONE.ordinal());
+                // No shadows.
+                shadowsCb.setChecked(false);
+                // No motion blur.
+                motionBlur.setValue(0f);
+                // No HDR tone mapping.
+                toneMappingSelect.setSelectedIndex(ToneMapping.NONE.ordinal());
+            }
+        });
+        low.pad(pad10, pad20, pad10, pad20);
+        low.addListener(new OwnTextTooltip(I18n.msg("gui.presets.low.info"), skin));
+        // Medium
+        OwnTextButton medium = new OwnTextButton(I18n.msg("gui.presets.med"), skin);
+        medium.setWidth(buttonWidth);
+        medium.setColor(ColorUtils.gBlueC);
+        medium.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                /* PRESET MEDIUM */
+
+                // Normal graphics quality.
+                graphicsQuality.setSelectedIndex(GraphicsQuality.NORMAL.ordinal());
+                // FXAA anti-aliasing.
+                antialias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                // Triangles as point style.
+                pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
+                // Polyline quadstrip line style.
+                lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
+                // Simple lens flare.
+                lensFlare.setValue(1f);
+                Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
+                // Vertex displacement elevation representation.
+                elevationSb.setSelectedIndex(ElevationType.REGULAR.ordinal());
+                // 5 shadows, 1024.
+                shadowsCb.setChecked(true);
+                nShadows.setSelectedIndex(4);
+                if (smResolution.getDoubleValue(0) < 1024) {
+                    smResolution.setText("1024");
+                }
+            }
+        });
+        medium.pad(pad10, pad20, pad10, pad20);
+        medium.addListener(new OwnTextTooltip(I18n.msg("gui.presets.med.info"), skin));
+        // High
+        OwnTextButton high = new OwnTextButton(I18n.msg("gui.presets.high"), skin);
+        high.setWidth(buttonWidth);
+        high.setColor(ColorUtils.gBlueC);
+        high.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                /* PRESET HIGH */
+
+                // Normal graphics quality.
+                graphicsQuality.setSelectedIndex(GraphicsQuality.HIGH.ordinal());
+                // FXAA anti-aliasing.
+                antialias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                // Triangles as point style.
+                pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
+                // Polyline quadstrip line style.
+                lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
+                // Complex lens flare.
+                lensFlare.setValue(1f);
+                Settings.settings.postprocess.lensFlare.type = LensFlareType.COMPLEX;
+                // Tessellation elevation representation.
+                elevationSb.setSelectedIndex(ElevationType.TESSELLATION.ordinal());
+                // 6 shadows, 2048.
+                shadowsCb.setChecked(true);
+                nShadows.setSelectedIndex(5);
+                if (smResolution.getDoubleValue(0) < 2048) {
+                    smResolution.setText("2048");
+                }
+            }
+        });
+        high.pad(pad10, pad20, pad10, pad20);
+        high.addListener(new OwnTextTooltip(I18n.msg("gui.presets.high.info"), skin));
+
+        presets.add(low).left().padRight(pad34).padBottom(pad10);
+        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.low.info"), 80), skin)).left().padBottom(pad10).row();
+        presets.add(medium).center().padRight(pad34).padBottom(pad10);
+        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.med.info"), 80), skin)).left().padBottom(pad10).row();
+        presets.add(high).center().padRight(pad34).padBottom(pad10);
+        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.high.info"), 80), skin)).left().padBottom(pad10).row();
+
+        // Add to content
+        addContentGroup(contentGraphicsTable, titlePresets, presets, 0f);
+
         // RESOLUTION/MODE
         Label titleResolution = new OwnLabel(I18n.msg("gui.resolutionmode"), skin, "header");
         Table mode = new Table();
@@ -376,7 +500,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         mode.add(maxFpsGroup).left().padBottom(pad10).row();
 
         // Add to content
-        addContentGroup(contentGraphicsTable, titleResolution, mode, 0f);
+        addContentGroup(contentGraphicsTable, titleResolution, mode);
 
         // GRAPHICS SETTINGS
         Label titleGraphics = new OwnLabel(I18n.msg("gui.graphicssettings"), skin, "header");
@@ -433,10 +557,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.aa.no"), 0), new ComboBoxBean(I18n.msg("gui.aa.fxaa"), -1),
                 new ComboBoxBean(I18n.msg("gui.aa.nfaa"), -2)};
-        aa = new OwnSelectBox<>(skin);
-        aa.setItems(aas);
-        aa.setWidth(selectWidth);
-        aa.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
+        antialias = new OwnSelectBox<>(skin);
+        antialias.setItems(aas);
+        antialias.setWidth(selectWidth);
+        antialias.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
 
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
         aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
@@ -554,7 +678,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         noticeHiResCell = graphics.add();
         noticeHiResCell.colspan(3).left().row();
         graphics.add(aaLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(aa).left().padRight(pad18).padBottom(pad10);
+        graphics.add(antialias).left().padRight(pad18).padBottom(pad10);
         graphics.add(aaTooltip).left().padBottom(pad10).row();
         OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
         OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
@@ -793,7 +917,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             toneMappingTypes[itm] = new ComboBoxBean(I18n.msg("gui.tonemapping." + tm.name().toLowerCase(Locale.ROOT)), tm.ordinal());
         }
 
-        OwnSelectBox<ComboBoxBean> toneMappingSelect = new OwnSelectBox<>(skin);
+        toneMappingSelect = new OwnSelectBox<>(skin);
         toneMappingSelect.setItems(toneMappingTypes);
         toneMappingSelect.setWidth(selectWidth);
         toneMappingSelect.setSelectedIndex(settings.postprocess.toneMapping.type.ordinal());
@@ -2643,7 +2767,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             settings.graphics.quality = GraphicsQuality.values()[bean.value];
         }
 
-        bean = aa.getSelected();
+        bean = antialias.getSelected();
         AntialiasType newAntiAlias = settings.postprocess.getAntialias(bean.value);
         if (settings.postprocess.antialiasing.type != newAntiAlias) {
             settings.postprocess.antialiasing.type = settings.postprocess.getAntialias(bean.value);
