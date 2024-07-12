@@ -89,6 +89,8 @@ public enum Event {
      * Anti aliasing changed, contains the new anti-aliasing value.
      **/
     ANTIALIASING_CMD,
+    /** Changes the quality setting of FXAA. Includes an integer in [0|1|2]. **/
+    FXAA_QUALITY_CMD,
 
     /** Notifies of screen resolution changes in windowed mode. Contains the new width and height as integers. **/
     WINDOW_RESOLUTION_INFO,

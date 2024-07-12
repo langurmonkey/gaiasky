@@ -158,7 +158,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         final var settings = Settings.settings;
         StarSettings ss = settings.scene.star;
-        GraphicsQuality gq = settings.graphics.quality;
         boolean safeMode = settings.program.safeMode;
         boolean vr = settings.runtime.openXr;
 
@@ -179,7 +178,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
         lightGlow.setEnabledOptions(true, true);
         ppb.set(lightGlow);
-        updateGlow(ppb, gq);
+        updateGlow(ppb, settings.graphics.quality);
 
         // RAY MARCHING SHADERS
         rayMarchingDefinitions.forEach((key, list) -> {

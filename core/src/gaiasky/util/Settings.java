@@ -3667,6 +3667,8 @@ public class Settings extends SettingsObject {
                            final Object... data) {
             if (isEnabled() && source != this) {
                 switch (event) {
+                    case ANTIALIASING_CMD -> antialiasing.type = (AntialiasType) data[0];
+                    case FXAA_QUALITY_CMD -> antialiasing.quality = MathUtils.clamp((Integer)data[0], 0, 2);
                     case BLOOM_CMD -> bloom.intensity = (float) data[0];
                     case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
                     case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
@@ -3716,6 +3718,7 @@ public class Settings extends SettingsObject {
         @Override
         public PostprocessSettings clone() {
             var c = (PostprocessSettings) super.clone();
+            c.antialiasing = this.antialiasing.clone();
             c.bloom = this.bloom.clone();
             c.unsharpMask = this.unsharpMask.clone();
             c.chromaticAberration = this.chromaticAberration.clone();
@@ -3734,6 +3737,7 @@ public class Settings extends SettingsObject {
 
         @Override
         protected void setParentRecursive(SettingsObject s) {
+            antialiasing.setParent(s);
             bloom.setParent(s);
             unsharpMask.setParent(s);
             chromaticAberration.setParent(s);
@@ -3754,8 +3758,10 @@ public class Settings extends SettingsObject {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD,
                     Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
                     Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
-                    Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD);
+                    Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD,
+                    Event.ANTIALIASING_CMD, Event.FXAA_QUALITY_CMD);
 
+            antialiasing.setupListeners();
             bloom.setupListeners();
             unsharpMask.setupListeners();
             chromaticAberration.setupListeners();
@@ -3773,6 +3779,7 @@ public class Settings extends SettingsObject {
         @Override
         public void dispose() {
             EventManager.instance.removeAllSubscriptions(this);
+            antialiasing.apply();
             bloom.dispose();
             unsharpMask.dispose();
             chromaticAberration.dispose();
@@ -3791,6 +3798,8 @@ public class Settings extends SettingsObject {
         public void apply() {
             // This needs to run in the main thread because it accesses the OpenGL context.
             GaiaSky.postRunnable(() -> {
+                EventManager.publish(Event.ANTIALIASING_CMD, this, antialiasing.type);
+                EventManager.publish(Event.FXAA_QUALITY_CMD, this, antialiasing.quality);
                 EventManager.publish(Event.BLOOM_CMD, this, bloom.intensity);
                 EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMask.factor);
                 EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, this, chromaticAberration.amount);
@@ -3808,6 +3817,7 @@ public class Settings extends SettingsObject {
                 EventManager.publish(Event.EXPOSURE_CMD, this, toneMapping.exposure);
                 EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilter);
 
+                antialiasing.apply();
                 bloom.apply();
                 unsharpMask.apply();
                 chromaticAberration.apply();
@@ -3877,9 +3887,15 @@ public class Settings extends SettingsObject {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class AntialiasSettings extends SettingsObject {
             public AntialiasType type = AntialiasType.FXAA;
             public int quality = 1;
+
+            @Override
+            public AntialiasSettings clone() {
+                return (AntialiasSettings) super.clone();
+            }
 
             @Override
             void apply() {

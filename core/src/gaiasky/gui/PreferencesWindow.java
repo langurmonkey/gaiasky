@@ -126,6 +126,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak,
             aberrationBak, lensFlareBak, filmGrainBak;
     private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
+    private int fxaaQuality, fxaaQualityBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
 
@@ -295,6 +296,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 graphicsQuality.setSelectedIndex(GraphicsQuality.LOW.ordinal());
                 // No anti-aliasing.
                 antialias.setSelectedIndex(idxAa(AntialiasType.NONE));
+                fxaaQuality = 0;
                 // Legacy point style.
                 pointCloudRenderer.setSelectedIndex(PointCloudMode.POINTS.ordinal());
                 // Legacy line style.
@@ -336,6 +338,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 graphicsQuality.setSelectedIndex(GraphicsQuality.NORMAL.ordinal());
                 // FXAA anti-aliasing.
                 antialias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                fxaaQuality = 1;
                 // Triangles as point style.
                 pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
                 // Polyline quadstrip line style.
@@ -369,6 +372,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 graphicsQuality.setSelectedIndex(GraphicsQuality.HIGH.ordinal());
                 // FXAA anti-aliasing.
                 antialias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                fxaaQuality = 2;
                 // Triangles as point style.
                 pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
                 // Polyline quadstrip line style.
@@ -564,6 +568,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         antialias.setItems(aas);
         antialias.setWidth(selectWidth);
         antialias.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
+        fxaaQuality = settings.postprocess.antialiasing.quality;
 
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
         aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
@@ -2607,6 +2612,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         reprojectionBak = settings.postprocess.reprojection.mode;
         upscaleFilterBak = settings.postprocess.upscaleFilter;
         frameCoordinatesBak = settings.program.uvGrid.frameCoordinates;
+        fxaaQualityBak = settings.postprocess.antialiasing.quality;
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -2770,12 +2776,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             settings.graphics.quality = GraphicsQuality.values()[bean.value];
         }
 
+        // Antialiasing
         bean = antialias.getSelected();
         AntialiasType newAntiAlias = settings.postprocess.getAntialias(bean.value);
         if (settings.postprocess.antialiasing.type != newAntiAlias) {
-            settings.postprocess.antialiasing.type = settings.postprocess.getAntialias(bean.value);
-            EventManager.publish(Event.ANTIALIASING_CMD, this, settings.postprocess.antialiasing);
+            EventManager.publish(Event.ANTIALIASING_CMD, this, newAntiAlias);
         }
+        EventManager.publish(Event.FXAA_QUALITY_CMD, this, fxaaQuality);
 
         settings.graphics.vsync = vsync.isChecked();
         try {
@@ -3114,6 +3121,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
         EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
         EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinatesBak);
+        EventManager.publish(Event.FXAA_QUALITY_CMD, this, fxaaQualityBak);
     }
 
     private void reloadLanguage() {
