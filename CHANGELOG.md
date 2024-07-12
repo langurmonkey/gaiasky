@@ -1,3 +1,53 @@
+<a name="3.6.3"></a>
+## [3.6.3](https://codeberg.org/gaiasky/gaiasky/tree/3.6.2-3) (2024-07-12)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.2-3...3.6.3)
+
+### Bug Fixes
+- relativistic shaders define their own helper functions. 
+- broken anchor in readme file. 
+- error computing next focus and closest body positions. 
+- restore elevation-aware planet traversal. 
+- artifacts in atmosphere shader when SSR is active. 
+- adjust maximum reach of point lights. 
+- improve single star selection code, especially when close to stars. 
+- regression where orientation lock stopped working altogether. 
+- adjust frequency and lacunarity randomizers so that more strucutre is always present. 
+- crash during initialization when model is set to randomize. 
+- tooltip background width incorrectly computed. 
+- remove call to pack() in constructor. 
+
+### Build System
+- upgrade bundled JRE to 21, minimum language version to 17. 
+
+### Features
+- add graphical presets to settings dialog. 
+- change antialiasing settings from only type to type and quality. 
+- rename 'graphics quality' to 'texture quality'. Change antialiasing settings from only type to type and quality. 
+- add tooltip with hotkeys to cinematic camera checkbox. 
+- automatic DPI scaling to support multi-DPI configurations. 
+- add initial amplitude to noise parametrization in procedural generation. 
+- improve camera velocity display units in camera info pane. 
+- divide procedural generation in 4 consecutive frames. Add emission generation as an extra (optional) channel. 
+- use normal map when elevation type is 'None' in procedural generation. 
+- move 'save textures' of procedural generation to a parallel thread. 
+- new splash image based on NASA exoplanets. 
+- improve layout of procedural generation window. 
+- add procedural generation button to camera info interface. 
+- surface generation presets (Earth-like, gas giant, rocky planet, etc.), and hide noise parameters in collapsible pane. 
+- add procedurally generated texture resolution to configuration and preferences window. 
+- replace CPU-based procedural generation with shader-based, which is orders of magnitude faster. 
+- improve cloud color and atmospheric fog density randomizers. 
+- enable multiple lights (and also point lights) for cloud shader. This is necessary for the NASA exoplanets. 
+- add groups in component types UI. 
+- add 'systems' component type, to contain all extrasolar planetary systems. 
+- add on-demand loading of JSON datasets to particle groups, which enables having thousands of extrasolar systems to explore. 
+- add script to translate a NASA exoplanet archive VOTable to the Gaia Sky JSON format. 
+- add 'refreshRate' to orbit objects to control how often they are updated (if needed), add button to camera info interface to refresh the orbit of the selected object. 
+
+### Performance Improvements
+- enable fast-math usage by default, and remove old, unused trigo scaffolding classes. 
+- improve performance of recursive grid shader, which was very slow due to the background fill (with interpolation), and the animation. Animation is now removed. 
+
 <a name="3.6.2-2"></a>
 ## [3.6.2-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.2) (2024-06-06)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.2...3.6.2-2)
