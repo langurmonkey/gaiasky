@@ -324,7 +324,6 @@ public class DatasetManagerWindow extends GenericDialog {
                                 // Reset datasets.
                                 Settings.settings.data.dataFiles.clear();
                                 reloadAll();
-                                GaiaSky.instance.getGlobalResources().reloadDataFiles();
                             });
                         } else {
                             Label warn = new OwnLabel(I18n.msg("gui.download.pickloc.permissions"), skin);

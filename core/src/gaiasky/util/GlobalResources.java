@@ -53,7 +53,6 @@ public class GlobalResources {
     private final ExtShaderProgram extSpriteShader;
     // Sprite batch using int indices.
     private final ExtSpriteBatch extSpriteBatch;
-    private final AssetManager manager;
     private final ShaderProgram shapeShader;
     private final ShaderProgram spriteShader;
     // The UI skin.
@@ -73,7 +72,6 @@ public class GlobalResources {
     }
 
     public GlobalResources(AssetManager manager) {
-        this.manager = manager;
         // Shape shader
         this.shapeShader = new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl"));
         if (!shapeShader.isCompiled()) {
@@ -95,7 +93,6 @@ public class GlobalResources {
         // Sprite batch
         this.extSpriteBatch = new ExtSpriteBatch(1000, getExtSpriteShader());
 
-        reloadDataFiles();
         updateSkin();
     }
 
@@ -672,12 +669,6 @@ public class GlobalResources {
             return String.format("%1$.0f %2$s", years, I18n.msg("gui.unit.year"));
         }
 
-    }
-
-    public void reloadDataFiles() {
-        // Star group textures
-        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/star.jpg"), Texture.class);
-        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/lut.jpg"), Texture.class);
     }
 
     public void updateSkin() {

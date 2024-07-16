@@ -1,10 +1,6 @@
 #version 330 core
 // UNIFORMS
 
-// Diffuse base texture
-uniform sampler2D u_diffuseTexture;
-// Grayscale lookup table
-uniform sampler2D u_normalTexture;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 

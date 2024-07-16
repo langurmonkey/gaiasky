@@ -158,10 +158,6 @@ public class ParticleUtils {
             throw new RuntimeException("The incoming star model component can't be null!");
         }
 
-        Texture tex = manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/star.jpg"), Texture.class);
-        Texture lut = manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/lut.jpg"), Texture.class);
-        tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
         Map<String, Object> params = new TreeMap<>();
         params.put("quality", 120L);
         params.put("diameter", 1d);
@@ -171,8 +167,6 @@ public class ParticleUtils {
         IntModel intModel = pair.getFirst();
         Material mat = pair.getSecond().get("base");
         mat.clear();
-        mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
-        mat.set(new TextureAttribute(TextureAttribute.Normal, lut));
         // Only to activate view vector (camera position)
         mat.set(new ColorAttribute(ColorAttribute.Specular));
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));

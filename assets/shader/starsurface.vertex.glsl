@@ -1,9 +1,5 @@
 #version 330 core
 
-#if defined(diffuseTextureFlag)
-#define textureFlag
-#endif
-
 #if defined(specularColorFlag)
 #define specularFlag
 #endif
@@ -26,10 +22,8 @@ uniform mat3 u_normalMatrix;
 out vec3 v_normal;
 #endif // normalFlag
 
-#ifdef textureFlag
 in vec2 a_texCoord0;
 out vec2 v_texCoords0;
-#endif // textureFlag
 
 uniform mat4 u_worldTrans;
 uniform float u_vrScale;
@@ -125,9 +119,7 @@ out float v_depth;
 
 void main() {
 	v_time = u_time;
-	#ifdef textureFlag
-		v_texCoords0 = a_texCoord0;
-	#endif // textureFlag
+	v_texCoords0 = a_texCoord0;
 
 	#if defined(colorFlag)
 		v_color = a_color;
