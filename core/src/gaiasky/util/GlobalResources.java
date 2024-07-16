@@ -10,8 +10,6 @@ package gaiasky.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Cursor;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -35,18 +33,12 @@ import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
-import org.apfloat.Apfloat;
 import org.lwjgl.opengl.GL30;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -62,13 +54,8 @@ public class GlobalResources {
     // Sprite batch using int indices.
     private final ExtSpriteBatch extSpriteBatch;
     private final AssetManager manager;
-    private ShaderProgram shapeShader;
+    private final ShaderProgram shapeShader;
     private final ShaderProgram spriteShader;
-    // Cursors.
-    private Cursor linkCursor;
-    private Cursor resizeXCursor;
-    private Cursor resizeYCursor;
-    private Cursor emptyCursor;
     // The UI skin.
     private Skin skin;
     /**
@@ -112,9 +99,6 @@ public class GlobalResources {
         updateSkin();
     }
 
-    public static void doneLoading(AssetManager manager) {
-    }
-
     /**
      * Formats a given double number. Uses scientific notation for numbers in [-9999,9999], and
      * regular numbers elsewhere.
@@ -128,10 +112,6 @@ public class GlobalResources {
         } else {
             return nf.format(number);
         }
-    }
-
-    public static Pair<Double, String> doubleToDistanceString(Apfloat d, DistanceUnits du) {
-        return doubleToDistanceString(d.doubleValue(), du);
     }
 
     /**
@@ -171,18 +151,6 @@ public class GlobalResources {
         Pair<Double, String> res = doubleToDistanceString(d, du);
         res.setSecond(res.getSecond().concat("/").concat(I18n.msg("gui.unit.second")));
         return res;
-    }
-
-    /**
-     * Converts this float to the string representation of a distance
-     *
-     * @param f  Distance in internal units
-     * @param du The distance units to use
-     * @return An array containing the float number and the string units
-     */
-    public static Pair<Float, String> floatToDistanceString(float f, DistanceUnits du) {
-        Pair<Double, String> result = doubleToDistanceString(f, du);
-        return new Pair<>(result.getFirst().floatValue(), result.getSecond());
     }
 
     /**
@@ -229,25 +197,6 @@ public class GlobalResources {
      */
     public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
         return FastMath.acos(point.dot(dir) / len) < coneAngle;
-    }
-
-    /**
-     * Computes whether any of the given points is visible by a camera with the
-     * given direction and the given cone angle. Coordinates are assumed to be
-     * in the camera-origin system
-     *
-     * @param points    The array of points to check
-     * @param coneAngle The cone angle of the camera (field of view)
-     * @param dir       The direction
-     * @return True if any of the points is in the camera view cone
-     */
-    public static boolean isAnyInView(Vector3d[] points, float coneAngle, Vector3d dir) {
-        boolean inView = false;
-        int size = points.length;
-        for (Vector3d point : points) {
-            inView = inView || FastMath.acos(point.dot(dir) / point.len()) < coneAngle;
-        }
-        return inView;
     }
 
     /**
@@ -353,50 +302,6 @@ public class GlobalResources {
             Files.copy(sourceFile, destinationFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static void listRecursive(Path f, final Array<Path> l, DirectoryStream.Filter<Path> filter) {
-        if (Files.exists(f)) {
-            if (Files.isDirectory(f)) {
-                try (Stream<Path> partial = Files.list(f)) {
-                    partial.forEachOrdered(p -> listRecursive(p, l, filter));
-                } catch (IOException e) {
-                    logger.error(e);
-                }
-
-            } else {
-                try {
-                    if (filter.accept(f))
-                        l.add(f);
-                } catch (IOException e) {
-                    logger.error(e);
-                }
-            }
-        }
-    }
-
-    /**
-     * Recursively count files in a directory
-     *
-     * @param dir The directory
-     * @return The number of files
-     * @throws IOException if an I/O error is thrown when accessing the starting file.
-     */
-    public static long fileCount(Path dir) throws IOException {
-        return fileCount(dir, null);
-    }
-
-    /**
-     * Count files matching a certain ending in a directory, recursively
-     *
-     * @param dir The directory
-     * @return The number of files
-     * @throws IOException if an I/O error is thrown when accessing the starting file.
-     */
-    public static long fileCount(Path dir, String[] extensions) throws IOException {
-        try (var stream = Files.walk(dir)) {
-            return stream.parallel().filter(p -> (!p.toFile().isDirectory() && endsWith(p.toFile().getName(), extensions))).count();
-        }
-    }
-
     /**
      * Returns true if the string ends with any of the endings
      *
@@ -478,34 +383,6 @@ public class GlobalResources {
         return String.format("%.1f %sB", bytes / FastMath.pow(unit, exp), pre);
     }
 
-    private static String generateMD5(FileInputStream inputStream) {
-        if (inputStream == null) {
-            return null;
-        }
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("MD5");
-            FileChannel channel = inputStream.getChannel();
-            ByteBuffer buff = ByteBuffer.allocate(2048);
-            while (channel.read(buff) != -1) {
-                buff.flip();
-                md.update(buff);
-                buff.clear();
-            }
-            byte[] hashValue = md.digest();
-            return new String(hashValue);
-        } catch (NoSuchAlgorithmException | IOException e) {
-            logger.error(e);
-            return null;
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                logger.error(e);
-            }
-        }
-    }
-
     /**
      * Attempts to calculate the size of a file or directory.
      *
@@ -578,17 +455,6 @@ public class GlobalResources {
             }
         }
         return l.toArray(new String[0]);
-    }
-
-    /**
-     * Converts the string array into a whitespace-separated string
-     * where each element is double-quoted.
-     *
-     * @param l The string array
-     * @return The resulting string
-     */
-    public static String toWhitespaceSeparatedList(String[] l) {
-        return toString(l, "\"", " ");
     }
 
     /**
@@ -766,44 +632,6 @@ public class GlobalResources {
         return combinations.toArray(String.class);
     }
 
-    /**
-     * Generates all combinations of the given size using the elements in values.
-     *
-     * @param values The elements to combine
-     * @param size   The size of the combinations
-     * @param <T>    The type
-     * @return The combinations
-     */
-    public static <T> List<List<T>> combination(List<T> values, int size) {
-
-        if (0 == size) {
-            return Collections.singletonList(Collections.emptyList());
-        }
-
-        if (values.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<List<T>> combination = new LinkedList<>();
-
-        T actual = values.iterator().next();
-
-        List<T> subSet = new LinkedList<T>(values);
-        subSet.remove(actual);
-
-        List<List<T>> subSetCombination = combination(subSet, size - 1);
-
-        for (List<T> set : subSetCombination) {
-            List<T> newSet = new LinkedList<T>(set);
-            newSet.add(0, actual);
-            combination.add(newSet);
-        }
-
-        combination.addAll(combination(subSet, size));
-
-        return combination;
-    }
-
     public static String nObjectsToString(long objects) {
         if (objects > 1e18) {
             return String.format("%1$.1f %2$s", objects / 1.0e18, I18n.msg("gui.unit.exa"));
@@ -853,7 +681,6 @@ public class GlobalResources {
     }
 
     public void updateSkin() {
-        initCursors();
         FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         if (!fh.exists()) {
             // Default to dark-green
@@ -868,27 +695,8 @@ public class GlobalResources {
         }
     }
 
-    private void initCursors() {
-        // Create skin right now, it is needed.
-        if (Settings.settings.program.ui.scale > 0.8) {
-            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0));
-            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16));
-            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16));
-        } else {
-            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link.png")), 4, 0));
-            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8));
-            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8));
-        }
-        setEmptyCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-empty.png")), 0, 5));
-
-    }
-
     public ShaderProgram getShapeShader() {
         return shapeShader;
-    }
-
-    public void setShapeShader(ShaderProgram shapeShader) {
-        this.shapeShader = shapeShader;
     }
 
     public ShaderProgram getSpriteShader() {
@@ -906,38 +714,6 @@ public class GlobalResources {
 
     public ExtSpriteBatch getExtSpriteBatch() {
         return extSpriteBatch;
-    }
-
-    public Cursor getLinkCursor() {
-        return linkCursor;
-    }
-
-    public void setLinkCursor(Cursor linkCursor) {
-        this.linkCursor = linkCursor;
-    }
-
-    public Cursor getResizeXCursor() {
-        return resizeXCursor;
-    }
-
-    public void setResizeXCursor(Cursor resizeXCursor) {
-        this.resizeXCursor = resizeXCursor;
-    }
-
-    public Cursor getResizeYCursor() {
-        return resizeYCursor;
-    }
-
-    public void setResizeYCursor(Cursor resizeYCursor) {
-        this.resizeYCursor = resizeYCursor;
-    }
-
-    public Cursor getEmptyCursor() {
-        return emptyCursor;
-    }
-
-    public void setEmptyCursor(Cursor emptyCursor) {
-        this.emptyCursor = emptyCursor;
     }
 
     public Skin getSkin() {
