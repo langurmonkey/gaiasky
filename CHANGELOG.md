@@ -1,3 +1,13 @@
+<a name="3.6.3-2"></a>
+## [3.6.3-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.3) (2024-07-17)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.3...3.6.3-2)
+
+### Bug Fixes
+- bad truncation leads to some SVTs not working properly. Fixes [#778](https://codeberg.org/gaiasky/gaiasky/issues/778). 
+
+### Features
+- use noise library for star surface shader. 
+
 <a name="3.6.3"></a>
 ## [3.6.3](https://codeberg.org/gaiasky/gaiasky/tree/3.6.2-3) (2024-07-12)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.2-3...3.6.3)
