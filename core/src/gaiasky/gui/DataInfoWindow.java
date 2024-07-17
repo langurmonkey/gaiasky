@@ -23,6 +23,8 @@ import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
+import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
@@ -239,7 +241,7 @@ public class DataInfoWindow extends GenericDialog {
                         }
                     }
                 }
-                if(!hit) {
+                if (!hit) {
                     urlCheck(url, wikiName, suffixes, listener);
                 }
             }
@@ -324,53 +326,8 @@ public class DataInfoWindow extends GenericDialog {
             // Star or particle set.
             var set = object.getSet();
             var bean = set.get(set.focusIndex);
-            if (bean.hasExtra()) {
-                var columnInfoList = set.columnInfoList;
-                var map = bean.getExtra();
-                var keys = map.keys();
-                Array<UCD> arr = new Array<>();
-                for(var ucd : keys) {
-                    arr.add(ucd);
-                }
-                arr.sort();
-                for (var ucd : arr) {
-                    Object value = map.get(ucd);
-                    var columnGroup = new HorizontalGroup();
-                    columnGroup.space(7f);
-                    var columnLabel = new OwnLabel(TextUtils.capitalise(ucd.colName), skin, colNameStyle);
-                    var valueLabel = new OwnLabel(value != null ? value.toString() : I18n.msg("gui.focusinfo.na"), skin, contentStyle);
-
-                    ColumnInfo colInfo = null;
-                    if (columnInfoList != null) {
-                        for (var ci : columnInfoList) {
-                            if (ci.getName().equalsIgnoreCase(ucd.colName)) {
-                                colInfo = ci;
-                                break;
-                            }
-                        }
-                    }
-
-                    columnGroup.addActor(columnLabel);
-                    if (colInfo != null) {
-                        if (colInfo.getDescription() != null) {
-                            // Desc.
-                            var desc = new OwnLabel("[d]", skin, "default-pink");
-                            desc.addListener(new OwnTextTooltip(colInfo.getDescription(), skin, 20));
-                            columnGroup.addActor(desc);
-                        }
-                        if (colInfo.getUnitString() != null) {
-                            // Units.
-                            var units = new OwnLabel("[u]", skin, "default-pink");
-                            units.addListener(new OwnTextTooltip(I18n.msg("gui.unit", colInfo.getUnitString()), skin, 20));
-                            columnGroup.addActor(units);
-                        }
-                    }
-
-                    dataTable.add(columnGroup).left().padRight(pad20).padBottom(padBottom);
-                    dataTable.add(valueLabel).left().padBottom(padBottom).row();
-                }
-
-            }
+            // Extra set attributes.
+            addExtraSet(set, bean);
 
 
         } else if (object.isCluster()) {
@@ -382,6 +339,9 @@ public class DataInfoWindow extends GenericDialog {
             addRadius(object);
 
         }
+
+        // Extra object attributes.
+        addExtra(object);
 
     }
 
@@ -513,6 +473,66 @@ public class DataInfoWindow extends GenericDialog {
         focusRadius.setText(GlobalResources.formatNumber(object.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
         dataTable.add(getLabel(I18n.msg("gui.focusinfo.radius"))).left().padRight(pad20).padBottom(padBottom);
         dataTable.add(focusRadius).left().padBottom(padBottom).row();
+    }
+
+    private void addExtraSet(ParticleSet set, IParticleRecord bean) {
+        if (!bean.hasExtra()) {
+            return;
+        }
+        var columnInfoList = set.columnInfoList;
+        var map = bean.getExtra();
+        var keys = map.keys();
+        Array<UCD> arr = new Array<>();
+        for (var ucd : keys) {
+            arr.add(ucd);
+        }
+        arr.sort();
+        for (var ucd : arr) {
+            Object value = map.get(ucd);
+            var columnGroup = new HorizontalGroup();
+            columnGroup.space(7f);
+            var columnLabel = new OwnLabel(TextUtils.capitalise(ucd.colName), skin, colNameStyle);
+            var valueLabel = new OwnLabel(value != null ? value.toString() : I18n.msg("gui.focusinfo.na"), skin, contentStyle);
+
+            ColumnInfo colInfo = null;
+            if (columnInfoList != null) {
+                for (var ci : columnInfoList) {
+                    if (ci.getName().equalsIgnoreCase(ucd.colName)) {
+                        colInfo = ci;
+                        break;
+                    }
+                }
+            }
+
+            columnGroup.addActor(columnLabel);
+            if (colInfo != null) {
+                if (colInfo.getDescription() != null) {
+                    // Desc.
+                    var desc = new OwnLabel("[d]", skin, "default-pink");
+                    desc.addListener(new OwnTextTooltip(colInfo.getDescription(), skin, 20));
+                    columnGroup.addActor(desc);
+                }
+                if (colInfo.getUnitString() != null) {
+                    // Units.
+                    var units = new OwnLabel("[u]", skin, "default-pink");
+                    units.addListener(new OwnTextTooltip(I18n.msg("gui.unit", colInfo.getUnitString()), skin, 20));
+                    columnGroup.addActor(units);
+                }
+            }
+
+            dataTable.add(columnGroup).left().padRight(pad20).padBottom(padBottom);
+            dataTable.add(valueLabel).left().padBottom(padBottom).row();
+        }
+    }
+
+    private void addExtra(FocusView object) {
+        if (object.getBase() != null && object.getBase().hasExtraAttributes()) {
+            var map = object.getBase().getExtraAttributes();
+            for (var entry : map.entries()) {
+                dataTable.add(getLabel(TextUtils.capitalise(entry.key))).padBottom(padBottom).left();
+                dataTable.add(entry.value.toString()).left().padBottom(padBottom).row();
+            }
+        }
     }
 
     private OwnLabel getLabel(String text) {

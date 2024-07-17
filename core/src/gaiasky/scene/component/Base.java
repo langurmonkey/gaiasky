@@ -9,6 +9,8 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.fasterxml.jackson.databind.util.CompactStringObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -73,6 +75,11 @@ public class Base implements Component, ICopy {
      * Has this been updated at least once?
      */
     public boolean initialUpdate = false;
+
+    /**
+     * Extra attributes.
+     */
+    public ObjectMap<String, Object> attributes;
 
     public String getName() {
         return names != null ? names[0] : null;
@@ -256,6 +263,21 @@ public class Base implements Component, ICopy {
             opacity = 1 - opacity;
         }
         return opacity;
+    }
+
+    public void addExtraAttribute(String name, Object value) {
+        if (attributes == null) {
+            attributes = new ObjectMap<>();
+        }
+        attributes.put(name, value);
+    }
+
+    public ObjectMap<String, Object> getExtraAttributes() {
+        return attributes;
+    }
+
+    public boolean hasExtraAttributes() {
+        return attributes != null && !attributes.isEmpty();
     }
 
     @Override

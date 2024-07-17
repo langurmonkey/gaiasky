@@ -317,8 +317,15 @@ public class JsonLoader extends AbstractSceneLoader {
                     }
                     return true;
                 } else {
-                    logger.warn("Component not found for attribute '" + attribute.name + "' and class '" + className + "'");
-                    return false;
+                    if (Mapper.base.has(entity)) {
+                        // Use parameter map.
+                        var base = Mapper.base.get(entity);
+                        base.addExtraAttribute(attribute.name, value);
+                        return true;
+                    } else {
+                        logger.warn("Component not found for attribute '" + attribute.name + "' and class '" + className + "'");
+                        return false;
+                    }
                 }
             } catch (Exception e) {
                 logger.error(e);
