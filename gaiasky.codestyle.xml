@@ -12,4 +12,7 @@
   <codeStyleSettings language="Glsl">
     <option name="SPACE_BEFORE_COLON" value="false" />
   </codeStyleSettings>
+  <codeStyleSettings language="JAVA">
+    <option name="RIGHT_MARGIN" value="160" />
+  </codeStyleSettings>
 </code_scheme>

@@ -139,7 +139,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonMinimap.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
         buttonMinimap.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_MINIMAP_ACTION, buttonMinimap, buttonMinimap.isChecked());
+                EventManager.publish(Event.MINIMAP_DISPLAY_CMD, buttonMinimap, buttonMinimap.isChecked());
             }
             return false;
         });
@@ -181,7 +181,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonLog.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.log"), kb.getStringKeys("action.log", true), skin));
         buttonLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LOG_ACTION, buttonLog);
+                EventManager.publish(Event.SHOW_LOG_CMD, buttonLog);
                 buttonLog.setCheckedNoFire(false);
             }
             return false;
@@ -224,7 +224,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         lastActiveButton = buttonTime;
 
         EventManager.instance.subscribe(this, Event.GUI_FOLD_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
-                Event.EXPAND_COLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP);
+                Event.EXPAND_COLLAPSE_PANE_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD);
     }
 
     private OwnTextIconButton createComponentButton(Skin skin, float pad, String buttonStyle, String title, GuiComponent component) {
@@ -362,13 +362,13 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                     button.setChecked(expand);
                 }
             }
-            case SHOW_MINIMAP_ACTION -> {
+            case MINIMAP_DISPLAY_CMD -> {
                 boolean show = (Boolean) data[0];
                 if (source != buttonMinimap) {
                     buttonMinimap.setCheckedNoFire(show);
                 }
             }
-            case TOGGLE_MINIMAP -> {
+            case MINIMAP_TOGGLE_CMD -> {
                 buttonMinimap.setCheckedNoFire(!buttonMinimap.isChecked());
             }
             default -> {

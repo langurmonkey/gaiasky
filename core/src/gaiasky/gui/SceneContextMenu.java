@@ -112,7 +112,7 @@ public class SceneContextMenu extends ContextMenu {
             MenuItem moreInfo = new MenuItem(I18n.msg("context.moreinfo", candidateNameShort), skin, skin.getDrawable("iconic-info"));
             moreInfo.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.SHOW_DATA_INFO_ACTION, moreInfo, candidate);
+                    EventManager.publish(Event.SHOW_DATA_INFO_CMD, moreInfo, candidate);
                 }
                 return false;
             });
@@ -234,7 +234,7 @@ public class SceneContextMenu extends ContextMenu {
                 MenuItem landOnCoord = new MenuItem(I18n.msg("context.landatcoord", candidateNameShort), skin, skin.getDrawable("land-at"));
                 landOnCoord.addListener(event -> {
                     if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_LAND_AT_LOCATION_ACTION, landOnCoord, candidate);
+                        EventManager.publish(Event.SHOW_LAND_AT_LOCATION_CMD, landOnCoord, candidate);
                         return true;
                     }
                     return false;
@@ -246,7 +246,7 @@ public class SceneContextMenu extends ContextMenu {
                 MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort), skin, skin.getDrawable("iconic-fork"));
                 proceduralSurface.addListener(event -> {
                     if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_PROCEDURAL_GEN_ACTION, proceduralSurface, candidate);
+                        EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralSurface, candidate);
                         return true;
                     }
                     return false;

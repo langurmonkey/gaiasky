@@ -36,7 +36,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
             logger.debug("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
             if (buttonCode == mappings.getButtonX()) {
-                em.post(Event.TOGGLE_MINIMAP, this);
+                em.post(Event.MINIMAP_TOGGLE_CMD, this);
             } else if (buttonCode == mappings.getButtonY()) {
                 em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits");
             } else if (buttonCode == mappings.getButtonA()) {

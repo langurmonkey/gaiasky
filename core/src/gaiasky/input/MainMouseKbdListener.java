@@ -329,7 +329,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
                                 // Right click, context menu
                                 Entity hit = getBestHit(screenX, screenY);
-                                EventManager.publish(Event.POPUP_MENU_FOCUS, this, hit, screenX, screenY);
+                                EventManager.publish(Event.CONTEXT_MENU_CMD, this, hit, screenX, screenY);
                             }
                         });
                         camera.setHorizontal(0);
@@ -338,7 +338,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 }
 
                 // Remove keyboard focus from GUI elements
-                EventManager.instance.notify(Event.REMOVE_KEYBOARD_FOCUS, this);
+                EventManager.instance.notify(Event.REMOVE_KEYBOARD_FOCUS_CMD, this);
 
                 this.button = -1;
             }

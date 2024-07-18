@@ -2346,8 +2346,8 @@ public class Settings extends SettingsObject {
                     }
                     case INDEXOFREFRACTION_CMD -> modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
                     case CUBEMAP_RESOLUTION_CMD -> modeCubemap.faceResolution = (int) data[0];
-                    case SHOW_MINIMAP_ACTION -> minimap.active = (boolean) (Boolean) data[0];
-                    case TOGGLE_MINIMAP -> minimap.active = !minimap.active;
+                    case MINIMAP_DISPLAY_CMD -> minimap.active = (boolean) (Boolean) data[0];
+                    case MINIMAP_TOGGLE_CMD -> minimap.active = !minimap.active;
                     case PLANETARIUM_APERTURE_CMD -> modeCubemap.planetarium.aperture = (float) data[0];
                     case PLANETARIUM_ANGLE_CMD -> modeCubemap.planetarium.angle = (float) data[0];
                     case PLANETARIUM_GEOMETRYWARP_FILE_CMD ->
@@ -2412,7 +2412,7 @@ public class Settings extends SettingsObject {
         protected void setupListeners() {
             EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD,
                     Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
-                    Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP,
+                    Event.INDEXOFREFRACTION_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD,
                     Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
                     Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
                     Event.UI_SCALE_FACTOR_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD, Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD);
@@ -2456,7 +2456,7 @@ public class Settings extends SettingsObject {
                 //     EventManager.publish(Event.STEREOSCOPIC_CMD, this, modeStereo.active);
                 //     EventManager.publish(Event.STEREO_PROFILE_CMD, this, modeStereo.profile.ordinal());
                 //     EventManager.publish(Event.CUBEMAP_CMD, this, modeCubemap.active, modeCubemap.projection);
-                EventManager.publish(Event.SHOW_MINIMAP_ACTION, this, minimap.active);
+                EventManager.publish(Event.MINIMAP_DISPLAY_CMD, this, minimap.active);
 
                 EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
             });

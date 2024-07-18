@@ -275,16 +275,22 @@ public class KeyBindings {
         addAction(new ProgramAction("action.preferences", () -> EventManager.publish(Event.SHOW_PREFERENCES_ACTION, this), noCleanMode));
 
         // minimap toggle
-        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.publish(Event.TOGGLE_MINIMAP, this), noCleanMode));
+        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.publish(Event.MINIMAP_TOGGLE_CMD, this), noCleanMode));
+
+        // console toggle
+        addAction(new ProgramAction("action.toggle/gui.console.title", () -> EventManager.publish(Event.CONSOLE_CMD, this), noCleanMode));
+
+        // console command
+        addAction(new ProgramAction("action.console", () -> EventManager.publish(Event.CONSOLE_CMD, this, true), noCleanMode));
 
         // load catalog
         addAction(new ProgramAction("action.loadcatalog", () -> EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, this), noCleanMode));
 
         // play camera path
-        addAction(new ProgramAction("action.playcamera", () -> EventManager.publish(Event.SHOW_PLAYCAMERA_ACTION, this), noCleanMode));
+        addAction(new ProgramAction("action.playcamera", () -> EventManager.publish(Event.SHOW_PLAYCAMERA_CMD, this), noCleanMode));
 
         // show log dialog
-        addAction(new ProgramAction("action.log", () -> EventManager.publish(Event.SHOW_LOG_ACTION, this), noCleanMode));
+        addAction(new ProgramAction("action.log", () -> EventManager.publish(Event.SHOW_LOG_CMD, this), noCleanMode));
 
         // Toggle orbits
         addAction(new ProgramAction("action.toggle/element.orbits", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits")));

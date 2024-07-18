@@ -1106,7 +1106,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setMinimapVisibility(boolean visible) {
-        postRunnable(() -> em.post(Event.SHOW_MINIMAP_ACTION, this, visible));
+        postRunnable(() -> em.post(Event.MINIMAP_DISPLAY_CMD, this, visible));
     }
 
     @Override

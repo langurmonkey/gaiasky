@@ -69,7 +69,7 @@ public class ExternalInformationUpdater {
 
                 // Gaia archive.
                 if (focus.isStar()) {
-                    EventManager.publish(Event.UPDATE_ARCHIVE_VIEW_ACTION, this, focus);
+                    EventManager.publish(Event.UPDATE_ARCHIVE_VIEW_CMD, this, focus);
                     if (gaiaButton != null)
                         gaiaButton.remove();
                     gaiaButton = new OwnTextButton(I18n.msg("gui.focusinfo.archive"), skin);
@@ -82,7 +82,7 @@ public class ExternalInformationUpdater {
                 }
 
                 // Data button (+ Info).
-                EventManager.publish(Event.UPDATE_DATA_INFO_ACTION, this, focus);
+                EventManager.publish(Event.UPDATE_DATA_INFO_CMD, this, focus);
                 if (infoButton != null)
                     infoButton.remove();
                 infoButton = new OwnTextButton(I18n.msg("gui.focusinfo.moreinfo"), skin);
@@ -91,7 +91,7 @@ public class ExternalInformationUpdater {
                 infoButton.pad(pad / 3f, pad, pad / 3f, pad);
                 infoButton.addListener((event) -> {
                     if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_DATA_INFO_ACTION, this, focus);
+                        EventManager.publish(Event.SHOW_DATA_INFO_CMD, this, focus);
                         return true;
                     }
                     return false;
@@ -191,7 +191,7 @@ public class ExternalInformationUpdater {
         @Override
         public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_ARCHIVE_VIEW_ACTION, this, focus);
+                EventManager.publish(Event.SHOW_ARCHIVE_VIEW_CMD, this, focus);
                 return true;
             }
             return false;

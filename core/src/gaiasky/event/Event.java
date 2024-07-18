@@ -79,7 +79,7 @@ public enum Event {
     /**
      * Adds the GUI component identified by the given name.
      **/
-    ADD_GUI_COMPONENT,
+    ADD_GUI_COMPONENT_CMD,
     /**
      * Contains a float with the intensity of the light in [0,1].
      **/
@@ -109,6 +109,9 @@ public enum Event {
     BOOKMARKS_MOVE_UP,
     /** Moves the bookmark down in the list of its parent. **/
     BOOKMARKS_MOVE_DOWN,
+
+    /** Shows and hides the console. Contains a boolean with the state, which is optional. Otherwise we toggle the console. **/
+    CONSOLE_CMD,
 
     /**
      * Empty event which informs that background loading is active.
@@ -795,7 +798,7 @@ public enum Event {
      * Will show a popup menu for a focus candidate. Contains the candidate and
      * the screenX and screenY coordinates of the click.
      **/
-    POPUP_MENU_FOCUS,
+    CONTEXT_MENU_CMD,
     /**
      * Contains a string with the headline message, will be displayed in a big
      * font in the center of the screen.
@@ -874,11 +877,11 @@ public enum Event {
     /**
      * Removes the GUI component identified by the given name.
      **/
-    REMOVE_GUI_COMPONENT,
+    REMOVE_GUI_COMPONENT_CMD,
     /**
      * Removes the keyboard focus in the GUI.
      **/
-    REMOVE_KEYBOARD_FOCUS,
+    REMOVE_KEYBOARD_FOCUS_CMD,
     /** Issues the command to clean pressed keys in KebyoardInputController. **/
     CLEAN_PRESSED_KEYS,
 
@@ -1087,22 +1090,22 @@ public enum Event {
      * </ol>
      */
     SHOW_TEXTURE_WINDOW_ACTION,
-    SHOW_LAND_AT_LOCATION_ACTION,
+    SHOW_LAND_AT_LOCATION_CMD,
     SHOW_LOAD_CATALOG_ACTION,
-    SHOW_LOG_ACTION,
+    SHOW_LOG_CMD,
     /**
      * Procedural surface and atmosphere generation.
      */
-    SHOW_PROCEDURAL_GEN_ACTION,
+    SHOW_PROCEDURAL_GEN_CMD,
     /**
      * Shows the minimap window/interface. Contains a boolean with the state.
      */
-    SHOW_MINIMAP_ACTION,
+    MINIMAP_DISPLAY_CMD,
 
     /**
      * Shows the camera path file selector, contains the stage and the skin.
      **/
-    SHOW_PLAYCAMERA_ACTION,
+    SHOW_PLAYCAMERA_CMD,
 
     SHOW_PREFERENCES_ACTION,
 
@@ -1137,16 +1140,16 @@ public enum Event {
      * as taken from the wikipedia API (if found), plus the actual data of the object in memory.
      * Contains the {@link FocusView} object.
      */
-    SHOW_DATA_INFO_ACTION,
+    SHOW_DATA_INFO_CMD,
     /** Updates the data window. Contains the {@link FocusView} object. **/
-    UPDATE_DATA_INFO_ACTION,
+    UPDATE_DATA_INFO_CMD,
     /**
      * Shows a window with the Gaia or Hipparcos archive info for the object in the data,
      * which must be a {@link FocusView}.
      */
-    SHOW_ARCHIVE_VIEW_ACTION,
+    SHOW_ARCHIVE_VIEW_CMD,
     /** Updates the archive view if it is open. **/
-    UPDATE_ARCHIVE_VIEW_ACTION,
+    UPDATE_ARCHIVE_VIEW_CMD,
     /**
      * Show uncertainties for Tycho star, if available. Contains the star.
      */
@@ -1369,7 +1372,7 @@ public enum Event {
     /**
      * Toggles minimap visibility
      **/
-    TOGGLE_MINIMAP,
+    MINIMAP_TOGGLE_CMD,
 
     /**
      * Toggles the pause of the update process. Contains the localised name.

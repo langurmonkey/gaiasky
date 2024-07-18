@@ -57,7 +57,6 @@ public class FullGui extends AbstractGui {
     private final FocusView view;
     protected ControlsWindow controlsWindow;
     protected ControlsInterface controlsInterface;
-    protected MinimapWindow minimapWindow;
     protected Container<CameraInfoInterface> fi;
     protected Container<TopInfoInterface> ti;
     protected Container<NotificationsInterface> ni;
@@ -69,6 +68,8 @@ public class FullGui extends AbstractGui {
     protected TopInfoInterface topInfoInterface;
     protected PopupNotificationsInterface popupNotificationsInterface;
     protected MinimapInterface minimapInterface;
+    protected MinimapWindow minimapWindow;
+    protected ConsoleInterface consoleInterface;
     protected LoadProgressInterface loadProgressInterface;
     protected LogWindow logWindow;
     protected DataInfoWindow dataInfoWindow;
@@ -108,7 +109,11 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, FOV_CHANGED_CMD, UPDATE_DATA_INFO_ACTION, SHOW_DATA_INFO_ACTION, SHOW_ARCHIVE_VIEW_ACTION, UPDATE_ARCHIVE_VIEW_ACTION, SHOW_PLAYCAMERA_ACTION, REMOVE_KEYBOARD_FOCUS, REMOVE_GUI_COMPONENT, ADD_GUI_COMPONENT, SHOW_LOG_ACTION, RA_DEC_UPDATED, LON_LAT_UPDATED, POPUP_MENU_FOCUS, SHOW_LAND_AT_LOCATION_ACTION, DISPLAY_POINTER_COORDS_CMD, TOGGLE_MINIMAP, SHOW_MINIMAP_ACTION, SHOW_PROCEDURAL_GEN_ACTION);
+        EventManager.instance.subscribe(this, FOV_CHANGED_CMD, UPDATE_DATA_INFO_CMD, SHOW_DATA_INFO_CMD,
+                SHOW_ARCHIVE_VIEW_CMD, UPDATE_ARCHIVE_VIEW_CMD, SHOW_PLAYCAMERA_CMD, REMOVE_KEYBOARD_FOCUS_CMD,
+                REMOVE_GUI_COMPONENT_CMD, ADD_GUI_COMPONENT_CMD, SHOW_LOG_CMD, RA_DEC_UPDATED, LON_LAT_UPDATED,
+                CONTEXT_MENU_CMD, SHOW_LAND_AT_LOCATION_CMD, DISPLAY_POINTER_COORDS_CMD, MINIMAP_TOGGLE_CMD,
+                MINIMAP_DISPLAY_CMD, SHOW_PROCEDURAL_GEN_CMD, CONSOLE_CMD);
     }
 
     protected void buildGui() {
@@ -189,6 +194,11 @@ public class FullGui extends AbstractGui {
         customInterface = new CustomInterface(stage, skin, lock);
         interfaces.add(customInterface);
 
+        // CONSOLE INTERFACE
+        consoleInterface = new ConsoleInterface(skin);
+        consoleInterface.setFillParent(true);
+        consoleInterface.bottom().left();
+
         // MOUSE X/Y COORDINATES
         pointerXCoord = new OwnLabel("", skin, "default");
         pointerXCoord.setAlignment(Align.bottom);
@@ -201,7 +211,9 @@ public class FullGui extends AbstractGui {
         rebuildGui();
 
         /* VERSION CHECK */
-        if (Settings.settings.program.update.lastCheck == null || Instant.now().toEpochMilli() - Settings.settings.program.update.lastCheck.toEpochMilli() > UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
+        if (Settings.settings.program.update.lastCheck == null
+                || (Instant.now().toEpochMilli() -
+                Settings.settings.program.update.lastCheck.toEpochMilli() > UpdateSettings.VERSION_CHECK_INTERVAL_MS)) {
             // Start check for new versions.
             final Timer.Task t = getVersionCheckTask();
             Timer.schedule(t, 10);
@@ -360,9 +372,9 @@ public class FullGui extends AbstractGui {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-            case SHOW_PROCEDURAL_GEN_ACTION -> {
-                FocusView planet = (FocusView) data[0];
-                Actor w = findActor("procedural-window");
+            case SHOW_PROCEDURAL_GEN_CMD -> {
+                var planet = (FocusView) data[0];
+                var w = findActor("procedural-window");
                 // Only one instance
                 if (w != null && w.hasParent()) {
                     if (!w.isVisible())
@@ -373,13 +385,13 @@ public class FullGui extends AbstractGui {
                     proceduralWindow.show(stage);
                 }
             }
-            case SHOW_LAND_AT_LOCATION_ACTION -> {
+            case SHOW_LAND_AT_LOCATION_CMD -> {
                 var target = (FocusView) data[0];
-                LandAtWindow landAtLocation = new LandAtWindow(target.getEntity(), stage, skin);
+                var landAtLocation = new LandAtWindow(target.getEntity(), stage, skin);
                 landAtLocation.show(stage);
             }
-            case SHOW_PLAYCAMERA_ACTION -> {
-                FileChooser fc = new FileChooser(I18n.msg("gui.camera.title"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+            case SHOW_PLAYCAMERA_CMD -> {
+                var fc = new FileChooser(I18n.msg("gui.camera.title"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.camera.run"));
@@ -398,7 +410,7 @@ public class FullGui extends AbstractGui {
                 });
                 fc.show(stage);
             }
-            case SHOW_LOG_ACTION -> {
+            case SHOW_LOG_CMD -> {
                 if (logWindow == null) {
                     logWindow = new LogWindow(stage, skin);
                 }
@@ -406,14 +418,14 @@ public class FullGui extends AbstractGui {
                 if (!logWindow.isVisible() || !logWindow.hasParent())
                     logWindow.show(stage);
             }
-            case UPDATE_DATA_INFO_ACTION -> {
+            case UPDATE_DATA_INFO_CMD -> {
                 if (dataInfoWindow != null && dataInfoWindow.isVisible() && dataInfoWindow.hasParent() && !dataInfoWindow.isUpdating()) {
-                    FocusView object = (FocusView) data[0];
+                    var object = (FocusView) data[0];
                     dataInfoWindow.update(object);
                 }
             }
-            case SHOW_DATA_INFO_ACTION -> {
-                FocusView object = (FocusView) data[0];
+            case SHOW_DATA_INFO_CMD -> {
+                var object = (FocusView) data[0];
                 if (dataInfoWindow == null) {
                     dataInfoWindow = new DataInfoWindow(stage, skin);
                 }
@@ -423,15 +435,15 @@ public class FullGui extends AbstractGui {
                         dataInfoWindow.show(stage);
                 }
             }
-            case UPDATE_ARCHIVE_VIEW_ACTION -> {
+            case UPDATE_ARCHIVE_VIEW_CMD -> {
                 if (archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()) {
                     // Update
-                    FocusView starFocus = (FocusView) data[0];
+                    var starFocus = (FocusView) data[0];
                     archiveViewWindow.update(starFocus);
                 }
             }
-            case SHOW_ARCHIVE_VIEW_ACTION -> {
-                FocusView starFocus = (FocusView) data[0];
+            case SHOW_ARCHIVE_VIEW_CMD -> {
+                var starFocus = (FocusView) data[0];
                 if (archiveViewWindow == null) {
                     archiveViewWindow = new ArchiveViewWindow(stage, skin);
                 }
@@ -439,24 +451,24 @@ public class FullGui extends AbstractGui {
                 if (!archiveViewWindow.isVisible() || !archiveViewWindow.hasParent())
                     archiveViewWindow.show(stage);
             }
-            case REMOVE_KEYBOARD_FOCUS -> stage.setKeyboardFocus(null);
-            case REMOVE_GUI_COMPONENT -> {
-                String name = (String) data[0];
-                String method = "remove" + TextUtils.capitalise(name);
+            case REMOVE_KEYBOARD_FOCUS_CMD -> stage.setKeyboardFocus(null);
+            case REMOVE_GUI_COMPONENT_CMD -> {
+                var name = (String) data[0];
+                var methodName = "remove" + TextUtils.capitalise(name);
                 try {
-                    Method m = ClassReflection.getMethod(this.getClass(), method);
-                    m.invoke(this);
+                    var method = ClassReflection.getMethod(this.getClass(), methodName);
+                    method.invoke(this);
                 } catch (ReflectionException e) {
                     logger.error(e);
                 }
                 rebuildGui();
             }
-            case ADD_GUI_COMPONENT -> {
-                String name = (String) data[0];
-                String method = "add" + TextUtils.capitalise(name);
+            case ADD_GUI_COMPONENT_CMD -> {
+                var name = (String) data[0];
+                var methodName = "add" + TextUtils.capitalise(name);
                 try {
-                    Method m = ClassReflection.getMethod(this.getClass(), method);
-                    m.invoke(this);
+                    Method method = ClassReflection.getMethod(this.getClass(), methodName);
+                    method.invoke(this);
                 } catch (ReflectionException e) {
                     logger.error(e);
                 }
@@ -466,10 +478,10 @@ public class FullGui extends AbstractGui {
                 if (Settings.settings.program.pointer.coordinates) {
                     Stage ui = pointerYCoord.getStage();
                     float uiScale = Settings.settings.program.ui.scale;
-                    Double ra = (Double) data[0];
-                    Double dec = (Double) data[1];
-                    Integer x = (Integer) data[4];
-                    Integer y = (Integer) data[5];
+                    var ra = (Double) data[0];
+                    var dec = (Double) data[1];
+                    var x = (Integer) data[4];
+                    var y = (Integer) data[5];
 
                     pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.ra", nf.format(ra)));
                     pointerXCoord.setPosition(x / uiScale, 1.6f);
@@ -479,12 +491,12 @@ public class FullGui extends AbstractGui {
             }
             case LON_LAT_UPDATED -> {
                 if (Settings.settings.program.pointer.coordinates) {
-                    Stage ui = pointerYCoord.getStage();
-                    float uiScale = Settings.settings.program.ui.scale;
-                    Double lon = (Double) data[0];
-                    Double lat = (Double) data[1];
-                    Integer x = (Integer) data[2];
-                    Integer y = (Integer) data[3];
+                    var ui = pointerYCoord.getStage();
+                    var uiScale = Settings.settings.program.ui.scale;
+                    var lon = (Double) data[0];
+                    var lat = (Double) data[1];
+                    var x = (Integer) data[2];
+                    var y = (Integer) data[3];
 
                     pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.lon", nf.format(lon)));
                     pointerXCoord.setPosition(x / uiScale, 1.6f);
@@ -497,34 +509,59 @@ public class FullGui extends AbstractGui {
                 pointerXCoord.setVisible(display);
                 pointerYCoord.setVisible(display);
             }
-            case POPUP_MENU_FOCUS -> {
-                final Entity candidate = (Entity) data[0];
-                int screenX = (int) data[1];
-                int screenY = (int) data[2];
+            case CONTEXT_MENU_CMD -> {
+                final var candidate = (Entity) data[0];
+                var screenX = (int) data[1];
+                var screenY = (int) data[2];
                 FocusView focusView = null;
                 if (candidate != null) {
                     view.setEntity(candidate);
                     focusView = view;
                 }
                 SceneContextMenu popup = new SceneContextMenu(skin, "default", screenX, screenY, focusView, catalogManager, scene);
-                int h = (int) getGuiStage().getHeight();
+                var h = (int) getGuiStage().getHeight();
                 float px = screenX * unitsPerPixel;
                 float py = h - screenY * unitsPerPixel - 32f;
                 popup.showMenu(stage, px, py);
             }
-            case TOGGLE_MINIMAP -> {
+            case MINIMAP_TOGGLE_CMD -> {
                 if (Settings.settings.program.minimap.inWindow) {
                     toggleMinimapWindow(stage);
                 } else {
                     toggleMinimapInterface(stage);
                 }
             }
-            case SHOW_MINIMAP_ACTION -> {
-                boolean show = (Boolean) data[0];
+            case MINIMAP_DISPLAY_CMD -> {
+                var show = (Boolean) data[0];
                 if (Settings.settings.program.minimap.inWindow) {
                     showMinimapWindow(stage, show);
                 } else {
                     showMinimapInterface(stage, show);
+                }
+            }
+            case CONSOLE_CMD -> {
+                boolean show;
+                if (data != null && data.length > 0) {
+                    show = (Boolean) data[0];
+                } else {
+                   show = !consoleInterface.hasParent();
+                }
+                if (show) {
+                    interfaces.add(consoleInterface);
+                    // Add to ui.
+                    if (!consoleInterface.hasParent() || consoleInterface.getParent() != stage.getRoot()) {
+                        stage.addActor(consoleInterface);
+                        consoleInterface.addAction(
+                                Actions.sequence(
+                                        Actions.alpha(0f),
+                                        Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                                        Actions.run(() -> consoleInterface.show())));
+
+                    }
+                } else if (consoleInterface != null) {
+                    interfaces.removeValue(consoleInterface, true);
+                    // Remove from ui.
+                    consoleInterface.closeConsole();
                 }
             }
             default -> {

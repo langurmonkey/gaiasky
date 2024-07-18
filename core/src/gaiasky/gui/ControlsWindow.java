@@ -79,7 +79,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(separatorTextureRegion);
 
-        EventManager.instance.subscribe(this, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD);
     }
 
     /**
@@ -190,7 +190,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         buttonMinimap.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
         buttonMinimap.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_MINIMAP_ACTION, buttonMinimap, buttonMinimap.isChecked());
+                EventManager.publish(Event.MINIMAP_DISPLAY_CMD, buttonMinimap, buttonMinimap.isChecked());
             }
             return false;
         });
@@ -223,7 +223,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         buttonLog.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
         buttonLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LOG_ACTION, buttonLog);
+                EventManager.publish(Event.SHOW_LOG_CMD, buttonLog);
                 buttonLog.setCheckedNoFire(false);
             }
             return false;
@@ -390,13 +390,13 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 CollapsiblePane pane = panes.get(name);
                 pane.togglePane();
             }
-            case SHOW_MINIMAP_ACTION -> {
+            case MINIMAP_DISPLAY_CMD -> {
                 boolean show = (Boolean) data[0];
                 if (source != buttonMinimap) {
                     buttonMinimap.setCheckedNoFire(show);
                 }
             }
-            case TOGGLE_MINIMAP -> {
+            case MINIMAP_TOGGLE_CMD -> {
                 buttonMinimap.setCheckedNoFire(!buttonMinimap.isChecked());
             }
             default -> {

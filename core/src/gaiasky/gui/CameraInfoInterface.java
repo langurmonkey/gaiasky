@@ -214,7 +214,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         landAt.setSize(buttonSize, buttonSize);
         landAt.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LAND_AT_LOCATION_ACTION, landAt, currentFocus);
+                EventManager.publish(Event.SHOW_LAND_AT_LOCATION_CMD, landAt, currentFocus);
                 return true;
             }
             return false;
@@ -230,7 +230,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         proceduralGeneration.addListener((event) -> {
             var view = (FocusView) currentFocus;
             if (currentFocus != null && Mapper.atmosphere.has(view.getEntity()) && event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_PROCEDURAL_GEN_ACTION, proceduralGeneration, currentFocus);
+                EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralGeneration, currentFocus);
                 return true;
             }
             return false;

@@ -93,7 +93,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                     // Nope.
                     return false;
                 }
-                EventManager.publish(Event.SHOW_PLAYCAMERA_ACTION, playCamera);
+                EventManager.publish(Event.SHOW_PLAYCAMERA_CMD, playCamera);
                 return true;
             }
             return false;

@@ -1,4 +1,4 @@
-#v3050402
+#v3060301
 # This file contains the key mappings for Gaia Sky.
 
 # Each line contains an action=keys pair, where action is the
@@ -24,6 +24,10 @@ action.preferences                          = P
 
 # Show log
 action.log                                  = ALT_L L
+
+# Console
+action.console                              = SHIFT_L SEMICOLON
+action.toggle/gui.console.title             = SHIFT_L GRAVE
 
 # Load catalog
 action.loadcatalog                          = CTRL_L O
