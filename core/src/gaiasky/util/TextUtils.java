@@ -27,6 +27,7 @@ public class TextUtils {
      * Escape a give String to make it safe to be printed or stored.
      *
      * @param s The input String.
+     *
      * @return The output String.
      **/
     public static String escape(String s) {
@@ -55,6 +56,7 @@ public class TextUtils {
      *
      * @param in         The character sequence.
      * @param breakChars The number of characters per line.
+     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(CharSequence in,
@@ -68,6 +70,7 @@ public class TextUtils {
      *
      * @param in         The string.
      * @param breakChars The number of characters per line.
+     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(String in,
@@ -82,6 +85,7 @@ public class TextUtils {
      * @param in         The string.
      * @param breakChars The number of characters per line.
      * @param forceBreak Break the string even when there are no separator characters.
+     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(String in,
@@ -168,6 +172,7 @@ public class TextUtils {
      * -> ModelTextureBump
      *
      * @param property The property displayName
+     *
      * @return The method name
      */
     public static String propertyToMethodName(String property) {
@@ -183,6 +188,7 @@ public class TextUtils {
      * Returns the given string with the first letter capitalised
      *
      * @param line The input string
+     *
      * @return The string with its first letter capitalised
      */
     public static String capitalise(String line) {
@@ -194,6 +200,7 @@ public class TextUtils {
      * others in lower case
      *
      * @param line The input string
+     *
      * @return The string with its first letter capitalised and the others in
      * lower case
      */
@@ -206,6 +213,7 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
+     *
      * @return The concatenation
      */
     public static String concatenate(String split,
@@ -228,6 +236,7 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
+     *
      * @return The concatenation
      */
     public static String concatenate(final String split,
@@ -361,6 +370,7 @@ public class TextUtils {
      *
      * @param base     The base string
      * @param suffixes All the suffixes
+     *
      * @return The result
      */
     public static String[] concatAll(String base,
@@ -374,10 +384,12 @@ public class TextUtils {
 
     /**
      * Returns a new array with the given element inserted at the beginning (index 0).
+     *
      * @param elements The array.
-     * @param element The new element to insert.
+     * @param element  The new element to insert.
+     * @param <T>      The type of objects contained in the arrays.
+     *
      * @return The new array.
-     * @param <T> The type of objects contained in the arrays.
      */
     public static <T> T[] addToBeginningOfArray(T[] elements, T element) {
         T[] newArray = Arrays.copyOf(elements, elements.length + 1);
@@ -464,6 +476,7 @@ public class TextUtils {
      * Removes the tags and unescapes the given HTML code into a plain string.
      *
      * @param html The HTML code.
+     *
      * @return Unescaped plain text without HTML tags or codes.
      */
     public static String html2text(String html) {
@@ -813,6 +826,7 @@ public class TextUtils {
      * @param str     The string to pad.
      * @param length  The target length.
      * @param padChar The padding character to use.
+     *
      * @return The padded string, or the original string if its length was greater than
      * the given target length.
      */
@@ -918,6 +932,7 @@ public class TextUtils {
      * Reads the first line of a file.
      *
      * @param file The path pointing to the file to read.
+     *
      * @return The first line as a string.
      */
     public static Optional<String> readFirstLine(Path file) {
@@ -942,6 +957,7 @@ public class TextUtils {
          * <code>org.apache.commons.lang3.StringEscapeUtils</code>.
          *
          * @param str The string to unescape.
+         *
          * @return A new unescaped String, <code>null</code> if null string input.
          */
         public static String unescapeHTML4(String str) {

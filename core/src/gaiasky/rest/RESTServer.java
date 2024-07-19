@@ -410,7 +410,7 @@ public class RESTServer {
                 }
                 ret.put("value", returnObject);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
             }
             return responseData(request, response, ret, true);
 
@@ -523,7 +523,7 @@ public class RESTServer {
                 logger.info("Server now stopped.");
             }
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            logger.error(e);
         }
 
     }
