@@ -197,7 +197,7 @@ public class FullGui extends AbstractGui {
         // CONSOLE INTERFACE
         consoleInterface = new ConsoleInterface(skin);
         consoleInterface.setFillParent(true);
-        consoleInterface.bottom().left();
+        consoleInterface.bottom().left().padLeft(70f);
 
         // MOUSE X/Y COORDINATES
         pointerXCoord = new OwnLabel("", skin, "default");
@@ -551,11 +551,7 @@ public class FullGui extends AbstractGui {
                     // Add to ui.
                     if (!consoleInterface.hasParent() || consoleInterface.getParent() != stage.getRoot()) {
                         stage.addActor(consoleInterface);
-                        consoleInterface.addAction(
-                                Actions.sequence(
-                                        Actions.alpha(0f),
-                                        Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
-                                        Actions.run(() -> consoleInterface.show())));
+                        consoleInterface.showConsole();
 
                     }
                 } else if (consoleInterface != null) {
