@@ -294,10 +294,24 @@ public class ConsoleInterface extends TableGuiInterface {
         if ("help".equals(command)) {
             addOutputOk(command);
             addOutputInfo("List of available API calls:");
-            methodMap.forEach((a, b) -> addOutputInfo("  " + a));
+
+            methodMap.keySet().stream().sorted().forEach(a -> {
+                var b = methodMap.get(a);
+                b.forEach(m -> {
+                    StringBuilder sb = new StringBuilder(m.getName());
+                    var params = m.getParameters();
+                    Arrays.stream(params).forEach(p -> {
+                        sb.append(" ").append(p.getName()).append("[").append(p.getType().getSimpleName()).append("]");
+                    });
+                    addOutputInfo("  " + sb);
+                });
+            });
             addOutputInfo("");
             addOutputInfo("List of available shortcuts:");
-            shortcutMap.forEach((a, b) -> addOutputInfo("  " + a + " :=: " + b));
+            shortcutMap.keySet().stream().sorted().forEach(a -> {
+                var b = shortcutMap.get(a);
+                addOutputInfo("  " + a + " :=: " + b);
+            });
         } else if (methodMap.containsKey(command)) {
             var methods = methodMap.get(command);
 
@@ -315,7 +329,6 @@ public class ConsoleInterface extends TableGuiInterface {
                     boolean ok = true;
                     for (int i = 0; i < params.length; i++) {
                         Parameter p = params[i];
-                        String paramName = p.getName();
                         var stringValue = parameters[i];
 
                         // Set type.
