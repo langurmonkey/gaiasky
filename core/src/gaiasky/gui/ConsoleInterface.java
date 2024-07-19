@@ -136,7 +136,7 @@ public class ConsoleInterface extends TableGuiInterface {
             return false;
         });
         inputTable = new Table(skin);
-        inputTable.add(prompt).left().padRight(pad);
+        inputTable.add(prompt).left().padLeft(pad).padRight(pad);
         inputTable.add(input).left();
 
         output = new Table(skin);
@@ -160,19 +160,18 @@ public class ConsoleInterface extends TableGuiInterface {
 
     private void rebuildMainTable() {
         var upp = GaiaSky.instance.getUnitsPerPixel();
-        input.setWidth((Gdx.graphics.getWidth() - pad - prompt.getWidth()) * upp - 500f);
-        outputScroll.setWidth((Gdx.graphics.getWidth() - pad - prompt.getWidth()) * upp - 500f);
-        output.setWidth(outputScroll.getWidth());
+        float w = (Gdx.graphics.getWidth() - pad - prompt.getWidth()) * upp - 500f;
+        input.setWidth(w - pad * 2f);
+        outputScroll.setWidth(w);
         Table mainTable = new Table(getSkin());
         mainTable.pad(pad);
         mainTable.setBackground("bg-pane-border-dark");
         mainTable.center();
         mainTable.add(new OwnLabel("  " + I18n.msg("gui.console.title"), getSkin(), "header-s")).left().padBottom(pad);
         mainTable.add(close).right().padBottom(pad).row();
-        mainTable.add(outputScroll).colspan(2).left().padLeft(pad).fillX().row();
-        mainTable.add(inputTable).colspan(2).left().padLeft(pad).fillX().pad(0);
+        mainTable.add(outputScroll).colspan(2).width(w).left().padLeft(pad).fillX().row();
+        mainTable.add(inputTable).colspan(2).left().width(w).padLeft(pad).fillX().pad(0);
         mainTable.pack();
-        mainTable.debug();
 
         // Add to parent.
         clearChildren();
