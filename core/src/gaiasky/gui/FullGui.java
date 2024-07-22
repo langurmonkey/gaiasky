@@ -29,7 +29,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
@@ -378,10 +377,13 @@ public class FullGui extends AbstractGui {
                 var planet = (FocusView) data[0];
 
                 // Check for cubemap textures, for they are incompatible with the procedural generation.
-                if(Mapper.model.has(planet.getEntity())) {
+                if (Mapper.model.has(planet.getEntity())) {
                     var model = Mapper.model.get(planet.getEntity());
                     var mtc = model.model.mtc;
-                    if(mtc.diffuseCubemap!= null) {
+                    if (mtc.diffuseCubemap != null ||
+                            mtc.specularCubemap != null ||
+                            mtc.heightCubemap != null ||
+                            mtc.emissiveCubemap != null) {
                         addCubemapProceduralWindow(skin, stage, planet.getName());
                     } else {
                         var w = findActor("procedural-window");
@@ -557,7 +559,7 @@ public class FullGui extends AbstractGui {
                 if (data != null && data.length > 0) {
                     show = (Boolean) data[0];
                 } else {
-                   show = !consoleInterface.hasParent();
+                    show = !consoleInterface.hasParent();
                 }
                 if (show) {
                     interfaces.add(consoleInterface);

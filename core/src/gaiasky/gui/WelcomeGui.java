@@ -47,14 +47,12 @@ import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 import gaiasky.util.scene2d.Separator;
 import gaiasky.vr.openxr.XrLoadStatus;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -606,12 +604,6 @@ public class WelcomeGui extends AbstractGui {
 
     private static void reloadLocalDatasets() {
         localDatasets.set(DataDescriptorUtils.instance().buildLocalDatasets(null));
-    }
-
-    private void savePreferences() {
-        // Save configuration
-        SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
-        EventManager.publish(Event.PROPERTIES_WRITTEN, this);
     }
 
     private int numTotalDatasetsEnabled() {
