@@ -3,47 +3,47 @@
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.3...3.6.3-2)
 
 ### Bug Fixes
-- bad truncation leads to some SVTs not working properly. Fixes [#778](https://codeberg.org/gaiasky/gaiasky/issues/778). 
+- bad truncation leads to some SVTs not working properly. Fixes [#778](https://codeberg.org/gaiasky/gaiasky/issues/778).
 
 ### Features
-- use noise library for star surface shader. 
+- use noise library for star surface shader.
 
 <a name="3.6.3"></a>
 ## [3.6.3](https://codeberg.org/gaiasky/gaiasky/tree/3.6.2-3) (2024-07-12)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.2-3...3.6.3)
 
 ### Bug Fixes
-- relativistic shaders define their own helper functions. 
-- broken anchor in readme file. 
-- error computing next focus and closest body positions. 
-- restore elevation-aware planet traversal. 
-- artifacts in atmosphere shader when SSR is active. 
-- adjust maximum reach of point lights. 
-- improve single star selection code, especially when close to stars. 
-- regression where orientation lock stopped working altogether. 
-- adjust frequency and lacunarity randomizers so that more strucutre is always present. 
-- crash during initialization when model is set to randomize. 
-- tooltip background width incorrectly computed. 
-- remove call to pack() in constructor. 
+- relativistic shaders define their own helper functions.
+- broken anchor in readme file.
+- error computing next focus and closest body positions.
+- restore elevation-aware planet traversal.
+- artifacts in atmosphere shader when SSR is active.
+- adjust maximum reach of point lights.
+- improve single star selection code, especially when close to stars.
+- regression where orientation lock stopped working altogether.
+- adjust frequency and lacunarity randomizers so that more structure is always present.
+- crash during initialization when model is set to randomize.
+- tooltip background width incorrectly computed.
+- remove call to pack() in constructor.
 
 ### Build System
-- upgrade bundled JRE to 21, minimum language version to 17. 
+- upgrade bundled JRE to 21, minimum language version to 17.
 
 ### Features
-- add graphical presets to settings dialog. 
-- change antialiasing settings from only type to type and quality. 
-- rename 'graphics quality' to 'texture quality'. Change antialiasing settings from only type to type and quality. 
-- add tooltip with hotkeys to cinematic camera checkbox. 
-- automatic DPI scaling to support multi-DPI configurations. 
-- add initial amplitude to noise parametrization in procedural generation. 
-- improve camera velocity display units in camera info pane. 
-- divide procedural generation in 4 consecutive frames. Add emission generation as an extra (optional) channel. 
-- use normal map when elevation type is 'None' in procedural generation. 
-- move 'save textures' of procedural generation to a parallel thread. 
-- new splash image based on NASA exoplanets. 
-- improve layout of procedural generation window. 
-- add procedural generation button to camera info interface. 
-- surface generation presets (Earth-like, gas giant, rocky planet, etc.), and hide noise parameters in collapsible pane. 
+- add graphical presets to settings dialog.
+- change antialiasing settings from only type to type and quality.
+- rename 'graphics quality' to 'texture quality'. Change antialiasing settings from only type to type and quality.
+- add tooltip with hotkeys to cinematic camera checkbox.
+- automatic DPI scaling to support multi-DPI configurations.
+- add initial amplitude to noise parametrization in procedural generation.
+- improve camera velocity display units in camera info pane.
+- divide procedural generation in 4 consecutive frames. Add emission generation as an extra (optional) channel.
+- use normal map when elevation type is 'None' in procedural generation.
+- move 'save textures' of procedural generation to a parallel thread.
+- new splash image based on NASA exoplanets.
+- improve layout of procedural generation window.
+- add procedural generation button to camera info interface.
+- surface generation presets (Earth-like, gas giant, rocky planet, etc.), and hide noise parameters in collapsible pane.
 - add procedurally generated texture resolution to configuration and preferences window. 
 - replace CPU-based procedural generation with shader-based, which is orders of magnitude faster. 
 - improve cloud color and atmospheric fog density randomizers. 
@@ -55,7 +55,7 @@
 - add 'refreshRate' to orbit objects to control how often they are updated (if needed), add button to camera info interface to refresh the orbit of the selected object. 
 
 ### Performance Improvements
-- enable fast-math usage by default, and remove old, unused trigo scaffolding classes. 
+- enable fast-math usage by default, and remove old, unused trigonometry scaffolding classes. 
 - improve performance of recursive grid shader, which was very slow due to the background fill (with interpolation), and the animation. Animation is now removed. 
 
 <a name="3.6.2-2"></a>
@@ -70,13 +70,13 @@
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.1...3.6.2)
 
 ### Bug Fixes
-- use a new instance of the preferences dialog each time it is open, so that all preferences are reinitialized correctly. 
+- use a new instance of the preferences dialog each time it is open, so that all preferences are initialized correctly. 
 - invert-x/-y button in gamepad GUI does not work/update correctly. 
 - ray-marching effects in cubemap modes. Probably a source of unforeseen consequences. 
 - remove blank frame produced when activating a ray-marching effect for the first time. 
-- never skip future closest body position computation. 
-- restore light glow effect in cubemap modes (360, planetarium, orthosphere). 
-- restore light glow effect in stereoscopic mode. 
+- never skip future closest body position computation.
+- restore light glow effect in cubemap modes (360, planetarium, ortho-sphere).
+- restore light glow effect in stereoscopic mode.
 
 ### Features
 - enable ray-marching effects in stereoscopic mode.
@@ -686,7 +686,7 @@
 ### Code Refactoring
 - set 'useColor' in models to false by default, so that the object color is not passed to the 3D model unless explicitly stated.
 - remove dpendency on gdx-gltf, implement own modification which directly loads meshes using 32-bit integer indices instead of 16-bit shorts.
-- rename some classes to make them more concise. Fix and improve javadoc comments.
+- rename some classes to make them more concise. Fix and improve Javadoc comments.
 - consolidate shader and resource disposing in post processors.
 - unify tessellation and regular shader infrastructure.
 - trigger star/particle set update task in updater systems instead of via the camera motion event. Shorten minimum times between metadata updates.
@@ -865,7 +865,7 @@
 - migration to new dataset structure, add data location cleaner utility at startup. 
 - add some extra room between dataset types to improve readability. 
 - support gzipped data descriptor files. 
-- introduce index of refraction for the celestial sphere when orthosphere view is on. Included as a slider in the experimental section of the GUI. 
+- introduce index of refraction for the celestial sphere when ortho-sphere view is on. Included as a slider in the experimental section of the GUI. 
 
 
 <a name="3.3.0"></a>
@@ -902,7 +902,7 @@
 
 ### Features
 - key bindings file versioning. If the key bindings file starts with the line `#v[version]`, that version is compared to the default one and overwritten when necessary. That makes updating key bindings much easier.
-- add new camera mode, orthosphere view, which includes the regular and the cross-eye orthosphere projections.
+- add new camera mode, ortho-sphere view, which includes the regular and the cross-eye ortho-sphere projections.
 - add cross-eye view of the orthographic projection of the celestial sphere
 
 
@@ -955,15 +955,15 @@
 - use minimum width for debug interface to prevent dynamic resizing depending on content.
 
 ### Build System
-- update changelog template repository to codeberg.
+- update changelog template repository to Codeberg.
 - upgrade gradle wrapper version to 7.5.1.
-- update gitlab references to codeberg, when possible. Use codeberg API for version checking.
-- remove gitlab CI file.
+- update Gitlab references to Codeberg, when possible. Use Codeberg API for version checking.
+- remove Gitlab CI file.
 - move namespace from `gitlab.com/langurmonkey` to `gitlab.com/gaiasky`.
-- docs project no longer a submodule.
+- docs project no longer a sub-module.
 - add aarch64 JRE to macOS bundle for M1 machines. Move to macOS single bundle archive from deprecated old single bundle.
 - force safe graphics mode on M1 macOS.
-- upgrade to libgdx 1.11.0 and LWJGL 3.3.1 --- this adds M1 Mac support.
+- upgrade to Libgdx 1.11.0 and LWJGL 3.3.1 --- this adds M1 Mac support.
 - use default GC (G1) in favor of Shenandoah (only LTS).
 
 ### Code Refactoring
@@ -977,16 +977,16 @@
 ### Documentation
 - typos and so.
 - improve comments on color maps GLSL code.
-- add new panorama orthographic projection to API javadocs.
+- add new panorama orthographic projection to API Javadocs.
 - remove wrong license (leftover from old copy-paste) in fisheye fragment shader code.
 - add contributor
-- update repository pointers to codeberg.
+- update repository pointers to Codeberg.
 
 ### Features
-- recompute UI scale at startup when starting with default config file. Fix particle set size when rendered as points, fix star scaling issue.
+- recompute UI scale at startup when starting with default configuration file. Fix particle set size when rendered as points, fix star scaling issue.
 - add back-buffer scale API call.
 - add repository to -v information.
-- Include "orthosphere" panorama mode -- orthospherical projection with both hemispheres overlaid to give a view of the celestial sphere from the outside.
+- Include "ortho-sphere" panorama mode -- ortho-spherical projection with both hemispheres overlaid to give a view of the celestial sphere from the outside.
 - enable gamepad operation in welcome GUI.
 - Include orthographic projection in panorama mode. Includes both hemispheres on the screen, side by side. Can be cycled through with `ctrl`+`shift`+`k`.
 - add support for KTX and ZKTX textures.
@@ -1601,7 +1601,7 @@
 - JSAMP maven is down, adding jar to lib.
 
 ### Documentation
-- clean up javadoc comments.
+- clean up Javadoc comments.
 - add missing acknowledgments and contributors.
 
 ### Style
@@ -1715,7 +1715,7 @@
 - modify default bloom settings (default intensity, passes, amount).
 
 ### Documentation
-- fix javadocs for binary format (1/n).
+- fix Javadocs for binary format (1/n).
 
 ### Performance Improvements
 - arrays of size not dependent on maxPart for octreegen.
@@ -2651,7 +2651,7 @@ pixels instead of a normalized value between 0 and 100.
 - new gradle 5 compile dep format.
 - update to lwjgl 3.2.3.
 - missing flag in rund, fix caps in ruler.
-- add javadoc generator and publisher.
+- add Javadoc generator and publisher.
 
 ### Code Refactoring
 
@@ -2910,7 +2910,7 @@ pixels instead of a normalized value between 0 and 100.
 - on Windows, install fails with "Could not determine java version from '9.0.1' [#204](https://codeberg.org/gaiasky/gaiasky/issues/204).
 - docs don't mention where record data appears [#198](https://codeberg.org/gaiasky/gaiasky/issues/198).
 - so....I...uhh...broke it in the most beautiful way I could think...ever. [#196](https://codeberg.org/gaiasky/gaiasky/issues/196).
-- javadocs no longer available [#183](https://codeberg.org/gaiasky/gaiasky/issues/183).
+- Javadocs no longer available [#183](https://codeberg.org/gaiasky/gaiasky/issues/183).
 - not truly compatible with Oculus Rift [#44](https://codeberg.org/gaiasky/gaiasky/issues/44).
 
 **Merged pull requests:**
