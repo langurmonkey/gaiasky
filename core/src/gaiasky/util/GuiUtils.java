@@ -141,7 +141,6 @@ public class GuiUtils {
 
             @Override
             protected void cancel() {
-                GaiaSky.postRunnable(Gdx.app::exit);
             }
 
             @Override
@@ -176,7 +175,6 @@ public class GuiUtils {
 
             @Override
             protected void cancel() {
-                GaiaSky.postRunnable(Gdx.app::exit);
             }
 
             @Override

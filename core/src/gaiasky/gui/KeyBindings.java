@@ -278,7 +278,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.publish(Event.MINIMAP_TOGGLE_CMD, this), noCleanMode));
 
         // console toggle
-        //addAction(new ProgramAction("action.toggle/gui.console.title", () -> EventManager.publish(Event.CONSOLE_CMD, this), noCleanMode));
+        addAction(new ProgramAction("action.toggle/gui.console.title", () -> EventManager.publish(Event.CONSOLE_CMD, this), noCleanMode));
 
         // console command
         addAction(new ProgramAction("action.console", () -> EventManager.publish(Event.CONSOLE_CMD, this, true), noCleanMode));

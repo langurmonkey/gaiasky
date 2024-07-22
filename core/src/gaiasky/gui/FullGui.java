@@ -29,10 +29,12 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -374,16 +376,27 @@ public class FullGui extends AbstractGui {
         switch (event) {
             case SHOW_PROCEDURAL_GEN_CMD -> {
                 var planet = (FocusView) data[0];
-                var w = findActor("procedural-window");
-                // Only one instance
-                if (w != null && w.hasParent()) {
-                    if (!w.isVisible())
-                        w.setVisible(true);
-                } else {
-                    ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
-                    proceduralWindow.setName("procedural-window");
-                    proceduralWindow.show(stage);
+
+                // Check for cubemap textures, for they are incompatible with the procedural generation.
+                if(Mapper.model.has(planet.getEntity())) {
+                    var model = Mapper.model.get(planet.getEntity());
+                    var mtc = model.model.mtc;
+                    if(mtc.diffuseCubemap!= null) {
+                        addCubemapProceduralWindow(skin, stage, planet.getName());
+                    } else {
+                        var w = findActor("procedural-window");
+                        // Only one instance
+                        if (w != null && w.hasParent()) {
+                            if (!w.isVisible())
+                                w.setVisible(true);
+                        } else {
+                            ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
+                            proceduralWindow.setName("procedural-window");
+                            proceduralWindow.show(stage);
+                        }
+                    }
                 }
+
             }
             case SHOW_LAND_AT_LOCATION_CMD -> {
                 var target = (FocusView) data[0];
@@ -677,5 +690,36 @@ public class FullGui extends AbstractGui {
             }
         }
         return cool;
+    }
+
+    public static void addCubemapProceduralWindow(Skin skin, Stage stage, String objectName) {
+        GenericDialog proceduralCubemap = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.procedural.title", objectName)), skin, stage) {
+
+            @Override
+            protected void build() {
+                OwnLabel info1 = new OwnLabel(I18n.msg("gui.procedural.cubemap.1"), skin);
+                OwnLabel info2 = new OwnLabel(I18n.msg("gui.procedural.cubemap.2"), skin);
+                content.add(info1).left().padTop(10).padBottom(5).row();
+                content.add(info2).left().padBottom(10);
+            }
+
+            @Override
+            protected boolean accept() {
+                return true;
+            }
+
+            @Override
+            protected void cancel() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+
+        };
+        proceduralCubemap.setAcceptText(I18n.msg("gui.ok"));
+        proceduralCubemap.setCancelText(null);
+        proceduralCubemap.buildSuper();
+        proceduralCubemap.show(stage);
     }
 }
