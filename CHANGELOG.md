@@ -32,7 +32,6 @@
 ### Features
 - add graphical presets to settings dialog.
 - change antialiasing settings from only type to type and quality.
-- rename 'graphics quality' to 'texture quality'. Change antialiasing settings from only type to type and quality.
 - add tooltip with hotkeys to cinematic camera checkbox.
 - automatic DPI scaling to support multi-DPI configurations.
 - add initial amplitude to noise parametrization in procedural generation.
