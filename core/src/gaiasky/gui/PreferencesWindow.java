@@ -56,6 +56,7 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 public class PreferencesWindow extends GenericDialog implements IObserver {
@@ -129,6 +130,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private int fxaaQuality, fxaaQualityBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
+    private AtomicBoolean vsyncValue;
 
     public PreferencesWindow(final Stage stage,
                              final Skin skin,
@@ -473,6 +475,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         vsync = new OwnCheckBox("", skin);
         vsync.setName("V-sync");
         vsync.setChecked(settings.graphics.vsync);
+        vsyncValue = new AtomicBoolean(settings.graphics.vsync);
+        vsync.addListener(e -> {
+            if (e instanceof ChangeEvent ce) {
+                vsyncValue.set(((OwnCheckBox) ce.getTarget()).isChecked());
+                return true;
+            }
+            return false;
+        });
 
         // LIMIT FPS
         IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
@@ -2739,7 +2749,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             }
 
         } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e, "Error copying default preferences file to user folder: " + userFolderConfFile);
+            logger.error(e, "Error copying default preferences file to user folder: " + userFolderConfFile);
         }
 
     }
@@ -2784,12 +2794,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         EventManager.publish(Event.FXAA_QUALITY_CMD, this, fxaaQuality);
 
-        settings.graphics.vsync = vsync.isChecked();
+        settings.graphics.vsync = vsyncValue.get();
         try {
             // Windows backend crashes for some reason
             Gdx.graphics.setVSync(settings.graphics.vsync);
         } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e);
+            logger.error(e);
         }
 
         // FPS limiter

@@ -56,10 +56,12 @@ public class ColorUtils {
     public static Color oLightGrayC = getCol(oLightGray);
     public static float[] oDarkGray = new float[] { 0.3f, 0.3f, 0.3f, 1f };
     public static Color oDarkGrayC = getCol(oDarkGray);
+    public static float[] oCyan = new float[] { 0f, 230f / 255f, 1f, 1f };
+    public static Color oCyanC = getCol(ddMagenta);
     /**
      * Highlight color array for datasets
      **/
-    public static float[][] colorArray = new float[][] { gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta };
+    public static float[][] colorArray = new float[][] { gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta, oCyan };
     private static float[][] teffToRGB_harre;
 
     private static Color getCol(float[] c) {

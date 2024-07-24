@@ -10,11 +10,14 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.script.IScriptingInterface;
@@ -44,6 +47,16 @@ public class ConsoleInterface extends TableGuiInterface {
     int historyIndex = -1;
     float pad = 10f;
 
+    private final String black = "\033[30m";
+    private final String red = "\033[31m";
+    private final String green = "\033[32m";
+    private final String yellow = "\033[33m";
+    private final String blue = "\033[34m";
+    private final String magenta = "\033[35m";
+    private final String cyan = "\033[36m";
+    private final String white = "\033[37m";
+    private final String reset = "\033[0m";
+
     private Map<String, String> shortcutMap;
 
     private final static Array<Message> console = new Array<>();
@@ -54,23 +67,31 @@ public class ConsoleInterface extends TableGuiInterface {
     }
 
     private enum MsgType {
-        INFO(ColorUtils.gYellowC),
-        ERROR(ColorUtils.gRedC),
-        RETURN(ColorUtils.gBlueC),
-        OK(ColorUtils.gGreenC);
+        INFO("info", ColorUtils.gYellowC, ColorUtils.gWhiteC),
+        ERROR("error", ColorUtils.gRedC, ColorUtils.gPinkC),
+        RETURN("return", ColorUtils.gBlueC, ColorUtils.gWhiteC),
+        OK("ok", ColorUtils.gGreenC, ColorUtils.gWhiteC);
 
-        private final Color color;
+        private final String code;
+        private final Color msgColor;
+        private final Color tagColor;
 
-        MsgType(Color color) {
-            this.color = color;
+        MsgType(String code, Color tagColor, Color msgColor) {
+            this.code = code;
+            this.tagColor = tagColor;
+            this.msgColor = msgColor;
         }
 
         public String getCodeString() {
-            return I18n.msg("gui." + this.toString().toLowerCase() + ".code");
+            return I18n.msg("gui." + code + ".code");
         }
 
-        public Color getColor() {
-            return color;
+        public Color getTagColor() {
+            return tagColor;
+        }
+
+        public Color getMsgColor() {
+            return msgColor;
         }
 
     }
@@ -130,6 +151,7 @@ public class ConsoleInterface extends TableGuiInterface {
                             input.setProgrammaticChangeEvents(false);
                             input.setText(cmdHistory.get(historyIndex));
                             input.setProgrammaticChangeEvents(true);
+                            input.setCursorPosition(input.getText().length());
                         }
                         case GSKeys.DOWN -> {
                             if (cmdHistory.isEmpty()) break;
@@ -138,6 +160,7 @@ public class ConsoleInterface extends TableGuiInterface {
                             input.setProgrammaticChangeEvents(false);
                             input.setText(cmdHistory.get(historyIndex));
                             input.setProgrammaticChangeEvents(true);
+                            input.setCursorPosition(input.getText().length());
                         }
                     }
                 }
@@ -165,7 +188,8 @@ public class ConsoleInterface extends TableGuiInterface {
         pack();
 
         if (console.isEmpty()) {
-            addOutputInfo(I18n.msg("gui.console.welcome"));
+            addOutputInfo(blue + I18n.msg("gui.console.welcome"));
+            addOutputInfo("");
         } else {
             restoreConsoleMessages();
         }
@@ -195,10 +219,20 @@ public class ConsoleInterface extends TableGuiInterface {
     private void initShortcuts() throws NoSuchMethodException {
         shortcutMap = new HashMap<>();
         shortcutMap.put("goto", "goToObject");
+        shortcutMap.put("find", "setCameraFocus");
         shortcutMap.put("focus", "setCameraFocus");
-        shortcutMap.put("camerafree", "setCameraFree");
+        shortcutMap.put("free", "setCameraFree");
         shortcutMap.put("starttime", "startSimulationTime");
         shortcutMap.put("stoptime", "stopSimulationTime");
+        shortcutMap.put("timewarp", "setTimeWarp");
+        shortcutMap.put("fov", "setFov");
+        shortcutMap.put("forward", "cameraForward");
+        shortcutMap.put("rotate", "cameraRotate");
+        shortcutMap.put("turn", "cameraTurn");
+        shortcutMap.put("stop", "cameraStop");
+        shortcutMap.put("roll", "cameraRoll");
+        shortcutMap.put("pitch", "cameraPitch");
+        shortcutMap.put("yaw", "cameraYaw");
     }
 
     public void showConsole() {
@@ -253,14 +287,108 @@ public class ConsoleInterface extends TableGuiInterface {
     }
 
     private void addMessageWidget(Message msg) {
-        OwnLabel status = new OwnLabel(msg.type.getCodeString(), getSkin(), "mono");
-        status.setColor(msg.type.getColor());
+        var status = new OwnLabel(msg.type.getCodeString(), getSkin(), "mono");
+        status.setColor(msg.type.getTagColor());
+        var message = constructMessage(msg);
 
         output.add(status).left().top().padRight(pad * 2f);
-        output.add(new OwnLabel(TextUtils.breakCharacters(msg.msg, (int) (outputScroll.getWidth() * 0.05)), getSkin(), "mono")).left().top().row();
+        output.add(message).left().top().row();
 
         var coordinates = status.localToAscendantCoordinates(output, vec2.set(status.getX(), status.getY()));
         outputScroll.scrollTo(coordinates.x, coordinates.y, status.getWidth(), status.getHeight());
+    }
+
+    private Actor constructMessage(Message msg) {
+        var currCol = Color.WHITE;
+        int segments = 0;
+        final int maxLen = (int) (outputScroll.getWidth() * 0.055);
+
+        // Initial vertical and horizontal groups layout.
+        Table vg = new Table(getSkin());
+        HorizontalGroup hg = new HorizontalGroup();
+        hg.align(Align.topLeft);
+        vg.add(hg).left().top().row();
+
+        String subString = TextUtils.breakCharacters(msg.msg, maxLen);
+        boolean finished = false;
+        while (!finished) {
+            // Check if substring starts with ANSI color code.
+            if (subString.startsWith("\033[")) {
+                // Starts with ANSI color code.
+                // Remove code and change current color.
+                var mIdx = subString.indexOf('m');
+                var code = Integer.parseInt(subString.substring(2, mIdx));
+                subString = subString.substring(mIdx + 1);
+                currCol = switch (code) {
+                    case 0, 37, 39 -> Color.WHITE;
+                    case 30 -> Color.BLACK;
+                    case 31 -> ColorUtils.gRedC;
+                    case 32 -> ColorUtils.gGreenC;
+                    case 33 -> ColorUtils.gYellowC;
+                    case 34 -> ColorUtils.gBlueC;
+                    case 35 -> ColorUtils.ddMagentaC;
+                    case 36 -> ColorUtils.oCyanC;
+                    default -> Color.WHITE;
+                };
+                finished = subString.isEmpty();
+            } else {
+                // Does not start with ANSI color code.
+                // Create label until next code with current color.
+                int nextCodeIdx = subString.indexOf("\033[");
+                if (nextCodeIdx < 0) {
+                    // No new codes.
+                    hg = addTextLabel(subString, vg, hg, currCol);
+                    finished = true;
+                } else {
+                    // There are new codes.
+                    var pre = subString.substring(0, nextCodeIdx);
+                    hg = addTextLabel(pre, vg, hg, currCol);
+                    subString = subString.substring(nextCodeIdx);
+                }
+
+            }
+            segments++;
+        }
+        if (segments == 0) {
+            var actor = new OwnLabel(TextUtils.breakCharacters(msg.msg, maxLen), getSkin(), "mono");
+            actor.setColor(msg.type.getMsgColor());
+            return actor;
+        } else {
+            return vg;
+        }
+    }
+
+    private HorizontalGroup addTextLabel(String str, Table vg, HorizontalGroup hg, Color col) {
+        if (str.indexOf('\n') < 0) {
+            // No breaks.
+            var text = new OwnLabel(str, getSkin(), "mono");
+            text.setColor(col);
+            hg.addActor(text);
+            return hg;
+        } else {
+            // We have breaks.
+            var part = str;
+            int idx;
+            while ((idx = part.indexOf('\n')) >= 0) {
+                String pre = part.substring(0, idx);
+                var text = new OwnLabel(pre, getSkin(), "mono");
+                text.setColor(col);
+                hg.addActor(text);
+                // New horizontal group.
+                hg = new HorizontalGroup();
+                hg.align(Align.left);
+                vg.add(hg).left().top().row();
+
+                part = "   " + part.substring(idx + 1);
+            }
+            // Last chunk.
+            if (!part.isEmpty()) {
+                var text = new OwnLabel(part, getSkin(), "mono");
+                text.setColor(col);
+                hg.addActor(text);
+            }
+            return hg;
+        }
     }
 
 
@@ -293,24 +421,31 @@ public class ConsoleInterface extends TableGuiInterface {
         // Process command.
         if ("help".equals(command)) {
             addOutputOk(command);
-            addOutputInfo("List of available API calls:");
+            addOutputInfo("List of available " + blue + "API calls" + reset + ":");
 
             methodMap.keySet().stream().sorted().forEach(a -> {
                 var b = methodMap.get(a);
                 b.forEach(m -> {
-                    StringBuilder sb = new StringBuilder(m.getName());
+                    StringBuilder sb = new StringBuilder("  " + green + m.getName() + reset);
                     var params = m.getParameters();
-                    Arrays.stream(params).forEach(p -> {
-                        sb.append(" ").append(p.getName()).append("[").append(p.getType().getSimpleName()).append("]");
-                    });
-                    addOutputInfo("  " + sb);
+                    for (var p : params) {
+                        sb.append(" ")
+                                .append(p.getName())
+                                .append("[")
+                                .append(yellow)
+                                .append(p.getType().getSimpleName())
+                                .append(reset)
+                                .append("]");
+
+                    }
+                    addOutputInfo(sb.toString());
                 });
             });
             addOutputInfo("");
-            addOutputInfo("List of available shortcuts:");
+            addOutputInfo("List of available " + blue + "shortcuts" + reset + ":");
             shortcutMap.keySet().stream().sorted().forEach(a -> {
                 var b = shortcutMap.get(a);
-                addOutputInfo("  " + a + " :=: " + b);
+                addOutputInfo("  " + a + yellow + " :=: " + green + b);
             });
         } else if (methodMap.containsKey(command)) {
             var methods = methodMap.get(command);
