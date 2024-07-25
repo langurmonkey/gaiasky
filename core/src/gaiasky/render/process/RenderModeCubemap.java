@@ -20,9 +20,9 @@ import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.ISceneRenderer;
+import gaiasky.render.postprocess.effects.Mosaic;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
-import gaiasky.render.postprocess.effects.Mosaic;
 
 import java.util.HashMap;
 import java.util.Map;

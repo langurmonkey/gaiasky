@@ -9,14 +9,12 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Label;
 import gaiasky.scene.component.SolidAngle;
-import net.jafama.FastMath;
 
 public class RaymarchingExtractor extends AbstractExtractSystem {
 

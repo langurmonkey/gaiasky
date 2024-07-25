@@ -9,9 +9,6 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.data.AssetBean;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.FocusActive;

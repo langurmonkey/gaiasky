@@ -27,7 +27,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.vr.FixedScreenViewport;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
 import gaiasky.util.TipsGenerator;

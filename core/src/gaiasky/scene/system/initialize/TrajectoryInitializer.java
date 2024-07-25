@@ -17,13 +17,9 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.util.Constants;
-import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL20;
-
-import java.util.Arrays;
 
 public class TrajectoryInitializer extends AbstractInitSystem {
 

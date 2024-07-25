@@ -12,7 +12,6 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

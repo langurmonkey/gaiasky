@@ -10,10 +10,10 @@ package gaiasky.render.postprocess.effects;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
-import gaiasky.util.Constants;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.CameraMotionBlurFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.util.Constants;
 
 public final class CameraMotionBlur extends PostProcessorEffect {
     private final CameraMotionBlurFilter cameraMotionBlurFilter;

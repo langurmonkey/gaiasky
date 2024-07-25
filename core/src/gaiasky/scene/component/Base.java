@@ -10,7 +10,6 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.fasterxml.jackson.databind.util.CompactStringObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;

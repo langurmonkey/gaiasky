@@ -8,8 +8,8 @@
 package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaiasky.render.postprocess.filters.UnsharpMaskFilter;
 import gaiasky.render.postprocess.PostProcessorEffect;
+import gaiasky.render.postprocess.filters.UnsharpMaskFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
 public final class UnsharpMask extends PostProcessorEffect {

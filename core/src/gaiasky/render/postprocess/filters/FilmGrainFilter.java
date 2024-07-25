@@ -9,8 +9,8 @@ package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
-import gaiasky.util.Constants;
 import gaiasky.render.util.ShaderLoader;
+import gaiasky.util.Constants;
 
 public final class FilmGrainFilter extends Filter<FilmGrainFilter> {
 

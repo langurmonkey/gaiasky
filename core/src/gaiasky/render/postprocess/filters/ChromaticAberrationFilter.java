@@ -8,8 +8,8 @@
 package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.math.MathUtils;
-import gaiasky.util.Constants;
 import gaiasky.render.util.ShaderLoader;
+import gaiasky.util.Constants;
 
 public final class ChromaticAberrationFilter extends Filter<ChromaticAberrationFilter> {
     private float aberrationAmount;

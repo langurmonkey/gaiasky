@@ -16,13 +16,13 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings;
 import gaiasky.gui.beans.CameraComboBoxBean;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.SlaveManager;
 import gaiasky.util.TextUtils;
 import gaiasky.util.camera.rec.Camcorder;
-import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 

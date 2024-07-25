@@ -11,7 +11,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Label;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 
 public class BackgroundExtractor extends AbstractExtractSystem {

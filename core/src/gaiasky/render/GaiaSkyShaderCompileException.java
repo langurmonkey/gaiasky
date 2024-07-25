@@ -13,11 +13,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.TessellationShaderProgram;
 import gaiasky.util.i18n.I18n;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 /**
  * A shader failed to compile.
  */

@@ -9,10 +9,10 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.GaiaSky;
-import gaiasky.render.postprocess.filters.DepthBufferFilter;
-import gaiasky.util.Constants;
 import gaiasky.render.postprocess.PostProcessorEffect;
+import gaiasky.render.postprocess.filters.DepthBufferFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.util.Constants;
 
 public final class DepthBuffer extends PostProcessorEffect {
     private final DepthBufferFilter filter;

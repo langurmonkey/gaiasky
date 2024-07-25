@@ -12,8 +12,8 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.util.Settings;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.util.Settings;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 

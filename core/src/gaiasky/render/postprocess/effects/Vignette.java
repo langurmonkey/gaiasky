@@ -9,8 +9,8 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaiasky.render.postprocess.filters.VignettingFilter;
 import gaiasky.render.postprocess.PostProcessorEffect;
+import gaiasky.render.postprocess.filters.VignettingFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
 public final class Vignette extends PostProcessorEffect {

@@ -19,7 +19,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;

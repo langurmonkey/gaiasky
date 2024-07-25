@@ -24,14 +24,14 @@ import gaiasky.event.IObserver;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.ISceneRenderer;
+import gaiasky.render.postprocess.effects.AnaglyphEffect;
+import gaiasky.render.postprocess.filters.CopyFilter;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
-import gaiasky.render.postprocess.effects.AnaglyphEffect;
-import gaiasky.render.postprocess.filters.CopyFilter;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 

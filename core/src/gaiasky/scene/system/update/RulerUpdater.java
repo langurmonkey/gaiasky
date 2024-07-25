@@ -17,8 +17,6 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 
-import java.text.DecimalFormat;
-
 public class RulerUpdater extends AbstractUpdateSystem {
 
     public RulerUpdater(Family family, int priority) {

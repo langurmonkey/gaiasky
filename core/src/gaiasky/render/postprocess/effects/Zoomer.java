@@ -9,9 +9,9 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
+import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.RadialBlurFilter;
 import gaiasky.render.postprocess.filters.ZoomFilter;
-import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
 public final class Zoomer extends PostProcessorEffect {

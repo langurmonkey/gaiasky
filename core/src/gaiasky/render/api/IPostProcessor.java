@@ -10,9 +10,9 @@ package gaiasky.render.api;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.util.Logger;
 import gaiasky.render.postprocess.PostProcessor;
 import gaiasky.render.postprocess.PostProcessorEffect;
+import gaiasky.util.Logger;
 
 import java.util.HashMap;
 import java.util.Map;

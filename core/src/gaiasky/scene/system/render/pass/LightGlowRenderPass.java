@@ -20,13 +20,13 @@ import gaiasky.event.EventManager;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.process.RenderModeOpenXR;
 import gaiasky.render.system.LightPositionUpdater;
+import gaiasky.render.util.GaiaSkyFrameBuffer;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.BillboardRenderer;
 import gaiasky.util.Settings;
-import gaiasky.render.util.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL40;
 
 import java.util.ArrayList;

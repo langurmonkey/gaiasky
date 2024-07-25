@@ -7,9 +7,7 @@
 
 package gaiasky.input;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.backends.lwjgl3.DefaultLwjgl3Input;
 import org.lwjgl.glfw.GLFW;
 
 import static com.badlogic.gdx.Input.Keys.NUM_4;

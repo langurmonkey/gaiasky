@@ -11,12 +11,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import gaiasky.render.postprocess.PostProcessor;
+import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.BiasFilter;
 import gaiasky.render.postprocess.filters.BlurFilter;
 import gaiasky.render.postprocess.filters.CombineFilter;
 import gaiasky.render.postprocess.filters.LightScatteringFilter;
-import gaiasky.render.postprocess.PostProcessor;
-import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 

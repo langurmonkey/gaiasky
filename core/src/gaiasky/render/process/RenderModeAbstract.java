@@ -15,7 +15,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
-import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 

@@ -34,7 +34,6 @@ import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 import org.yaml.snakeyaml.Yaml;
 

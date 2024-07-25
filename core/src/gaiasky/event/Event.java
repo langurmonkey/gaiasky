@@ -8,10 +8,10 @@
 package gaiasky.event;
 
 import gaiasky.render.RenderGroup;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.view.FocusView;
-import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 
 import static gaiasky.util.Settings.*;
 

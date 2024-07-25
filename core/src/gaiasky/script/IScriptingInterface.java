@@ -9,6 +9,7 @@ package gaiasky.script;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.component.AttitudeComponent;
@@ -18,7 +19,6 @@ import gaiasky.scene.view.VertsView;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.IPythonCoordinatesProvider;
-import gaiasky.render.postprocess.effects.CubmeapProjectionEffect;
 
 import java.util.List;
 

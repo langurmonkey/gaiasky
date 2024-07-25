@@ -16,7 +16,10 @@ import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 

@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.Logger;
 import gaiasky.render.util.ShaderLoader;
+import gaiasky.util.Logger;
 import net.jafama.FastMath;
 
 public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {

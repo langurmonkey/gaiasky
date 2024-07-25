@@ -15,9 +15,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
+import gaiasky.render.postprocess.util.FullscreenQuad3;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.render.postprocess.util.FullscreenQuad3;
 
 public abstract class Filter3<T> implements Disposable {
     protected static final Log logger = Logger.getLogger(Filter3.class);

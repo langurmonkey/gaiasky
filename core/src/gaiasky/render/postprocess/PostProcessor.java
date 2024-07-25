@@ -20,10 +20,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.render.postprocess.util.PingPongBuffer;
-import gaiasky.util.Settings;
-import gaiasky.util.Settings.UpscaleFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 import gaiasky.render.util.ItemsManager;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.UpscaleFilter;
 
 import java.util.function.IntSupplier;
 
