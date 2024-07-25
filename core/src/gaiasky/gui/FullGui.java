@@ -29,6 +29,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
@@ -196,7 +197,7 @@ public class FullGui extends AbstractGui {
         interfaces.add(customInterface);
 
         // CONSOLE INTERFACE
-        consoleInterface = new ConsoleInterface(skin);
+        consoleInterface = new ConsoleInterface(skin, GaiaSky.instance.getConsoleManager());
         consoleInterface.setFillParent(true);
         consoleInterface.bottom().left().padLeft(70f);
 

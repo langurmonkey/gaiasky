@@ -18,9 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.script.IScriptingInterface;
+import gaiasky.script.ConsoleManager;
+import gaiasky.script.ConsoleManager.MsgType;
+import gaiasky.script.ConsoleManager.Message;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
@@ -28,15 +29,14 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ConsoleInterface extends TableGuiInterface {
     private static final Logger.Log logger = Logger.getLogger(ConsoleInterface.class.getSimpleName());
+
+    private final ConsoleManager manager;
 
     private final Table inputTable;
     private final OwnTextField input;
@@ -57,48 +57,10 @@ public class ConsoleInterface extends TableGuiInterface {
     private final String white = "\033[37m";
     private final String reset = "\033[0m";
 
-    private Map<String, String> shortcutMap;
 
-    private final static Array<Message> console = new Array<>();
-    private final static Array<String> cmdHistory = new Array<>();
-    private static Map<String, Array<Method>> methodMap;
-
-    record Message(String msg, MsgType type, Instant time) {
-    }
-
-    private enum MsgType {
-        INFO("info", ColorUtils.gYellowC, ColorUtils.gWhiteC),
-        ERROR("error", ColorUtils.gRedC, ColorUtils.gPinkC),
-        RETURN("return", ColorUtils.gBlueC, ColorUtils.gWhiteC),
-        OK("ok", ColorUtils.gGreenC, ColorUtils.gWhiteC);
-
-        private final String code;
-        private final Color msgColor;
-        private final Color tagColor;
-
-        MsgType(String code, Color tagColor, Color msgColor) {
-            this.code = code;
-            this.tagColor = tagColor;
-            this.msgColor = msgColor;
-        }
-
-        public String getCodeString() {
-            return I18n.msg("gui." + code + ".code");
-        }
-
-        public Color getTagColor() {
-            return tagColor;
-        }
-
-        public Color getMsgColor() {
-            return msgColor;
-        }
-
-    }
-
-    public ConsoleInterface(final Skin skin) {
+    public ConsoleInterface(final Skin skin, final ConsoleManager manager) {
         super(skin);
-        initializeMethodMap();
+        this.manager = manager;
 
         close = new OwnTextIconButton("", skin, "quit");
         close.setSize(33, 30);
@@ -141,24 +103,24 @@ public class ConsoleInterface extends TableGuiInterface {
                             // Close.
                                 this.closeConsole();
                         case GSKeys.UP -> {
-                            if (cmdHistory.isEmpty()) break;
+                            if (manager.cmdHistory().isEmpty()) break;
                             // History up.
                             if (historyIndex == -1) {
-                                historyIndex = Math.max(0, cmdHistory.size - 1);
+                                historyIndex = Math.max(0, manager.cmdHistory().size - 1);
                             } else {
                                 historyIndex = Math.max(0, historyIndex - 1);
                             }
                             input.setProgrammaticChangeEvents(false);
-                            input.setText(cmdHistory.get(historyIndex));
+                            input.setText(manager.cmdHistory().get(historyIndex));
                             input.setProgrammaticChangeEvents(true);
                             input.setCursorPosition(input.getText().length());
                         }
                         case GSKeys.DOWN -> {
-                            if (cmdHistory.isEmpty()) break;
+                            if (manager.cmdHistory().isEmpty()) break;
                             // History down.
-                            historyIndex = Math.min(cmdHistory.size - 1, historyIndex + 1);
+                            historyIndex = Math.min(manager.cmdHistory().size - 1, historyIndex + 1);
                             input.setProgrammaticChangeEvents(false);
-                            input.setText(cmdHistory.get(historyIndex));
+                            input.setText(manager.cmdHistory().get(historyIndex));
                             input.setProgrammaticChangeEvents(true);
                             input.setCursorPosition(input.getText().length());
                         }
@@ -179,15 +141,10 @@ public class ConsoleInterface extends TableGuiInterface {
         outputScroll.setSmoothScrolling(true);
         outputScroll.setFadeScrollBars(false);
 
-        try {
-            initShortcuts();
-        } catch (NoSuchMethodException e) {
-            logger.error("Error initializing console shortcut commands");
-        }
         rebuildMainTable();
         pack();
 
-        if (console.isEmpty()) {
+        if (manager.messages().isEmpty()) {
             addOutputInfo(blue + I18n.msg("gui.console.welcome"));
             addOutputInfo("");
         } else {
@@ -216,25 +173,6 @@ public class ConsoleInterface extends TableGuiInterface {
         add(mainTable);
     }
 
-    private void initShortcuts() throws NoSuchMethodException {
-        shortcutMap = new HashMap<>();
-        shortcutMap.put("goto", "goToObject");
-        shortcutMap.put("find", "setCameraFocus");
-        shortcutMap.put("focus", "setCameraFocus");
-        shortcutMap.put("free", "setCameraFree");
-        shortcutMap.put("starttime", "startSimulationTime");
-        shortcutMap.put("stoptime", "stopSimulationTime");
-        shortcutMap.put("timewarp", "setTimeWarp");
-        shortcutMap.put("fov", "setFov");
-        shortcutMap.put("forward", "cameraForward");
-        shortcutMap.put("rotate", "cameraRotate");
-        shortcutMap.put("turn", "cameraTurn");
-        shortcutMap.put("stop", "cameraStop");
-        shortcutMap.put("roll", "cameraRoll");
-        shortcutMap.put("pitch", "cameraPitch");
-        shortcutMap.put("yaw", "cameraYaw");
-    }
-
     public void showConsole() {
         rebuildMainTable();
         input.getStage().setKeyboardFocus(input);
@@ -257,7 +195,7 @@ public class ConsoleInterface extends TableGuiInterface {
 
     private void restoreConsoleMessages() {
         output.clearChildren(true);
-        for (var msg : console) {
+        for (var msg : manager.messages()) {
             addMessageWidget(msg);
         }
     }
@@ -281,14 +219,14 @@ public class ConsoleInterface extends TableGuiInterface {
     private final Vector2 vec2 = new Vector2();
 
     private void addOutput(String messageText, final MsgType type) {
-        Message msg = new Message(messageText, type, Instant.now());
+        ConsoleManager.Message msg = new ConsoleManager.Message(messageText, type, Instant.now());
         addMessageWidget(msg);
-        console.add(msg);
+        manager.messages().add(msg);
     }
 
     private void addMessageWidget(Message msg) {
-        var status = new OwnLabel(msg.type.getCodeString(), getSkin(), "mono");
-        status.setColor(msg.type.getTagColor());
+        var status = new OwnLabel(msg.type().getCodeString(), getSkin(), "mono");
+        status.setColor(msg.type().getTagColor());
         var message = constructMessage(msg);
 
         output.add(status).left().top().padRight(pad * 2f);
@@ -309,7 +247,7 @@ public class ConsoleInterface extends TableGuiInterface {
         hg.align(Align.topLeft);
         vg.add(hg).left().top().row();
 
-        String subString = TextUtils.breakCharacters(msg.msg, maxLen);
+        String subString = TextUtils.breakCharacters(msg.msg(), maxLen);
         boolean finished = false;
         while (!finished) {
             // Check if substring starts with ANSI color code.
@@ -350,8 +288,8 @@ public class ConsoleInterface extends TableGuiInterface {
             segments++;
         }
         if (segments == 0) {
-            var actor = new OwnLabel(TextUtils.breakCharacters(msg.msg, maxLen), getSkin(), "mono");
-            actor.setColor(msg.type.getMsgColor());
+            var actor = new OwnLabel(TextUtils.breakCharacters(msg.msg(), maxLen), getSkin(), "mono");
+            actor.setColor(msg.type().getMsgColor());
             return actor;
         } else {
             return vg;
@@ -398,7 +336,7 @@ public class ConsoleInterface extends TableGuiInterface {
         }
         cmd = cmd.trim();
         // Add to command history.
-        cmdHistory.add(cmd);
+        manager.addCommandToHistory(cmd);
 
         // Split command and parameters.
         String command0;
@@ -413,18 +351,15 @@ public class ConsoleInterface extends TableGuiInterface {
         var numParams = parameters != null ? parameters.length : 0;
 
         // Convert shortcut.
-        String command = command0;
-        if (shortcutMap.containsKey(command0)) {
-            command = shortcutMap.get(command0);
-        }
+        String command = manager.unwrapShortcut(command0);
 
         // Process command.
         if ("help".equals(command)) {
             addOutputOk(command);
             addOutputInfo("List of available " + blue + "API calls" + reset + ":");
 
-            methodMap.keySet().stream().sorted().forEach(a -> {
-                var b = methodMap.get(a);
+            manager.methodMap().keySet().stream().sorted().forEach(a -> {
+                var b = manager.methodMap().get(a);
                 b.forEach(m -> {
                     StringBuilder sb = new StringBuilder("  " + green + m.getName() + reset);
                     var params = m.getParameters();
@@ -443,12 +378,12 @@ public class ConsoleInterface extends TableGuiInterface {
             });
             addOutputInfo("");
             addOutputInfo("List of available " + blue + "shortcuts" + reset + ":");
-            shortcutMap.keySet().stream().sorted().forEach(a -> {
-                var b = shortcutMap.get(a);
+            manager.shortcutMap().keySet().stream().sorted().forEach(a -> {
+                var b = manager.shortcutMap().get(a);
                 addOutputInfo("  " + a + yellow + " :=: " + green + b);
             });
-        } else if (methodMap.containsKey(command)) {
-            var methods = methodMap.get(command);
+        } else if (manager.hasMethod(command)) {
+            var methods = manager.getMethods(command);
 
             var matched = 0;
             // Match parameters.
@@ -612,23 +547,4 @@ public class ConsoleInterface extends TableGuiInterface {
     public void dispose() {
     }
 
-    private static void initializeMethodMap() {
-        if (methodMap == null) {
-            Class<IScriptingInterface> iScriptingInterfaceClass = IScriptingInterface.class;
-            Method[] allMethods = iScriptingInterfaceClass.getDeclaredMethods();
-
-            methodMap = new HashMap<>();
-            for (Method method : allMethods) {
-                Array<Method> matches;
-                if (methodMap.containsKey(method.getName())) {
-                    matches = methodMap.get(method.getName());
-                } else {
-                    matches = new Array<>(false, 1);
-                }
-                if (!matches.contains(method, true))
-                    matches.add(method);
-                methodMap.put(method.getName(), matches);
-            }
-        }
-    }
 }

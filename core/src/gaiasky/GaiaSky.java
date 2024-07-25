@@ -54,6 +54,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
+import gaiasky.script.ConsoleManager;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
@@ -251,6 +252,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * The global catalog manager.
      */
     private CatalogManager catalogManager;
+    /**
+     * The console manager
+     */
+    private ConsoleManager consoleManager;
     /**
      * The scripting interface.
      */
@@ -530,6 +535,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Catalog manager.
         this.catalogManager = new CatalogManager();
+
+        // Console manager.
+        this.consoleManager = new ConsoleManager();
 
         // Initialise master manager.
         MasterManager.initialize();
@@ -1728,6 +1736,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     public CatalogManager getCatalogManager() {
         return this.catalogManager;
+    }
+
+    public ConsoleManager getConsoleManager() {
+        return this.consoleManager;
     }
 
     /**
