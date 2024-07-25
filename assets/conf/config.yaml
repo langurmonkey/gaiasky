@@ -146,7 +146,8 @@ scene:
     power: 1.0
     # Base screen size of stars.
     pointSize: 6.2
-    # Saturate star colors by this amount.
+    # Value to add to each star's saturation value in HSV.
+    # A value of 0 does not modify the saturation of stars.
     saturate: 0.16
     # Control the glow amount when close to stars.
     # Should be set rather low, i.e., in [0.01, 0.5].
