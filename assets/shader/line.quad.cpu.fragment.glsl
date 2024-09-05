@@ -11,7 +11,7 @@ in vec2 v_uv;
 in float v_w;
 
 // We use the location of the layer buffer (1).
-layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -27,10 +27,10 @@ void main() {
     float alpha = pow(core, 1.8);
     float cplus = pow(core, 10.0);
 
-    fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha;
-
     // Recover depth value using input w.
     gl_FragDepth = logarithmicDepth(v_w, u_zfar, u_k);
+
+    layerBuffer = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha;
 
     #ifdef ssrFlag
     ssrBuffers();

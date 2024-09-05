@@ -375,6 +375,7 @@ in vec3 v_normalTan;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #ifdef ssrFlag
     #include <shader/lib/ssr.frag.glsl>
@@ -610,6 +611,7 @@ void main() {
     // Final color equation
     fragColor = vec4(diffuseColor * shdw + diffuseScattering * shdw + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_data.opacity);
     fragColor.rgb += selfShadow * specularColor;
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef atmosphereGround
         #define exposure 1.0

@@ -13,6 +13,7 @@ in vec2 v_uv;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -42,6 +43,7 @@ void main() {
     // Final color
     fragColor = saturate(alpha * (vec4(v_col.rgb + core * 2.0, 1.0)));
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Add outline
     //if (uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {

@@ -112,6 +112,7 @@ uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -208,6 +209,7 @@ void main() {
 	#endif
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+	layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
 	#ifdef ssrFlag
 	ssrBuffers();

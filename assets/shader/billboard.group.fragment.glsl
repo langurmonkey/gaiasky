@@ -27,6 +27,7 @@ flat in int v_layer;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -75,6 +76,7 @@ void main() {
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Add outline
     //if (uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {

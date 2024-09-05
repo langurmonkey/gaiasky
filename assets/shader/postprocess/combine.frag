@@ -49,5 +49,5 @@ void main()
 	src2.rgb = adjustSaturation(src2.rgb, u_src2Saturation);
 
 	// combine
-	fragColor = vec4(src1 + src2, 1.0);
+	fragColor = vec4(src1 + src2 , 1.0);
 }

@@ -15,6 +15,7 @@ in float v_textureIndex;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #define PI 3.1415927
 
@@ -47,6 +48,7 @@ void main() {
     }
 
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef ssrFlag
     ssrBuffers();

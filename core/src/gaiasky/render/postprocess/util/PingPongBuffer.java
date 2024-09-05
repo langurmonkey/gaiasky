@@ -154,7 +154,7 @@ public final class PingPongBuffer implements Disposable {
     public void reset() {
         if (ownResources) {
             buffer1 = owned1;
-            buffer2 = ownedMain;
+            buffer2 = owned2;
             width = ownedW;
             height = ownedH;
             bufResult = ownedResult;
@@ -167,7 +167,7 @@ public final class PingPongBuffer implements Disposable {
         if (ownResources) {
             // make sure we delete what we own
             // if the caller didn't call {@link #reset()}
-            ownedMain.dispose();
+            owned2.dispose();
             owned1.dispose();
         }
     }

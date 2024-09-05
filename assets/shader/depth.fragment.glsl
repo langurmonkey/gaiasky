@@ -52,6 +52,7 @@ in VertexData v_data;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 // Renders a depth map for the shadow mapping algorithm
 void main() {
@@ -61,4 +62,5 @@ void main() {
     // Fill buffer with depth and transparency.
     fragColor = vec4(gl_FragCoord.z, diffuse.a, 1.0, 1.0);
     //fragColor = vec4(v_data.texCoords.x, v_data.texCoords.y, 0.0, 1.0);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 }

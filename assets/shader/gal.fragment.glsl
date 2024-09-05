@@ -10,6 +10,7 @@ in vec2 v_texCoords;
 in vec4 v_color;
 
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #define light_decay 1.3
 #define PI 3.1415927
@@ -35,6 +36,7 @@ vec4 drawSimple(vec2 tc) {
 void main() {
 	fragColor = drawSimple(v_texCoords);
 	fragColor.rgb *= fragColor.a;
+	layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
 	// Add outline
 	//if (v_texCoords.x > 0.99 || v_texCoords.x < 0.01 || v_texCoords.y > 0.99 || v_texCoords.y < 0.01) {

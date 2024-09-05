@@ -15,6 +15,7 @@ in float v_textureIndex;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #define PI 3.1415927
 
@@ -43,6 +44,7 @@ void main() {
         fragColor = textured();
     }
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Add outline
     //if (v_uv.x > 0.99 || v_uv.x < 0.01 || v_uv.y > 0.99 || v_uv.y < 0.01) {

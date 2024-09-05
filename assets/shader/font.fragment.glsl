@@ -15,7 +15,7 @@ in float v_opacity;
 
 // OUTPUT
 // We use the location of the layer buffer (1).
-layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 void main(void){
     // Smoothing is adapted arbitrarily to produce crisp borders at all sizes)
@@ -29,7 +29,7 @@ void main(void){
 
     // Additive
     float a = aa * v_color.a;
-    fragColor = vec4(v_color.rgb, 1.0) * a;
+    layerBuffer = vec4(v_color.rgb, 1.0) * a;
 
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

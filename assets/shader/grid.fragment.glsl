@@ -18,6 +18,7 @@ in vec4 v_color;
 
 // We use the location of the layer buffer (1).
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -86,6 +87,7 @@ vec4 square(vec2 tc) {
 
 void main() {
     fragColor = square(v_texCoords0);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef ssrFlag
     ssrBuffers();

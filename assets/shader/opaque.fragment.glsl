@@ -6,6 +6,7 @@ uniform float u_cameraK;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
@@ -16,6 +17,7 @@ layout (location = 0) out vec4 fragColor;
 // Renders all black for the occlusion testing.
 void main() {
     fragColor = vec4(0.0, 0.0, 1.0, 1.0);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Logarithmic depth buffer.
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

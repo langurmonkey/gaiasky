@@ -22,6 +22,7 @@ in vec3 v_viewVec;
 #include <shader/lib/logdepthbuff.glsl>
 
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #define time v_time * 0.02
 
@@ -89,8 +90,9 @@ void main() {
     fragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
-    #ifdef ssrFlag
+#ifdef ssrFlag
         ssrBuffers();
     #endif // ssrFlag
 }

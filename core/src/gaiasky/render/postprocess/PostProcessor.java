@@ -24,6 +24,7 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 import gaiasky.render.util.ItemsManager;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.UpscaleFilter;
+import org.lwjgl.opengl.GL30;
 
 import java.util.function.IntSupplier;
 
@@ -294,8 +295,9 @@ public final class PostProcessor implements Disposable {
             }
 
             capturing = true;
-            composite.begin();
-            composite.capture();
+            composite.getMainBuffer().begin();
+            //composite.begin();
+            //composite.capture();
 
             if (useDepth) {
                 Gdx.gl.glClearDepthf(clearDepth);
@@ -348,8 +350,8 @@ public final class PostProcessor implements Disposable {
         if (enabled && capturing) {
             capturing = false;
             hasCaptured = true;
-            composite.end();
-            return composite.getResultBuffer();
+            composite.getMainBuffer().end();
+            return composite.getMainBuffer();
         }
 
         return null;
@@ -375,6 +377,29 @@ public final class PostProcessor implements Disposable {
         for (PostProcessorEffect e : effectsManager) {
             e.rebind();
         }
+    }
+
+    // Assumes the two textures are the same dimensions
+    void copyFrameBufferTexture(int width, int height, FrameBuffer fbIn, FrameBuffer fbOut)
+    {
+        // Bind input FBO + texture to a color attachment
+        GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, fbIn.getFramebufferHandle());
+        GL30.glFramebufferTexture2D(GL30.GL_READ_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_TEXTURE_2D, fbIn.getColorBufferTexture().glTarget, 0);
+        GL30.glReadBuffer(GL30.GL_COLOR_ATTACHMENT0);
+
+        // Bind destination FBO + texture to another color attachment
+        GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, fbOut.getFramebufferHandle());
+        GL30.glFramebufferTexture2D(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL30.GL_TEXTURE_2D, fbOut.getColorBufferTexture().glTarget, 0);
+        GL30.glDrawBuffer(GL30.GL_COLOR_ATTACHMENT1);
+
+        // specify source, destination drawing (sub)rectangles.
+        GL30.glBlitFramebuffer(0, 0, width, height,
+                0, 0, width, height,
+                GL30.GL_COLOR_BUFFER_BIT, GL30.GL_NEAREST);
+
+        // unbind the color attachments
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL30.GL_TEXTURE_2D, 0, 0);
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_TEXTURE_2D, 0, 0);
     }
 
     /**
@@ -404,7 +429,9 @@ public final class PostProcessor implements Disposable {
 
                     composite.capture();
                     {
-                        e.render(composite.getSourceBuffer(), composite.getResultBuffer(), composite.getMainBuffer());
+                        // We use the main buffer as the first source.
+                        var source = i == 0 ? composite.getMainBuffer() : composite.getSourceBuffer();
+                        e.render(source, composite.getResultBuffer(), composite.getMainBuffer());
                     }
                 }
 

@@ -291,9 +291,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
 
         // BLEND - color + layer (labels, lines, grids)
-        //Blend blend = new Blend();
-        //blend.setEnabled(true);
-        //ppb.add(blend);
+        Blend blend = new Blend();
+        blend.setEnabled(true);
+        ppb.add(blend);
 
         // UNSHARP MASK
         UnsharpMask unsharp = new UnsharpMask();

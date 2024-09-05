@@ -103,6 +103,7 @@ in vec3 v_fragPosWorld;
 in mat3 v_tbn;
 
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
@@ -165,6 +166,7 @@ void main() {
     fragColor = vec4(cloudColor * shdw, cloud.a) * v_opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef ssrFlag
     ssrBuffers();
