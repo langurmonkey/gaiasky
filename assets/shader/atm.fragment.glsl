@@ -48,7 +48,7 @@ void main(void) {
     fragColor *= v_eclipseFactor;
     #endif // eclipsingBodyFlag
 
-    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 0.0);
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
