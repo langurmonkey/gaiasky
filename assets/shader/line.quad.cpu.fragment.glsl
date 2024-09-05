@@ -10,6 +10,7 @@ in vec2 v_uv;
 // Used for depth computation.
 in float v_w;
 
+// We use the location of the layer buffer (1).
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag

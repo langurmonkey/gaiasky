@@ -15,6 +15,7 @@ in vec4 v_col;
 in float v_coord;
 in vec2 v_uv;
 
+// We use the location of the layer buffer (1).
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag

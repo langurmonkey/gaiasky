@@ -60,7 +60,7 @@ public interface IPostProcessor extends Disposable {
          *
          * @param effect The effect
          */
-        public void set(PostProcessorEffect effect) {
+        public void add(PostProcessorEffect effect) {
             addEffect(DEFAULT_KEY, effect);
         }
 
@@ -79,7 +79,7 @@ public interface IPostProcessor extends Disposable {
          * @param key    The key
          * @param effect The effect
          */
-        public void set(String key, PostProcessorEffect effect) {
+        public void add(String key, PostProcessorEffect effect) {
             addEffect(key, effect);
         }
 

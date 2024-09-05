@@ -60,7 +60,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     /**
      * Contains a map by name with
      * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string},
-     * 5:texture3{string}]] for ray-marching post-processors.
+     * 5:texture3{string}] for ray-marching post-processors.
      */
     private final Map<String, Object[]> rayMarchingDefinitions;
     /**
@@ -147,8 +147,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         return switch (type) {
             case screen ->
                     new int[]{(int) FastMath.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) FastMath.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale)};
-            case screenshot ->
-                    new int[]{Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]};
+            case screenshot -> new int[]{Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]};
             case frame -> new int[]{Settings.settings.frame.resolution[0], Settings.settings.frame.resolution[1]};
         };
     }
@@ -177,7 +176,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setBackBufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
         lightGlow.setEnabledOptions(true, true);
-        ppb.set(lightGlow);
+        ppb.add(lightGlow);
         updateGlow(ppb, settings.graphics.quality);
 
         // RAY MARCHING SHADERS
@@ -206,7 +205,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             rm.setEnabled(raymarch.isOn);
-            ppb.set(key, rm);
+            ppb.add(key, rm);
         });
 
         // COPY
@@ -221,14 +220,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         SSR ssrEffect = new SSR();
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
         ssrEffect.setEnabled(settings.postprocess.ssr.active && !vr && !safeMode);
-        ppb.set(ssrEffect);
+        ppb.add(ssrEffect);
 
         // CAMERA MOTION BLUR
         CameraMotionBlur cameraMotionBlur = new CameraMotionBlur(width, height);
         cameraMotionBlur.setBlurScale(Settings.settings.postprocess.motionBlur.strength);
         cameraMotionBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
         cameraMotionBlur.setEnabledOptions(false, false);
-        ppb.set(cameraMotionBlur);
+        ppb.add(cameraMotionBlur);
         updateCameraBlur(ppb);
 
         /*
@@ -273,7 +272,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             pseudoLensFlare.setBias(lensFlareSettings.bias);
             pseudoLensFlare.setBlurPasses(lensFlareSettings.blurPasses);
             pseudoLensFlare.setEnabledOptions(false, true);
-            ppb.set(pseudoLensFlare);
+            ppb.add(pseudoLensFlare);
         } else {
             // TRUE LENS FLARE
             // Get resources.
@@ -288,14 +287,19 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             lensFlare.setLensStarburstTexture(lensStarBurst);
             lensFlare.setEnabled(lensFlareSettings.active);
             lensFlare.setEnabledOptions(false, true);
-            ppb.set(lensFlare);
+            ppb.add(lensFlare);
         }
+
+        // BLEND - color + layer (labels, lines, grids)
+        //Blend blend = new Blend();
+        //blend.setEnabled(true);
+        //ppb.add(blend);
 
         // UNSHARP MASK
         UnsharpMask unsharp = new UnsharpMask();
         unsharp.setSharpenFactor(settings.postprocess.unsharpMask.factor);
         unsharp.setEnabled(settings.postprocess.unsharpMask.factor > 0);
-        ppb.set(unsharp);
+        ppb.add(unsharp);
 
         // ANTI-ALIAS
         initAntiAliasing(settings.postprocess.antialiasing.type, width, height, ppb);
@@ -308,7 +312,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         bloom.setBloomSaturation(0.7f);
         bloom.setThreshold(0.3f);
         bloom.setEnabled(settings.postprocess.bloom.intensity > 0);
-        ppb.set(bloom);
+        ppb.add(bloom);
 
         // DISTORTION (STEREOSCOPIC MODE)
         Curvature curvature = new Curvature();
@@ -316,7 +320,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         curvature.setZoom(0.75f);
         curvature.setEnabled(settings.program.modeStereo.active && settings.program.modeStereo.profile == StereoProfile.VR_HEADSET);
         curvature.setEnabledOptions(false, false);
-        ppb.set(curvature);
+        ppb.add(curvature);
 
         // RE-PROJECTION
         Reprojection reprojection = new Reprojection(width, height);
@@ -324,20 +328,20 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         reprojection.setMode(settings.postprocess.reprojection.mode.mode);
         reprojection.setEnabled(settings.postprocess.reprojection.active);
         reprojection.setEnabledOptions(false, false);
-        ppb.set(reprojection);
+        ppb.add(reprojection);
 
         // FILM GRAIN
         FilmGrain grain = new FilmGrain(settings.postprocess.filmGrain.intensity);
         grain.setEnabledOptions(false, false);
         grain.setEnabled(settings.postprocess.filmGrain.intensity != 0f);
-        ppb.set(grain);
+        ppb.add(grain);
 
         // CHROMATIC ABERRATION
         float amount = Settings.settings.postprocess.chromaticAberration.amount * GaiaSky.instance.cameraManager.getFovFactor();
         ChromaticAberration aberration = new ChromaticAberration(amount);
         aberration.setEnabledOptions(false, false);
         aberration.setEnabled(amount > 0);
-        ppb.set(aberration);
+        ppb.add(aberration);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
         initLevels(ppb);
@@ -366,7 +370,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
             warpingMesh.setEnabled(true);
             warpingMesh.setEnabledOptions(false, false);
-            ppb.set(warpingMesh);
+            ppb.add(warpingMesh);
 
         }
 
@@ -378,7 +382,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 WarpingMesh warpingMesh = new WarpingMesh(data, width, height);
                 warpingMesh.setEnabled(true);
                 warpingMesh.setEnabledOptions(false, false);
-                ppb.set(warpingMesh);
+                ppb.add(warpingMesh);
             } else {
                 logger.error("Warping mesh PFM file does not exist: " + settings.postprocess.warpingMesh.pfmFile);
             }
@@ -387,7 +391,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         // UPSCALE (only screen, last effect in chain!)
         if (rt == RenderType.screen) {
             XBRZ upscaleFilter = new XBRZ();
-            ppb.set(upscaleFilter);
+            ppb.add(upscaleFilter);
             updateUpscaleFilter(settings.postprocess.upscaleFilter, settings.graphics.backBufferScale, upscaleFilter, ppb);
         }
 
@@ -417,7 +421,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private void updateCameraBlur(PostProcessBean ppb) {
         CameraMotionBlur cameraMotionBlur = (CameraMotionBlur) ppb.get(CameraMotionBlur.class);
         if (cameraMotionBlur != null) {
-                cameraMotionBlur.setBlurMaxSamples(35);
+            cameraMotionBlur.setBlurMaxSamples(35);
         }
     }
 
@@ -441,7 +445,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             case NONE -> levels.disableToneMapping();
         }
 
-        ppb.set(levels);
+        ppb.add(levels);
     }
 
 
@@ -456,7 +460,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
         if (antialiasing != null) {
             antialiasing.setEnabled(Settings.settings.postprocess.antialiasing.type.isPostProcessAntialias());
-            ppb.set(antialiasing);
+            ppb.add(antialiasing);
         }
     }
 
@@ -1073,8 +1077,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-            case BACKBUFFER_SCALE_CMD ->
-                    updateUpscaleFilters(Settings.settings.postprocess.upscaleFilter, (Float) data[0]);
+            case BACKBUFFER_SCALE_CMD -> updateUpscaleFilters(Settings.settings.postprocess.upscaleFilter, (Float) data[0]);
             case UPSCALE_FILTER_CMD -> {
                 var upscaleFilter = (UpscaleFilter) data[0];
                 updateUpscaleFilters(upscaleFilter, (float) Settings.settings.graphics.backBufferScale);

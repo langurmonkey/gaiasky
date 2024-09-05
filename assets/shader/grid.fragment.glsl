@@ -16,6 +16,7 @@ in float v_opacity;
 // Color
 in vec4 v_color;
 
+// We use the location of the layer buffer (1).
 layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag

@@ -20,8 +20,8 @@ import org.lwjgl.opengl.GL30;
 public final class PingPongBuffer implements Disposable {
     public final boolean ownResources;
     // save/restore state
-    private final GaiaSkyFrameBuffer ownedMain, ownedExtra;
-    public Texture texture1, texture2, textureDepth, textureNormal, textureReflectionMap;
+    private final GaiaSkyFrameBuffer ownedMain, owned1, owned2;
+    public Texture texture1, texture2;
     public int width, height;
     private GaiaSkyFrameBuffer buffer1, buffer2;
     // internal state
@@ -37,58 +37,56 @@ public final class PingPongBuffer implements Disposable {
 
         // BUFFER USED FOR THE ACTUAL RENDERING:
         // n RENDER TARGETS:
-        //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
-        //      1: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
-        //      2: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
-        //      3: COLOR 2 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
-        // 1 DEPTH TEXTURE ATTACHMENT
+        //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (SCENE)
+        //      1: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NON_SCENE: labels, lines, grids)
+        //      2: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
+        //      3: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
+        //      4: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
         ownedMain = createMainFrameBuffer(width, height, hasDepth, hasNormal, hasReflectionMask, pixmapFormat, preventFloatBuffer);
 
         // EXTRA BUFFER:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
         addColorRenderTarget(frameBufferBuilder, pixmapFormat, preventFloatBuffer);
-        ownedExtra = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
+        owned1 = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
+        owned2 = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
 
-        // Buffer the scene is rendered to is actually the second
-        set(ownedExtra, ownedMain);
-    }
-
-    /** Creates a new ping-pong buffer with the given buffers. */
-    public PingPongBuffer(GaiaSkyFrameBuffer buffer1, GaiaSkyFrameBuffer buffer2) {
-        ownResources = false;
-        ownedMain = null;
-        ownedExtra = null;
-        set(buffer1, buffer2);
+        // Set buffers. We start writing to buffer 2 (see PingPongBuffer#capture()).
+        set(owned1, owned2);
     }
 
     public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
-        int colorIndex, depthIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+        int colorIndex, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
         int idx = 0;
 
         // 0
-        // Main color render target.
+        // Main color render target (scene).
         addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
         colorIndex = idx++;
 
         // 1
-        // Normal buffer
+        // Layer render target (non-scene elements).
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        layerIndex = idx++;
+
+        // 2
+        // Normal buffer.
         if (hasNormal) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             normalIndex = idx++;
         }
 
-        // 2
-        // Reflection mask buffer
+        // 3
+        // Reflection mask buffer.
         if (hasReflectionMask) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             reflectionMaskIndex = idx++;
         }
 
-        // 3
-        // Depth buffer
+        // 4
+        // Depth buffer.
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
             if(!preventFloatBuffer) {
@@ -96,7 +94,7 @@ public final class PingPongBuffer implements Disposable {
             }
         }
 
-        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, normalIndex, reflectionMaskIndex);
+        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, layerIndex, normalIndex, reflectionMaskIndex);
 
     }
 
@@ -155,8 +153,8 @@ public final class PingPongBuffer implements Disposable {
     /** Restore the previous buffers if the instance was owning resources. */
     public void reset() {
         if (ownResources) {
-            buffer1 = ownedMain;
-            buffer2 = ownedExtra;
+            buffer1 = owned1;
+            buffer2 = ownedMain;
             width = ownedW;
             height = ownedH;
             bufResult = ownedResult;
@@ -170,7 +168,7 @@ public final class PingPongBuffer implements Disposable {
             // make sure we delete what we own
             // if the caller didn't call {@link #reset()}
             ownedMain.dispose();
-            ownedExtra.dispose();
+            owned1.dispose();
         }
     }
 
@@ -181,9 +179,6 @@ public final class PingPongBuffer implements Disposable {
     public void rebind() {
         texture1 = buffer1.getColorBufferTexture();
         texture2 = buffer2.getColorBufferTexture();
-        textureDepth = buffer1.getDepthBufferTexture();
-        textureNormal = buffer1.getNormalBufferTexture();
-        textureReflectionMap = buffer1.getReflectionMaskBufferTexture();
     }
 
     /**
@@ -267,11 +262,6 @@ public final class PingPongBuffer implements Disposable {
 
     public GaiaSkyFrameBuffer getMainBuffer() {
         return ownedMain;
-    }
-
-    /** @return the depth texture attachment containing the depth buffer */
-    public Texture getDepthTexture() {
-        return textureDepth;
     }
 
     // internal use

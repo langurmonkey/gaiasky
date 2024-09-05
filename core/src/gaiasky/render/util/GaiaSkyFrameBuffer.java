@@ -14,14 +14,14 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 public class GaiaSkyFrameBuffer extends FrameBuffer {
 
     // Indices for all buffers
-    private int colorIndex = -1, depthIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+    private int colorIndex = -1, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
 
     /**
-     * Creates a buffer. Contains the builder and the indices for color, depth, velocity, normal and reflection buffers.
+     * Creates a buffer. Contains the builder and the indices for color, depth, layer, normal and reflection mask buffers.
      * If any of the indices is negative, the render target does not exist in this buffer.
      *
      * @param bufferBuilder The builder.
-     * @param indices       The indices for color, depth, velocity, normal and reflection buffers.
+     * @param indices       The indices for color, depth, layer, normal and reflection mask buffers.
      */
     public GaiaSkyFrameBuffer(GLFrameBufferBuilder<? extends GLFrameBuffer<Texture>> bufferBuilder, int... indices) {
         super(bufferBuilder);
@@ -30,9 +30,11 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
         if (indices.length > 1)
             depthIndex = indices[1];
         if (indices.length > 2)
-            normalIndex = indices[2];
+            layerIndex = indices[2];
         if (indices.length > 3)
-            reflectionMaskIndex = indices[3];
+            normalIndex = indices[3];
+        if (indices.length > 4)
+            reflectionMaskIndex = indices[4];
     }
 
     public Texture getColorBufferTexture() {
@@ -45,6 +47,13 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
     public Texture getDepthBufferTexture() {
         if (depthIndex >= 0)
             return textureAttachments.get(depthIndex);
+        else
+            return null;
+    }
+
+    public Texture getLayerBufferTexture() {
+        if (layerIndex >= 0)
+            return textureAttachments.get(layerIndex);
         else
             return null;
     }

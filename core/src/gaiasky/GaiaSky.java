@@ -328,19 +328,21 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     tw = settings.graphics.resolution[0];
                     th = settings.graphics.resolution[1];
                 }
-                var w = (int) (tw * settings.graphics.backBufferScale);
-                var h = (int) (th * settings.graphics.backBufferScale);
+                final var w = settings.runtime.openXr ? settings.graphics.backBufferResolution[0] : (int) (tw * settings.graphics.backBufferScale);
+                final var h = settings.runtime.openXr ? settings.graphics.backBufferResolution[1] : (int) (th * settings.graphics.backBufferScale);
                 /* RENDER THE SCENE. */
                 sceneRenderer.clearScreen();
-
-                if (settings.runtime.openXr) {
-                    sceneRenderer.render(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null,
-                            postProcessor.getPostProcessBean(RenderType.screen));
-                } else {
-                    var ppb = postProcessor.getPostProcessBean(RenderType.screen);
-                    if (ppb != null)
-                        sceneRenderer.render(cameraManager, t, w, h, tw, th, null, ppb);
-                }
+                var ppb = postProcessor.getPostProcessBean(RenderType.screen);
+                if (ppb != null)
+                    sceneRenderer.render(
+                            cameraManager,
+                            t,
+                            w,
+                            h,
+                            tw,
+                            th,
+                            null,
+                            ppb);
 
                 // Render the GUI, setting the viewport.
                 if (settings.runtime.openXr) {
@@ -348,6 +350,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 } else {
                     guiRegistry.render(tw, th);
                 }
+
                 if (mainVRGui != null) {
                     mainVRGui.render(0, 0);
                 }

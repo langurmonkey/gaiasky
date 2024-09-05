@@ -32,12 +32,9 @@ const vec3 GRAYSCALE = vec3(0.3, 0.59, 0.11);
 // 0 = totally desaturated
 // 1 = saturation unchanged
 // higher = increase saturation
-//const float BaseSat = 1;
-//const float BloomSat = 1;
 
 vec3 adjustSaturation(vec3 color, float saturation) {
 	vec3 grey = vec3(dot(color, GRAYSCALE));
-	//vec3 grey = vec3((color.r+color.g+color.b)*0.333);
 	return mix(grey, color, saturation);
 }
 

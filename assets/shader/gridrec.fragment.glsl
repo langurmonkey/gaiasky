@@ -28,6 +28,7 @@ in float v_opacity;
 in vec4 v_color;
 
 // OUTPUT
+// We use the location of the layer buffer (1).
 layout (location = 0) out vec4 fragColor;
 
 #define PI 3.141592

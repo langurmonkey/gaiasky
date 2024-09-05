@@ -125,11 +125,9 @@ public final class PostProcessor implements Disposable {
     /** Provides a way to query the pipeline for the most used states */
     public static boolean isStateEnabled(int pname) {
         if (EnableQueryStates) {
-            // Gdx.app.log( "PipelineState", "Querying blending" );
             return pipelineState.isEnabled(pname);
         }
 
-        // Gdx.app.log( "PipelineState", "(not querying)" );
         return false;
     }
 
@@ -361,15 +359,6 @@ public final class PostProcessor implements Disposable {
         return composite;
     }
 
-    /** After a capture/captureEnd action, returns the just captured buffer */
-    public GaiaSkyFrameBuffer captured() {
-        if (enabled && hasCaptured) {
-            return composite.getResultBuffer();
-        }
-
-        return null;
-    }
-
     /** Regenerates and/or rebinds owned resources when needed, eg. when the OpenGL context is lost. */
     public void rebind() {
         // Wrap.
@@ -392,7 +381,7 @@ public final class PostProcessor implements Disposable {
      * Stops capturing the scene and apply the effect chain, if there is one. If the specified output FrameBuffer is NULL, then
      * the rendering will be performed to screen.
      */
-    public void render(FrameBuffer dest) {
+    public void render(FrameBuffer destination) {
         captureEnd();
 
         if (!hasCaptured) {
@@ -425,12 +414,12 @@ public final class PostProcessor implements Disposable {
 
             currentPostProcessor = null;
 
-            if (listener != null && dest == null) {
+            if (listener != null && destination == null) {
                 listener.beforeRenderToScreen();
             }
 
             // render with null dest (to screen)
-            items.get(count - 1).render(composite.getResultBuffer(), dest, composite.getMainBuffer());
+            items.get(count - 1).render(composite.getResultBuffer(), destination, composite.getMainBuffer());
 
             // ensure default texture unit #0 is active
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);

@@ -284,8 +284,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case MODEL_PIX_DUST -> // MODELS DUST AND MESH
                     system = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
-            case MODEL_VERT_ADDITIVE ->
-                    system = new ModelRenderer(this, MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
+            case MODEL_VERT_ADDITIVE -> system = new ModelRenderer(this, MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
             case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY
                     system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
             case MODEL_VERT_EARLY -> // MODEL PER-VERTEX-LIGHTING EARLY
@@ -306,10 +305,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case PARTICLE_GROUP -> {
                 final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudModeParticles) {
-                    case TRIANGLES ->
-                            new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
-                    case POINTS ->
-                            new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+                    case TRIANGLES -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+                    case POINTS -> new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
                 };
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
@@ -330,8 +327,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 // STAR GROUP
                 final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudMode) {
-                    case TRIANGLES ->
-                            new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
+                    case TRIANGLES -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
                     case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
                 };
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -341,10 +337,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 // VARIABLE GROUP
                 final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudMode) {
-                    case TRIANGLES ->
-                            new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-                    case POINTS ->
-                            new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+                    case TRIANGLES -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+                    case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
                 };
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
@@ -470,12 +464,34 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(final ICamera camera, final double t, final int rw, final int rh, final int tw, final int th, final FrameBuffer fb, final PostProcessBean ppb) {
+    /**
+     * Main render function.
+     *
+     * @param camera The camera.
+     * @param t      The session time, in seconds.
+     * @param rw     The actual width of the frame buffer to render.
+     * @param rh     The actual height of the frame buffer to render.
+     * @param tw     The width of the target to render.
+     * @param th     The height of the target to render.
+     * @param fb     The frame buffer. Null to render to screen.
+     * @param ppb    The post process bean.
+     */
+    public void render(final ICamera camera,
+                       final double t,
+                       final int rw,
+                       final int rh,
+                       final int tw,
+                       final int th,
+                       final FrameBuffer fb,
+                       final PostProcessBean ppb) {
+
         if (rendering.get()) {
+            // Init render mode (stereo, 360, etc.) if necessary.
             if (renderMode == null) {
                 initRenderMode(camera);
             }
 
+            // Do all render passes (SVT, shadow mapping, etc.).
             for (var renderPass : renderPasses) {
                 renderPass.render(camera);
             }
@@ -505,7 +521,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
-     * Renders the scene.
+     * Renders the scene given a camera, a session time in seconds and a render context.
      *
      * @param camera        The camera to use.
      * @param t             The time in seconds since the start.
@@ -578,6 +594,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if a given component type is on
      *
      * @param comp The component
+     *
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -588,6 +605,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if the component types are all on
      *
      * @param comp The components
+     *
      * @return Whether the components are all on
      */
     public boolean allOn(ComponentTypes comp) {
@@ -611,6 +629,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * of all components
      *
      * @param comp The components
+     *
      * @return The alpha value
      */
     public float alpha(ComponentTypes comp) {
@@ -700,6 +719,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      *
      * @param type The component type.
      * @param t    The current time in seconds.
+     *
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type, double t) {

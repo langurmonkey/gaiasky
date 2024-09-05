@@ -49,7 +49,7 @@ public class RenderModeAbstract {
     protected void postProcessRender(PostProcessBean ppb, FrameBuffer fb, boolean postproc, ICamera camera, int rw, int rh) {
         ppb.render(fb);
 
-        // Render camera
+        // Render camera.
         if (!Settings.settings.runtime.openXr) {
             if (fb != null && postproc) {
                 fb.begin();
@@ -62,12 +62,6 @@ public class RenderModeAbstract {
 
         resultBuffer = fb != null ? fb : ppb.pp.getCombinedBuffer().getResultBuffer();
     }
-
-    protected void postProcessCancel(PostProcessBean ppb, FrameBuffer fb, boolean postproc) {
-
-    }
-
-
 
     public RenderingContext getRenderingContext() {
         return rc;

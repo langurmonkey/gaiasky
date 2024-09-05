@@ -14,6 +14,7 @@ in vec2 v_texCoords;
 in float v_opacity;
 
 // OUTPUT
+// We use the location of the layer buffer (1).
 layout (location = 0) out vec4 fragColor;
 
 void main(void){
