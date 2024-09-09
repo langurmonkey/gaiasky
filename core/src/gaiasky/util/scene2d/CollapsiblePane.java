@@ -41,7 +41,7 @@ public class CollapsiblePane extends Table {
     float targetHeight;
     boolean expanding = false;
     boolean collapsing = false;
-    Runnable expandCollapseRunnable = null;
+    Runnable expandCollapseRunnable;
 
     /**
      * Creates a collapsible pane.
@@ -60,8 +60,20 @@ public class CollapsiblePane extends Table {
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage, final Image icon, final String title, final Actor content, float width, final Skin skin, String titleStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
-        this(stage, icon, title, content, width, skin, titleStyle, expandButtonStyle, detachButtonStyle, expanded, null, shortcut, topIcons);
+    public CollapsiblePane(final Stage stage,
+                           final Image icon,
+                           final String title,
+                           final Actor content,
+                           float width,
+                           final Skin skin,
+                           String titleStyle,
+                           String expandButtonStyle,
+                           String detachButtonStyle,
+                           boolean expanded,
+                           String shortcut,
+                           Actor... topIcons) {
+        this(stage, icon, title, content, width, skin, titleStyle, expandButtonStyle, detachButtonStyle, expanded,
+                null, shortcut, topIcons);
     }
 
     /**
@@ -80,8 +92,19 @@ public class CollapsiblePane extends Table {
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage, final String title, final Actor content, float width, final Skin skin, String titleStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
-        this(stage, null, title, content, width, skin, titleStyle, expandButtonStyle, detachButtonStyle, expanded, null, shortcut, topIcons);
+    public CollapsiblePane(final Stage stage,
+                           final String title,
+                           final Actor content,
+                           float width,
+                           final Skin skin,
+                           String titleStyle,
+                           String expandButtonStyle,
+                           String detachButtonStyle,
+                           boolean expanded,
+                           String shortcut,
+                           Actor... topIcons) {
+        this(stage, null, title, content, width, skin, titleStyle, expandButtonStyle,
+                detachButtonStyle, expanded, null, shortcut, topIcons);
     }
 
     /**

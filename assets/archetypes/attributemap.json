@@ -593,6 +593,10 @@
         "description": "A 2-dimensional position [longitude, latitude] on the surface of the parent, in degrees.",
         "units": "Double[2]"
       },
+      "locationType": {
+        "description": "Additional categorization of locations. This is used only in the UI so that all locations in the same category can be turned on and off at the same time with a single click.",
+        "units": "String"
+      },
       "distFactor": {
         "description": "The distance from the center of the object, in case of non-spherical parent objects. This is essentially the radius, as the locations are given in [longitude, latitude, radius]. Typically the radius is that of the object, but this parameter overrides it.",
         "units": "Double"

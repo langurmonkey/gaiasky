@@ -41,8 +41,8 @@ public class LocInitializer extends AbstractInitSystem {
         label.renderFunction = LabelView::renderTextLocation;
         label.labelPosition = new Vector3b();
 
-        body.color = new float[] { 1f, 1f, 1f, 1f };
-        body.size *= Constants.KM_TO_U;
+        body.color = new float[]{1f, 1f, 1f, 1f};
+        body.size *= (float) Constants.KM_TO_U;
 
         loc.location3d = new Vector3();
         loc.sizeKm = (float) (body.size * Constants.U_TO_KM);
@@ -51,6 +51,17 @@ public class LocInitializer extends AbstractInitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
+        var loc = Mapper.loc.get(entity);
+        var graph = Mapper.graph.get(entity);
 
+        // Initialize location type if needed.
+        if (loc.locationType == null || loc.locationType.isEmpty()) {
+            // Set type equal to parent name.
+            Entity papa = graph.parent;
+            if (papa != null) {
+                var pBase = Mapper.base.get(papa);
+                loc.locationType = pBase.getLocalizedName();
+            }
+        }
     }
 }

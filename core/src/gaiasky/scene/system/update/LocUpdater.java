@@ -17,7 +17,7 @@ import gaiasky.scene.component.LocationMark;
 
 public class LocUpdater extends AbstractUpdateSystem {
 
-    private ModelUpdater updater;
+    private final ModelUpdater updater;
 
     public LocUpdater(Family family, int priority) {
         super(family, priority);

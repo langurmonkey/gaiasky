@@ -24,6 +24,7 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Pair;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -145,6 +146,154 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     }
 
     private void addObjects(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
+        if (ct == ComponentType.Locations) {
+            addObjectsLocations(objectsGroup, checkBoxes, ct, filter);
+        } else {
+            addObjectsRegular(objectsGroup, checkBoxes, ct, filter);
+        }
+    }
+
+    private void addObjectsLocations(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
+        objectsGroup.clear();
+        checkBoxes.clear();
+        Array<Entity> objects = new Array<>();
+        scene.findEntitiesByComponentType(ct, objects);
+        Array<String> typeNames = new Array<>(false, objects.size);
+        Map<String, Pair<Map<String, IVisibilitySwitch>, Array<String>>> typeMap = new HashMap<>();
+        cbMap.clear();
+        // Organize by types.
+        for (Entity object : objects) {
+            var base = Mapper.base.get(object);
+
+            if (filter(base.names, filter)) {
+                var loc = Mapper.loc.get(object);
+                var name = base.getName();
+
+                var type = loc.locationType != null ? loc.locationType : "No type";
+                if (!typeMap.containsKey(type)) {
+                    Array<String> objNames = new Array<>();
+                    Map<String, IVisibilitySwitch> objMap = new HashMap<>();
+                    typeMap.put(type, new Pair<>(objMap, objNames));
+                    typeNames.add(type);
+                }
+                Pair<Map<String, IVisibilitySwitch>, Array<String>> pair = typeMap.get(type);
+                pair.getSecond().add(name);
+                pair.getFirst().put(name, new FocusView(object));
+            }
+        }
+        // Sort all names.
+        typeNames.sort();
+        typeMap.forEach((key, value) -> value.getSecond().sort());
+
+
+        if (typeNames.isEmpty()) {
+            objectsGroup.addActor(new OwnLabel(I18n.msg("gui.elements.type.none"), skin));
+        } else {
+            for (String typeName : typeNames) {
+                Pair<Map<String, IVisibilitySwitch>, Array<String>> pair = typeMap.get(typeName);
+                var names = pair.getSecond();
+                var map = pair.getFirst();
+                Array<OwnCheckBox> groupCheckBoxes = new Array<>();
+
+                // Table for type checkboxes.
+                Table cbs = new Table(skin);
+                cbs.top().left();
+                for (String name : names) {
+                    HorizontalGroup objectHgroup = new HorizontalGroup();
+                    objectHgroup.space(space4);
+                    objectHgroup.left();
+                    OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
+                    cb.left();
+                    IVisibilitySwitch obj = map.get(name);
+                    cb.setChecked(obj.isVisible(true));
+                    groupCheckBoxes.add(cb);
+                    cbMap.put(name, cb);
+
+                    cb.addListener((event) -> {
+                        if (event instanceof ChangeListener.ChangeEvent && map.containsKey(name)) {
+                            GaiaSky.postRunnable(() -> {
+                                EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, cb, obj, obj.getName(), cb.isChecked());
+                                // Meshes are single objects but also catalogs!
+                                // Connect to catalog visibility
+                                if (Mapper.mesh.has(((FocusView) obj).getEntity())) {
+                                    EventManager.publish(Event.CATALOG_VISIBLE, cb, obj.getName(), cb.isChecked());
+                                }
+                            });
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    objectHgroup.addActor(cb);
+                    // Tooltips
+                    if (obj.getDescription() != null) {
+                        ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
+                        meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
+                        objectHgroup.addActor(meshDescTooltip);
+                    }
+
+                    cbs.add(objectHgroup).top().left().padBottom(space2).row();
+                    checkBoxes.add(cb);
+                }
+
+                // Create collapsible pane for type.
+                Table buttons;
+                // Select all.
+                Button selectAll = new OwnImageButton(skin, "select-all");
+                selectAll.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        for (var checkBox : groupCheckBoxes) {
+                            if (!checkBox.isDisabled()) {
+                                checkBox.setChecked(true);
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                });
+                selectAll.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.select.all"), skin));
+
+                // Select none.
+                Button selectNone = new OwnImageButton(skin, "select-none");
+                selectNone.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        for (var checkBox : groupCheckBoxes) {
+                            if (!checkBox.isDisabled()) {
+                                checkBox.setChecked(false);
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                });
+                selectNone.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.select.none"), skin));
+
+                final float buttonSize = 17f;
+                buttons = new Table(skin);
+                buttons.padRight(pad20);
+                buttons.add(selectAll).size(buttonSize, buttonSize).right().bottom().padRight(pad10);
+                buttons.add(selectNone).size(buttonSize, buttonSize).right().bottom();
+
+                CollapsiblePane cp = new CollapsiblePane(
+                        stage,
+                        typeName,
+                        cbs,
+                        385f,
+                        skin,
+                        "header",
+                        "expand-collapse",
+                        null,
+                        filter != null && !filter.isEmpty(),
+                        null,
+                        buttons);
+                objectsGroup.addActor(cp);
+            }
+        }
+
+        objectsGroup.pack();
+    }
+
+    private void addObjectsRegular(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
         objectsGroup.clear();
         checkBoxes.clear();
         Array<Entity> objects = new Array<>();

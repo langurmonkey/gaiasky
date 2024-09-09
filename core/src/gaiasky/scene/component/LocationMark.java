@@ -21,6 +21,12 @@ public class LocationMark implements Component {
     public String displayName;
 
     /**
+     * Additional categorization of locations. This is used only in the UI so that all locations in the same category can be turned on and off at
+     * the same time with a single click.
+     */
+    public String locationType = null;
+
+    /**
      * Longitude and latitude
      **/
     public Vector2 location;
@@ -40,5 +46,9 @@ public class LocationMark implements Component {
 
     public void setDistFactor(Double distFactor) {
         this.distFactor = distFactor.floatValue();
+    }
+
+    public void setLocationType(String type) {
+        this.locationType = type.strip();
     }
 }
