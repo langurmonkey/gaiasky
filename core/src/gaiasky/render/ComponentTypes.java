@@ -78,9 +78,6 @@ public class ComponentTypes extends BitSet {
         for (int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
             // operate on index i here
             sb.append(values[i]).append(" ");
-            if (i == Integer.MAX_VALUE) {
-                break; // or (i+1) would overflow
-            }
         }
         sb.replace(sb.length() - 1, sb.length(), "");
         return sb.toString();
@@ -91,20 +88,21 @@ public class ComponentTypes extends BitSet {
         Planets("icon-elem-planets"),
         Moons("icon-elem-moons"),
         Satellites("icon-elem-satellites"),
-        Asteroids("icon-elem-asteroids"),
 
+        Asteroids("icon-elem-asteroids"),
         Clusters("icon-elem-clusters"),
         MilkyWay("icon-elem-milkyway"),
         Galaxies("icon-elem-galaxies"),
+
         Nebulae("icon-elem-nebulae"),
         Meshes("icon-elem-meshes"),
         Systems("icon-elem-systems"),
-
         Labels("icon-elem-labels"),
+
         Orbits("icon-elem-orbits"),
-        CosmicLocations("icon-elem-cosmiclocations"),
         Locations("icon-elem-locations"),
         Countries("icon-elem-countries"),
+        Ruler("icon-elem-ruler"),
 
         Equatorial("icon-elem-equatorial"),
         Ecliptic("icon-elem-ecliptic"),
@@ -113,15 +111,14 @@ public class ComponentTypes extends BitSet {
 
         Constellations("icon-elem-constellations"),
         Boundaries("icon-elem-boundaries"),
-
-        Ruler("icon-elem-ruler"),
-        Effects("icon-elem-effects"),
         Atmospheres("icon-elem-atmospheres"),
         Clouds("icon-elem-clouds"),
-        Axes("icon-elem-axes"),
 
+        Effects("icon-elem-effects"),
+        Axes("icon-elem-axes"),
         VelocityVectors("icon-elem-arrows"),
         Titles("icon-elem-titles"),
+
         Keyframes("icon-elem-keyframes"),
         Others("icon-elem-others"),
 

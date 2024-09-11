@@ -167,9 +167,13 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
             if (filter(base.names, filter)) {
                 var loc = Mapper.loc.get(object);
+                var hasLoc = loc != null;
                 var name = base.getName();
 
-                var type = loc.locationType != null ? loc.locationType : "No type";
+                var defaultType = I18n.msg("gui.location.type.default");
+                var type = hasLoc ?
+                        (loc.locationType != null ? loc.locationType : defaultType) :
+                        Mapper.graph.get(object).parentName;
                 if (!typeMap.containsKey(type)) {
                     Array<String> objNames = new Array<>();
                     Map<String, IVisibilitySwitch> objMap = new HashMap<>();
@@ -199,9 +203,9 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 Table cbs = new Table(skin);
                 cbs.top().left();
                 for (String name : names) {
-                    HorizontalGroup objectHgroup = new HorizontalGroup();
-                    objectHgroup.space(space4);
-                    objectHgroup.left();
+                    HorizontalGroup objectHGroup = new HorizontalGroup();
+                    objectHGroup.space(space4);
+                    objectHGroup.left();
                     OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
                     cb.left();
                     IVisibilitySwitch obj = map.get(name);
@@ -224,15 +228,15 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                         return false;
                     });
 
-                    objectHgroup.addActor(cb);
+                    objectHGroup.addActor(cb);
                     // Tooltips
                     if (obj.getDescription() != null) {
                         ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
                         meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
-                        objectHgroup.addActor(meshDescTooltip);
+                        objectHGroup.addActor(meshDescTooltip);
                     }
 
-                    cbs.add(objectHgroup).top().left().padBottom(space2).row();
+                    cbs.add(objectHGroup).top().left().padBottom(space2).row();
                     checkBoxes.add(cb);
                 }
 

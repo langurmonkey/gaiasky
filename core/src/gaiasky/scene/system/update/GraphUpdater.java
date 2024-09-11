@@ -192,17 +192,18 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 // Go down a level
                 for (int i = 0; i < graph.children.size; i++) {
                     Entity child = graph.children.get(i);
-                    update(child, time, graph.translation, getChildrenOpacity(entity, base, fade, opacity));
+                    update(child, time, graph.translation, getChildrenOpacity(entity, child, base, fade, opacity));
                 }
             }
         }
     }
 
     private float getChildrenOpacity(Entity entity,
+                                     Entity child,
                                      Base base,
                                      Fade fade,
                                      float opacity) {
-        if (Mapper.billboardSet.has(entity)) {
+        if (Mapper.billboardSet.has(entity) && Mapper.tagBackgroundModel.has(child)) {
             return 1 - base.opacity;
         } else if (fade != null) {
             return base.opacity;

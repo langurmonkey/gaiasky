@@ -31,9 +31,7 @@ public class ShapeUpdater extends AbstractUpdateSystem {
     public void updateEntity(Entity entity, float deltaTime) {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
-        var shape = Mapper.shape.get(entity);
         var model = Mapper.model.get(entity);
-        var coord = Mapper.coordinates.get(entity);
         var transform = Mapper.transform.get(entity);
         var affine = Mapper.affine.get(entity);
 

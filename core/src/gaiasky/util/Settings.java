@@ -65,7 +65,7 @@ public class Settings extends SettingsObject {
      *    3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static final int SOURCE_VERSION = 3060303;
+    public static final int SOURCE_VERSION = 3060401;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the
