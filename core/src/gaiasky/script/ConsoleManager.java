@@ -100,12 +100,22 @@ public class ConsoleManager {
     private void initShortcuts() {
         shortcutMap = new HashMap<>();
         shortcutMap.put("goto", "goToObject");
+        shortcutMap.put("gotonow", "goToObjectInstant");
+        shortcutMap.put("land", "landOnObject");
+        shortcutMap.put("distance", "getDistanceTo");
+        shortcutMap.put("pos", "getObjectPosition");
+
         shortcutMap.put("find", "setCameraFocus");
         shortcutMap.put("focus", "setCameraFocus");
         shortcutMap.put("free", "setCameraFree");
+
         shortcutMap.put("starttime", "startSimulationTime");
         shortcutMap.put("stoptime", "stopSimulationTime");
+        shortcutMap.put("time", "setSimulationTime");
         shortcutMap.put("timewarp", "setTimeWarp");
+
+        shortcutMap.put("startexindex", "setStarTextureIndex");
+
         shortcutMap.put("fov", "setFov");
         shortcutMap.put("forward", "cameraForward");
         shortcutMap.put("rotate", "cameraRotate");
@@ -114,6 +124,18 @@ public class ConsoleManager {
         shortcutMap.put("roll", "cameraRoll");
         shortcutMap.put("pitch", "cameraPitch");
         shortcutMap.put("yaw", "cameraYaw");
+        shortcutMap.put("setcampos", "setCameraPosition");
+        shortcutMap.put("campos", "getCameraPosition");
+        shortcutMap.put("setcamdir", "setCameraDirection");
+        shortcutMap.put("camdir", "getCameraDirection");
+        shortcutMap.put("setcamup", "setCameraUp");
+        shortcutMap.put("camup", "getCameraUp");
+
+        shortcutMap.put("screenshot", "saveScreenshot");
+        shortcutMap.put("version", "getVersionNumber");
+        shortcutMap.put("log", "log");
+        shortcutMap.put("print", "print");
+
         shortcutMap.put("exit", "quit");
     }
 

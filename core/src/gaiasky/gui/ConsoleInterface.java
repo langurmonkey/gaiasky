@@ -29,6 +29,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.Instant;
 import java.util.Arrays;
@@ -329,6 +330,20 @@ public class ConsoleInterface extends TableGuiInterface {
         }
     }
 
+    private String processMethod(Method m) {
+        StringBuilder sb = new StringBuilder("  " + green + m.getName() + reset);
+        var params = m.getParameters();
+        for (var p : params) {
+            sb.append(" ")
+                    .append(p.getName())
+                    .append("[")
+                    .append(yellow)
+                    .append(p.getType().getSimpleName())
+                    .append(reset)
+                    .append("]");
+        }
+        return sb.toString();
+    }
 
     private void processCommand(String cmd) {
         if (cmd == null || cmd.isEmpty()) {
@@ -360,21 +375,7 @@ public class ConsoleInterface extends TableGuiInterface {
 
             manager.methodMap().keySet().stream().sorted().forEach(a -> {
                 var b = manager.methodMap().get(a);
-                b.forEach(m -> {
-                    StringBuilder sb = new StringBuilder("  " + green + m.getName() + reset);
-                    var params = m.getParameters();
-                    for (var p : params) {
-                        sb.append(" ")
-                                .append(p.getName())
-                                .append("[")
-                                .append(yellow)
-                                .append(p.getType().getSimpleName())
-                                .append(reset)
-                                .append("]");
-
-                    }
-                    addOutputInfo(sb.toString());
-                });
+                b.forEach(m -> addOutputInfo(processMethod(m)));
             });
             addOutputInfo("");
             addOutputInfo("List of available " + blue + "shortcuts" + reset + ":");
@@ -512,6 +513,17 @@ public class ConsoleInterface extends TableGuiInterface {
 
             if (matched == 0) {
                 addOutputError(String.format("%s: could not match command", cmd));
+
+                final var commandName = manager.shortcutMap().get(cmd);
+                var candidates = manager.methodMap().keySet().stream().filter(a -> a.equalsIgnoreCase(commandName)).toList();
+                if(!candidates.isEmpty()) {
+                    addOutputInfo("Possible candidates:");
+                    candidates.forEach(c -> {
+                        var l = manager.methodMap().get(c);
+                        l.forEach(m -> addOutputInfo(processMethod(m)));
+                    });
+                    addOutputInfo("");
+                }
             }
 
 
