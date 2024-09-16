@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.ConsoleManager.Message;
@@ -32,7 +33,9 @@ import gaiasky.util.scene2d.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ConsoleInterface extends TableGuiInterface {
     private static final Logger.Log logger = Logger.getLogger(ConsoleInterface.class.getSimpleName());
@@ -345,6 +348,57 @@ public class ConsoleInterface extends TableGuiInterface {
         return sb.toString();
     }
 
+    /**
+     * Tokenizes the list of parameters by splitting at white spaces.
+     *
+     * @param params The parameters in a single string.
+     *
+     * @return Array of parameters.
+     */
+    private String[] tokenizeParametersSimple(String params) {
+        return params.split("\\s+");
+    }
+
+    /**
+     * Tokenizes the list of parameters.
+     *
+     * @param params The parameters in a single string.
+     *
+     * @return Array of parameters.
+     */
+    private String[] tokenizeParameters(String params) {
+        List<String> list = new ArrayList<>();
+        var n = params.length();
+        var modeStr = false;
+        StringBuilder curr = new StringBuilder();
+        for (var i = 0; i < n; i++) {
+            final var c = params.charAt(i);
+            switch (c) {
+                case '"' -> {
+                    if (modeStr) {
+                        // Finish string.
+                        list.add(curr.toString());
+                        curr = new StringBuilder();
+                    }
+                    modeStr = !modeStr;
+                }
+                case ' ' -> {
+                    if (!modeStr) {
+                        // Parameter separator.
+                        list.add(curr.toString());
+                        curr = new StringBuilder();
+                    } else {
+                        // Add to current string.
+                        curr.append(c);
+                    }
+                }
+                default -> curr.append(c);
+            }
+        }
+        String[] arr = new String[list.size()];
+        return list.toArray(arr);
+    }
+
     private void processCommand(String cmd) {
         if (cmd == null || cmd.isEmpty()) {
             return;
@@ -359,7 +413,7 @@ public class ConsoleInterface extends TableGuiInterface {
         if (cmd.contains(" ")) {
             int idx = cmd.indexOf(" ");
             command0 = cmd.substring(0, idx);
-            parameters = cmd.substring(idx + 1).split("\\s+");
+            parameters = tokenizeParameters(cmd.substring(idx + 1));
         } else {
             command0 = cmd;
         }
@@ -516,7 +570,7 @@ public class ConsoleInterface extends TableGuiInterface {
 
                 final var commandName = manager.shortcutMap().get(cmd);
                 var candidates = manager.methodMap().keySet().stream().filter(a -> a.equalsIgnoreCase(commandName)).toList();
-                if(!candidates.isEmpty()) {
+                if (!candidates.isEmpty()) {
                     addOutputInfo("Possible candidates:");
                     candidates.forEach(c -> {
                         var l = manager.methodMap().get(c);
