@@ -114,6 +114,7 @@ project(":core") {
 
         // OpenXR
         api group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
+        api group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
         api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
         api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-windows"
 

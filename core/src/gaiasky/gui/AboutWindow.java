@@ -29,6 +29,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
+import org.lwjgl.glfw.GLFW;
 import oshi.SystemInfo;
 
 import java.time.Instant;
@@ -37,6 +38,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
 
+@SuppressWarnings("ALL")
 public class AboutWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(AboutWindow.class);
 
@@ -345,13 +347,15 @@ public class AboutWindow extends GenericDialog {
         try {
             var si = new SystemInfo();
             var os = si.getOperatingSystem();
+            var st = System.getenv("XDG_SESSION_TYPE");
             sysOS = new OwnLabel(
                     I18n.msg("gui.help.os.family") + ": " + os.getFamily()
                             + "\n" + I18n.msg("gui.help.os.name") + ": " + os.getVersionInfo().getCodeName()
                             + "\n" + I18n.msg("gui.help.os.version") + ": " + os.getVersionInfo().getVersion()
                             + "\n" + I18n.msg("gui.help.os.build") + ": " + os.getVersionInfo().getBuildNumber()
                             + "\n" + I18n.msg("gui.help.os.manufacturer") + ": " + os.getManufacturer()
-                            + "\n" + I18n.msg("gui.help.os.arch") + ": " + System.getProperty("os.arch"), skin);
+                            + "\n" + I18n.msg("gui.help.os.arch") + ": " + System.getProperty("os.arch")
+                            + (SysUtils.isLinux() ? ("\n" + I18n.msg("gui.help.os.session") + ": " + st)  : ""), skin);
         } catch (Error e) {
             sysOS = new OwnLabel(System.getProperty("os.name") + "\n" + System.getProperty("os.version") + "\n" + System.getProperty("os.arch"), skin);
         }
@@ -359,6 +363,8 @@ public class AboutWindow extends GenericDialog {
         var glRendererTitle = new OwnLabel(I18n.msg("gui.help.graphicsdevice"), skin);
         var glRendererStr = Gdx.gl.glGetString(GL20.GL_RENDERER);
         var glRenderer = new OwnLabel(TextUtils.breakSpaces(glRendererStr, 48), skin);
+
+        var sessionTypeTitle = new OwnLabel(I18n.msg("gui.help.graphicsdevice"), skin);
 
         // OpenGL info
         var glInfo = new OwnLabel(I18n.msg("gui.help.openglinfo"), skin, "header");
