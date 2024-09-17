@@ -233,9 +233,9 @@ public class AboutWindow extends GenericDialog {
         contentAbout.add(contribTitle).left().padRight(pad18).padTop(pad18);
         contentAbout.add(contrib).left().padTop(pad18);
         contentAbout.row();
-        contentAbout.add(licenseHorizontal).colspan(2).center().padTop(pad18);
+        contentAbout.add(licenseHorizontal).colspan(2).center().padTop(pad18 * 4f);
         contentAbout.row();
-        contentAbout.add(thanksSc).colspan(2).center().padTop(pad18 * 4f);
+        contentAbout.add(thanksSc).colspan(2).center().padTop(pad18 * 6f);
         contentAbout.pack();
 
         /* CONTENT 3 - SYSTEM */

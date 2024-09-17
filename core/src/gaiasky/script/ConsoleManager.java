@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages the console or terminal, keeps its history and more.
+ * Manages the Gaia Sky console/terminal, keeps its history and more. The console accepts all calls defined in {@link IScriptingInterface}. Aliases to the
+ * most useful calls are defined in {@link ConsoleManager#shortcutMap}, and can be used as shortcuts.
+ * The user interface part of the console in implemented in {@link gaiasky.gui.ConsoleInterface}.
  */
 public class ConsoleManager {
 
@@ -27,9 +29,18 @@ public class ConsoleManager {
     private Map<String, Array<Method>> methodMap;
     private Map<String, String> shortcutMap;
 
+    /**
+     * A single console message. Typically, this is represented visually by a single line.
+     * @param msg The message string.
+     * @param type The message type.
+     * @param time The message creation time.
+     */
     public record Message(String msg, MsgType type, Instant time) {
     }
 
+    /**
+     * Type of console message.
+     */
     public enum MsgType {
         INFO("info", ColorUtils.gYellowC, ColorUtils.gWhiteC),
         ERROR("error", ColorUtils.gRedC, ColorUtils.gPinkC),
@@ -97,6 +108,9 @@ public class ConsoleManager {
         return command;
     }
 
+    /**
+     * Initialize aliases to the most useful API calls.
+     */
     private void initShortcuts() {
         shortcutMap = new HashMap<>();
         shortcutMap.put("goto", "goToObject");

@@ -37,9 +37,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The user interface for the Gaia Sky console. The backend is implemented in {@link ConsoleManager}.
+ */
 public class ConsoleInterface extends TableGuiInterface {
     private static final Logger.Log logger = Logger.getLogger(ConsoleInterface.class.getSimpleName());
 
+    /**
+     * The console manager keeps track of the console data.
+     */
     private final ConsoleManager manager;
 
     private final Table inputTable;
