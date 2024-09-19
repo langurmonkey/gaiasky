@@ -260,6 +260,10 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         return label == null || label.label;
     }
 
+    public boolean isLocation() {
+        return loc != null;
+    }
+
     @Override
     public float getTextOpacity() {
         return base.opacity;

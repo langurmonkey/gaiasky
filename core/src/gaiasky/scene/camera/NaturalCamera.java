@@ -1528,8 +1528,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     setCenterFocus((Boolean) data[0]);
                 }
             }
-            case CONTROLLER_CONNECTED_INFO ->
-                    Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
+            case CONTROLLER_CONNECTED_INFO -> Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
             case CONTROLLER_DISCONNECTED_INFO -> {
                 // Empty.
             }
@@ -1872,6 +1871,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch.end();
     }
 
+    /**
+     * Draws a cross-hair as a decal, a 3D camera-oriented texture.
+     *
+     * @param batch     The batch.
+     * @param chFocus   The focus element.
+     * @param focusMode The mode.
+     * @param sprite    The sprite.
+     * @param r         Red.
+     * @param g         Green.
+     * @param b         Blue.
+     * @param a         Alpha.
+     */
     private void drawCrossHairDecal(SpriteBatch batch,
                                     IFocus chFocus,
                                     boolean focusMode,
@@ -1925,20 +1936,20 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Draws a cross-hair given a camera-relative position
+     * Draws a cross-hair given a camera-relative position.
      *
-     * @param p              The position in floating camera coordinates
-     * @param distToCam      The distance to the camera
-     * @param radius         Radius of object
-     * @param crossHairTex   Cross-hair texture
+     * @param p              The position in floating camera coordinates.
+     * @param distToCam      The distance to the camera.
+     * @param radius         Radius of object.
+     * @param crossHairTex   Cross-hair texture.
      * @param crossHairScale The scale of the cross-hair.
-     * @param arrowTex       Arrow texture
-     * @param rw             Width
-     * @param rh             Height
-     * @param r              Red
-     * @param g              Green
-     * @param b              Blue
-     * @param a              Alpha
+     * @param arrowTex       Arrow texture.
+     * @param rw             Width.
+     * @param rh             Height.
+     * @param r              Red.
+     * @param g              Green.
+     * @param b              Blue.
+     * @param a              Alpha.
      */
     private void drawCrossHair(Vector3b p,
                                double distToCam,

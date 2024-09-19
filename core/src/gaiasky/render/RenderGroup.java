@@ -11,75 +11,75 @@ import com.badlogic.gdx.utils.Bits;
 
 public enum RenderGroup {
     /**
-     * None
+     * None.
      **/
     NONE(-100),
     /**
-     * A skybox rendered with a cubemap
+     * A skybox rendered with a cubemap.
      */
     SKYBOX(0),
     /**
-     * Using default shader, no normal map
+     * Using default shader, no normal map.
      **/
     MODEL_BG(100),
     /**
-     * Grids shader
+     * Grids shader.
      **/
     MODEL_VERT_GRID(200),
     /**
-     * Single pixel
+     * Single pixel.
      **/
     POINT_STAR(300),
     /**
-     * Annotations
+     * Annotations.
      **/
     FONT_ANNOTATION(400),
     /**
-     * Opaque meshes (dust, etc.)
+     * Opaque meshes (dust, etc.).
      **/
     MODEL_PIX_DUST(500),
     /**
-     * Per-pixel lighting (early in the rendering pipeline)
+     * Per-pixel lighting (early in the rendering pipeline).
      **/
     MODEL_PIX_EARLY(600),
     /**
-     * Per-vertex lighting (early in the rendering pipeline)
+     * Per-vertex lighting (early in the rendering pipeline).
      **/
     MODEL_VERT_EARLY(700),
     /**
-     * Group of billboard datasets
+     * Group of billboard datasets.
      **/
     BILLBOARD_GROUP(800),
     /**
-     * Particle group
+     * Particle group.
      **/
     PARTICLE_GROUP(1000),
     /**
-     * Particle group (extended, billboards)
+     * Particle group (extended, billboards).
      **/
     PARTICLE_GROUP_EXT_BILLBOARD(1100),
     /**
-     * Particle group (extended, wireframes)
+     * Particle group (extended, wireframes).
      **/
     PARTICLE_GROUP_EXT_MODEL(1110),
     /**
-     * Star group
+     * Star group.
      **/
     STAR_GROUP(1300),
     /**
-     * Variable star group
+     * Variable star group.
      **/
     VARIABLE_GROUP(1400),
     /**
-     * A particle defined by orbital elements
+     * A particle defined by orbital elements.
      **/
     ORBITAL_ELEMENTS_PARTICLE(1500),
     /**
-     * A particle group defined by orbital elements
+     * A particle group defined by orbital elements.
      **/
     ORBITAL_ELEMENTS_GROUP(1600),
     /**
-     * Models with only diffuse lighting
+     * Models with only diffuse lighting.
      **/
     MODEL_DIFFUSE(1700),
     /**
@@ -87,63 +87,63 @@ public enum RenderGroup {
      **/
     MODEL_PIX(1800),
     /**
-     * Tessellated model
+     * Tessellated model.
      **/
     MODEL_PIX_TESS(1900),
     /**
-     * Beams
+     * Beams.
      **/
     MODEL_VERT_BEAM(2000),
     /**
-     * Model star
+     * Model star.
      **/
     MODEL_VERT_STAR(2100),
     /**
-     * Label
+     * Label.
      **/
     FONT_LABEL(2200),
     /**
-     * Recursive grid
+     * Recursive grid.
      */
     MODEL_VERT_RECGRID(2500),
     /**
-     * Point
+     * Point.
      **/
     POINT(3000),
     /**
-     * Point GPU
+     * Point GPU.
      **/
     POINT_GPU(3100),
     /**
-     * Line
+     * Line.
      **/
     LINE(4000),
     /**
-     * Line GPU
+     * Line GPU.
      **/
     LINE_GPU(4100),
     /**
-     * IntShader - front (planets, satellites...)
+     * IntShader - front (planets, satellites...).
      **/
     BILLBOARD_SSO(5000),
     /**
-     * Regular billboard sprite
+     * Regular billboard sprite.
      **/
     BILLBOARD_SPRITE(5300),
     /**
-     * IntShader - galaxies
+     * IntShader - galaxies.
      **/
     BILLBOARD_GAL(5400),
     /**
-     * Star billboards
+     * Star billboards.
      **/
     BILLBOARD_STAR(5500),
     /**
-     * Atmospheres of planets
+     * Atmospheres of planets.
      **/
     MODEL_ATM(6000),
     /**
-     * Clouds
+     * Clouds.
      **/
     MODEL_CLOUD(6500),
     /**
@@ -151,21 +151,25 @@ public enum RenderGroup {
      **/
     MODEL_PIX_TRANSPARENT(7000),
     /**
-     * Line late
+     * Line late.
      **/
     LINE_LATE(8000),
     /**
-     * Shapes
+     * Shapes.
      **/
     SHAPE(9000),
     /**
-     * Particle effects
+     * Particle effects.
      */
     PARTICLE_EFFECTS(10000),
     /**
-     * Transparent additive-blended meshes
+     * Transparent additive-blended meshes.
      **/
-    MODEL_VERT_ADDITIVE(11000);
+    MODEL_VERT_ADDITIVE(11000),
+    /**
+     * Single sprite.
+     */
+    SPRITE(12000);
 
     public final int priority;
 

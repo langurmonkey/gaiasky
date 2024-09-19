@@ -23,6 +23,7 @@ public class LocExtractor extends AbstractExtractSystem {
         var base = Mapper.base.get(entity);
         if (mustRender(base)) {
             addToRender(Mapper.render.get(entity), RenderGroup.FONT_LABEL);
+            addToRender(Mapper.render.get(entity), RenderGroup.SPRITE);
         }
     }
 

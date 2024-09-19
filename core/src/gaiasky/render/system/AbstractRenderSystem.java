@@ -40,7 +40,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     private boolean vrScaleFlag = false, depthBufferFlag = false;
 
     protected final Vector3 aux3f = new Vector3();
-    protected final Vector3d aux3d = new Vector3d();
 
     protected AbstractRenderSystem(SceneRenderer sceneRenderer,
                                    RenderGroup rg,

@@ -31,6 +31,9 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.List;
 
+/**
+ * Render system that render single points.
+ */
 public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     protected static final Log logger = Logger.getLogger(PointPrimitiveRenderSystem.class);
 
@@ -124,7 +127,7 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     }
 
     private void render(Entity entity, PointView pointView, float alpha) {
-        // Render points CPU
+        // CPU point rendering.
         var body = Mapper.body.get(entity);
         var verts = Mapper.verts.get(entity);
         var graph = Mapper.graph.get(entity);

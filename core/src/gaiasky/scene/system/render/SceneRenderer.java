@@ -413,6 +413,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new ShapeRenderer(this, SHAPE, alphas, globalResources.getShapeShader());
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
+            case SPRITE -> {
+                // SPRITES
+                system = new SpriteRenderer(this, SPRITE, alphas, globalResources.getSpriteShader());
+                system.addPreRunnables(regularBlendR, noDepthTestR);
+            }
         }
 
         // Add system.
