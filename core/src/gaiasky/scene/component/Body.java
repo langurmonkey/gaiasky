@@ -22,6 +22,7 @@ public class Body implements Component, ICopy {
      * It is not the absolute position. If the entity has a {@link ProperMotion} component,
      * the proper motion is applied for the current time. The position at epoch is
      * kept in {@link Body#posEpoch}.
+     * The absolute position is held at {@link GraphNode#translation}.
      */
     public Vector3b pos = new Vector3b();
     /**

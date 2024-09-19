@@ -18,8 +18,8 @@ import java.util.List;
 
 public class ModelScaffolding implements Component {
 
-    /** Multiplier for Loc view angle **/
-    public float locVaMultiplier = 4f;
+    /** Solid angle factor for the locations of this object. Effectively multiplies the solid angle of locations. **/
+    public float locVaMultiplier = 3f;
     /** ThresholdLabel for children locations. **/
     public float locThresholdLabel = 1f;
 

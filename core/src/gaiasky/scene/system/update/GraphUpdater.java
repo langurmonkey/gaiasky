@@ -333,6 +333,14 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
     }
 
+    public void updatePositionLocationMark(Entity entity,
+                                           Body body,
+                                           GraphNode graph) {
+        var loc = Mapper.loc.get(entity);
+        // loc.location3d contains the position already (last frame).
+        body.pos.set(loc.location3d);
+    }
+
     /**
      * Method to update the position of a shape object.
      *

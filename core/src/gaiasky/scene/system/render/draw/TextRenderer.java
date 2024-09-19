@@ -50,7 +50,6 @@ public class TextRenderer extends FontRenderSystem {
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         batch.begin();
 
-        int size = renderables.size();
         ExtShaderProgram program = programs[0];
         renderFont3D(renderables, program, camera, alphas[ComponentType.Labels.ordinal()]);
         batch.end();

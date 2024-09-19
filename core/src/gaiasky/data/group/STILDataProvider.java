@@ -535,7 +535,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 tEff = (float) bvToTEff.bvToTeff(colorIndex);
                             }
 
-                            // RGB COLOR (PACKED) from COLOR INDEX or Teff
+                            // RGB COLOR (PACKED) from COLOR INDEX or effective temperature.
                             float colorPacked;
                             float[] rgb = null;
                             if (Float.isFinite(colorIndex)) {

@@ -12,8 +12,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class LocationMark implements Component {
-    public static final float LOWER_LIMIT = 3e-5f;
-    public static final float UPPER_LIMIT = 3e-3f;
+    // Locations with a solid angle greater than this are shown.
+    public static final float LOWER_LIMIT = 5e-4f;
+    // Locations with a solid angle lower than this are shown.
+    public static final float UPPER_LIMIT = 4.5e-3f;
 
     /**
      * The display name
@@ -30,6 +32,9 @@ public class LocationMark implements Component {
      * Longitude and latitude
      **/
     public Vector2 location;
+    /**
+     * Location in the reference system of the parent.
+     */
     public Vector3 location3d;
     /**
      * This controls the distance from the center in case of non-spherical
@@ -39,6 +44,12 @@ public class LocationMark implements Component {
 
     // Size in Km
     public float sizeKm;
+
+    /**
+     * Ignore the {@link LocationMark#UPPER_LIMIT} when determining the visibility of this location's label.
+     * Effectively, setting this to true causes the location to not disappear regardless of the camera's distance.
+     */
+    public boolean ignoreSolidAngleLimit = false;
 
     public void setLocation(double[] pos) {
         this.location = new Vector2((float) pos[0], (float) pos[1]);
@@ -50,5 +61,9 @@ public class LocationMark implements Component {
 
     public void setLocationType(String type) {
         this.locationType = type.strip();
+    }
+
+    public void setIgnoreSolidAngleLimit(boolean ignoreSolidAngleLimit) {
+        this.ignoreSolidAngleLimit = ignoreSolidAngleLimit;
     }
 }

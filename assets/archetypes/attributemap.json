@@ -597,6 +597,10 @@
         "description": "Additional categorization of locations. This is used only in the UI so that all locations in the same category can be turned on and off at the same time with a single click.",
         "units": "String"
       },
+      "ignoreSolidAngleLimit": {
+        "description": "Ignore the solid angle upper limit when determining the visibility of this location. Setting this to true causes the location to not disappear, regardless of the camera distance.",
+        "units": "Boolean"
+      },
       "distFactor": {
         "description": "The distance from the center of the object, in case of non-spherical parent objects. This is essentially the radius, as the locations are given in [longitude, latitude, radius]. Typically the radius is that of the object, but this parameter overrides it.",
         "units": "Double"

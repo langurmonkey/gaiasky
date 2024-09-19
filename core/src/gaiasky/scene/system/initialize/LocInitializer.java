@@ -32,10 +32,12 @@ public class LocInitializer extends AbstractInitSystem {
         var label = Mapper.label.get(entity);
 
         graph.mustUpdateFunction = GraphUpdater::mustUpdateLoc;
+        graph.positionUpdaterConsumer = GraphUpdater::updatePositionLocationMark;
 
         label.label = true;
         label.labelMax = 1;
         label.textScale = 1e-7f;
+        label.labelFactor = 0.15f;
         label.renderConsumer = LabelEntityRenderSystem::renderLocation;
         label.depthBufferConsumer = LabelView::noTextDepthBuffer;
         label.renderFunction = LabelView::renderTextLocation;

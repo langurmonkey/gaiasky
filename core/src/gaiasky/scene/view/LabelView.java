@@ -89,7 +89,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextCelestial() {
-        return base.names != null && renderTextBase() && (label.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel / label.labelBias);
+        return base.names != null
+                && renderTextBase()
+                && (label.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel / label.labelBias);
     }
 
     public boolean renderTextParticle() {
@@ -99,12 +101,16 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextLocation() {
-        if (renderTextBase() && (body.solidAngle >= LocationMark.LOWER_LIMIT / 10 && body.solidAngle <= LocationMark.UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || label.forceLabel)) {
+        if (renderTextBase()
+                && (
+                        (body.solidAngle >= LocationMark.LOWER_LIMIT
+                            && (body.solidAngle <= LocationMark.UPPER_LIMIT || loc.ignoreSolidAngleLimit))
+                        || label.forceLabel)
+                ){
             Vector3d aux = D31;
-            graph.translation.put(aux).scl(-1);
-
-            double cosAlpha = aux.add(loc.location3d.x, loc.location3d.y, loc.location3d.z).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor());
-            return cosAlpha < -0.3f;
+            graph.translation.put(aux).sub(body.pos).scl(-1);
+            // Make sure we don't render locations if the normal at the point points away from the camera.
+            return aux.add(loc.location3d).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor()) < -0.3;
         } else {
             return false;
         }
@@ -160,7 +166,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         if (constel != null) {
             return .2e7f * (float) Constants.DISTANCE_SCALE_FACTOR;
         } else if (loc != null) {
-            return body.size * 0.3f;
+            return body.size * label.labelFactor;
         } else if (Mapper.keyframes.has(entity)) {
             return label.labelMax * (float) Constants.DISTANCE_SCALE_FACTOR;
         }
