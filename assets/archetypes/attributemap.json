@@ -588,7 +588,7 @@
       }
     },
     "LocationMark": {
-      "description": "Defines attributes related to locations and location mark objects. The label color is defined in 'labelColor', and the marker color is defined in 'color'.",
+      "description": "Defines attributes related to location objects. Location objects usually mark special points on the surface of objects, like cities, craters, etc. They have a label (text) and an optoinal marker. The label color is defined in the attribute 'labelColor', and the marker color is defined in the attribute 'color'.",
       "location": {
         "description": "A 2-dimensional position [longitude, latitude] on the surface of the parent, in degrees.",
         "units": "Double[2]"

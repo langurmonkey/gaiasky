@@ -22,8 +22,13 @@ public class LocExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
         if (mustRender(base)) {
+            var loc = Mapper.loc.get(entity);
             addToRender(Mapper.render.get(entity), RenderGroup.FONT_LABEL);
-            addToRender(Mapper.render.get(entity), RenderGroup.SPRITE);
+            // Only render marker if texture is not 'none'.
+            if (!(loc.locationMarkerTexture != null
+                    && loc.locationMarkerTexture.equalsIgnoreCase("none"))) {
+                addToRender(Mapper.render.get(entity), RenderGroup.SPRITE);
+            }
         }
     }
 
