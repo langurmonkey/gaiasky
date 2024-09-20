@@ -8,21 +8,28 @@
 package gaiasky.scene.system.render.draw.sprite;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import gaiasky.GaiaSky;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.DecalUtils;
+import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3d;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SpriteEntityRenderSystem {
+    protected static final Logger.Log logger = Logger.getLogger(SpriteEntityRenderSystem.class);
+
     private final LabelView view;
 
     private final Vector3d D31 = new Vector3d();
 
-    private Sprite spriteMain;
+    private Map<String, Sprite> spriteMap;
 
     public SpriteEntityRenderSystem() {
         this.view = new LabelView();
@@ -30,9 +37,35 @@ public class SpriteEntityRenderSystem {
     }
 
     private void initSprites() {
-        Texture mainTex = new Texture(Gdx.files.internal("img/loc-marker.png"));
-        mainTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        spriteMain = new Sprite(mainTex);
+        this.spriteMap = new HashMap<>();
+
+        var spriteDefault = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-default"));
+        var spriteFlag = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-flag"));
+        var spriteCity = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-city"));
+        this.spriteMap.put("default", spriteDefault);
+        this.spriteMap.put("loc-marker-default", spriteDefault);
+        this.spriteMap.put("flag", spriteFlag);
+        this.spriteMap.put("loc-marker-flag", spriteFlag);
+        this.spriteMap.put("city", spriteCity);
+        this.spriteMap.put("loc-marker-city", spriteCity);
+    }
+
+    private Sprite getSprite(String name) {
+        if (name.equalsIgnoreCase("none")) {
+            return null;
+        }
+        var s = spriteMap.get(name);
+        if (s == null) {
+            try {
+                Texture t = new Texture(Settings.settings.data.dataFile(name));
+                t.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                s = new Sprite(t);
+                spriteMap.put(name, s);
+            } catch (Exception e) {
+                logger.error(e);
+            }
+        }
+        return s;
     }
 
     public void render(Entity entity, SpriteBatch batch, ICamera camera) {
@@ -44,18 +77,29 @@ public class SpriteEntityRenderSystem {
             Vector3d pos = D31;
             view.textPosition(camera, pos);
 
-            spriteMain.setColor(0.7f, 0.6f, 0.0f, 0.4f);
-            DecalUtils.drawSprite(spriteMain,
-                    batch,
-                    (float) pos.x,
-                    (float) pos.y,
-                    (float) pos.z,
-                    0.0001d,
-                    1f,
-                    camera,
-                    true,
-                    0.02f,
-                    0.04f);
+            var sprite = getSprite(view.loc.locationMarkerTexture);
+            if (sprite != null) {
+                var body = view.body;
+
+                float[] color = body.color != null ? body.color : body.labelColor;
+                if (color != null) {
+                    sprite.setColor(color[0], color[1], color[2], color.length > 3 ? color[3] : 0.4f);
+                } else {
+                    // Default.
+                    sprite.setColor(0.7f, 0.6f, 0.0f, 0.4f);
+                }
+                DecalUtils.drawSprite(sprite,
+                        batch,
+                        (float) pos.x,
+                        (float) pos.y,
+                        (float) pos.z,
+                        0.0001d,
+                        1f,
+                        camera,
+                        true,
+                        0.017f,
+                        0.035f);
+            }
         }
     }
 

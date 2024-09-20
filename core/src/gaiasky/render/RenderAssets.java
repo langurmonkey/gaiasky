@@ -10,6 +10,7 @@ package gaiasky.render;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.util.ShaderLoader;
@@ -30,6 +31,9 @@ import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader.Tessellat
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParameter;
 import gaiasky.util.i18n.I18n;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Loads and initializes shaders, fonts, batches and other resources used for rendering, especially
@@ -187,6 +191,7 @@ public class RenderAssets {
      * @param manager The asset manager.
      */
     public void doneLoading(AssetManager manager) {
+
         String[] names = GlobalResources.combinations(new String[]{" (ssr)", " (vel)", " (rel)", " (grav)"});
 
         /*
@@ -356,6 +361,7 @@ public class RenderAssets {
      * @param fragmentShader The fragment shader file.
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
+     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
@@ -375,6 +381,7 @@ public class RenderAssets {
      * @param fragmentShader The fragment shader file.
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
+     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
@@ -395,6 +402,7 @@ public class RenderAssets {
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
      * @param fixedPrepend   The fixed defines that must appear in all shaders, if any.
+     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,
@@ -415,6 +423,7 @@ public class RenderAssets {
      * @param names          The shader names or identifiers.
      * @param prepend        The pre-processor defines for each shader name.
      * @param fixedPrepend   The fixed defines that must appear in all shaders, if any.
+     *
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager,

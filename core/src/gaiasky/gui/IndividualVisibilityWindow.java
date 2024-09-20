@@ -55,6 +55,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         setAcceptText(I18n.msg("gui.close"));
         setModal(false);
+        setWidth(500f);
 
         // Build
         buildSuper();
@@ -70,7 +71,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         final String cct = currentComponentType;
         // Components
-        float buttonPadHor = 6f;
+        float buttonPadHor = 14f;
+        float buttonPadVert = 8f;
         int visTableCols = 7;
         Table buttonTable = new Table(skin);
         // Always one button checked
@@ -78,7 +80,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         buttonGroup.setMinCheckCount(1);
         buttonGroup.setMaxCheckCount(1);
 
-        content.add(buttonTable).top().left().padBottom(pad18).row();
+        content.add(buttonTable).top().center().padBottom(pad18).row();
         elementsCell = content.add().top().left();
 
         ComponentType[] visibilityEntities = ComponentType.values();
@@ -120,7 +122,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 if (name.equals(cct)) {
                     button.setChecked(true);
                 }
-                Cell<?> c = buttonTable.add(button);
+                Cell<?> c = buttonTable.add(button).padBottom(buttonPadVert);
                 if ((i + 1) % visTableCols == 0) {
                     buttonTable.row();
                 } else {
@@ -282,7 +284,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                         stage,
                         typeName,
                         cbs,
-                        385f,
+                        510f,
                         skin,
                         "header",
                         "expand-collapse",
@@ -359,14 +361,14 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         if (ct.equals(ComponentType.Stars)) {
             objectsGroup.addActor(new OwnLabel("", skin));
-            objectsGroup.addActor(new OwnLabel(I18n.msg("notif.visibility.stars"), skin));
+            objectsGroup.addActor(new OwnLabel(TextUtils.breakCharacters(I18n.msg("notif.visibility.stars"), 40), skin));
         }
 
         objectsGroup.pack();
     }
 
     private Group visibilitySwitcher(final ComponentType ct, final String title, final String id) {
-        float componentWidth = 400f;
+        float componentWidth = 495f;
 
         // Objects
         final VerticalGroup objectsGroup = new VerticalGroup();

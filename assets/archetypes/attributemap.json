@@ -588,7 +588,7 @@
       }
     },
     "LocationMark": {
-      "description": "Defines attributes related to locations and location mark objects.",
+      "description": "Defines attributes related to locations and location mark objects. The label color is defined in 'labelColor', and the marker color is defined in 'color'.",
       "location": {
         "description": "A 2-dimensional position [longitude, latitude] on the surface of the parent, in degrees.",
         "units": "Double[2]"
@@ -600,6 +600,13 @@
       "ignoreSolidAngleLimit": {
         "description": "Ignore the solid angle upper limit when determining the visibility of this location. Setting this to true causes the location to not disappear, regardless of the camera distance.",
         "units": "Boolean"
+      },
+      "locationMarkerTexture": {
+        "description": "Location marker texture (image). Set to 'none' to disable maker. Possible values are 'none', 'default', 'flag', 'city', or a path to a PNG image. If the path directs to a data package, the format is '$data/[package-name]/path/to/file.png'.",
+        "units": "String",
+        "aliases": [
+          "markerTexture"
+        ]
       },
       "distFactor": {
         "description": "The distance from the center of the object, in case of non-spherical parent objects. This is essentially the radius, as the locations are given in [longitude, latitude, radius]. Typically the radius is that of the object, but this parameter overrides it.",

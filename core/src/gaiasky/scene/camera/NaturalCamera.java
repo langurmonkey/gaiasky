@@ -14,7 +14,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -37,6 +36,7 @@ import gaiasky.input.GameMouseKbdListener;
 import gaiasky.input.MainGamepadListener;
 import gaiasky.input.MainMouseKbdListener;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderAssets;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -93,9 +93,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Reference to focus, backup.
      **/
     public FocusView focusBak;
-    public double[] hudScales;
-    public Color[] hudColors;
-    public float hudWidth, hudHeight;
     /**
      * Previous and aux quaternions, for focus lock.
      */
@@ -266,7 +263,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private ShapeRenderer shapeRenderer;
 
     private Sprite spriteFocus, spriteClosest, spriteHome;
-    private Texture crosshairArrow, gravWaveCrosshair;
+    private Texture crosshairArrow, crosshairGravWaves;
 
     /**
      * A reference to the main scene.
@@ -370,51 +367,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Init sprite batch for crosshair.
         spriteBatch = new SpriteBatch(50, spriteShader);
 
-        // Focus crosshair.
-        Texture crosshairFocus = new Texture(Gdx.files.internal("img/crosshair-focus.png"));
-        crosshairFocus.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        spriteFocus = new Sprite(crosshairFocus);
-
-        // Closest crosshair.
-        Texture crosshairClosest = new Texture(Gdx.files.internal("img/crosshair-closest.png"));
-        crosshairClosest.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        spriteClosest = new Sprite(crosshairClosest);
-
-        // Home crosshair.
-        Texture crosshairHome = new Texture(Gdx.files.internal("img/crosshair-home.png"));
-        crosshairHome.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        spriteHome = new Sprite(crosshairHome);
-
-        // Arrow crosshair.
-        crosshairArrow = new Texture(Gdx.files.internal("img/crosshair-arrow.png"));
-        crosshairArrow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        // Velocity vector crosshair.
-        Texture velocityCrosshair = new Texture(Gdx.files.internal("img/ai-vel.png"));
-        velocityCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        // Anti-velocity vector crosshair.
-        Texture antiVelocityCrosshair = new Texture(Gdx.files.internal("img/ai-antivel.png"));
-        antiVelocityCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        // Grav wave crosshair.
-        gravWaveCrosshair = new Texture(Gdx.files.internal("img/gravwave-pointer.png"));
-        gravWaveCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        // Speed HUD.
-        Texture sHUD = new Texture(Gdx.files.internal("img/hud-corners.png"));
-        sHUD.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        hudWidth = sHUD.getWidth();
-        hudHeight = sHUD.getHeight();
-
-        hudScales = new double[]{HUD_SCALE_MIN, HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) / 3d, HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) * 2d / 3d};
-        Sprite[] hudSprites = new Sprite[hudScales.length];
-        hudColors = new Color[]{Color.WHITE, Color.GREEN, Color.GOLD, Color.LIME, Color.PINK, Color.ORANGE, Color.CORAL, Color.CYAN, Color.FIREBRICK, Color.FOREST};
-
-        for (int i = 0; i < hudScales.length; i++) {
-            hudSprites[i] = new Sprite(sHUD);
-            hudSprites[i].setOriginCenter();
-        }
 
         // FOCUS_MODE is changed from GUI.
         EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD,
@@ -424,6 +376,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 Event.FREE_MODE_COORD_CMD, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD,
                 Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO,
                 Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
+    }
+
+    @Override
+    public void doneLoading(AssetManager manager) {
+        var globalResources = GaiaSky.instance.getGlobalResources();
+        spriteFocus = new Sprite(globalResources.getTexture("crosshair-focus"));
+        spriteClosest = new Sprite(globalResources.getTexture("crosshair-closest"));
+        spriteHome = new Sprite(globalResources.getTexture("crosshair-home"));
+        crosshairArrow = globalResources.getTexture("crosshair-arrow");
+        crosshairGravWaves = globalResources.getTexture("crosshair-arrow");
     }
 
     /**
@@ -1849,8 +1811,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (Settings.settings.runtime.gravitationalWaves) {
             RelativisticEffectsManager gw = RelativisticEffectsManager.getInstance();
 
-            float chw = gravWaveCrosshair.getWidth();
-            float chh = gravWaveCrosshair.getHeight();
+            float chw = crosshairGravWaves.getWidth();
+            float chh = crosshairGravWaves.getHeight();
             float chw2 = chw / 2;
             float chh2 = chh / 2;
 
@@ -1864,7 +1826,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (inside) {
                 // Cyan
                 spriteBatch.setColor(0, 1, 1, 1);
-                spriteBatch.draw(gravWaveCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
+                spriteBatch.draw(crosshairGravWaves, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
             }
         }
 

@@ -39,7 +39,6 @@ import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 public class LabelEntityRenderSystem {
 
@@ -64,6 +63,14 @@ public class LabelEntityRenderSystem {
 
         // Parent scaffolding.
         var scaffolding = Mapper.modelScaffolding.get(graph.parent);
+
+        float[] color = body.labelColor != null ? body.labelColor : body.color;
+        if (color != null) {
+            batch.setColor(color[0], color[1], color[2], color.length > 3 ? color[3] : 0.6f);
+        } else {
+            // Default.
+            batch.setColor(1f, 1f, 1f, 0.6f);
+        }
 
         Vector3d labelPosition = D31;
         view.textPosition(camera, labelPosition);

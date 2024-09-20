@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
@@ -20,6 +21,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.input.SpacecraftGamepadListener;
 import gaiasky.input.SpacecraftMouseKbdListener;
+import gaiasky.render.RenderAssets;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;
@@ -129,6 +131,10 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         // FOCUS_MODE is changed from GUI
         EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.SPACECRAFT_LOADED, Event.SPACECRAFT_MACHINE_SELECTION_INFO);
+    }
+
+    @Override
+    public void doneLoading(AssetManager manager) {
     }
 
     public Entity getSpacecraft() {

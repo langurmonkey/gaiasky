@@ -115,7 +115,8 @@ public class RelativisticEffectsManager implements IObserver {
      * This must be called every cycle, it updates
      * the needed parameters for the gravitational waves
      *
-     * @param time
+     * @param time The time.
+     * @param camera The camera.
      */
     public void update(ITimeFrameProvider time, ICamera camera) {
         /*

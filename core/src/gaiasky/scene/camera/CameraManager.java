@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.RenderAssets;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
@@ -86,6 +87,12 @@ public class CameraManager implements ICamera, IObserver {
         updateCurrentCamera();
 
         EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.FOV_CHANGED_CMD);
+    }
+
+    public void doneLoading(AssetManager manager) {
+        for (var cam : cameras) {
+            cam.doneLoading(manager);
+        }
     }
 
     /**

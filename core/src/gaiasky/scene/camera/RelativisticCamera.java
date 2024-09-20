@@ -43,6 +43,10 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
+    public void doneLoading(AssetManager manager) {
+    }
+
+    @Override
     public PerspectiveCamera getCamera() {
         return camera;
     }

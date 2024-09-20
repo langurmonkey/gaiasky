@@ -740,6 +740,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         final var settings = Settings.settings;
         // Get assets.
         final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
+        // Global resources.
+        globalResources.doneLoading(assetManager);
 
         windowCreated = true;
         // Dispose of welcome and loading GUIs.
@@ -793,6 +795,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
         sceneRenderer.doneLoading(assetManager);
         sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) FastMath.round(graphics.getWidth() * settings.graphics.backBufferScale),
                 (int) FastMath.round(graphics.getHeight() * settings.graphics.backBufferScale));
+
+        // Camera.
+        cameraManager.doneLoading(assetManager);
 
         // Set up entities.
         scene.setUpEntities();

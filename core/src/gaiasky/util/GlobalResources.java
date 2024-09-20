@@ -9,7 +9,9 @@ package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -64,6 +66,8 @@ public class GlobalResources {
      * Scientific format.
      */
     public static final DecimalFormat nfSci;
+    /** Textures. **/
+    private Map<String, Texture> textures;
 
     static {
         nf = new DecimalFormat("#########.###");
@@ -93,6 +97,53 @@ public class GlobalResources {
         this.extSpriteBatch = new ExtSpriteBatch(1000, getExtSpriteShader());
 
         updateSkin();
+
+        /* TEXTURES */
+        textures = new HashMap<>();
+        TextureLoader.TextureParameter params = new TextureLoader.TextureParameter();
+        params.minFilter = TextureFilter.Linear;
+        params.magFilter = TextureFilter.Linear;
+        manager.load("img/markers/crosshair-focus.png", Texture.class, params);
+        manager.load("img/markers/crosshair-closest.png", Texture.class, params);
+        manager.load("img/markers/crosshair-home.png", Texture.class, params);
+        manager.load("img/markers/crosshair-arrow.png", Texture.class, params);
+        manager.load("img/markers/ai-pointer.png", Texture.class, params);
+        manager.load("img/markers/ai-vel.png", Texture.class, params);
+        manager.load("img/markers/ai-antivel.png", Texture.class, params);
+        manager.load("img/markers/gravwave-pointer.png", Texture.class, params);
+        manager.load("img/markers/loc-marker-default.png", Texture.class, params);
+        manager.load("img/markers/loc-marker-flag.png", Texture.class, params);
+        manager.load("img/markers/loc-marker-city.png", Texture.class, params);
+        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class, params);
+    }
+
+    public void doneLoading(AssetManager manager) {
+
+        /* Textures */
+        textures.put("crosshair-focus", manager.get("img/markers/crosshair-focus.png"));
+        textures.put("crosshair-closest", manager.get("img/markers/crosshair-closest.png"));
+        textures.put("crosshair-home", manager.get("img/markers/crosshair-home.png"));
+        textures.put("crosshair-arrow", manager.get("img/markers/crosshair-arrow.png"));
+        textures.put("ai-pointer", manager.get("img/markers/ai-pointer.png"));
+        textures.put("ai-vel", manager.get("img/markers/ai-vel.png"));
+        textures.put("ai-antivel", manager.get("img/markers/ai-antivel.png"));
+        textures.put("gravwave-pointer", manager.get("img/markers/gravwave-pointer.png"));
+        textures.put("loc-marker-default", manager.get("img/markers/loc-marker-default.png"));
+        textures.put("loc-marker-flag", manager.get("img/markers/loc-marker-flag.png"));
+        textures.put("loc-marker-city", manager.get("img/markers/loc-marker-city.png"));
+        textures.put("attitude-indicator", manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class));
+
+    }
+
+    /**
+     * Gets a texture from the map by name.
+     *
+     * @param name The texture name.
+     *
+     * @return The texture.
+     */
+    public Texture getTexture(String name) {
+        return textures != null ? textures.get(name) : null;
     }
 
     /**
@@ -100,6 +151,7 @@ public class GlobalResources {
      * regular numbers elsewhere.
      *
      * @param number The number to format.
+     *
      * @return The string representation.
      */
     public static String formatNumber(double number) {
@@ -115,6 +167,7 @@ public class GlobalResources {
      *
      * @param d  Distance in internal units.
      * @param du The distance units to use.
+     *
      * @return An array containing the float number and the string units.
      */
     public static Pair<Double, String> doubleToDistanceString(double d, DistanceUnits du) {
@@ -141,6 +194,7 @@ public class GlobalResources {
      *
      * @param d  Velocity in internal units per second.
      * @param du The distance units to use.
+     *
      * @return Array containing the number and the units.
      */
     public static Pair<Double, String> doubleToVelocityString(double d, DistanceUnits du) {
@@ -154,6 +208,7 @@ public class GlobalResources {
      * its numbers
      *
      * @param array The array of doubles
+     *
      * @return The array of floats
      */
     public static float[] toFloatArray(double[] array) {
@@ -173,6 +228,7 @@ public class GlobalResources {
      * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
+     *
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3b point, double len, float coneAngle, Vector3d dir) {
@@ -189,6 +245,7 @@ public class GlobalResources {
      * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
+     *
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
@@ -201,6 +258,7 @@ public class GlobalResources {
      * @param buf       Buffer to compare against
      * @param compareTo Buffer to compare to (content should be ASCII lowercase if
      *                  possible)
+     *
      * @return True if the buffers compare favourably, false otherwise
      */
     public static boolean equal(String buf, char[] compareTo, boolean ignoreCase) {
@@ -275,6 +333,7 @@ public class GlobalResources {
      * {@link Constants#getPartFileMaxAgeMs()}.
      *
      * @param path the path to delete.
+     *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static void deleteRecursively(Path path) throws IOException {
@@ -303,6 +362,7 @@ public class GlobalResources {
      *
      * @param s       The string
      * @param endings The endings
+     *
      * @return True if the string ends with any of the endings
      */
     public static boolean endsWith(String s, String[] endings) {
@@ -368,6 +428,7 @@ public class GlobalResources {
      *
      * @param bytes The bytes
      * @param si    Whether to use SI units (1000-multiples) or binary (1024-multiples)
+     *
      * @return The size in a human-readable form
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
@@ -425,6 +486,7 @@ public class GlobalResources {
      * str = '"a" "bc" "d" "efghi"'
      *
      * @param str The string
+     *
      * @return The resulting array
      */
     public static String[] parseWhitespaceSeparatedList(String str) {
@@ -460,6 +522,7 @@ public class GlobalResources {
      * @param l         The list
      * @param quote     The quote string to use
      * @param separator The separator
+     *
      * @return The resulting string
      */
     public static String toString(String[] l, String quote, String separator) {
@@ -601,6 +664,7 @@ public class GlobalResources {
      * Generates all combinations of all sizes of all the strings given in values.
      *
      * @param values The input strings to combine.
+     *
      * @return The resulting combinations.
      */
     public static String[] combinations(String[] values) {

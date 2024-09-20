@@ -43,7 +43,10 @@ public class LocInitializer extends AbstractInitSystem {
         label.renderFunction = LabelView::renderTextLocation;
         label.labelPosition = new Vector3b();
 
-        body.color = new float[]{1f, 1f, 1f, 1f};
+        if (body.color == null) {
+            // Default maker color.
+            body.color = new float[]{0.7f, 0.6f, 0.0f, 0.4f};
+        }
         body.size *= (float) Constants.KM_TO_U;
 
         loc.location3d = new Vector3();

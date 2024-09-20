@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.component.MotorEngine;
@@ -135,11 +136,6 @@ public class SpacecraftGui extends AbstractGui {
         db = new DecalBatch(4, new CameraGroupStrategy(aiCam));
         mb = new IntModelBatch();
 
-        assetManager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class);
-        assetManager.load("img/ai-pointer.png", Texture.class);
-        assetManager.load("img/ai-vel.png", Texture.class);
-        assetManager.load("img/ai-antivel.png", Texture.class);
-
         EventManager.instance.subscribe(this, gaiasky.event.Event.SPACECRAFT_LOADED);
     }
 
@@ -147,15 +143,12 @@ public class SpacecraftGui extends AbstractGui {
      * Constructs the interface
      */
     public void doneLoading(AssetManager assetManager) {
-        Texture aiTexture = assetManager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class);
-        aiTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        aiPointerTexture = assetManager.get("img/ai-pointer.png", Texture.class);
-        aiPointerTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        var globalResources = GaiaSky.instance.getGlobalResources();
+        Texture aiTexture = globalResources.getTexture("attitude-indicator");
+        aiPointerTexture = globalResources.getTexture("ai-pointer");
 
-        Texture aiVelTex = assetManager.get("img/ai-vel.png", Texture.class);
-        aiVelTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture aiAntivelTex = assetManager.get("img/ai-antivel.png", Texture.class);
-        aiAntivelTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        Texture aiVelTex = globalResources.getTexture("ai-vel");
+        Texture aiAntivelTex = globalResources.getTexture("ai-antivel");
 
         aiVelDec = Decal.newDecal(new TextureRegion(aiVelTex));
         aiAntivelDec = Decal.newDecal(new TextureRegion(aiAntivelTex));

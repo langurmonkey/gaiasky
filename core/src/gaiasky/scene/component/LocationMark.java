@@ -29,6 +29,12 @@ public class LocationMark implements Component {
     public String locationType = null;
 
     /**
+     * Location marker texture. Set to 'none' to disable maker.
+     * Possible values are 'none', 'default', 'flag', 'city', or a path to a PNG image.
+     */
+    public String locationMarkerTexture = "default";
+
+    /**
      * Longitude and latitude
      **/
     public Vector2 location;
@@ -61,6 +67,14 @@ public class LocationMark implements Component {
 
     public void setLocationType(String type) {
         this.locationType = type.strip();
+    }
+
+    public void setLocationMarkerTexture(String tex) {
+        this.locationMarkerTexture = tex;
+    }
+
+    public void setMarkerTexture(String tex) {
+        this.setLocationMarkerTexture(tex);
     }
 
     public void setIgnoreSolidAngleLimit(boolean ignoreSolidAngleLimit) {

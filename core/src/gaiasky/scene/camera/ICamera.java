@@ -8,9 +8,11 @@
 package gaiasky.scene.camera;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.render.RenderAssets;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.math.Vector3b;
@@ -18,6 +20,13 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public interface ICamera {
+
+    /**
+     * Loading is finished, gather resources.
+     *
+     * @param manager The asset manager.
+     */
+    void doneLoading(AssetManager manager);
 
     /**
      * Returns the perspective camera.
@@ -152,6 +161,7 @@ public interface ICamera {
      * Checks if the given entity is the current focus.
      *
      * @param entity The entity.
+     *
      * @return Whether the entity is focus.
      */
     boolean isFocus(Entity entity);
