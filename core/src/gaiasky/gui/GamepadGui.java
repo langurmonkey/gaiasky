@@ -277,19 +277,19 @@ public class GamepadGui extends AbstractGui {
 
         infoMessage = new OwnLabel("", skin, "default-blue");
         infoCell = searchT.add();
-        infoCell.colspan(10).padBottom(pad20).row();
+        infoCell.colspan(11).padBottom(pad20).row();
 
-        // First row
-        addTextKey("Q", searchModel, 0, 0, false);
-        addTextKey("W", searchModel, 1, 0, false);
-        addTextKey("E", searchModel, 2, 0, false);
-        addTextKey("R", searchModel, 3, 0, false);
-        addTextKey("T", searchModel, 4, 0, false);
-        addTextKey("Y", searchModel, 5, 0, false);
-        addTextKey("U", searchModel, 6, 0, false);
-        addTextKey("I", searchModel, 7, 0, false);
-        addTextKey("O", searchModel, 8, 0, false);
-        addTextKey("P", searchModel, 9, 0, false);
+        // Numbers row
+        addTextKey("1", searchModel, 0, 0, false);
+        addTextKey("2", searchModel, 1, 0, false);
+        addTextKey("3", searchModel, 2, 0, false);
+        addTextKey("4", searchModel, 3, 0, false);
+        addTextKey("5", searchModel, 4, 0, false);
+        addTextKey("6", searchModel, 5, 0, false);
+        addTextKey("7", searchModel, 6, 0, false);
+        addTextKey("8", searchModel, 7, 0, false);
+        addTextKey("9", searchModel, 8, 0, false);
+        addTextKey("0", searchModel, 9, 0, false);
         addTextKey("<--", (event) -> {
             if (event instanceof ChangeEvent) {
                 if (!searchField.getText().isBlank()) {
@@ -298,39 +298,44 @@ public class GamepadGui extends AbstractGui {
             }
             return false;
         }, searchModel, 10, 0, true, tfw / 1.5f, 0);
+
+        // First row
+        addTextKey("Q", searchModel, 0, 1, false);
+        addTextKey("W", searchModel, 1, 1, false);
+        addTextKey("E", searchModel, 2, 1, false);
+        addTextKey("R", searchModel, 3, 1, false);
+        addTextKey("T", searchModel, 4, 1, false);
+        addTextKey("Y", searchModel, 5, 1, false);
+        addTextKey("U", searchModel, 6, 1, false);
+        addTextKey("I", searchModel, 7, 1, false);
+        addTextKey("O", searchModel, 8, 1, false);
+        addTextKey("P", searchModel, 9, 1, true);
+
         // Second row
-        searchT.add().padRight(pad5).padBottom(pad10);
-        addTextKey("A", searchModel, 1, 1, false);
-        addTextKey("S", searchModel, 2, 1, false);
-        addTextKey("D", searchModel, 3, 1, false);
-        addTextKey("F", searchModel, 4, 1, false);
-        addTextKey("G", searchModel, 5, 1, false);
-        addTextKey("H", searchModel, 6, 1, false);
-        addTextKey("J", searchModel, 7, 1, false);
-        addTextKey("K", searchModel, 8, 1, false);
-        addTextKey("L", searchModel, 9, 1, false);
-        addTextKey("Clear", (event) -> {
-            if (event instanceof ChangeEvent) {
-                if (!searchField.getText().isBlank()) {
-                    searchField.setText("");
-                }
-            }
-            return false;
-        }, searchModel, 10, 1, true, tfw / 1.5f, 0);
+        addTextKey("A", searchModel, 0, 2, false);
+        addTextKey("S", searchModel, 1, 2, false);
+        addTextKey("D", searchModel, 2, 2, false);
+        addTextKey("F", searchModel, 3, 2, false);
+        addTextKey("G", searchModel, 4, 2, false);
+        addTextKey("H", searchModel, 5, 2, false);
+        addTextKey("J", searchModel, 6, 2, false);
+        addTextKey("K", searchModel, 7, 2, false);
+        addTextKey("L", searchModel, 8, 2, false);
+        addTextKey("'", searchModel, 9, 2, true);
+
         // Third row
-        searchT.add().padRight(pad5).padBottom(pad10);
-        searchT.add().padRight(pad5).padBottom(pad10);
-        addTextKey("Z", searchModel, 2, 2, false);
-        addTextKey("X", searchModel, 3, 2, false);
-        addTextKey("C", searchModel, 4, 2, false);
-        addTextKey("V", searchModel, 5, 2, false);
-        addTextKey("B", searchModel, 6, 2, false);
-        addTextKey("N", searchModel, 7, 2, false);
-        addTextKey("M", searchModel, 8, 2, false);
-        addTextKey("-", searchModel, 9, 2, true);
+        addTextKey("Z", searchModel, 0, 3, false);
+        addTextKey("X", searchModel, 1, 3, false);
+        addTextKey("C", searchModel, 2, 3, false);
+        addTextKey("V", searchModel, 3, 3, false);
+        addTextKey("B", searchModel, 4, 3, false);
+        addTextKey("N", searchModel, 5, 3, false);
+        addTextKey("M", searchModel, 6, 3, false);
+        addTextKey(".", searchModel, 7, 3, false);
+        addTextKey(",", searchModel, 8, 3, false);
+        addTextKey("-", searchModel, 9, 3, true);
 
         // Fourth row
-        searchT.add().padRight(pad5).padBottom(pad10);
         searchT.add().padRight(pad5).padBottom(pad10);
         searchT.add().padRight(pad5).padBottom(pad10);
         addTextKey("SPACE", (event) -> {
@@ -338,7 +343,15 @@ public class GamepadGui extends AbstractGui {
                 searchField.setText(searchField.getText() + " ");
             }
             return false;
-        }, searchModel, 5, 3, false, tfw * 2f, 6);
+        }, searchModel, 7, 4, false, tfw * 2f, 6);
+        addTextKey("Clear", (event) -> {
+            if (event instanceof ChangeEvent) {
+                if (!searchField.getText().isBlank()) {
+                    searchField.setText("");
+                }
+            }
+            return false;
+        }, searchModel, 8, 4, false, tfw / 1.5f, 3);
 
         tabContents.add(container(searchT, tw1, th));
         updatePads(searchT);
@@ -1348,11 +1361,14 @@ public class GamepadGui extends AbstractGui {
 
     private void addTextKey(String text, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, int colspan) {
         OwnTextButton key = new OwnTextButton(text, skin, "big");
-        if (width > 0)
+        if (width > 0) {
             key.setWidth(width);
+        } else {
+            key.setMinWidth(70f);
+        }
         key.addListener(el);
         m[i][j] = key;
-        var c = searchT.add(key).padRight(pad5).padBottom(pad10);
+        var c = searchT.add(key).left().padRight(pad5).padBottom(pad10);
         if (nl)
             c.row();
         if (colspan > 1)
