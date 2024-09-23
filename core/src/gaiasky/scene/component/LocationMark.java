@@ -44,7 +44,7 @@ public class LocationMark implements Component {
     public Vector3 location3d;
     /**
      * This controls the distance from the center in case of non-spherical
-     * objects
+     * objects.
      **/
     public float distFactor = 1f;
 

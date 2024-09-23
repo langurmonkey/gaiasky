@@ -588,7 +588,7 @@
       }
     },
     "LocationMark": {
-      "description": "Defines attributes related to location objects. Location objects usually mark special points on the surface of objects, like cities, craters, etc. They have a label (text) and an optoinal marker. The label color is defined in the attribute 'labelColor', and the marker color is defined in the attribute 'color'.",
+      "description": "Defines attributes related to location objects. Location objects usually mark special points on the surface of objects, like cities, craters, etc. They have a label (text) and an optoinal marker. The label color is defined in the attribute 'labelColor', and the marker color is defined in the attribute 'color'. See :ref:`locations` for more information.",
       "location": {
         "description": "A 2-dimensional position [longitude, latitude] on the surface of the parent, in degrees.",
         "units": "Double[2]"
@@ -609,7 +609,7 @@
         ]
       },
       "distFactor": {
-        "description": "The distance from the center of the object, in case of non-spherical parent objects. This is essentially the radius, as the locations are given in [longitude, latitude, radius]. Typically the radius is that of the object, but this parameter overrides it.",
+        "description": "Factor to apply to the radius of the parent object to get distance from the center of the object, in case of non-spherical parent objects. This modulates the distance of the location from the center of the object (radius), as the locations are given in [longitude, latitude, radius]. If this is not specified, the radius is that of the parent object. If you want the location to show at double the radius distance, use 2.0.",
         "units": "Double"
       }
     },
