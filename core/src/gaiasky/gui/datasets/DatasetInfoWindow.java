@@ -9,7 +9,7 @@ package gaiasky.gui.datasets;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.gui.GenericDialog;
+import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;

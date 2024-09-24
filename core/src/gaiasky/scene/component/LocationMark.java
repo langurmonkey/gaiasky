@@ -18,9 +18,14 @@ public class LocationMark implements Component {
     public static final float UPPER_LIMIT = 4.5e-3f;
 
     /**
-     * The display name
+     * The display name.
      **/
     public String displayName;
+
+    /**
+     * Description, which shows up in a tooltip when the mouse cursor hovers over the location marker.
+     */
+    public String tooltipText;
 
     /**
      * Additional categorization of locations. This is used only in the UI so that all locations in the same category can be turned on and off at
@@ -79,5 +84,9 @@ public class LocationMark implements Component {
 
     public void setIgnoreSolidAngleLimit(boolean ignoreSolidAngleLimit) {
         this.ignoreSolidAngleLimit = ignoreSolidAngleLimit;
+    }
+
+    public void setTooltipText(String tooltip) {
+        this.tooltipText = tooltip;
     }
 }

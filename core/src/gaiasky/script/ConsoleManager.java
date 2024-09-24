@@ -9,6 +9,7 @@ package gaiasky.script;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.gui.iface.ConsoleInterface;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 /**
  * Manages the Gaia Sky console/terminal, keeps its history and more. The console accepts all calls defined in {@link IScriptingInterface}. Aliases to the
  * most useful calls are defined in {@link ConsoleManager#shortcutMap}, and can be used as shortcuts.
- * The user interface part of the console in implemented in {@link gaiasky.gui.ConsoleInterface}.
+ * The user interface part of the console in implemented in {@link ConsoleInterface}.
  */
 public class ConsoleManager {
 

@@ -11,7 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.gui.ConsoleLogger;
+import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;

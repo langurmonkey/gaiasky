@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.gui.GenericDialog;
+import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;

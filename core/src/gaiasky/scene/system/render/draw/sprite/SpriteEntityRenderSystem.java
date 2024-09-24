@@ -8,9 +8,14 @@
 package gaiasky.scene.system.render.draw.sprite;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.DecalUtils;
@@ -68,6 +73,9 @@ public class SpriteEntityRenderSystem {
         return s;
     }
 
+
+    Vector3 F31 = new Vector3();
+
     public void render(Entity entity, SpriteBatch batch, ICamera camera) {
         view.setEntity(entity);
 
@@ -99,6 +107,22 @@ public class SpriteEntityRenderSystem {
                         true,
                         0.017f,
                         0.035f);
+
+                // Check mouse collision.
+                var loc = Mapper.loc.get(entity);
+                if (loc != null && loc.tooltipText != null) {
+                    pos.put(F31);
+                    camera.getCamera().project(F31);
+                    var x = Gdx.input.getX();
+                    var y_o = Gdx.input.getY();
+                    var y = Gdx.graphics.getHeight() - y_o;
+
+                    var s = 8;
+                    if (x > F31.x - s && x < F31.x + s && y > F31.y - s && y < F31.y + s) {
+                        // Collision!
+                        EventManager.publish(Event.LOCATION_HOVER_INFO, this, x, y_o, view.text(), loc.tooltipText);
+                    }
+                }
             }
         }
     }

@@ -17,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
-import gaiasky.gui.BookmarksManager;
+import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.render.MainPostProcessor;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;

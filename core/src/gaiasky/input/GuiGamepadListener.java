@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.TimeUtils;
-import gaiasky.gui.IGamepadMappings;
+import gaiasky.gui.api.IGamepadMappings;
 import gaiasky.util.GuiUtils;
 
 /**

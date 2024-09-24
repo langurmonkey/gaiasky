@@ -14,7 +14,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop.CLIArgs;
-import gaiasky.gui.IInputListener;
+import gaiasky.gui.api.IInputListener;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

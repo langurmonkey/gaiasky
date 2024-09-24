@@ -51,7 +51,7 @@ public class LocInitializer extends AbstractInitSystem {
 
         loc.location3d = new Vector3();
         loc.sizeKm = (float) (body.size * Constants.U_TO_KM);
-        loc.displayName = "˟ " + base.getLocalizedName();
+        loc.displayName = "  " + base.getLocalizedName();
     }
 
     @Override

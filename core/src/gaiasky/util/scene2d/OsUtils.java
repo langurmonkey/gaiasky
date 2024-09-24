@@ -10,7 +10,7 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import gaiasky.gui.GSKeys;
+import gaiasky.gui.main.GSKeys;
 
 public class OsUtils {
     private static final String OS = System.getProperty("os.name", "").toLowerCase();

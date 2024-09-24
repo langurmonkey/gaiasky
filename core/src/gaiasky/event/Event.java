@@ -1488,6 +1488,12 @@ public enum Event {
     CONSTELLATION_UPDATE_CMD,
 
     /**
+     * Informs that the mouse is hovering over the given location.
+     * Contains the coordinates [x, y], the name of the location and its description.
+     */
+    LOCATION_HOVER_INFO,
+
+    /**
      * Informs of the material generation, contains a boolean (start, finish)
      */
     PROCEDURAL_GENERATION_SURFACE_INFO,

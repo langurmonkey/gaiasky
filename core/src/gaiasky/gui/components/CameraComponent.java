@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.KeyBindings;
+import gaiasky.gui.main.KeyBindings;
 import gaiasky.gui.beans.CameraComboBoxBean;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.camera.CameraManager.CameraMode;

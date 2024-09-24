@@ -12,7 +12,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import gaiasky.gui.ConsoleLogger;
+import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;

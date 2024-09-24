@@ -20,7 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
-import gaiasky.gui.GSKeys;
+import gaiasky.gui.main.GSKeys;
 
 public class MenuItem extends Button {
     private static final Vector2 tmpVector = new Vector2();

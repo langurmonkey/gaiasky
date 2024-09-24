@@ -14,7 +14,7 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.api.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.gui.ConsoleLogger;
+import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Trajectory;

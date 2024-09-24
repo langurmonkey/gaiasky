@@ -15,7 +15,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.KeyBindings;
+import gaiasky.gui.main.KeyBindings;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;

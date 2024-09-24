@@ -23,7 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.gui.IGui;
+import gaiasky.gui.api.IGui;
 import gaiasky.render.ComponentTypes;
 import gaiasky.util.Bits;
 import gaiasky.util.Logger;

@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.gui.GenericDialog;
+import gaiasky.gui.window.GenericDialog;
 import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.gui.beans.StringIndexComobBoxBean;
 import gaiasky.gui.beans.TransformComboBoxBean;

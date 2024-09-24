@@ -31,7 +31,7 @@ import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.gui.GenericDialog;
+import gaiasky.gui.window.GenericDialog;
 import gaiasky.input.WindowGamepadListener;
 import gaiasky.input.WindowKbdListener;
 import gaiasky.util.*;

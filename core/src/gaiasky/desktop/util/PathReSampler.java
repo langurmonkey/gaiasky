@@ -12,7 +12,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.util.OrbitDataLoader;
-import gaiasky.gui.ConsoleLogger;
+import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;

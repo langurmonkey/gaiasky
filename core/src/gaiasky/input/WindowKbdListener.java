@@ -9,7 +9,7 @@ package gaiasky.input;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.gui.GenericDialog;
+import gaiasky.gui.window.GenericDialog;
 
 public class WindowKbdListener extends GuiKbdListener {
 

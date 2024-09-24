@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.gui.WelcomeGui;
+import gaiasky.gui.main.WelcomeGui;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.view.FocusView;
