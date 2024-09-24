@@ -14,7 +14,9 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.component.LocationMark;
 import gaiasky.util.TextUtils;
+import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 
 /**
@@ -61,31 +63,36 @@ public class LocationInfoInterface extends TableGuiInterface implements IObserve
         if (event == Event.LOCATION_HOVER_INFO) {
             var x = (Integer) data[0];
             var y = (Integer) data[1];
-            var loc = (String) data[2];
-            var description = (String) data[3];
+            var loc = (LocationMark) data[2];
             if (currentLocation != null) {
                 if (!loc.equals(currentLocation)) {
                     // Remove current, create.
                     content.clear();
                     clear();
-                    addLocationDialog(x, y, loc, description);
+                    addLocationDialog(x, y, loc);
                 }
             } else {
                 // Create loc.
-                addLocationDialog(x, y, loc, description);
+                addLocationDialog(x, y, loc);
             }
 
             lastUpdateTime = GaiaSky.instance.getRunTimeSeconds();
         }
     }
 
-    private void addLocationDialog(int x, int y, String name, String description) {
+    private void addLocationDialog(int x, int y, LocationMark loc) {
+        var description = loc.tooltipText;
         description = TextUtils.breakCharacters(description, 50);
-        content.add(new OwnLabel(name, skin, "header-s")).left().padBottom(12f).row();
-        content.add(new OwnLabel(description, skin)).left().padBottom(12f).row();
+        content.add(new OwnLabel(loc.displayName, skin, "header-s")).left().padBottom(12f).row();
+        if (description != null) {
+            content.add(new OwnLabel(description, skin)).left().padBottom(12f).row();
+        }
+        if (loc.link != null) {
+            content.add(new Link(TextUtils.capString(loc.link, 50), skin, loc.link)).left();
+        }
         content.pack();
         add(content).bottom().center();
-        currentLocation = name;
+        currentLocation = loc.displayName;
 
         // Position fake toolkit.
         var v = new Vector2(x, y);

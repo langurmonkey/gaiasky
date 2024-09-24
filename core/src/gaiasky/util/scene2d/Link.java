@@ -45,9 +45,9 @@ public class Link extends Label {
         initialize();
     }
 
-    public Link(CharSequence text, Skin skin, String linkto) {
+    public Link(CharSequence text, Skin skin, String linkTo) {
         super(text, skin, "link");
-        this.linkURL = linkto;
+        this.linkURL = linkTo;
         initialize();
     }
 

@@ -120,7 +120,7 @@ public class SpriteEntityRenderSystem {
                     var s = 8;
                     if (x > F31.x - s && x < F31.x + s && y > F31.y - s && y < F31.y + s) {
                         // Collision!
-                        EventManager.publish(Event.LOCATION_HOVER_INFO, this, x, y_o, view.text(), loc.tooltipText);
+                        EventManager.publish(Event.LOCATION_HOVER_INFO, this, x, y_o, loc);
                     }
                 }
             }

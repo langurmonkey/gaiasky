@@ -597,6 +597,10 @@
         "description": "Descriptive text to display as a tooltip when the mouse hovers over the location mark. Only locations with markers display tooltips.",
         "units": "String"
       },
+      "link": {
+        "description": "A link (URL) to an external resource, preferrably Wikipedia, with more information about this location.",
+        "units": "String"
+      },
       "locationType": {
         "description": "Additional categorization of locations. This is used only in the UI so that all locations in the same category can be turned on and off at the same time with a single click.",
         "units": "String"

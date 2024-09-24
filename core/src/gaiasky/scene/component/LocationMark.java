@@ -28,6 +28,11 @@ public class LocationMark implements Component {
     public String tooltipText;
 
     /**
+     * A link (URL) to an external resource, displayed in the tooltip if present.
+     */
+    public String link;
+
+    /**
      * Additional categorization of locations. This is used only in the UI so that all locations in the same category can be turned on and off at
      * the same time with a single click.
      */
