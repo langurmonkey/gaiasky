@@ -2222,11 +2222,25 @@ public interface IScriptingInterface {
     float[] getPositionAndSizeGui(String name);
 
     /**
+     * Returns a string with the version number, build string, system, builder and build time.
+     *
+     * @return A string with the full version information.
+     */
+    String getVersion();
+
+    /**
      * Returns the version number string.
      *
      * @return The version number string.
      */
     String getVersionNumber();
+
+    /**
+     * Returns the build string.
+     *
+     * @return The build string.
+     */
+    String getBuildString();
 
     /**
      * Blocks the script until the focus is the object indicated by the name.

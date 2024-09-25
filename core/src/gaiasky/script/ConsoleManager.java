@@ -147,7 +147,7 @@ public class ConsoleManager {
         shortcutMap.put("camup", "getCameraUp");
 
         shortcutMap.put("screenshot", "saveScreenshot");
-        shortcutMap.put("version", "getVersionNumber");
+        shortcutMap.put("version", "getVersion");
         shortcutMap.put("log", "log");
         shortcutMap.put("print", "print");
 

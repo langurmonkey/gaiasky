@@ -2597,8 +2597,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public String getVersion() {
+        return Settings.settings.version.version +
+                '\n' +
+                Settings.settings.version.build +
+                '\n' +
+                Settings.settings.version.system +
+                '\n' +
+                Settings.settings.version.builder +
+                '\n' +
+                Settings.settings.version.buildTime;
+    }
+
+    @Override
     public String getVersionNumber() {
         return Settings.settings.version.version;
+    }
+
+    @Override
+    public String getBuildString() {
+        return Settings.settings.version.build;
     }
 
     @Override

@@ -226,9 +226,11 @@ public class ConsoleInterface extends TableGuiInterface {
     private final Vector2 vec2 = new Vector2();
 
     private void addOutput(String messageText, final MsgType type) {
-        ConsoleManager.Message msg = new ConsoleManager.Message(messageText, type, Instant.now());
-        addMessageWidget(msg);
-        manager.messages().add(msg);
+        if (messageText != null) {
+            ConsoleManager.Message msg = new ConsoleManager.Message(messageText, type, Instant.now());
+            addMessageWidget(msg);
+            manager.messages().add(msg);
+        }
     }
 
     private void addMessageWidget(Message msg) {
@@ -340,13 +342,19 @@ public class ConsoleInterface extends TableGuiInterface {
         StringBuilder sb = new StringBuilder("  " + green + m.getName() + reset);
         var params = m.getParameters();
         for (var p : params) {
+            var c = p.getType();
+            if(!c.isPrimitive()
+                && !c.isArray()
+                && !c.equals(String.class)){
+                // Unsupported parameter type (not a primitive, array or string).
+                return null;
+            }
             sb.append(" ")
                     .append(p.getName())
-                    .append("[")
+                    .append(":")
                     .append(yellow)
-                    .append(p.getType().getSimpleName())
-                    .append(reset)
-                    .append("]");
+                    .append(c.getSimpleName())
+                    .append(reset);
         }
         return sb.toString();
     }
@@ -398,6 +406,10 @@ public class ConsoleInterface extends TableGuiInterface {
                 default -> curr.append(c);
             }
         }
+        // Add final parameter if needed.
+        if (!curr.isEmpty()) {
+            list.add(curr.toString());
+        }
         String[] arr = new String[list.size()];
         return list.toArray(arr);
     }
@@ -427,19 +439,50 @@ public class ConsoleInterface extends TableGuiInterface {
 
         // Process command.
         if ("help".equals(command)) {
-            addOutputOk(command);
-            addOutputInfo("List of available " + blue + "API calls" + reset + ":");
+            if (numParams == 0) {
+                addOutputOk(command);
+                addOutputInfo(blue + I18n.msg("gui.console.api") + reset + ":");
+                manager.methodMap()
+                        .keySet()
+                        .stream()
+                        .sorted()
+                        .forEach(a -> {
+                            var b = manager.methodMap().get(a);
+                            b.forEach(m -> addOutputInfo(processMethod(m)));
+                        });
 
-            manager.methodMap().keySet().stream().sorted().forEach(a -> {
-                var b = manager.methodMap().get(a);
-                b.forEach(m -> addOutputInfo(processMethod(m)));
-            });
-            addOutputInfo("");
-            addOutputInfo("List of available " + blue + "shortcuts" + reset + ":");
-            manager.shortcutMap().keySet().stream().sorted().forEach(a -> {
-                var b = manager.shortcutMap().get(a);
-                addOutputInfo("  " + a + yellow + " :=: " + green + b);
-            });
+                addOutputInfo("");
+
+                addOutputInfo(blue + I18n.msg("gui.console.shortcuts") + reset + ":");
+                manager.shortcutMap().keySet().stream().sorted().forEach(a -> {
+                    var b = manager.shortcutMap().get(a);
+                    addOutputInfo("  " + a + yellow + " :=: " + green + b);
+                });
+            } else if (numParams == 1) {
+                if ("api".equals(parameters[0])) {
+                    addOutputOk(command);
+                    addOutputInfo(blue + I18n.msg("gui.console.api") + reset + ":");
+                    manager.methodMap()
+                            .keySet()
+                            .stream()
+                            .sorted()
+                            .forEach(a -> {
+                                var b = manager.methodMap().get(a);
+                                b.forEach(m -> addOutputInfo(processMethod(m)));
+                            });
+                } else if ("shortcuts".equals(parameters[0])) {
+                    addOutputOk(command);
+                    addOutputInfo(blue + I18n.msg("gui.console.shortcuts") + reset + ":");
+                    manager.shortcutMap().keySet().stream().sorted().forEach(a -> {
+                        var b = manager.shortcutMap().get(a);
+                        addOutputInfo("  " + a + yellow + " :=: " + green + b);
+                    });
+                } else {
+                    addOutputError(I18n.msg("gui.console.cmd.parameters", cmd));
+                }
+            } else {
+                addOutputError(I18n.msg("gui.console.cmd.parameters", cmd));
+            }
         } else if (manager.hasMethod(command)) {
             var methods = manager.getMethods(command);
 
