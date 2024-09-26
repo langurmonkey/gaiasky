@@ -356,6 +356,7 @@ in vec3 o_normalTan;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 layerBuffer;
 
 #ifdef ssrFlag
     #include <shader/lib/ssr.frag.glsl>
@@ -472,7 +473,7 @@ void main() {
         #endif // roughnessTextureFlag, shininessFlag
 
         #ifdef reflectionCubemapFlag
-            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
+            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 10.0).rgb;
         #endif // reflectionCubemapFlag
 
         // Metallic.
@@ -527,8 +528,8 @@ void main() {
             selfShadow *= saturate(4.0 * NL);
 
             specularColor += specular * min(1.0, pow(NH, 40.0));
-            shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
-            diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
+            shadowColor += col * night * max(0.0, 0.5 - NL);
+            diffuseColor = saturate(diffuseColor + col * NL + ambient * (1.0 - NL));
         }
     #endif // directionalLightsFlag
 
@@ -582,18 +583,19 @@ void main() {
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag
         vec3 diffuseScattering = fetchColorDiffuseScattering();
-        diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion * shdw;
+        diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion;
     #else
         vec3 diffuseScattering = vec3(0.0);
     #endif // diffuseScatteringColorFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor + diffuseScattering + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
+    fragColor = vec4(diffuseColor * shdw + diffuseScattering * shdw + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
     fragColor.rgb += selfShadow * specularColor;
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef atmosphereGround
         #define exposure 1.0
-        fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor, 0.0, 1.0);
+        fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * o_fadeFactor, 0.0, 1.0);
         #if defined(heightFlag)
             fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
         #endif // heightFlag
