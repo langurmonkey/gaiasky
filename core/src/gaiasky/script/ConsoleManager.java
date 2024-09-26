@@ -62,6 +62,10 @@ public class ConsoleManager {
             return I18n.msg("gui." + code + ".code");
         }
 
+        public String getNameString() {
+            return I18n.msg("gui." + code + ".name");
+        }
+
         public Color getTagColor() {
             return tagColor;
         }

@@ -19,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.gui.main.GSKeys;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.ConsoleManager.Message;
@@ -37,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConsoleInterface extends TableGuiInterface {
+public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(ConsoleInterface.class.getSimpleName());
 
     /**
@@ -53,6 +56,10 @@ public class ConsoleInterface extends TableGuiInterface {
     private final OwnLabel prompt;
     int historyIndex = -1;
     float pad = 10f;
+    private boolean captureNotification = false;
+
+    private Logger.LoggerLevel level;
+    private String message;
 
     private final String black = "\033[30m";
     private final String red = "\033[31m";
@@ -158,6 +165,7 @@ public class ConsoleInterface extends TableGuiInterface {
             restoreConsoleMessages();
         }
 
+        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION);
     }
 
     private void rebuildMainTable() {
@@ -235,6 +243,7 @@ public class ConsoleInterface extends TableGuiInterface {
 
     private void addMessageWidget(Message msg) {
         var status = new OwnLabel(msg.type().getCodeString(), getSkin(), "mono");
+        status.addListener(new OwnTextTooltip(msg.type().getNameString(), getSkin()));
         status.setColor(msg.type().getTagColor());
         var message = constructMessage(msg);
 
@@ -343,9 +352,9 @@ public class ConsoleInterface extends TableGuiInterface {
         var params = m.getParameters();
         for (var p : params) {
             var c = p.getType();
-            if(!c.isPrimitive()
-                && !c.isArray()
-                && !c.equals(String.class)){
+            if (!c.isPrimitive()
+                    && !c.isArray()
+                    && !c.equals(String.class)) {
                 // Unsupported parameter type (not a primitive, array or string).
                 return null;
             }
@@ -570,41 +579,50 @@ public class ConsoleInterface extends TableGuiInterface {
                         /* Invoke method */
                         try {
                             // note: invoke may return null explicitly or because is void type
+                            startNotificationCapture();
                             Object returnObject = method.invoke(GaiaSky.instance.scripting(), arguments);
-                            addOutputOk(cmd);
+                            stopNotificationCapture();
 
-                            if (returnObject != null) {
-                                String returnStr;
-                                var clazz = returnObject.getClass();
-                                if (int[].class.equals(clazz)) {
-                                    var obj = (int[]) returnObject;
-                                    returnStr = Arrays.toString(obj);
-                                } else if (Integer[].class.equals(clazz)) {
-                                    var obj = (Integer[]) returnObject;
-                                    returnStr = Arrays.toString(obj);
-                                } else if (float[].class.equals(clazz)) {
-                                    var obj = (float[]) returnObject;
-                                    returnStr = Arrays.toString(obj);
-                                } else if (Float[].class.equals(clazz)) {
-                                    var obj = (Float[]) returnObject;
-                                    returnStr = Arrays.toString(obj);
-                                } else if (double[].class.equals(clazz)) {
-                                    var obj = (double[]) returnObject;
-                                    returnStr = Arrays.toString(obj);
-                                } else if (Double[].class.equals(clazz)) {
-                                    var obj = (Double[]) returnObject;
-                                    returnStr = Arrays.toString(obj);
-                                } else if (String[].class.equals(clazz)) {
-                                    var obj = (String[]) returnObject;
-                                    returnStr = Arrays.toString(obj);
-                                } else {
-                                    // Base type, rely on toString().
-                                    returnStr = returnObject.toString();
+                            if (notificationAvailable() && level == Logger.LoggerLevel.ERROR) {
+                                addOutputError(cmd);
+                                addOutputInfo(message);
+                            } else {
+                                addOutputOk(cmd);
+
+                                if (returnObject != null) {
+                                    String returnStr;
+                                    var clazz = returnObject.getClass();
+                                    if (int[].class.equals(clazz)) {
+                                        var obj = (int[]) returnObject;
+                                        returnStr = Arrays.toString(obj);
+                                    } else if (Integer[].class.equals(clazz)) {
+                                        var obj = (Integer[]) returnObject;
+                                        returnStr = Arrays.toString(obj);
+                                    } else if (float[].class.equals(clazz)) {
+                                        var obj = (float[]) returnObject;
+                                        returnStr = Arrays.toString(obj);
+                                    } else if (Float[].class.equals(clazz)) {
+                                        var obj = (Float[]) returnObject;
+                                        returnStr = Arrays.toString(obj);
+                                    } else if (double[].class.equals(clazz)) {
+                                        var obj = (double[]) returnObject;
+                                        returnStr = Arrays.toString(obj);
+                                    } else if (Double[].class.equals(clazz)) {
+                                        var obj = (Double[]) returnObject;
+                                        returnStr = Arrays.toString(obj);
+                                    } else if (String[].class.equals(clazz)) {
+                                        var obj = (String[]) returnObject;
+                                        returnStr = Arrays.toString(obj);
+                                    } else {
+                                        // Base type, rely on toString().
+                                        returnStr = returnObject.toString();
+                                    }
+                                    addOutputReturn(returnStr);
                                 }
-                                addOutputReturn(returnStr);
                             }
                             break;
                         } catch (Exception e) {
+                            addOutputError(e.toString());
                             logger.error(e);
                         }
                     }
@@ -659,4 +677,35 @@ public class ConsoleInterface extends TableGuiInterface {
     public void dispose() {
     }
 
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        // We just capture the incoming notification and add it to the console.
+        if (event == Event.POST_NOTIFICATION && captureNotification) {
+            level = (Logger.LoggerLevel) data[0];
+            Object[] dat = (Object[]) data[1];
+            var msg = new java.lang.StringBuilder();
+            int startIndex = 1;
+            for (int i = startIndex; i < dat.length; i++) {
+                msg.append(dat[i].toString());
+                if (i < dat.length - 1 && !(i == dat.length - 2 && dat[dat.length - 1] instanceof Boolean)) {
+                    msg.append(" - ");
+                }
+            }
+            message = msg.toString();
+        }
+    }
+
+    private boolean notificationAvailable() {
+        return level != null && message != null;
+    }
+
+    private void startNotificationCapture() {
+        level = null;
+        message = null;
+        captureNotification = true;
+    }
+
+    private void stopNotificationCapture() {
+        captureNotification = false;
+    }
 }

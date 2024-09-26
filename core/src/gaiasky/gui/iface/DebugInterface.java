@@ -44,7 +44,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel debugDynRes;
     private final OwnLabel fps;
     private final OwnLabel spf;
-    private final OwnLabel device;
     private final OwnSlider queueStatus;
     /** Lock object for synchronization **/
     private final Object lock;
@@ -143,7 +142,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         deviceGroup.space(pad05);
         String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);
         String glDeviceShort = TextUtils.capString(glDevice, 30);
-        device = new OwnLabel(glDeviceShort, skin, "hud-big");
+        OwnLabel device = new OwnLabel(glDeviceShort, skin, "hud-big");
         device.setColor(skin.getColor("blue"));
         device.addListener(new OwnTextTooltip(glDevice, skin));
         deviceGroup.addActor(device);
@@ -212,7 +211,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra.row();
 
 
-        /* VMEMORY */
+        /* VIDEO MEMORY */
         debugVRAMUsed = new OwnLabel("", skin, "hud");
         debugVRAMTotal = new OwnLabel("", skin, "hud");
 
