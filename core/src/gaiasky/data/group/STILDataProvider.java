@@ -61,7 +61,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     /** These names are not allowed **/
-    private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
+    private static final String[] forbiddenNameValues = {"-", "...", "nop", "nan", "?", "_", "x", "n/a"};
     /** Store already visited colName:attribute pairs. **/
     private final Map<String, Integer> stringAttributesMap;
     /** Store the last index for a given attribute. **/
@@ -571,6 +571,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Empty ID
                                 id = ++objectId;
                             }
+                            // Add hip numbers if present.
+                            if (hip < 0 && hasCol(ColId.hip)) {
+                                int hipIndex = idx(ColId.hip);
+                                var hipNum = row[hipIndex];
+                                if(hipNum instanceof Integer hn) {
+                                    hip = hn;
+                                }
+                            }
 
                             // NAME(S)
                             String[] names;
@@ -578,9 +586,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Name from ID.
                                 if (idIsNotNumber) {
                                     Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
-                                    names = new String[] { idPair.getSecond() };
+                                    names = new String[]{idPair.getSecond()};
                                 } else {
-                                    names = new String[] { Long.toString(id) };
+                                    names = new String[]{Long.toString(id)};
                                 }
                             } else {
                                 // We have a name.
@@ -601,7 +609,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 }
                                 // Default to ID.
                                 if (names.length == 0) {
-                                    names = new String[] { Long.toString(id) };
+                                    names = new String[]{Long.toString(id)};
                                 }
                             }
 
@@ -609,7 +617,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (rgb != null) {
                                 colors.put(id, rgb);
                             }
-                            sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
+                            sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
 
                             if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS
                                     || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {
@@ -715,6 +723,27 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
         return list;
     }
+
+    protected boolean hasCol(ColId colId) {
+        for (var ci : columnInfoList) {
+            if (ci.getName().equals(colId.name())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected int idx(ColId colId) {
+        int idx = 0;
+        for (var ci : columnInfoList) {
+            if (ci.getName().equals(colId.name())) {
+                return idx;
+            }
+            idx++;
+        }
+        return -1;
+    }
+
 
     private void exportCsv(double[] x,
                            double[] y,
