@@ -111,10 +111,6 @@ public class GaiaSkyDesktop implements IObserver {
      **/
     private static PrintStream out;
     /**
-     * Force re-computing the UI scale.
-     **/
-    private boolean configFileOverwritten = false;
-    /**
      * The Gaia Sky application instance.
      **/
     private GaiaSky gs;
@@ -190,7 +186,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Init properties file.
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                gaiaSkyDesktop.setConfigFileOverwritten(initConfigFile(cliArgs.vr));
+                boolean ignored = initConfigFile(cliArgs.vr);
             }
 
             // Init global configuration.
@@ -642,10 +638,6 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setTitle(title);
 
         new Lwjgl3Application(new ErrorDialog(ex, message), cfg);
-    }
-
-    public void setConfigFileOverwritten(boolean b) {
-        this.configFileOverwritten = b;
     }
 
     @Override

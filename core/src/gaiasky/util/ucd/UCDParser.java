@@ -458,28 +458,28 @@ public class UCDParser {
             return PositionType.valueOf("EQ_SPH_" + (pos3 == null ? "PLX" : (isDist(pos3.colName) ? "DIST" : "PLX")));
         }
         String meaning = pos1.UCD[0][1];
-        String postypestr = null, disttype = null;
+        String posTypeStr = null, distType = null;
         PositionType postype = null;
         switch (meaning) {
-        case "eq" -> postypestr = "EQ_SPH_";
-        case "ecliptic" -> postypestr = "ECL_SPH_";
-        case "galactic" -> postypestr = "GAL_SPH_";
+        case "eq" -> posTypeStr = "EQ_SPH_";
+        case "ecliptic" -> posTypeStr = "ECL_SPH_";
+        case "galactic" -> posTypeStr = "GAL_SPH_";
         case "cartesian" -> postype = PositionType.EQ_XYZ;
         }
 
         if (pos3 != null) {
             meaning = pos3.UCD[0][1];
             switch (meaning) {
-            case "parallax" -> disttype = "PLX";
-            case "distance" -> disttype = "DIST";
+            case "parallax" -> distType = "PLX";
+            case "distance" -> distType = "DIST";
             }
         } else {
-            disttype = "PLX";
+            distType = "PLX";
         }
 
-        if (postype == null && postypestr != null && disttype != null) {
+        if (postype == null && posTypeStr != null && distType != null) {
             // Construct from postypestr and disttype
-            postype = PositionType.valueOf(postypestr + disttype);
+            postype = PositionType.valueOf(posTypeStr + distType);
         }
 
         return postype;

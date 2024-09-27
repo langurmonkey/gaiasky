@@ -408,7 +408,7 @@ public class Settings extends SettingsObject {
         PNG("png"),
         JPG("jpeg");
 
-        public String extension;
+        public final String extension;
 
         ImageFormat(String extension) {
             this.extension = extension;

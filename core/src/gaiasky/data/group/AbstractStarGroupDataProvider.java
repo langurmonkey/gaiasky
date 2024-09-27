@@ -104,7 +104,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     public AbstractStarGroupDataProvider() {
         super();
-        parallelism = ForkJoinPool.commonPool().getParallelism();
+        try (var p = ForkJoinPool.commonPool()) {
+            parallelism = p.getParallelism();
+        }
     }
 
     public ColId colIdFromStr(final String name) {
@@ -138,10 +140,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected int idx(ColId colId) {
-        if (indexMap != null && indexMap.containsKey(colId))
-            return indexMap.get(colId);
-        else
-            return -1;
+        if (indexMap != null && indexMap.containsKey(colId)) return indexMap.get(colId);
+        else return -1;
     }
 
     protected boolean hasCol(ColId colId) {
@@ -154,23 +154,19 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected boolean hasAdditionalColumn(ColId col) {
-        if (additional == null)
-            return false;
+        if (additional == null) return false;
         for (AdditionalCols add : additional) {
-            if (add != null && add.hasCol(col))
-                return true;
+            if (add != null && add.hasCol(col)) return true;
         }
         return false;
     }
 
     protected Double getAdditionalValue(ColId col, Long sourceId) {
-        if (additional == null)
-            return null;
+        if (additional == null) return null;
         for (AdditionalCols add : additional) {
             if (add != null && add.hasCol(col)) {
                 Double d = add.get(col, sourceId);
-                if (d != null)
-                    return d;
+                if (d != null) return d;
             }
         }
         return null;
@@ -195,10 +191,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Initialises the lists and structures given number of elements
      */
     protected void initLists(int elems) {
-        if (parallelism > 1)
-            list = Collections.synchronizedList(new ArrayList<>(elems));
-        else
-            list = new ArrayList<>(elems);
+        if (parallelism > 1) list = Collections.synchronizedList(new ArrayList<>(elems));
+        else list = new ArrayList<>(elems);
     }
 
     protected void initLists() {
@@ -225,7 +219,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Checks whether the parallax is accepted or not.
-     *
      * <b>If adaptive is not enabled:</b>
      * <pre>
      * accepted = pllx &gt; 0 &amp;&amp; pllx_err &lt; pllx * pllx_err_factor &amp;&amp; pllx_err &le; 1
@@ -239,22 +232,21 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * accepted = pllx &gt; 0 &amp;&amp; pllx_err &lt; pllx * pllx_err_factor &amp;&amp; pllx_err &le; 1, otherwise
      * </pre>
      *
-     * @param appmag  Apparent magnitude of star.
-     * @param pllx    Parallax of star.
-     * @param pllxerr Parallax error of star.
+     * @param appMag        Apparent magnitude of star.
+     * @param parallax      Parallax of star.
+     * @param parallaxError Parallax error of star.
      *
      * @return True if parallax is accepted, false otherwise
      */
-    protected boolean acceptParallax(double appmag, double pllx, double pllxerr) {
+    protected boolean acceptParallax(double appMag, double parallax, double parallaxError) {
         // If geometric distances are present, always accept, we use distances directly
-        if (hasAdditionalColumn(ColId.geodist))
-            return true;
-        if (!Double.isFinite(appmag)) {
+        if (hasAdditionalColumn(ColId.geodist)) return true;
+        if (!Double.isFinite(appMag)) {
             return false;
-        } else if (adaptiveParallax && appmag < 13.1) {
-            return pllx >= 0 && pllxerr < pllx * parallaxErrorFactorBright && pllxerr <= 1;
+        } else if (adaptiveParallax && appMag < 13.1) {
+            return parallax >= 0 && parallaxError < parallax * parallaxErrorFactorBright && parallaxError <= 1;
         } else {
-            return pllx >= 0 && pllxerr < pllx * parallaxErrorFactorFaint && pllxerr <= 1;
+            return parallax >= 0 && parallaxError < parallax * parallaxErrorFactorFaint && parallaxError <= 1;
         }
     }
 
@@ -280,8 +272,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      */
     protected double getGeoDistance(long sourceId) {
         Double geodist = getAdditionalValue(ColId.geodist, sourceId);
-        if (geodist == null || geodist.isInfinite() || geodist.isNaN())
-            return -1;
+        if (geodist == null || geodist.isInfinite() || geodist.isNaN()) return -1;
         return geodist;
     }
 
@@ -336,27 +327,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected void dumpToDisk(List<IParticleRecord> data, String filename, String format) {
-        if (format.equals("bin"))
-            dumpToDiskBin(data, filename, false);
-        else if (format.equals("csv"))
-            dumpToDiskCsv(data, filename);
+        if (format.equals("bin")) dumpToDiskBin(data, filename);
+        else if (format.equals("csv")) dumpToDiskCsv(data, filename);
     }
 
-    protected void dumpToDiskBin(List<IParticleRecord> data, String filename, boolean serialized) {
-        if (serialized) {
-            // Use java serialization method
-            List<IParticleRecord> l = new ArrayList<>(data.size());
-            l.addAll(data);
-
-            try {
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
-                oos.writeObject(l);
-                oos.close();
-                logger.info("File " + filename + " written with " + l.size() + " stars");
-            } catch (Exception e) {
-                logger.error(e);
-            }
-        } else {
+    protected void dumpToDiskBin(List<IParticleRecord> data, String filename) {
             // Use own binary format
             BinaryDataProvider io = new BinaryDataProvider();
             try {
@@ -366,7 +341,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             } catch (Exception e) {
                 logger.error(e);
             }
-        }
     }
 
     protected void dumpToDiskCsv(List<IParticleRecord> data, String filename) {
@@ -427,8 +401,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         if (additionalFiles != null && !additionalFiles.isBlank()) {
             this.additionalFiles = additionalFiles.split(",");
             this.additional = new ArrayList<>();
-            if (this.additionalFiles.length > 0)
-                loadAdditional();
+            if (this.additionalFiles.length > 0) loadAdditional();
         }
     }
 
@@ -495,8 +468,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             FileChannel fc = raf.getChannel();
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             data = new ByteBufferInputStream(mem);
-            if (f.toString().endsWith(".gz"))
-                data = new GZIPInputStream(data);
+            if (f.toString().endsWith(".gz")) data = new GZIPInputStream(data);
             BufferedReader br = new BufferedReader(new InputStreamReader(data));
             // Read header
             String additionalSplit = ",|\\s+";
@@ -566,33 +538,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Represents a column type.
      */
     public enum ColId {
-        sourceid,
-        hip,
-        names,
-        ra,
-        dec,
-        pllx,
-        ra_err,
-        dec_err,
-        pllx_err,
-        pmra,
-        pmdec,
-        radvel,
-        pmra_err,
-        pmdec_err,
-        radvel_err,
-        gmag,
-        bpmag,
-        rpmag,
-        bp_rp,
-        col_idx,
-        ref_epoch,
-        teff,
-        radius,
-        ag,
-        ebp_min_rp,
-        ruwe,
-        geodist
+        sourceid, hip, names, ra, dec, pllx, ra_err, dec_err, pllx_err, pmra, pmdec, radvel, pmra_err, pmdec_err, radvel_err, gmag, bpmag, rpmag, bp_rp, col_idx, ref_epoch, teff, radius, ag, ebp_min_rp, ruwe, geodist
     }
 
     public static class AdditionalCols {
