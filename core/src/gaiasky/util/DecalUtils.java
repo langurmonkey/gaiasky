@@ -135,13 +135,19 @@ public class DecalUtils {
 
         if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
             double dist = camera.position.dst(tmp3.set(x, y, z));
-            double minsize = minSizeDegrees > 0 ? FastMath.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
-            double maxsize = maxSizeDegrees > 0 ? FastMath.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
-            size = MathUtils.clamp(size, (float) minsize, (float) maxsize);
+            double minSize = minSizeDegrees > 0 ? FastMath.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
+            double maxSize = maxSizeDegrees > 0 ? FastMath.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
+            size = MathUtils.clamp(size, (float) minSize, (float) maxSize);
         }
 
         float sizeF = (float) size;
-        batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(sizeF, sizeF, sizeF);
+        batch.getTransformMatrix()
+                .set(camera.combined)
+                .translate(x, y, z)
+                .rotate(rotation)
+                .rotate(0, 1, 0, 180)
+                .rotate(0, 0, 1, rotationCenter)
+                .scale(sizeF, sizeF, sizeF);
         // Force matrices to be set to shader
         batch.setProjectionMatrix(idt);
 

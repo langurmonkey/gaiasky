@@ -76,7 +76,7 @@ public class SpriteEntityRenderSystem {
 
     Vector3 F31 = new Vector3();
 
-    public void render(Entity entity, SpriteBatch batch, ICamera camera) {
+    public void render(Entity entity, SpriteBatch batch, ICamera camera, float alpha) {
         view.setEntity(entity);
 
         if (view.isLocation()
@@ -91,10 +91,10 @@ public class SpriteEntityRenderSystem {
 
                 float[] color = body.color != null ? body.color : body.labelColor;
                 if (color != null) {
-                    sprite.setColor(color[0], color[1], color[2], color.length > 3 ? color[3] : 0.4f);
+                    sprite.setColor(color[0], color[1], color[2], color.length > 3 ? color[3] * alpha : 0.4f * alpha);
                 } else {
                     // Default.
-                    sprite.setColor(0.7f, 0.6f, 0.0f, 0.4f);
+                    sprite.setColor(0.7f, 0.6f, 0.0f, 0.4f * alpha);
                 }
                 DecalUtils.drawSprite(sprite,
                         batch,

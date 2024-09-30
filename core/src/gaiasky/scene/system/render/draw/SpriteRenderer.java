@@ -36,7 +36,9 @@ public class SpriteRenderer extends AbstractRenderSystem {
         batch.begin();
 
         for (var r : renderables) {
-            renderer.render(((Render) r).getEntity(), batch, camera);
+            var e = ((Render) r).getEntity();
+            var alpha = getAlpha(e);
+            renderer.render(e, batch, camera, alpha);
         }
 
         batch.end();

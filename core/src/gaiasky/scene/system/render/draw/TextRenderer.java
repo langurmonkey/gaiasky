@@ -66,7 +66,7 @@ public class TextRenderer extends FontRenderSystem {
             // Label color
             program.setUniform4fv("u_color", body.labelColor, 0, 4);
             // Component alpha
-            program.setUniformf("u_componentAlpha", getAlpha(entity) * (view.isLabel()  ? alpha : 1));
+            program.setUniformf("u_componentAlpha", getAlpha(entity) * (view.isLabel() ? alpha : 1));
             // Font opacity multiplier, take into account element opacity
             program.setUniformf("u_opacity", 0.75f * view.getTextOpacity());
             // z-far and k
