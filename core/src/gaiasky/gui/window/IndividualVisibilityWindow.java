@@ -23,6 +23,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IVisibilitySwitch;
+import gaiasky.scene.component.Base;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
@@ -85,10 +86,10 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         elementsCell = content.add().top().left();
 
         ComponentType[] visibilityEntities = ComponentType.values();
-        for (int i = 0; i < visibilityEntities.length; i++) {
-            final ComponentType ct = visibilityEntities[i];
+        int j = 0;
+        for (final ComponentType ct : visibilityEntities) {
             final String name = ct.getName();
-            if (name != null) {
+            if (name != null && componentFilter(ct)) {
                 Button button;
                 if (ct.style != null) {
                     Image icon = new Image(skin.getDrawable(ct.style));
@@ -107,7 +108,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 }
 
                 button.addListener(event -> {
-                    if (event instanceof ChangeListener.ChangeEvent && button.isChecked()) {
+                    if (event instanceof ChangeEvent && button.isChecked()) {
                         // Change content only when button is checked!
                         Group elementsList = visibilitySwitcher(ct, TextUtils.capitalise(ct.getName()), ct.getName());
                         elementsCell.clearActor();
@@ -124,17 +125,34 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                     button.setChecked(true);
                 }
                 Cell<?> c = buttonTable.add(button).padBottom(buttonPadVert);
-                if ((i + 1) % visTableCols == 0) {
+                if ((j + 1) % visTableCols == 0) {
                     buttonTable.row();
                 } else {
                     c.padRight(buttonPadHor);
                 }
                 buttonGroup.add(button);
+                j++;
             }
         }
         if (cct != null)
             buttonGroup.setChecked(cct);
         content.pack();
+    }
+
+    /**
+     * Filters component types for the individual visibility window. Returns true for those components that should be listed
+     * in the window.
+     * @param ct The component type.
+     * @return Whether it should be listed or not.
+     */
+    private boolean componentFilter(ComponentType ct) {
+        return ct != ComponentType.Labels
+                && ct != ComponentType.Atmospheres
+                && ct != ComponentType.Clouds
+                && ct != ComponentType.Effects
+                && ct != ComponentType.VelocityVectors
+                && ct != ComponentType.Keyframes
+                && ct != ComponentType.Systems;
     }
 
     private boolean filter(final String[] names, final String filter) {
@@ -150,17 +168,17 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
     private void addObjects(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
         if (ct == ComponentType.Locations) {
-            addObjectsLocations(objectsGroup, checkBoxes, ct, filter);
+            addObjectsLocations(objectsGroup, checkBoxes, filter);
         } else {
             addObjectsRegular(objectsGroup, checkBoxes, ct, filter);
         }
     }
 
-    private void addObjectsLocations(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
+    private void addObjectsLocations(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final String filter) {
         objectsGroup.clear();
         checkBoxes.clear();
         Array<Entity> objects = new Array<>();
-        scene.findEntitiesByComponentType(ct, objects);
+        scene.findEntitiesByComponentType(ComponentType.Locations, objects);
         Array<String> typeNames = new Array<>(false, objects.size);
         Map<String, Pair<Map<String, IVisibilitySwitch>, Array<String>>> typeMap = new HashMap<>();
         cbMap.clear();
@@ -168,7 +186,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         for (Entity object : objects) {
             var base = Mapper.base.get(object);
 
-            if (filter(base.names, filter)) {
+            if (filter(base.names, filter) &&
+                    !isHookObject(base)) {
                 var loc = Mapper.loc.get(object);
                 var hasLoc = loc != null;
                 var name = base.getName();
@@ -313,7 +332,11 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             // Omit stars with no proper names and particle groups
             var base = Mapper.base.get(object);
             var name = base.getName();
-            if (name != null && !GlobalResources.isNumeric(name) && !exception(ct, object) && filter(base.names, filter)) {
+            if (name != null
+                    && !GlobalResources.isNumeric(name)
+                    && !exception(ct, object)
+                    && filter(base.names, filter)
+                    && !isHookObject(base)) {
                 names.add(name);
                 objMap.put(name, new FocusView(object));
             }
@@ -403,7 +426,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         // Buttons
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(pad10);
-        OwnTextIconButton selAll = new OwnTextIconButton("", skin, "audio");
+        OwnTextIconButton selAll = new OwnTextIconButton("", skin, "select-all");
         selAll.addListener(new OwnTextTooltip(I18n.msg("gui.select.all"), skin));
         selAll.pad(space2);
         selAll.addListener((event) -> {
@@ -413,7 +436,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             }
             return false;
         });
-        OwnTextIconButton selNone = new OwnTextIconButton("", skin, "ban");
+        OwnTextIconButton selNone = new OwnTextIconButton("", skin, "select-none");
         selNone.addListener(new OwnTextTooltip(I18n.msg("gui.select.none"), skin));
         selNone.pad(space2);
         selNone.addListener((event) -> {
@@ -426,17 +449,34 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         buttons.addActor(selAll);
         buttons.addActor(selNone);
 
+        Table header = new Table(skin);
+        header.add(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header")).left().pad(5f).width(componentWidth - 100f);
+        header.add(buttons).right().pad(5f).width(100f);
+
         VerticalGroup group = new VerticalGroup();
         group.left();
         group.columnLeft();
         group.space(space8);
 
-        group.addActor(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"));
+        group.addActor(header);
         group.addActor(filter);
         group.addActor(scrollPane);
-        group.addActor(buttons);
 
         return group;
+    }
+
+    /**
+     * Checks whether the given archetype is a hook object, i.e., a virtual object that is there only to
+     * aggregate a group of objects as children in the scene graph.
+     * @param b The base component.
+     * @return Whether it is a hook object.
+     */
+    private boolean isHookObject(Base b) {
+        return b.archetype.getName().equals("FadeNode") ||
+                b.archetype.getName().equals("OrbitalElementsGroup") ||
+                b.archetype.getName().equals("GenericCatalog") ||
+                b.archetype.getName().equals("Invisible") ||
+                b.getName().endsWith("-hook");
     }
 
     /**
@@ -446,10 +486,12 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
      * @param ct     The component type
      * @param object The object
      *
-     * @return Whether this object is an exception (should not be listed) or not
+     * @return Whether this object is an exception (should not be listed) or not.
      */
     private boolean exception(ComponentType ct, Entity object) {
-        return ct == ComponentType.Planets && Mapper.trajectory.has(object) || Mapper.particleSet.has(object) || Mapper.starSet.has(object) || Mapper.base.get(object).hasName("asteroids hook");
+        return (ct == ComponentType.Planets && Mapper.trajectory.has(object))
+                || Mapper.particleSet.has(object)
+                || Mapper.starSet.has(object);
     }
 
     @Override

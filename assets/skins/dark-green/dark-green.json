@@ -410,6 +410,12 @@
       "up": "default-round",
       "imageUp": "map-icon"
     },
+    "select-all": {
+      "imageUp": "iconic-check"
+    },
+    "select-none": {
+      "imageUp": "iconic-x"
+    },
     "eye": {
       "imageUp": "iconic-eye"
     },
