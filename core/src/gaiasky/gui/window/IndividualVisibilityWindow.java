@@ -152,6 +152,11 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 && ct != ComponentType.Effects
                 && ct != ComponentType.VelocityVectors
                 && ct != ComponentType.Keyframes
+                && ct != ComponentType.RecursiveGrid
+                && ct != ComponentType.Equatorial
+                && ct != ComponentType.Ecliptic
+                && ct != ComponentType.Galactic
+                && ct != ComponentType.Boundaries
                 && ct != ComponentType.Systems;
     }
 
