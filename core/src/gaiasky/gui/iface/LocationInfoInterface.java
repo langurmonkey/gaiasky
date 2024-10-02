@@ -27,7 +27,7 @@ import gaiasky.util.scene2d.OwnLabel;
 public class LocationInfoInterface extends TableGuiInterface implements IObserver {
 
     private final Skin skin;
-    private static final double TIMEOUT_SECS = 0.5;
+    private static final double TIMEOUT_SECS = 1.0;
     private double lastUpdateTime = -1;
     private String currentLocation;
     private final Table content;
@@ -65,7 +65,7 @@ public class LocationInfoInterface extends TableGuiInterface implements IObserve
             var y = (Integer) data[1];
             var loc = (LocationMark) data[2];
             if (currentLocation != null) {
-                if (!loc.equals(currentLocation)) {
+                if (!loc.displayName.equals(currentLocation)) {
                     // Remove current, create.
                     content.clear();
                     clear();
