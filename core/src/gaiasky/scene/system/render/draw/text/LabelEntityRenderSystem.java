@@ -457,6 +457,7 @@ public class LabelEntityRenderSystem {
             var cam = camera.getCamera();
             var w = Gdx.graphics.getWidth();
             var h = Gdx.graphics.getHeight();
+            // Manual scaling to correct for screen size.
             var scale = (float) Math.sqrt(w * w + h * h) / 2200f;
             var labelSize = Settings.settings.scene.label.size * scale;
             var offsetY = verticalOffset++ * 16 * labelSize;

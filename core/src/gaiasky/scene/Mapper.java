@@ -16,6 +16,7 @@ public class Mapper {
     public static final ComponentMapper<Base> base = ComponentMapper.getFor(Base.class);
     public static final ComponentMapper<GraphNode> graph = ComponentMapper.getFor(GraphNode.class);
     public static final ComponentMapper<Render> render = ComponentMapper.getFor(Render.class);
+    public static final ComponentMapper<RenderFlags> renderFlags = ComponentMapper.getFor(RenderFlags.class);
     public static final ComponentMapper<Id> id = ComponentMapper.getFor(Id.class);
     public static final ComponentMapper<Hip> hip = ComponentMapper.getFor(Hip.class);
     public static final ComponentMapper<Body> body = ComponentMapper.getFor(Body.class);

@@ -53,6 +53,7 @@ public class ModelExtractor extends AbstractExtractSystem {
             var cloud = Mapper.cloud.get(entity);
             var render = Mapper.render.get(entity);
             var label = Mapper.label.get(entity);
+            var renderFlags = Mapper.renderFlags.get(entity);
 
             camera.checkClosestBody(entity);
 
@@ -87,12 +88,16 @@ public class ModelExtractor extends AbstractExtractSystem {
                     }
 
                     if (body.solidAngleApparent < thQuad1) {
-                        addToRender(render, RenderGroup.BILLBOARD_SSO);
+                        if(renderFlags == null || renderFlags.renderQuad) {
+                            addToRender(render, RenderGroup.BILLBOARD_SSO);
+                        }
                     } else if (body.solidAngleApparent > thQuad2) {
                         addToRenderModel(render, model);
                     } else {
                         // Both
-                        addToRender(render, RenderGroup.BILLBOARD_SSO);
+                        if(renderFlags == null || renderFlags.renderQuad) {
+                            addToRender(render, RenderGroup.BILLBOARD_SSO);
+                        }
                         addToRenderModel(render, model);
                     }
                     if (renderText(base, body, sa, label)) {

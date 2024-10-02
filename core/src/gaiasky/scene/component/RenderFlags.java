@@ -14,7 +14,7 @@ public class RenderFlags implements Component {
     /**
      * Whether to render this entity as a quad.
      */
-    public boolean renderQuad;
+    public boolean renderQuad = true;
 
     public void setRenderQuad(String renderQuad) {
         this.renderQuad = Boolean.getBoolean(renderQuad);
