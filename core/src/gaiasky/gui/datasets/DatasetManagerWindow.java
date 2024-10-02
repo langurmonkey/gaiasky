@@ -114,6 +114,7 @@ public class DatasetManagerWindow extends GenericDialog {
         this(stage, skin, serverDd, true, I18n.msg("gui.close"));
     }
 
+    @SuppressWarnings("unchecked")
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
         super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates", serverDd.numUpdates) : ""), skin, stage);
         this.nf = new DecimalFormat("##0.0");
@@ -660,7 +661,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                 cb.setChecked(false);
                                                                 cb.setProgrammaticChangeEvents(true);
                                                             }
-                                                            GaiaSky.postRunnable(() -> reloadRightPane(right, dataset, mode));
+                                                            GaiaSky.postRunnable(() -> reloadRightPane(right, dataset, DatasetMode.INSTALLED));
                                                         }
                                                     });
                                                     datasetContext.addItem(disable);
@@ -676,7 +677,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                 cb.setChecked(true);
                                                                 cb.setProgrammaticChangeEvents(true);
                                                             }
-                                                            GaiaSky.postRunnable(() -> reloadRightPane(right, dataset, mode));
+                                                            GaiaSky.postRunnable(() -> reloadRightPane(right, dataset, DatasetMode.INSTALLED));
                                                         }
                                                     });
                                                     datasetContext.addItem(enable);
@@ -1227,11 +1228,17 @@ public class DatasetManagerWindow extends GenericDialog {
         cleanupTempFiles(true, false);
     }
 
+    /**
+     * Remove a single file in the temp directory.
+     * @param file The file to remove.
+     */
     private void cleanupTempFile(String file) {
         deleteFile(Path.of(file));
     }
 
-    private void cleanupTempFiles(final boolean dataDownloads, final boolean dataDescriptor) {
+    @SuppressWarnings("all")
+    private void cleanupTempFiles(final boolean dataDownloads,
+                                  final boolean dataDescriptor) {
         if (dataDownloads) {
             final Path tempDir = SysUtils.getTempDir(Settings.settings.data.location);
             // Clean up partial downloads.

@@ -170,7 +170,7 @@ public class KeyBindings {
     public String[] getStringKeys(String actionId, String join, boolean allSets) {
         if (allSets) {
             var keySets = getAllKeys(actionId);
-            if(keySets != null && !keySets.isEmpty()) {
+            if (keySets != null && !keySets.isEmpty()) {
                 String[] result = new String[keySets.size()];
                 int i = 0;
                 for (TreeSet<Integer> keys : keySets) {

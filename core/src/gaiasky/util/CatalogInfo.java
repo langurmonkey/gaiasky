@@ -8,6 +8,7 @@
 package gaiasky.util;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
@@ -21,6 +22,10 @@ import gaiasky.util.i18n.I18n;
 
 import java.time.Instant;
 
+/**
+ * Saves the metadata on a particular catalog or dataset loaded into Gaia Sky, and implements
+ * some common operations like highlighting.
+ */
 public class CatalogInfo {
     private static final Log logger = Logger.getLogger(CatalogInfo.class);
     private static int colorIndexSequence = 0;

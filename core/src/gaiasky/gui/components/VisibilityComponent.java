@@ -15,8 +15,8 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.main.KeyBindings;
 import gaiasky.gui.beans.ComboBoxBean;
+import gaiasky.gui.main.KeyBindings;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -45,7 +45,12 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
     public VisibilityComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.PM_LEN_FACTOR_CMD, Event.PM_NUM_FACTOR_CMD, Event.PM_COLOR_MODE_CMD, Event.PM_ARROWHEADS_CMD);
+        EventManager.instance.subscribe(this,
+                Event.TOGGLE_VISIBILITY_CMD,
+                Event.PM_LEN_FACTOR_CMD,
+                Event.PM_NUM_FACTOR_CMD,
+                Event.PM_COLOR_MODE_CMD,
+                Event.PM_ARROWHEADS_CMD);
     }
 
     public void setVisibilityEntitites(ComponentType[] ve, boolean[] v) {
@@ -80,13 +85,10 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     }
                     // Name is the key
                     button.setName(ct.key);
+
                     // Tooltip (with or without hotkey)
-                    String[] hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key, true);
-                    if (hk != null && hk.length > 0) {
-                        button.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(ct.getName()), hk, skin));
-                    } else {
-                        button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
-                    }
+                    addButtonTooltip(button, ct);
+
                     // In VR, protect 'Others' component type by disabling it. Otherwise, VR controllers, which are of type 'Others',
                     // may disappear.
                     button.setDisabled(ct.key.equals("element.others") && GaiaSky.instance.isVR());
@@ -134,7 +136,13 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         });
 
         // NUM FACTOR
-        pmNumFactorSlider = new OwnSliderPlus(I18n.msg("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
+        pmNumFactorSlider = new OwnSliderPlus(
+                I18n.msg("gui.pmnumfactor"),
+                Constants.MIN_SLIDER_1,
+                Constants.MAX_SLIDER,
+                Constants.SLIDER_STEP_SMALL,
+                Constants.MIN_PM_NUM_FACTOR,
+                Constants.MAX_PM_NUM_FACTOR, skin);
         pmNumFactorSlider.setName("proper motion vectors number factor");
         pmNumFactorSlider.setWidth(componentWidth);
         pmNumFactorSlider.setMappedValue(Settings.settings.scene.properMotion.number);
@@ -297,6 +305,20 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
             }
         }
 
+    }
+
+    private void addButtonTooltip(Button button, ComponentType ct) {
+        String[] hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key, true);
+        String text = TextUtils.capitalise(ct.getName());
+        if (ct.equals(ComponentType.Constellations)) {
+            text += " - " + I18n.msg("gui.tooltip.ct.constellations.hip");
+        }
+
+        if (hk != null && hk.length > 0) {
+            button.addListener(new OwnTextHotkeyTooltip(text, hk, skin, 9));
+        } else {
+            button.addListener(new OwnTextTooltip(text, skin));
+        }
     }
 
     @Override

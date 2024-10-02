@@ -29,9 +29,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.beans.CameraComboBoxBean;
 import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.gui.bookmarks.BookmarksManager.BookmarkNode;
-import gaiasky.gui.beans.CameraComboBoxBean;
 import gaiasky.gui.iface.CameraInfoInterface;
 import gaiasky.gui.iface.TopInfoInterface;
 import gaiasky.gui.vr.MainVRGui;
@@ -171,6 +171,7 @@ public class GamepadGui extends AbstractGui {
         rebuildGui();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void rebuildGui() {
 
@@ -388,7 +389,7 @@ public class GamepadGui extends AbstractGui {
 
         Table camT = new Table(skin);
         camT.setSize(tw1, th);
-        CameraManager cm = GaiaSky.instance.getCameraManager();
+        CameraManager cam = GaiaSky.instance.getCameraManager();
 
         final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
         if (!vr) {
@@ -402,7 +403,7 @@ public class GamepadGui extends AbstractGui {
             cameraModel[0][0] = cameraMode;
             cameraMode.setWidth(ww);
             cameraMode.setItems(cameraOptions);
-            cameraMode.setSelectedIndex(cm.getMode().ordinal());
+            cameraMode.setSelectedIndex(cam.getMode().ordinal());
             cameraMode.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     CameraComboBoxBean selection = cameraMode.getSelected();
@@ -771,6 +772,8 @@ public class GamepadGui extends AbstractGui {
                     }
                     return false;
                 });
+                addButtonTooltip(button, ct);
+
                 // In VR, protect 'Others' component type by disabling it. Otherwise, VR controllers, which are of type 'Others',
                 // may disappear.
                 button.setDisabled(ct.key.equals("element.others") && GaiaSky.instance.isVR());
@@ -1033,7 +1036,7 @@ public class GamepadGui extends AbstractGui {
             motionBlur.setWidth(ww);
             motionBlur.setMappedValue(Settings.settings.postprocess.motionBlur.strength);
             motionBlur.addListener(event -> {
-                if(event instanceof ChangeEvent ce) {
+                if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.MOTION_BLUR_CMD, motionBlur, motionBlur.getMappedValue());
                 }
                 return false;
@@ -1270,6 +1273,7 @@ public class GamepadGui extends AbstractGui {
         initialized = true;
     }
 
+    @SuppressWarnings("all")
     private void fillBookmarksColumn(Cell<Container>[] columns, int columnIndex, List<BookmarkNode> bookmarks, Actor[][] model, float w, float h) {
         fillBookmarksColumn(columns, columnIndex, bookmarks, model, w, h, true);
     }
@@ -1326,7 +1330,7 @@ public class GamepadGui extends AbstractGui {
 
     private void updateFocusedBookmark() {
         if (((vr && selectedTab == 2) || (!vr && selectedTab == 1)) && fi < maxBookmarkDepth - 1) {
-            if(currentModel[fi][fj] instanceof BookmarkButton selectedBookmark) {
+            if (currentModel[fi][fj] instanceof BookmarkButton selectedBookmark) {
                 // Move scroll position.
                 var scroll = GuiUtils.getScrollPaneAncestor(selectedBookmark);
                 if (scroll != null) {
@@ -1809,11 +1813,11 @@ public class GamepadGui extends AbstractGui {
 
                 }
                 case INVERT_X_CMD -> {
-                   if (source != this && invertXButton != null) {
-                       invertXButton.setProgrammaticChangeEvents(false);
-                       invertXButton.setChecked((Boolean) data[0]);
-                       invertXButton.setProgrammaticChangeEvents(true);
-                   }
+                    if (source != this && invertXButton != null) {
+                        invertXButton.setProgrammaticChangeEvents(false);
+                        invertXButton.setChecked((Boolean) data[0]);
+                        invertXButton.setProgrammaticChangeEvents(true);
+                    }
                 }
                 case INVERT_Y_CMD -> {
                     if (source != this && invertYButton != null) {
@@ -1825,6 +1829,20 @@ public class GamepadGui extends AbstractGui {
                 default -> {
                 }
             }
+        }
+    }
+
+    private void addButtonTooltip(Button button, ComponentType ct) {
+        String[] hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key, true);
+        String text = TextUtils.capitalise(ct.getName());
+        if (ct.equals(ComponentType.Constellations)) {
+            text += " - " + I18n.msg("gui.tooltip.ct.constellations.hip");
+        }
+
+        if (hk != null && hk.length > 0) {
+            button.addListener(new OwnTextHotkeyTooltip(text, hk, skin, 9));
+        } else {
+            button.addListener(new OwnTextTooltip(text, skin));
         }
     }
 

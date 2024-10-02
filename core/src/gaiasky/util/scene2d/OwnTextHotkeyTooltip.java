@@ -9,6 +9,7 @@ package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
+import gaiasky.util.TextUtils;
 
 public class OwnTextHotkeyTooltip extends Tooltip<Table> {
     private final OwnLabel label;
@@ -34,21 +35,9 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
     public OwnTextHotkeyTooltip(String text, String[] hotkeys, Skin skin, final TooltipManager manager, TextTooltipStyle style, int breakSpaces) {
         super(null, manager);
 
-        // Warp text if breakSpaces <= 0
+        // Warp text if breakSpaces <= 0.
         if (breakSpaces > 0) {
-            StringBuilder sb = new StringBuilder(text);
-            int spaces = 0;
-            for (int i = 0; i < sb.length(); i++) {
-                char c = sb.charAt(i);
-                if (c == ' ') {
-                    spaces++;
-                }
-                if (spaces == breakSpaces) {
-                    sb.setCharAt(i, '\n');
-                    spaces = 0;
-                }
-            }
-            text = sb.toString();
+            text = TextUtils.breakSpaces(text, breakSpaces);
         }
 
         Table table = new Table(skin);

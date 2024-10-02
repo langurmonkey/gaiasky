@@ -127,7 +127,7 @@ public class TextUtils {
 
     public static String breakSpaces(String in,
                                      int breakSpaces) {
-        // Warp text if breakSpaces <= 0
+        // Warp text if breakSpaces > 0
         if (breakSpaces > 0) {
             java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
             int spaces = 0;

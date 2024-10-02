@@ -135,25 +135,25 @@ public class CatalogManager implements IObserver {
             if (ci != null) {
                 ci.highlight(highlight);
 
-                if (ci.highlighted)
-                    logger.info(I18n.msg("notif.highlight.on", ci.name));
-                else
-                    logger.info(I18n.msg("notif.highlight.off", ci.name));
-            }
-        }
-        case CATALOG_POINT_SIZE_SCALING_CMD -> {
-            CatalogInfo ci;
-            String dsName;
-            dsName = (String) data[0];
-            double scaling = (Double) data[1];
-            if (ciMap.containsKey(dsName)) {
-                ci = ciMap.get(dsName);
-                if (ci.entity != null) {
-                    var hl = Mapper.highlight.get(ci.entity);
-                    hl.pointscaling = (float) scaling;
+                    if (ci.highlighted)
+                        logger.info(I18n.msg("notif.highlight.on", ci.name));
+                    else
+                        logger.info(I18n.msg("notif.highlight.off", ci.name));
                 }
             }
-        }
+            case CATALOG_POINT_SIZE_SCALING_CMD -> {
+                CatalogInfo ci;
+                String dsName;
+                dsName = (String) data[0];
+                double scaling = (Double) data[1];
+                if (ciMap.containsKey(dsName)) {
+                    ci = ciMap.get(dsName);
+                    if (ci.entity != null) {
+                        var hl = Mapper.highlight.get(ci.entity);
+                        hl.pointscaling = (float) scaling;
+                    }
+                }
+            }
         }
     }
 }
