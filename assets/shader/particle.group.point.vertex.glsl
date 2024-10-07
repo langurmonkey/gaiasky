@@ -43,7 +43,16 @@ void main() {
         vec4 aux = u_transform * vec4(particlePos, 1.0);
         particlePos.xyz = aux.xyz;
     }
-    vec3 pos = particlePos.xyz - u_camPos;
+    // Only apply VR scale to far away positions to prevent overflow in VR mode.
+    float d = dot(particlePos, particlePos);
+    float vrScale;
+    if (d < 1.0e30) {
+        vrScale = 1.0;
+    } else {
+        vrScale = u_vrScale;
+    }
+
+    vec3 pos = (particlePos.xyz - u_camPos) / vrScale;
 
     // Distance to point - watch out, if position contains large values, this produces overflow!
     // Downscale before computing length()
@@ -76,6 +85,6 @@ void main() {
     v_textureIndex = a_textureIndex;
 
     vec4 gpos = u_projView * vec4(pos, 1.0);
-    gl_Position = gpos;
+    gl_Position = gpos * vrScale;
     gl_PointSize = min(max(solidAngle * u_sizeFactor * cubemapSizeFactor, u_sizeLimits.x), u_sizeLimits.y);
 }

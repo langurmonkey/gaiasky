@@ -168,15 +168,15 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                 var value = particle.getExtra(set.textureAttribute);
                                 if (value instanceof Number num) {
                                     textureIndex = MathUtils.clamp(num.intValue() - 1, 0, nTextures - 1);
-                                } else if(value instanceof String str) {
+                                } else if (value instanceof String str) {
                                     // Try to parse it as integer, otherwise, use hash code.
                                     try {
-                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) -1, 0, nTextures -1);
+                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0, nTextures - 1);
                                     } catch (NumberFormatException ignored) {
                                         textureIndex = value.hashCode() % nTextures;
                                     }
                                 } else {
-                                   // Any other type, use hash code.
+                                    // Any other type, use hash code.
                                     textureIndex = value.hashCode() % nTextures;
                                 }
                             } else {
@@ -203,7 +203,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                 model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = particle.col();
                             } else {
                                 // Generate color.
-                                if(set.colorFromTexture && set.textureArray != null && textureIndex >= 0f) {
+                                if (set.colorFromTexture && set.textureArray != null && textureIndex >= 0f) {
                                     // Generate color using texture index, so particles with the same index get the
                                     // same color.
                                     float r = 0, g = 0, b = 0;

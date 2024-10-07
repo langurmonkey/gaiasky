@@ -206,9 +206,9 @@ public class BillboardEntityRenderSystem implements IObserver {
             boolean star = Mapper.hip.has(entity);
             extra.computedSize = body.size;
 
-            if (body.solidAngle > solidAngleThresholdBottomOverFovFactor) {
+            if (body.solidAngle * Constants.DISTANCE_SCALE_FACTOR > solidAngleThresholdBottomOverFovFactor) {
                 double dist;
-                if (body.solidAngle > solidAngleThresholdTopOverFovFactor) {
+                if (body.solidAngle * Constants.DISTANCE_SCALE_FACTOR > solidAngleThresholdTopOverFovFactor) {
                     dist = (float) extra.radius / Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP;
                 } else {
                     dist = body.distToCamera / fovFactor;
@@ -216,7 +216,10 @@ public class BillboardEntityRenderSystem implements IObserver {
                 extra.computedSize *= (dist / extra.radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM;
             }
 
-            extra.computedSize *= Settings.settings.scene.star.pointSize * (star ? Settings.settings.scene.star.glowFactor : 0.2 / Constants.DISTANCE_SCALE_FACTOR);
+            extra.computedSize *= Settings.settings.scene.star.pointSize
+                    * (star ?
+                    Settings.settings.scene.star.glowFactor
+                    : 0.2 / (Constants.DISTANCE_SCALE_FACTOR != 1 ? 200.0 : 1.0));
             return (float) (extra.computedSize * extra.primitiveRenderScale);
         } else if (Mapper.fade.has(entity)) {
             // Regular billboards

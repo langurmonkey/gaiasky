@@ -12,8 +12,6 @@ uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform vec2 u_solidAngleMap;
-// VR scale factor
-uniform float u_vrScale;
 uniform float u_proximityThreshold;
 // x - alpha
 // y - point size/fov factor
@@ -57,7 +55,7 @@ out vec2 v_uv;
 
 void main() {
 	// Lengths
-	float l0 = LEN0 * u_vrScale;
+	float l0 = LEN0;
 	float l1 = l0 * 1e3;
 
     vec3 particlePos = a_starPos.xyz;

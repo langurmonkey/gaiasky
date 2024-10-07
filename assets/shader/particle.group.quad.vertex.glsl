@@ -60,7 +60,16 @@ void main() {
         vec4 aux = u_transform * vec4(particlePos, 1.0);
         particlePos.xyz = aux.xyz;
     }
-    vec3 pos = (particlePos - u_camPos) / u_vrScale;
+    // Only apply VR scale to far away positions to prevent overflow in VR mode.
+    float d = dot(particlePos, particlePos);
+    float vrScale;
+    if (d < 1.0e30) {
+        vrScale = 1.0;
+    } else {
+        vrScale = u_vrScale;
+    }
+
+    vec3 pos = (particlePos - u_camPos) / vrScale;
 
     #ifdef extendedParticlesFlag
     // Apply proper motion if it is not zero.
@@ -108,7 +117,7 @@ void main() {
     float s_size = particleSize;
     #include <shader/snippet/billboard.glsl>
 
-    gl_Position = gpos * u_vrScale;
+    gl_Position = gpos * vrScale;
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;

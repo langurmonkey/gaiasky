@@ -393,7 +393,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                             // Solid angle in radians.
                                             double sa = new Angle(sizePair.getSecond(), sizePair.getFirst().unit).get(AngleUnit.RAD);
                                             // Size in parsecs = tan(sa) * distPc
-                                            sizePc = FastMath.tan(sa) * p.realPosition.len();
+                                            sizePc = FastMath.tan(sa) * distPc;
                                         } else if (Length.isLength(sizeUcd.unit)) {
                                             // Size in parsecs, directly.
                                             sizePc = new Length(sizePair.getSecond(), sizePair.getFirst().unit).get(LengthUnit.PC);

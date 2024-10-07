@@ -194,9 +194,6 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
     public ParticleRecord readParticleRecord(IDataReader in, double factor) throws IOException {
         var pType = extra.get() ? ParticleRecordType.PARTICLE_EXT : ParticleRecordType.PARTICLE;
 
-        double[] dataD = new double[pType.doubleArraySize];
-        float[] dataF = new float[pType.floatArraySize];
-
         // ID
         long id = in.readLong();
 
