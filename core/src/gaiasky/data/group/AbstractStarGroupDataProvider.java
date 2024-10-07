@@ -153,6 +153,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return val != null && !Double.isNaN(val) && !Double.isInfinite(val);
     }
 
+    @SuppressWarnings("all")
     protected boolean hasAdditionalColumn(ColId col) {
         if (additional == null) return false;
         for (AdditionalCols add : additional) {
@@ -332,15 +333,15 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected void dumpToDiskBin(List<IParticleRecord> data, String filename) {
-            // Use own binary format
-            BinaryDataProvider io = new BinaryDataProvider();
-            try {
-                int n = data.size();
-                io.writeData(data, new FileOutputStream(filename));
-                logger.info("File " + filename + " written with " + n + " stars");
-            } catch (Exception e) {
-                logger.error(e);
-            }
+        // Use own binary format
+        BinaryDataProvider io = new BinaryDataProvider();
+        try {
+            int n = data.size();
+            io.writeData(data, new FileOutputStream(filename));
+            logger.info("File " + filename + " written with " + n + " stars");
+        } catch (Exception e) {
+            logger.error(e);
+        }
     }
 
     protected void dumpToDiskCsv(List<IParticleRecord> data, String filename) {

@@ -9,7 +9,7 @@ package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Bits;
-import org.eclipse.jetty.util.log.Log;
+import gaiasky.util.Logger;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -55,7 +55,8 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
      *
      * @return The attribute if any, otherwise null
      */
-    public final <T extends Attribute> T get(Class<T> clazz, final int index) {
+    @SuppressWarnings("unchecked")
+    public final <T extends Attribute> T get(Class<T> ignored, final int index) {
         return (T) get(index);
     }
 
@@ -159,7 +160,7 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
             if (candidate != null) {
                 attributes.removeValue(candidate, true);
             } else {
-                Log.getLogger(Attributes.class.getSimpleName()).warn("Attribute not found: " + index);
+                Logger.getLogger(Attributes.class.getSimpleName()).warn("Attribute not found: " + index);
             }
             Bits type = Bits.empty();
             type.set(index);
