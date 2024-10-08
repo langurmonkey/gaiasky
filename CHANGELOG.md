@@ -1,3 +1,38 @@
+<a name="3.6.4"></a>
+## [3.6.4](https://codeberg.org/gaiasky/gaiasky/tree/3.6.3-2) (2024-10-08)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.3-2...3.6.4)
+
+### Bug Fixes
+- locations of some particle sets in VR. 
+- make entities honor 'renderQuad' property in render flags component. 
+- UV grid projected coordinates now scale correctly with screen size. 
+- prevent virtual objects (hooks, invisibles, catalogs, etc.) from appearing in the individual visibility window. Hide meta-components (atmospheres, keyframes, etc.) from buttons list. Fix layout. 
+- always load HIP numbers if present in the STIL data loader. 
+- update Jetty, JSON and XMLRPC libraries to secure versions (the old versions contain known vulnerabilities). 
+- inform user of unsupported cubemap textured objects with procedural generation. 
+
+### Build System
+- update versions of JCommander, STIL and ApFloat, remove Joise. 
+- update OSHI library version. 
+
+### Documentation
+- add architectures to download table. 
+- fix typos and spelling errors in changelog file. 
+- move VR info into `README.md` from `VR.md`. 
+
+### Features
+- improve on-screen keyboard in controller UI. 
+- add custom marker textures and custom colors for locations. 
+- add markers to locations; they pinpoint the exact position of the location labe. 
+- add new attribute to location marks, 'ignoreSolidAngleLimit', which disregards the limits when computing visibility. Cap angular sizes for all locations. 
+- add session type to system information (Linux only). 
+- remove 'cosmic locations' content type, move it to regular locations (requires default data pack update.). 
+- add location type attribute to location objects. This attribute is used to categorize locations by groups in the individual visibility window. 
+- separate scene from other elements (labels, lines, etc.) to be able to apply different post-processing effects to each. 
+- move console business logic to console manager entity. 
+- add an implementation of console/terminal, which accepts commands to interact directly with the Gaia Sky API. 
+- add a generic map in the base component to store 'unrecognized' attributes; these get displayed in the object info window. 
+
 <a name="3.6.3-2"></a>
 ## [3.6.3-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.3) (2024-07-17)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.3...3.6.3-2)
