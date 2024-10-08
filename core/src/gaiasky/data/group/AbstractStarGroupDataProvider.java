@@ -104,9 +104,10 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     public AbstractStarGroupDataProvider() {
         super();
-        try (var p = ForkJoinPool.commonPool()) {
-            parallelism = p.getParallelism();
-        }
+        // TODO This is for compatibility with Java 17.
+        var p = ForkJoinPool.commonPool();
+        parallelism = p.getParallelism();
+        p.shutdownNow();
     }
 
     public ColId colIdFromStr(final String name) {
