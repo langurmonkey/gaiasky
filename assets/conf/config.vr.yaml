@@ -136,6 +136,8 @@ scene:
   particleGroups:
     # Default number of labels for particle groups. Applies unless overwritten.
     numLabels: 0
+    # Default billboard texture for particles and particle groups.
+    texBillboard: $data/default-data/tex/base/sso.png
   # Star settings.
   star:
     # Render star spheres.

@@ -105,7 +105,7 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackUITextures)
         // *****************************
-        //api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS
@@ -114,13 +114,13 @@ project(":core") {
         // OpenXR
         api group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
         api group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
-        api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
-        api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-windows"
+        runtimeOnly "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
+        runtimeOnly "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-windows"
 
         // LibGDX
         api group: "com.badlogicgames.gdx", name: "gdx", version: "$gdxVersion"
         api group: "com.badlogicgames.gdx", name: "gdx-backend-lwjgl3", version: "$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
         // gdx-controllers:2.+ bases up on SDL 2.0.12
         api group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-core", version: "$gdxcontrollersVersion"
