@@ -241,13 +241,13 @@ public class KeyBindings {
         // Condition that checks the current camera is not Game
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
         // Condition that checks the GUI is visible (no clean mode)
-        BooleanRunnable noCleanMode = () -> Settings.settings.runtime.displayGui || GaiaSky.instance.externalView;
+        BooleanRunnable noCleanMode = () -> Settings.settings.runtime.displayGui || GaiaSky.instance.getCliArgs().externalView;
         // Condition that checks that panorama mode is off
         BooleanRunnable noPanorama = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPanorama());
         // Condition that checks that planetarium mode is off
         BooleanRunnable noPlanetarium = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPlanetarium());
-        // Condition that checks that orthosphere view mode is off
-        BooleanRunnable noOrthosphere = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isOrthosphere());
+        // Condition that checks that ortho-sphere view mode is off
+        BooleanRunnable noOrthoSphere = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isOrthosphere());
         // Condition that checks that we are not a slave with a special projection
         BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
         // Condition that checks that we are a master and have slaves
@@ -388,7 +388,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPlanetariumOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
-        }, noPanorama, noOrthosphere));
+        }, noPanorama, noOrthoSphere));
 
         // Toggle planetarium projection
         addAction(new ProgramAction("action.toggle/element.planetarium.projection", () -> {
@@ -396,13 +396,13 @@ public class KeyBindings {
                 int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPlanetariumProjection().ordinal();
                 EventManager.publish(Event.PLANETARIUM_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
-        }, noPanorama, noOrthosphere));
+        }, noPanorama, noOrthoSphere));
 
         // Toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPanoramaOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.EQUIRECTANGULAR);
-        }, noPlanetarium, noOrthosphere));
+        }, noPlanetarium, noOrthoSphere));
 
         // Toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
@@ -410,7 +410,7 @@ public class KeyBindings {
                 int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
-        }, noPlanetarium, noOrthosphere));
+        }, noPlanetarium, noOrthoSphere));
 
         // Toggle orthosphere mode
         addAction(new ProgramAction("action.toggle/element.orthosphere", () -> {

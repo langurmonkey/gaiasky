@@ -188,10 +188,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     public boolean saveState = true;
     /**
-     * External view with final rendered scene and no UI.
-     */
-    public boolean externalView;
-    /**
      * External UI window.
      */
     public GaiaSkyView gaiaSkyView = null;
@@ -1212,7 +1208,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         }
 
         // Create UI window if needed.
-        if (externalView && gaiaSkyView == null) {
+        if (cliArgs.externalView && gaiaSkyView == null) {
             postRunnable(() -> {
                 // Create window.
                 Lwjgl3Application app = (Lwjgl3Application) Gdx.app;
