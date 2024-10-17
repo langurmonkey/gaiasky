@@ -1,3 +1,13 @@
+<a name="3.6.4-2"></a>
+## [3.6.4-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.4) (2024-10-17)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.4...3.6.4-2)
+
+### Bug Fixes
+- external view feature not working. 
+
+### Build System
+- remove lib directory, does not contain anything anymore.
+
 <a name="3.6.4"></a>
 ## [3.6.4](https://codeberg.org/gaiasky/gaiasky/tree/3.6.3-2) (2024-10-08)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.3-2...3.6.4)
