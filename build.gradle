@@ -13,9 +13,9 @@ allprojects {
 
     ext {
         appName = "GaiaSky"
-        gdxVersion = "1.12.1"
+        gdxVersion = "1.13.0"
         gdxcontrollersVersion = "2.2.2"
-        lwjglVersion = "3.3.3"
+        lwjglVersion = "3.3.4"
         jcommanderVersion = "2.+"
         slf4jVersion = "2.0.+"
         sparkjavaVersion = "2.9.+"
@@ -105,7 +105,7 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackUITextures)
         // *****************************
-        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        //api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS
