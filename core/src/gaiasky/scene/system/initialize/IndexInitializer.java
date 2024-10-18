@@ -31,7 +31,6 @@ public class IndexInitializer extends AbstractInitSystem {
 
         // Unwrap octree objects
         if (Mapper.octree.has(entity)) {
-            var octree = Mapper.octree.get(entity);
             var octant = Mapper.octant.get(entity);
             initializeOctant(octant.octant);
         }

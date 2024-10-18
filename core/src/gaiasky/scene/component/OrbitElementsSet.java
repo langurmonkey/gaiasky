@@ -13,6 +13,10 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 
+/**
+ * Aggregates children entities (typically orbits) so that they are treated as one,
+ * especially in terms of GPU draw calls.
+ */
 public class OrbitElementsSet implements Component {
     public Array<Entity> alwaysUpdate;
     public boolean initialUpdate = true;

@@ -142,7 +142,6 @@ public class Index {
                 // Particle/star sets add names of each contained particle.
                 addParticleSet(entity, Mapper.particleSet.get(entity));
                 addParticleSet(entity, Mapper.starSet.get(entity));
-
             }
         }
         if (!ok) {
@@ -196,17 +195,21 @@ public class Index {
     }
 
     private boolean mustAddToIndex(Entity entity) {
-        // All entities except the ones who have perimeter, location mark and particle or star set
-        return entity.getComponent(Perimeter.class) == null && entity.getComponent(LocationMark.class) == null && entity.getComponent(ParticleSet.class) == null && entity.getComponent(StarSet.class) == null;
+        // All entities except the ones who have perimeter, location mark, particle or star set.
+        return entity.getComponent(Perimeter.class) == null
+                && entity.getComponent(LocationMark.class) == null
+                && entity.getComponent(ParticleSet.class) == null
+                && entity.getComponent(StarSet.class) == null;
     }
 
     /** Removes the given key from the index. **/
     public void remove(String key) {
         index.remove(key);
     }
+
     /** Removes the given keys from the index. **/
     public void remove(String[] keys) {
-        for(var key : keys) {
+        for (var key : keys) {
             index.remove(key);
         }
     }

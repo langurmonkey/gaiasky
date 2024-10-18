@@ -263,6 +263,13 @@ public class SearchDialog extends GenericDialog {
         scene.matchingFocusableNodes(text, matching, 10, null);
     }
 
+    /**
+     * Consults the scene index with the given search string and selects the object and returns true if the
+     * object exists and is focusable, and returns false otherwise.
+     * @param text The text to look up.
+     * @param scene The scene object.
+     * @return True if the object exists and is focusable, false otherwise.
+     */
     private boolean checkString(String text, Scene scene) {
         try {
             if (scene.index().containsEntity(text)) {
