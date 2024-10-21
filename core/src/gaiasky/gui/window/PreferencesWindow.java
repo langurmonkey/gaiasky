@@ -27,12 +27,12 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.beans.*;
+import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.gui.main.GSKeys;
 import gaiasky.gui.main.GamepadMappings;
 import gaiasky.gui.main.KeyBindings;
 import gaiasky.gui.main.KeyBindings.ProgramAction;
-import gaiasky.gui.beans.*;
-import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -73,11 +73,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen;
     private OwnCheckBox windowed;
-    private OwnCheckBox vsync;
     private OwnCheckBox maxFps;
     private OwnCheckBox multithreadCb;
     private OwnCheckBox lodFadeCb;
-    private OwnCheckBox cbAutoCamrec;
+    private OwnCheckBox cbAutoCamRec;
     private OwnCheckBox real;
     private OwnCheckBox invertX;
     private OwnCheckBox invertY;
@@ -103,7 +102,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> graphicsQuality, antialias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
+    private OwnSelectBox<ComboBoxBean> graphicsQuality, antiAlias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
@@ -130,7 +129,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak,
             aberrationBak, lensFlareBak, filmGrainBak;
     private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
-    private int fxaaQuality, fxaaQualityBak;
+    private int FXAAQuality, FXAAQualityBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
     private AtomicBoolean vsyncValue;
@@ -300,8 +299,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 // Low graphics quality.
                 graphicsQuality.setSelectedIndex(GraphicsQuality.LOW.ordinal());
                 // No anti-aliasing.
-                antialias.setSelectedIndex(idxAa(AntialiasType.NONE));
-                fxaaQuality = 0;
+                antiAlias.setSelectedIndex(idxAa(AntialiasType.NONE));
+                FXAAQuality = 0;
                 // Legacy point style.
                 pointCloudRenderer.setSelectedIndex(PointCloudMode.POINTS.ordinal());
                 // Legacy line style.
@@ -342,8 +341,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 // Normal graphics quality.
                 graphicsQuality.setSelectedIndex(GraphicsQuality.NORMAL.ordinal());
                 // FXAA anti-aliasing.
-                antialias.setSelectedIndex(idxAa(AntialiasType.FXAA));
-                fxaaQuality = 1;
+                antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                FXAAQuality = 1;
                 // Triangles as point style.
                 pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
                 // Polyline quadstrip line style.
@@ -376,8 +375,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 // Normal graphics quality.
                 graphicsQuality.setSelectedIndex(GraphicsQuality.HIGH.ordinal());
                 // FXAA anti-aliasing.
-                antialias.setSelectedIndex(idxAa(AntialiasType.FXAA));
-                fxaaQuality = 2;
+                antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                FXAAQuality = 2;
                 // Triangles as point style.
                 pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
                 // Polyline quadstrip line style.
@@ -443,7 +442,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         heightField = new OwnTextField("", skin, heightValidator);
         heightField.setWidth(inputSmallWidth);
         final OwnLabel xLabel = new OwnLabel("x", skin);
-        populateWidthHeight();
+        populateWidthHeight(false);
 
         windowedResolutions.add(widthField).left().padRight(pad10);
         windowedResolutions.add(xLabel).left().padRight(pad10);
@@ -475,11 +474,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // VSYNC
         OwnLabel vsyncLabel = new OwnLabel(I18n.msg("gui.vsync"), skin);
-        vsync = new OwnCheckBox("", skin);
-        vsync.setName("V-sync");
-        vsync.setChecked(settings.graphics.vsync);
+        OwnCheckBox vSync = new OwnCheckBox("", skin);
+        vSync.setName("V-sync");
+        vSync.setChecked(settings.graphics.vsync);
         vsyncValue = new AtomicBoolean(settings.graphics.vsync);
-        vsync.addListener(e -> {
+        vSync.addListener(e -> {
             if (e instanceof ChangeEvent ce) {
                 vsyncValue.set(((OwnCheckBox) ce.getTarget()).isChecked());
                 return true;
@@ -515,7 +514,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         mode.add(windowed).left().padRight(pad18).padTop(pad18).padBottom(pad18);
         mode.add(windowedResolutions).left().padTop(pad18).padBottom(pad18).row();
         mode.add(vsyncLabel).left().padRight(pad34).padBottom(pad10);
-        mode.add(vsync).left().padBottom(pad10).row();
+        mode.add(vSync).left().padBottom(pad10).row();
         mode.add(maxFpsLabel).left().padRight(pad34).padBottom(pad10);
         mode.add(maxFpsGroup).left().padBottom(pad10).row();
 
@@ -577,11 +576,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.aa.no"), 0), new ComboBoxBean(I18n.msg("gui.aa.fxaa"), -1),
                 new ComboBoxBean(I18n.msg("gui.aa.nfaa"), -2)};
-        antialias = new OwnSelectBox<>(skin);
-        antialias.setItems(aas);
-        antialias.setWidth(selectWidth);
-        antialias.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
-        fxaaQuality = settings.postprocess.antialiasing.quality;
+        antiAlias = new OwnSelectBox<>(skin);
+        antiAlias.setItems(aas);
+        antiAlias.setWidth(selectWidth);
+        antiAlias.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
+        FXAAQuality = settings.postprocess.antialiasing.quality;
 
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
         aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
@@ -699,7 +698,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         noticeHiResCell = graphics.add();
         noticeHiResCell.colspan(3).left().row();
         graphics.add(aaLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(antialias).left().padRight(pad18).padBottom(pad10);
+        graphics.add(antiAlias).left().padRight(pad18).padBottom(pad10);
         graphics.add(aaTooltip).left().padBottom(pad10).row();
         OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
         OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
@@ -1264,7 +1263,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Save textures
         OwnLabel saveTexturesLabel = new OwnLabel(I18n.msg("gui.procedural.savetextures"), skin);
-        vsync = new OwnCheckBox("", skin);
+        vSync = new OwnCheckBox("", skin);
         saveTextures = new OwnCheckBox("", skin, pad10);
         saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
         OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
@@ -2129,9 +2128,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Activate automatically
         OwnLabel autoCamrecLabel = new OwnLabel(I18n.msg("gui.camerarec.frameoutput"), skin);
-        cbAutoCamrec = new OwnCheckBox("", skin);
-        cbAutoCamrec.setChecked(settings.camrecorder.auto);
-        cbAutoCamrec.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera.frameoutput"), skin));
+        cbAutoCamRec = new OwnCheckBox("", skin);
+        cbAutoCamRec.setChecked(settings.camrecorder.auto);
+        cbAutoCamRec.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera.frameoutput"), skin));
         OwnImageButton camrecAutoTooltip = new OwnImageButton(skin, "tooltip");
         camrecAutoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera.frameoutput"), skin));
 
@@ -2143,7 +2142,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         camrec.add(camRecFps).left().expandX().padBottom(pad10);
         camrec.add(camrecFpsTooltip).left().padLeft(pad10).padBottom(pad10).row();
         camrec.add(autoCamrecLabel).left().padRight(pad34).padBottom(pad10);
-        camrec.add(cbAutoCamrec).left().padBottom(pad10);
+        camrec.add(cbAutoCamRec).left().padBottom(pad10);
         camrec.add(camrecAutoTooltip).left().padLeft(pad10).padBottom(pad10).row();
         camrec.add(keyframePrefs).colspan(3).left().padTop(pad34 * 2f).row();
 
@@ -2551,11 +2550,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         setUpTabListeners();
     }
 
-    private void populateWidthHeight() {
-        if (widthField != null && widthField.getText().isBlank()) {
+    private void populateWidthHeight(boolean force) {
+        if (force || widthField != null && widthField.getText().isBlank()) {
             widthField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getWidth(), 100, 10000)));
         }
-        if (heightField != null && heightField.getText().isBlank()) {
+        if (force || heightField != null && heightField.getText().isBlank()) {
             heightField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getHeight(), 100, 10000)));
         }
     }
@@ -2571,7 +2570,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                               Action action) {
         GenericDialog result = super.show(stage, action);
         updateBackupValues();
-        populateWidthHeight();
+        populateWidthHeight(true);
         return result;
     }
 
@@ -2625,7 +2624,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         reprojectionBak = settings.postprocess.reprojection.mode;
         upscaleFilterBak = settings.postprocess.upscaleFilter;
         frameCoordinatesBak = settings.program.uvGrid.frameCoordinates;
-        fxaaQualityBak = settings.postprocess.antialiasing.quality;
+        FXAAQualityBak = settings.postprocess.antialiasing.quality;
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -2790,12 +2789,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // Antialiasing
-        bean = antialias.getSelected();
+        bean = antiAlias.getSelected();
         AntialiasType newAntiAlias = settings.postprocess.getAntialias(bean.value);
         if (settings.postprocess.antialiasing.type != newAntiAlias) {
             EventManager.publish(Event.ANTIALIASING_CMD, this, newAntiAlias);
         }
-        EventManager.publish(Event.FXAA_QUALITY_CMD, this, fxaaQuality);
+        EventManager.publish(Event.FXAA_QUALITY_CMD, this, FXAAQuality);
 
         settings.graphics.vsync = vsyncValue.get();
         try {
@@ -3016,7 +3015,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Camera recording
         EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camRecFps.getText()));
-        settings.camrecorder.auto = cbAutoCamrec.isChecked();
+        settings.camrecorder.auto = cbAutoCamRec.isChecked();
 
         // Cubemap resolution (same as plResolution)
         int newResolution = Integer.parseInt(cmResolution.getText());
@@ -3134,7 +3133,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
         EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
         EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinatesBak);
-        EventManager.publish(Event.FXAA_QUALITY_CMD, this, fxaaQualityBak);
+        EventManager.publish(Event.FXAA_QUALITY_CMD, this, FXAAQualityBak);
     }
 
     private void reloadLanguage() {
@@ -3169,7 +3168,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             settings.graphics.resolution[0] = Integer.parseInt(widthField.getText());
             settings.graphics.resolution[1] = Integer.parseInt(heightField.getText());
         } else {
-            populateWidthHeight();
+            populateWidthHeight(true);
         }
 
         enableComponents(!fullscreen, widthField, heightField, xLabel);
@@ -3222,6 +3221,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             str = "PL";
         }
         return str;
+    }
+
+    public void resize(int width, int height) {
+        populateWidthHeight(true);
     }
 
     @Override

@@ -1004,4 +1004,11 @@ public class WelcomeGui extends AbstractGui {
         return localDatasets;
     }
 
+    @Override
+    public void resize(final int width, final int height) {
+        if(preferencesWindow != null) {
+            preferencesWindow.resize(width, height);
+        }
+        super.resize(width, height);
+    }
 }
