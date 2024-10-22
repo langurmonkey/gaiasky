@@ -200,9 +200,14 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 // Reference system transform
                 Matrix4d refSysTransform = null;
                 if (graph.children != null && graph.children.size > 0) {
-                    refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
+                    if (Mapper.transform.has(graph.children.get(0))) {
+                        refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
+                    }
                 }
-                if (graph.children != null && graph.children.size > 0 && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
+                if (refSysTransform != null
+                        && graph.children != null && graph.children.size > 0
+                        && Mapper.trajectory.has(graph.children.get(0))
+                        && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
                     refSysTransform.putIn(aux).inv();
                     refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
                 } else if (refSysTransform != null) {

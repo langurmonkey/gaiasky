@@ -72,6 +72,7 @@ public class Mapper {
     public static final ComponentMapper<VRDevice> vr = ComponentMapper.getFor(VRDevice.class);
 
     // Tags
+    public static final ComponentMapper<TagCopy> tagCopy = ComponentMapper.getFor(TagCopy.class);
     public static final ComponentMapper<TagBackgroundModel> tagBackgroundModel = ComponentMapper.getFor(TagBackgroundModel.class);
     public static final ComponentMapper<TagBillboardSimple> tagBillboard = ComponentMapper.getFor(TagBillboardSimple.class);
     public static final ComponentMapper<TagHeliotropic> tagHeliotropic = ComponentMapper.getFor(TagHeliotropic.class);

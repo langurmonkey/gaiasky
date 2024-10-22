@@ -21,6 +21,7 @@ import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ICopy;
 import gaiasky.scene.component.IDisposable;
+import gaiasky.scene.component.tag.TagCopy;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.update.*;
@@ -471,6 +472,7 @@ public class Scene {
         }
     }
 
+    @SuppressWarnings("all")
     private <T extends EntityUpdater> T findUpdater(Class<T> updaterClass) {
         if (updaters != null) {
             for (EntityUpdater updater : updaters) {
@@ -732,6 +734,12 @@ public class Scene {
         return families;
     }
 
+    /**
+     * Gets a line copy of the given entity, and attaches a {@link gaiasky.scene.component.tag.TagCopy} component to all the
+     * entities in the line.
+     * @param entity The entity.
+     * @return The line copied entity.
+     */
     public Entity getLineCopy(Entity entity) {
         var copy = getSimpleCopy(entity);
         var graph = Mapper.graph.get(entity);
@@ -743,6 +751,12 @@ public class Scene {
         return copy;
     }
 
+    /**
+     * Gets a simple copy of the given entity and its components. Additionally, it attaches the {@link gaiasky.scene.component.tag.TagCopy} component
+     * to the entity.
+     * @param entity The entity to copy.
+     * @return The copy.
+     */
     public Entity getSimpleCopy(Entity entity) {
         Entity copy = engine.createEntity();
         /*
@@ -762,6 +776,9 @@ public class Scene {
                     logger.error("Could not create copy of component " + component.getClass().getSimpleName());
                 }
             }
+            // Attach copy tag.
+            copy.add(new TagCopy());
+
         }
         return copy;
     }

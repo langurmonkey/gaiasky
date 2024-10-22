@@ -186,8 +186,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
             }
 
             var ds = Mapper.datasetDescription.get(entity);
-            // Some elements (sets, octrees) process their own children.
-            boolean processChildren = !(Mapper.tagNoProcessChildren.has(entity) || (ds != null && !GaiaSky.instance.isOn(base.ct)));
+            // Some elements (orbital element sets, octrees) process their own children.
+            // But: not in the case of a copy!
+            boolean processChildren = Mapper.tagCopy.has(entity) || !(Mapper.tagNoProcessChildren.has(entity) || (ds != null && !GaiaSky.instance.isOn(base.ct)));
             if (processChildren && graph.children != null && opacity > 0) {
                 // Go down a level
                 for (int i = 0; i < graph.children.size; i++) {

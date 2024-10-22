@@ -22,7 +22,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.parse.Parser;
@@ -37,8 +36,6 @@ import java.text.DecimalFormat;
  * Visual settings of a particular dataset.
  */
 public class DatasetVisualSettingsWindow extends GenericDialog implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(DatasetVisualSettingsWindow.class);
-
     private final CatalogInfo ci;
     private OwnTextField highlightSizeFactor, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
     private OwnCheckBox allVisible, fadeIn, fadeOut;
