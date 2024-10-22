@@ -513,10 +513,13 @@ public class GaiaSkyDesktop implements IObserver {
             configureWindowSize(cfg);
             cfg.setResizable(true);
         }
-        if (cliArgs.vr) {
-            cfg.setWindowIcon(FileType.Internal, "icon/gsvr_icon.png");
-        } else {
-            cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
+        // Wayland does not support window icons.
+        if (!SysUtils.isWayland()) {
+            if (cliArgs.vr) {
+                cfg.setWindowIcon(FileType.Internal, "icon/gsvr_icon.png");
+            } else {
+                cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
+            }
         }
         // OpenXR requires OpenGL 4.5.
         int minor = cliArgs.vr ? XR_OPENGL_MINOR : DEFAULT_OPENGL_MINOR;
