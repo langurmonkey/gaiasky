@@ -20,6 +20,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.JPGWriter;
 import org.apache.commons.io.FilenameUtils;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -33,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 
 /**
  * Some handy system utilities and constants.
@@ -198,8 +200,16 @@ public class SysUtils {
         return System.getenv("XDG_SESSION_TYPE").equals("x11");
     }
 
+    public static boolean isGLFWX11() {
+        return GLFW.glfwGetPlatform() == GLFW.GLFW_PLATFORM_X11;
+    }
+
     public static boolean isWayland() {
         return System.getenv("XDG_SESSION_TYPE").equals("wayland");
+    }
+
+    public static boolean isGLFWWayland() {
+        return GLFW.glfwGetPlatform() == GLFW.GLFW_PLATFORM_WAYLAND;
     }
 
     public static boolean isWindows() {

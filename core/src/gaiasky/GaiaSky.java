@@ -1163,10 +1163,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (xrDriver != null)
             xrDriver.dispose();
 
-        // GLFW crashes on glfwDestroyWindow() on Wayland.
-        if (SysUtils.isLinux() && SysUtils.isWayland()) {
-            System.exit(0);
-        }
     }
 
     public void resetDynamicResolution() {
