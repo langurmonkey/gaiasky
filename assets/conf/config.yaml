@@ -218,7 +218,7 @@ scene:
     # The octant thresholds [rad]:
     # - radius/distance below which we do not observe the octant. Above this angle, inner stars' opacity is interpolated. Angle in radians.
     # - radius/distance above which we observe the octant fully. Above this angle, inner stars are painted with full opacity. Angle in radians.
-    threshold: [ 1.4, 1.8 ]
+    threshold: [ 1.5, 1.9 ]
     # If on, particles fade in and out between levels of detail.
     fade: true
   # Renderer settings.
