@@ -61,6 +61,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     private Texture currentLutTexture;
     private Cell<?> lutImageCell;
     private OwnTextButton genCloudsButton, genSurfaceButton;
+    /** The surface generation is enabled only when the model is *NOT* using cubemap textures. **/
+    private boolean surfaceEnabled;
 
     private int genCloudNum = 0, genSurfaceNum = 0;
 
@@ -75,10 +77,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         this.initAc = Mapper.atmosphere.get(this.target).atmosphere;
         this.rand = new Random(1884L);
         this.setModal(false);
+        this.surfaceEnabled = initMtc.diffuseCubemap == null &&
+                initMtc.specularCubemap == null &&
+                initMtc.heightCubemap == null &&
+                initMtc.emissiveCubemap == null;
 
         EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO,
-                                        Event.PROCEDURAL_GENERATION_SURFACE_INFO,
-                                        Event.FOCUS_CHANGED);
+                Event.PROCEDURAL_GENERATION_SURFACE_INFO,
+                Event.FOCUS_CHANGED);
 
         setAcceptText(I18n.msg("gui.close"));
 
@@ -94,6 +100,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         this.initClc = Mapper.cloud.get(this.target).cloud;
         this.initAc = Mapper.atmosphere.get(this.target).atmosphere;
         this.setModal(false);
+        this.surfaceEnabled = initMtc.diffuseCubemap == null &&
+                initMtc.specularCubemap == null &&
+                initMtc.heightCubemap == null &&
+                initMtc.emissiveCubemap == null;
 
         this.getTitleLabel().setText(I18n.msg("gui.procedural.title", view.getLocalizedName()));
 
@@ -129,7 +139,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         tabAtmosphere.pad(pad10);
         tabAtmosphere.setWidth(tabWidth);
 
-        group.addActor(tabSurface);
+        if (this.surfaceEnabled) {
+            group.addActor(tabSurface);
+        }
         group.addActor(tabClouds);
         group.addActor(tabAtmosphere);
 
@@ -157,7 +169,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         buildContentAtmosphere(contentAtmosphere);
 
         /* ADD ALL CONTENT */
-        tabContent.addActor(contentSurface);
+        if (this.surfaceEnabled) {
+            tabContent.addActor(contentSurface);
+        }
         tabContent.addActor(contentClouds);
         tabContent.addActor(contentAtmosphere);
 
@@ -695,8 +709,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         noiseTable.add(ridgeTooltip).left().padBottom(pad18).row();
 
         CollapsiblePane groupPane = new CollapsiblePane(stage, null, I18n.msg(key),
-                                                        noiseTable, fieldWidthAll * 1.2f, skin, "hud-header", "expand-collapse",
-                                                        null, expanded, () -> me.pack(), null, (Actor) null);
+                noiseTable, fieldWidthAll * 1.2f, skin, "hud-header", "expand-collapse",
+                null, expanded, () -> me.pack(), null, (Actor) null);
 
         content.add(groupPane).colspan(3).center().padBottom(pad34).row();
     }
@@ -712,7 +726,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
                         Color col = new Color(p.getPixel(x, y));
-                        float[] rgb = new float[] { col.r, col.g, col.b, 1f };
+                        float[] rgb = new float[]{col.r, col.g, col.b, 1f};
                         if (hue != 0) {
                             // Shift hue of lookup table by an amount in degrees
                             float[] hsb = ColorUtils.rgbToHsb(rgb);
@@ -754,10 +768,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
             // Add button group with presets.
             addLocalButtons(content, "gui.procedural.surface",
-                            this::randomizeSurfaceGasGiant,
-                            this::randomizeSurfaceEarthLike,
-                            this::randomizeSurfaceColdPlanet,
-                            this::randomizeSurfaceRockyPlanet);
+                    this::randomizeSurfaceGasGiant,
+                    this::randomizeSurfaceEarthLike,
+                    this::randomizeSurfaceColdPlanet,
+                    this::randomizeSurfaceRockyPlanet);
 
             // Add generate and randomize buttons
             genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
@@ -900,7 +914,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad18).row();
 
         // Fog color
-        ColorPicker cloudColor = new ColorPicker(new float[] { clc.color[0], clc.color[1], clc.color[2], clc.color[3] }, stage, skin);
+        ColorPicker cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
         cloudColor.setSize(128f, 128f);
         cloudColor.setNewColorRunnable(() -> {
             float[] col = cloudColor.getPickedColor();
@@ -1039,9 +1053,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Fog density
         OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
-                                                     Constants.MIN_ATM_FOG_DENSITY,
-                                                     Constants.MAX_ATM_FOG_DENSITY,
-                                                     Constants.SLIDER_STEP_TINY, skin);
+                Constants.MIN_ATM_FOG_DENSITY,
+                Constants.MAX_ATM_FOG_DENSITY,
+                Constants.SLIDER_STEP_TINY, skin);
         fogDensity.setWidth(fieldWidthTotal);
         fogDensity.setValue(ac.fogDensity);
         fogDensity.addListener(new ChangeListener() {
@@ -1073,7 +1087,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(samplesTooltip).left().padBottom(pad18).row();
 
         // Fog color
-        ColorPicker fogColor = new ColorPicker(new float[] { ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f }, stage, skin);
+        ColorPicker fogColor = new ColorPicker(new float[]{ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f}, stage, skin);
         fogColor.setNewColorRunnable(() -> {
             float[] col = fogColor.getPickedColor();
             ac.fogColor.x = col[0];
@@ -1097,11 +1111,11 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     protected Boolean randomizeSurface(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
         switch (rand.nextInt(10)) {
-        case 0, 1, 2, 3 -> initMtc.randomizeEarthLike(rand.nextLong());
-        case 4 -> initMtc.randomizeRockyPlanet(rand.nextLong());
-        case 5, 6 -> initMtc.randomizeGasGiant(rand.nextLong());
-        case 7, 8 -> initMtc.randomizeColdPlanet(rand.nextLong());
-        case 9 -> initMtc.randomizeAll(rand.nextLong());
+            case 0, 1, 2, 3 -> initMtc.randomizeEarthLike(rand.nextLong());
+            case 4 -> initMtc.randomizeRockyPlanet(rand.nextLong());
+            case 5, 6 -> initMtc.randomizeGasGiant(rand.nextLong());
+            case 7, 8 -> initMtc.randomizeColdPlanet(rand.nextLong());
+            case 9 -> initMtc.randomizeAll(rand.nextLong());
         }
 
         if (rebuild) {
@@ -1312,36 +1326,36 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                        Object source,
                        Object... data) {
         switch (event) {
-        case PROCEDURAL_GENERATION_CLOUD_INFO -> {
-            boolean status = (Boolean) data[0];
-            if (status) {
-                genCloudNum++;
-            } else {
-                genCloudNum = FastMath.max(genCloudNum - 1, 0);
+            case PROCEDURAL_GENERATION_CLOUD_INFO -> {
+                boolean status = (Boolean) data[0];
+                if (status) {
+                    genCloudNum++;
+                } else {
+                    genCloudNum = FastMath.max(genCloudNum - 1, 0);
+                }
+                updateButtonStatus();
             }
-            updateButtonStatus();
-        }
-        case PROCEDURAL_GENERATION_SURFACE_INFO -> {
-            boolean status = (Boolean) data[0];
-            if (status) {
-                genSurfaceNum++;
-            } else {
-                genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
+            case PROCEDURAL_GENERATION_SURFACE_INFO -> {
+                boolean status = (Boolean) data[0];
+                if (status) {
+                    genSurfaceNum++;
+                } else {
+                    genSurfaceNum = FastMath.max(genSurfaceNum - 1, 0);
+                }
+                updateButtonStatus();
             }
-            updateButtonStatus();
-        }
-        case FOCUS_CHANGED -> {
-            Entity entity;
-            if (data[0] instanceof String) {
-                entity = GaiaSky.instance.scene.getEntity((String) data[0]);
-            } else {
-                FocusView v = (FocusView) data[0];
-                entity = v.getEntity();
+            case FOCUS_CHANGED -> {
+                Entity entity;
+                if (data[0] instanceof String) {
+                    entity = GaiaSky.instance.scene.getEntity((String) data[0]);
+                } else {
+                    FocusView v = (FocusView) data[0];
+                    entity = v.getEntity();
+                }
+                if (Mapper.atmosphere.has(entity)) {
+                    reinitialize(entity);
+                }
             }
-            if (Mapper.atmosphere.has(entity)) {
-                reinitialize(entity);
-            }
-        }
         }
     }
 }

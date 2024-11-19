@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
-import com.badlogic.gdx.graphics.g3d.particles.batches.PointSpriteParticleBatch;
+import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
@@ -27,19 +27,17 @@ import java.util.List;
 
 public class ParticleSystemRenderSystem extends AbstractRenderSystem {
     private final ParticleSystem particleSystem;
-    private final PointSpriteParticleBatch pointSpriteParticleBatch;
+    private final BillboardParticleBatch batch;
     private final ParticleEffect explosion;
-    private final ModelBatch modelBatch;
     private final Matrix4 trf;
     private ParticleEffect explosionInstance;
 
     public ParticleSystemRenderSystem(SceneRenderer sceneRenderer) {
         super(sceneRenderer, null, null, null);
-        modelBatch = new ModelBatch();
         particleSystem = new ParticleSystem();
         // Since our particle effects are PointSprites, we create a PointSpriteParticleBatch
-        pointSpriteParticleBatch = new PointSpriteParticleBatch();
-        particleSystem.add(pointSpriteParticleBatch);
+        batch = new BillboardParticleBatch();
+        particleSystem.add(batch);
 
         ParticleEffectLoader pel = new ParticleEffectLoader(new InternalFileHandleResolver());
         ParticleEffectLoader.ParticleEffectLoadParameter loadParam = new ParticleEffectLoader.ParticleEffectLoadParameter(particleSystem.getBatches());
@@ -55,7 +53,7 @@ public class ParticleSystemRenderSystem extends AbstractRenderSystem {
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        pointSpriteParticleBatch.setCamera(camera.getCamera());
+        batch.setCamera(camera.getCamera());
 
         if (explosionInstance == null) {
             explosionInstance = explosion.copy();
@@ -66,13 +64,13 @@ public class ParticleSystemRenderSystem extends AbstractRenderSystem {
         Vector3 pos = new Vector3((float) Constants.AU_TO_U, (float) 0, (float) Constants.AU_TO_U);
         pos.sub(camera.getPos().put(new Vector3()));
         trf.idt().translate(pos);
-        modelBatch.begin(camera.getCamera());
+        batch.setCamera(camera.getCamera());
+        batch.begin();
         explosionInstance.setTransform(trf);
         particleSystem.update(); // technically not necessary for rendering
         particleSystem.begin();
         particleSystem.draw();
         particleSystem.end();
-        modelBatch.render(particleSystem);
-        modelBatch.end();
+        batch.end();
     }
 }

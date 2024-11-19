@@ -391,24 +391,15 @@ public class FullGui extends AbstractGui {
 
                 // Check for cubemap textures, for they are incompatible with the procedural generation.
                 if (Mapper.model.has(planet.getEntity())) {
-                    var model = Mapper.model.get(planet.getEntity());
-                    var mtc = model.model.mtc;
-                    if (mtc.diffuseCubemap != null ||
-                            mtc.specularCubemap != null ||
-                            mtc.heightCubemap != null ||
-                            mtc.emissiveCubemap != null) {
-                        addCubemapProceduralWindow(skin, stage, planet.getName());
+                    var w = findActor("procedural-window");
+                    // Only one instance
+                    if (w != null && w.hasParent()) {
+                        if (!w.isVisible())
+                            w.setVisible(true);
                     } else {
-                        var w = findActor("procedural-window");
-                        // Only one instance
-                        if (w != null && w.hasParent()) {
-                            if (!w.isVisible())
-                                w.setVisible(true);
-                        } else {
-                            ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
-                            proceduralWindow.setName("procedural-window");
-                            proceduralWindow.show(stage);
-                        }
+                        ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
+                        proceduralWindow.setName("procedural-window");
+                        proceduralWindow.show(stage);
                     }
                 }
 
