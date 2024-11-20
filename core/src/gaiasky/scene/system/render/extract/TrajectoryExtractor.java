@@ -93,7 +93,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
             if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && renderer.isOn(ComponentType.Asteroids)) {
                 addToRender(render, RenderGroup.ORBITAL_ELEMENTS_PARTICLE);
             }
-            if (label.forceLabel) {
+            if (label.renderLabel && label.forceLabel) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
         }

@@ -86,6 +86,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
 
     private boolean renderText(Body body, SolidAngle sa, Label label, ParticleExtra particleExtra) {
         return particleExtra.computedSize > 0 &&
+                label.renderLabel &&
                 renderer.isOn(ComponentType.Labels) &&
                 body.solidAngleApparent >= (sa.thresholdLabel / (label.labelBias * camera.getFovFactor()));
     }

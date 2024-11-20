@@ -73,7 +73,9 @@ public class ModelExtractor extends AbstractExtractSystem {
                 // Simple billboards.
                 if (body.solidAngleApparent >= sa.thresholdNone) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
-                    addToRender(render, RenderGroup.FONT_LABEL);
+                    if (label.renderLabel) {
+                        addToRender(render, RenderGroup.FONT_LABEL);
+                    }
                 }
             } else {
                 // Rest of models.
@@ -148,6 +150,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                                SolidAngle sa,
                                Label label) {
         return base.names != null
+                && label.renderLabel
                 && renderer.isOn(ComponentTypes.ComponentType.Labels)
                 && (label.forceLabel || body.solidAngleApparent >= sa.thresholdLabel / label.labelBias);
     }

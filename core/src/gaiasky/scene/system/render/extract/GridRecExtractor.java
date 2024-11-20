@@ -26,12 +26,13 @@ public class GridRecExtractor extends AbstractExtractSystem {
             var label = Mapper.label.get(entity);
 
             addToRender(render, RenderGroup.MODEL_VERT_RECGRID);
-            if (label.label) {
+            if (label.label && label.renderLabel) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
             if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
                 addToRender(render, RenderGroup.LINE);
             }
+            addToRender(render, RenderGroup.PARTICLE_SYSTEM);
         }
 
     }

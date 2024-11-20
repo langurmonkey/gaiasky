@@ -30,6 +30,10 @@ public class Label implements Component {
      * bypassing the solid angle check
      */
     public boolean forceLabel = false;
+    /**
+     * This flag disables the rendering of the label.
+     */
+    public boolean renderLabel = true;
     /** Factor to apply to the size of the label. **/
     public float labelFactor = 0;
     /** Internal rendering factor **/
@@ -63,6 +67,10 @@ public class Label implements Component {
 
     public void setForceLabel(Boolean force) {
         this.forceLabel = force;
+    }
+
+    public void setRenderLabel(Boolean render) {
+        this.renderLabel = render;
     }
 
     /**

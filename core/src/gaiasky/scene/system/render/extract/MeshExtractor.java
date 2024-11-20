@@ -27,12 +27,13 @@ public class MeshExtractor extends AbstractExtractSystem {
 
         if (mustRender(base) && GaiaSky.instance.isInitialised()) {
             switch (mesh.shading) {
-            case ADDITIVE -> addToRender(render, RenderGroup.MODEL_VERT_ADDITIVE);
-            case REGULAR -> addToRender(render, RenderGroup.MODEL_PIX_EARLY);
-            case DUST -> addToRender(render, RenderGroup.MODEL_PIX_DUST);
+                case ADDITIVE -> addToRender(render, RenderGroup.MODEL_VERT_ADDITIVE);
+                case REGULAR -> addToRender(render, RenderGroup.MODEL_PIX_EARLY);
+                case DUST -> addToRender(render, RenderGroup.MODEL_PIX_DUST);
             }
 
-            addToRender(render, RenderGroup.FONT_LABEL);
+            if (Mapper.label.get(entity).renderLabel)
+                addToRender(render, RenderGroup.FONT_LABEL);
         }
     }
 }

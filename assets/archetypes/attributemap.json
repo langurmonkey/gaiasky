@@ -526,6 +526,10 @@
           "labelPositionKm"
         ]
       },
+      "renderLabel": {
+        "description": "Defaults to true, this flag enables or disables the actual rendering of the label in the attached object.",
+        "unit": "Boolean"
+      },
       "forceLabel": {
         "description": "Force-display the label of this object, regardless of its solid angle. If 'true', the label for this object is always displayed.",
         "unit": "Boolean"
