@@ -21,7 +21,10 @@ import gaiasky.util.math.Vector3d;
 
 public class Focus implements Component {
 
-    /** Whether this entity is focusable or not. **/
+    /**
+     * Whether this entity is focusable or not. If it is not focusable, the entity won't appear in the search results and
+     * can't be selected with the mouse.
+     **/
     public boolean focusable = true;
 
     /** Consumer that returns whether the focus is active or not. **/

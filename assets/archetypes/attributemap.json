@@ -903,7 +903,7 @@
     "Focus": {
       "description": "Defines attributes related to objects that can be focussed.",
       "focusable": {
-        "description": "Defines whether the object is focusable or not. By default, this is on.",
+        "description": "Defines whether the object is focusable or not. Non-focusable objects do not appear in the search results and can't be selected with the mouse. By default, this is true.",
         "units": "Boolean"
       }
     },

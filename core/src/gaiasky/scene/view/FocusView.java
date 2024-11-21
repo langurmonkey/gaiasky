@@ -941,6 +941,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
+    public boolean isFocusable() {
+        return focus == null || focus.focusable;
+    }
+
+    @Override
     public float[] getColor() {
         return body.color;
     }

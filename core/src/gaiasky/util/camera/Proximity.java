@@ -532,6 +532,11 @@ public class Proximity {
         }
 
         @Override
+        public boolean isFocusable() {
+            return false;
+        }
+
+        @Override
         public float[] getColor() {
             return col;
         }

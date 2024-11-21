@@ -407,6 +407,12 @@ public interface IFocus {
     boolean isCopy();
 
     /**
+     * Whether this focus is focusable. This checks the attribute 'focusable' of the Focus component.
+     * @return Whether the focus is focusable.
+     */
+    boolean isFocusable();
+
+    /**
      * Gets the color of this object.
      *
      * @return The color as an RGBA float array.

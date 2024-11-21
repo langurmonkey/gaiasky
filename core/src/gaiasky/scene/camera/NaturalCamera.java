@@ -443,7 +443,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         speedScalingCapped = FastMath.max(10d * Constants.M_TO_U, speedScaling);
         switch (m) {
             case FOCUS_MODE:
-                if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow()) {
+                if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow() && focus.isFocusable()) {
                     final double appMagCamera, appMagEarth;
                     synchronized (updateLock) {
                         focusBak = focus;

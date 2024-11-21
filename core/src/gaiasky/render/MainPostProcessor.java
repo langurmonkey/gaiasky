@@ -768,7 +768,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         l = new Object[]{shader, false, entity};
                     }
                     addRayMarchingDef(name, l);
-                    logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
+                    logger.debug("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
                 } else {
                     var rmTime = getRaymarchingTime();
                     for (int i = 0; i < RenderType.values().length; i++) {
@@ -779,7 +779,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                 rms.forEach((key, rmEffect) -> {
                                     Raymarching raymarching = (Raymarching) rmEffect;
                                     raymarching.setEnabled(status);
-                                    logger.info("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
+                                    logger.debug("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
 
                                     // We also update time and object position for the first time here.
                                     var rmEntity = (Entity) rayMarchingDefinitions.get(key)[2];

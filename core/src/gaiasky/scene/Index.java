@@ -279,8 +279,9 @@ public class Index {
         for (String key : keys) {
             if (abort != null && abort.get())
                 return;
-            Entity entity = index.get(key);
-            if (Mapper.focus.has(entity) && key.startsWith(name)) {
+            var entity = index.get(key);
+            var focus = Mapper.focus.get(entity);
+            if (focus != null && focus.focusable && key.startsWith(name)) {
                 results.add(key);
                 i++;
             }
@@ -291,8 +292,9 @@ public class Index {
         for (String key : keys) {
             if (abort != null && abort.get())
                 return;
-            Entity entity = index.get(key);
-            if (Mapper.focus.has(entity) && key.contains(name)) {
+            var entity = index.get(key);
+            var focus = Mapper.focus.get(entity);
+            if (focus != null && focus.focusable && key.contains(name)) {
                 results.add(key);
                 i++;
             }
