@@ -267,18 +267,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPreRunnables(regularBlendR, noDepthTestR);
                 system.addPostRunnables(clearDepthR);
             }
-            case LINE -> {
-                // LINES CPU
-                system = getLineCPURenderSystem();
-            }
-            case LINE_GPU -> {
-                // LINES GPU
-                system = getLineGPURenderSystem();
-            }
-            case POINT -> // POINTS CPU
-                    system = new PointPrimitiveRenderSystem(this, POINT, alphas, renderAssets.pointShaders);
+            case LINE -> system = getLineCPURenderSystem();
+            case LINE_GPU -> system = getLineGPURenderSystem();
+            case POINT -> system = new PointPrimitiveRenderSystem(this, POINT, alphas, renderAssets.pointShaders);
             case POINT_GPU -> {
-                // POINTS GPU
                 system = new PrimitiveVertexRenderSystem<>(this, POINT_GPU, alphas, renderAssets.primitiveGpuShaders, false);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
@@ -289,8 +281,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
             case MODEL_VERT_EARLY -> // MODEL PER-VERTEX-LIGHTING EARLY
                     system = new ModelRenderer(this, MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
-            case MODEL_DIFFUSE -> // MODEL DIFFUSE
-                    system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
+            case MODEL_DIFFUSE -> system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
             case MODEL_PIX -> // MODEL PER-PIXEL-LIGHTING
                     system = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPixelLighting);
             case MODEL_PIX_TESS -> {
@@ -300,8 +291,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case MODEL_VERT_BEAM -> // MODEL BEAM
                     system = new ModelRenderer(this, MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
-            case BILLBOARD_GROUP -> // BILLBOARD GROUP
-                    system = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
+            case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
             case PARTICLE_GROUP -> {
                 final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudModeParticles) {
@@ -312,19 +302,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case PARTICLE_GROUP_EXT_BILLBOARD -> {
-                // PARTICLE GROUP (EXTENDED, billboards)
                 system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_BILLBOARD, alphas, renderAssets.particleGroupExtBillboardShaders);
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case PARTICLE_GROUP_EXT_MODEL -> {
-                // PARTICLE GROUP (EXTENDED, models)
                 system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_MODEL, alphas, renderAssets.particleGroupExtModelShaders);
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case STAR_GROUP -> {
-                // STAR GROUP
                 final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudMode) {
                     case TRIANGLES -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
@@ -334,7 +321,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case VARIABLE_GROUP -> {
-                // VARIABLE GROUP
                 final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudMode) {
                     case TRIANGLES -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
@@ -344,13 +330,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case ORBITAL_ELEMENTS_PARTICLE -> {
-                // ORBITAL ELEMENTS PARTICLES
                 system = new ElementsRenderer(this, ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case ORBITAL_ELEMENTS_GROUP -> {
-                // ORBITAL ELEMENTS GROUP
                 system = new ElementsSetRenderer(this, ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
@@ -361,23 +345,19 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case FONT_LABEL -> // LABELS
                     system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
             case BILLBOARD_SSO -> {
-                // BILLBOARD SSO
                 system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.billboardShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case BILLBOARD_STAR -> {
-                // BILLBOARD STARS
                 system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.billboardShaders, Settings.settings.scene.star.getStarTexture(), true);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(lightGlowPass.getLpu());
             }
             case BILLBOARD_GAL -> {
-                // BILLBOARD GALAXIES
                 system = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case BILLBOARD_SPRITE -> {
-                // BILLBOARD SPRITES
                 system = new BillboardRenderer(this, BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null, false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
@@ -403,18 +383,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
             }
             case PARTICLE_EFFECTS -> {
-                // PARTICLE EFFECTS
                 system = new ParticleEffectsRenderer(this, PARTICLE_EFFECTS, alphas, renderAssets.particleEffectShaders);
                 system.addPreRunnables(additiveBlendR, noDepthTestR);
                 system.addPostRunnables(regularBlendR);
             }
+            case PARTICLE_SYSTEM -> system = new ParticleSystemRenderer(this, PARTICLE_SYSTEM, alphas);
             case SHAPE -> {
-                // SHAPES
                 system = new ShapeRenderer(this, SHAPE, alphas, globalResources.getShapeShader());
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
             case SPRITE -> {
-                // SPRITES
                 system = new SpriteRenderer(this, SPRITE, alphas, globalResources.getSpriteShader());
                 system.addPreRunnables(regularBlendR, noDepthTestR);
             }

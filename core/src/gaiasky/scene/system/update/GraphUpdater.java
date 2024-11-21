@@ -163,7 +163,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
                         base.opacity = 1;
                     }
                 }
-                updateFadeDistance(body, fade);
+                updateFadeDistance(entity, body, fade);
                 updateFadeOpacity(base, fade);
             } else {
                 base.opacity = opacity;
@@ -213,7 +213,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void updateFadeDistance(Body body,
+    private void updateFadeDistance(Entity entity,
+            Body body,
                                     Fade fade) {
         if (fade.fadePositionObject != null) {
             fade.currentDistance = Mapper.body.get(fade.fadePositionObject).distToCamera;
@@ -223,7 +224,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             // Here we only use the camera position!
             fade.currentDistance = D31.set(camera.getPos()).len() * camera.getFovFactor();
         }
-        body.distToCamera = fade.fadePositionObject == null ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.fadePositionObject).distToCamera;
+        body.distToCamera = fade.fadePositionObject == null || fade.fadePositionObject == entity ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.fadePositionObject).distToCamera;
     }
 
     private void updateFadeOpacity(Base base,

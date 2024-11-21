@@ -912,6 +912,7 @@ public class DefaultIntShader extends BaseIntShader {
 
     public static class Inputs {
         public final static Uniform projTrans = new Uniform("u_projTrans");
+        public final static Uniform viewTrans = new Uniform("u_viewTrans");
         public final static Uniform projViewTrans = new Uniform("u_projViewTrans");
         public final static Uniform cameraPosition = new Uniform("u_cameraPosition");
         public final static Uniform cameraDirection = new Uniform("u_cameraDirection");
@@ -1012,6 +1013,15 @@ public class DefaultIntShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 shader.set(inputID, shader.camera.projection);
+            }
+        };
+        public final static Setter viewTrans = new GlobalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, shader.camera.view);
             }
         };
         public final static Setter projViewTrans = new GlobalSetter() {

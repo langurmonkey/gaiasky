@@ -607,6 +607,25 @@ public class Vector3d implements VectorDouble<Vector3d> {
                 x * l_mat[Matrix4d.M01] + y * l_mat[Matrix4d.M11] + z * l_mat[Matrix4d.M21] + l_mat[Matrix4d.M31],
                 x * l_mat[Matrix4d.M02] + y * l_mat[Matrix4d.M12] + z * l_mat[Matrix4d.M22] + l_mat[Matrix4d.M32]);
     }
+    /** Left-multiplies the vector by the given matrix.
+     * @param matrix The matrix
+     * @return This vector for chaining */
+    public Vector3d mul (Matrix3d matrix) {
+        final double[] l_mat = matrix.val;
+        return set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M01] + z * l_mat[Matrix3.M02],
+                x * l_mat[Matrix3.M10] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M12],
+                x * l_mat[Matrix3.M20] + y * l_mat[Matrix3.M21] + z * l_mat[Matrix3.M22]);
+    }
+
+    /** Multiplies the vector by the transpose of the given matrix.
+     * @param matrix The matrix
+     * @return This vector for chaining */
+    public Vector3d traMul (Matrix3d matrix) {
+        final double[] l_mat = matrix.val;
+        return set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M10] + z * l_mat[Matrix3.M20],
+                x * l_mat[Matrix3.M01] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M21],
+                x * l_mat[Matrix3.M02] + y * l_mat[Matrix3.M12] + z * l_mat[Matrix3.M22]);
+    }
 
     /**
      * Multiplies the vector by the given {@link Quaternion}.

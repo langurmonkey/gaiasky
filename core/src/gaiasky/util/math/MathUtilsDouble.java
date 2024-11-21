@@ -7,6 +7,7 @@
 
 package gaiasky.util.math;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import net.jafama.FastMath;
 import org.apfloat.Apfloat;
@@ -53,6 +54,17 @@ public final class MathUtilsDouble {
     /** Returns the cosine in radians from a lookup table. */
     static public double cos(double radians) {
         return Sin.table[(int) ((radians + PI / 2) * radToIndex) & SIN_MASK];
+    }
+    /** Returns the sine in degrees from a lookup table. For optimal precision, use degrees between -360 and 360 (both
+     * inclusive). */
+    static public double sinDeg (double degrees) {
+        return Sin.table[(int)(degrees * degToIndex) & SIN_MASK];
+    }
+
+    /** Returns the cosine in degrees from a lookup table. For optimal precision, use degrees between -360 and 360 (both
+     * inclusive). */
+    static public double cosDeg (double degrees) {
+        return Sin.table[(int)((degrees + 90) * degToIndex) & SIN_MASK];
     }
 
     /**
