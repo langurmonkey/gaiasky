@@ -10,6 +10,7 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -59,6 +60,8 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         if (rm.additionalTexture != null) {
             var tp = new OwnTextureLoader.OwnTextureParameter();
             tp.genMipMaps = false;
+            tp.minFilter = TextureFilter.Linear;
+            tp.magFilter = TextureFilter.Linear;
             rm.additionalTextureUnpacked = addToLoad(rm.additionalTexture, tp);
         } else {
             rm.additionalTextureUnpacked = null;
