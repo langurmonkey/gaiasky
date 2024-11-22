@@ -62,6 +62,8 @@ public class RaymarchingInitializer extends AbstractInitSystem {
             tp.genMipMaps = false;
             tp.minFilter = TextureFilter.Linear;
             tp.magFilter = TextureFilter.Linear;
+            tp.wrapU = Texture.TextureWrap.Repeat;
+            tp.wrapV = Texture.TextureWrap.Repeat;
             rm.additionalTextureUnpacked = addToLoad(rm.additionalTexture, tp);
         } else {
             rm.additionalTextureUnpacked = null;

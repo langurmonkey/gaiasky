@@ -130,7 +130,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE,
                 Event.CAMERA_ORIENTATION_UPDATE, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
                 Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
-                Event.FILM_GRAIN_CMD);
+                Event.FILM_GRAIN_CMD, Event.SHADER_POSTPROCESS_RELOAD_CMD);
     }
 
     public void initializeOffScreenPostProcessors() {
@@ -181,13 +181,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         // RAY MARCHING SHADERS
         rayMarchingDefinitions.forEach((key, list) -> {
-            Raymarching rm = new Raymarching((String) list[0], width, height);
+            RaymarchObject rm = new RaymarchObject((String) list[0], width, height);
             // Fixed uniforms
             float zFar = (float) GaiaSky.instance.getCameraManager().current.getFar();
             float k = Constants.getCameraK();
             var entity = (Entity) list[2];
             var body = Mapper.body.get(entity);
-            var raymarch = Mapper.raymarching.get(entity);
+            var raymarching = Mapper.raymarching.get(entity);
             // We normalize the size.
             rm.setSize(body.size * 0.1f);
             rm.setZfarK(zFar, k);
@@ -204,7 +204,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     logger.error(e);
                 }
             }
-            rm.setEnabled(raymarch.isOn);
+            rm.setEnabled(raymarching.isOn);
             ppb.add(key, rm);
         });
 
@@ -774,11 +774,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
-                            Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                            Map<String, PostProcessorEffect> rms = ppb.getAll(RaymarchObject.class);
                             if (rms != null)
                                 rms.forEach((key, rmEffect) -> {
-                                    Raymarching raymarching = (Raymarching) rmEffect;
-                                    raymarching.setEnabled(status);
+                                    RaymarchObject raymarchObject = (RaymarchObject) rmEffect;
+                                    raymarchObject.setEnabled(status);
                                     logger.debug("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
 
                                     // We also update time and object position for the first time here.
@@ -787,8 +787,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                     focusView.setEntity(rmEntity);
                                     focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
                                     var camPos = v3b1.set(GaiaSky.instance.getCameraManager().getPos()).sub(v3b2).put(v3f1);
-                                    raymarching.setTime(rmTime);
-                                    raymarching.setPos(camPos);
+                                    raymarchObject.setTime(rmTime);
+                                    raymarchObject.setPos(camPos);
                                 });
                         }
                     }
@@ -801,11 +801,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         // Update ray marching additional data
-                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(RaymarchObject.class);
                         if (rms != null) {
                             PostProcessorEffect ppe = rms.get(name);
                             if (ppe != null)
-                                ((Raymarching) ppe).setAdditional(additional);
+                                ((RaymarchObject) ppe).setAdditional(additional);
                         }
                     }
                 }
@@ -826,7 +826,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             glow.setOrientation(cameraOffset * 50f);
 
                         // Update ray marching shaders
-                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(RaymarchObject.class);
                         if (rms != null)
                             rms.forEach((key, rmEffect) -> {
                                 if (rmEffect.isEnabled()) {
@@ -835,9 +835,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                     focusView.setEntity(rmEntity);
                                     focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
                                     var camPos = v3b1.set(campos).sub(v3b2).put(v3f1);
-                                    Raymarching raymarching = (Raymarching) rmEffect;
-                                    raymarching.setTime(rmTime);
-                                    raymarching.setPos(camPos);
+                                    RaymarchObject raymarchObject = (RaymarchObject) rmEffect;
+                                    raymarchObject.setTime(rmTime);
+                                    raymarchObject.setPos(camPos);
                                 }
                             });
                     }
@@ -857,15 +857,15 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         // Update all raymarching and SSR shaders
-                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(RaymarchObject.class);
                         if (rms != null)
                             rms.forEach((key, rmEffect) -> {
                                 if (rmEffect.isEnabled()) {
-                                    Raymarching raymarching = (Raymarching) rmEffect;
-                                    raymarching.setFrustumCorners(frustumCorners);
-                                    raymarching.setView(view);
-                                    raymarching.setCombined(combined);
-                                    raymarching.setViewportSize(w, h);
+                                    RaymarchObject raymarchObject = (RaymarchObject) rmEffect;
+                                    raymarchObject.setFrustumCorners(frustumCorners);
+                                    raymarchObject.setView(view);
+                                    raymarchObject.setCombined(combined);
+                                    raymarchObject.setViewportSize(w, h);
                                 }
                             });
                         Map<String, PostProcessorEffect> ssrs = ppb.getAll(SSR.class);
@@ -1082,6 +1082,21 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 var upscaleFilter = (UpscaleFilter) data[0];
                 updateUpscaleFilters(upscaleFilter, (float) Settings.settings.graphics.backBufferScale);
             }
+            case SHADER_POSTPROCESS_RELOAD_CMD -> GaiaSky.postRunnable(() -> {
+                // Update shaders of all effects.
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        var effects = pps[i].effects;
+                        for (var mapsKey : effects.keySet()) {
+                            var effectsMap = effects.get(mapsKey);
+                            for (var key : effectsMap.keySet()) {
+                                var effect = effectsMap.get(key);
+                                effect.updateShaders();
+                            }
+                        }
+                    }
+                }
+            });
             default -> {
             }
         }

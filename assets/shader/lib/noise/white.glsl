@@ -1,6 +1,6 @@
 // #name: White
 
-/**
+/*
  * Implimentation of 3D white noise.
  * Based on: https://www.ronja-tutorials.com/post/024-white-noise/
  *

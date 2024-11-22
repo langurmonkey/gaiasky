@@ -131,3 +131,4 @@ action.slave.configure                      = S L V
 
 # Debug
 action.ui.reload                            = CTRL_L SHIFT_L U I
+action.shaders.reload                       = CTRL_L SHIFT_L P

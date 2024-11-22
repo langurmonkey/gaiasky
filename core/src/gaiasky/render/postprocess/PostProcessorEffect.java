@@ -78,6 +78,13 @@ public abstract class PostProcessorEffect implements Disposable {
     }
 
     /**
+     * Re-compiles the shaders of all filters in this effect.
+     */
+    public void updateShaders(){
+        // Empty by default. Re-implement in subclass if necessary.
+    }
+
+    /**
      * Default implementation uses the resources in the disposables list.
      **/
     public void dispose() {

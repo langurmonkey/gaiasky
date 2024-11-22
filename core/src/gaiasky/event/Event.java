@@ -1442,6 +1442,10 @@ public enum Event {
      * Clears all cached shaders.
      */
     CLEAR_SHADERS,
+    /**
+     * Reloads and re-compiles the post-processing shaders. Currently, only ray-marching shaders implement this feature.
+     */
+    SHADER_POSTPROCESS_RELOAD_CMD,
 
     /**
      * Resets the main renderer.

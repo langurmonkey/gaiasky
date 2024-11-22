@@ -20,6 +20,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 zfark;
     private final Vector3 pos;
     private final float[] additional;
+    private final String fragmentShaderName;
     private Matrix4 frustumCorners;
     private final Matrix4 invView;
     private final Matrix4 combined;
@@ -55,6 +56,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
      */
     public RaymarchingFilter(String fragmentShader, Vector2 viewportSize) {
         super(ShaderLoader.fromFile("raymarching/screenspace", fragmentShader));
+        this.fragmentShaderName = fragmentShader;
         this.viewport = viewportSize;
         this.zfark = new Vector2();
         this.pos = new Vector3();
@@ -64,6 +66,13 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.additional = new float[4];
         this.size = 1;
         rebind();
+    }
+
+    /**
+     * Re-compiles the shader. To run in a post-runnable!
+     */
+    public void updateProgram() {
+        updateProgram(ShaderLoader.fromFile("raymarching/screenspace", fragmentShaderName));
     }
 
     public void setFrustumCorners(Matrix4 fc) {

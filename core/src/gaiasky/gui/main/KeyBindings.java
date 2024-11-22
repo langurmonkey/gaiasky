@@ -494,6 +494,9 @@ public class KeyBindings {
         // Reload UI (debugging)
         addAction(new ProgramAction("action.ui.reload", () -> EventManager.publish(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources())));
 
+        // Re-compile post-process shaders (debugging)
+        addAction(new ProgramAction("action.shaders.reload", () -> EventManager.publish(Event.SHADER_POSTPROCESS_RELOAD_CMD, this)));
+
         // Configure slave
         addAction(new ProgramAction("action.slave.configure", () -> EventManager.publish(Event.SHOW_SLAVE_CONFIG_ACTION, this), masterWithSlaves));
 

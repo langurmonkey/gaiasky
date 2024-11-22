@@ -54,6 +54,13 @@ public abstract class Filter3<T> implements Disposable {
     }
 
     /**
+     * Disposes the current shader, reloads it from disk and re-compiles it. Run synchronously.
+     */
+    public void updateProgram() {
+        // Empty, re-implement in subclass if needed.
+    }
+
+    /**
      * Caution, disposes of the current program and updates it with the new one. Run synchronously after render().
      *
      * @param program The new shader program.

@@ -15,14 +15,17 @@ import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.RaymarchingFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
-public final class Raymarching extends PostProcessorEffect {
+/**
+ * A ray-marching shader to render an object or effect using ray-marching.
+ */
+public final class RaymarchObject extends PostProcessorEffect {
     private final RaymarchingFilter filter;
 
-    public Raymarching(String fragmentShader, float viewportWidth, float viewportHeight) {
+    public RaymarchObject(String fragmentShader, float viewportWidth, float viewportHeight) {
         this(fragmentShader, (int) viewportWidth, (int) viewportHeight);
     }
 
-    public Raymarching(String fragmentShader, int viewportWidth, int viewportHeight) {
+    public RaymarchObject(String fragmentShader, int viewportWidth, int viewportHeight) {
         super();
         filter = new RaymarchingFilter(fragmentShader, viewportWidth, viewportHeight);
         disposables.add(filter);
@@ -74,6 +77,12 @@ public final class Raymarching extends PostProcessorEffect {
 
     public void setAdditional(int index, float value) {
         filter.setAdditional(index, value);
+    }
+
+    @Override
+    public void updateShaders() {
+        super.updateShaders();
+        filter.updateProgram();
     }
 
     @Override
