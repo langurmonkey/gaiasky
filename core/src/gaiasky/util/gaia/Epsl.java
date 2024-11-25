@@ -64,8 +64,9 @@ public class Epsl extends AnalyticalAttitudeDataServer {
         omega = getOmegaRef() + FOUR_PI * (double) tRemainder
                 / (double) twicePeriod;
 
-        /* SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
-         * 	GLOBAL	GAIASANDBOX
+        /*
+         * SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
+         * 	GLOBAL -> GAIA SKY
          * 	Z -> Y
          * 	X -> Z
          * 	Y -> X
@@ -120,20 +121,6 @@ public class Epsl extends AnalyticalAttitudeDataServer {
 
         spinVector = new Vector3d();
         setInitialized(true);
-    }
-
-    /**
-     * @return non-truncated spin phase
-     */
-    public double getOmegaFull() {
-        return omega + omegaRevs * TWO_PI;
-    }
-
-    /**
-     * @return spin phase normalised to range [0, 4 Pi]
-     */
-    public double getOmegaMod4Pi() {
-        return omega + (omegaRevs % 2) * TWO_PI;
     }
 
     /**

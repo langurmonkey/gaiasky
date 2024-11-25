@@ -54,8 +54,9 @@ public class AttitudeConverter {
             double nu, double omega, double lSunDot, double nuDot,
             double omegaDot) {
 
-        /* SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
-         * 	GLOBAL ->	GAIASANDBOX
+        /*
+         * SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
+         * 	GLOBAL -> GAIA SKY
          * 	Z -> Y
          * 	X -> Z
          * 	Y -> X
