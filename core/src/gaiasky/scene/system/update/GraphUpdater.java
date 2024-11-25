@@ -180,7 +180,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 // Regular objects.
                 // Take into account size of model objects.
                 var model = Mapper.model.get(entity);
-                double modelSize = model != null ? model.modelSize : 1;
+                double modelSize = model != null ? model.modelSize : 1.0;
                 body.solidAngle = FastMath.atan(body.size * modelSize / body.distToCamera);
                 body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
             }
