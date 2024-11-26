@@ -667,7 +667,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     }
                 } else {
                     radiusSptLabel.setText(I18n.msg("gui.focusinfo.radius"));
-                    focusRadiusSpt.setText(GlobalResources.formatNumber(view.getRadius() * Constants.U_TO_KM) + " " + I18n.msg("gui.unit.km"));
+                    var rad = GlobalResources.doubleToDistanceString(view.getRadius(), settings.program.ui.distanceUnits);
+                    focusRadiusSpt.setText(GlobalResources.formatNumber(Math.max(0d, rad.getFirst())) + " " + rad.getSecond());
 
                     tEffLabel.setVisible(false);
                     focusTEff.setVisible(false);
