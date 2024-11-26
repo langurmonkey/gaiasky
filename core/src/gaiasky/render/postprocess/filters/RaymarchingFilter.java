@@ -72,7 +72,11 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
      * Re-compiles the shader. To run in a post-runnable!
      */
     public void updateProgram() {
-        updateProgram(ShaderLoader.fromFile("raymarching/screenspace", fragmentShaderName));
+        try {
+            var program = ShaderLoader.fromFile("raymarching/screenspace", fragmentShaderName);
+            updateProgram(program);
+        } catch(Exception ignored) {
+        }
     }
 
     public void setFrustumCorners(Matrix4 fc) {

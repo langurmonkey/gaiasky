@@ -30,7 +30,7 @@ public final class ShaderLoader {
         return ShaderLoader.fromFile(vertexFileName, fragmentFileName, "");
     }
 
-    public static ShaderProgram fromFile(String vertexFileName, String fragmentFileName, String defines) {
+    public static ShaderProgram fromFile(String vertexFileName, String fragmentFileName, String defines) throws RuntimeException {
         String log = "\"" + vertexFileName + " / " + fragmentFileName + "\"";
         if (!defines.isEmpty()) {
             log += " w/ (" + defines.replace("\n", ", ") + ")";
@@ -69,18 +69,18 @@ public final class ShaderLoader {
 
     }
 
-    public static ShaderProgram fromString(String vertex, String fragment, String vertexName, String fragmentName) {
+    public static ShaderProgram fromString(String vertex, String fragment, String vertexName, String fragmentName) throws RuntimeException {
         return ShaderLoader.fromString(vertex, fragment, vertexName, fragmentName, "");
     }
 
-    public static ShaderProgram fromString(String vertex, String fragment, String vertexName, String fragmentName, String defines) {
+    public static ShaderProgram fromString(String vertex, String fragment, String vertexName, String fragmentName, String defines) throws RuntimeException {
         ShaderProgram.pedantic = ShaderLoader.Pedantic;
         ShaderProgram shader = new ShaderProgram(insertDefines(vertex, defines), insertDefines(fragment, defines));
 
         if (!shader.isCompiled()) {
             logger.error("Compile error: " + vertexName + " / " + fragmentName);
             logger.error(shader.getLog());
-            System.exit(-1);
+            throw new RuntimeException("Compile error: " + vertexName + " / " + fragmentName);
         }
 
         return shader;

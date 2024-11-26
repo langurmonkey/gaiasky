@@ -779,7 +779,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                 rms.forEach((key, rmEffect) -> {
                                     RaymarchObject raymarchObject = (RaymarchObject) rmEffect;
                                     raymarchObject.setEnabled(status);
-                                    logger.debug("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
 
                                     // We also update time and object position for the first time here.
                                     var rmEntity = (Entity) rayMarchingDefinitions.get(key)[2];
