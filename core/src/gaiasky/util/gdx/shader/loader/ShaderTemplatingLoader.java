@@ -9,6 +9,8 @@ package gaiasky.util.gdx.shader.loader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 
 import java.util.Scanner;
 
@@ -24,8 +26,14 @@ public class ShaderTemplatingLoader {
             // Strip brackets.
             file = file.replace("<", "").replace(">", "");
         }
-
-        FileHandle fh = Gdx.files.internal(file);
+        FileHandle fh;
+        if(file.startsWith(Constants.DATA_LOCATION_TOKEN)) {
+            // Dataset.
+            fh = Settings.settings.data.dataFileHandle(file);
+        } else {
+            // Internal file (assets directory).
+            fh = Gdx.files.internal(file);
+        }
         return load(fh);
     }
 
