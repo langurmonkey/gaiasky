@@ -57,7 +57,11 @@ public class ModelExtractor extends AbstractExtractSystem {
 
             camera.checkClosestBody(entity);
 
-            if (Mapper.tagBillboardGalaxy.has(entity)) {
+            if (Mapper.aurora.has(entity)) {
+                // Aurora borealis/australis.
+                addToRender(render, RenderGroup.MODEL_AURORA);
+
+            } else if (Mapper.tagBillboardGalaxy.has(entity)) {
                 // Billboard galaxies.
                 double thPoint = (sa.thresholdQuad * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
                 if (body.solidAngleApparent >= thPoint) {

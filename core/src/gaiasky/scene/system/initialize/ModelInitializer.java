@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
@@ -99,6 +100,7 @@ public class ModelInitializer extends AbstractInitSystem {
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
         boolean isBillboardGal = Mapper.tagBillboardGalaxy.has(entity);
+        boolean isAurora = Mapper.aurora.has(entity);
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateModel;
@@ -115,6 +117,10 @@ public class ModelInitializer extends AbstractInitSystem {
         } else {
             // The rest of the bodies use the flags.
             body.size = (float) ((body.size * (body.sizeIsRadiusFlag ? 2.0 : 1.0)) * (body.sizeInUnitsFlag ? 1.0 : Constants.KM_TO_U));
+        }
+
+        if (isAurora) {
+            initializeAurora(model);
         }
 
         // First init spacecraft if needed
@@ -203,6 +209,17 @@ public class ModelInitializer extends AbstractInitSystem {
             }
 
         }
+    }
+
+    private void initializeAurora(Model model) {
+
+        // Model renderer.
+        model.renderConsumer = ModelEntityRenderSystem::renderAurora;
+
+        // No culling.
+        model.model.culling = false;
+        // Additive.
+        model.model.setBlendMode(BlendMode.ADDITIVE);
     }
 
     private void initializeSpacecraft(Entity entity, Base base, Body body, GraphNode graph, Model model, ModelScaffolding scaffolding, MotorEngine engine, Label label) {

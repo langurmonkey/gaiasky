@@ -91,10 +91,6 @@ public enum RenderGroup {
      **/
     MODEL_PIX_TESS(1900),
     /**
-     * Beams.
-     **/
-    MODEL_VERT_BEAM(2000),
-    /**
      * Model star.
      **/
     MODEL_VERT_STAR(2100),
@@ -142,6 +138,10 @@ public enum RenderGroup {
      * Atmospheres of planets.
      **/
     MODEL_ATM(6000),
+    /**
+     * Aurora.
+     **/
+    MODEL_AURORA(5800),
     /**
      * Clouds.
      **/

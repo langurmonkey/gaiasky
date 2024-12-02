@@ -70,6 +70,7 @@ public class Mapper {
     public static final ComponentMapper<Keyframes> keyframes = ComponentMapper.getFor(Keyframes.class);
     public static final ComponentMapper<Perimeter> perimeter = ComponentMapper.getFor(Perimeter.class);
     public static final ComponentMapper<VRDevice> vr = ComponentMapper.getFor(VRDevice.class);
+    public static final ComponentMapper<Aurora> aurora = ComponentMapper.getFor(Aurora.class);
 
     // Tags
     public static final ComponentMapper<TagCopy> tagCopy = ComponentMapper.getFor(TagCopy.class);

@@ -1049,4 +1049,19 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
         }
     }
+
+    public void updateTime(double t) {
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            if(mat.has(FloatAttribute.Time)) {
+                // Update.
+                ((FloatAttribute)mat.get(FloatAttribute.Time)).value = (float) t;
+
+            } else {
+                // Add attribute.
+                mat.set(new FloatAttribute(FloatAttribute.Time, (float) t));
+            }
+        }
+    }
 }

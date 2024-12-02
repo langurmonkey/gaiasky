@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
+import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
@@ -177,6 +178,50 @@ public class ModelEntityRenderSystem {
 
             float colorAlpha = Mapper.tagBillboard.has(entity) || Mapper.tagBillboardGalaxy.has(entity) ? body.color[3] : 1.0f;
             mc.update(alpha * alphaFactor * colorAlpha, relativistic);
+            model.model.setSize(body.size);
+            batch.render(mc.instance, mc.env);
+        }
+    }
+    /**
+     * Renders an aurora.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The batch.
+     * @param alpha        The alpha value.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
+     */
+    public void renderAurora(Entity entity,
+                                   Model model,
+                                   IntModelBatch batch,
+                                   float alpha,
+                                   double t,
+                                   RenderingContext rc,
+                                   RenderGroup renderGroup,
+                                   boolean shadow,
+                                   boolean relativistic) {
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+
+        ModelComponent mc = model.model;
+        if (mc != null && mc.instance != null && mc.isModelInitialised()) {
+            var base = Mapper.base.get(entity);
+            var body = Mapper.body.get(entity);
+
+            float alphaFactor;
+            if (scaffolding != null) {
+                alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity * base.opacity;
+            } else {
+                alphaFactor = base.opacity;
+            }
+
+            mc.updateTime(t);
+            mc.update(alpha * alphaFactor, relativistic);
+            mc.setBlendMode(BlendMode.ADDITIVE);
+            mc.updateDepthTest();
             model.model.setSize(body.size);
             batch.render(mc.instance, mc.env);
         }
