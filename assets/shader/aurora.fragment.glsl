@@ -103,13 +103,11 @@ float fbm2(vec2 p, int oct) {
     return pnoise(p + 10. * fbm(p, oct) + vec2(0.0, u_time), oct);
 }
 
-// Calculate the lights themselves
-vec3 lights(vec2 co) {
+// Calculate the aurora lights given the top and bottom colors.
+vec3 lights(vec2 co, vec3 colTop, vec3 colBottom) {
     float d, r, g, b, h;
     vec3 rc, gc, bc, hc;
 
-    vec3 colTop = fetchColorEmissive(vec4(1.0, 0.2, 0.1, 1.0)).rgb;
-    vec3 colBottom = fetchColorDiffuse(vec4(0.0, 1.0, 0.4, 1.0)).rgb;
 
     // Red (top)
     r = fbm2(co * vec2(1.0, 0.5), 1);
@@ -135,20 +133,25 @@ void main() {
     vec2 uv = v_data.texCoords;
     float t = u_simuTime * 0.01;
 
+    vec3 colTop = fetchColorEmissive(vec4(1.0, 0.2, 0.1, 1.0)).rgb;
+    vec3 colBottom = fetchColorDiffuse(vec4(0.0, 1.0, 0.4, 1.0)).rgb;
+
+    float phase = colBottom.b * PI;
+
+
     float f = 0.3 + 0.3 * pnoise(vec2(8.0 * uv.x, 0.01 * t), 4);
     vec2 aco = uv;
     aco.y -= f - 0.3;
-    aco.y *= (25.0 + abs(sin(t * 0.1 - uv.x * 5.0)) * 32.0);
+    aco.y *= (25.0 + abs(sin( 0.1 - uv.x * 5.0 + phase)) * 32.0);
     aco.x *= 1000.0;
     // Fade at x == 0 and x == 1
     float fade = smoothstep(uv.x, 0.0, 0.01) * smoothstep(uv.x, 1.0, 0.99) * smoothstep(uv.y, 1.0, 0.9);
 
     //vec3 col = lights(aco);
-
-    vec3 col = lights(aco)
-            * (smoothstep(0.3, 0.6, pnoise(vec2(10.0 * uv.x, 0.3 * t), 1))
+    vec3 col = lights(aco, colTop, colBottom)
+            * (smoothstep(0.3, 0.6, pnoise(vec2(10.0 * uv.x + phase, 0.3 * t), 1))
                 + 0.5 * smoothstep(0.5, 0.7, pnoise(vec2(10.0 * uv.x, t), 1)))
-            * pow(clamp(sin(PI + ((t * 0.1 + uv.x) * PI / 2.0) * pnoise(vec2(10.0 * uv.x, 0.3 * t), 1)) * cos((t * 0.2 + uv.x) * -PI / 3.0), 0.0, 2.0), 1.5);
+            * pow(clamp(sin(PI + ((t * 0.1 + uv.x + phase) * PI / 2.0) * pnoise(vec2(10.0 * uv.x, 0.3 * t), 1)) * cos((t * 0.2 + uv.x + phase) * -PI / 3.0), 0.0, 2.0), 1.5);
 
     fragColor = vec4(clamp(pow(col * fade, vec3(2.0)), 0.0, 1.0), 1.0);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
