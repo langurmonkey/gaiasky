@@ -197,7 +197,8 @@ public class SysUtils {
     }
 
     public static boolean isX11() {
-        return System.getenv("XDG_SESSION_TYPE").equals("x11");
+        var sessionType = System.getenv("XDG_SESSION_TYPE");
+        return sessionType != null && sessionType.equals("x11");
     }
 
     public static boolean isGLFWX11() {
@@ -205,7 +206,8 @@ public class SysUtils {
     }
 
     public static boolean isWayland() {
-        return System.getenv("XDG_SESSION_TYPE").equals("wayland");
+        var sessionType = System.getenv("XDG_SESSION_TYPE");
+        return sessionType != null && sessionType.equals("wayland");
     }
 
     public static boolean isGLFWWayland() {
