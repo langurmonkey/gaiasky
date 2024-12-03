@@ -136,7 +136,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The batch.
      * @param alpha        The alpha value.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -182,6 +182,7 @@ public class ModelEntityRenderSystem {
             batch.render(mc.instance, mc.env);
         }
     }
+
     /**
      * Renders an aurora.
      *
@@ -189,21 +190,21 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The batch.
      * @param alpha        The alpha value.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
      * @param relativistic Whether to apply relativistic effects.
      */
     public void renderAurora(Entity entity,
-                                   Model model,
-                                   IntModelBatch batch,
-                                   float alpha,
-                                   double t,
-                                   RenderingContext rc,
-                                   RenderGroup renderGroup,
-                                   boolean shadow,
-                                   boolean relativistic) {
+                             Model model,
+                             IntModelBatch batch,
+                             float alpha,
+                             double t,
+                             RenderingContext rc,
+                             RenderGroup renderGroup,
+                             boolean shadow,
+                             boolean relativistic) {
         var scaffolding = Mapper.modelScaffolding.get(entity);
 
         ModelComponent mc = model.model;
@@ -218,7 +219,7 @@ public class ModelEntityRenderSystem {
                 alphaFactor = base.opacity;
             }
 
-            mc.updateTime(t);
+            mc.updateTimes(GaiaSky.instance.getT(), GaiaSky.instance.time.getTimeSeconds() % 1000.0);
             mc.update(alpha * alphaFactor, relativistic);
             mc.setBlendMode(BlendMode.ADDITIVE);
             mc.updateDepthTest();
@@ -234,7 +235,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The batch.
      * @param alpha        The alpha value.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -270,7 +271,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param modelBatch   The batch.
      * @param alpha        The alpha value.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -317,7 +318,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The batch.
      * @param alpha        The alpha value.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -361,7 +362,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param modelBatch   The model batch.
      * @param alpha        The model alpha.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -394,7 +395,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The model batch.
      * @param alpha        The model alpha.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -446,7 +447,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The model batch.
      * @param alpha        The model alpha.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -488,7 +489,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The model batch.
      * @param alpha        The model alpha.
-     * @param t            The time.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.
@@ -533,7 +534,7 @@ public class ModelEntityRenderSystem {
      * @param model        The model component.
      * @param batch        The batch.
      * @param alpha        The alpha value.
-     * @param t            The time, in seconds, since the session start.
+     * @param t            The time, in seconds, since the start of the session.
      * @param rc           The rendering context.
      * @param renderGroup  The render group.
      * @param shadow       Whether to prepare the shadow environment.

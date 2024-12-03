@@ -44,6 +44,9 @@ public class FloatAttribute extends Attribute {
     public static final String TimeAlias = "time";
     public static final int Time = register(TimeAlias);
 
+    public static final String SimuTimeAlias = "simuTime";
+    public static final int SimuTime = register(SimuTimeAlias);
+
     public static final String SvtTileSizeAlias = "svtTileSize";
     public static final int SvtTileSize = register(SvtTileSizeAlias);
 

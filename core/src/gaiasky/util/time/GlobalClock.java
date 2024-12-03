@@ -19,6 +19,8 @@ import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.Arrays;
 
 /**
@@ -218,6 +220,11 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     @Override
     public Instant getTime() {
         return time;
+    }
+
+    @Override
+    public double getTimeSeconds() {
+        return time.toEpochMilli() / 1000.0;
     }
 
     @Override

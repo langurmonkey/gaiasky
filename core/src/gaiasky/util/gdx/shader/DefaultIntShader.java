@@ -52,6 +52,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_cameraNearFar;
     public final int u_cameraK;
     public final int u_time;
+    public final int u_simuTime;
     // VR
     public final int u_vrScale;
     public final int u_vrOffset;
@@ -252,6 +253,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_cameraNearFar = register(Inputs.cameraNearFar, Setters.cameraNearFar);
         u_cameraK = register(Inputs.cameraK, Setters.cameraK);
         u_time = register(Inputs.time, Setters.time);
+        u_simuTime = register(Inputs.simuTime, Setters.simuTime);
         u_vrScale = register(Inputs.vrScale, Setters.vrScale);
         u_vrOffset = register(Inputs.vrOffset, Setters.vrOffset);
         // Eclipses
@@ -464,6 +466,9 @@ public class DefaultIntShader extends BaseIntShader {
         if (attributes.has(FloatAttribute.Time)) {
             prefix.append("#define " + FloatAttribute.TimeAlias + "Flag\n");
         }
+        if (attributes.has(FloatAttribute.SimuTime)) {
+            prefix.append("#define " + FloatAttribute.SimuTimeAlias + "Flag\n");
+        }
         if (attributes.has(FloatAttribute.HeightNoiseSize)) {
             prefix.append("#define heightFlag\n");
         }
@@ -675,6 +680,10 @@ public class DefaultIntShader extends BaseIntShader {
         if (has(u_time)) {
             float time = (float) GaiaSky.instance.getT();
             set(u_time, time);
+        }
+        if (has(u_simuTime)) {
+            float time = (float) (GaiaSky.instance.time.getTimeSeconds() % 10000.0);
+            set(u_simuTime, time);
         }
     }
 
@@ -959,6 +968,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
         public final static Uniform time = new Uniform("u_time", FloatAttribute.Time);
+        public final static Uniform simuTime = new Uniform("u_simuTime", FloatAttribute.SimuTime);
         public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
 
         public final static Uniform reflectionCubemap = new Uniform("u_reflectionCubemap");
@@ -1165,6 +1175,15 @@ public class DefaultIntShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Time)))).value);
+            }
+        };
+        public final static Setter simuTime = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.SimuTime)))).value);
             }
         };
         public final static Setter diffuseColor = new LocalSetter() {

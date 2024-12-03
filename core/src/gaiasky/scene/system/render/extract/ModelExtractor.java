@@ -94,14 +94,14 @@ public class ModelExtractor extends AbstractExtractSystem {
                     }
 
                     if (body.solidAngleApparent < thQuad1) {
-                        if(renderFlags == null || renderFlags.renderQuad) {
+                        if (renderFlags == null || renderFlags.renderQuad) {
                             addToRender(render, RenderGroup.BILLBOARD_SSO);
                         }
                     } else if (body.solidAngleApparent > thQuad2) {
                         addToRenderModel(render, model);
                     } else {
                         // Both
-                        if(renderFlags == null || renderFlags.renderQuad) {
+                        if (renderFlags == null || renderFlags.renderQuad) {
                             addToRender(render, RenderGroup.BILLBOARD_SSO);
                         }
                         addToRenderModel(render, model);

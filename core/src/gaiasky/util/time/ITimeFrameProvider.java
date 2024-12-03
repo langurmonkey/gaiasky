@@ -33,6 +33,12 @@ public interface ITimeFrameProvider {
     Instant getTime();
 
     /**
+     * Gets the time in seconds since 1970-01-01T00:00Z (ISO).
+     * @return The seconds since 1970-01-01T00:00Z (ISO).
+     */
+    double getTimeSeconds();
+
+    /**
      * Updates this time frame with the system time difference
      *
      * @param dt System time difference in seconds

@@ -213,9 +213,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     private long startTimeScene;
     /**
-     * Holds the session run time in seconds.
+     * The time, in seconds, computed by adding every frame dt. This counts the time of the scene after it finished loading.
      */
     private double t;
+    /**
+     * The GUI registry holds all GUI components.
+     */
     private GuiRegistry guiRegistry;
     /**
      * Dynamic resolution level, the index in {@link gaiasky.util.Settings.GraphicsSettings#dynamicResolutionScale}
@@ -1810,7 +1813,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     /**
-     * Gets the run time in seconds of this Gaia Sky instance.
+     * Gets the run time in seconds of this Gaia Sky instance, computed since the start of the program.
      *
      * @return The time, in seconds, since Gaia Sky started running.
      */

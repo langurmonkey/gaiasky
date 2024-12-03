@@ -1050,7 +1050,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void updateTime(double t) {
+    public void updateTimes(double sessionTime, double simuTime) {
+        updateSessionTime(sessionTime);
+        updateSimuTime(simuTime);
+    }
+
+    public void updateSessionTime(double t) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
@@ -1061,6 +1066,20 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             } else {
                 // Add attribute.
                 mat.set(new FloatAttribute(FloatAttribute.Time, (float) t));
+            }
+        }
+    }
+    public void updateSimuTime(double t) {
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            if(mat.has(FloatAttribute.SimuTime)) {
+                // Update.
+                ((FloatAttribute)mat.get(FloatAttribute.SimuTime)).value = (float) t;
+
+            } else {
+                // Add attribute.
+                mat.set(new FloatAttribute(FloatAttribute.SimuTime, (float) t));
             }
         }
     }

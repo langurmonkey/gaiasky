@@ -17,6 +17,7 @@ public class RealTimeClock implements ITimeFrameProvider {
     private static final double SEC_TO_HOUR = 1d / 3600d;
 
     private double dt;
+    /** Current number of milliseconds from epoch (1970-01-01T00:00Z (ISO)). **/
     private long time;
     private double lastUpdate = 0;
 
@@ -43,9 +44,13 @@ public class RealTimeClock implements ITimeFrameProvider {
     }
 
     @Override
+    public double getTimeSeconds() {
+        return time / 1000.0;
+    }
+
+    @Override
     public void update(double dt) {
         this.dt = dt;
-        double dtHours = dt * SEC_TO_HOUR;
         time = TimeUtils.millis();
 
         // Post event each 1/2 second

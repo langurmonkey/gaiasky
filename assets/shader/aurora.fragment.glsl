@@ -4,6 +4,7 @@
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 uniform float u_time;
+uniform float u_simuTime;
 
 // INPUT
 struct VertexData {
@@ -21,6 +22,8 @@ in VertexData v_data;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 layerBuffer;
+
+#define PI 3.14159
 
 #include <shader/lib/logdepthbuff.glsl>
 
@@ -110,20 +113,21 @@ vec3 lights(vec2 co) {
 // Renders all black for the occlusion testing.
 void main() {
     vec2 uv = v_data.texCoords;
+    float t = u_simuTime * 0.1;
 
-    float f = 0.3 + 0.3 * pnoise(vec2(8.0 * uv.x, 0.01 * u_time), 4);
+    float f = 0.3 + 0.3 * pnoise(vec2(8.0 * uv.x, 0.01 * t), 4);
     vec2 aco = uv;
     aco.y -= f - 0.3;
-    aco.y *= (25.0 + abs(sin(u_time * 0.1 - uv.x * 5.0)) * 32.0);
-    aco.x *= 1900.0;
+    aco.y *= (25.0 + abs(sin(t * 0.1 - uv.x * 5.0)) * 32.0);
+    aco.x *= 1000.0;
     // Fade at x == 0 and x == 1
     float fade = smoothstep(uv.x, 0.0, 0.01) * smoothstep(uv.x, 1.0, 0.99) * smoothstep(uv.y, 1.0, 0.9);
 
     //vec3 col = lights(aco);
     vec3 col = 0.5 * lights(aco)
-    * (smoothstep(0.3, 0.6, pnoise(vec2(10. * uv.x, 0.3 * u_time), 1))
-    + 0.5 * smoothstep(0.5, 0.7, pnoise(vec2(10. * uv.x, u_time), 1)))
-    * abs(sin(u_time * 0.1 + uv.x));
+    * (smoothstep(0.3, 0.6, pnoise(vec2(10.0 * uv.x, 0.3 * t), 1))
+    + 0.5 * smoothstep(0.5, 0.7, pnoise(vec2(10.0 * uv.x, t), 1)))
+    * clamp(sin((t * 0.1 + uv.x * PI * 2.0) * pnoise(vec2(10.0 * uv.x, 0.3 * t), 1)), 0.0, 1.0);
 
     fragColor = vec4(col * fade, 1.0);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
