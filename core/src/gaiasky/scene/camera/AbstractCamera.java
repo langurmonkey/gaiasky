@@ -279,7 +279,7 @@ public abstract class AbstractCamera implements ICamera {
     public synchronized void checkClosestBody(IFocus cb) {
         if (cb instanceof FocusView candidate) {
             // A copy can never be the closest
-            if (!cb.isCopy() && !Mapper.tagNoClosest.has(((FocusView) cb).getEntity())) {
+            if (!cb.isCopy() && !Mapper.tagNoClosest.has(candidate.getEntity())) {
                 if (closestBody.getEntity() == null) {
                     closestBody.setEntity(candidate.getEntity());
                 } else {
@@ -294,7 +294,8 @@ public abstract class AbstractCamera implements ICamera {
     public synchronized void checkClosestBody(Entity cb) {
         // A copy can never be the closest
         var base = Mapper.base.get(cb);
-        if (!base.copy && !Mapper.tagNoClosest.has(cb)) {
+        var body = Mapper.body.get(cb);
+        if (!base.copy && !Mapper.tagNoClosest.has(cb) && body.cameraCollision) {
             if (!closestBody.isValid()) {
                 closestBody.setEntity(cb);
             } else {

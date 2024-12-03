@@ -37,14 +37,14 @@ public interface IFocus {
     boolean isValid();
 
     /**
-     * Returns the unique id of this focus.
+     * Return the unique id of this focus.
      *
      * @return The id.
      */
     long getId();
 
     /**
-     * Returns the id of the focus candidate of this object. Defaults to
+     * Return the id of the focus candidate of this object. Defaults to
      * {@link IFocus#getId()}.
      *
      * @return The id of the candidate.
@@ -52,7 +52,7 @@ public interface IFocus {
     long getCandidateId();
 
     /**
-     * Returns the localized name of this focus. If it has no localized name,
+     * Return the localized name of this focus. If it has no localized name,
      * it returns the default name.
      *
      * @return The localized name.
@@ -60,14 +60,14 @@ public interface IFocus {
     String getLocalizedName();
 
     /**
-     * Returns the first name of this focus.
+     * Return the first name of this focus.
      *
      * @return The first name.
      */
     String getName();
 
     /**
-     * Returns all names of this focus.
+     * Return all names of this focus.
      *
      * @return All names of this focus.
      */
@@ -98,7 +98,7 @@ public interface IFocus {
     String getClosestName();
 
     /**
-     * Returns the name of the focus candidate of this object. Defaults to
+     * Return the name of the focus candidate of this object. Defaults to
      * {@link IFocus#getName()}.
      *
      * @return The name of the candidate.
@@ -106,14 +106,14 @@ public interface IFocus {
     String getCandidateName();
 
     /**
-     * Returns the component types of this focus.
+     * Return the component types of this focus.
      *
      * @return The component types.
      */
     ComponentTypes getCt();
 
     /**
-     * Returns whether this focus object is active or not. The active status
+     * Return whether this focus object is active or not. The active status
      * determines whether the object can be focussed or not.
      *
      * @return The active status.
@@ -121,7 +121,7 @@ public interface IFocus {
     boolean isFocusActive();
 
     /**
-     * Returns the position.
+     * Return the position.
      *
      * @return The position.
      */
@@ -137,7 +137,7 @@ public interface IFocus {
     IFocus getFirstStarAncestor();
 
     /**
-     * Returns the absolute position of this entity in the native coordinates
+     * Return the absolute position of this entity in the native coordinates
      * (equatorial system).
      *
      * @param out The out vector.
@@ -146,7 +146,7 @@ public interface IFocus {
     Vector3b getAbsolutePosition(Vector3b out);
 
     /**
-     * Returns the absolute position of the entity identified by
+     * Return the absolute position of the entity identified by
      * name within this entity in the native reference system.
      *
      * @param name The name (lowercase) of the entity to get the position from (useful in case of star groups).
@@ -194,7 +194,7 @@ public interface IFocus {
     Vector3b getPredictedPosition(Vector3b aux, double deltaTime);
 
     /**
-     * Returns the current distance to the camera in internal units.
+     * Return the current distance to the camera in internal units.
      *
      * @return The current distance to the camera, in internal units.
      */
@@ -208,14 +208,14 @@ public interface IFocus {
     double getClosestDistToCamera();
 
     /**
-     * Returns the current view angle of this entity, in radians.
+     * Return the current view angle of this entity, in radians.
      *
      * @return The view angle in radians.
      */
     double getSolidAngle();
 
     /**
-     * Returns the current apparent view angle (view angle corrected with the
+     * Return the current apparent view angle (view angle corrected with the
      * field of view) of this entity, in radians.
      *
      * @return The apparent view angle in radians.
@@ -223,7 +223,7 @@ public interface IFocus {
     double getSolidAngleApparent();
 
     /**
-     * Returns the candidate apparent view angle (view angle corrected with the
+     * Return the candidate apparent view angle (view angle corrected with the
      * field of view) of this entity, in radians.
      *
      * @return The apparent view angle in radians.
@@ -231,41 +231,41 @@ public interface IFocus {
     double getCandidateSolidAngleApparent();
 
     /**
-     * Returns the right ascension angle of this focus object.
+     * Return the right ascension angle of this focus object.
      *
      * @return The right ascension angle in degrees.
      */
     double getAlpha();
 
     /**
-     * Returns the declination angle of this focus object.
+     * Return the declination angle of this focus object.
      *
      * @return The declination angle in degrees.
      */
     double getDelta();
 
     /**
-     * Returns the size (diameter) of this entity in internal units.
+     * Return the size (diameter) of this entity in internal units.
      *
      * @return The size in internal units.
      */
     double getSize();
 
     /**
-     * Returns the radius of this focus object in internal units.
+     * Return the radius of this focus object in internal units.
      *
      * @return The radius of the focus, in internal units.
      */
     double getRadius();
 
     /**
-     * Returns the effective temperature.
+     * Return the effective temperature.
      * @return The effective temperature of the object, in Kelvins.
      */
     double getTEff();
 
     /**
-     * Returns the surface elevation of the projected position of the current camera
+     * Return the surface elevation of the projected position of the current camera
      * on this focus object, which is usually the radius plus a value lookup
      * in the height texture (if exists).
      *
@@ -295,49 +295,49 @@ public interface IFocus {
     double getElevationAt(Vector3b camPos, Vector3b nextPos);
 
     /**
-     * Returns the height scale of this focus, or 0 if it has no height info.
+     * Return the height scale of this focus, or 0 if it has no height info.
      *
      * @return The height scale in internal units.
      */
     double getHeightScale();
 
     /**
-     * Gets the apparent magnitude.
+     * Get the apparent magnitude.
      *
      * @return The apparent magnitude.
      */
     float getAppmag();
 
     /**
-     * Gets the absolute magnitude.
+     * Get the absolute magnitude.
      *
      * @return The absolute magnitude.
      */
     float getAbsmag();
 
     /**
-     * Returns the orientation matrix of this focus.
+     * Return the orientation matrix of this focus.
      *
      * @return The orientation matrix. Can be null.
      */
     Matrix4d getOrientation();
 
     /**
-     * Returns the rotation component of this focus.
+     * Return the rotation component of this focus.
      *
      * @return The rotation component. Can be null.
      */
     RotationComponent getRotationComponent();
 
     /**
-     * Returns the orientation quaternion of this focus.
+     * Return the orientation quaternion of this focus.
      *
      * @return The orientation quaternion. Can be null.
      */
     QuaternionDouble getOrientationQuaternion();
 
     /**
-     * Adds this focus to the hits list if it is hit by the [screenX, screenY]
+     * Add this focus to the hits list if it is hit by the [screenX, screenY]
      * position.
      *
      * @param screenX   The x position of the hit.
@@ -353,7 +353,7 @@ public interface IFocus {
     void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits);
 
     /**
-     * Adds this focus to the hits list if it is hit by the given ray.
+     * Add this focus to the hits list if it is hit by the given ray.
      *
      * @param p0     Start point of the ray.
      * @param p1     End point of the ray.
@@ -370,14 +370,14 @@ public interface IFocus {
     void makeFocus();
 
     /**
-     * Prepares the candidate with the given name.
+     * Prepare the candidate with the given name.
      *
      * @param name The name in lower case.
      */
     IFocus getFocus(String name);
 
     /**
-     * Checks whether this focus is within its valid time range, so that it can
+     * Check whether this focus is within its valid time range, so that it can
      * be used as a focus.
      *
      * @return Whether the focus object is within its valid time range.
@@ -385,14 +385,14 @@ public interface IFocus {
     boolean isCoordinatesTimeOverflow();
 
     /**
-     * Gets the depth of this focus object in the scene graph.
+     * Get the depth of this focus object in the scene graph.
      *
      * @return The depth of the scene graph.
      */
     int getSceneGraphDepth();
 
     /**
-     * Gets the octant this focus belongs to, if any. This will return null
+     * Get the octant this focus belongs to, if any. This will return null
      * if this focus is not part of an octree.
      *
      * @return The octant this focus belongs to. Null if it is not part of an octree.
@@ -400,17 +400,23 @@ public interface IFocus {
     OctreeNode getOctant();
 
     /**
-     * Whether this is a copy or not.
+     * Check whether this is a copy or not.
      *
      * @return Whether the object is a copy or not.
      */
     boolean isCopy();
 
     /**
-     * Whether this focus is focusable. This checks the attribute 'focusable' of the Focus component.
+     * Check whether this focus is actually focusable. This checks the attribute 'focusable' of the Focus component.
      * @return Whether the focus is focusable.
      */
     boolean isFocusable();
+
+    /**
+     * Check whether this focus has camera collisions enabled.
+     * @return Whether the focus has camera collisions enabled.
+     */
+    boolean isCameraCollision();
 
     /**
      * Gets the color of this object.

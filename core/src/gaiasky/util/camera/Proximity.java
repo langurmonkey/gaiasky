@@ -537,6 +537,11 @@ public class Proximity {
         }
 
         @Override
+        public boolean isCameraCollision() {
+            return true;
+        }
+
+        @Override
         public float[] getColor() {
             return col;
         }

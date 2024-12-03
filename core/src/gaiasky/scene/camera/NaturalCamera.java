@@ -57,11 +57,13 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * The basic camera of Gaia Sky. Implements focus, free and game modes. It also incorporates the
+ * cinematic and the non-cinematic behaviours.
+ */
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private static final double MIN_DIST = 1 * Constants.M_TO_U;
-    private static final double HUD_SCALE_MIN = 0.5f;
-    private static final double HUD_SCALE_MAX = 3.0f;
     /**
      * The force acting on the entity and the friction.
      **/

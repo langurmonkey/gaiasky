@@ -946,6 +946,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
+    public boolean isCameraCollision() {
+        return body != null && body.cameraCollision;
+    }
+
+    @Override
     public float[] getColor() {
         return body.color;
     }
