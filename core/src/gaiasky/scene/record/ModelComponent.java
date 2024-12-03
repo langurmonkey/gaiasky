@@ -395,8 +395,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                        Matrix4 localTransform,
                        float alpha) {
         switch (blendMode) {
-            case ALPHA ->
-                    update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+            case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
             case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
             case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, true);
             case NONE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, false);
@@ -1022,7 +1021,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         MaterialComponent mtc = new MaterialComponent();
         // Randomize material.
         Random rnd = new Random(seed);
-        switch(rnd.nextInt(5)) {
+        switch (rnd.nextInt(5)) {
             case 0 -> mtc.randomizeAll(seed);
             case 1 -> mtc.randomizeEarthLike(seed);
             case 2 -> mtc.randomizeColdPlanet(seed);
@@ -1049,6 +1048,20 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
         }
     }
+    public void updateCamPos(Vector3 cameraPos) {
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            if (mat.has(Vector3Attribute.CameraPos)) {
+                // Update.
+                ((Vector3Attribute) mat.get(Vector3Attribute.CameraPos)).value.set(cameraPos);
+
+            } else {
+                // Add attribute.
+                mat.set(new Vector3Attribute(Vector3Attribute.CameraPos, cameraPos));
+            }
+        }
+    }
 
     public void updateTimes(double sessionTime, double simuTime) {
         updateSessionTime(sessionTime);
@@ -1059,9 +1072,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
-            if(mat.has(FloatAttribute.Time)) {
+            if (mat.has(FloatAttribute.Time)) {
                 // Update.
-                ((FloatAttribute)mat.get(FloatAttribute.Time)).value = (float) t;
+                ((FloatAttribute) mat.get(FloatAttribute.Time)).value = (float) t;
 
             } else {
                 // Add attribute.
@@ -1069,13 +1082,14 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
         }
     }
+
     public void updateSimuTime(double t) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
-            if(mat.has(FloatAttribute.SimuTime)) {
+            if (mat.has(FloatAttribute.SimuTime)) {
                 // Update.
-                ((FloatAttribute)mat.get(FloatAttribute.SimuTime)).value = (float) t;
+                ((FloatAttribute) mat.get(FloatAttribute.SimuTime)).value = (float) t;
 
             } else {
                 // Add attribute.

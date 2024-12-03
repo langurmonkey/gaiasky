@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -32,6 +33,7 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
+import net.jafama.FastMath;
 
 import java.util.Objects;
 
@@ -183,6 +185,7 @@ public class ModelEntityRenderSystem {
         }
     }
 
+    private Vector3 aux = new Vector3();
     /**
      * Renders an aurora.
      *
@@ -219,7 +222,8 @@ public class ModelEntityRenderSystem {
                 alphaFactor = base.opacity;
             }
 
-            mc.updateTimes(GaiaSky.instance.getT(), GaiaSky.instance.time.getTimeSeconds() % 1000.0);
+            mc.updateCamPos(GaiaSky.instance.cameraManager.getPos().put(aux));
+            mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
             mc.update(alpha * alphaFactor, relativistic);
             mc.setBlendMode(BlendMode.ADDITIVE);
             mc.updateDepthTest();

@@ -6,6 +6,13 @@ uniform float u_cameraK;
 uniform float u_time;
 uniform float u_simuTime;
 
+#ifdef diffuseColorFlag
+uniform vec4 u_diffuseColor;
+#define fetchColorDiffuse(defaultValue) u_diffuseColor
+#else
+#define fetchColorDiffuse(defaultValue) defaultValue
+#endif // diffuseColorFlag
+
 // INPUT
 struct VertexData {
     vec2 texCoords;
@@ -20,16 +27,20 @@ struct VertexData {
 in VertexData v_data;
 
 // OUTPUT
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 layerBuffer;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 layerBuffer;
 
 #define PI 3.14159
 
 #include <shader/lib/logdepthbuff.glsl>
 
 // Noise functions
-float hash(vec2 co) { return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453); }
-float hash(float x, float y) { return hash(vec2(x, y)); }
+float hash(vec2 co) {
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+float hash(float x, float y) {
+    return hash(vec2(x, y));
+}
 
 float shash(vec2 co) {
     float x = co.x;
@@ -74,7 +85,6 @@ float pnoise(vec2 co, int oct) {
     return total / m;
 }
 
-
 // FBM: repeatedly apply Perlin noise to position
 vec2 fbm(vec2 p, int oct) {
     return vec2(pnoise(p + vec2(u_time, 0.0), oct), pnoise(p + vec2(-u_time, 0.0), oct));
@@ -89,6 +99,8 @@ vec3 lights(vec2 co) {
     float d, r, g, b, h;
     vec3 rc, gc, bc, hc;
 
+    vec3 color = fetchColorDiffuse(vec4(0.0, 1.0, 0.4, 1.0)).rgb;
+
     // Red (top)
     r = fbm2(co * vec2(1.0, 0.5), 1);
     d = pnoise(2.0 * co + vec2(0.3 * u_time), 2);
@@ -97,11 +109,10 @@ vec3 lights(vec2 co) {
 
     // Green (middle)
     g = fbm2(co * vec2(2., 0.5), 4);
-    gc = 0.8 * vec3(0.5, 1.0, 0.0) * clamp(2. * pow((3. - 2. * g) * g * g, 2.5) - 0.5 * co.y, 0.0, 1.0) * smoothstep(-2. * d, 0.0, co.y) * smoothstep(0.0, 0.3, 1.1 + d - co.y);
+    gc = 0.8 * color * clamp(2. * pow((3. - 2. * g) * g * g, 2.5) - 0.5 * co.y, 0.0, 1.0) * smoothstep(-2. * d, 0.0, co.y) * smoothstep(0.0, 0.3, 1.1 + d - co.y);
 
     g = fbm2(co * vec2(1.0, 0.2), 2);
-    gc += 0.5 * vec3(0.5, 1.0, 0.0) * clamp(2. * pow((3. - 2. * g) * g * g, 2.5) - 0.5 * co.y, 0.0, 1.0) * smoothstep(-2. * d, 0.0, co.y) * smoothstep(0.0, 0.3, 1.1 + d - co.y);
-
+    gc += 0.5 * color * clamp(2. * pow((3. - 2. * g) * g * g, 2.5) - 0.5 * co.y, 0.0, 1.0) * smoothstep(-2. * d, 0.0, co.y) * smoothstep(0.0, 0.3, 1.1 + d - co.y);
 
     // Blue (bottom)
     h = pnoise(vec2(5.0 * co.x, 5.0 * u_time), 1);
@@ -125,14 +136,13 @@ void main() {
 
     //vec3 col = lights(aco);
     vec3 col = 0.5 * lights(aco)
-    * (smoothstep(0.3, 0.6, pnoise(vec2(10.0 * uv.x, 0.3 * t), 1))
-    + 0.5 * smoothstep(0.5, 0.7, pnoise(vec2(10.0 * uv.x, t), 1)))
-    * clamp(sin((t * 0.1 + uv.x * PI * 2.0) * pnoise(vec2(10.0 * uv.x, 0.3 * t), 1)), 0.0, 1.0);
+            * (smoothstep(0.3, 0.6, pnoise(vec2(10.0 * uv.x, 0.3 * t), 1))
+                + 0.5 * smoothstep(0.5, 0.7, pnoise(vec2(10.0 * uv.x, t), 1)))
+            * clamp(sin((t * 0.1 + uv.x * PI * 2.0) * pnoise(vec2(10.0 * uv.x, 0.3 * t), 1)) * cos(t * 0.2 + uv.x * -PI * 3.0), 0.0, 1.0);
 
     fragColor = vec4(col * fade, 1.0);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Logarithmic depth buffer.
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
-
 }

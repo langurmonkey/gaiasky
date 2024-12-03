@@ -163,7 +163,7 @@ public class RenderAssets {
                 new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
                         "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.svt.detection.fragment.glsl"));
         manager.load("per-pixel-lighting-aurora", RelativisticShaderProvider.class,
-                new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/aurora.fragment.glsl"));
+                new RelativisticShaderProviderParameter("shader/aurora.vertex.glsl", "shader/aurora.fragment.glsl"));
 
         manager.load("skybox", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/skybox.vertex.glsl", "shader/skybox.fragment.glsl"));
         manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));

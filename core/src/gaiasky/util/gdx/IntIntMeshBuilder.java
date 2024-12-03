@@ -915,8 +915,8 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         final float ao = MathUtils.degreesToRadians * angleFrom;
         final float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
         final float us = 1f / divisions;
-        float u = 0f;
-        float angle = 0f;
+        float u;
+        float angle;
         VertexInfo curr1 = vertTmp3.set(null, null, null, null);
         curr1.hasUV = curr1.hasPosition = curr1.hasNormal = true;
         VertexInfo curr2 = vertTmp4.set(null, null, null, null);
