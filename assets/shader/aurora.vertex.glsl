@@ -204,15 +204,7 @@ vec3 calcNormal(vec2 p, vec2 dp) {
 }
 
 #include <shader/lib/geometry.glsl>
-
-float rand(vec2 n) {
-    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
-}
-float noise(vec2 n) {
-    const vec2 d = vec2(0.0, 1.0);
-    vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
-    return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
-}
+#include <shader/lib/noise.glsl>
 
 void main() {
     // Tangent space transform
@@ -233,7 +225,7 @@ void main() {
     // Wiggle the vertices in local space.
     float t = u_simuTime / 25000.0 + 0.5;
     vec3 p = g_position.xyz;
-    p.xz += vec2(0.04 * noise(p.zx * 20.0 * t), 0.04 * noise(p.xz * 20.0 * t));
+    p.xz += vec2(0.01 * snoise((p.zx + t) * 20.0), 0.01 * snoise((p.xz + t) * 20.0));
     vec4 g_pos = vec4(p.xyz, 1.0);
 
     // Location in world coordinates (world origin is at the camera)
