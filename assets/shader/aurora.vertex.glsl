@@ -5,7 +5,6 @@
 // Scene time and simulation time.
 uniform float u_time;
 uniform float u_simuTime;
-uniform vec3 u_cameraPos;
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// POSITION ATTRIBUTE - VERTEX

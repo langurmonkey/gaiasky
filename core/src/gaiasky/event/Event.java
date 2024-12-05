@@ -1445,7 +1445,7 @@ public enum Event {
     /**
      * Reloads and re-compiles the post-processing shaders. Currently, only ray-marching shaders implement this feature.
      */
-    SHADER_POSTPROCESS_RELOAD_CMD,
+    SHADER_RELOAD_CMD,
 
     /**
      * Resets the main renderer.

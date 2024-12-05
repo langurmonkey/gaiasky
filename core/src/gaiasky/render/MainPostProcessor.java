@@ -130,7 +130,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE,
                 Event.CAMERA_ORIENTATION_UPDATE, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
                 Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
-                Event.FILM_GRAIN_CMD, Event.SHADER_POSTPROCESS_RELOAD_CMD);
+                Event.FILM_GRAIN_CMD, Event.SHADER_RELOAD_CMD);
     }
 
     public void initializeOffScreenPostProcessors() {
@@ -1081,7 +1081,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 var upscaleFilter = (UpscaleFilter) data[0];
                 updateUpscaleFilters(upscaleFilter, (float) Settings.settings.graphics.backBufferScale);
             }
-            case SHADER_POSTPROCESS_RELOAD_CMD -> GaiaSky.postRunnable(() -> {
+            case SHADER_RELOAD_CMD -> GaiaSky.postRunnable(() -> {
                 // Update shaders of all effects.
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {

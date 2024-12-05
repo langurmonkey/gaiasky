@@ -380,6 +380,17 @@
         "unit": "Map"
       }
     },
+    "Volume": {
+      "description": "Defines a volume to be rendered inside a model, typically a bounding box.",
+      "vertexShader": {
+        "description": "The vertex shader to use. Prefix with `$data` to use a shader in a dataset. Defaults to the PBR vertex shader.",
+        "unit": "String"
+      },
+      "fragmentShader": {
+        "description": "The fragment shader to use. Prefix with `$data` to use a shader in a dataset.",
+        "unit": "String"
+      }
+    },
     "Atmosphere": {
       "description": "Defines the atmosphere of a planet or moon. See the :ref:`atmospheric-scattering` documentation for more information.",
       "atmosphere": {

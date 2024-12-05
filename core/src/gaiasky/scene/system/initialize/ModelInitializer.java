@@ -212,14 +212,8 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     private void initializeAurora(Model model) {
-
         // Model renderer.
         model.renderConsumer = ModelEntityRenderSystem::renderAurora;
-
-        // No culling.
-        model.model.culling = false;
-        // Additive.
-        model.model.setBlendMode(BlendMode.ADDITIVE);
     }
 
     private void initializeSpacecraft(Entity entity, Base base, Body body, GraphNode graph, Model model, ModelScaffolding scaffolding, MotorEngine engine, Label label) {

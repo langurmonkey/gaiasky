@@ -382,6 +382,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineCpuShaders);
                 system.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
             }
+            case VOLUME -> // VOLUME MODEL
+                    system = new VolumeRenderer(this, VOLUME, alphas);
             case PARTICLE_EFFECTS -> {
                 system = new ParticleEffectsRenderer(this, PARTICLE_EFFECTS, alphas, renderAssets.particleEffectShaders);
                 system.addPreRunnables(additiveBlendR, noDepthTestR);

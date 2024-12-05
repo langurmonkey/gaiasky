@@ -135,17 +135,21 @@ public enum RenderGroup {
      **/
     BILLBOARD_STAR(5500),
     /**
-     * Atmospheres of planets.
-     **/
-    MODEL_ATM(6000),
-    /**
      * Aurora.
      **/
     MODEL_AURORA(5800),
     /**
+     * Atmospheres of planets.
+     **/
+    MODEL_ATM(6000),
+    /**
      * Clouds.
      **/
     MODEL_CLOUD(6500),
+    /**
+     * Volume models.
+     **/
+    VOLUME(6800),
     /**
      * Using normal shader for per-pixel lighting, rendered late for items with transparency.
      **/

@@ -25,7 +25,7 @@ public class ModelRenderer extends AbstractRenderSystem {
     protected IntModelBatch batch;
 
     /**
-     * Creates a new model batch render component.
+     * Creates a new model renderer based on a single model batch.
      *
      * @param rg     The render group.
      * @param alphas The alphas list.

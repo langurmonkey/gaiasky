@@ -57,7 +57,11 @@ public class ModelExtractor extends AbstractExtractSystem {
 
             camera.checkClosestBody(entity);
 
-            if (Mapper.aurora.has(entity)) {
+            if (Mapper.volume.has(entity)) {
+                // Volume models.
+                addToRender(render, RenderGroup.VOLUME);
+
+            } else if (Mapper.aurora.has(entity)) {
                 // Aurora borealis/australis.
                 addToRender(render, RenderGroup.MODEL_AURORA);
 

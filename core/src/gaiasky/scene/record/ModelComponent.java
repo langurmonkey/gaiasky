@@ -471,17 +471,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void addColorToMaterial() {
-        if (cc != null) {
-            int n = instance.materials.size;
-            for (int i = 0; i < n; i++) {
-                Material material = instance.materials.get(i);
-                // Only set color if useColor is true or the material does not have it yet.
-                if (useColor || !material.has(ColorAttribute.Diffuse)) {
-                    material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
-                    if (!culling) {
-                        material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
-                    }
-                }
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material material = instance.materials.get(i);
+            // Only set color if useColor is true or the material does not have it yet.
+
+            if (cc != null && (useColor || !material.has(ColorAttribute.Diffuse))) {
+                material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
+            }
+            if (!culling) {
+                material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
             }
         }
     }
@@ -1048,6 +1047,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
         }
     }
+
     public void updateCamPos(Vector3 cameraPos) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
@@ -1066,6 +1066,22 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void updateTimes(double sessionTime, double simuTime) {
         updateSessionTime(sessionTime);
         updateSimuTime(simuTime);
+    }
+
+    public void updateSize(double size) {
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            if (mat.has(FloatAttribute.BodySize)) {
+                // Update.
+                ((FloatAttribute) mat.get(FloatAttribute.BodySize)).value = (float) size;
+
+            } else {
+                // Add attribute.
+                mat.set(new FloatAttribute(FloatAttribute.BodySize, (float) size));
+            }
+        }
+
     }
 
     public void updateSessionTime(double t) {

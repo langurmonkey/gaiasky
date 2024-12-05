@@ -248,6 +248,7 @@ public class Scene {
             addInitializer(new PerimeterInitializer(setUp, families.perimeters, priority++));
             addInitializer(new VRDeviceInitializer(setUp, families.vrdevices, priority++));
             addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority));
+            addInitializer(new VolumeInitializer(setUp, families.volumes, priority));
 
             // Run once.
             runOnce(initializers);

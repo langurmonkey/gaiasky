@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
-import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
@@ -26,6 +25,7 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.record.AtmosphereComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.SceneRenderer;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
@@ -41,10 +41,14 @@ public class ModelEntityRenderSystem {
 
     private final ParticleUtils utils;
     private final SceneRenderer sceneRenderer;
-    private final Vector3b aux3b2 = new Vector3b();
+    private final FocusView focusView;
+    private final Vector3b v3b1 = new Vector3b(), v3b2 = new Vector3b();
+    private final Vector3 v3f1 = new Vector3();
 
     public ModelEntityRenderSystem(SceneRenderer sr) {
         this.sceneRenderer = sr;
+        this.focusView = new FocusView();
+        this.focusView.setScene(GaiaSky.instance.scene);
         this.utils = new ParticleUtils();
     }
 
@@ -185,7 +189,57 @@ public class ModelEntityRenderSystem {
         }
     }
 
-    private Vector3 aux = new Vector3();
+    private final Vector3 aux = new Vector3();
+    /**
+     * Renders a volume model.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The batch.
+     * @param alpha        The alpha value.
+     * @param t            The time, in seconds, since the start of the session.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param shadow       Whether to prepare the shadow environment.
+     * @param relativistic Whether to apply relativistic effects.
+     */
+    public void renderVolume(Entity entity,
+                             Model model,
+                             IntModelBatch batch,
+                             float alpha,
+                             double t,
+                             RenderingContext rc,
+                             RenderGroup renderGroup,
+                             boolean shadow,
+                             boolean relativistic) {
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+
+        ModelComponent mc = model.model;
+        if (mc != null && mc.instance != null && mc.isModelInitialised()) {
+            var base = Mapper.base.get(entity);
+            var body = Mapper.body.get(entity);
+
+            float alphaFactor;
+            if (scaffolding != null) {
+                alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity * base.opacity;
+            } else {
+                alphaFactor = base.opacity;
+            }
+            // Object position in floating camera system.
+            focusView.setEntity(entity);
+            focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
+            var camPos = v3b1.set(v3b2).sub(GaiaSky.instance.getCameraManager().getPos()).put(v3f1);
+
+            mc.setCulling(false);
+            mc.updateCamPos(camPos);
+            mc.updateSize(focusView.getSize());
+            mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
+            mc.update(alpha * alphaFactor, relativistic);
+            mc.updateDepthTest();
+            model.model.setSize(body.size);
+            batch.render(mc.instance, mc.env);
+        }
+    }
     /**
      * Renders an aurora.
      *
@@ -222,10 +276,8 @@ public class ModelEntityRenderSystem {
                 alphaFactor = base.opacity;
             }
 
-            mc.updateCamPos(GaiaSky.instance.cameraManager.getPos().put(aux));
             mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
             mc.update(alpha * alphaFactor, relativistic);
-            mc.setBlendMode(BlendMode.ADDITIVE);
             mc.updateDepthTest();
             model.model.setSize(body.size);
             batch.render(mc.instance, mc.env);
@@ -432,7 +484,7 @@ public class ModelEntityRenderSystem {
                     double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
                     int idx = set.proximity.updating[0].index;
                     // We need to fetch the position again, for the camera position is different in stereoscopic mode.
-                    var pos = set.fetchPosition(set.get(idx), GaiaSky.instance.getICamera().getPos(), aux3b2, set.currDeltaYears);
+                    var pos = set.fetchPosition(set.get(idx), GaiaSky.instance.getICamera().getPos(), v3b1, set.currDeltaYears);
                     mc.instance.transform.idt().translate((float) pos.x.doubleValue(), (float) pos.y.doubleValue(), (float) pos.z.doubleValue()).scl(
                             (float) (set.getRadius(set.active[0]) * 2d * variableScaling));
                     if (relativistic) {

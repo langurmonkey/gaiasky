@@ -64,6 +64,10 @@
             "parent": "ModelBody",
             "components": [ "Aurora" ]
         },
+        "Volume": {
+            "parent": "ModelBody",
+            "components": [ "Volume" ]
+        },
         "Particle": {
             "parent": "CelestialBody",
             "components": [

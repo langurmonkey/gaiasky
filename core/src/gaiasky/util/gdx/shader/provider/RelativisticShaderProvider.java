@@ -24,8 +24,8 @@ public class RelativisticShaderProvider extends DefaultIntShaderProvider {
         EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
-    public RelativisticShaderProvider(final String vertexFile, final String fragmentFile, final String vertexShader, final String fragmentShader) {
-        this(new Config(vertexFile, fragmentFile, vertexShader, fragmentShader));
+    public RelativisticShaderProvider(final String vertexFile, final String fragmentFile, final String vertexShaderCode, final String fragmentShaderCode) {
+        this(new Config(vertexFile, fragmentFile, vertexShaderCode, fragmentShaderCode));
     }
 
     public RelativisticShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {
