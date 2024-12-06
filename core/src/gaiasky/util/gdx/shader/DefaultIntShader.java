@@ -53,6 +53,8 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_cameraK;
     public final int u_time;
     public final int u_simuTime;
+    // Atmosphere and volumes
+    public final int u_cameraPos;
     // VR
     public final int u_vrScale;
     public final int u_vrOffset;
@@ -131,6 +133,10 @@ public class DefaultIntShader extends BaseIntShader {
     // Generic.
     protected final int u_generic1;
     protected final int u_generic2;
+
+    // Noise.
+    protected final int u_noise1Texture;
+    protected final int u_noise2Texture;
 
     // Cascaded shadow maps.
     public int[] u_csmTransforms = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
@@ -256,6 +262,8 @@ public class DefaultIntShader extends BaseIntShader {
         u_simuTime = register(Inputs.simuTime, Setters.simuTime);
         u_vrScale = register(Inputs.vrScale, Setters.vrScale);
         u_vrOffset = register(Inputs.vrOffset, Setters.vrOffset);
+        // Atmosphere and volumes
+        u_cameraPos = register(Inputs.cameraPos, Setters.cameraPos);
         // Eclipses
         u_eclipseOutlines = register(Inputs.eclipseOutlines, Setters.eclipseOutlines);
         u_eclipsingBodyPos = register(Inputs.eclipsingBodyPos, Setters.eclipsingBodyPos);
@@ -332,6 +340,10 @@ public class DefaultIntShader extends BaseIntShader {
         // Generic.
         u_generic1 = register(Inputs.generic1, Setters.generic1);
         u_generic2 = register(Inputs.generic2, Setters.generic2);
+
+        // Noise.
+        u_noise1Texture = register(Inputs.noise1Texture, Setters.noise1Texture);
+        u_noise2Texture = register(Inputs.noise2Texture, Setters.noise2Texture);
     }
 
     public static String getDefaultVertexShader() {
@@ -936,6 +948,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform normalMatrix = new Uniform("u_normalMatrix");
         public final static Uniform bones = new Uniform("u_bones");
 
+        public final static Uniform cameraPos = new Uniform("u_cameraPos", Vector3Attribute.CameraPos);
+
         public final static Uniform eclipseOutlines = new Uniform("u_eclipseOutlines", IntAttribute.EclipseOutlines);
         public final static Uniform eclipsingBodyPos = new Uniform("u_eclipsingBodyPos", Vector3Attribute.EclipsingBodyPos);
         public final static Uniform eclipsingBodyRadius = new Uniform("u_eclipsingBodyRadius", FloatAttribute.EclipsingBodyRadius);
@@ -956,6 +970,10 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform diffuseScatteringColor = new Uniform("u_diffuseScatteringColor", ColorAttribute.DiffuseScattering);
         public final static Uniform occlusionMetallicRoughnessTexture = new Uniform("u_occlusionMetallicRoughnessTexture",
                 TextureAttribute.OcclusionMetallicRoughness);
+
+
+        public final static Uniform noise1Texture = new Uniform("u_noise1Texture", TextureAttribute.Noise1);
+        public final static Uniform noise2Texture = new Uniform("u_noise2Texture", TextureAttribute.Noise2);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
@@ -1106,6 +1124,18 @@ public class DefaultIntShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 shader.set(inputID, tmpM.set(renderable.worldTransform).inv().transpose());
+            }
+        };
+        public final static Setter cameraPos = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.CameraPos))
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.CameraPos)))).value);
             }
         };
         public final static Setter eclipseOutlines = new LocalSetter() {
@@ -1787,6 +1817,28 @@ public class DefaultIntShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Generic2)))).value);
+            }
+        };
+        public final static Setter noise1Texture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(
+                        ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Noise1)))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter noise2Texture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(
+                        ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Noise2)))).textureDescription);
+                shader.set(inputID, unit);
             }
         };
 

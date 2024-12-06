@@ -780,12 +780,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                     RaymarchObject raymarchObject = (RaymarchObject) rmEffect;
                                     raymarchObject.setEnabled(status);
 
-                                    // We also update time and object position for the first time here.
+                                    // In our approach, the object is always at the origin (0 0 0), so we compute the location of the camera with respect to it.
+                                    // cam = cam_float - obj
                                     var rmEntity = (Entity) rayMarchingDefinitions.get(key)[2];
                                     focusView.setScene(scene);
                                     focusView.setEntity(rmEntity);
                                     focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
                                     var camPos = v3b1.set(GaiaSky.instance.getCameraManager().getPos()).sub(v3b2).put(v3f1);
+
                                     raymarchObject.setTime(rmTime);
                                     raymarchObject.setPos(camPos);
                                 });

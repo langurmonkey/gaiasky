@@ -225,12 +225,13 @@ public class ModelEntityRenderSystem {
             } else {
                 alphaFactor = base.opacity;
             }
-            // Object position in floating camera system.
+
+            // In our approach, the object is always at the origin (0 0 0), so we compute the location of the camera with respect to it.
+            // cam = cam_float - obj
             focusView.setEntity(entity);
             focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
-            var camPos = v3b1.set(v3b2).sub(GaiaSky.instance.getCameraManager().getPos()).put(v3f1);
+            var camPos = v3b1.set(GaiaSky.instance.getCameraManager().getPos()).sub(v3b2).put(v3f1);
 
-            mc.setCulling(false);
             mc.updateCamPos(camPos);
             mc.updateSize(focusView.getSize());
             mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));

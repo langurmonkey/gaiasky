@@ -1052,13 +1052,13 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
-            if (mat.has(Vector3Attribute.CameraPos)) {
+           if (mat.has(Vector3Attribute.CameraPos)) {
                 // Update.
                 ((Vector3Attribute) mat.get(Vector3Attribute.CameraPos)).value.set(cameraPos);
 
             } else {
                 // Add attribute.
-                mat.set(new Vector3Attribute(Vector3Attribute.CameraPos, cameraPos));
+                mat.set(new Vector3Attribute(Vector3Attribute.CameraPos, new Vector3(cameraPos)));
             }
         }
     }

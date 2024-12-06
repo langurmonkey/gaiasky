@@ -35,6 +35,12 @@ public class TextureAttribute extends Attribute {
     public final static int Roughness = register(RoughnessAlias);
     public final static String OcclusionMetallicRoughnessAlias = "occlusionMetallicRoughnessTexture";
     public final static int OcclusionMetallicRoughness = register(OcclusionMetallicRoughnessAlias);
+
+    public final static String Noise1Alias = "noise1Texture";
+    public final static int Noise1 = register(Noise1Alias);
+    public final static String Noise2Alias = "noise2Texture";
+    public final static int Noise2 = register(Noise2Alias);
+
     public final static String HeightAlias = "heightTexture";
     public final static int Height = register(HeightAlias);
     public final static String SvtCacheAlias = "svtCacheTexture";
