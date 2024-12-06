@@ -24,6 +24,7 @@ import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL33;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.StringBuilder;
@@ -1323,6 +1324,9 @@ public class ExtShaderProgram implements Disposable {
         } catch (IOException e) {
             logger.error("Creating " + dir + " directory crashed (inception level 1 achieved!)");
         }
+
+        // Remove preceding directories, if any.
+        name = name.substring(name.lastIndexOf(File.separatorChar) + 1);
 
         Path crashReportFile = dir.resolve(name);
         try (PrintWriter out = new PrintWriter(crashReportFile.toFile())) {

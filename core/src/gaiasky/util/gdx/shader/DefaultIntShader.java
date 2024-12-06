@@ -130,13 +130,13 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtIndirectionMetallicTexture;
     protected final int u_svtIndirectionRoughnessTexture;
     protected final int u_svtIndirectionAoTexture;
-    // Generic.
+    // Generic float values.
     protected final int u_generic1;
     protected final int u_generic2;
 
-    // Noise.
-    protected final int u_noise1Texture;
-    protected final int u_noise2Texture;
+    // Generic textures.
+    protected final int u_texture0;
+    protected final int u_texture1;
 
     // Cascaded shadow maps.
     public int[] u_csmTransforms = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
@@ -337,13 +337,13 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtIndirectionRoughnessTexture = register(Inputs.svtIndirectionRoughnessTexture, Setters.svtIndirectionRoughnessTexture);
         u_svtIndirectionAoTexture = register(Inputs.svtIndirectionAoTexture, Setters.svtIndirectionAoTexture);
 
-        // Generic.
+        // Generic float values.
         u_generic1 = register(Inputs.generic1, Setters.generic1);
         u_generic2 = register(Inputs.generic2, Setters.generic2);
 
-        // Noise.
-        u_noise1Texture = register(Inputs.noise1Texture, Setters.noise1Texture);
-        u_noise2Texture = register(Inputs.noise2Texture, Setters.noise2Texture);
+        // Generic textures.
+        u_texture0 = register(Inputs.texture0, Setters.texture0);
+        u_texture1 = register(Inputs.texture1, Setters.texture1);
     }
 
     public static String getDefaultVertexShader() {
@@ -972,8 +972,8 @@ public class DefaultIntShader extends BaseIntShader {
                 TextureAttribute.OcclusionMetallicRoughness);
 
 
-        public final static Uniform noise1Texture = new Uniform("u_noise1Texture", TextureAttribute.Noise1);
-        public final static Uniform noise2Texture = new Uniform("u_noise2Texture", TextureAttribute.Noise2);
+        public final static Uniform texture0 = new Uniform("u_texture0", TextureAttribute.Texture0);
+        public final static Uniform texture1 = new Uniform("u_texture1", TextureAttribute.Texture1);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
@@ -1819,25 +1819,25 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Generic2)))).value);
             }
         };
-        public final static Setter noise1Texture = new LocalSetter() {
+        public final static Setter texture0 = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(
-                        ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Noise1)))).textureDescription);
+                        ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Texture0)))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
-        public final static Setter noise2Texture = new LocalSetter() {
+        public final static Setter texture1 = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(
-                        ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Noise2)))).textureDescription);
+                        ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Texture1)))).textureDescription);
                 shader.set(inputID, unit);
             }
         };

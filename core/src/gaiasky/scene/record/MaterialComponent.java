@@ -103,9 +103,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     // Texture location strings.
     public boolean texInitialised, texLoading;
-    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao, occlusionMetallicRoughness;
+    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao, occlusionMetallicRoughness, texture0, texture1;
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked,
-            heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked;
+            heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked, texture0Unpacked, texture1Unpacked;
     // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
@@ -197,6 +197,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         if (ringnormal != null)
             ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
+        if (texture0 != null)
+            texture0Unpacked = addToLoad(texture0, getTP(texture0, true), manager);
+        if (texture1 != null)
+            texture1Unpacked = addToLoad(texture1, getTP(texture1, true), manager);
 
         // Cube maps
         if (diffuseCubemap != null)
@@ -259,7 +263,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 && ComponentUtils.isLoaded(roughnessCubemap, manager)
                 && ComponentUtils.isLoaded(metallicCubemap, manager)
                 && ComponentUtils.isLoaded(heightCubemap, manager)
-                && ComponentUtils.isLoaded(aoCubemap, manager);
+                && ComponentUtils.isLoaded(aoCubemap, manager)
+                && ComponentUtils.isLoaded(texture0, manager)
+                && ComponentUtils.isLoaded(texture1, manager);
     }
 
     public boolean hasSVT() {
@@ -438,6 +444,14 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                 material.set(new TextureAttribute(TextureAttribute.OcclusionMetallicRoughness, tex));
             }
         }
+        if (texture0 != null && material.get(TextureAttribute.Texture0) == null) {
+            Texture tex = manager.get(texture0Unpacked, Texture.class);
+            addTexture0(tex);
+        }
+        if (texture1 != null && material.get(TextureAttribute.Texture1) == null) {
+            Texture tex = manager.get(texture1Unpacked, Texture.class);
+            addTexture1(tex);
+        }
 
         // Cubemaps.
         if (diffuseCubemap != null) {
@@ -584,6 +598,16 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     private void addRoughnessTex(Texture roughnessTex) {
         if (roughnessTex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Roughness, roughnessTex));
+        }
+    }
+    private void addTexture0(Texture tex) {
+        if (tex != null && material != null) {
+            material.set(new TextureAttribute(TextureAttribute.Texture0, tex));
+        }
+    }
+    private void addTexture1(Texture tex) {
+        if (tex != null && material != null) {
+            material.set(new TextureAttribute(TextureAttribute.Texture1, tex));
         }
     }
 
@@ -955,6 +979,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public void setOcclusionMetallicRoughness(String texture) {
         this.occlusionMetallicRoughness = Settings.settings.data.dataFile(texture);
     }
+    public void setTexture0(String texture0) {
+        this.texture0 = Settings.settings.data.dataFile(texture0);
+    }
+    public void setTexture1(String texture1) {
+        this.texture1 = Settings.settings.data.dataFile(texture1);
+    }
 
     public void setDiffuseCubemap(String cubemap) {
         this.diffuseCubemap = new CubemapComponent();
@@ -1145,6 +1175,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         disposeTexture(manager, material, metallic, metallicUnpacked, TextureAttribute.Metallic, null);
         disposeTexture(manager, material, roughness, roughnessUnapcked, TextureAttribute.Roughness, null);
         disposeTexture(manager, material, ao, aoUnpacked, TextureAttribute.AO, null);
+        disposeTexture(manager, material, texture0, texture0Unpacked, TextureAttribute.Texture0, null);
+        disposeTexture(manager, material, texture1, texture1Unpacked, TextureAttribute.Texture1, null);
         disposeCubemap(manager, material, CubemapAttribute.DiffuseCubemap, diffuseCubemap);
         disposeCubemap(manager, material, CubemapAttribute.NormalCubemap, normalCubemap);
         disposeCubemap(manager, material, CubemapAttribute.EmissiveCubemap, emissiveCubemap);
@@ -1268,6 +1300,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             sb.append(",").append(ringnormal);
         if (height != null)
             sb.append(",").append(height);
+        if (texture0 != null)
+            sb.append(",").append(texture0);
+        if (texture1 != null)
+            sb.append(",").append(texture1);
         return sb.toString();
     }
 
@@ -1288,6 +1324,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         this.biomeHueShift = other.biomeHueShift;
         this.biomeSaturation = other.biomeSaturation;
         this.heightScale = other.heightScale;
+        this.texture0 = other.texture0;
+        this.texture1 = other.texture1;
         this.nc = new NoiseComponent();
         if (other.nc != null) {
             this.nc.copyFrom(other.nc);
@@ -1522,6 +1560,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
         if (object.roughness != null) {
             this.roughness = object.roughness;
+        }
+        if (object.texture0 != null) {
+            this.texture0 = object.texture0;
+        }
+        if (object.texture1 != null) {
+            this.texture1 = object.texture1;
         }
         // Cubemaps.
         if (object.diffuseCubemap != null) {
