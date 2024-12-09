@@ -292,8 +292,8 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createBox(float width, float height, float depth, final Material material, final Bits attributes) {
-        return createBox(width, height, depth, GL20.GL_TRIANGLES, material, attributes);
+    public IntModel createBox(float width, float height, float depth, boolean flip, final Material material, final Bits attributes) {
+        return createBox(width, height, depth, flip, GL20.GL_TRIANGLES, material, attributes);
     }
 
     /**
@@ -305,9 +305,9 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createBox(float width, float height, float depth, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createBox(float width, float height, float depth, boolean flip, int primitiveType, final Material material, final Bits attributes) {
         begin();
-        part("box", primitiveType, attributes, material).box(width, height, depth);
+        part("box", primitiveType, attributes, material).box(width, height, depth, flip);
         return end();
     }
 

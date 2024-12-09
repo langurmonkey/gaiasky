@@ -232,7 +232,8 @@ public class ModelCache {
                         height = ((Double) params.get("size")).floatValue();
                         depth = ((Double) params.get("size")).floatValue();
                     }
-                    model = mb.createBox(width, height, depth, mat, attributes);
+                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    model = mb.createBox(width, height, depth, flip, mat, attributes);
                 }
             }
         }

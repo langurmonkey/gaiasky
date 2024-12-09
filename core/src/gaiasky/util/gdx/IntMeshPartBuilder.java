@@ -114,16 +114,29 @@ public interface IntMeshPartBuilder {
     void patch(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, int divisionsU, int divisionsV);
 
     /** Add a box. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
-    void box(VertexInfo corner000, VertexInfo corner010, VertexInfo corner100, VertexInfo corner110, VertexInfo corner001, VertexInfo corner011, VertexInfo corner101, VertexInfo corner111);
+    void box(VertexInfo corner000, VertexInfo corner010, VertexInfo corner100, VertexInfo corner110, VertexInfo corner001, VertexInfo
+            corner011, VertexInfo corner101, VertexInfo corner111);
+
+    /** Add a box. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
+    void box(VertexInfo corner000, VertexInfo corner010, VertexInfo corner100, VertexInfo corner110, VertexInfo corner001, VertexInfo corner011, VertexInfo corner101, VertexInfo corner111, boolean flip);
 
     /** Add a box. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
     void box(Vector3 corner000, Vector3 corner010, Vector3 corner100, Vector3 corner110, Vector3 corner001, Vector3 corner011, Vector3 corner101, Vector3 corner111);
 
+    /** Add a box. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
+    void box(Vector3 corner000, Vector3 corner010, Vector3 corner100, Vector3 corner110, Vector3 corner001, Vector3 corner011, Vector3 corner101, Vector3 corner111, boolean flip);
+
     /** Add a box given the matrix. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
     void box(Matrix4 transform);
 
+    /** Add a box given the matrix. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
+    void box(Matrix4 transform, boolean flip);
+
     /** Add a box with the specified dimensions. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
     void box(float width, float height, float depth);
+
+    /** Add a box with the specified dimensions. Requires GL_POINTS, GL_LINES or GL_TRIANGLES primitive type. */
+    void box(float width, float height, float depth, boolean flip);
 
     /** Add a box at the specified location, with the specified dimensions */
     void box(float x, float y, float z, float width, float height, float depth);

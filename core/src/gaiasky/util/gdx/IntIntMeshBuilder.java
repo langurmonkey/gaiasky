@@ -669,6 +669,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void box(VertexInfo corner000, VertexInfo corner010, VertexInfo corner100, VertexInfo corner110, VertexInfo corner001, VertexInfo corner011, VertexInfo corner101, VertexInfo corner111) {
+        box(corner000, corner010, corner100, corner110, corner001, corner011, corner101, corner111, false);
+
+    }
+
+    @Override
+    public void box(VertexInfo corner000, VertexInfo corner010, VertexInfo corner100, VertexInfo corner110, VertexInfo corner001, VertexInfo corner011, VertexInfo corner101, VertexInfo corner111, boolean flip) {
         ensureVertices(8);
         final int i000 = vertex(corner000);
         final int i100 = vertex(corner100);
@@ -681,51 +687,103 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
         if (primitiveType == GL20.GL_LINES) {
             ensureIndices(24);
-            rect(i000, i100, i110, i010);
-            rect(i101, i001, i011, i111);
+            if (!flip) {
+                rect(i000, i100, i110, i010);
+                rect(i101, i001, i011, i111);
+            } else {
+                rect(i000, i010, i110, i100);
+                rect(i101, i111, i011, i001);
+            }
             index(i000, i001, i010, i011, i110, i111, i100, i101);
         } else if (primitiveType == GL20.GL_POINTS) {
             ensureRectangleIndices(2);
-            rect(i000, i100, i110, i010);
-            rect(i101, i001, i011, i111);
+            if (!flip) {
+                rect(i000, i100, i110, i010);
+                rect(i101, i001, i011, i111);
+            } else {
+                rect(i000, i010, i110, i100);
+                rect(i101, i111, i011, i001);
+            }
         } else { // GL10.GL_TRIANGLES
             ensureRectangleIndices(6);
-            rect(i000, i100, i110, i010);
-            rect(i101, i001, i011, i111);
-            rect(i000, i010, i011, i001);
-            rect(i101, i111, i110, i100);
-            rect(i101, i100, i000, i001);
-            rect(i110, i111, i011, i010);
+            if (!flip) {
+                rect(i000, i100, i110, i010);
+                rect(i101, i001, i011, i111);
+                rect(i000, i010, i011, i001);
+                rect(i101, i111, i110, i100);
+                rect(i101, i100, i000, i001);
+                rect(i110, i111, i011, i010);
+            } else {
+                rect(i000, i010, i110, i100);
+                rect(i101, i111, i011, i001);
+                rect(i000, i001, i011, i010);
+                rect(i101, i100, i110, i111);
+                rect(i101, i001, i000, i100);
+                rect(i110, i010, i011, i111);
+            }
         }
     }
 
     @Override
     public void box(Vector3 corner000, Vector3 corner010, Vector3 corner100, Vector3 corner110, Vector3 corner001, Vector3 corner011, Vector3 corner101, Vector3 corner111) {
+        box(corner000, corner010, corner100, corner110, corner001, corner011, corner101, corner111, false);
+
+    }
+
+    @Override
+    public void box(Vector3 corner000, Vector3 corner010, Vector3 corner100, Vector3 corner110, Vector3 corner001, Vector3 corner011, Vector3 corner101, Vector3 corner111, boolean flip) {
         if (norOffset < 0 && uvOffset < 0) {
-            box(vertTmp1.set(corner000, null, null, null), vertTmp2.set(corner010, null, null, null), vertTmp3.set(corner100, null, null, null), vertTmp4.set(corner110, null, null, null), vertTmp5.set(corner001, null, null, null), vertTmp6.set(corner011, null, null, null), vertTmp7.set(corner101, null, null, null), vertTmp8.set(corner111, null, null, null));
+            box(vertTmp1.set(corner000, null, null, null), vertTmp2.set(corner010, null, null, null), vertTmp3.set(corner100, null, null, null), vertTmp4.set(corner110, null, null, null), vertTmp5.set(corner001, null, null, null), vertTmp6.set(corner011, null, null, null), vertTmp7.set(corner101, null, null, null), vertTmp8.set(corner111, null, null, null), flip);
         } else {
             ensureRectangles(6);
             Vector3 nor = tempV1.set(corner000).lerp(corner110, 0.5f).sub(tempV2.set(corner001).lerp(corner111, 0.5f)).nor();
-            rect(corner000, corner010, corner110, corner100, nor);
-            rect(corner011, corner001, corner101, corner111, nor.scl(-1));
+            if (!flip) {
+                rect(corner000, corner010, corner110, corner100, nor);
+                rect(corner011, corner001, corner101, corner111, nor.scl(-1));
+            } else {
+                nor.scl(-1);
+                rect(corner000, corner100, corner110, corner010, nor);
+                rect(corner011, corner111, corner101, corner001, nor.scl(-1));
+            }
             nor = tempV1.set(corner000).lerp(corner101, 0.5f).sub(tempV2.set(corner010).lerp(corner111, 0.5f)).nor();
-            rect(corner001, corner000, corner100, corner101, nor);
-            rect(corner010, corner011, corner111, corner110, nor.scl(-1));
+            if (!flip) {
+                rect(corner001, corner000, corner100, corner101, nor);
+                rect(corner010, corner011, corner111, corner110, nor.scl(-1));
+            } else {
+                nor.scl(-1);
+                rect(corner001, corner101, corner100, corner000, nor);
+                rect(corner010, corner110, corner111, corner011, nor.scl(-1));
+            }
             nor = tempV1.set(corner000).lerp(corner011, 0.5f).sub(tempV2.set(corner100).lerp(corner111, 0.5f)).nor();
-            rect(corner001, corner011, corner010, corner000, nor);
-            rect(corner100, corner110, corner111, corner101, nor.scl(-1));
+            if (!flip) {
+                rect(corner001, corner011, corner010, corner000, nor);
+                rect(corner100, corner110, corner111, corner101, nor.scl(-1));
+            } else {
+                nor.scl(-1);
+                rect(corner001, corner000, corner010, corner011, nor);
+                rect(corner100, corner101, corner111, corner110, nor.scl(-1));
+            }
         }
     }
 
     @Override
     public void box(Matrix4 transform) {
-        box(tmp(-0.5f, -0.5f, -0.5f).mul(transform), tmp(-0.5f, 0.5f, -0.5f).mul(transform), tmp(0.5f, -0.5f, -0.5f).mul(transform), tmp(0.5f, 0.5f, -0.5f).mul(transform), tmp(-0.5f, -0.5f, 0.5f).mul(transform), tmp(-0.5f, 0.5f, 0.5f).mul(transform), tmp(0.5f, -0.5f, 0.5f).mul(transform), tmp(0.5f, 0.5f, 0.5f).mul(transform));
+        box(transform, false);
+    }
+
+    public void box(Matrix4 transform, boolean flip) {
+        box(tmp(-0.5f, -0.5f, -0.5f).mul(transform), tmp(-0.5f, 0.5f, -0.5f).mul(transform), tmp(0.5f, -0.5f, -0.5f).mul(transform), tmp(0.5f, 0.5f, -0.5f).mul(transform), tmp(-0.5f, -0.5f, 0.5f).mul(transform), tmp(-0.5f, 0.5f, 0.5f).mul(transform), tmp(0.5f, -0.5f, 0.5f).mul(transform), tmp(0.5f, 0.5f, 0.5f).mul(transform), flip);
         cleanup();
     }
 
     @Override
     public void box(float width, float height, float depth) {
-        box(matTmp1.setToScaling(width, height, depth));
+        box(width, height, depth, false);
+    }
+
+    @Override
+    public void box(float width, float height, float depth, boolean flip) {
+        box(matTmp1.setToScaling(width, height, depth), flip);
     }
 
     @Override
@@ -742,6 +800,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public void circle(float radius, int divisions, final Vector3 center, final Vector3 normal) {
         circle(radius, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z);
     }
+
 
     @Override
     public void circle(float radius, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal) {
