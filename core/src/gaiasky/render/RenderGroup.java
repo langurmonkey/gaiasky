@@ -149,7 +149,7 @@ public enum RenderGroup {
     /**
      * Volume models.
      **/
-    VOLUME(6800),
+    VOLUME(5810),
     /**
      * Using normal shader for per-pixel lighting, rendered late for items with transparency.
      **/
