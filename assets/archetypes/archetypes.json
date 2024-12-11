@@ -62,7 +62,7 @@
         },
         "Aurora": {
             "parent": "ModelBody",
-            "components": [ "Auora" ]
+            "components": [ "Aurora" ]
         },
         "Volume": {
             "parent": "ModelBody",
