@@ -227,7 +227,7 @@
     "Trajectory": {
       "description": "Defines attributes related to orbits and trajectory objects. See :ref:`orbits` for more information.",
       "orbitProvider": {
-        "description": "In *Orbit* archetype objects, this is the fully-qualified Java class that provides orbit data. This class needs to implement ``IOrbitDataProvider``. |brsp| **Values:** |br| ``gaiasky.data.orbit.OrbitalParametersProvider`` -- orbit is defined with orbital elements. |br| ``gaiasky.data.orbit.OrbitFileDataProvider`` -- orbit defined from a file of samples. |brsp| See :ref:`orbits` for more information.",
+        "description": "In *Orbit* archetype objects, this is the fully-qualified Java class that provides orbit data. This class needs to implement ``IOrbitDataProvider``. |brsp| **Values:** |br| ``gaiasky.data.orbit.OrbitalParametersProvider`` -- orbit is defined with orbital elements. |br| ``gaiasky.data.orbit.OrbitFileDataProvider`` -- orbit defined from a file of 3D sample points, in Km. |brsp| See :ref:`orbits` for more information.",
         "unit": "String",
         "aliases": [
           "provider"
@@ -949,6 +949,9 @@
         "description": "Scale factor taht applies to the the visual representation for each object of this dataset.",
         "unit": "Double"
       }
+    },
+    "Aurora": {
+      "description": "An aurora object."
     }
   }
 }

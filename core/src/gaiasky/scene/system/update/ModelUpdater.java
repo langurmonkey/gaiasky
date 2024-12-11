@@ -111,7 +111,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 && orientation != null
                 && orientation.attitudeComponent != null
                 && (time.getHdiff() != 0 || forceUpdate)) {
-            var quaternionOrientation = (AttitudeComponent) orientation.attitudeComponent;
+            var quaternionOrientation = orientation.attitudeComponent;
             if (quaternionOrientation.nonRotatedPos != null) {
                 quaternionOrientation.nonRotatedPos.set(body.pos);
                 // Undo rotation.
