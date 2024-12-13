@@ -286,6 +286,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         if (mtc == null && instance != null) {
             addColorToMaterial();
         }
+
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Event.ECLIPSES_CMD);
 
@@ -510,9 +511,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                                 int blendSrc,
                                 int blendDest,
                                 boolean blendEnabled) {
+        boolean isAdditive = blendEnabled && blendMode == BlendMode.ADDITIVE;
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
+            // Blending.
             BlendingAttribute ba;
             if (mat.has(BlendingAttribute.Type)) {
                 ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
@@ -525,22 +528,55 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
             ba.blended = blendEnabled;
             ba.opacity = alpha;
+
+            // Color.
+            if (isAdditive) {
+                if (mat.has(ColorAttribute.Diffuse)) {
+                    var c = (ColorAttribute) mat.get(ColorAttribute.Diffuse);
+                    if (c != null)
+                        c.color.a = alpha;
+                }
+            }
         }
     }
 
     private boolean sizeSet = false;
 
-    public void setSize(double sizeInternal) {
+    public void updateSizeKm(double sizeInternal) {
+        updateSize(sizeInternal * Constants.KM_TO_U);
+    }
+
+    public void updateSize(double sizeInternal) {
         if (!sizeSet && instance != null) {
-            float sizeKm = (float) (sizeInternal * Constants.U_TO_KM);
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
-                mat.set(new FloatAttribute(FloatAttribute.BodySize, sizeKm));
+                if (mat.has(FloatAttribute.BodySize)) {
+                    // Update.
+                    ((FloatAttribute) mat.get(FloatAttribute.BodySize)).value = (float) sizeInternal;
+                } else {
+                    // Add attribute.
+                    mat.set(new FloatAttribute(FloatAttribute.BodySize, (float) sizeInternal));
+                }
             }
             sizeSet = true;
         }
+
     }
+    public void setUnits(double kmToUnits) {
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            if (mat.has(FloatAttribute.KmToU)) {
+                // Update.
+                ((FloatAttribute) mat.get(FloatAttribute.KmToU)).value = (float) kmToUnits;
+            } else {
+                // Add attribute.
+                mat.set(new FloatAttribute(FloatAttribute.KmToU, (float) kmToUnits));
+            }
+        }
+    }
+
 
     public void disableBlending() {
         int n = instance.materials.size;
@@ -1052,7 +1088,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
-           if (mat.has(Vector3Attribute.CameraPos)) {
+            if (mat.has(Vector3Attribute.CameraPos)) {
                 // Update.
                 ((Vector3Attribute) mat.get(Vector3Attribute.CameraPos)).value.set(cameraPos);
 
@@ -1066,22 +1102,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void updateTimes(double sessionTime, double simuTime) {
         updateSessionTime(sessionTime);
         updateSimuTime(simuTime);
-    }
-
-    public void updateSize(double size) {
-        int n = instance.materials.size;
-        for (int i = 0; i < n; i++) {
-            Material mat = instance.materials.get(i);
-            if (mat.has(FloatAttribute.BodySize)) {
-                // Update.
-                ((FloatAttribute) mat.get(FloatAttribute.BodySize)).value = (float) size;
-
-            } else {
-                // Add attribute.
-                mat.set(new FloatAttribute(FloatAttribute.BodySize, (float) size));
-            }
-        }
-
     }
 
     public void updateSessionTime(double t) {

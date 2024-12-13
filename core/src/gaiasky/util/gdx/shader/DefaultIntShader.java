@@ -130,6 +130,8 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtIndirectionMetallicTexture;
     protected final int u_svtIndirectionRoughnessTexture;
     protected final int u_svtIndirectionAoTexture;
+    // Units.
+    protected final int u_kmToU;
     // Generic float values.
     protected final int u_generic1;
     protected final int u_generic2;
@@ -336,6 +338,10 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtIndirectionEmissiveTexture = register(Inputs.svtIndirectionEmissiveTexture, Setters.svtIndirectionEmissiveTexture);
         u_svtIndirectionRoughnessTexture = register(Inputs.svtIndirectionRoughnessTexture, Setters.svtIndirectionRoughnessTexture);
         u_svtIndirectionAoTexture = register(Inputs.svtIndirectionAoTexture, Setters.svtIndirectionAoTexture);
+
+        // Units.
+        u_kmToU = register(Inputs.kmToU, Setters.kmToU);
+
 
         // Generic float values.
         u_generic1 = register(Inputs.generic1, Setters.generic1);
@@ -1027,6 +1033,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform svtIndirectionMetallicTexture = new Uniform("u_svtIndirectionMetallicTexture");
         public final static Uniform svtIndirectionRoughnessTexture = new Uniform("u_svtIndirectionRoughnessTexture");
         public final static Uniform svtIndirectionAoTexture = new Uniform("u_svtIndirectionAoTexture");
+
+        public final static Uniform kmToU = new Uniform("u_kmToU", FloatAttribute.KmToU);
 
         public final static Uniform generic1 = new Uniform("u_generic1", FloatAttribute.Generic1);
         public final static Uniform generic2 = new Uniform("u_generic2", FloatAttribute.Generic2);
@@ -1799,6 +1807,15 @@ public class DefaultIntShader extends BaseIntShader {
                     shader.set(inputID, shader.context.textureBinder.bind(
                             ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionAmbientOcclusion)))).textureDescription));
                 }
+            }
+        };
+        public final static Setter kmToU = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.KmToU)))).value);
             }
         };
         public final static Setter generic1 = new LocalSetter() {

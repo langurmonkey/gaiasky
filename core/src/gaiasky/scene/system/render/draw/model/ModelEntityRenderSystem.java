@@ -184,12 +184,11 @@ public class ModelEntityRenderSystem {
 
             float colorAlpha = Mapper.tagBillboard.has(entity) || Mapper.tagBillboardGalaxy.has(entity) ? body.color[3] : 1.0f;
             mc.update(alpha * alphaFactor * colorAlpha, relativistic);
-            model.model.setSize(body.size);
+            mc.updateSizeKm(body.size);
             batch.render(mc.instance, mc.env);
         }
     }
 
-    private final Vector3 aux = new Vector3();
     /**
      * Renders a volume model.
      *
@@ -217,7 +216,6 @@ public class ModelEntityRenderSystem {
         ModelComponent mc = model.model;
         if (mc != null && mc.instance != null && mc.isModelInitialised()) {
             var base = Mapper.base.get(entity);
-            var body = Mapper.body.get(entity);
 
             float alphaFactor;
             if (scaffolding != null) {
@@ -233,11 +231,9 @@ public class ModelEntityRenderSystem {
             var camPos = v3b1.set(GaiaSky.instance.getCameraManager().getPos()).sub(v3b2).put(v3f1);
 
             mc.updateCamPos(camPos);
-            mc.updateSize(focusView.getSize());
             mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
             mc.update(alpha * alphaFactor, relativistic);
             mc.updateDepthTest();
-            model.model.setSize(body.size);
             batch.render(mc.instance, mc.env);
         }
     }
@@ -280,7 +276,7 @@ public class ModelEntityRenderSystem {
             mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
             mc.update(alpha * alphaFactor, relativistic);
             mc.updateDepthTest();
-            model.model.setSize(body.size);
+            mc.updateSizeKm(body.size);
             batch.render(mc.instance, mc.env);
         }
     }
@@ -312,12 +308,11 @@ public class ModelEntityRenderSystem {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
 
-        mc.update(graph.localTransform, alpha * base.opacity * body.color[3]);
+        mc.update(relativistic, graph.localTransform, alpha * base.opacity * body.color[3]);
         mc.updateDepthTest();
         Gdx.gl20.glLineWidth(1.5f + Settings.settings.scene.renderer.line.glWidthBias);
         batch.render(mc.instance, mc.env);
 
-        model.model.update(alpha * base.opacity, relativistic);
         batch.render(model.model.instance, model.model.env);
     }
 
@@ -636,7 +631,7 @@ public class ModelEntityRenderSystem {
             }
             model.model.updateEclipsingBodyUniforms(entity);
             model.model.update(alpha * base.opacity, relativistic);
-            model.model.setSize(body.size);
+            model.model.updateSizeKm(body.size);
             batch.render(model.model.instance, model.model.env);
         }
     }
