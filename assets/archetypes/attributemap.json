@@ -949,9 +949,6 @@
         "description": "Scale factor taht applies to the the visual representation for each object of this dataset.",
         "unit": "Double"
       }
-    },
-    "Aurora": {
-      "description": "An aurora object."
     }
   }
 }

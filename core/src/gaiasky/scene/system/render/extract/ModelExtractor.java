@@ -62,10 +62,6 @@ public class ModelExtractor extends AbstractExtractSystem {
                 // Volume models.
                 addToRender(render, RenderGroup.VOLUME);
 
-            } else if (Mapper.aurora.has(entity)) {
-                // Aurora borealis/australis.
-                addToRender(render, RenderGroup.MODEL_AURORA);
-
             } else if (Mapper.tagBillboardGalaxy.has(entity)) {
                 // Billboard galaxies.
                 double thPoint = (sa.thresholdQuad * camera.getFovFactor()) / scaffolding.sizeScaleFactor;

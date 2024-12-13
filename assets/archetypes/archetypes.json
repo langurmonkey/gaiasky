@@ -60,10 +60,6 @@
                 "gaiasky.scenegraph.Planet"
             ]
         },
-        "Aurora": {
-            "parent": "ModelBody",
-            "components": [ "Aurora" ]
-        },
         "Volume": {
             "parent": "ModelBody",
             "components": [ "Volume" ]

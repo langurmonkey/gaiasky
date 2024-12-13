@@ -135,10 +135,6 @@ public enum RenderGroup {
      **/
     BILLBOARD_STAR(5500),
     /**
-     * Aurora.
-     **/
-    MODEL_AURORA(5800),
-    /**
      * Atmospheres of planets.
      **/
     MODEL_ATM(6000),

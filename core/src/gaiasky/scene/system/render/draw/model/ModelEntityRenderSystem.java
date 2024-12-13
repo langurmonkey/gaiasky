@@ -237,49 +237,6 @@ public class ModelEntityRenderSystem {
             batch.render(mc.instance, mc.env);
         }
     }
-    /**
-     * Renders an aurora.
-     *
-     * @param entity       The entity.
-     * @param model        The model component.
-     * @param batch        The batch.
-     * @param alpha        The alpha value.
-     * @param t            The time, in seconds, since the start of the session.
-     * @param rc           The rendering context.
-     * @param renderGroup  The render group.
-     * @param shadow       Whether to prepare the shadow environment.
-     * @param relativistic Whether to apply relativistic effects.
-     */
-    public void renderAurora(Entity entity,
-                             Model model,
-                             IntModelBatch batch,
-                             float alpha,
-                             double t,
-                             RenderingContext rc,
-                             RenderGroup renderGroup,
-                             boolean shadow,
-                             boolean relativistic) {
-        var scaffolding = Mapper.modelScaffolding.get(entity);
-
-        ModelComponent mc = model.model;
-        if (mc != null && mc.instance != null && mc.isModelInitialised()) {
-            var base = Mapper.base.get(entity);
-            var body = Mapper.body.get(entity);
-
-            float alphaFactor;
-            if (scaffolding != null) {
-                alphaFactor = Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity * base.opacity;
-            } else {
-                alphaFactor = base.opacity;
-            }
-
-            mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
-            mc.update(alpha * alphaFactor, relativistic);
-            mc.updateDepthTest();
-            mc.updateSizeKm(body.size);
-            batch.render(mc.instance, mc.env);
-        }
-    }
 
     /**
      * Renders a wireframe/shape model.

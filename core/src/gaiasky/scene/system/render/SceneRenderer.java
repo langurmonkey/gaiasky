@@ -289,8 +289,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
-            case MODEL_AURORA -> // MODEL AURORA
-                    system = new ModelRenderer(this, MODEL_AURORA, alphas, renderAssets.mbPixelLightingAurora);
             case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
             case PARTICLE_GROUP -> {
                 final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
