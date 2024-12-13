@@ -47,7 +47,7 @@ public class RenderAssets {
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
     public ExtShaderProgram[] billboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders, primitiveGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
-    public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbPixelLightingAurora, mbVertexLightingThruster, mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation, mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
+    public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbVertexLightingThruster, mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation, mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
     public BitmapFont font2d, font3d, fontTitles;
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
@@ -162,8 +162,6 @@ public class RenderAssets {
         manager.load("per-pixel-lighting-svtdetection-tessellation", TessellationShaderProvider.class,
                 new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl",
                         "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.svt.detection.fragment.glsl"));
-        manager.load("per-pixel-lighting-aurora", RelativisticShaderProvider.class,
-                new RelativisticShaderProviderParameter("shader/aurora.vertex.glsl", "shader/aurora.fragment.glsl"));
 
         manager.load("skybox", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/skybox.vertex.glsl", "shader/skybox.fragment.glsl"));
         manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));
@@ -301,7 +299,6 @@ public class RenderAssets {
         TessellationShaderProvider perPixelLightingOpaqueTessellation = manager.get("per-pixel-lighting-opaque-tessellation");
         IntShaderProvider perPixelLightingSvtDetection = manager.get("per-pixel-lighting-svtdetection");
         IntShaderProvider perPixelLightingSvtDetectionTessellation = manager.get("per-pixel-lighting-svtdetection-tessellation");
-        IntShaderProvider perPixelLightingAurora = manager.get("per-pixel-lighting-aurora");
 
         // Others
         IntShaderProvider skybox = manager.get("skybox");
@@ -326,7 +323,6 @@ public class RenderAssets {
         mbPixelLightingOpaqueTessellation = new IntModelBatch(perPixelLightingOpaqueTessellation);
         mbPixelLightingSvtDetectionTessellation = new IntModelBatch(perPixelLightingSvtDetectionTessellation);
         mbPixelLightingDepthTessellation = new IntModelBatch(perPixelLightingDepthTessellation);
-        mbPixelLightingAurora = new IntModelBatch(perPixelLightingAurora);
 
         mbSkybox = new IntModelBatch(skybox);
         mbAtmosphere = new IntModelBatch(atmosphere);
