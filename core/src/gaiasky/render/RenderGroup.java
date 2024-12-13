@@ -167,10 +167,6 @@ public enum RenderGroup {
      */
     PARTICLE_EFFECTS(10000),
     /**
-     * Particle system.
-     */
-    PARTICLE_SYSTEM(10100),
-    /**
      * Transparent additive-blended meshes.
      **/
     MODEL_VERT_ADDITIVE(11000),

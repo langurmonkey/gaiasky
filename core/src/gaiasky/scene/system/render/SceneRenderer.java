@@ -389,7 +389,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPreRunnables(additiveBlendR, noDepthTestR);
                 system.addPostRunnables(regularBlendR);
             }
-            case PARTICLE_SYSTEM -> system = new ParticleSystemRenderer(this, PARTICLE_SYSTEM, alphas);
             case SHAPE -> {
                 system = new ShapeRenderer(this, SHAPE, alphas, globalResources.getShapeShader());
                 system.addPreRunnables(regularBlendR, depthTestR);

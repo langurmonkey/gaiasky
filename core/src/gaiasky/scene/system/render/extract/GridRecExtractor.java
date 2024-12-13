@@ -32,8 +32,6 @@ public class GridRecExtractor extends AbstractExtractSystem {
             if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
                 addToRender(render, RenderGroup.LINE);
             }
-            addToRender(render, RenderGroup.PARTICLE_SYSTEM);
         }
-
     }
 }
