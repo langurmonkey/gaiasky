@@ -63,7 +63,7 @@ vec3 g_binormal = vec3(0.0, 1.0, 0.0);
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef tangentFlag
 in vec3 a_tangent;
-#endif //tangentFlagvec3
+#endif //tangentFlag
 
 #if defined(tangentFlag)
 vec3 g_tangent = a_tangent;
