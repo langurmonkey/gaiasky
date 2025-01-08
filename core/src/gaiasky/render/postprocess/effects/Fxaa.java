@@ -10,6 +10,7 @@ package gaiasky.render.postprocess.effects;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.filters.FxaaFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.render.util.ShaderLoader;
 
 public final class Fxaa extends Antialiasing {
     private final FxaaFilter fxaaFilter;
@@ -49,4 +50,11 @@ public final class Fxaa extends Antialiasing {
         restoreViewport(dest);
         fxaaFilter.setInput(src).setOutput(dest).render();
     }
+
+    @Override
+    public void updateShaders() {
+        super.updateShaders();
+        fxaaFilter.updateProgram();
+    }
+
 }

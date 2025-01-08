@@ -12,6 +12,7 @@ import gaiasky.render.util.ShaderLoader;
 
 public final class FxaaFilter extends Filter<FxaaFilter> {
     private final Vector2 viewportInverse;
+    private final int quality;
 
     /**
      * Creates an FXAA filter with the given viewport size and quality.
@@ -42,6 +43,7 @@ public final class FxaaFilter extends Filter<FxaaFilter> {
      */
     public FxaaFilter(Vector2 viewportSize, int quality) {
         super(ShaderLoader.fromFile("screenspace", "fxaa", "#define FXAA_PRESET " + (quality % 3 + 3)));
+        this.quality = quality;
         this.viewportInverse = viewportSize;
         this.viewportInverse.x = 1f / this.viewportInverse.x;
         this.viewportInverse.y = 1f / this.viewportInverse.y;
@@ -77,6 +79,10 @@ public final class FxaaFilter extends Filter<FxaaFilter> {
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
+    }
+
+    public void updateProgram() {
+        super.updateProgram(ShaderLoader.fromFile("screenspace", "fxaa", "#define FXAA_PRESET " + (quality % 3 + 3)));
     }
 
     public enum Param implements Parameter {

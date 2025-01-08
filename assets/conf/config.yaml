@@ -556,7 +556,7 @@ postprocess:
     # Antialias type: [NONE|FXAA|NFAA]
     type: FXAA
     # Antialias quality, in [0, 1, 2] from worse to best.
-    quality: 1
+    quality: 2
   # Bloom settings
   bloom:
     # Intensity of bloom
