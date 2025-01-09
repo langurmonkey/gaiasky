@@ -31,6 +31,7 @@ public class InvisibleExtractor extends AbstractExtractSystem {
         var render = Mapper.render.get(entity);
         var label = Mapper.label.get(entity);
         if (renderText(base, body, sa, label)) {
+            // This is for label-only objects!
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }
@@ -40,6 +41,7 @@ public class InvisibleExtractor extends AbstractExtractSystem {
                                SolidAngle sa,
                                Label label) {
         return base.names != null
+                // Label objects.
                 && label.label
                 && label.renderLabel
                 && mustRender(base)

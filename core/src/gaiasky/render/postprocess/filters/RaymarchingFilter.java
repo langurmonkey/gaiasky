@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.util.ShaderLoader;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import net.jafama.FastMath;
 
@@ -25,6 +26,8 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Matrix4 invView;
     private final Matrix4 combined;
     private float timeSecs;
+    // VR scaling.
+    private float distanceScale;
     private float size;
     /**
      * Default depth buffer texture. In our case, it contains the logarithmic
@@ -64,6 +67,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.invView = new Matrix4();
         this.combined = new Matrix4();
         this.additional = new float[4];
+        this.distanceScale = (float) Constants.DISTANCE_SCALE_FACTOR;
         this.size = 1;
         rebind();
     }
@@ -170,6 +174,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.Pos, pos);
         setParams(Param.Time, timeSecs);
         setParams(Param.Size, size);
+        setParams(Param.DistanceScale, distanceScale);
         setParamsv(Param.Additional, additional, 0, 4);
         endParams();
     }
@@ -191,6 +196,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         TextureAdditional("u_texture2", 0),
         Time("u_time", 1),
         Size("u_size", 1),
+        DistanceScale("u_distScale", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
         Pos("u_pos", 3),
