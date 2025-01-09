@@ -45,7 +45,7 @@ public class InvisibleInitializer extends AbstractInitSystem {
         label.textScale = 0.2f;
         label.labelMax = 1.8f;
         if (label.labelFactor == 0)
-            label.labelFactor = (float) (0.5e-3f);
+            label.labelFactor = 0.5e-3f;
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextBase;
     }

@@ -111,9 +111,9 @@ public class RaymarchingInitializer extends AbstractInitSystem {
                 var sa = Mapper.sa.get(entity);
                 sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * 60.0;
                 label.textScale = 0.2f;
-                label.labelMax = 1f;
+                label.labelMax = 1.6f;
                 if (label.labelFactor == 0)
-                    label.labelFactor = (float) (0.5e-3f * Constants.DISTANCE_SCALE_FACTOR);
+                    label.labelFactor = 0.5e-3f;
                 label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
                 label.renderFunction = LabelView::renderTextBase;
             } else {
