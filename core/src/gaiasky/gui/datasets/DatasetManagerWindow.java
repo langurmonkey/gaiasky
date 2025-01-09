@@ -90,6 +90,7 @@ public class DatasetManagerWindow extends GenericDialog {
         iconMap.put("system", "iconic-target");
         iconMap.put("texture-pack", "icon-elem-moons");
         iconMap.put("virtualtex-pack", "iconic-image");
+        iconMap.put("volume", "icon-elem-nebulae");
     }
 
     private final DatasetDesc[] selectedDataset;
@@ -155,12 +156,14 @@ public class DatasetManagerWindow extends GenericDialog {
             case "catalog-gal" -> 3;
             case "catalog-cluster" -> 4;
             case "catalog-sso" -> 5;
-            case "system" -> 6;
-            case "spacecraft" -> 7;
-            case "mesh" -> 8;
-            case "other" -> 9;
-            case "catalog-other" -> 10;
-            default -> 11;
+            case "catalog-other" -> 6;
+            case "system" -> 7;
+            case "spacecraft" -> 8;
+            case "mesh" -> 9;
+            case "volume" -> 10;
+            case "virtualtex-pack" -> 11;
+            case "other" -> 12;
+            default -> 13;
         };
     }
 
