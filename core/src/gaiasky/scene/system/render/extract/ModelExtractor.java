@@ -61,6 +61,9 @@ public class ModelExtractor extends AbstractExtractSystem {
             if (Mapper.volume.has(entity)) {
                 // Volume models.
                 addToRender(render, RenderGroup.VOLUME);
+                if (renderText(base, body, sa, label)) {
+                    addToRender(render, RenderGroup.FONT_LABEL);
+                }
 
             } else if (Mapper.tagBillboardGalaxy.has(entity)) {
                 // Billboard galaxies.

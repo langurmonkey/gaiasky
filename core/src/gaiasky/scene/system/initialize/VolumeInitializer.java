@@ -18,6 +18,7 @@ import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 
 public class VolumeInitializer extends AbstractInitSystem {
     public VolumeInitializer(boolean setUp, Family family, int priority) {
@@ -40,10 +41,21 @@ public class VolumeInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         var body = Mapper.body.get(entity);
         var model = Mapper.model.get(entity);
+        var label = Mapper.label.get(entity);
+        var sa = Mapper.sa.get(entity);
 
         // Set units.
         model.model.setUnits(Constants.KM_TO_U);
         // Set size.
         model.model.updateSize(body.size);
+
+        // Set up label
+        sa.thresholdLabel = (Math.toRadians(1e-6) * Constants.DISTANCE_SCALE_FACTOR / Settings.settings.scene.label.number) * 5000.0;
+        label.textScale = 0.2f;
+        label.labelMax = 0.0006f;
+        if (label.labelFactor == 0)
+            label.labelFactor = 0.5e-3f;
+        label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
+        label.renderFunction = LabelView::renderTextBase;
     }
 }
