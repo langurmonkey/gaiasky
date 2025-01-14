@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 3060300
+configVersion: 3060501
 
 #
 # Data configuration
@@ -471,7 +471,7 @@ program:
     dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
     # Data descriptor file location.
     # This can also point to a local repository description file (use file://).
-    dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030301.json.gz
+    dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-03060501.json.gz
 
 #
 # Controls configuration
