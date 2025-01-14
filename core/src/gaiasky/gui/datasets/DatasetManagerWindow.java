@@ -497,7 +497,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 typeString = TextUtils.trueCapitalise(type.typeStr);
             }
             CollapsiblePane groupPane = new CollapsiblePane(stage, paneImage, typeString,
-            contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
+                    contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
                     null, filter != null && !filter.isBlank(), null, buttons);
             leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
             selectionOrder.add(new Pair<>(null, groupPane.getExpandCollapseActor()));
@@ -714,7 +714,11 @@ public class DatasetManagerWindow extends GenericDialog {
                                             });
                                             datasetContext.addItem(install);
                                         }
-                                        datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
+                                        var h = (int) stage.getHeight();
+                                        float unitsPerPixel = GaiaSky.instance.getUnitsPerPixel();
+                                        float px = Gdx.input.getX(ie.getPointer()) * unitsPerPixel;
+                                        float py = h - Gdx.input.getY(ie.getPointer()) * unitsPerPixel - 32f;
+                                        datasetContext.showMenu(stage, px, py);
                                     });
                                 }
                             }
