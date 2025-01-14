@@ -490,8 +490,14 @@ public class DatasetManagerWindow extends GenericDialog {
 
             var paneImage = new OwnImage(skin.getDrawable(getIcon(type.typeStr)));
             paneImage.setSize(45f, 45f);
-            CollapsiblePane groupPane = new CollapsiblePane(stage, paneImage, I18n.msg("gui.download.type." + type.typeStr),
-                    contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
+            String typeString;
+            if (I18n.hasMessage("gui.download.type." + type.typeStr)) {
+                typeString = I18n.msg("gui.download.type." + type.typeStr);
+            } else {
+                typeString = TextUtils.trueCapitalise(type.typeStr);
+            }
+            CollapsiblePane groupPane = new CollapsiblePane(stage, paneImage, typeString,
+            contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
                     null, filter != null && !filter.isBlank(), null, buttons);
             leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
             selectionOrder.add(new Pair<>(null, groupPane.getExpandCollapseActor()));
@@ -1157,7 +1163,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 int count;
                 byte[] data = new byte[2048];
 
-                while((count = tarIs.read(data)) != -1) {
+                while ((count = tarIs.read(data)) != -1) {
                     dest.write(data, 0, count);
                 }
 
