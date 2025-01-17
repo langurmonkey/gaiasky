@@ -1,3 +1,38 @@
+<a name="3.6.5"></a>
+## [3.6.5](https://codeberg.org/gaiasky/gaiasky/tree/3.6.4-2) (2025-01-15)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.4-2...3.6.5)
+
+### Bug Fixes
+- add bluesky link to about page. 
+- add 'volumes and effects' catalog type. 
+- increase default quality of FXAA filter, provide a simpler implementation (disabled by default), and enable hot shader reloading for FXAA effect. 
+- enable `"flip"` attribute for `box`es/`cube`s in mesh builders. 
+- apply noise function to aurora cylinder vertices over time. 
+- separate simulation time from scene time in shaders, improve aurora effect. 
+- add `"cameraCollision"` attribute to bodies. 
+- add support for auroras. 
+- shader include statement now supports targets in datasets. 
+- add bluesky link. 
+- add on-demand re-compilation of post-processing shaders from their source files, in runtime. 
+- add new attribute 'renderLabel' to label component. This enables/disables the actual rendering of the label. 
+- update Gaia Sky icon. 
+
+### Build System
+- update configuration file version number. This implies that your old configuration file gets overriden with the new version during the first startup of the new Gaia Sky version.
+- update to Libgdx 1.13.1.
+
+### Features
+- add support for volume rendering. The infrastructure is in place with an new archetype `Volume`. This is necessary for the new volumetric aurora dataset and volume nebulae in NGC2000.
+- add 'volumes and effects' catalog type.
+- enable `"flip"` attribute for `box`es/`cube`s in mesh builders.
+- add `"cameraCollision"` attribute to bodies.
+- shader include statement now supports targets in datasets.
+- add on-demand re-compilation of post-processing shaders from their source files, in runtime.
+- add new attribute 'renderLabel' to label component. This enables/disables the actual rendering of the label.
+- increase default quality of FXAA filter, provide a simpler implementation (disabled by default), and enable hot shader reloading for FXAA effect.
+- update Gaia Sky icon.
+- add bluesky link to readme file and about page.
+
 <a name="3.6.4-2"></a>
 ## [3.6.4-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.4) (2024-10-17)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.4...3.6.4-2)

@@ -34,6 +34,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
+/**
+ * Projects a cubemap using a specific projection algorithm.
+ */
 public class RenderModeCubemapProjections extends RenderModeCubemap implements IRenderMode, IObserver {
     private static final Log logger = Logger.getLogger(RenderModeCubemapProjections.class);
 

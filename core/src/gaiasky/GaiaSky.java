@@ -1142,10 +1142,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public void resetDynamicResolution() {
-        dynamicResolutionLevel = 0;
-        Settings.settings.graphics.backBufferScale = 1f;
+        if (Settings.settings.graphics.dynamicResolution) {
+            Settings.settings.graphics.dynamicResolution = false;
+            Settings.settings.graphics.backBufferScale = 1f;
+            dynamicResolutionLevel = 0;
+            lastDynamicResolutionChange = 0;
+        }
         postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
-        lastDynamicResolutionChange = 0;
     }
 
     public FrameBuffer getBackRenderBuffer() {

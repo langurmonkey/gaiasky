@@ -27,6 +27,9 @@ import gaiasky.util.Settings;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Manages the rendering of each of the sides of a cubemap in the directions X, -X, Y, -Y, Z, -Z.
+ */
 public abstract class RenderModeCubemap extends RenderModeAbstract {
 
     private final Mosaic mosaic;
