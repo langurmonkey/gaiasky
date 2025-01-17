@@ -1698,6 +1698,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
         return cliArgs.headless;
     }
 
+    public boolean isExternalView() {
+        return gaiaSkyView != null;
+    }
+
     public GlobalResources getGlobalResources() {
         return this.globalResources;
     }

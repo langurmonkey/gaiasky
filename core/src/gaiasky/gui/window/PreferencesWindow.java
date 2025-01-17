@@ -8,6 +8,7 @@
 package gaiasky.gui.window;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
@@ -113,7 +114,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<UpscaleFilter> upscaleFilter;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix,
             frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle,
-            smResolution, maxFpsInput;
+            smResolution, maxFpsInput, evwField, evhField;
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
             celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
             chromaticAberration, filmGrain, lensFlare, velocityVectors, motionBlur, pgResolution;
@@ -521,11 +522,54 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to content
         addContentGroup(contentGraphicsTable, titleResolution, mode);
 
-        // GRAPHICS SETTINGS
-        Label titleGraphics = new OwnLabel(I18n.msg("gui.graphicssettings"), skin, "header");
-        Table graphics = new Table();
+        // EXTERNAL VIEW SETTINGS
+        if (GaiaSky.instance.isExternalView()) {
+            var externalView = GaiaSky.instance.gaiaSkyView;
+            var titleExternal = new OwnLabel(I18n.msg("gui.extview.settings"), skin, "header");
+            var extView = new Table();
 
-        OwnLabel graphicsQualityLabel = new OwnLabel(I18n.msg("gui.gquality"), skin);
+            // Window Size
+            var winSizeLabel = new OwnLabel(I18n.msg("gui.extview.windowsize"), skin);
+
+            var extViewSize = new Table(skin);
+            evwField = new OwnTextField("", skin, widthValidator);
+            evwField.setWidth(inputSmallWidth);
+            evhField = new OwnTextField("", skin, heightValidator);
+            evhField.setWidth(inputSmallWidth);
+            final var xxLabel = new OwnLabel("x", skin);
+            populateWidthHeight(true, evwField, evhField, externalView.graphics);
+
+            extViewSize.add(evwField).left().padRight(pad10);
+            extViewSize.add(xxLabel).left().padRight(pad10);
+            extViewSize.add(evhField).left().row();
+
+            // Resolution info
+            var resolutionLabel = new OwnLabel(I18n.msg("gui.extview.resolution"), skin);
+
+            float w = (float) (Gdx.graphics.getWidth() * Settings.settings.graphics.backBufferScale);
+            float h = (float) (Gdx.graphics.getHeight() * Settings.settings.graphics.backBufferScale);
+            var resInfo = TextUtils.breakCharacters(
+                    I18n.msg("gui.extview.resolution.info",
+                            Integer.toString(MathUtils.round(w)),
+                            Integer.toString(MathUtils.round(h))),
+                    45);
+            var infoLabel = new OwnLabel(resInfo, skin);
+
+            labels.add(winSizeLabel, resolutionLabel);
+
+            extView.add(winSizeLabel).left().padRight(pad18);
+            extView.add(extViewSize).left().padBottom(pad18).row();
+            extView.add(resolutionLabel).left().padTop(pad18).padRight(pad18);
+            extView.add(infoLabel).left().padTop(pad18).row();
+
+            addContentGroup(contentGraphicsTable, titleExternal, extView);
+        }
+
+        // GRAPHICS SETTINGS
+        var titleGraphics = new OwnLabel(I18n.msg("gui.graphicssettings"), skin, "header");
+        var graphics = new Table();
+
+        var graphicsQualityLabel = new OwnLabel(I18n.msg("gui.gquality"), skin);
         graphicsQualityLabel.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
 
         ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
@@ -2551,11 +2595,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private void populateWidthHeight(boolean force) {
-        if (force || widthField != null && widthField.getText().isBlank()) {
-            widthField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getWidth(), 100, 10000)));
+        populateWidthHeight(force, widthField, heightField, Gdx.graphics);
+    }
+
+    private void populateWidthHeight(boolean force, OwnTextField w, OwnTextField h, Graphics g) {
+        if (force || w != null && w.getText().isBlank()) {
+            w.setText(Integer.toString(MathUtils.clamp(g.getWidth(), 100, 10000)));
         }
-        if (force || heightField != null && heightField.getText().isBlank()) {
-            heightField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getHeight(), 100, 10000)));
+        if (force || h != null && h.getText().isBlank()) {
+            h.setText(Integer.toString(MathUtils.clamp(g.getHeight(), 100, 10000)));
         }
     }
 
@@ -2786,6 +2834,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         boolean restartDialog = settings.graphics.quality.ordinal() != bean.value;
         if (settings.graphics.quality.ordinal() != bean.value) {
             settings.graphics.quality = GraphicsQuality.values()[bean.value];
+        }
+
+        if(GaiaSky.instance.isExternalView()) {
+            // Apply width/height of external view window.
+            var ev = GaiaSky.instance.gaiaSkyView;
+            ev.graphics.setWindowedMode((int) evwField.getIntValue(1920), (int) evhField.getIntValue(1080));
         }
 
         // Antialiasing
