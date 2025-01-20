@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -44,6 +46,7 @@ import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
 import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.MenuItem;
 import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -51,6 +54,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.kamranzafar.jtar.TarEntry;
 import org.kamranzafar.jtar.TarInputStream;
 
+import java.awt.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -580,7 +584,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
                             if (select.isChecked()) {
-                                actionEnableDataset(dataset);
+                                actionEnableDataset(dataset, select);
                             } else {
                                 actionDisableDataset(dataset);
                             }
@@ -680,7 +684,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     enable.addListener(new ChangeListener() {
                                                         @Override
                                                         public void changed(ChangeEvent event, Actor actor) {
-                                                            actionEnableDataset(dataset);
+                                                            actionEnableDataset(dataset, null);
                                                             if (installOrSelect instanceof OwnCheckBox cb) {
                                                                 cb.setProgrammaticChangeEvents(false);
                                                                 cb.setChecked(true);
@@ -1072,7 +1076,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     // Ok message.
                     EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, dataset.key, 0);
                     dataset.exists = true;
-                    actionEnableDataset(dataset);
+                    actionEnableDataset(dataset, null);
                     if (successRunnable != null) {
                         successRunnable.run();
                     }
@@ -1432,21 +1436,115 @@ public class DatasetManagerWindow extends GenericDialog {
         });
     }
 
-    private void actionEnableDataset(DatasetDesc dataset) {
-        // Texture packs can't be enabled
+    /**
+     * Enables a given dataset, so that it is loaded when Gaia Sky starts.
+     * @param dataset The dataset to enable.
+     */
+    private void actionEnableDataset(DatasetDesc dataset, OwnCheckBox cb) {
+        // Texture packs can't be enabled here.
         if (dataset.type.equals("texture-pack"))
-            return;
+            return ;
+
         String filePath = null;
         if (dataset.checkStr != null) {
             filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
         }
         if (filePath != null && !filePath.isBlank()) {
             if (!Settings.settings.data.dataFiles.contains(filePath)) {
-                Settings.settings.data.dataFiles.add(filePath);
+                var opt = checkDatasetIncompatibilities(dataset);
+                if (opt.isEmpty()) {
+                    Settings.settings.data.dataFiles.add(filePath);
+                } else {
+                    if (cb != null) {
+                        // Uncheck check box until user takes action.
+                        cb.setProgrammaticChangeEvents(false);
+                        cb.setChecked(false);
+                        cb.setProgrammaticChangeEvents(true);
+                    }
+                    final var path = filePath;
+                    GenericDialog question = new GenericDialog(I18n.msg("gui.download.incompatibility"), skin, stage) {
+                        @Override
+                        protected void build() {
+                            content.clear();
+                            content.add(new OwnLabel(TextUtils.breakCharacters(opt.get(), 80), skin)).left().padBottom(pad34).row();
+                            content.add(new OwnLabel(I18n.msg("gui.download.incompatibility.proceed"), skin)).left().padBottom(pad18).row();
+                        }
+
+                        @Override
+                        protected boolean accept() {
+                            // Add to selected.
+                            Settings.settings.data.dataFiles.add(path);
+                            if (cb != null) {
+                                cb.setProgrammaticChangeEvents(false);
+                                cb.setChecked(true);
+                                cb.setProgrammaticChangeEvents(true);
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        protected void cancel() {
+                            // Nothing.
+                        }
+
+                        @Override
+                        public void dispose() {
+                            // Nothing.
+                        }
+                    };
+                    question.setAcceptText(I18n.msg("gui.yes"));
+                    question.setCancelText(I18n.msg("gui.no"));
+                    question.buildSuper();
+                    question.show(stage);
+                }
             }
         }
     }
 
+    /**
+     * Checks whether the given dataset has incompatibilities with the currently enabled datasets.
+     * @param dataset The dataset to check.
+     * @return Whether there are incompatibilities with the given dataset and the enabled datasets.
+     */
+    private Optional<String> checkDatasetIncompatibilities(DatasetDesc dataset) {
+        // Check LOD catalogs.
+        if (dataset.datasetType.typeStr.equalsIgnoreCase("catalog-lod")) {
+            var lodDatasets = dataset.datasetType.datasets;
+            for (var lodDataset : lodDatasets) {
+                if (lodDataset != dataset && isEnabled(lodDataset)) {
+                    return Optional.of(I18n.msg("gui.download.incompatibility.lod"));
+                }
+            }
+        }
+        // Check clusters.
+        if (dataset.datasetType.typeStr.equalsIgnoreCase("catalog-cluster")) {
+            var clusterDatasets = dataset.datasetType.datasets;
+            for (var clusterDataset : clusterDatasets) {
+                if (clusterDataset != dataset && isEnabled(clusterDataset)) {
+                    return Optional.of(I18n.msg("gui.download.incompatibility.cluster"));
+                }
+            }
+        }
+        // SDSS.
+        if (dataset.datasetType.typeStr.equalsIgnoreCase("catalog-gal") && dataset.key.contains("sdss")) {
+            var galDatasets = dataset.datasetType.datasets;
+            for (var sdssDataset : galDatasets) {
+                if (sdssDataset.key.contains("sdss") && sdssDataset != dataset && isEnabled(sdssDataset)) {
+                    return Optional.of(I18n.msg("gui.download.incompatibility.sdss"));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private boolean isEnabled(final DatasetDesc dataset) {
+        return isPathIn(Settings.settings.data.dataFile(dataset.checkStr), Settings.settings.data.dataFiles);
+    }
+
+    /**
+     * Disable a given dataset, so that it is not loaded during startup.
+     * @param dataset The dataset to disable.
+     */
     private void actionDisableDataset(DatasetDesc dataset) {
         // Base data can't be disabled
         if (!dataset.baseData) {
