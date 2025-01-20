@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -1466,8 +1467,13 @@ public class DatasetManagerWindow extends GenericDialog {
                         @Override
                         protected void build() {
                             content.clear();
-                            content.add(new OwnLabel(TextUtils.breakCharacters(opt.get(), 80), skin)).left().padBottom(pad34).row();
-                            content.add(new OwnLabel(I18n.msg("gui.download.incompatibility.proceed"), skin)).left().padBottom(pad18).row();
+                            var warningIcon = skin.getDrawable("iconic-warning");
+                            var warning = new OwnImage(warningIcon);
+                            warning.setSize(38, 38);
+                            warning.setColor(ColorUtils.gYellowC);
+                            content.add(warning).left().padRight(pad20).padBottom(pad34);
+                            content.add(new OwnLabel(TextUtils.breakCharacters(opt.get(), 60), skin)).left().padBottom(pad34).row();
+                            content.add(new OwnLabel(I18n.msg("gui.download.incompatibility.proceed"), skin)).left().colspan(2).padBottom(pad18).row();
                         }
 
                         @Override
