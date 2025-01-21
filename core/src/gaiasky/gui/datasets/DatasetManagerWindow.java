@@ -1484,6 +1484,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 cb.setProgrammaticChangeEvents(false);
                                 cb.setChecked(true);
                                 cb.setProgrammaticChangeEvents(true);
+                                GaiaSky.postRunnable(() -> reloadRightPane(right, dataset, currentMode));
                             }
                             return true;
                         }
