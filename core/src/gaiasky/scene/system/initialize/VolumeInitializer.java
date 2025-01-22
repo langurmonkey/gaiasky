@@ -50,7 +50,7 @@ public class VolumeInitializer extends AbstractInitSystem {
         model.model.updateSize(body.size);
 
         // Set up label
-        sa.thresholdLabel = (Math.toRadians(1e-6) * Constants.DISTANCE_SCALE_FACTOR / Settings.settings.scene.label.number) * 5000.0;
+        sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * 5000.0;
         label.textScale = 0.2f;
         label.labelMax = 0.0006f;
         if (label.labelFactor == 0)
