@@ -51,11 +51,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Holds the settings of Gaia Sky. This class has a near 1-to-1 mapping to the configuration file, conf.yaml.
+ * Holds the settings of Gaia Sky. This class is an almost 1-to-1 mapping to the Gaia Sky configuration file, <code>config.yaml</code>.
  */
 public class Settings extends SettingsObject {
 
-    /*
+    /**
      * Source version, used to enable or disable datasets.
      * This is usually tag where each number is allocated 2 digits.
      * Version = major.minor.rev-seq -> 1.2.5 major=1; minor=2; rev=5; seq=0
@@ -64,7 +64,7 @@ public class Settings extends SettingsObject {
      *    2.1.7   -> 2010700
      *    3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
-     */
+     **/
     public static final int SOURCE_VERSION = 3060501;
     /**
      * Assets location for this instance of Gaia Sky.
@@ -109,7 +109,7 @@ public class Settings extends SettingsObject {
     }
 
     /**
-     * Sets the static reference to {@link Settings} to the given object.
+     * Set the static reference to {@link Settings} to the given object.
      * This method deactivates and disposes the old settings object, and activates the new one.
      *
      * @param s The settings object.
@@ -131,8 +131,9 @@ public class Settings extends SettingsObject {
         return false;
     }
 
-    // The configuration version
+    /** Version of the currently loaded configuration file. **/
     public int configVersion;
+    /** Initialization flag. **/
     @JsonIgnore
     public boolean initialized = false;
     @JsonIgnore
@@ -753,14 +754,24 @@ public class Settings extends SettingsObject {
 
     }
 
+    /**
+     * This object holds all the data pertaining to the software version.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class VersionSettings extends SettingsObject {
+        /** Version string. **/
         public String version;
+        /** Version number as an integer. See {@link Settings#SOURCE_VERSION}. **/
         public int versionNumber;
+        /** The build time, as an instant. **/
         public Instant buildTime;
+        /** Username of the builder. **/
         public String builder;
+        /** System in which the software was built. **/
         public String system;
+        /** The build string. This usually coincides with the git commit. **/
         public String build;
+        /** Formatter for dates. **/
         private DateTimeFormatter dateFormatter;
 
         public void initialize(String version,
@@ -814,12 +825,20 @@ public class Settings extends SettingsObject {
     // ENUMERATIONS
     //=============
 
+    /**
+     * Holds configuration options related to the data files.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DataSettings extends SettingsObject {
+        /** Location of the data directory. **/
         public String location;
+        /** A list of all the enabled data files. These will be loaded at startup. **/
         public List<String> dataFiles;
+        /** Location of the default reflection skybox (cubemap). **/
         public String reflectionSkyboxLocation;
+        /** Whether to use high accuracy mode in the calculations. Results in more precise locations for some objects. **/
         public boolean highAccuracy;
+        /** Whether to use the real attitude of Gaia, or the analytical one (NSL). **/
         public boolean realGaiaAttitude;
 
         /**
@@ -943,9 +962,14 @@ public class Settings extends SettingsObject {
         }
     }
 
+    /**
+     * Settings that relate to the performance of the application.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PerformanceSettings extends SettingsObject {
+        /** Whether to use multithreading or not. **/
         public boolean multithreading;
+        /** Number of threads in the background thread pool. If negative, the number of CPU cores is used. **/
         public int numberThreads;
 
         /**
@@ -985,6 +1009,9 @@ public class Settings extends SettingsObject {
         }
     }
 
+    /**
+     * Graphics settings of Gaia Sky.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class GraphicsSettings extends SettingsObject implements IObserver {
         /**
@@ -993,7 +1020,7 @@ public class Settings extends SettingsObject {
          **/
         @JsonIgnore
         final public double[] dynamicResolutionScale = new double[]{1f, 0.85f, 0.75f, 0.5f};
-        /** Graphics texture quality. **/
+        /** Graphics quality includes texture size and the fidelity of some effects. **/
         public GraphicsQuality quality;
         public int[] resolution;
         public boolean resizable;
@@ -1141,6 +1168,10 @@ public class Settings extends SettingsObject {
         }
     }
 
+    /**
+     * Settings of the scene, organized into camera, particle groups, star, proper motion,
+     * octree, renderer, crosshair, and initialization settings.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SceneSettings extends SettingsObject implements IObserver {
         public String homeObject;
@@ -1155,8 +1186,12 @@ public class Settings extends SettingsObject {
         public CrosshairSettings crosshair;
         public InitializationSettings initialization;
         public Map<String, Boolean> visibility;
+
+        /** The factor by which to scale the distance units in desktop mode. Usually 1. **/
         @JsonIgnore
         public double distanceScaleDesktop = 1.0;
+
+        /** The factor by which to scale the distance units in VR mode. **/
         @JsonIgnore
         public double distanceScaleVr = 1.0e4;
 
@@ -1273,6 +1308,9 @@ public class Settings extends SettingsObject {
             initialization.apply();
         }
 
+        /**
+         * Settings of the camera system, such as speed, fov, etc.
+         */
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class CameraSettings extends SettingsObject implements IObserver {
             public int speedLimitIndex;
@@ -1474,6 +1512,9 @@ public class Settings extends SettingsObject {
             }
         }
 
+        /**
+         * Star settings define visual and behavioral characteristics of stars.
+         */
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class StarSettings extends SettingsObject implements IObserver {
             public boolean renderStarSpheres;
@@ -1634,6 +1675,9 @@ public class Settings extends SettingsObject {
                 threshold.apply();
             }
 
+            /**
+             * Settings that apply to star and particle groups.
+             */
             @JsonIgnoreProperties(ignoreUnknown = true)
             public static class GroupSettings extends SettingsObject {
                 public boolean billboard;
@@ -1672,6 +1716,9 @@ public class Settings extends SettingsObject {
                 }
             }
 
+            /**
+             * Threshold angles used in rendering.
+             */
             @JsonIgnoreProperties(ignoreUnknown = true)
             public static class ThresholdSettings extends SettingsObject {
                 public double quad;
@@ -1701,6 +1748,9 @@ public class Settings extends SettingsObject {
             }
         }
 
+        /**
+         * Global settings for labels.
+         */
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class LabelSettings extends SettingsObject implements IObserver {
             public float size;
@@ -1742,6 +1792,9 @@ public class Settings extends SettingsObject {
             }
         }
 
+        /**
+         * Settings of velocity vectors.
+         */
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ProperMotionSettings extends SettingsObject implements IObserver {
             public float length;
