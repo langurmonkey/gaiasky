@@ -521,8 +521,8 @@ public class SpacecraftGui extends AbstractGui {
 
         // Draw attitude indicator
         aiViewport.setCamera(aiCam);
-        aiViewport.setWorldSize(indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale);
-        aiViewport.setScreenBounds((int) (indicatorx * Settings.settings.program.ui.scale), (int) (indicatory * Settings.settings.program.ui.scale), (int) (indicatorw * Settings.settings.program.ui.scale), (int) (indicatorh * Settings.settings.program.ui.scale));
+        aiViewport.setWorldSize(indicatorw / unitsPerPixel, indicatorh / unitsPerPixel);
+        aiViewport.setScreenBounds((int) (indicatorx / unitsPerPixel), (int) (indicatory / unitsPerPixel), (int) (indicatorw / unitsPerPixel), (int) (indicatorh / unitsPerPixel));
         aiViewport.apply();
 
         // Model
