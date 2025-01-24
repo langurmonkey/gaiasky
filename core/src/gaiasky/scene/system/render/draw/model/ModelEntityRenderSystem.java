@@ -314,7 +314,7 @@ public class ModelEntityRenderSystem {
         // Grid style in u_elevationMultiplier.
         mc.setFloatExtAttribute(FloatAttribute.ElevationMultiplier, (float) Settings.settings.program.recursiveGrid.style.ordinal());
         // Line width.
-        mc.setFloatExtAttribute(FloatAttribute.Ts, Settings.settings.scene.renderer.line.width);
+        mc.setFloatExtAttribute(FloatAttribute.Ts, Settings.settings.scene.renderer.line.width * 1.4f);
 
         // Render.
         modelBatch.render(mc.instance, mc.env);
