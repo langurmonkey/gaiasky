@@ -95,6 +95,10 @@ public enum RenderGroup {
      **/
     MODEL_VERT_STAR(2100),
     /**
+     * Volume models.
+     **/
+    VOLUME(2110),
+    /**
      * Label.
      **/
     FONT_LABEL(2200),
@@ -142,10 +146,6 @@ public enum RenderGroup {
      * Clouds.
      **/
     MODEL_CLOUD(6500),
-    /**
-     * Volume models.
-     **/
-    VOLUME(6810),
     /**
      * Using normal shader for per-pixel lighting, rendered late for items with transparency.
      **/
