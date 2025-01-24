@@ -55,7 +55,7 @@ jar {
 }
 
 install4j {
-    installDir = file("${System.properties['user.home']}/Programs/install4j10")
+    installDir = file("${System.properties['user.home']}/Programs/install4j11")
 }
 
 sourceSets {

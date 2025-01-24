@@ -1,3 +1,26 @@
+<a name="3.6.6"></a>
+## [3.6.6](https://codeberg.org/gaiasky/gaiasky/tree/3.6.5) (2025-01-24)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.5...3.6.6)
+
+### Bug Fixes
+- attitude indicator not scaling with units-per-pixel value in spacecraft UI. 
+- incorrect initialization of label threshold in volumes in VR mode. 
+- entering panorama mode resets back-buffer scale. The issue was that the dynamic resolution reset routine was always applied, and not only when the dynamic resolution setting was on. 
+
+### Build System
+- update install4j template to version 11. 
+
+### Documentation
+- improve javadoc comments in settings class. 
+
+### Features
+- move volumes earlier in the rendering pipeline, because they now write to the depth buffer. 
+- check for dataset incompatibilities and ask user to confirm action when selecting incompatible datasets. 
+- add window size and resolution of external view in settings, when the external view is active. 
+
+### Performance Improvements
+- replace arbitrary precision `add()` call with double one to compute spherical coordinates of objects. 
+
 <a name="3.6.5"></a>
 ## [3.6.5](https://codeberg.org/gaiasky/gaiasky/tree/3.6.4-2) (2025-01-15)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.4-2...3.6.5)
