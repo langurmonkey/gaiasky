@@ -1,5 +1,5 @@
 <a name="3.6.6"></a>
-## [3.6.6](https://codeberg.org/gaiasky/gaiasky/tree/3.6.5) (2025-01-24)
+## [3.6.6](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.6) (2025-01-24)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.5...3.6.6)
 
 ### Bug Fixes
@@ -22,7 +22,7 @@
 - replace arbitrary precision `add()` call with double one to compute spherical coordinates of objects. 
 
 <a name="3.6.5"></a>
-## [3.6.5](https://codeberg.org/gaiasky/gaiasky/tree/3.6.4-2) (2025-01-15)
+## [3.6.5](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.5) (2025-01-15)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.4-2...3.6.5)
 
 ### Bug Fixes
@@ -57,7 +57,7 @@
 - add bluesky link to readme file and about page.
 
 <a name="3.6.4-2"></a>
-## [3.6.4-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.4) (2024-10-17)
+## [3.6.4-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.4-2) (2024-10-17)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.4...3.6.4-2)
 
 ### Bug Fixes
@@ -67,7 +67,7 @@
 - remove lib directory, does not contain anything anymore.
 
 <a name="3.6.4"></a>
-## [3.6.4](https://codeberg.org/gaiasky/gaiasky/tree/3.6.3-2) (2024-10-08)
+## [3.6.4](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.4) (2024-10-08)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.3-2...3.6.4)
 
 ### Bug Fixes
@@ -102,7 +102,7 @@
 - add a generic map in the base component to store 'unrecognized' attributes; these get displayed in the object info window. 
 
 <a name="3.6.3-2"></a>
-## [3.6.3-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.3) (2024-07-17)
+## [3.6.3-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.3-2) (2024-07-17)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.3...3.6.3-2)
 
 ### Bug Fixes
@@ -112,7 +112,7 @@
 - use noise library for star surface shader.
 
 <a name="3.6.3"></a>
-## [3.6.3](https://codeberg.org/gaiasky/gaiasky/tree/3.6.2-3) (2024-07-12)
+## [3.6.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.3) (2024-07-12)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.2-3...3.6.3)
 
 ### Bug Fixes
@@ -161,14 +161,14 @@
 - improve performance of recursive grid shader, which was very slow due to the background fill (with interpolation), and the animation. Animation is now removed. 
 
 <a name="3.6.2-2"></a>
-## [3.6.2-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.2) (2024-06-06)
+## [3.6.2-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.2-2) (2024-06-06)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.2...3.6.2-2)
 
 ### Bug Fixes
 - shadow map GLSL library crash due to use of old, unsupported  call. Fixes [#773](https://codeberg.org/gaiasky/gaiasky/issues/773).
 
 <a name="3.6.2"></a>
-## [3.6.2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.1) (2024-06-05)
+## [3.6.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.2) (2024-06-05)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.1...3.6.2)
 
 ### Bug Fixes
@@ -184,7 +184,7 @@
 - enable ray-marching effects in stereoscopic mode.
 
 <a name="3.6.1"></a>
-## [3.6.1](https://codeberg.org/gaiasky/gaiasky/tree/3.6.0-3) (2024-05-29)
+## [3.6.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.1) (2024-05-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.0-3...3.6.1)
 
 ### Bug Fixes
@@ -245,14 +245,14 @@
 - speed up star position computation (for labels and billboards), cap number of labels per octree star group, reduce precision of arbitrary precision numbers. These measures result in a drastic increase in overall performance. 
 
 <a name="3.6.0-3"></a>
-## [3.6.0-3](https://codeberg.org/gaiasky/gaiasky/tree/3.6.0-2) (2024-03-15)
+## [3.6.0-3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.0-3) (2024-03-15)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.0-2...3.6.0-3)
 
 ### Bug Fixes
 - back-buffer scale initialization when config file is resetted. 
 
 <a name="3.6.0-2"></a>
-## [3.6.0-2](https://codeberg.org/gaiasky/gaiasky/tree/3.6.0) (2024-03-14)
+## [3.6.0-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.0-2) (2024-03-14)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.0...3.6.0-2)
 
 ### Bug Fixes
@@ -267,7 +267,7 @@
 - annotate camera files with frame rate so that playback can adjust it automatically.
 
 <a name="3.6.0"></a>
-## [3.6.0](https://codeberg.org/gaiasky/gaiasky/tree/3.5.9-2) (2024-03-12)
+## [3.6.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.0) (2024-03-12)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.9-2...3.6.0)
 
 ### Bug Fixes
@@ -298,7 +298,7 @@
 - add smooth interpolation methods to `cameraTransition()` calls. The new methods can use either a logistic sigmoid or a logit function. Smoothing factor is configurable via a parameter. 
 
 <a name="3.5.9-2"></a>
-## [3.5.9-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.9) (2024-02-22)
+## [3.5.9-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.9-2) (2024-02-22)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.9...3.5.9-2)
 
 ### Bug Fixes
@@ -308,7 +308,7 @@
 - only add natives for the specific target platform in built packages.
 
 <a name="3.5.9"></a>
-## [3.5.9](https://codeberg.org/gaiasky/gaiasky/tree/3.5.8-3) (2024-02-19)
+## [3.5.9](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.9) (2024-02-19)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.8-3...3.5.9)
 
 ### Bug Fixes
@@ -336,14 +336,14 @@
 - add support for additional texture(s) in raymarching shaders. 
 
 <a name="3.5.8-3"></a>
-## [3.5.8-3](https://codeberg.org/gaiasky/gaiasky/tree/3.5.8-2) (2024-01-29)
+## [3.5.8-3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.8-3) (2024-01-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.8-2...3.5.8-3)
 
 ### Bug Fixes
 - make sure a focus' star ancestor exists before trying to get its parenthood in the octree.
 
 <a name="3.5.8-2"></a>
-## [3.5.8-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.8) (2024-01-29)
+## [3.5.8-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.8-2) (2024-01-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.8...3.5.8-2)
 
 ### Bug Fixes
@@ -351,7 +351,7 @@
 - number of reported layers by OpenXR driver can be 0, otherwise app does not start. Fixes [#763](https://codeberg.org/gaiasky/gaiasky/issues/763).
 
 <a name="3.5.8"></a>
-## [3.5.8](https://codeberg.org/gaiasky/gaiasky/tree/3.5.7-3) (2024-01-26)
+## [3.5.8](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.8) (2024-01-26)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.7-3...3.5.8)
 
 ### Bug Fixes
@@ -405,7 +405,7 @@
 - Merge branch 'star-shading'
 
 <a name="3.5.7-3"></a>
-## [3.5.7-3](https://codeberg.org/gaiasky/gaiasky/tree/3.5.7-2) (2023-11-29)
+## [3.5.7-3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.7-3) (2023-11-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.7-2...3.5.7-3)
 
 ### Bug Fixes
@@ -418,7 +418,7 @@
 - use default mappings file if the configured one does not exist.
 
 <a name="3.5.7-2"></a>
-## [3.5.7-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.7) (2023-11-21)
+## [3.5.7-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.7-2) (2023-11-21)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.7...3.5.7-2)
 
 ### Bug Fixes
@@ -440,7 +440,7 @@
 - enable `numLabels` attribute for star set objects in order to control the number of labels rendered for a given star set. 
 
 <a name="3.5.7"></a>
-## [3.5.7](https://codeberg.org/gaiasky/gaiasky/tree/3.5.6-2) (2023-11-07)
+## [3.5.7](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.7) (2023-11-07)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.6-2...3.5.7)
 
 ### Features
@@ -473,7 +473,7 @@
 - Merge branch 'RacerBG-bg-update'
 
 <a name="3.5.6-2"></a>
-## [3.5.6-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.6) (2023-10-24)
+## [3.5.6-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.6-2) (2023-10-24)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.6...3.5.6-2)
 
 ### Bug Fixes
@@ -483,7 +483,7 @@
 - shadow map camera direction with point lights. 
 
 <a name="3.5.6"></a>
-## [3.5.6](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5-2) (2023-10-20)
+## [3.5.6](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.6) (2023-10-20)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5-2...3.5.6)
 
 ### Features
@@ -517,7 +517,7 @@
 - code style now formats Javadoc comments.
 
 <a name="3.5.5-2"></a>
-## [3.5.5-2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5-1) (2023-10-04)
+## [3.5.5-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.5-2) (2023-10-04)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5-1...3.5.5-2)
 
 ### Bug Fixes
@@ -528,7 +528,7 @@
 - automate creation of HTML downloads table and properly use 'pkgver' and 'pkgrel' fields in AUR package. 
 
 <a name="3.5.5-1"></a>
-## [3.5.5-1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.5) (2023-10-03)
+## [3.5.5-1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.5-1) (2023-10-03)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.5...3.5.5-1)
 
 ### Features
@@ -543,7 +543,7 @@
 - unexpected and weird behaviour when spamming repeatedly left buttons in new UI. 
 
 <a name="3.5.5"></a>
-## [3.5.5](https://codeberg.org/gaiasky/gaiasky/tree/3.5.4-1) (2023-09-29)
+## [3.5.5](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.5) (2023-09-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.4-1...3.5.5)
 
 ### Features
@@ -566,7 +566,7 @@
 - scale tessellation quality using the body size to prevent severe slow-downs in smaller bodies. 
 
 <a name="3.5.4-1"></a>
-## [3.5.4-1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.4) (2023-09-21)
+## [3.5.4-1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.4-1) (2023-09-21)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.4...3.5.4-1)
 
 ### Bug Fixes
@@ -577,7 +577,7 @@
 - set bundled JRE version to 17 instead of 20; seemingly, there are non-negligible performance issues with the JRE 20 on some configurations. 
 
 <a name="3.5.4"></a>
-## [3.5.4](https://codeberg.org/gaiasky/gaiasky/tree/3.5.3) (2023-09-20)
+## [3.5.4](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.4) (2023-09-20)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.3...3.5.4)
 
 ### Features
@@ -590,7 +590,7 @@
 - redesign loading screen to follow welcome screen style. 
 
 <a name="3.5.3"></a>
-## [3.5.3](https://codeberg.org/gaiasky/gaiasky/tree/3.5.2) (2023-09-14)
+## [3.5.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.3) (2023-09-14)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.2...3.5.3)
 
 ### Bug Fixes
@@ -625,7 +625,7 @@
 - Merge branch 'keyframes'
 
 <a name="3.5.2"></a>
-## [3.5.2](https://codeberg.org/gaiasky/gaiasky/tree/3.5.1) (2023-07-26)
+## [3.5.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.2) (2023-07-26)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.1...3.5.2)
 
 ### Bug Fixes
@@ -643,7 +643,7 @@
 - steam deck programmatic detection to default to full screen at startup.
 
 <a name="3.5.1"></a>
-## [3.5.1](https://codeberg.org/gaiasky/gaiasky/tree/3.5.0) (2023-07-19)
+## [3.5.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.1) (2023-07-19)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.0...3.5.1)
 
 ### Bug Fixes
@@ -651,7 +651,7 @@
 - VR flag from `--openvr` to `--openxr`. 
 
 <a name="3.5.0"></a>
-## [3.5.0](https://codeberg.org/gaiasky/gaiasky/tree/3.5.0-rc10) (2023-07-17)
+## [3.5.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.5.0) (2023-07-17)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.5.0-rc10...3.5.0)
 
 ### Features
@@ -823,7 +823,7 @@
 - update style with new hard wrap length and new wrapping rules for function signature parameters.
 
 <a name="3.4.2"></a>
-## [3.4.2](https://codeberg.org/gaiasky/gaiasky/tree/3.4.1) (2023-03-15)
+## [3.4.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.4.2) (2023-03-15)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.4.1...3.4.2)
 
 ### Bug Fixes
@@ -843,7 +843,7 @@
 
 
 <a name="3.4.1"></a>
-## [3.4.1](https://codeberg.org/gaiasky/gaiasky/tree/3.4.0) (2023-03-09)
+## [3.4.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.4.1) (2023-03-09)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.4.0...3.4.1)
 
 ### Bug Fixes
@@ -880,7 +880,7 @@
 - initial implementation of a proper in-scene VR user interface with mouse interaction. 
 
 <a name="3.4.0"></a>
-## [3.4.0](https://codeberg.org/gaiasky/gaiasky/tree/3.3.2) (2023-02-13)
+## [3.4.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.4.0) (2023-02-13)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.2...3.4.0)
 
 ### Features
@@ -910,7 +910,7 @@
 - flag Gaia Sky VR as alpha software.
 
 <a name="3.3.2"></a>
-## [3.3.2](https://codeberg.org/gaiasky/gaiasky/tree/3.3.1) (2022-12-18)
+## [3.3.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.3.2) (2022-12-18)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.1...3.3.2)
 
 ### Bug Fixes
@@ -921,7 +921,7 @@
 
 
 <a name="3.3.1"></a>
-## [3.3.1](https://codeberg.org/gaiasky/gaiasky/tree/3.3.0) (2022-12-13)
+## [3.3.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.3.1) (2022-12-13)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.0...3.3.1)
 
 ### Bug Fixes
@@ -971,7 +971,7 @@
 
 
 <a name="3.3.0"></a>
-## [3.3.0](https://codeberg.org/gaiasky/gaiasky/tree/3.3.0-rc02) (2022-11-11)
+## [3.3.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.3.0) (2022-11-11)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.0-rc02...3.3.0)
 
 ### Bug Fixes
@@ -994,7 +994,7 @@
 
 
 <a name="3.3.0-rc02"></a>
-## [3.3.0-rc02](https://codeberg.org/gaiasky/gaiasky/tree/3.3.0-rc01) (2022-11-03)
+## [3.3.0-rc02](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.3.0-rc02) (2022-11-03)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.0-rc01...3.3.0-rc02)
 
 ### Bug Fixes
@@ -1009,7 +1009,7 @@
 
 
 <a name="3.3.0-rc01"></a>
-## [3.3.0-rc01](https://codeberg.org/gaiasky/gaiasky/tree/3.2.1) (2022-10-27)
+## [3.3.0-rc01](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.3.0-rc01) (2022-10-27)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.1...3.3.0-rc01)
 
 ### Bug Fixes
@@ -1117,7 +1117,7 @@
 - add notice when there are no datasets.
 
 <a name="3.2.1"></a>
-## [3.2.1](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0) (2022-06-21).
+## [3.2.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.1) (2022-06-21).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0...3.2.1).
 
 ### Bug Fixes
@@ -1143,7 +1143,7 @@
 
 
 <a name="3.2.0"></a>
-## [3.2.0](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc16) (2022-06-07)
+## [3.2.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0) (2022-06-07)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc16...3.2.0)
 
 ### Bug Fixes
@@ -1161,7 +1161,7 @@
 
 
 <a name="3.2.0-rc16"></a>
-## [3.2.0-rc16](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc15) (2022-05-16)
+## [3.2.0-rc16](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc16) (2022-05-16)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc15...3.2.0-rc16)
 
 ### Bug Fixes
@@ -1174,7 +1174,7 @@
 
 
 <a name="3.2.0-rc15"></a>
-## [3.2.0-rc15](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc14) (2022-05-12)
+## [3.2.0-rc15](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc15) (2022-05-12)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc14...3.2.0-rc15)
 
 ### Bug Fixes
@@ -1188,7 +1188,7 @@
 
 
 <a name="3.2.0-rc14"></a>
-## [3.2.0-rc14](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc13) (2022-04-29)
+## [3.2.0-rc14](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc14) (2022-04-29)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc13...3.2.0-rc14)
 
 ### Bug Fixes
@@ -1211,7 +1211,7 @@
 
 
 <a name="3.2.0-rc13"></a>
-## [3.2.0-rc13](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc12) (2022-04-19)
+## [3.2.0-rc13](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc13) (2022-04-19)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc12...3.2.0-rc13)
 
 ### Bug Fixes
@@ -1252,7 +1252,7 @@
 
 
 <a name="3.2.0-rc12"></a>
-## [3.2.0-rc12](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc11) (2022-03-22)
+## [3.2.0-rc12](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc12) (2022-03-22)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc11...3.2.0-rc12)
 
 ### Bug Fixes
@@ -1271,7 +1271,7 @@
 
 
 <a name="3.2.0-rc11"></a>
-## [3.2.0-rc11](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc10) (2022-03-14)
+## [3.2.0-rc11](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc11) (2022-03-14)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc10...3.2.0-rc11)
 
 ### Code Refactoring
@@ -1284,7 +1284,7 @@
 
 
 <a name="3.2.0-rc10"></a>
-## [3.2.0-rc10](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc09) (2022-03-11)
+## [3.2.0-rc10](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc10) (2022-03-11)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc09...3.2.0-rc10)
 
 ### Bug Fixes
@@ -1304,7 +1304,7 @@
 
 
 <a name="3.2.0-rc09"></a>
-## [3.2.0-rc09](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc08) (2022-03-08)
+## [3.2.0-rc09](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc09) (2022-03-08)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc08...3.2.0-rc09)
 
 ### Code Refactoring
@@ -1312,7 +1312,7 @@
 
 
 <a name="3.2.0-rc08"></a>
-## [3.2.0-rc08](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc07) (2022-03-07)
+## [3.2.0-rc08](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc08) (2022-03-07)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc07...3.2.0-rc08)
 
 ### Bug Fixes
@@ -1320,7 +1320,7 @@
 
 
 <a name="3.2.0-rc07"></a>
-## [3.2.0-rc07](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc06) (2022-03-04)
+## [3.2.0-rc07](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc07) (2022-03-04)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc06...3.2.0-rc07)
 
 ### Bug Fixes
@@ -1342,7 +1342,7 @@
 
 
 <a name="3.2.0-rc06"></a>
-## [3.2.0-rc06](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc05) (2022-02-23)
+## [3.2.0-rc06](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc06) (2022-02-23)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc05...3.2.0-rc06)
 
 ### Bug Fixes
@@ -1358,7 +1358,7 @@
 
 
 <a name="3.2.0-rc05"></a>
-## [3.2.0-rc05](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc04) (2022-02-15)
+## [3.2.0-rc05](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc05) (2022-02-15)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc04...3.2.0-rc05)
 
 ### Bug Fixes
@@ -1390,7 +1390,7 @@
 
 
 <a name="3.2.0-rc04"></a>
-## [3.2.0-rc04](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc03) (2022-01-26)
+## [3.2.0-rc04](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc04) (2022-01-26)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc03...3.2.0-rc04)
 
 ### Bug Fixes
@@ -1398,7 +1398,7 @@
 
 
 <a name="3.2.0-rc03"></a>
-## [3.2.0-rc03](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc02) (2022-01-25)
+## [3.2.0-rc03](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc03) (2022-01-25)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc02...3.2.0-rc03)
 
 ### Bug Fixes
@@ -1413,7 +1413,7 @@
 
 
 <a name="3.2.0-rc02"></a>
-## [3.2.0-rc02](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc01) (2022-01-18)
+## [3.2.0-rc02](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc02) (2022-01-18)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc01...3.2.0-rc02)
 
 ### Bug Fixes
@@ -1440,7 +1440,7 @@
 
 
 <a name="3.2.0-rc01"></a>
-## [3.2.0-rc01](https://codeberg.org/gaiasky/gaiasky/tree/3.1.6) (2021-12-17)
+## [3.2.0-rc01](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.2.0-rc01) (2021-12-17)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.6...3.2.0-rc01)
 
 ### Bug Fixes
@@ -1517,14 +1517,14 @@
 - Merge branch 'points-triangles'.
 
 <a name="3.1.6"></a>
-## [3.1.6](https://codeberg.org/gaiasky/gaiasky/tree/3.1.5) (2021-09-22).
+## [3.1.6](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.1.6) (2021-09-22).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.5...3.1.6).
 
 ### Bug Fixes
 - VR GUI object initialization -- consolidate init() signature.
 
 <a name="3.1.5"></a>
-## [3.1.5](https://codeberg.org/gaiasky/gaiasky/tree/3.1.4) (2021-09-22).
+## [3.1.5](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.1.5) (2021-09-22).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.4...3.1.5).
 
 ### Bug Fixes
@@ -1564,7 +1564,7 @@
 
 
 <a name="3.1.4"></a>
-## [3.1.4](https://codeberg.org/gaiasky/gaiasky/tree/3.1.3) (2021-07-02).
+## [3.1.4](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.1.4) (2021-07-02).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.3...3.1.4).
 
 ### Bug Fixes
@@ -1591,7 +1591,7 @@
 
 
 <a name="3.1.3"></a>
-## [3.1.3](https://codeberg.org/gaiasky/gaiasky/tree/3.1.2) (2021-06-22).
+## [3.1.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.1.3) (2021-06-22).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.2...3.1.3).
 
 ### Bug Fixes
@@ -1609,7 +1609,7 @@
 - performance improvements in arbitrary precision vector distance method.
 
 <a name="3.1.2"></a>
-## [3.1.2](https://codeberg.org/gaiasky/gaiasky/tree/3.1.1) (2021-06-16).
+## [3.1.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.1.2) (2021-06-16).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.1...3.1.2).
 
 ### Bug Fixes
@@ -1634,7 +1634,7 @@
 - change developer_name to be consistent with FlatHub metadata (max 60 chars).
 
 <a name="3.1.0"></a>
-## [3.1.0](https://codeberg.org/gaiasky/gaiasky/tree/3.0.3) (2021-06-10).
+## [3.1.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.1.0) (2021-06-10).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.3...3.1.0).
 
 ### Features
@@ -1713,7 +1713,7 @@
 - some shader formatting.
 
 <a name="3.0.3"></a>
-## [3.0.3](https://codeberg.org/gaiasky/gaiasky/tree/3.0.2) (2021-02-25).
+## [3.0.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.0.3) (2021-02-25).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.2...3.0.3).
 
 ### Features
@@ -1758,7 +1758,7 @@
 
 
 <a name="3.0.2"></a>
-## [3.0.2](https://codeberg.org/gaiasky/gaiasky/tree/3.0.1) (2021-01-21).
+## [3.0.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.0.2) (2021-01-21).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.1...3.0.2).
 
 ### Features
@@ -1836,7 +1836,7 @@
 - update thread names, fix monitor objects, increase sg update time interval.
 
 <a name="3.0.1"></a>
-## [3.0.1](https://codeberg.org/gaiasky/gaiasky/tree/3.0.0) (2020-12-10).
+## [3.0.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.0.1) (2020-12-10).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.0...3.0.1).
 
 ### Features
@@ -1870,7 +1870,7 @@
 - update pointers to documentation.
 
 <a name="3.0.0"></a>
-## [3.0.0](https://codeberg.org/gaiasky/gaiasky/tree/2.3.1) (2020-12-02).
+## [3.0.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.0.0) (2020-12-02).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.3.1...3.0.0).
 
 ### Features
@@ -1967,7 +1967,7 @@
 - move RenderGroup to render package for consistency.
 
 <a name="2.3.1"></a>
-## [2.3.1](https://codeberg.org/gaiasky/gaiasky/tree/2.3.0) (2020-07-08).
+## [2.3.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.3.1) (2020-07-08).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.3.0...2.3.1).
 
 ### Bug Fixes
@@ -1981,7 +1981,7 @@
 - hot reload of galaxy models.
    .
 <a name="2.3.0"></a>
-## [2.3.0](https://codeberg.org/gaiasky/gaiasky/tree/2.2.6) (2020-07-07).
+## [2.3.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.3.0) (2020-07-07).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.6...2.3.0).
 
 ### Bug Fixes
@@ -2039,7 +2039,7 @@
 
 
 <a name="2.2.6"></a>
-## [2.2.6](https://codeberg.org/gaiasky/gaiasky/tree/2.2.5) (2020-05-15).
+## [2.2.6](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.2.6) (2020-05-15).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.5...2.2.6).
 
 ### Bug Fixes
@@ -2150,7 +2150,7 @@
 
 
 <a name="2.2.5"></a>
-## [2.2.5](https://codeberg.org/gaiasky/gaiasky/tree/2.2.4) (2020-03-04).
+## [2.2.5](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.2.5) (2020-03-04).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.4...2.2.5).
 
 ### Bug Fixes
@@ -2204,7 +2204,7 @@ pixels instead of a normalized value between 0 and 100.
 
 
 <a name="2.2.4"></a>
-## [2.2.4](https://codeberg.org/gaiasky/gaiasky/tree/2.2.3) (2020-01-22).
+## [2.2.4](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.2.4) (2020-01-22).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.3...2.2.4).
 
 ### Bug Fixes
@@ -2283,7 +2283,7 @@ pixels instead of a normalized value between 0 and 100.
 - improve performance of api call method/parameter matching.
 
 <a name="2.2.3"></a>
-## [2.2.3](https://codeberg.org/gaiasky/gaiasky/tree/2.2.2) (2019-11-05).
+## [2.2.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.2.3) (2019-11-05).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.2...2.2.3).
 
 ### Bug Fixes
@@ -2301,7 +2301,7 @@ pixels instead of a normalized value between 0 and 100.
 - add support for release notes in download manager.
 
 <a name="2.2.2"></a>
-## [2.2.2](https://codeberg.org/gaiasky/gaiasky/tree/2.2.1) (2019-10-31).
+## [2.2.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.2.2) (2019-10-31).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.1...2.2.2).
 
 ### Bug Fixes
@@ -2378,7 +2378,7 @@ pixels instead of a normalized value between 0 and 100.
 - new velocity-based camera blur.
 
 <a name="2.2.1"></a>
-## [2.2.1](https://codeberg.org/gaiasky/gaiasky/tree/2.2.0) (2019-09-10).
+## [2.2.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.2.1) (2019-09-10).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.0...2.2.1).
 
 ### Bug Fixes
@@ -2438,7 +2438,7 @@ pixels instead of a normalized value between 0 and 100.
 
 
 <a name="2.2.0"></a>
-## [2.2.0](https://codeberg.org/gaiasky/gaiasky/tree/2.1.7-vr) (2019-08-01).
+## [2.2.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.2.0) (2019-08-01).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.7-vr...2.2.0).
 
 ### Bug Fixes
@@ -2544,7 +2544,7 @@ pixels instead of a normalized value between 0 and 100.
 - add optional arrowheads to velocity vectors.
 
 <a name="2.1.7"></a>
-## [2.1.7](https://codeberg.org/gaiasky/gaiasky/tree/2.1.6) (2019-01-11).
+## [2.1.7](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.7) (2019-01-11).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.6...2.1.7).
 
 ### Bug Fixes
@@ -2575,7 +2575,7 @@ pixels instead of a normalized value between 0 and 100.
 - add RUWE to octree generator.
 
 <a name="2.1.6"></a>
-## [2.1.6](https://codeberg.org/gaiasky/gaiasky/tree/2.1.5) (2018-12-18).
+## [2.1.6](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.6) (2018-12-18).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.5...2.1.6).
 
 ### Bug Fixes
@@ -2628,7 +2628,7 @@ pixels instead of a normalized value between 0 and 100.
 - nbg loader to manage distances better.
 
 <a name="2.1.5"></a>
-## [2.1.5](https://codeberg.org/gaiasky/gaiasky/tree/2.1.4) (2018-12-03).
+## [2.1.5](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.5) (2018-12-03).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.4...2.1.5).
 
 ### Bug Fixes
@@ -2667,7 +2667,7 @@ pixels instead of a normalized value between 0 and 100.
 - fix info message.
 
 <a name="2.1.4"></a>
-## [2.1.4](https://codeberg.org/gaiasky/gaiasky/tree/2.1.3) (2018-11-23).
+## [2.1.4](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.4) (2018-11-23).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.3...2.1.4).
 
 ### Bug Fixes
@@ -2702,7 +2702,7 @@ pixels instead of a normalized value between 0 and 100.
 - wee reformatting.
 
 <a name="2.1.3"></a>
-## [2.1.3](https://codeberg.org/gaiasky/gaiasky/tree/2.1.2-vr) (2018-10-31).
+## [2.1.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.3) (2018-10-31).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.2-vr...2.1.3).
 
 ### Bug Fixes
@@ -2734,7 +2734,7 @@ pixels instead of a normalized value between 0 and 100.
 - remove leftover variables in full gui.
 
 <a name="2.1.2-vr"></a>
-## [2.1.2-vr](https://codeberg.org/gaiasky/gaiasky/tree/2.1.2) (2018-09-28).
+## [2.1.2-vr](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.2-vr) (2018-09-28).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.2...2.1.2-vr).
 
 ### Bug Fixes
@@ -2780,7 +2780,7 @@ pixels instead of a normalized value between 0 and 100.
 - minor style issues.
 
 <a name="2.1.2"></a>
-## [2.1.2](https://codeberg.org/gaiasky/gaiasky/tree/2.1.1) (2018-09-18).
+## [2.1.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.2) (2018-09-18).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.1...2.1.2).
 
 ### Bug Fixes
@@ -2795,7 +2795,7 @@ pixels instead of a normalized value between 0 and 100.
 - add new key bindings for simple actions.
 
 <a name="2.1.1"></a>
-## [2.1.1](https://codeberg.org/gaiasky/gaiasky/tree/2.1.0) (2018-09-14).
+## [2.1.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.1) (2018-09-14).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.0...2.1.1).
 
 ### Bug Fixes
@@ -2808,7 +2808,7 @@ pixels instead of a normalized value between 0 and 100.
 - mended submodule init and update.
 
 <a name="2.1.0"></a>
-## [2.1.0](https://codeberg.org/gaiasky/gaiasky/tree/2.0.3) (2018-09-11).
+## [2.1.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.1.0) (2018-09-11).
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.3...2.1.0).
 
 ### Bug Fixes
@@ -2838,7 +2838,7 @@ pixels instead of a normalized value between 0 and 100.
 - fix style of contributing once and for all.
 - fix style in CONTRIBUTING.md.
 
-## [2.0.3](https://codeberg.org/gaiasky/gaiasky/tree/2.0.3) (2018-08-28).
+## [2.0.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.0.3) (2018-08-28).
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.2-vr...2.0.3).
 
 **Implemented enhancements:**
@@ -2856,10 +2856,10 @@ pixels instead of a normalized value between 0 and 100.
 - REST server static files use assets.location [#300](https://codeberg.org/gaiasky/gaiasky/pull/300) ([vga101](https://github.com/vga101)).
 - re-introduce REST API [#281](https://codeberg.org/gaiasky/gaiasky/pull/281) ([vga101](https://github.com/vga101)).
 
-## [2.0.2-vr](https://codeberg.org/gaiasky/gaiasky/tree/2.0.2-vr) (2018-07-25).
+## [2.0.2-vr](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.0.2-vr) (2018-07-25).
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.2...2.0.2-vr).
 
-## [2.0.2](https://codeberg.org/gaiasky/gaiasky/tree/2.0.2) (2018-07-06).
+## [2.0.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.0.2) (2018-07-06).
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.1...2.0.2).
 
 **Implemented enhancements:**
@@ -2878,7 +2878,7 @@ pixels instead of a normalized value between 0 and 100.
 
 - fix broken link to DR2 default catalog [#280](https://codeberg.org/gaiasky/gaiasky/pull/280) ([vga101](https://github.com/vga101)).
 
-## [2.0.1](https://codeberg.org/gaiasky/gaiasky/tree/2.0.1) (2018-06-14).
+## [2.0.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.0.1) (2018-06-14).
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.0-vr...2.0.1).
 
 **Implemented enhancements:**
@@ -2901,7 +2901,7 @@ pixels instead of a normalized value between 0 and 100.
 
 - maximum time reached [#271](https://codeberg.org/gaiasky/gaiasky/issues/271).
 
-## [2.0.0-vr](https://codeberg.org/gaiasky/gaiasky/tree/2.0.0-vr) (2018-05-09).
+## [2.0.0-vr](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.0.0-vr) (2018-05-09).
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.0...2.0.0-vr).
 
 **Implemented enhancements:**
@@ -2917,7 +2917,7 @@ pixels instead of a normalized value between 0 and 100.
 
 - is it possible to extend the size of the user interface [#269](https://codeberg.org/gaiasky/gaiasky/issues/269).
 
-## [2.0.0](https://codeberg.org/gaiasky/gaiasky/tree/2.0.0) (2018-04-24).
+## [2.0.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/2.0.0) (2018-04-24).
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.5.0...2.0.0).
 
 **Implemented enhancements:**
@@ -3020,7 +3020,7 @@ pixels instead of a normalized value between 0 and 100.
 - add REST API for remote control [#237](https://codeberg.org/gaiasky/gaiasky/pull/237) ([vga101](https://github.com/vga101)).
 - DE translation and minor formatting update [#235](https://codeberg.org/gaiasky/gaiasky/pull/235) ([vga101](https://github.com/vga101)).
 
-## [1.5.0](https://codeberg.org/gaiasky/gaiasky/tree/1.5.0) (2017-08-02).
+## [1.5.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/1.5.0) (2017-08-02).
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.4...1.5.0).
 
 **Implemented enhancements:**
@@ -3113,7 +3113,7 @@ pixels instead of a normalized value between 0 and 100.
 - fix TGAS extraction path in running instructions [#110](https://codeberg.org/gaiasky/gaiasky/pull/110) ([vga101](https://github.com/vga101)).
 - Slovene translation [#108](https://codeberg.org/gaiasky/gaiasky/pull/108) ([kcotar](https://github.com/kcotar)).
 
-## [1.0.4](https://codeberg.org/gaiasky/gaiasky/tree/1.0.4) (2016-12-07)
+## [1.0.4](https://codeberg.org/gaiasky/gaiasky/releases/tag/1.0.4) (2016-12-07)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.3...1.0.4).
 
 **Implemented enhancements:**
@@ -3138,7 +3138,7 @@ pixels instead of a normalized value between 0 and 100.
 
 - fixed broken download links in README.md [#99](https://codeberg.org/gaiasky/gaiasky/pull/99) ([adamkewley](https://github.com/adamkewley)).
 
-## [1.0.3](https://codeberg.org/gaiasky/gaiasky/tree/1.0.3) (2016-11-15)
+## [1.0.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/1.0.3) (2016-11-15)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.2...1.0.3).
 
 **Fixed bugs:**
@@ -3146,10 +3146,10 @@ pixels instead of a normalized value between 0 and 100.
 - fix FoV modes [#92](https://codeberg.org/gaiasky/gaiasky/issues/92).
 - run tutorial runs pointer [#91](https://codeberg.org/gaiasky/gaiasky/issues/91).
 
-## [1.0.2](https://codeberg.org/gaiasky/gaiasky/tree/1.0.2) (2016-11-14)
+## [1.0.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/1.0.2) (2016-11-14)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.1...1.0.2).
 
-## [1.0.1](https://codeberg.org/gaiasky/gaiasky/tree/1.0.1) (2016-11-11)
+## [1.0.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/1.0.1) (2016-11-11)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.0...1.0.1).
 
 **Implemented enhancements:**
@@ -3174,7 +3174,7 @@ pixels instead of a normalized value between 0 and 100.
 
 - Gaia Sky crashes on Windows 10, Java 1.8.0\_101 [#79](https://codeberg.org/gaiasky/gaiasky/issues/79).
 
-## [1.0.0](https://codeberg.org/gaiasky/gaiasky/tree/1.0.0) (2016-09-13)
+## [1.0.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/1.0.0) (2016-09-13)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.800b...1.0.0).
 
 **Implemented enhancements:**
@@ -3197,7 +3197,7 @@ pixels instead of a normalized value between 0 and 100.
 - fix mouse input in stereoscopic mode [#61](https://codeberg.org/gaiasky/gaiasky/issues/61).
 - app won't start [#13](https://codeberg.org/gaiasky/gaiasky/issues/13).
 
-## [0.800b](https://codeberg.org/gaiasky/gaiasky/tree/0.800b) (2016-04-28)
+## [0.800b](https://codeberg.org/gaiasky/gaiasky/releases/tag/0.800b) (2016-04-28)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.707b...0.800b).
 
 **Implemented enhancements:**
@@ -3220,7 +3220,7 @@ pixels instead of a normalized value between 0 and 100.
 - fix the looks for HiDPI screens [#56](https://codeberg.org/gaiasky/gaiasky/issues/56).
 - app fails to start OS X [#54](https://codeberg.org/gaiasky/gaiasky/issues/54).
 
-## [0.707b](https://codeberg.org/gaiasky/gaiasky/tree/0.707b) (2015-09-14)
+## [0.707b](https://codeberg.org/gaiasky/gaiasky/releases/tag/0.707b) (2015-09-14)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.706b...0.707b).
 
 **Implemented enhancements:**
@@ -3248,7 +3248,7 @@ pixels instead of a normalized value between 0 and 100.
 - fix night/day blending in shader  [#33](https://codeberg.org/gaiasky/gaiasky/issues/33).
 - screenshot action (F5) not working well with motion blur [#27](https://codeberg.org/gaiasky/gaiasky/issues/27).
 
-## [0.706b](https://codeberg.org/gaiasky/gaiasky/tree/0.706b) (2015-05-05)
+## [0.706b](https://codeberg.org/gaiasky/gaiasky/releases/tag/0.706b) (2015-05-05)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.705b...0.706b).
 
 **Implemented enhancements:**
@@ -3270,7 +3270,7 @@ pixels instead of a normalized value between 0 and 100.
 
 - deprecated [#17](https://codeberg.org/gaiasky/gaiasky/issues/17).
 
-## [0.705b](https://codeberg.org/gaiasky/gaiasky/tree/0.705b) (2015-04-16)
+## [0.705b](https://codeberg.org/gaiasky/gaiasky/releases/tag/0.705b) (2015-04-16)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.704b...0.705b).
 
 **Fixed bugs:**
@@ -3280,7 +3280,7 @@ pixels instead of a normalized value between 0 and 100.
 - make new PixelBloomRenderSystem work for frame output and screenshots [#7](https://codeberg.org/gaiasky/gaiasky/issues/7).
 - make new PixelBloomRenderSystem work in stereoscopic mode [#6](https://codeberg.org/gaiasky/gaiasky/issues/6).
 
-## [0.704b](https://codeberg.org/gaiasky/gaiasky/tree/0.704b) (2015-03-27)
+## [0.704b](https://codeberg.org/gaiasky/gaiasky/releases/tag/0.704b) (2015-03-27)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.703b...0.704b).
 
 **Implemented enhancements:**
@@ -3298,11 +3298,11 @@ pixels instead of a normalized value between 0 and 100.
 - investigate VM crash [#4](https://codeberg.org/gaiasky/gaiasky/issues/4).
 - decide fate of desktop/doc/gaiasandbox\_manual.tex [#3](https://codeberg.org/gaiasky/gaiasky/issues/3).
 
-## [0.703b](https://codeberg.org/gaiasky/gaiasky/tree/0.703b) (2014-12-17)
+## [0.703b](https://codeberg.org/gaiasky/gaiasky/releases/tag/0.703b) (2014-12-17)
 [Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.700b...0.703b).
 
 - multiple big additions.
 
-## [0.700b](https://codeberg.org/gaiasky/gaiasky/tree/0.700b) (2014-12-11)
+## [0.700b](https://codeberg.org/gaiasky/gaiasky/releases/tag/0.700b) (2014-12-11)
 
 - first beta version.
