@@ -1439,7 +1439,7 @@ public enum Event {
      */
     CLEAR_SHADERS,
     /**
-     * Reloads and re-compiles the post-processing shaders. Currently, only ray-marching shaders implement this feature.
+     * Reloads and re-compiles the ray-marching post-processing and volume shaders.
      */
     SHADER_RELOAD_CMD,
 

@@ -21,10 +21,10 @@ in vec3 v_viewVec;
 
 #include <shader/lib/logdepthbuff.glsl>
 
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 layerBuffer;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 layerBuffer;
 
-#define time v_time * 0.02
+#define time v_time * 0.005
 
 #include <shader/lib/luma.glsl>
 #include <shader/lib/noise/common.glsl>
@@ -41,20 +41,20 @@ float triangle_wave(float x) {
 
 void main() {
     // Perimeter is 1 when normal faces camera, 0 when normal is 90 degrees from view.
-    float perimeter = dot(normalize(v_normal), vec3(v_viewVec)) * 0.5;
-    vec3 percolor = v_lightDiffuse * min(1.0, perimeter + 0.4);
+    float perimeter = dot(normalize(v_normal), vec3(v_viewVec)) * 0.6;
+    vec3 percolor = v_lightDiffuse * min(1.0, perimeter + 0.5);
 
     // Star surface
     gln_tFBMOpts opts = gln_tFBMOpts(0.3245, // seed
-                    1.0,     // amplitude
-                    0.7,     // persistence
-                    30.0,    // frequency
-                    2.0,     // lacunarity
-                    vec3(2.0, 2.0, 2.0), // scale
-                    1.0,     // power
-                    2,       // octaves
-                    false,
-                    false);
+            0.1, // amplitude
+            1.4, // persistence
+            40.0, // frequency
+            2.0, // lacunarity
+            vec3(2.0, 2.0, 2.0), // scale
+            1.0, // power
+            2, // octaves
+            false,
+            false);
     // Sample point.
     vec2 viewport = vec2(1500.0, 750.0);
     vec2 xy = v_texCoords0 * viewport;
@@ -67,17 +67,16 @@ void main() {
     float cosPhi = cos(phi);
     // P is a point in the sphere.
     vec3 p = vec3(
-        cosPhi * cos(theta) + r,
-        cosPhi * sin(theta),
-        sin(phi)
-    );
-
+            cosPhi * cos(theta) + r,
+            cosPhi * sin(theta),
+            sin(phi)
+        );
 
     float n = (gln_cfbm(p, opts) + 1.75) * 0.125;
 
     // Sunspots
-    float s = 0.7;
-    float un_radius = 4.0;
+    float s = 0.57;
+    float un_radius = 3.0;
     vec3 spos = p * un_radius;
     float frequency = 1.0;
     float t1 = gln_simplex_curl(spos * frequency) - s;
@@ -92,7 +91,7 @@ void main() {
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
-#ifdef ssrFlag
-        ssrBuffers();
+    #ifdef ssrFlag
+    ssrBuffers();
     #endif // ssrFlag
 }
