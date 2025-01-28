@@ -24,7 +24,7 @@ in vec3 v_viewVec;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 layerBuffer;
 
-#define time v_time * 0.005
+#define time v_time * 0.001
 
 #include <shader/lib/luma.glsl>
 #include <shader/lib/noise/common.glsl>
@@ -48,11 +48,11 @@ void main() {
     gln_tFBMOpts opts = gln_tFBMOpts(0.3245, // seed
             0.1, // amplitude
             1.4, // persistence
-            40.0, // frequency
+            80.0, // frequency
             2.0, // lacunarity
-            vec3(2.0, 2.0, 2.0), // scale
+            vec3(4.0, 4.0, 4.0), // scale
             1.0, // power
-            2, // octaves
+            1, // octaves
             false,
             false);
     // Sample point.
@@ -72,18 +72,24 @@ void main() {
             sin(phi)
         );
 
-    float n = (gln_cfbm(p, opts) + 1.75) * 0.125;
+    float n = (gln_cfbm(p, opts) + 1.6) * 0.12;
 
     // Sunspots
-    float s = 0.57;
-    float un_radius = 3.0;
+    float s = 0.47;
+    float un_radius = 2.3;
     vec3 spos = p * un_radius;
-    float frequency = 1.0;
-    float t1 = gln_simplex_curl(spos * frequency) - s;
-    float t2 = gln_simplex_curl((spos + un_radius) * frequency) - s;
-    float ss = (max(t1, 0.0) * max(t2, 0.0)) * 2.0;
+    float frequency = 1.6;
+    float f1 = gln_simplex_curl(spos * frequency);
+    float f2 = gln_simplex_curl((spos + un_radius) * frequency);
+    float t1 = f1 - s;
+    float t2 = f2 - s;
+    float ss = (max(t1, 0.0) * max(t2, 0.0)) * 4.0;
+
+    float ss2 = pow(ss * 1.5, 5.0);
+
     // Accumulate total noise
-    float total = n - ss;
+    float total = n * (1.0 - ss) - ss2;
+    // float total = n - ss2;
 
     vec3 color = vec3(total, total, total);
     fragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
