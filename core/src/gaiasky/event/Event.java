@@ -697,10 +697,6 @@ public enum Event {
      **/
     MUSIC_PREVIOUS_CMD,
     /**
-     * Reload music files.
-     **/
-    MUSIC_RELOAD_CMD,
-    /**
      * Info about current track.
      **/
     MUSIC_TRACK_INFO,
