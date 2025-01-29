@@ -1,6 +1,6 @@
 {{ if .Versions -}}
 <a name="unreleased"></a>
-## [Unreleased]({{ .Info.RepositoryURL }}/tree/master)
+## [Unreleased]({{ .Info.RepositoryURL }}/src/branch/master)
 [Full changelog]({{ .Info.RepositoryURL }}/compare/{{ $latest := index .Versions 0 }}{{ $latest.Tag.Name }}...HEAD)
 
 {{ if .Unreleased.CommitGroups -}}
@@ -15,7 +15,7 @@
 
 {{ range .Versions }}
 <a name="{{ .Tag.Name }}"></a>
-## {{ if .Tag.Previous }}[{{ .Tag.Name }}]({{ $.Info.RepositoryURL }}/tree/{{ .Tag.Previous.Name }}){{ else }}{{ .Tag.Name }}{{ end }} ({{ datetime "2006-01-02" .Tag.Date }})
+## {{ if .Tag.Name }}[{{ .Tag.Name }}]({{ $.Info.RepositoryURL }}/releases/tag/{{ .Tag.Name }}){{ else }}{{ .Tag.Name }}{{ end }} ({{ datetime "2006-01-02" .Tag.Date }})
 {{ if .Tag.Previous }}[Full changelog]({{ $.Info.RepositoryURL }}/compare/{{ .Tag.Previous.Name }}...{{ .Tag.Name }}){{ end }}
 
 {{ range .CommitGroups -}}
