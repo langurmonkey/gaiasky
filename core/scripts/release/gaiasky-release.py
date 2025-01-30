@@ -122,6 +122,21 @@ def gen_downloads_table(gsfolder):
 
     print("Generated downloads table file: %s" % fout.name)
 
+def get_git_tag_date(tag):
+    try:
+        # Run the git command to get the commit date of the tag
+        result = subprocess.run(
+            ["git", "log", "-1", "--format=%ci", tag],
+            capture_output=True, text=True, check=True
+        )
+        git_date = result.stdout.strip()
+
+         # Convert to desired format
+        date_obj = datetime.strptime(git_date, '%Y-%m-%d %H:%M:%S %z')
+        return date_obj.strftime('%Y-%m-%dT%H:%M:%S')
+    except subprocess.CalledProcessError:
+        print(f"Error: Tag '{tag}' not found or git command failed.")
+        return None
 
 if __name__ == '__main__':
     arguments = check_args(sys.argv[1:])
@@ -198,6 +213,13 @@ if __name__ == '__main__':
             # HTML DOWNLOADS TABLE
             gen_downloads_table(arguments.gs_folder)
 
+            # RECALL PARAMETERS
+            packages_dir = max(glob.glob(os.path.join(arguments.gs_folder, 'releases', 'packages-*')), key=os.path.getmtime)
+            packages_name = os.path.basename(packages_dir)
+            version_rev = packages_name[9:]
+            version_flat = arguments.tag.replace('.', '_')
+            release_date = get_git_tag_date(arguments.tag)
+
             # PRINT TODOS
             print()
             print()
@@ -208,6 +230,11 @@ if __name__ == '__main__':
             print(" > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget updates.xml)")
             print(" > Update symlink to latest: rm latest && ln -s new_release latest")
             print(" > Generate the html listings for the new files: dir2html")
+            print(" > Update config.yaml of webiste with:")
+            print("     > version: %s" % arguments.tag)
+            print("     > versionFlat: %s" % version_flat)
+            print("     > versionRevision: %s" % version_rev)
+            print("     > releaseDate: %s" % release_date)
             print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
             print("     > The HTML downloads table is in the packages folder!")
             print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
