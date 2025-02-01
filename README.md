@@ -38,11 +38,12 @@ This file contains the following sections:
 
 | Component             | Minimum requirement                                           |
 |-----------------------|---------------------------------------------------------------|
-| **Operating system**  | Linux / Windows 7+ / macOS, x86-64 (ARM CPUs are unsupported) |
+| **Operating system**  | Linux / Windows 10+ / macOS                                   |
+| **Architecture**      | x86_64, ARM (only Apple silicon through compat layer)         |
 | **CPU**               | Intel Core i5 3rd Generation. 4+ cores recommended            |
-| **GPU**               | Support for OpenGL 3.3 (4.x recommended), 1 GB VRAM           |
-| **Memory**            | 2-6 GB RAM (depends on loaded datasets)                       |
-| **Hard drive**        | 1 GB of free disk space (depends on downloaded datasets)      |
+| **GPU**               | Support for OpenGL 3.3 (4.2 recommended), 1 GB VRAM           |
+| **Memory**            | 4+ GB RAM (depends on loaded datasets)                        |
+| **Hard drive**        | 1+ GB of free disk space (depends on downloaded datasets)     |
 
 ### 2. Pre-built packages
 
