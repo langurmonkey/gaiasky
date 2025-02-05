@@ -47,7 +47,6 @@
         </classPath>
       </java>
       <iconImageFiles>
-        <file path="@gs-git-folder@/assets/icon/gs_032.png" />
         <file path="@gs-git-folder@/assets/icon/gs_064.png" />
         <file path="@gs-git-folder@/assets/icon/gs_128.png" />
       </iconImageFiles>
@@ -62,8 +61,6 @@
         </classPath>
       </java>
       <iconImageFiles>
-        <file path="@gs-git-folder@/assets/icon/gs_032.png" />
-        <file path="@gs-git-folder@/assets/icon/gs_064.png" />
         <file path="@gs-git-folder@/assets/icon/gs_128.png" />
       </iconImageFiles>
     </launcher>
@@ -77,8 +74,6 @@
         </classPath>
       </java>
       <iconImageFiles>
-        <file path="@gs-git-folder@/assets/icon/gsvr_016.png" />
-        <file path="@gs-git-folder@/assets/icon/gsvr_032.png" />
         <file path="@gs-git-folder@/assets/icon/gsvr_064.png" />
         <file path="@gs-git-folder@/assets/icon/gsvr_128.png" />
       </iconImageFiles>
