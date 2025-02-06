@@ -73,9 +73,9 @@ public class Settings extends SettingsObject {
      **/
     public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
-    public static final String HOMEPAGE = "https://zah.uni-heidelberg.de/gaia/outreach/gaiasky";
-    public static final String HOMEPAGE_DOWNLOADS = "https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
-    public static final String DOCUMENTATION = "https://gaia.ari.uni-heidelberg.de/gaiasky/docs";
+    public static final String HOMEPAGE = "https://gaiasky.space";
+    public static final String HOMEPAGE_DOWNLOADS = "https://gaiasky.space/downloads";
+    public static final String DOCUMENTATION = "http://docs.gaiasky.space";
     public static final String REPOSITORY = "https://codeberg.org/gaiasky/gaiasky";
     public static final String SOCIAL_MEDIA_NAME = "#GaiaSky";
     public static final String SOCIAL_MEDIA_URL = "https://mastodon.social/tags/GaiaSky";

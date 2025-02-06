@@ -137,14 +137,14 @@ public class AboutWindow extends GenericDialog {
         contentHelp.row();
         contentHelp.add(gaiasky).pad(pad18).padBottom(pad18 * 5f).colspan(2);
         contentHelp.row();
+        contentHelp.add(homepageTitle).left().padBottom(pad34).row();
+        contentHelp.add(homepageLink).left().padBottom(pad34 * 2f);
+        contentHelp.row();
         contentHelp.add(docsTitle).left().padBottom(pad34).row();
         contentHelp.add(docsLink).left().padBottom(pad18 * 4f);
         contentHelp.row();
         contentHelp.add(repoTitle).left().padBottom(pad34).row();
         contentHelp.add(repoLink).left().padBottom(pad18 * 4f);
-        contentHelp.row();
-        contentHelp.add(homepageTitle).left().padBottom(pad34).row();
-        contentHelp.add(homepageLink).left().padBottom(pad34 * 2f);
         contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
