@@ -47,8 +47,7 @@
         </classPath>
       </java>
       <iconImageFiles>
-        <file path="@gs-git-folder@/assets/icon/gs_064.png" />
-        <file path="@gs-git-folder@/assets/icon/gs_128.png" />
+        <file path="@gs-git-folder@/assets/icon/gs_round_256.png" />
       </iconImageFiles>
     </launcher>
     <launcher name="gaiasky macos" id="573" excludeFromMenu="true" menuName="${compiler:sys.fullName}">
@@ -61,7 +60,7 @@
         </classPath>
       </java>
       <iconImageFiles>
-        <file path="@gs-git-folder@/assets/icon/gs_128.png" />
+        <file path="@gs-git-folder@/assets/icon/gs_macos_512.png" />
       </iconImageFiles>
     </launcher>
     <launcher name="gaiasky vr" id="683" menuName="${compiler:sys.fullName}/${compiler:sys.fullName} VR">
@@ -74,8 +73,7 @@
         </classPath>
       </java>
       <iconImageFiles>
-        <file path="@gs-git-folder@/assets/icon/gsvr_064.png" />
-        <file path="@gs-git-folder@/assets/icon/gsvr_128.png" />
+        <file path="@gs-git-folder@/assets/icon/gsvr_round_256.png" />
       </iconImageFiles>
     </launcher>
   </launchers>
@@ -86,17 +84,12 @@
           <property name="customIconImageFiles">
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>@gs-git-folder@/assets/icon/gs_032.png</string>
+                <string>@gs-git-folder@/assets/icon/gs_round_128.png</string>
               </object>
             </add>
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>@gs-git-folder@/assets/icon/gs_064.png</string>
-              </object>
-            </add>
-            <add>
-              <object class="com.install4j.api.beans.ExternalFile">
-                <string>@gs-git-folder@/assets/icon/gs_128.png</string>
+                <string>@gs-git-folder@/assets/icon/gs_round_256.png</string>
               </object>
             </add>
           </property>
@@ -126,7 +119,7 @@
                 <property name="imageAnchor" type="enum" class="com.install4j.api.beans.Anchor" value="NORTHEAST" />
                 <property name="imageFile">
                   <object class="com.install4j.api.beans.ExternalFile">
-                    <string>@gs-git-folder@/assets/icon/gs_064.png</string>
+                    <string>@gs-git-folder@/assets/icon/gs_round_256.png</string>
                   </object>
                 </property>
               </serializedBean>
@@ -1305,10 +1298,10 @@ return true;</property>
         <entry location="gaiasky" />
         <entry location="gaiasky-appimage.desktop" />
         <entry location="gaiasky.6.gz" />
-        <entry location="gs_icon.svg" />
+        <entry location="gs_icon_round.svg" />
         <entry location="AppRun" />
-        <entry location="gsvr_icon.png" />
-        <entry location="gs_icon.png" />
+        <entry location="gsvr_round_256.png" />
+        <entry location="gs_round_256.png" />
         <entry location="rest-static" />
         <entry filesetId="970" />
         <entry filesetId="972" />
@@ -1389,9 +1382,9 @@ return true;</property>
         <entry location="gaiasky-appimage.desktop" />
         <entry location="gaiasky.6.gz" />
         <entry location="gaiasky.desktop" />
-        <entry location="gs_icon.svg" />
+        <entry location="gs_icon_round.svg" />
         <entry location="AppRun" />
-        <entry location="gs_icon.png" />
+        <entry location="gs_round_256.png" />
         <entry location="rest-static" />
         <entry filesetId="970" />
         <entry filesetId="972" />

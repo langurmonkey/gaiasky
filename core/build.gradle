@@ -285,10 +285,9 @@ tasks.register('dist') {
         copy {
             from "$baseDir/assets/icon"
             into "$distDir"
-            include "gs_icon.png"
+            include "gs_round_256.png"
             include "gs_icon.ico"
-            include "gs_icon.svg"
-            include "gsvr_icon.png"
+            include "gsvr_round_256.png"
             include "gsvr_icon.ico"
         }
 
@@ -410,7 +409,7 @@ tasks.register('createAppImage') {
 
         // Set up AppRun executable, remove unneeded files
         delete "$appimgDir/gaiasky", "$appimgDir/gaiasky.cmd"
-        delete "$appimgDir/gs_icon.ico", "$appimgDir/gs_icon.svg", "$appimgDir/gsvr_icon.ico", "$appimgDir/gsvr_icon.png"
+        delete "$appimgDir/gs_icon.ico", "$appimgDir/gs_icon.svg"
         delete "$appimgDir/gaiasky.desktop"
         delete "$appimgDir/" + "$gsId" + ".appdata.xml"
         file("$appimgDir/gaiasky-appimage.desktop").renameTo(file("$appimgDir/gaiasky.desktop"))

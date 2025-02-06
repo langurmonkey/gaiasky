@@ -276,11 +276,11 @@ public class WelcomeGui extends AbstractGui {
         // Logo and title.
         Table titleGroup = new Table(skin);
 
-        FileHandle gsIcon = Gdx.files.internal("icon/gs_icon.png");
+        FileHandle gsIcon = Gdx.files.internal("icon/gs_icon_256.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         Image logo = new Image(iconTex);
-        logo.setScale(1.4f);
+        logo.setScale(1.05f);
         logo.setOrigin(Align.center);
 
         OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");

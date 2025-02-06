@@ -516,9 +516,9 @@ public class GaiaSkyDesktop implements IObserver {
         // Wayland does not support window icons.
         if (!SysUtils.isWayland()) {
             if (cliArgs.vr) {
-                cfg.setWindowIcon(FileType.Internal, "icon/gsvr_icon.png");
+                cfg.setWindowIcon(FileType.Internal, "icon/gsvr_round_256.png");
             } else {
-                cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
+                cfg.setWindowIcon(FileType.Internal, "icon/gs_round_256.png");
             }
         }
         // OpenXR requires OpenGL 4.5.

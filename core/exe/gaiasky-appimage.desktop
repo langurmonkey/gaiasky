@@ -3,5 +3,5 @@ Type=Application
 Name=Gaia Sky
 Comment=3D universe simulator for desktop and VR with support for more than a billion objects
 Exec=gaiasky
-Icon=gs_icon
+Icon=gs_round_256
 Categories=Science;

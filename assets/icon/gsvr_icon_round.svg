@@ -8,10 +8,10 @@
    version="1.1"
    id="svg1688"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
-   sodipodi:docname="gs_icon.svg"
-   inkscape:export-filename="gs_icon_l.png"
-   inkscape:export-xdpi="266.66666"
-   inkscape:export-ydpi="266.66666"
+   sodipodi:docname="gsvr_icon_round.svg"
+   inkscape:export-filename="gsvr_round_256.png"
+   inkscape:export-xdpi="136.53334"
+   inkscape:export-ydpi="136.53334"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -22,6 +22,24 @@
    xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs1682">
+    <rect
+       x="39.597979"
+       y="100.40916"
+       width="117.37972"
+       height="83.438598"
+       id="rect24" />
+    <linearGradient
+       id="linearGradient23"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#c9c9c9;stop-opacity:1;"
+         offset="0"
+         id="stop23" />
+      <stop
+         style="stop-color:#79868d;stop-opacity:1;"
+         offset="1"
+         id="stop24" />
+    </linearGradient>
     <linearGradient
        id="swatch12"
        inkscape:swatch="solid">
@@ -53,6 +71,125 @@
        r="12.5687"
        gradientTransform="matrix(-2.8090061,-2.822951,2.1855498,-2.1747538,-505.53114,963.62165)"
        gradientUnits="userSpaceOnUse" />
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Drop Shadow"
+       id="filter21"
+       x="-0.17855541"
+       y="-0.16408914"
+       width="1.343114"
+       height="1.3919907">
+      <feFlood
+         result="flood"
+         in="SourceGraphic"
+         flood-opacity="1.000000"
+         flood-color="rgb(0,0,0)"
+         id="feFlood20" />
+      <feGaussianBlur
+         result="blur"
+         in="SourceGraphic"
+         stdDeviation="1.500000"
+         id="feGaussianBlur20" />
+      <feOffset
+         result="offset"
+         in="blur"
+         dx="-0.306204"
+         dy="1.400000"
+         id="feOffset20" />
+      <feComposite
+         result="comp1"
+         operator="in"
+         in="flood"
+         in2="offset"
+         id="feComposite20" />
+      <feComposite
+         result="fbSourceGraphic"
+         operator="over"
+         in="SourceGraphic"
+         in2="comp1"
+         id="feComposite21" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix21" />
+      <feFlood
+         id="feFlood21"
+         result="flood"
+         in="fbSourceGraphic"
+         flood-opacity="1.000000"
+         flood-color="rgb(0,0,0)" />
+      <feGaussianBlur
+         id="feGaussianBlur21"
+         result="blur"
+         in="fbSourceGraphic"
+         stdDeviation="1.500000" />
+      <feOffset
+         id="feOffset21"
+         result="offset"
+         in="blur"
+         dx="-0.306204"
+         dy="1.400000" />
+      <feComposite
+         id="feComposite22"
+         result="comp1"
+         operator="in"
+         in="flood"
+         in2="offset" />
+      <feComposite
+         id="feComposite23"
+         result="comp2"
+         operator="over"
+         in="fbSourceGraphic"
+         in2="comp1" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient23"
+       id="linearGradient24"
+       x1="7.8165369"
+       y1="271.27344"
+       x2="39.808472"
+       y2="296.26825"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Drop Shadow"
+       id="filter42"
+       x="-0.034449133"
+       y="-0.10420862"
+       width="1.0992598"
+       height="1.2665647">
+      <feFlood
+         result="flood"
+         in="SourceGraphic"
+         flood-opacity="1.000000"
+         flood-color="rgb(0,0,0)"
+         id="feFlood41" />
+      <feGaussianBlur
+         result="blur"
+         in="SourceGraphic"
+         stdDeviation="1.574707"
+         id="feGaussianBlur41" />
+      <feOffset
+         result="offset"
+         in="blur"
+         dx="3.330864"
+         dy="2.108812"
+         id="feOffset41" />
+      <feComposite
+         result="comp1"
+         operator="in"
+         in="flood"
+         in2="offset"
+         id="feComposite41" />
+      <feComposite
+         result="comp2"
+         operator="over"
+         in="SourceGraphic"
+         in2="comp1"
+         id="feComposite42" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -62,8 +199,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="-36.062445"
-     inkscape:cy="69.296463"
+     inkscape:cx="107.12667"
+     inkscape:cy="68.589356"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -92,9 +229,19 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-259.95833)">
+    <rect
+       style="fill:url(#linearGradient24);stroke:none;stroke-width:0.423333;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect1"
+       width="44.71418"
+       height="44.714191"
+       x="1.4554098"
+       y="261.41373"
+       ry="22.357096"
+       rx="22.35709" />
     <g
        id="g1"
-       transform="translate(0.43862716,0.42639148)">
+       transform="matrix(0.65792169,0,0,0.65792169,8.6357803,96.431289)"
+       style="filter:url(#filter21)">
       <ellipse
          transform="rotate(43.661262)"
          ry="10.963622"
@@ -234,5 +381,15 @@
          d="m 22.071583,272.26186 2.442631,-2.6244 1.277532,0.10609 c 0.290017,1.36933 1.315192,3.11979 2.962617,4.79283 l 0.203675,1.83815 -2.720556,2.87685 c -1.538651,-1.43477 -3.625818,-4.12086 -4.165899,-6.98946 z"
          style="fill:#2a2a2a;fill-opacity:0.977593;stroke:none;stroke-width:0.272381px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-4.4901279,261.08086)"
+       id="text24"
+       style="font-size:53.3333px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect24);display:inline;filter:url(#filter42)"><tspan
+         x="46.098556"
+         y="147.59567"
+         id="tspan2"><tspan
+           style="font-family:Ethnocentric;-inkscape-font-specification:'Ethnocentric, Normal';fill:#ffffff"
+           id="tspan1">VR</tspan></tspan></text>
   </g>
 </svg>

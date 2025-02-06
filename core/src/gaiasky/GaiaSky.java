@@ -1192,7 +1192,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 config.setWindowedMode(graphics.getWidth(), graphics.getHeight());
                 config.setTitle(Settings.APPLICATION_NAME + " - External view");
                 config.useVsync(false);
-                config.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
+                config.setWindowIcon(Files.FileType.Internal, "icon/gs_round_256.png");
                 gaiaSkyView = new GaiaSkyView(globalResources.getSkin(), globalResources.getSpriteShader());
                 Lwjgl3Window newWindow = app.newWindow(gaiaSkyView, config);
                 gaiaSkyView.setWindow(newWindow);

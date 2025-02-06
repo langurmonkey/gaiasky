@@ -126,7 +126,7 @@ public class AboutWindow extends GenericDialog {
         var repoLink = new Link(Settings.REPOSITORY, linkLargeStyle, Settings.REPOSITORY);
 
         // Icon.
-        var gsIcon = Gdx.files.internal(Settings.settings.runtime.openXr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
+        var gsIcon = Gdx.files.internal(Settings.settings.runtime.openXr ? "icon/gsvr_round_256.png" : "icon/gs_icon_256.png");
         var iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         var gaiaSkyIcon = new Image(iconTex);

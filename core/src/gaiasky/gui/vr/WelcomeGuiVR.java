@@ -55,10 +55,11 @@ public class WelcomeGuiVR extends AbstractGui {
         bottom.bottom();
 
         // Logo.
-        FileHandle gsIcon = Gdx.files.internal("icon/gs_icon.png");
+        FileHandle gsIcon = Gdx.files.internal("icon/gs_icon_256.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         Image logo = new Image(iconTex);
+        logo.setScale(0.75f);
         logo.setOrigin(Align.center);
         center.add(logo).padBottom(20f).row();
         // Title.
