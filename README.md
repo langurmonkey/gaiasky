@@ -1,4 +1,4 @@
-<h3 align="center"><img src="assets/icon/gs_icon.png" alt="Gaia Sky" width="130px"><br>Gaia Sky - <i>Open source 3D Universe platform</i></h3>
+<h3 align="center"><img src="assets/icon/gs_round_256.png" alt="Gaia Sky" width="130px"><br>Gaia Sky - <i>Open source 3D Universe platform</i></h3>
 
 <p align="center">
 <a href="https://codeberg.org/gaiasky/gaiasky/releases"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcodeberg.org%2Fapi%2Fv1%2Frepos%2Fgaiasky%2Fgaiasky%2Freleases%2Flatest&query=%24.tag_name&label=release" alt="Latest release" /></a>
@@ -8,15 +8,15 @@
 <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/stats"><img src="https://img.shields.io/badge/stats-gaiasky-%234d7" alt="Stats" /></a>
 </p>
 
-[**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://www.esa.int/Science_Exploration/Space_Science/Gaia) to chart more than 1 billion stars.
+[**Gaia Sky**](https://gaiasky.space) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://www.esa.int/Science_Exploration/Space_Science/Gaia) to chart more than 1 billion stars.
 
 A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Catalog](https://dx.doi.org/10.1109/TVCG.2018.2864508).
 
 
 To get the latest up-to-date and most complete information,
 
-*  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
-*  Read the [**official documentation**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs) ([PDF version](https://gaia.ari.uni-heidelberg.de/gaiasky/docs-pdf))
+*  Visit our [**home page**](https://gaiasky.space)
+*  Read the [**official documentation**](http://docs.gaiasky.space) ([PDF version](https://gaia.ari.uni-heidelberg.de/gaiasky/docs-pdf))
 *  Submit a [**bug** or a **feature request**](https://codeberg.org/gaiasky/gaiasky/issues)
 *  Follow development news at [@gaiasky.bsky.social](https://bsky.app/profile/gaiasky.bsky.social) or [#GaiaSky@mastodon](https://mastodon.social/tags/GaiaSky)
 
@@ -47,7 +47,7 @@ This file contains the following sections:
 
 ### 2. Pre-built packages
 
-This is the Gaia Sky source repository. We recommend using the [pre-built packages](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads) for the different Operating Systems in case you want a stable and hassle-free experience. We offer pre-built packages for Linux, macOS or Windows [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/).
+This is the Gaia Sky source repository. We recommend using the [pre-built packages](https://gaiasky.space/downloads) for the different Operating Systems in case you want a stable and hassle-free experience.
 
 
 ### 3. Development branch
@@ -121,7 +121,7 @@ This software is published and distributed under the MPL 2.0 (Mozilla Public Lic
 
 ##  7. Contact information
 
-The main webpage of the project is [zah.uni-heidelberg.de/gaia/outreach/gaiasky](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky). There you can find the latest versions and the latest information on Gaia Sky.
+Up-to-date contact information can be found in the main webpage of the project, [gaiasky.space/contact](https://gaiasky.space/contact).
 
 ##  8. Contributing
 
