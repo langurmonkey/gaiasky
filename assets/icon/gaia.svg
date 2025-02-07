@@ -8,8 +8,8 @@
    version="1.1"
    id="svg1688"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
-   sodipodi:docname="gs_icon_round.svg"
-   inkscape:export-filename="gs_macos_500.png"
+   sodipodi:docname="gs_icon.svg"
+   inkscape:export-filename="gs_icon_l.png"
    inkscape:export-xdpi="266.66666"
    inkscape:export-ydpi="266.66666"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -22,18 +22,6 @@
    xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs1682">
-    <linearGradient
-       id="linearGradient23"
-       inkscape:collect="always">
-      <stop
-         style="stop-color:#c9c9c9;stop-opacity:1;"
-         offset="0"
-         id="stop23" />
-      <stop
-         style="stop-color:#79868d;stop-opacity:1;"
-         offset="1"
-         id="stop24" />
-    </linearGradient>
     <linearGradient
        id="swatch12"
        inkscape:swatch="solid">
@@ -65,87 +53,6 @@
        r="12.5687"
        gradientTransform="matrix(-2.8090061,-2.822951,2.1855498,-2.1747538,-505.53114,963.62165)"
        gradientUnits="userSpaceOnUse" />
-    <filter
-       style="color-interpolation-filters:sRGB;"
-       inkscape:label="Drop Shadow"
-       id="filter21"
-       x="-0.17855541"
-       y="-0.16408914"
-       width="1.343114"
-       height="1.3919907">
-      <feFlood
-         result="flood"
-         in="SourceGraphic"
-         flood-opacity="1.000000"
-         flood-color="rgb(0,0,0)"
-         id="feFlood20" />
-      <feGaussianBlur
-         result="blur"
-         in="SourceGraphic"
-         stdDeviation="1.500000"
-         id="feGaussianBlur20" />
-      <feOffset
-         result="offset"
-         in="blur"
-         dx="-0.306204"
-         dy="1.400000"
-         id="feOffset20" />
-      <feComposite
-         result="comp1"
-         operator="in"
-         in="flood"
-         in2="offset"
-         id="feComposite20" />
-      <feComposite
-         result="fbSourceGraphic"
-         operator="over"
-         in="SourceGraphic"
-         in2="comp1"
-         id="feComposite21" />
-      <feColorMatrix
-         result="fbSourceGraphicAlpha"
-         in="fbSourceGraphic"
-         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
-         id="feColorMatrix21" />
-      <feFlood
-         id="feFlood21"
-         result="flood"
-         in="fbSourceGraphic"
-         flood-opacity="1.000000"
-         flood-color="rgb(0,0,0)" />
-      <feGaussianBlur
-         id="feGaussianBlur21"
-         result="blur"
-         in="fbSourceGraphic"
-         stdDeviation="1.500000" />
-      <feOffset
-         id="feOffset21"
-         result="offset"
-         in="blur"
-         dx="-0.306204"
-         dy="1.400000" />
-      <feComposite
-         id="feComposite22"
-         result="comp1"
-         operator="in"
-         in="flood"
-         in2="offset" />
-      <feComposite
-         id="feComposite23"
-         result="comp2"
-         operator="over"
-         in="fbSourceGraphic"
-         in2="comp1" />
-    </filter>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient23"
-       id="linearGradient24"
-       x1="7.8165369"
-       y1="271.27344"
-       x2="39.808472"
-       y2="296.26825"
-       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -154,9 +61,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.0000001"
-     inkscape:cx="28.249999"
-     inkscape:cy="147.5"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="-36.062445"
+     inkscape:cy="69.296463"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -185,19 +92,9 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-259.95833)">
-    <rect
-       style="fill:url(#linearGradient24);stroke:none;stroke-width:0.423333;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
-       id="rect1"
-       width="44.71418"
-       height="44.714191"
-       x="1.4554098"
-       y="261.41373"
-       ry="22.357096"
-       rx="22.35709" />
     <g
        id="g1"
-       transform="matrix(0.65792169,0,0,0.65792169,7.2326153,97.74091)"
-       style="filter:url(#filter21)">
+       transform="translate(0.43862716,0.42639148)">
       <ellipse
          transform="rotate(43.661262)"
          ry="10.963622"

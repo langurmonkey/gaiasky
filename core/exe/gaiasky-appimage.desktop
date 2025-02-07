@@ -1,7 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Gaia Sky
-Comment=3D universe simulator for desktop and VR with support for more than a billion objects
+Comment=Explore the universe in 3D
 Exec=gaiasky
 Icon=gs_round_256
-Categories=Science;
+Categories=Science;Education;
+Keywords=space;planets;stars;galaxies;universe;explore
