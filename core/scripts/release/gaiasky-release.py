@@ -157,6 +157,7 @@ if __name__ == '__main__':
         print()
         print("- Make sure that $GS/releasenotes.txt exists and is ready, otherwise we will auto-generate it!")
         print("    - Use the generate-releasenotes script.")
+        print("- Make sure that the space.gaiasky.GaiaSky.metainfo.xml file in assets/metainfo is up to date. Update the version number and date, and the release notes.")
         print()
         input("Press any key to continue, or C-c to quit...")
 

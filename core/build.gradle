@@ -225,6 +225,12 @@ tasks.register('dist') {
             into "$distDir/conf"
         }
 
+        // Copy metainfo file
+        copy {
+            from "$baseDir/assets/metainfo"
+            into "$distDir/"
+        }
+
         // Copy i18n files
         mkdir "$distDir/i18n"
         copy {
