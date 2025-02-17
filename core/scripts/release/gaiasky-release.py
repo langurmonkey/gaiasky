@@ -10,6 +10,7 @@ This script prepares Gaia Sky for a new release
 """
 
 import argparse, os, sys, json, glob
+from datetime import datetime
 from tempfile import mkstemp
 from shutil import move
 from os import fdopen, remove
@@ -88,39 +89,6 @@ def process_files(defs, gsfolder, do=True):
             print("Commenting: %s" % line, end="", flush=True)
             comment_line("%s/%s" % (gsfolder, file), line, commentchar, uncomment=False)
 
-
-    # Find tag/version.
-def gen_downloads_table(gsfolder):
-    packages_dir = max(glob.glob(os.path.join(gsfolder, 'releases', 'packages-*')), key=os.path.getmtime)
-    packages_name = os.path.basename(packages_dir)
-    version_rev = packages_name[9:]
-    version = packages_name[9:packages_name.rfind('.')]
-    version_underscore = version.replace('.', '_')
-
-    # Prepare SHA256 checksums.
-    shamap = {}
-    shaf = open(os.path.join(packages_dir, 'sha256sums'))
-    for line in shaf:
-        tokens = line.split(' ')
-        key = tokens[1][tokens[1].rfind('.') + 1:].strip()
-        shamap[key] = tokens[0]
-
-    fin = open(os.path.join(gsfolder, 'core', 'scripts', 'release', 'downloads-table.template.html'), 'rt')
-    fout = open(os.path.join(packages_dir, 'downloads-table.html'), 'wt')
-
-    for line in fin:
-        # Substitute version and revision.
-        line = line.replace('${VERSION_FLAT}', version_underscore).replace('${VERSION_REVISION}', version_rev)
-        #line = line.replace('${SHA256_DEB}', shamap['deb'])
-        #line = line.replace('${SHA256_RPM}', shamap['rpm'])
-        #line = line.replace('${SHA256_SH}', shamap['sh'])
-        #line = line.replace('${SHA256_APPIMAGE}', shamap['appimage'])
-        #line = line.replace('${SHA256_WIN}', shamap['exe'])
-        #line = line.replace('${SHA256_DMG}', shamap['dmg'])
-        #line = line.replace('${SHA256_TAR}', shamap['gz'])
-        fout.write(line)
-
-    print("Generated downloads table file: %s" % fout.name)
 
 def get_git_tag_date(tag):
     try:
@@ -211,13 +179,11 @@ if __name__ == '__main__':
             # REVERT FILES
             process_files(releaserules, arguments.gs_folder, do=False)
 
-            # HTML DOWNLOADS TABLE
-            gen_downloads_table(arguments.gs_folder)
-
             # RECALL PARAMETERS
             packages_dir = max(glob.glob(os.path.join(arguments.gs_folder, 'releases', 'packages-*')), key=os.path.getmtime)
             packages_name = os.path.basename(packages_dir)
             version_rev = packages_name[9:]
+            build = packages_name[-9:]
             version_flat = arguments.tag.replace('.', '_')
             release_date = get_git_tag_date(arguments.tag)
 
@@ -231,13 +197,15 @@ if __name__ == '__main__':
             print(" > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget updates.xml)")
             print(" > Update symlink to latest: rm latest && ln -s new_release latest")
             print(" > Generate the html listings for the new files: dir2html")
-            print(" > Update config.yaml of webiste with:")
+            print(" > Create new post on website $GSW with change log")
+            print(" > Run $GSW/script/gen-releases.py to generate the new release")
+            print(" > Update config.yaml [params.release] of webiste $GSW with:")
             print("     > version: %s" % arguments.tag)
             print("     > versionFlat: %s" % version_flat)
-            print("     > versionRevision: %s" % version_rev)
-            print("     > releaseDate: %s" % release_date)
-            print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
-            print("     > The HTML downloads table is in the packages folder!")
+            print("     > versionBuild: %s" % version_rev)
+            print("     > build: %s" % build)
+            print("     > date: %s" % release_date)
+            print("     > post: /news/year/pointer-to-release-post.md")
             print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
             print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
             print(" > Add new release to codeberg: https://codeberg.org/gaiasky/gaiasky/releases")
