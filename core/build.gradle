@@ -293,6 +293,7 @@ tasks.register('dist') {
             into "$distDir"
             include "gs_round_256.png"
             include "gs_icon.ico"
+            include "gs_icon.svg"
             include "gsvr_round_256.png"
             include "gsvr_icon.ico"
         }
