@@ -6,8 +6,8 @@
   <url type="bugtracker">https://codeberg.org/gaiasky/gaiasky/issues</url>
 
   <branding>
-    <color type="primary" scheme_preference="light">#433316</color>
-    <color type="primary" scheme_preference="dark">#d0b98f</color>
+    <color type="primary" scheme_preference="light">#ddc6ac</color>
+    <color type="primary" scheme_preference="dark">#bc8d57</color>
     </branding>
 
   <name>Gaia Sky</name>
@@ -68,59 +68,43 @@
   <screenshots>
     <screenshot type="default">
       <caption>Rendering of Earth's surface with the aurora borealis.</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250124/00000.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/aurora.jpg</image>
       </screenshot>
     <screenshot>
       <caption>View of Saturn and its rings</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00000.jpg</image>
-      </screenshot>
-    <screenshot>
-      <caption>Earthrise</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00002.jpg</image>
-      </screenshot>
-    <screenshot>
-      <caption>Atmospheric scattering of Earth</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00003.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/saturn.jpg</image>
       </screenshot>
     <screenshot>
       <caption>Black hole with accretion disk</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00004.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/blackhole.jpg</image>
+      </screenshot>
+    <screenshot>
+      <caption>Earthrise</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/earthrise.jpg</image>
+      </screenshot>
+    <screenshot>
+      <caption>Atmospheric scattering of Earth</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/scattering.jpg</image>
       </screenshot>
     <screenshot>
       <caption>SDSS galaxies</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00005.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/sdss.jpg</image>
       </screenshot>
     <screenshot>
-      <caption>The inner Solar System</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00006.jpg</image>
-      </screenshot>
-    <screenshot>
-      <caption>Spacecraft in planetarium mode</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00007.jpg</image>
+      <caption>The inner Solar System with planets and asteroids</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/asteroids.jpg</image>
       </screenshot>
     <screenshot>
       <caption>Solar eclipse representation on the surface of Earth</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00008.jpg</image>
-      </screenshot>
-    <screenshot>
-      <caption>Phobos and Mars</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00009.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/eclipse.jpg</image>
       </screenshot>
     <screenshot>
       <caption>The Trifid nebula rendered as a volume</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250124/00001.jpg</image>
-      </screenshot>
-    <screenshot>
-      <caption>Iso-surface maps</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00011.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/trifid.jpg</image>
       </screenshot>
     <screenshot>
       <caption>The International Space Station</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20240926/00012.jpg</image>
-      </screenshot>
-    <screenshot>
-      <caption>The Milky Way</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20231002/00008.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20250218_flathub/iss.jpg</image>
       </screenshot>
     </screenshots>
   </component>
