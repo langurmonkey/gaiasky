@@ -3860,7 +3860,7 @@ public class Settings extends SettingsObject {
                 EventManager.publish(Event.LENS_FLARE_CMD, this, lensFlare.strength);
                 EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlow.active);
                 EventManager.publish(Event.SSR_CMD, this, ssr.active);
-                EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.active);
+                EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.strength);
                 EventManager.publish(Event.REPROJECTION_CMD, this, reprojection.active, reprojection.mode);
                 EventManager.publish(Event.BRIGHTNESS_CMD, this, levels.brightness);
                 EventManager.publish(Event.CONTRAST_CMD, this, levels.contrast);
