@@ -22,11 +22,6 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
      **/
     public double angle;
     /**
-     * Current delta angle.
-     */
-    public double deltaAngle;
-
-    /**
      * The rotation period in hours.
      **/
     public double period;
@@ -66,7 +61,6 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
         var prevAngle = angle;
         long t = time.getTime().toEpochMilli() - AstroUtils.J2000_MS;
         angle = (meridianAngle + angularVelocity * t * Nature.MS_TO_H) % 360.0;
-        deltaAngle = angle - prevAngle;
     }
 
     /**
@@ -166,7 +160,6 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
 
     public RotationComponent copy() {
         var clone = new RotationComponent();
-        clone.deltaAngle = deltaAngle;
         clone.angularVelocity = angularVelocity;
         clone.angle = angle;
         clone.axialTilt = axialTilt;

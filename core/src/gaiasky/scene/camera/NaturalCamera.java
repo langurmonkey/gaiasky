@@ -425,6 +425,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
+    double previousRotationAngle = 0;
     private void camUpdate(double dt,
                            ITimeFrameProvider time) {
         currentMouseKbdListener.update();
@@ -466,7 +467,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                 if (focus.getRotationComponent() != null) {
                                     var rc = focus.getRotationComponent();
                                     // Rotation component present - planets, etc.
-                                    double deltaAngle = rc.deltaAngle;
+                                    double deltaAngle = rc.angle - previousRotationAngle;
+                                    previousRotationAngle = rc.angle;
                                     // aux5 <- focus position.
                                     aux5b.set(focusPos);
                                     // aux3 <- focus to camera vector.
