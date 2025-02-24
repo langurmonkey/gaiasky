@@ -142,6 +142,17 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);
         data.time.add(Instant.ofEpochMilli(d.toEpochMilli()));
 
+
+        // Apply multiplier if necessary.
+        if (parameter.multiplier != 1f) {
+            int n = data.x.size();
+            for (int i = 0; i < n; i++) {
+                data.x.set(i, data.x.get(i) * parameter.multiplier);
+                data.y.set(i, data.y.get(i) * parameter.multiplier);
+                data.z.set(i, data.z.get(i) * parameter.multiplier);
+            }
+        }
+
         if (writeData) {
             try {
                 OrbitDataWriter.writeOrbitData(writeDataPath + "orb." + bodyDesc.toUpperCase() + ".dat", data);

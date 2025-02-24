@@ -56,7 +56,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
 
         public Date ini;
         public double orbitalPeriod;
-        public double multiplier;
+        public double multiplier = 1;
         public int numSamples;
         public String name;
         public OrbitComponent orbitalParamaters;

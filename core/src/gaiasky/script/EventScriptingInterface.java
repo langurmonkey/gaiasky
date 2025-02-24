@@ -32,11 +32,11 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.EventManager.TimeFrame;
 import gaiasky.event.IObserver;
-import gaiasky.gui.window.ColormapPicker;
 import gaiasky.gui.api.IGui;
 import gaiasky.gui.beans.OrientationComboBoxBean.ShapeOrientation;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
+import gaiasky.gui.window.ColormapPicker;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -1578,9 +1578,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (Mapper.modelScaffolding.has(object)) {
                 var scaffolding = Mapper.modelScaffolding.get(object);
                 scaffolding.setSizeScaleFactor(scalingFactor);
+            } else if (Mapper.trajectory.has(object)) {
+                var trajectory = Mapper.trajectory.get(object);
+                trajectory.params.multiplier = scalingFactor;
             } else {
                 var base = Mapper.base.get(object);
-                logger.error("Object '" + base.getName() + "' is not a model object");
+                logger.error("Object '" + base.getName() + "' is not a model or trajectory object");
             }
         }
     }
@@ -1598,6 +1601,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             className = name;
             objectName = null;
         }
+        // Coordinates provider.
         List<AbstractOrbitCoordinates> aocs = AbstractOrbitCoordinates.getInstances();
         for (AbstractOrbitCoordinates aoc : aocs) {
             if (aoc.getClass().getSimpleName().equalsIgnoreCase(className)) {
@@ -1612,6 +1616,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
             }
         }
+
         logger.info(name + ": modified scaling of " + modified + " orbits");
     }
 

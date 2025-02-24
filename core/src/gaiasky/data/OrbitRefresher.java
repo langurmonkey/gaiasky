@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.api.IOrbitDataProvider;
+import gaiasky.data.orbit.OrbitBodyDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitSamplerDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
@@ -105,23 +106,25 @@ public class OrbitRefresher implements IObserver {
 
                     // Generate orbits if any
                     if (toLoad.size > 0) {
-                        try {
-                            for (OrbitDataLoaderParameters params : toLoad) {
-                                if (params.entity != null) {
-                                    Entity entity = params.entity;
-                                    var trajectory = Mapper.trajectory.get(entity);
+                        for (OrbitDataLoaderParameters params : toLoad) {
+                            if (params.entity != null) {
+                                Entity entity = params.entity;
+                                var trajectory = Mapper.trajectory.get(entity);
+                                try {
                                     if (trajectory == null) {
                                         continue;
                                     }
                                     IOrbitDataProvider currentProvider;
                                     IOrbitDataProvider objectProvider = trajectory.providerInstance;
-                                    if (objectProvider == null || objectProvider instanceof OrbitFileDataProvider) {
+                                    if (Mapper.tagHeliotropic.has(entity)) {
+                                        currentProvider = objectProvider;
+                                    } else if (objectProvider == null || objectProvider instanceof OrbitFileDataProvider) {
                                         currentProvider = this.provider;
                                     } else {
                                         currentProvider = objectProvider;
                                     }
                                     // Generate data
-                                    currentProvider.load(null, params);
+                                    currentProvider.load(trajectory.oc.source, params);
                                     final PointCloudData pcd = currentProvider.getData();
                                     // Post new data to object
                                     GaiaSky.postRunnable(() -> {
@@ -137,11 +140,12 @@ public class OrbitRefresher implements IObserver {
                                         trajectory.refreshing = false;
                                     });
 
+                                } catch (Exception e) {
+                                    trajectory.refreshing = false;
+                                    // This will happen when the queue has been cleared during processing.
+                                    logger.debug("Refreshing orbits operation failed.");
                                 }
                             }
-                        } catch (Exception e) {
-                            // This will happen when the queue has been cleared during processing.
-                            logger.debug("Refreshing orbits operation failed.");
                         }
                     }
                 }
