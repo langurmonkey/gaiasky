@@ -29,6 +29,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected boolean periodic = true;
     protected Vector3d center;
     protected Entity entity;
+    protected Entity owner;
     protected double scaling = 1d;
 
     protected AbstractOrbitCoordinates() {
@@ -66,8 +67,9 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
                     entity = ((Scene) params[0]).index().getEntity(orbitName);
                 }
                 if (params[1] instanceof Entity orbitObject) {
+                    owner = orbitObject;
                     var trajectory = Mapper.trajectory.get(entity);
-                    trajectory.setBody(orbitObject, EntityUtils.getRadius(orbitObject), trajectory.distDown, trajectory.distUp);
+                    trajectory.setBody(owner, EntityUtils.getRadius(owner), trajectory.distDown, trajectory.distUp);
                 }
             }
         }

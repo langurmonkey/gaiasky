@@ -406,7 +406,8 @@ public class JsonLoader extends AbstractSceneLoader {
             try {
                 m.invoke(instance, value);
             } catch (ReflectionException e) {
-                throw new RuntimeException(e);
+                logger.error(e);
+                return false;
             }
             return true;
         } else {
