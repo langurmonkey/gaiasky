@@ -19,6 +19,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected static final Log logger = Logger.getLogger(AbstractOrbitCoordinates.class);
@@ -121,5 +122,35 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
             return Mapper.verts.get(entity).pointCloudData;
         }
         return null;
+    }
+
+    protected void updateOwner(Map<String, Entity> index) {
+       if(owner != null) {
+           var base = Mapper.base.get(owner);
+           if (base != null) {
+               var newOwner = index.get(base.getName().toLowerCase());
+               if(newOwner != null) {
+                   owner = newOwner;
+               }
+           }
+       }
+    }
+
+    protected void copyParameters(AbstractOrbitCoordinates other){
+        other.orbitName = this.orbitName;
+        other.center = this.center;
+        other.periodic = this.periodic;
+        other.owner = this.owner;
+        other.entity = this.entity;
+        other.scaling = this.scaling;
+    }
+
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        return this;
     }
 }

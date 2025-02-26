@@ -7,6 +7,7 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
@@ -21,6 +22,7 @@ import gaiasky.util.math.Vector3d;
 import org.apfloat.Apfloat;
 
 import java.time.Instant;
+import java.util.Map;
 
 public class StaticCoordinates implements IBodyCoordinates {
 
@@ -140,4 +142,14 @@ public class StaticCoordinates implements IBodyCoordinates {
     public String toString() {
         return "{" + "pos=" + position + ", trf='" + transformName + '\'' + '}';
     }
+
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        return this;
+    }
+
 }

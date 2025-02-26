@@ -35,6 +35,8 @@ import gaiasky.util.tree.OctreeNode;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,6 +49,9 @@ public class Scene {
 
     /** The index of names to entities. **/
     private Index index;
+
+    /** Local copy index. **/
+    private ThreadLocal<HashMap<String, Entity>> copyIndex;
 
     /** Repository for families, which are component set definitions. **/
     private Families families;
@@ -263,6 +268,7 @@ public class Scene {
             int numEntities = engine.getEntities().size();
 
             index = new Index(archetypes, numEntities);
+            copyIndex = ThreadLocal.withInitial(HashMap::new);
 
             // Prepare system.
             indexInitializer = new IndexInitializer(index, Family.all(Base.class).get(), 0);
@@ -742,13 +748,44 @@ public class Scene {
      * @return The line copied entity.
      */
     public Entity getLineCopy(Entity entity) {
+        var idx = copyIndex.get();
+        // Clear index before use.
+        idx.clear();
+        // Get line copy.
+        var copy = getLineCopy(entity, idx);
+
+        // Some coordinates objects ({@link AbstractOrbitCoordinates} for instance) contain references to objects
+        // that are updated during querying. We need to update those references.
+        var e = copy;
+        while (e != null) {
+            // Update references to owner.
+            if (Mapper.coordinates.has(e)) {
+                var coordinates = Mapper.coordinates.get(e);
+                coordinates.coordinates.updateReferences(idx);
+            }
+
+            var g = Mapper.graph.get(e);
+            e = g.parent;
+        }
+        // Clear index for next use.
+        idx.clear();
+
+        return copy;
+    }
+
+    public Entity getLineCopy(Entity entity, Map<String, Entity> index) {
+        // Get simple copy.
         var copy = getSimpleCopy(entity);
+        // Add to copy index.
+        var base = Mapper.base.get(copy);
+        index.put(base.getName().toLowerCase(), copy);
         var graph = Mapper.graph.get(entity);
         if (graph.parent != null) {
-            var parentCopy = getLineCopy(graph.parent);
+            var parentCopy = getLineCopy(graph.parent, index);
             var parentCopyGraph = Mapper.graph.get(parentCopy);
             parentCopyGraph.addChild(parentCopy, copy, false, 1);
         }
+
         return copy;
     }
 

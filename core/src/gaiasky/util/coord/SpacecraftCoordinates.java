@@ -7,6 +7,7 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -24,6 +25,7 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
+import java.util.Map;
 
 public class SpacecraftCoordinates implements IBodyCoordinates {
     private static final Log logger = Logger.getLogger(SpacecraftCoordinates.class);
@@ -172,4 +174,12 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         return posb;
     }
 
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        return this;
+    }
 }

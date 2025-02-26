@@ -9,7 +9,10 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.utils.Array;
+import gaiasky.util.coord.ComposedTimedOrbitCoordinates;
 import gaiasky.util.coord.IBodyCoordinates;
+import gaiasky.util.coord.TimedOrbitCoordinates;
 
 public class Coordinates implements Component, ICopy {
 
@@ -34,7 +37,7 @@ public class Coordinates implements Component, ICopy {
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());
-        copy.coordinates = coordinates;
+        copy.coordinates = coordinates.getCopy();
         copy.timeOverflow = timeOverflow;
         return copy;
     }

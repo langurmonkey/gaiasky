@@ -7,9 +7,11 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.util.math.Vector3b;
 
 import java.time.Instant;
+import java.util.Map;
 
 public class PythonBodyCoordinates implements IBodyCoordinates {
 
@@ -38,4 +40,14 @@ public class PythonBodyCoordinates implements IBodyCoordinates {
         provider.getEquatorialCartesianCoordinates(AstroUtils.getJulianDate(instant), out);
         return out;
     }
+
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        return this;
+    }
+
 }

@@ -7,9 +7,11 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.util.math.Vector3b;
 
 import java.time.Instant;
+import java.util.Map;
 
 public interface IBodyCoordinates {
 
@@ -55,5 +57,17 @@ public interface IBodyCoordinates {
      * in case of non-elliptical orbits such as Gaia.
      */
     Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out);
+
+    /**
+     * Update the references in this coordinates object with the given index.
+     * @param index The index to use.
+     */
+    void updateReferences(Map<String, Entity> index);
+
+    /**
+     * Gets a copy of this coordinates object.
+     * @return The copy.
+     */
+    IBodyCoordinates getCopy();
 
 }

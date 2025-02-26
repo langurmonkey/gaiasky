@@ -1,5 +1,6 @@
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
@@ -10,6 +11,7 @@ import gaiasky.util.math.Vector3b;
 
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.Map;
 
 /**
  * Implementation of coordinates that contains more than one timed coordinates object.
@@ -122,5 +124,24 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
             logger.error(nsme, "Method does not exist: " + method);
             return out;
         }
+    }
+
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+        for (var c : this.coordinates) {
+            c.updateReferences(index);
+        }
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        var copy = new ComposedTimedOrbitCoordinates();
+        copy.processOnlyActive = this.processOnlyActive;
+        copy.scene = this.scene;
+        copy.coordinates = new Array<>(this.coordinates.size);
+        for (var c : this.coordinates) {
+            copy.coordinates.add((TimedOrbitCoordinates) c.getCopy());
+        }
+        return copy;
     }
 }

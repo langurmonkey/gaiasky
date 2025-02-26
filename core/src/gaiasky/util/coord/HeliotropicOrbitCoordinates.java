@@ -7,9 +7,11 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.util.math.Vector3b;
 
 import java.time.Instant;
+import java.util.Map;
 
 public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
 
@@ -35,6 +37,18 @@ public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
         }
         // Rotate by solar longitude, and convert to equatorial.
         return out.rotate(AstroUtils.getSunLongitude(date) + 180, 0, 1, 0).mul(Coordinates.eclToEq()).scl(scaling);
+    }
+
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+        updateOwner(index);
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        var copy = new HeliotropicOrbitCoordinates();
+        copyParameters(copy);
+        return copy;
     }
 
 }

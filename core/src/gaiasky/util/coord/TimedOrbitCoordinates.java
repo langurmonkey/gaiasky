@@ -1,16 +1,24 @@
 package gaiasky.util.coord;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.Pool;
 import gaiasky.scene.Scene;
 import gaiasky.util.Logger;
 import gaiasky.util.math.Vector3b;
 
 import java.time.Instant;
+import java.util.Map;
 
 /**
  * Composition of {@link IBodyCoordinates} that contains a start and end time of validity.
  */
 public class TimedOrbitCoordinates implements IBodyCoordinates {
+
+    static final Pool<TimedOrbitCoordinates> pool = new Pool<>() {
+        protected TimedOrbitCoordinates newObject() {
+            return new TimedOrbitCoordinates();
+        }
+    };
     protected static final Logger.Log logger = Logger.getLogger(TimedOrbitCoordinates.class);
 
     public AbstractOrbitCoordinates coordinates;
@@ -75,5 +83,28 @@ public class TimedOrbitCoordinates implements IBodyCoordinates {
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out) {
         return coordinates.getEquatorialCartesianCoordinates(instant, out);
+    }
+
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+        coordinates.updateReferences(index);
+
+        // Update parent.
+        if (parentName != null) {
+            var key = parentName.toLowerCase();
+            if (index.containsKey(key)) {
+                parent = index.get(key);
+            }
+        }
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        var copy = pool.obtain();
+        copy.start = this.start;
+        copy.end = this.end;
+        copy.parentName = this.parentName;
+        copy.coordinates = (AbstractOrbitCoordinates) this.coordinates.getCopy();
+        return copy;
     }
 }

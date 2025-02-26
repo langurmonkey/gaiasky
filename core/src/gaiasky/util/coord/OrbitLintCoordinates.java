@@ -7,6 +7,7 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Trajectory;
@@ -18,6 +19,7 @@ import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
 import java.time.Instant;
+import java.util.Map;
 
 public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     OrbitComponent orbitalParams;
@@ -139,7 +141,21 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             return Mapper.graph.get(Mapper.graph.get(entity).parent).orientation;
         }
         return null;
+    }
 
+    @Override
+    public void updateReferences(Map<String, Entity> index) {
+        updateOwner(index);
+    }
+
+    @Override
+    public IBodyCoordinates getCopy() {
+        var copy = new OrbitLintCoordinates();
+        copy.orbitalParams = this.orbitalParams;
+        copy.transform = this.transform.cpy();
+        copy.data = this.data;
+        copyParameters(copy);
+        return copy;
     }
 
 }
