@@ -206,9 +206,9 @@ public class BillboardEntityRenderSystem implements IObserver {
             boolean star = Mapper.hip.has(entity);
             extra.computedSize = body.size;
 
-            if (body.solidAngle * Constants.DISTANCE_SCALE_FACTOR > solidAngleThresholdBottomOverFovFactor) {
+            if (body.solidAngle > solidAngleThresholdBottomOverFovFactor) {
                 double dist;
-                if (body.solidAngle * Constants.DISTANCE_SCALE_FACTOR > solidAngleThresholdTopOverFovFactor) {
+                if (body.solidAngle > solidAngleThresholdTopOverFovFactor) {
                     dist = (float) extra.radius / Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP;
                 } else {
                     dist = body.distToCamera / fovFactor;

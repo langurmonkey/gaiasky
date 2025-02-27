@@ -15,7 +15,6 @@ uniform float u_size;
 uniform vec3 u_camUp;
 uniform float u_apparent_angle;
 uniform float u_th_angle_point;
-uniform float u_vrScale;
 
 #ifdef relativisticEffects
 #include <shader/lib/relativity.glsl>
