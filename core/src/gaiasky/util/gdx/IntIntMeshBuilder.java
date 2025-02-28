@@ -26,14 +26,14 @@ import gaiasky.util.gdx.model.IntMeshPart;
 import net.jafama.FastMath;
 
 public class IntIntMeshBuilder implements IntMeshPartBuilder {
-    private final static Pool<Vector3> vectorPool = new Pool<Vector3>() {
+    private final static Pool<Vector3> vectorPool = new Pool<>() {
         @Override
         protected Vector3 newObject() {
             return new Vector3();
         }
     };
     private final static Array<Vector3> vectorArray = new Array<>();
-    private final static Pool<Matrix4> matrices4Pool = new Pool<Matrix4>() {
+    private final static Pool<Matrix4> matrices4Pool = new Pool<>() {
         @Override
         protected Matrix4 newObject() {
             return new Matrix4();
