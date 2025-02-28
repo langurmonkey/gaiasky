@@ -127,9 +127,9 @@ public class LabelEntityRenderSystem {
             }
         }
 
-        // n up, n down (if possible)
+        // n - 1 up, n + 1 down (if possible)
         int n = 2;
-        for (int i = index - n; i < index + n; i++) {
+        for (int i = index - (n + 1); i < index + n - 1; i++) {
             if (i >= 0 && i < gr.annotations.size()) {
                 // Render
                 renderDistanceLabel(view, batch, shader, sys, rc, camera, gr.annotations.get(i).getFirst(), gr.annotations.get(i).getSecond());

@@ -131,9 +131,9 @@ public class GridRecUpdater extends AbstractUpdateSystem {
                 graph.localTransform.translate(focus.getAbsolutePosition(B31).sub(camera.getPos()).setLength(vrScl).add(vrOffset).put(F31));
         }
         if (gr.regime == 1)
-            graph.localTransform.scl((float) (body.distToCamera * 0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
+            graph.localTransform.scl((float) (body.distToCamera * 0.023d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
         else
-            graph.localTransform.scl((float) (0.067f * vrScl * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
+            graph.localTransform.scl((float) (0.023f * vrScl * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
 
         if (transform.matrixf != null)
             graph.localTransform.mul(transform.matrixf);
