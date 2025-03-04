@@ -29,7 +29,9 @@ public class SceneObserver implements IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         switch (event) {
         case PER_OBJECT_VISIBILITY_CMD -> {
             if (data[0] instanceof FocusView focusView) {
@@ -50,12 +52,19 @@ public class SceneObserver implements IObserver {
             }
         }
         case FORCE_OBJECT_LABEL_CMD -> {
-            if (data[0] instanceof FocusView entity) {
+            FocusView focusView = null;
+            if (data[0] instanceof Entity entity) {
+                view.setEntity(entity);
+                focusView = view;
+            } else if (data[0] instanceof FocusView fv) {
+                focusView = fv;
+            }
+            if (focusView != null) {
                 final String name = (String) data[1];
                 final boolean state = (boolean) data[2];
 
-                entity.setForceLabel(state, name.toLowerCase(Locale.ROOT));
-                logger.info(I18n.msg("notif.object.flag", "forceLabel", entity.getName(), I18n.msg("gui." + state)));
+                focusView.setForceLabel(state, name.toLowerCase(Locale.ROOT));
+                logger.info(I18n.msg("notif.object.flag", "forceLabel", focusView.getName(), I18n.msg("gui." + state)));
             }
         }
         case LABEL_COLOR_CMD -> {
