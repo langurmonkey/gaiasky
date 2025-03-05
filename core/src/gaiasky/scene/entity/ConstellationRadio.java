@@ -22,7 +22,9 @@ public class ConstellationRadio extends EntityRadio {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         if (event == Event.CONSTELLATION_UPDATE_CMD) {
             Scene scene = (Scene) data[0];
             setUp(scene);
@@ -43,7 +45,7 @@ public class ConstellationRadio extends EntityRadio {
                     s2 = hipMap.get(pair[1]);
                     if (constel.lines[i] == null && s1 != null && s2 != null) {
                         constel.lines[i] = new IPosition[] { s1, s2 };
-                    } else {
+                    } else if (s1 == null || s2 == null) {
                         constel.allLoaded = false;
                     }
                 }
