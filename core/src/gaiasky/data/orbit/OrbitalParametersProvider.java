@@ -91,6 +91,8 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
     public void loadOld(String file, OrbitDataLoaderParameters parameter) {
         OrbitComponent params = parameter.orbitalParamaters;
+        if (params == null)
+            return;
         try {
             // Parameters of the ellipse
             double a = params.semimajoraxis;

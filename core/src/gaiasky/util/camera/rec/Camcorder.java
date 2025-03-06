@@ -137,13 +137,9 @@ public class Camcorder implements IObserver {
                     logger.warn(I18n.msg("notif.cameraplay.record.busy", mode));
                     return;
                 }
-                // Start recording
-                RecorderState newMode;
-                if (state) {
-                    newMode = RecorderState.RECORDING;
-                } else {
-                    newMode = RecorderState.IDLE;
-                }
+
+                RecorderState newMode = state ? RecorderState.RECORDING : RecorderState.IDLE;
+
                 if (newMode == RecorderState.RECORDING) {
                     // We start recording, prepare buffer!
                     if (mode.get() == RecorderState.RECORDING) {
