@@ -427,9 +427,6 @@
     "eye": {
       "imageUp": "iconic-eye"
     },
-    "audio": {
-      "imageUp": "iconic-audio"
-    },
     "ban": {
       "imageUp": "iconic-ban"
     },
@@ -464,11 +461,11 @@
       "imageUp": "iconic-caret-right"
     },
     "key-caret-left": {
-      "up" : "key",
+      "up": "key",
       "imageUp": "iconic-caret-left"
     },
     "key-caret-right": {
-      "up" : "key",
+      "up": "key",
       "imageUp": "iconic-caret-right"
     },
     "edit": {
@@ -552,9 +549,6 @@
       "disabledFontColor": "dark-gray",
       "imageUp": "quit-icon"
     },
-    "car": {
-      "imageUp": "car-icon"
-    },
     "log": {
       "imageUp": "log-icon"
     },
@@ -575,9 +569,6 @@
     },
     "screen-mode": {
       "imageUp": "screen-mode"
-    },
-    "script-stop": {
-      "imageUp": "script-stop"
     },
     "camera-stop": {
       "imageUp": "camera-stop"
@@ -721,16 +712,6 @@
     },
     "question": {
       "imageUp": "question-mark"
-    },
-    "audio-playpause": {
-      "imageUp": "audio-play",
-      "imageChecked": "audio-pause"
-    },
-    "audio-fwd": {
-      "imageUp": "audio-fwd"
-    },
-    "audio-bwd": {
-      "imageUp": "audio-bwd"
     },
     "reload": {
       "imageUp": "reload"
