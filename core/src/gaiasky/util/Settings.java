@@ -407,7 +407,7 @@ public class Settings extends SettingsObject {
 
     public enum ImageFormat {
         PNG("png"),
-        JPG("jpeg");
+        JPG("jpg");
 
         public final String extension;
 
