@@ -171,8 +171,8 @@ public class Camcorder implements IObserver {
                 } else {
                     // Stop.
                     var showFilePicker = true;
-                    if (data.length > 1 && data[1] != null) {
-                        showFilePicker = (Boolean) data[1];
+                    if (data.length > 2 && data[2] != null) {
+                        showFilePicker = (Boolean) data[2];
                     }
                     // Flush and close
                     if (mode.get() == RecorderState.IDLE) {

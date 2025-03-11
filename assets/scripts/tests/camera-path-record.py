@@ -15,11 +15,11 @@ def printall(string):
     print(string)
 
 filename = "test_script_path"
-printall("Recording camera path for 5 seconds with name '%s'" % filename)
+printall("Recording camera path for 2 seconds with name '%s'" % filename)
 
 gs.startRecordingCameraPath(filename)
 
-gs.sleep(5.0)
+gs.sleep(2.0)
 
 gs.stopRecordingCameraPath()
 

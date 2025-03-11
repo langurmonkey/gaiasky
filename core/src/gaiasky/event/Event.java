@@ -853,7 +853,7 @@ public enum Event {
     RECALCULATE_CONTROLS_WINDOW_SIZE,
     /**
      * Issues the command to enable camera recording. Contains the boolean
-     * indicating the state (start/finish) and a file name (null for auto-generated) if starting, or a boolean indicating
+     * indicating the state (start/finish) and a file name (null for auto-generated) if starting, and a boolean indicating
      * whether to show the file name picker window if finishing.
      **/
     RECORD_CAMERA_CMD,
