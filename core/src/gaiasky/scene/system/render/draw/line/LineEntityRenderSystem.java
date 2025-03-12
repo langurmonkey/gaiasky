@@ -430,13 +430,14 @@ public class LineEntityRenderSystem {
             // Position
             Vector3b lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
             // Proper motion
-            Vector3d pm = D32.set(star.pmx(), star.pmy(), star.pmz()).scl(set.currDeltaYears);
+            double vrFac = Constants.DISTANCE_SCALE_FACTOR;
+            Vector3d pm = D32.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac).scl(set.currDeltaYears);
             // Rest of attributes
             float distToCamera = (float) lPos.lenDouble();
             float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
             if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
                 Vector3d p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
-                Vector3d ppm = D32.set(star.pmx(), star.pmy(), star.pmz()).scl(Settings.settings.scene.properMotion.length);
+                Vector3d ppm = D32.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac).scl(Settings.settings.scene.properMotion.length);
                 double p1p2len = ppm.len();
                 Vector3d p2 = D33.set(ppm).add(p1);
 
@@ -444,17 +445,9 @@ public class LineEntityRenderSystem {
                 float maxSpeedKms = 100;
                 float r, g, b;
                 switch (Settings.settings.scene.properMotion.colorMode) {
-                    default -> {
-                        // DIRECTION
-                        // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
-                        ppm.nor();
-                        r = (float) (ppm.x + 1d) / 2f;
-                        g = (float) (ppm.y + 1d) / 2f;
-                        b = (float) (ppm.z + 1d) / 2f;
-                    }
                     case 1 -> {
                         // LENGTH
-                        ppm.set(star.pmx(), star.pmy(), star.pmz());
+                        ppm.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac);
                         // Units/year to Km/s
                         ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
                         double len = MathUtilsDouble.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
@@ -493,7 +486,7 @@ public class LineEntityRenderSystem {
                     case 4 -> {
                         // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
                         if (ppm.len2() != 0) {
-                            ppm.set(star.pmx(), star.pmy(), star.pmz());
+                            ppm.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac);
                             // Units/year to Km/s
                             ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
                             Vector3d camStar = D34.set(p1);
@@ -512,6 +505,14 @@ public class LineEntityRenderSystem {
                         r = ColorUtils.gBlue[0] + 0.2f;
                         g = ColorUtils.gBlue[1] + 0.4f;
                         b = ColorUtils.gBlue[2] + 0.4f;
+                    }
+                    default -> {
+                        // DIRECTION
+                        // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
+                        ppm.nor();
+                        r = (float) (ppm.x + 1d) / 2f;
+                        g = (float) (ppm.y + 1d) / 2f;
+                        b = (float) (ppm.z + 1d) / 2f;
                     }
                 }
 
