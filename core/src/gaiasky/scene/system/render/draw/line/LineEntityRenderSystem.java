@@ -430,14 +430,13 @@ public class LineEntityRenderSystem {
             // Position
             Vector3b lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
             // Proper motion
-            double vrFac = Constants.DISTANCE_SCALE_FACTOR;
-            Vector3d pm = D32.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac).scl(set.currDeltaYears);
+            Vector3d pm = D32.set(star.pmx(), star.pmy(), star.pmz()).scl(set.currDeltaYears);
             // Rest of attributes
             float distToCamera = (float) lPos.lenDouble();
             float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
             if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
                 Vector3d p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
-                Vector3d ppm = D32.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac).scl(Settings.settings.scene.properMotion.length);
+                Vector3d ppm = D32.set(star.pmx(), star.pmy(), star.pmz()).scl(Settings.settings.scene.properMotion.length);
                 double p1p2len = ppm.len();
                 Vector3d p2 = D33.set(ppm).add(p1);
 
@@ -447,7 +446,7 @@ public class LineEntityRenderSystem {
                 switch (Settings.settings.scene.properMotion.colorMode) {
                     case 1 -> {
                         // LENGTH
-                        ppm.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac);
+                        ppm.set(star.pmx(), star.pmy(), star.pmz());
                         // Units/year to Km/s
                         ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
                         double len = MathUtilsDouble.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
@@ -486,7 +485,7 @@ public class LineEntityRenderSystem {
                     case 4 -> {
                         // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
                         if (ppm.len2() != 0) {
-                            ppm.set(star.pmx() * vrFac, star.pmy() * vrFac, star.pmz() * vrFac);
+                            ppm.set(star.pmx(), star.pmy(), star.pmz());
                             // Units/year to Km/s
                             ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
                             Vector3d camStar = D34.set(p1);

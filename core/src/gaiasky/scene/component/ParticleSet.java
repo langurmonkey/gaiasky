@@ -886,9 +886,9 @@ public class ParticleSet implements Component, IDisposable {
                                         double deltaYears) {
         Vector3d pm = D32.set(0, 0, 0);
         if (pb.hasProperMotion()) {
-            pm.set(pb.pmx() * Constants.DISTANCE_SCALE_FACTOR,
-                    pb.pmy() * Constants.DISTANCE_SCALE_FACTOR,
-                    pb.pmz() * Constants.DISTANCE_SCALE_FACTOR).scl(deltaYears);
+            pm.set(pb.pmx(),
+                    pb.pmy(),
+                    pb.pmz()).scl(deltaYears);
         }
         Vector3d destination = out.set(pb.x(), pb.y(), pb.z());
         // Apply affine transformations, if any.
@@ -928,9 +928,9 @@ public class ParticleSet implements Component, IDisposable {
                                   double deltaYears) {
         Vector3d pm = D32;
         if (pb.hasProperMotion()) {
-            pm.set(pb.pmx() * Constants.DISTANCE_SCALE_FACTOR,
-                    pb.pmy() * Constants.DISTANCE_SCALE_FACTOR,
-                    pb.pmz() * Constants.DISTANCE_SCALE_FACTOR).scl(deltaYears);
+            pm.set(pb.pmx(),
+                    pb.pmy(),
+                    pb.pmz()).scl(deltaYears);
         } else {
             pm.set(0, 0, 0);
         }

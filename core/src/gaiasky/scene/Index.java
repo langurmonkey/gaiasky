@@ -189,9 +189,9 @@ public class Index {
                 for (IParticleRecord pb : stars) {
                     if (pb.hip() > 0) {
                         hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
-                                pb.pmx() * Constants.DISTANCE_SCALE_FACTOR,
-                                pb.pmy() * Constants.DISTANCE_SCALE_FACTOR,
-                                pb.pmz() * Constants.DISTANCE_SCALE_FACTOR));
+                                pb.pmx(),
+                                pb.pmy(),
+                                pb.pmz()));
                     }
                 }
             }

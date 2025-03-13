@@ -70,7 +70,8 @@ public abstract class BinaryIOBase implements BinaryIO {
         for (int i = 0; i < nFloats; i++) {
             int idx = i + floatOffset;
             dataF[idx] = in.readFloat();
-            if (idx == ParticleRecord.I_FSIZE)
+            // Scale proper motions and size
+            if (idx <= ParticleRecord.I_FPMZ || idx == ParticleRecord.I_FSIZE)
                 dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
         // Version 2: we have the HIP number in the data file.

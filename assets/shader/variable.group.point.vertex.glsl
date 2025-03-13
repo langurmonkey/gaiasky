@@ -85,7 +85,7 @@ void main() {
     // Proper motion using 64-bit emulated arithmetics:
     // pm = a_pm * t * DAY_TO_YEAR
     // pos = pos + pm
-    vec3 pms = a_pm * u_vrScale;
+    vec3 pms = a_pm;
     vec2 t_yr = ds_mul(u_t, ds_set(DAY_TO_YEAR));
     vec2 pmx = ds_mul(ds_set(pms.x), t_yr);
     vec2 pmy = ds_mul(ds_set(pms.y), t_yr);
