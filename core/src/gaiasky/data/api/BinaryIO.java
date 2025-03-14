@@ -15,6 +15,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 
+/**
+ * This class represents a BinaryIO interface, which allows for reading and writing binary data.
+ */
 public interface BinaryIO {
 
     /**
