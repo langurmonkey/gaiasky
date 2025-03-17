@@ -50,7 +50,7 @@ fi
 
 
 echo "Using classpath: $CLASSPATH_LIB_DIR"
-$JAVA_HOME/bin/javadoc -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -classpath "$CLASSPATH_LIB_DIR/*" -subpackages gaiasky -doctitle "<b>Gaia Sky Javadoc</b>" -header "<strong><a href='https://zah.uni-heidelberg.de/gaia/outreach/gaiasky'>Gaia Sky</a></strong> | <a href='https://gaia.ari.uni-heidelberg.de/gaiasky/docs'>docs</a> | <a href='https://codeberg.org/gaiasky/'>sources</a> " -bottom "<a href='https://zah.uni-heidelberg.de/gaia/outreach/gaiasky'>Gaia Sky website</a> | <a href='https://gaia.ari.uni-heidelberg.de/gaiasky/docs'>Project documentation</a> | <a href='https://codeberg.org/gaiasky/'>Code repository</a>" -encoding UTF-8 -docencoding utf-8 -charset utf-8
+$JAVA_HOME/bin/javadoc -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -classpath "$CLASSPATH_LIB_DIR/*" -subpackages gaiasky -doctitle "<b>Gaia Sky Javadoc</b>" -header "<strong><a href='https://gaiasky.space'>Gaia Sky</a></strong> | <a href='http://docs.gaiasky.space'>docs</a> | <a href='https://codeberg.org/gaiasky/'>source</a> " -bottom "<a href='https://gaiasky.space'>Gaia Sky website</a> | <a href='http://docs.gaiasky.space'>Project documentation</a> | <a href='https://codeberg.org/gaiasky/'>Code repository</a>" -encoding UTF-8 -docencoding utf-8 -charset utf-8
 
 
 # Copy to server
