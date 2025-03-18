@@ -1,3 +1,48 @@
+<a name="3.6.7"></a>
+## [3.6.7](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.7) (2025-03-18)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.6...3.6.7)
+
+### Features
+- add script to test frame output. 
+- add composition of timed orbit coordinates and timed orbit coordinates to enable changing orbits during an object's lifetime. 
+- update metainfo colors. 
+- update metainfo with better screenshots, appropriately sized for flathub. 
+- update icons to higher resolution, add macos and round versions. 
+- update pointers to project website and docs. 
+- add instructions to new website in release script. 
+- adjust star shader so that sunspots are more prominent. Enable hot reload in star shaders (use `Ctrl`+`Shift`+`Y`). 
+- remove music classes and events. 
+- increase default line width of recursive grid. 
+
+### Bug Fixes
+- star velocity vectors in VR do not work. 
+- star's proper motions do not work in VR. 
+- stopRecordingCameraPath() does not work. 
+- default to .jpg instead of .jpeg as file extension for screenshots and still frames. 
+- refreshing orbits sometimes crashes the thread. 
+- constellation names sometimes not showing up with LOD catalogs. 
+- `FORCE_OBJECT_LABEL_CMD` now accepts an `Entity` type to work with `setForceDisplayLabel(name)` API call. 
+- adjust recursive grid labels and base model size. 
+- billboard rendering for single stars in VR mode. 
+- do not show component types with no style in visibility component or gamepad GUI. 
+- focus orientation lock does not work consistently. 
+- trajectory scaling. 
+- missing translation keys for invisible component type. 
+- resotre motion blur settings crashes the app. 
+- changelog template contains wrong URL paths. 
+
+### Build System
+- upgrade to gradle 8.10. 
+- remove old downloads-table template, update release script with new instructions regarding release publishing on the new gaiasky.space website. 
+- include metainfo file in tarball, flathub now requires this file to come from upstream. 
+- remove 16 and 32 pixel icons from launchers. Use only 128px for macOS. 
+
+### Code Refactoring
+- clean up skins, remove unused icons. 
+
+### Documentation
+- update website pointers in readme file. 
+
 <a name="3.6.6"></a>
 ## [3.6.6](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.6) (2025-01-24)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.5...3.6.6)

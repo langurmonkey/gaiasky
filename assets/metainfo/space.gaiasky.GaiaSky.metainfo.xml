@@ -39,24 +39,39 @@
 
   <releases>
 
-    <release version="3.6.6" date="2025-01-24" urgency="high">
-      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.6.6.caf73d2de/releasenotes.html</url>
+    <release version="3.6.7" date="2025-03-18" urgency="high">
+      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.6.7.5160f2cfe/releasenotes.html</url>
       <description>
       <p>Features</p>
         <ul>
-          <li>move volumes earlier in the rendering pipeline, because they now write to the depth buffer.</li>
-          <li>check for dataset incompatibilities and ask user to confirm action when selecting incompatible datasets.</li>
-          <li>add window size and resolution of external view in settings, when the external view is active.</li>
+          <li>add composition of timed orbit coordinates and timed orbit coordinates to enable changing orbits during an object’s lifetime.</li>
+          <li>update app colors in metainfo file.</li>
+          <li>update metainfo with better screenshots, appropriately sized for flathub.</li>
+          <li>update icons to higher resolution, add macos and round versions.</li>
+          <li>update pointers to project website and docs.</li>
+          <li>add script to test frame output.</li>
+          <li>add instructions to new website in release script.</li>
+          <li>adjust star shader so that sunspots are more prominent. Enable hot reload in star shaders (use <code>Ctrl</code>+<code>Shift</code>+<code>Y</code>).</li>
+          <li>remove music classes and events.</li>
+          <li>increase default line width of recursive grid.</li>
         </ul>
-        <p>Bug Fixes</p>
+      <p>Bug Fixes</p>
         <ul>
-          <li>attitude indicator not scaling with units-per-pixel value in spacecraft UI.</li>
-          <li>incorrect initialization of label threshold in volumes in VR mode.</li>
-          <li>entering panorama mode resets back-buffer scale. The issue was that the dynamic resolution reset routine was always applied, and not only when the dynamic resolution setting was on.</li>
-        </ul>
-        <p>Performance Improvements</p>
-        <ul>
-          <li>replace arbitrary precision <code>add()</code> call with double-precision one to compute spherical coordinates of objects. Double-precision is more than sufficient for that purpose.</li>
+          <li>star velocity vectors in VR do not work.</li>
+          <li>star’s proper motions do not work in VR.</li>
+          <li><code>stopRecordingCameraPath()</code> does not work.</li>
+          <li>default to .jpg instead of .jpeg as file extension for screenshots and still frames.</li>
+          <li>refreshing orbits sometimes crashes the thread.</li>
+          <li>constellation names sometimes not showing up with LOD catalogs.</li>
+          <li><code>FORCE_OBJECT_LABEL_CMD</code> now accepts an <code>Entity</code> type to work with <code>setForceDisplayLabel(name)</code> API call.</li>
+          <li>adjust recursive grid labels and base model size.</li>
+          <li>billboard rendering for single stars in VR mode.</li>
+          <li>do not show component types with no style in visibility component or gamepad GUI.</li>
+          <li>focus orientation lock does not work consistently.</li>
+          <li>trajectory scaling.</li>
+          <li>missing translation keys for invisible component type.</li>
+          <li>resotre motion blur settings crashes the app.</li>
+          <li>changelog template contains wrong URL paths.</li>
         </ul>
       </description>
       </release>
