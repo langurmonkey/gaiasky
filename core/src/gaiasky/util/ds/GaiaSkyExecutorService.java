@@ -14,7 +14,7 @@ import net.jafama.FastMath;
 import java.util.concurrent.*;
 
 /**
- * Executor service of Gaia Sky, backed by a {@link ThreadPoolExecutor}
+ * Executor service of Gaia Sky, backed by a {@link ThreadPoolExecutor}. It includes a blocking queue of tasks to be run.
  */
 public class GaiaSkyExecutorService {
     private static final Logger.Log logger = Logger.getLogger(GaiaSkyExecutorService.class);

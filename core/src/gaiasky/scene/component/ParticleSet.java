@@ -225,9 +225,9 @@ public class ParticleSet implements Component, IDisposable {
     public Map<Integer, float[]> labelColors;
 
     /**
-     * Stores the time when the last sort operation finished, in ms.
+     * Stores the time when the last sort operation finished, in seconds.
      */
-    public long lastSortTime;
+    public double lastSortTime;
 
     /**
      * The mean distance from the origin of all points in this group.
@@ -301,9 +301,6 @@ public class ParticleSet implements Component, IDisposable {
 
     // Reference to the entity.
     public Entity entity;
-
-    // Is it updating?
-    public final AtomicBoolean updating = new AtomicBoolean(false);
 
     // Updater task.
     public ParticleSetUpdaterTask updaterTask;
