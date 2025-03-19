@@ -42,12 +42,12 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
+public final class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
     /**
      * Default texture parameters
      **/
-    protected static final OwnTextureParameter textureParamsMipMap, textureParams;
-    protected static final PFMTextureParameter pfmTextureParams;
+    private static final OwnTextureParameter textureParamsMipMap, textureParams;
+    private static final PFMTextureParameter pfmTextureParams;
     private static final Array<String> lookUpTables = new Array<>();
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
 

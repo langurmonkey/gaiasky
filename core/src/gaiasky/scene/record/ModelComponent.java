@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-public class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
+public final class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
     private static final ColorAttribute globalAmbient;
 

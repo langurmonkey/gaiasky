@@ -24,7 +24,7 @@ import net.jafama.FastMath;
 
 import java.nio.file.Path;
 
-public class VirtualTextureComponent extends NamedComponent {
+public final class VirtualTextureComponent extends NamedComponent {
 
     /**
      * The indirection buffer texture. {@link TextureExt} enables drawing to

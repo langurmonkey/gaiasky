@@ -13,6 +13,8 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.RotationComponent;
+import gaiasky.scene.view.FocusView;
+import gaiasky.util.camera.Proximity;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;

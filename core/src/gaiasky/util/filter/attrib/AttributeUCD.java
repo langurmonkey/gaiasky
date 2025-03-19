@@ -10,7 +10,7 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.ucd.UCD;
 
-public class AttributeUCD implements IAttribute {
+public final class AttributeUCD implements IAttribute {
     public UCD ucd;
 
     public AttributeUCD(UCD ucd) {

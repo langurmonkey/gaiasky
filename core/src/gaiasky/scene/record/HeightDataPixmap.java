@@ -19,7 +19,7 @@ import gaiasky.scene.record.BilinearInterpolator.GridModel;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.SysUtils;
 
-public class HeightDataPixmap implements IHeightData {
+public final class HeightDataPixmap implements IHeightData {
 
     private final Pixmap heightPixmap;
     private GridModel model;

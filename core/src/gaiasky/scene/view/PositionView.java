@@ -14,7 +14,7 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
-public class PositionView extends AbstractView implements IPosition {
+public non-sealed class PositionView extends AbstractView implements IPosition {
 
     /** The body component. **/
     private Body body;

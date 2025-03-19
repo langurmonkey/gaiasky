@@ -16,7 +16,7 @@ import net.jafama.FastMath;
 
 import java.nio.file.Path;
 
-public class HeightDataSVT implements IHeightData {
+public final class HeightDataSVT implements IHeightData {
 
     private final SVTQuadtree<Path> svt;
     private final AssetManager manager;

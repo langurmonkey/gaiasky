@@ -21,10 +21,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.api.*;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
-import gaiasky.render.api.IRenderMode;
-import gaiasky.render.api.IRenderable;
-import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.process.RenderModeCubemapProjections;
 import gaiasky.render.process.RenderModeMain;
@@ -539,22 +537,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     /**
      * Empty renderable object to act as a stub so that autonomous systems are processed.
      */
-    private final IRenderable stubRenderable = new IRenderable() {
-        @Override
-        public ComponentTypes getComponentType() {
-            return null;
-        }
-
-        @Override
-        public double getDistToCamera() {
-            return 0;
-        }
-
-        @Override
-        public float getOpacity() {
-            return 0;
-        }
-    };
+    private final IRenderable stubRenderable = new StubRenderable();
 
     /**
      * This must be called when all the rendering for the current frame has

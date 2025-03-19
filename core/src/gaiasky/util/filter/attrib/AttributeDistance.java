@@ -12,7 +12,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
 
-public class AttributeDistance extends AttributeAbstract implements IAttribute {
+public final class AttributeDistance extends AttributeAbstract implements IAttribute {
     @Override
     public Object get(IParticleRecord bean) {
         return FastMath.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;

@@ -8,6 +8,7 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import gaiasky.scene.component.Render;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.*;
 

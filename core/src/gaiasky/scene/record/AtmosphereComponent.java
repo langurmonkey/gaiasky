@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-public class AtmosphereComponent extends NamedComponent implements IUpdatable<AtmosphereComponent> {
+public final class AtmosphereComponent extends NamedComponent implements IUpdatable<AtmosphereComponent> {
 
     public int quality;
     public float size;

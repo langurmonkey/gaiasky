@@ -17,7 +17,7 @@ import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
 import gaiasky.util.Settings;
 
-public class BaseView extends AbstractView {
+public non-sealed class BaseView extends AbstractView {
 
     /** The base component. **/
     public Base base;

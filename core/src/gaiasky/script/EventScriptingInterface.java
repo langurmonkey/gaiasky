@@ -98,7 +98,7 @@ import java.util.function.Function;
  * mainly the event manager to communicate with the rest of Gaia Sky.
  */
 @SuppressWarnings({"unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue"})
-public class EventScriptingInterface implements IScriptingInterface, IObserver {
+public final class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
     // Reference to the event manager

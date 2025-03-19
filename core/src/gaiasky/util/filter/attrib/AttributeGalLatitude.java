@@ -10,7 +10,7 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.i18n.I18n;
 
-public class AttributeGalLatitude extends AttributeAbstract implements IAttribute {
+public final class AttributeGalLatitude extends AttributeAbstract implements IAttribute {
     @Override
     public Object get(IParticleRecord bean) {
         return bean.b();

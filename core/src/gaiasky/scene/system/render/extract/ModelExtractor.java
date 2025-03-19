@@ -9,9 +9,9 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.component.Render;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;

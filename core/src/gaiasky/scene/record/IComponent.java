@@ -7,6 +7,6 @@
 
 package gaiasky.scene.record;
 
-public interface IComponent {
+public sealed interface IComponent permits NamedComponent {
     void initialize(String name);
 }

@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 
-public abstract class AbstractView {
+public sealed abstract class AbstractView permits BaseView, PositionView {
 
     /** A reference to the entity. **/
     protected Entity entity;

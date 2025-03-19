@@ -10,7 +10,9 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.math.Vector3d;
 
-public interface IAttribute {
+public sealed interface IAttribute permits AttributeAbsmag, AttributeAppmag, AttributeColorBlue, AttributeColorGreen, AttributeColorRed, AttributeDEC,
+        AttributeDistance, AttributeEclLatitude, AttributeEclLongitude, AttributeGalLatitude, AttributeGalLongitude, AttributeMualpha, AttributeMudelta,
+        AttributeRA, AttributeRadvel, AttributeUCD {
     Vector3d aux1 = new Vector3d();
     Vector3d aux2 = new Vector3d();
 

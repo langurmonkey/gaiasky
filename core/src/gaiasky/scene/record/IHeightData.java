@@ -7,7 +7,7 @@
 
 package gaiasky.scene.record;
 
-public interface IHeightData {
+public sealed interface IHeightData permits HeightDataPixmap, HeightDataSVT {
 
     /**
      * Gets the height normalized in [0,1] for the given UV coordinates.

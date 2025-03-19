@@ -20,7 +20,6 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader;
 import gaiasky.util.gdx.shader.provider.RelativisticShaderProvider;
 
 import java.util.List;

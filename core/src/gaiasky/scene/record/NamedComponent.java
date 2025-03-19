@@ -16,7 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-public abstract class NamedComponent implements IComponent, Disposable {
+public sealed abstract class NamedComponent implements IComponent, Disposable permits AtmosphereComponent, CloudComponent, MaterialComponent, ModelComponent, NoiseComponent, VirtualTextureComponent {
     protected String name;
 
     @Override

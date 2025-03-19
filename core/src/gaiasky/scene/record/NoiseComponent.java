@@ -23,7 +23,7 @@ import net.jafama.FastMath;
 import java.util.Arrays;
 import java.util.Random;
 
-public class NoiseComponent extends NamedComponent {
+public final class NoiseComponent extends NamedComponent {
     public double[] scale = new double[]{1.0, 1.0, 1.0};
     public double power = 1.0;
     public int octaves = 4;

@@ -47,11 +47,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.scene.record.MaterialComponent.convertToComponent;
 
-public class CloudComponent extends NamedComponent implements IMaterialProvider, IUpdatable<CloudComponent> {
+public final class CloudComponent extends NamedComponent implements IMaterialProvider, IUpdatable<CloudComponent> {
     /**
      * Default texture parameters
      **/
-    protected static final OwnTextureParameter textureParams;
+    private static final OwnTextureParameter textureParams;
     private static final Log logger = Logger.getLogger(CloudComponent.class);
 
     static {

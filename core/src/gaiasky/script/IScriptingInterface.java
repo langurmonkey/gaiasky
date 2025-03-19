@@ -28,7 +28,7 @@ import java.util.List;
  * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Scripting.html">this page</a>.</p>
  */
 @SuppressWarnings("unused")
-public interface IScriptingInterface {
+public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * Gets the location of the assets folder.
