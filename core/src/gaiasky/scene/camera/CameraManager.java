@@ -714,14 +714,6 @@ public class CameraManager implements ICamera, IObserver {
         public boolean isGame() {
             return this.equals(CameraMode.GAME_MODE);
         }
-
-        public boolean useFocus() {
-            return isFocus();
-        }
-
-        public boolean useClosest() {
-            return isFree() || isGame();
-        }
     }
 
     public static class BackupProjectionCamera {
