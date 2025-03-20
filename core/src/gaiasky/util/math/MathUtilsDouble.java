@@ -229,6 +229,20 @@ public final class MathUtilsDouble {
     }
 
     /**
+     * GLSL mix function: performs a linear interpolation between {@code x} and {@code y} using {@code a} to weight between them.
+     *
+     * @param x start of the range in which to interpolate.
+     * @param y end of the range in which to interpolate.
+     * @param a value to use to interpolate between x and y.
+     *
+     * @return Interpolation between {@code x} and {@code y} using {@code a} as weight.
+     */
+    public static double mix(double x, double y, double a) {
+        return x * (1.0 - a) + y * a;
+    }
+
+
+    /**
      * Fast linear interpolation. If you can guarantee that x0 &le; x1, then use this.
      *
      * @param x  The value to interpolate.

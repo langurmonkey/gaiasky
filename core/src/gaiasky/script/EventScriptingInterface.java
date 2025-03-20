@@ -73,6 +73,7 @@ import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
+import org.apfloat.Apfloat;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
@@ -109,7 +110,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     private final CatalogManager catalogManager;
     // Auxiliary vectors
     private final Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
-    private final Vector3b aux3b1, aux3b2, aux3b3;
+    private final Vector3b aux3b1, aux3b2, aux3b3, aux3b4, aux3b5;
     private final Vector2d aux2d1;
     private final Set<AtomicBoolean> stops;
     private final FocusView focusView;
@@ -144,6 +145,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         aux3b1 = new Vector3b();
         aux3b2 = new Vector3b();
         aux3b3 = new Vector3b();
+        aux3b4 = new Vector3b();
+        aux3b5 = new Vector3b();
         aux2d1 = new Vector2d();
 
         em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE, Event.SCENE_LOADED);
@@ -1799,6 +1802,57 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void goToObjectInstant(String name) {
         setCameraFocusInstantAndGo(name);
+    }
+
+    @Override
+    public void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds) {
+        if (checkString(name, "name") && checkObjectName(name)) {
+            Entity focus = scene.findFocus(name);
+            goToObjectSmooth(focus, positionDurationSeconds, orientationDurationSeconds);
+        } else {
+            logger.error("Could not find position of " + name);
+        }
+    }
+
+    public void goToObjectSmooth(Entity object, double positionDurationSeconds, double orientationDurationSeconds) {
+        focusView.setEntity(object);
+        // Get focus radius.
+        var radius = focusView.getRadius();
+        // Get object position.
+        var objectPos = focusView.getAbsolutePosition(focusView.getName(), aux3b1);
+        // Get start position.
+        var camPos = aux3b2.set(GaiaSky.instance.cameraManager.getPos());
+        var camUp = aux3b3.set(GaiaSky.instance.cameraManager.getUp());
+
+        if (objectPos != null && camPos != null) {
+            var o = objectPos;
+            var c = camPos;
+            var u = camUp;
+
+
+            // Camera to object vector.
+            var camObj = aux3b4.set(o).sub(c);
+            // Direction is object - camera.
+            var dir = aux3b5.set(camObj).nor();
+            // Up vector from current camera up.
+            var up = aux3b1.set(camUp).crs(dir).crs(dir).scl(-1).nor();
+
+            // Length between camera and object, minus radius * 2.5.
+            var len = camObj.len().subtract(new Apfloat(radius * 2.5));
+            // Final position.
+            var pos = camObj.nor().scl(len).add(c);
+
+
+            cameraTransition(pos.valuesd(),
+                    dir.valuesd(),
+                    up.valuesd(),
+                    positionDurationSeconds,
+                    "logisticsigmoid",
+                    20.0,
+                    orientationDurationSeconds,
+                    "logisticsigmoid",
+                    17.0);
+        }
     }
 
     @Override

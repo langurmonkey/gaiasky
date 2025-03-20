@@ -1713,6 +1713,16 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void goToObjectInstant(String name);
 
     /**
+     * Move the camera to the object identified by the given name, internally using smooth camera transition calls,
+     * like {@link #cameraTransition(double[], double[], double[], double)}.
+     *
+     * @param name                          The name of the object to go to.
+     * @param positionDurationSeconds       The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds    The duration of the transition in orientation, in seconds.
+     */
+    void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds);
+
+    /**
      * Lands on the object with the given name, if it is a planet or moon. The land location is
      * determined by the line of sight from the current position of the camera
      * to the object.
