@@ -1848,7 +1848,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     up.valuesd(),
                     positionDurationSeconds,
                     "logisticsigmoid",
-                    20.0,
+                    60.0,
                     orientationDurationSeconds,
                     "logisticsigmoid",
                     17.0);
