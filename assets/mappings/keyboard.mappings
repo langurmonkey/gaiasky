@@ -27,6 +27,7 @@ action.log                                  = ALT_L L
 
 # doc:Open console
 action.console                              = SHIFT_L SEMICOLON
+# doc:Toggle console
 action.toggle/gui.console.title             = SHIFT_L GRAVE
 
 # doc:Load new dataset
@@ -153,7 +154,7 @@ action.camera.speedup                       = Z
 action.toggle/element.debugmode             = CTRL_L D
 
 # Search
-# doc: Search box
+# doc: Show search dialog
 action.search                               = CTRL_L F
 action.search                               = F
 action.search                               = SLASH
