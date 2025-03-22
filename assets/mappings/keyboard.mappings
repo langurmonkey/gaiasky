@@ -8,85 +8,128 @@
 
 # Blank lines and lines starting with '#' are ignored.
 
-# Help
+# doc:Show help
 action.help                                 = F1
 action.help                                 = H
 
-# Exit
+# doc:Exit application
 action.exit                                 = ESC
 action.exit                                 = CTRL_L Q
 
-# Home
+# doc:Instantly move to home object
 action.home                                 = HOME
 
-# Preferences
+# doc:Show preferences
 action.preferences                          = P
 
-# Show log
+# doc:Show log
 action.log                                  = ALT_L L
 
-# Console
+# doc:Open console
 action.console                              = SHIFT_L SEMICOLON
 action.toggle/gui.console.title             = SHIFT_L GRAVE
 
-# Load catalog
+# doc:Load new dataset
 action.loadcatalog                          = CTRL_L O
 
-# Play camera
+# doc:Play camera path file
 action.playcamera                           = ALT_L C
 
 # Visibility toggles
+
+# doc:Toggle visibility of orbits
 action.toggle/element.orbits                = SHIFT_L O
+# doc:Toggle visibility of planets
 action.toggle/element.planets               = SHIFT_L P
+# doc:Toggle visibility of moons
 action.toggle/element.moons                 = SHIFT_L M
+# doc:Toggle visibility of stars
 action.toggle/element.stars                 = SHIFT_L S
+# doc:Toggle visibility of satellites
 action.toggle/element.satellites            = SHIFT_L T
+# doc:Toggle visibility of asteroids
 action.toggle/element.asteroids             = SHIFT_L A
+# doc:Toggle visibility of labels
 action.toggle/element.labels                = SHIFT_L L
+# doc:Toggle visibility of constellations
 action.toggle/element.constellations        = SHIFT_L C
+# doc:Toggle visibility of boundaries
 action.toggle/element.boundaries            = SHIFT_L B
+# doc:Toggle visibility of equatorial grid
 action.toggle/element.equatorial            = SHIFT_L Q
+# doc:Toggle visibility of ecliptic grid
 action.toggle/element.ecliptic              = SHIFT_L E
+# doc:Toggle visibility of galactic grid
 action.toggle/element.galactic              = SHIFT_L G
+# doc:Toggle visibility of recursive grid
 action.toggle/element.recursivegrid         = SHIFT_L R
+# doc:Toggle visibility of meshes
 action.toggle/element.meshes                = SHIFT_L H
+# doc:Toggle visibility of clusters
 action.toggle/element.clusters              = SHIFT_L V
+# doc:Toggle visibility of keyframes
 action.toggle/element.keyframes             = SHIFT_L K
 
 # Time
+# doc:Halve time warp (hold for smooth decrease)
 action.dividetime                           = COMMA
+# doc:Double time warp (hold for smooth increase)
 action.doubletime                           = PERIOD
+# doc:Start/stop time
 action.pauseresume                          = SPACE
+# doc:Reset time warp to 1
 action.time.warp.reset                      = CTRL_L PERIOD
 
 # FOV
+# doc:Increase FOV angle
 action.incfov                               = CTRL_L R_BRACKET
+# doc:Decrease FOV angle
 action.decfov                               = CTRL_L L_BRACKET
 
 # Screen modes and effects
+# doc:Toggle fullscreen 
 action.togglefs                             = F11
+# doc:Capture screenshot
 action.screenshot                           = F5
+# doc:Save cubemap faces as images
 action.screenshot.cubemap                   = F7
+# doc:Toggle frame output mode
 action.toggle/element.frameoutput           = F6
+# doc: Expand/collapse UI window (old UI)
 action.toggle/element.controls              = U
+# doc: Toggle panorama mode
 action.toggle/element.360                   = CTRL_L K
+# doc: Change panorama projection
 action.toggle/element.projection            = CTRL_L SHIFT_L K
+# doc: Toggle orthosphere mode
 action.toggle/element.orthosphere           = CTRL_L J
+# doc: Change orthosphere profile
 action.toggle/element.orthosphere.profile   = CTRL_L SHIFT_L J
+# doc: Toggle stereoscopic mode
 action.toggle/element.stereomode            = CTRL_L S
+# doc: Change stereoscopic profile
 action.switchstereoprofile                  = CTRL_L SHIFT_L S
+# doc: Toggle planetarium mode
 action.toggle/element.planetarium           = CTRL_L P
+# doc: Change planetarium projection
 action.toggle/element.planetarium.projection= CTRL_L SHIFT_L P
+# doc: Toggle UI on/off
 action.toggle/element.cleanmode             = CTRL_L U
+# doc: Toggle mouse capture
 action.toggle/gui.mousecapture              = CTRL_L SHIFT_L L
 
 # Keyframes
+# doc: Add new keyframe
 action.keyframe                             = CTRL_L W
 
 # Camera modes
+# doc: Free camera mode
 camera.full/camera.FREE_MODE                = NUM_0
+# doc: Focus camera mode
 camera.full/camera.FOCUS_MODE               = NUM_1
+# doc: Game camera mode
 camera.full/camera.GAME_MODE                = NUM_2
+# doc: Spacecraft mode
 camera.full/camera.SPACECRAFT_MODE          = NUM_3
 
 camera.full/camera.FREE_MODE                = NUMPAD_0
@@ -94,41 +137,61 @@ camera.full/camera.FOCUS_MODE               = NUMPAD_1
 camera.full/camera.GAME_MODE                = NUMPAD_2
 camera.full/camera.SPACECRAFT_MODE          = NUMPAD_3
 
-# Cinematic camera
+# doc: Cycle camera modes
 action.toggle/camera.mode                   = CTRL_L M
+
+# Cinematic camera
+# doc: Toggle cinematic camera
 action.toggle/camera.cinematic              = CTRL_L C
 
 # Speed up camera movement (hold key(s))
+# doc: Speed up camera movement (hold)
 action.camera.speedup                       = Z
 
 # Debug info
+# doc: Toggle debug pane
 action.toggle/element.debugmode             = CTRL_L D
 
 # Search
+# doc: Search box
 action.search                               = CTRL_L F
 action.search                               = F
 action.search                               = SLASH
 
 # Stars and particles
+# doc: Toggle smooth transitions in LOD datasets
 action.toggle/element.octreeparticlefade    = CTRL_L SHIFT_L O
+# doc: Reset star point size
 action.starpointsize.reset                  = CTRL_L SHIFT_L R
 
 # General actions
+# doc: Go to focus object
 action.gotoobject                           = CTRL_L G
+# doc: Reset time
 action.resettime                            = CTRL_L R
+# doc: Toggle minimap
 action.toggle/gui.minimap.title             = TAB
 
 # GUI elements
+# doc: Time pane
 action.expandcollapse.pane/gui.time         = T
+# doc: Camera pane
 action.expandcollapse.pane/gui.camera       = C
+# doc: Visibility pane
 action.expandcollapse.pane/gui.visibility   = V
+# doc: Visual effects pane
 action.expandcollapse.pane/gui.lighting     = L
+# doc: Datasets pane
 action.expandcollapse.pane/gui.dataset.title= D
+# doc: Bookmarks pane
 action.expandcollapse.pane/gui.bookmarks    = B
 
 # Master/slave
+# doc: Show replica configuration dialog
 action.slave.configure                      = S L V
 
 # Debug
+# doc: Reload user interface
 action.ui.reload                            = CTRL_L SHIFT_L U I
+# doc: Recompile and reload shaders
 action.shaders.reload                       = CTRL_L SHIFT_L Y
