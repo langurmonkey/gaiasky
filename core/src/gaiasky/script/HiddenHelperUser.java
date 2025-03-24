@@ -14,7 +14,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
 
@@ -147,7 +146,6 @@ public class HiddenHelperUser implements IObserver {
 
         @Override
         public void run() {
-            //((EventScriptingInterface) GaiaSky.instance.scripting()).goToObjectSmooth(body, 10.0, 5.0);
             ((EventScriptingInterface) GaiaSky.instance.scripting()).goToObject(body, -1, 1, stop);
             currentTasks.removeValue(this, true);
         }

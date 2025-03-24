@@ -1715,12 +1715,26 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     /**
      * Move the camera to the object identified by the given name, internally using smooth camera transition calls,
      * like {@link #cameraTransition(double[], double[], double[], double)}.
+     * The target position and orientation are computed first during the call execution and are not subsequently updated. This means that
+     * the camera does not follow the object if it moves. If time is activated, and the object moves, this call does not go to the
+     * object's current position at the end, but at the beginning.
      *
-     * @param name                          The name of the object to go to.
-     * @param positionDurationSeconds       The duration of the transition in position, in seconds.
-     * @param orientationDurationSeconds    The duration of the transition in orientation, in seconds.
+     * @param name                       The name of the object to go to.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
      */
     void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds);
+
+    /**
+     * Same as {@link #goToObjectSmooth(String, double, double)}, but with a boolean that indicates whether the call is synchronous.
+     *
+     * @param name                       The name of the object to go to.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param sync                       If true, the call is synchronous and waits for the camera
+     *                                   file to finish. Otherwise, it returns immediately.
+     */
+    void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
 
     /**
      * Lands on the object with the given name, if it is a planet or moon. The land location is

@@ -1806,15 +1806,21 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds) {
+        goToObjectSmooth(name, positionDurationSeconds, orientationDurationSeconds, true);
+    }
+
+    @Override
+    public void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
         if (checkString(name, "name") && checkObjectName(name)) {
             Entity focus = scene.findFocus(name);
-            goToObjectSmooth(focus, positionDurationSeconds, orientationDurationSeconds);
+            goToObjectSmooth(focus, positionDurationSeconds, orientationDurationSeconds, sync);
         } else {
             logger.error("Could not find position of " + name);
         }
+
     }
 
-    public void goToObjectSmooth(Entity object, double positionDurationSeconds, double orientationDurationSeconds) {
+    public void goToObjectSmooth(Entity object, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
         focusView.setEntity(object);
         // Get focus radius.
         var radius = focusView.getRadius();
@@ -1844,6 +1850,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
 
             cameraTransition(pos.valuesd(),
+                    "internal",
                     dir.valuesd(),
                     up.valuesd(),
                     positionDurationSeconds,
@@ -1851,7 +1858,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     60.0,
                     orientationDurationSeconds,
                     "logisticsigmoid",
-                    17.0);
+                    17.0,
+                    sync);
         }
     }
 
@@ -2983,11 +2991,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 end = () -> unparkRunnable(name);
 
             var u = DistanceUnits.valueOf(units.toUpperCase());
-            double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
+            double[] finalPosition = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
 
             // Create and park runnable
             CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
-                    posUnits,
+                    finalPosition,
                     camDir,
                     camUp,
                     positionDurationSeconds,
@@ -5780,6 +5788,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          *
          * @param p0 The initial position.
          * @param p1 The final position.
+         *
          * @return The linear interpolation path.
          */
         private PathDouble<Vector3d> getPath(Vector3d p0,
