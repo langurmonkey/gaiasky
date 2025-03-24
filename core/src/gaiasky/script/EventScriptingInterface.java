@@ -1810,17 +1810,30 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
+    public void goToObjectSmooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds) {
+        goToObjectSmooth(name, solidAngle, positionDurationSeconds, orientationDurationSeconds, true);
+    }
+
+    @Override
     public void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
+        goToObjectSmooth(name, -1.0, positionDurationSeconds, orientationDurationSeconds, true);
+    }
+
+    @Override
+    public void goToObjectSmooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
         if (checkString(name, "name") && checkObjectName(name)) {
             Entity focus = scene.findFocus(name);
-            goToObjectSmooth(focus, positionDurationSeconds, orientationDurationSeconds, sync);
+            goToObjectSmooth(focus, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync);
         } else {
             logger.error("Could not find position of " + name);
         }
-
     }
 
     public void goToObjectSmooth(Entity object, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
+        goToObjectSmooth(object, -1.0, positionDurationSeconds, orientationDurationSeconds, sync);
+    }
+
+    public void goToObjectSmooth(Entity object, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
         focusView.setEntity(object);
         // Get focus radius.
         var radius = focusView.getRadius();
@@ -1843,8 +1856,22 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             // Up vector from current camera up.
             var up = aux3b1.set(camUp).crs(dir).crs(dir).scl(-1).nor();
 
-            // Length between camera and object, minus radius * 2.5.
-            var len = camObj.len().subtract(new Apfloat(radius * 2.5));
+            // Length between camera and object, computed from the solid angle.
+            double targetAngle = FastMath.toRadians(solidAngle);
+            if (targetAngle < 0.0) {
+                // Particles have different sizes to the rest.
+                if (focusView.isParticleSet()) {
+                    var rx0 = 1.31; // pc
+                    var rx1 = 2805.0; // pc
+                    var y0 = 1.0;
+                    var y1 = 0.001;
+                    targetAngle = FastMath.toRadians(y0 + (y1 - y0) * (focusView.getAbsolutePosition(aux3b1).lenDouble() * Constants.U_TO_PC - rx0) / (rx1 - rx0));
+                } else {
+                    targetAngle = FastMath.toRadians(20.0);
+                }
+            }
+            var targetDistance = radius / FastMath.tan(targetAngle * 0.5);
+            var len = camObj.len().subtract(new Apfloat(targetDistance));
             // Final position.
             var pos = camObj.nor().scl(len).add(c);
 

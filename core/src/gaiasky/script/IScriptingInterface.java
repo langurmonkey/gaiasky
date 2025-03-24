@@ -1726,6 +1726,18 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds);
 
     /**
+     * Same as {@link #goToObjectSmooth(String, double, double)}, but with the target solid angle of the object.
+     *
+     * @param name                       The name of the object to go to.
+     * @param solidAngle                 The target solid angle of the object, in degrees. This
+     *                                   is used to compute the final distance to the object. The angle
+     *                                   gets larger and larger as we approach the object.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     */
+    void goToObjectSmooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds);
+
+    /**
      * Same as {@link #goToObjectSmooth(String, double, double)}, but with a boolean that indicates whether the call is synchronous.
      *
      * @param name                       The name of the object to go to.
@@ -1735,6 +1747,20 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *                                   file to finish. Otherwise, it returns immediately.
      */
     void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
+
+    /**
+     * Same as {@link #goToObjectSmooth(String, double, double, boolean)}, but with the target solid angle of the object.
+     *
+     * @param name                       The name of the object to go to.
+     * @param solidAngle                 The target solid angle of the object, in degrees. This
+     *                                   is used to compute the final distance to the object. The angle
+     *                                   gets larger and larger as we approach the object.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param sync                       If true, the call is synchronous and waits for the camera
+     *                                   file to finish. Otherwise, it returns immediately.
+     */
+    void goToObjectSmooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
 
     /**
      * Lands on the object with the given name, if it is a planet or moon. The land location is
