@@ -27,6 +27,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * Manages bookmarks for the application.
+ */
 public class BookmarksManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(BookmarksManager.class);
     private Path bookmarksFile;
@@ -484,6 +487,10 @@ public class BookmarksManager implements IObserver {
          * Time, positional bookmarks.
          */
         public Instant time;
+        /**
+         * Settings object, for settings bookmarks.
+         */
+        public Settings settings;
         /**
          * The full path.
          */

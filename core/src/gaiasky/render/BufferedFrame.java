@@ -10,10 +10,23 @@ package gaiasky.render;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
+/**
+ * This class is used to store a frame that has been buffered and will be rendered later.
+ */
 public class BufferedFrame implements Poolable {
 
+    /**
+     * The pixmap of the frame.
+     */
     public Pixmap pixmap;
-    public String folder, filename;
+    /**
+     * The folder where the frame should be saved to.
+     */
+    public String folder;
+    /**
+     * The filename for the frame.
+     */
+    public String filename;
 
     public BufferedFrame() {
         super();
