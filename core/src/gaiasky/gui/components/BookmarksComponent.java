@@ -173,8 +173,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                         }
                     }
                     return true;
-                } else if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
+                } else if (event instanceof InputEvent ie) {
                     ie.toCoordinates(event.getListenerActor(), tmpCoords);
                     if (ie.getType() == Type.touchDown && ie.getButton() == Input.Buttons.RIGHT) {
                         TreeNode target = bookmarksTree.getNodeAt(tmpCoords.y);
@@ -267,7 +266,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 }
 
                                 newMenu(cm);
-                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
+                                cm.showMenu(stage, ie.getStageX(), ie.getStageY());
                             });
                         } else {
                             // New folder
@@ -291,7 +290,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 });
                                 cm.addItem(newDirectory);
                                 newMenu(cm);
-                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()), Gdx.graphics.getHeight() - Gdx.input.getY(ie.getPointer()));
+                                cm.showMenu(stage, ie.getStageX(), ie.getStageY());
                             });
                         }
                     }
