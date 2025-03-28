@@ -162,9 +162,25 @@ public class SettingsManager {
         System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
     }
 
+    /**
+     * Persists the given settings object to the given file.
+     *
+     * @param settings     The settings object to persist.
+     * @param settingsFile The file to save the settings to.
+     */
+    public static void persistSettings(final Settings settings, final File settingsFile) {
+        if (instance != null)
+            instance.persist(settings, settingsFile);
+    }
+
+    /**
+     * Persists the current settings object of the singleton to the given file.
+     *
+     * @param settingsFile The file to save the settings to.
+     */
     public static void persistSettings(final File settingsFile) {
         if (instance != null)
-            instance.persist(settingsFile);
+            instance.persist(instance.settings, settingsFile);
     }
 
     public static String getConfigFileName(boolean vr) {
@@ -365,7 +381,7 @@ public class SettingsManager {
         settings.initialize();
     }
 
-    private void persist(final File settingsFile) {
+    private void persist(final Settings settings, final File settingsFile) {
         try {
             boolean backup = settings.program.safeMode;
             if (settings.program.safeModeFlag) {

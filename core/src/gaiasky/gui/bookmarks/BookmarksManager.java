@@ -113,6 +113,7 @@ public class BookmarksManager implements IObserver {
      * Gets the version from the given bookmarks file by reading the first line.
      *
      * @param path The path to the file.
+     *
      * @return The version, or -1 if it does not exist.
      */
     private int getFileVersion(Path path) {
@@ -208,7 +209,7 @@ public class BookmarksManager implements IObserver {
     private synchronized void persistBookmarks(Path file) {
         if (bookmarks != null) {
             StringBuilder content = new StringBuilder();
-            if(version >= 0) {
+            if (version >= 0) {
                 content.append(String.format("#v%04d\n", version));
             }
             content.append("# Bookmarks file for Gaia Sky, one bookmark per line, folder separator: '/', comments: '#'");
@@ -239,6 +240,7 @@ public class BookmarksManager implements IObserver {
      * Adds a bookmark with the given path.
      *
      * @param path The path to add.
+     *
      * @return True if added.
      */
     public synchronized boolean addBookmark(String path, boolean folder) {
@@ -254,6 +256,7 @@ public class BookmarksManager implements IObserver {
      *
      * @param path   The line text.
      * @param folder Whether it is a folder or not.
+     *
      * @return Whether the bookmark was inserted.
      */
     private synchronized boolean insertBookmark(String path, boolean folder) {
@@ -288,6 +291,7 @@ public class BookmarksManager implements IObserver {
      * Removes a bookmark by its path.
      *
      * @param path The path to remove
+     *
      * @return True if removed.
      */
     public synchronized boolean removeBookmark(String path) {
@@ -310,6 +314,7 @@ public class BookmarksManager implements IObserver {
      * Remove all bookmarks with the given name.
      *
      * @param name The name to remove.
+     *
      * @return Number of removed bookmarks.
      */
     public synchronized int removeBookmarksByName(String name) {
@@ -351,6 +356,15 @@ public class BookmarksManager implements IObserver {
         return nRemoved;
     }
 
+    /**
+     * Generates a unique identifier for the bookmark.
+     *
+     * @return A unique identifier for the bookmark, based on Java's {@link UUID} class.
+     */
+    private String generateId(boolean needsId) {
+        return needsId ? UUID.randomUUID().toString() : null;
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
@@ -372,7 +386,8 @@ public class BookmarksManager implements IObserver {
                     Instant t = (Instant) data[3];
                     String name = (String) data[4];
                     boolean folder = (boolean) data[5];
-                    String text = "{" + str(pos) + "|" + str(dir) + "|" + str(up) + "|" + t.toString() + "|" + name + "}";
+                    String id = generateId(false);
+                    String text = String.format("{%s|%s|%s|%s|%s|%s}", str(pos), str(dir), str(up), t.toString(), name, id);
                     if (addBookmark(text, folder)) {
                         logger.info("Bookmark added: " + text);
                     } else {
@@ -398,7 +413,7 @@ public class BookmarksManager implements IObserver {
                     removeBookmark(src.path.toString());
                     addBookmark(src.text, false);
                 } else {
-                    // Move to dest folder
+                    // Move to destination folder
                     if (dest.folder) {
                         removeBookmark(src.path.toString());
                         addBookmark(dest.path.resolve(src.text).toString(), false);
@@ -450,15 +465,26 @@ public class BookmarksManager implements IObserver {
 
     public static class BookmarkNode {
 
-        private static final String VEC3_REGEX = "\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?]";
+        /**
+         * Token to use for null values.
+         */
+        private static final String NULL_TOKEN = "null";
+
+        /**
+         * Regular expression for a nullable vector with three components.
+         */
+        private static final String VEC3_REGEX = "(" + NULL_TOKEN + "|\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?])";
         /**
          * Regular expression that defines the format of positional bookmarks, which is:
-         * <code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name}</code>
+         * <p><code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name|id}</code></p>
+         * All terms may be null.
          */
         public static final String POS_BOOKMARK_REGEX = "\\{" + VEC3_REGEX +
                 "\\|" + VEC3_REGEX +
                 "\\|" + VEC3_REGEX +
-                "\\|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z\\|[^|,\\\\]+}";
+                "\\|(?:" + NULL_TOKEN + "|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z)" +
+                "\\|[^|,\\\\]+" +
+                "(\\|(?:" + NULL_TOKEN + "|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?}";
 
         /**
          * <p>The text of the bookmark in the bookmarks.txt file.
@@ -484,9 +510,13 @@ public class BookmarksManager implements IObserver {
          */
         public Vector3d up;
         /**
-         * Time, positional bookmarks.
+         * Time, for positional bookmarks.
          */
         public Instant time;
+        /**
+         * The UUID, for positional bookmarks.
+         */
+        public String uuid;
         /**
          * Settings object, for settings bookmarks.
          */
@@ -524,20 +554,28 @@ public class BookmarksManager implements IObserver {
                     var dir = tokens[1];
                     var up = tokens[2];
                     var instant = tokens[3];
-                    this.name = tokens[4];
+                    var name = tokens[4];
+                    var uuid = tokens.length > 5 ? tokens[5] : null;
 
+                    // Name can't be null.
+                    this.name = name;
+                    // These are nullable.
+                    this.uuid = uuid != null && uuid.equals(NULL_TOKEN) ? null : uuid;
                     this.position = vectorFromString(pos);
                     this.direction = vectorFromString(dir);
                     this.up = vectorFromString(up);
-                    this.time = Instant.parse(instant);
+                    this.time = instant.equals(NULL_TOKEN) ? null : Instant.parse(instant);
                 } else {
-                    // Regular bookmark.
+                    // Regular bookmark, only object name.
                     this.name = this.text;
                 }
             }
         }
 
         private Vector3d vectorFromString(String vectorString) {
+            if (vectorString.equals(NULL_TOKEN)) {
+                return null;
+            }
             var tokens = vectorString.substring(1, vectorString.length() - 1).split(",");
             return new Vector3d(Parser.parseDouble(tokens[0]), Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]));
         }
