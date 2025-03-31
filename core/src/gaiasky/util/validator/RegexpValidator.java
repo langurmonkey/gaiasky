@@ -7,6 +7,9 @@
 
 package gaiasky.util.validator;
 
+/**
+ * Validator that checks that the given string matches a regular expression.
+ */
 public class RegexpValidator extends CallbackValidator {
     private final String expr;
 

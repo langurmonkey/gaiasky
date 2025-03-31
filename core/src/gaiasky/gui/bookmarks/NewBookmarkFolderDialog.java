@@ -17,6 +17,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.FolderValidator;
 import gaiasky.util.validator.IValidator;
+import gaiasky.util.validator.StringValidator;
 
 public class NewBookmarkFolderDialog extends GenericDialog {
     private static final Log logger = Logger.getLogger(NewBookmarkFolderDialog.class);
@@ -38,8 +39,9 @@ public class NewBookmarkFolderDialog extends GenericDialog {
 
     public void build() {
         // Info message
-        IValidator val = new FolderValidator();
-        input = new OwnTextField("", skin, val);
+        IValidator folderValidator = new FolderValidator();
+        IValidator stringValidator = new StringValidator(folderValidator, new Character[]{'{', '}', '|', ','});
+        input = new OwnTextField("", skin, stringValidator);
         input.setWidth(480f);
         input.setMessageText("New folder");
 

@@ -16,8 +16,7 @@ import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
-import gaiasky.util.validator.LengthValidator;
-import gaiasky.util.validator.RegexpValidator;
+import gaiasky.util.validator.*;
 
 public class BookmarkNameDialog extends GenericDialog {
     private static int SEQ_NUM = 0;
@@ -42,7 +41,10 @@ public class BookmarkNameDialog extends GenericDialog {
         bookmarkName.setMaxLength(30);
         bookmarkName.setWidth(inputWidth);
 
-        var val = new RegexpValidator(new LengthValidator(1, 30), "[^,\\|\\\\]+");
+        // Validator: folder, character, length.
+        IValidator folderValidator = new FolderValidator();
+        IValidator stringValidator = new StringValidator(folderValidator, new Character[]{'{', '}', '|', ','});
+        var val = new LengthValidator(stringValidator, 1, 30);
         bookmarkName.setValidator(val);
 
         content.add(new OwnLabel(I18n.msg("gui.bookmark.name"), skin)).pad(pad, pad, 0, pad * 2).right();
