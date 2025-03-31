@@ -5034,16 +5034,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             return false;
         }
 
-        var result = SettingsManager.setSettingsInstance(settingsStack.pop());
-        if (result) {
+        if (SettingsManager.setSettingsInstance(settingsStack.pop())) {
             // Apply settings.
             Settings.settings.apply();
             // Reload UI.
             // postRunnable(()->{
             // em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
             // });
+            return true;
         }
-        return result;
+        return false;
     }
 
     @Override
