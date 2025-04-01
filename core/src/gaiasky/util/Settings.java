@@ -302,7 +302,7 @@ public class Settings extends SettingsObject {
     }
 
     @Override
-    protected void setupListeners() {
+    public void setupListeners() {
         if (this.camrecorder != null)
             camrecorder.setupListeners();
         if (this.controls != null)

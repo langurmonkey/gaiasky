@@ -623,7 +623,11 @@ public class BookmarksManager implements IObserver {
                         Path settingsFile = parent.resolve(this.uuid);
                         try {
                             this.settings = SettingsManager.instance.loadSettings(settingsFile.toFile());
-                            this.settings.runtime = new Settings.RuntimeSettings();
+                            this.settings.setParent(this.settings);
+                            // Runtime.
+                            this.settings.runtime = Settings.settings.runtime.clone();
+                            this.settings.runtime.inputEnabled = true;
+                            this.settings.runtime.setParent(this.settings);
                         } catch (IOException e) {
                             logger.error(String.format("Could not load settings file: %s", settingsFile.toAbsolutePath().toString()), e);
                         }

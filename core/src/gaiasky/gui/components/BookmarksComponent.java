@@ -183,6 +183,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 if (selected.node.settings != null) {
                                     GaiaSky.postRunnable(() -> {
                                         if (SettingsManager.setSettingsInstance(selected.node.settings)) {
+                                            Settings.settings.setupListeners();
                                             Settings.settings.apply();
                                         }
                                     });
