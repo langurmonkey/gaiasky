@@ -400,6 +400,7 @@ public class BookmarksManager implements IObserver {
                     // Simple object bookmark.
                     boolean folder = (boolean) data[1];
                     if (addBookmark(name, folder)) {
+                        persistBookmarks();
                         logger.info(I18n.msg("gui.bookmark.add.ok", name));
                     } else {
                         logger.error(I18n.msg("gui.bookmark.add.error", name));
@@ -431,6 +432,7 @@ public class BookmarksManager implements IObserver {
                     }
                     String text = String.format("{%s|%s|%s|%s|%s|%s}", str(pos), str(dir), str(up), str(t), name, str(id));
                     if (addBookmark(text, folder)) {
+                        persistBookmarks();
                         logger.info(I18n.msg("gui.bookmark.add.ok", text));
                     } else {
                         logger.error(I18n.msg("gui.bookmark.add.error", text));
@@ -439,13 +441,18 @@ public class BookmarksManager implements IObserver {
             }
             case BOOKMARKS_REMOVE -> {
                 String name = (String) data[0];
-                if (removeBookmark(name))
+                if (removeBookmark(name)) {
+                    persistBookmarks();
                     logger.info(I18n.msg("gui.bookmark.remove.ok", name));
+                }
             }
             case BOOKMARKS_REMOVE_ALL -> {
                 String name = (String) data[0];
                 int removed = removeBookmarksByName(name);
-                logger.info(removed + " bookmarks with name '" + name + "' removed");
+                if (removed > 0) {
+                    persistBookmarks();
+                    logger.info(I18n.msg("gui.bookmark.remove.name.ok", removed, name));
+                }
             }
             case BOOKMARKS_MOVE -> {
                 BookmarkNode src = (BookmarkNode) data[0];
@@ -454,11 +461,13 @@ public class BookmarksManager implements IObserver {
                     // Move to root
                     removeBookmark(src.path.toString());
                     addBookmark(src.text, false);
+                    persistBookmarks();
                 } else {
                     // Move to destination folder
                     if (dest.folder) {
                         removeBookmark(src.path.toString());
                         addBookmark(dest.path.resolve(src.text).toString(), false);
+                        persistBookmarks();
                     } else {
                         logger.error(I18n.msg("error.destination.notdir", dest));
                     }
@@ -476,6 +485,7 @@ public class BookmarksManager implements IObserver {
                 if (idx0 > 0) {
                     list.remove(idx0);
                     list.add(idx0 - 1, bookmark);
+                    persistBookmarks();
                 }
             }
             case BOOKMARKS_MOVE_DOWN -> {
@@ -490,6 +500,7 @@ public class BookmarksManager implements IObserver {
                 if (idx1 < list.size() - 1) {
                     list.remove(idx1);
                     list.add(idx1 + 1, bookmark);
+                    persistBookmarks();
                 }
             }
             default -> {
