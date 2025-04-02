@@ -7,6 +7,7 @@
 
 package gaiasky.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
@@ -1047,6 +1048,19 @@ public class Settings extends SettingsObject {
          */
         public int[] proceduralGenerationResolution = new int[]{3000, 1500};
 
+        /**
+         * Updates the back-buffer resolution array using the current resolution and back-buffer scale setting.
+         */
+        public void updateBackBufferResolution() {
+            if (backBufferResolution == null) {
+                backBufferResolution = new int[2];
+            }
+            if (Gdx.graphics != null && settings != null && (backBufferResolution[0] <= 0 || backBufferResolution[1] <= 0)) {
+                backBufferResolution[0] = (int) (Gdx.graphics.getWidth() * backBufferScale);
+                backBufferResolution[1] = (int) (Gdx.graphics.getWidth() * backBufferScale);
+            }
+        }
+
         public void setQuality(final String qualityString) {
             this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
         }
@@ -1087,8 +1101,7 @@ public class Settings extends SettingsObject {
                     }
                     case BACKBUFFER_SCALE_CMD -> {
                         backBufferScale = (Float) data[0];
-                        backBufferResolution[0] = (int) FastMath.round(resolution[0] * backBufferScale);
-                        backBufferResolution[1] = (int) FastMath.round(resolution[1] * backBufferScale);
+                        updateBackBufferResolution();
                     }
                     case PROCEDURAL_GENERATION_RESOLUTION_CMD -> {
                         int w = (Integer) data[0];
@@ -1132,6 +1145,7 @@ public class Settings extends SettingsObject {
         public void apply() {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, fpsLimit);
             // EventManager.publish(Event.BACKBUFFER_SCALE_CMD, this, (float) backBufferScale);
+            updateBackBufferResolution();
 
             fullScreen.apply();
         }

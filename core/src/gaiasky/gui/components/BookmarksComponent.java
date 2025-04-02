@@ -182,14 +182,15 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                     EventManager.publish(Event.TIME_CHANGE_CMD, bookmarksTree, selected.node.time);
                                 if (selected.node.settings != null) {
                                     GaiaSky.postRunnable(() -> {
+                                        var version = Settings.settings.version.clone();
                                         if (SettingsManager.setSettingsInstance(selected.node.settings)) {
                                             Settings.settings.setupListeners();
+                                            Settings.settings.version = version;
                                             Settings.settings.apply();
                                         }
                                     });
                                 }
                             });
-
                         }
                     }
                     return true;
