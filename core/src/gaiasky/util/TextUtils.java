@@ -23,6 +23,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TextUtils {
 
+     // Regex pattern to match ANSI escape sequences
+    private static final String ANSI_REGEX = "\\u001B\\[[;\\d]*m";
+
+    /**
+     * Removes ANSI color codes from the input string.
+     *
+     * @param input The string possibly containing ANSI color codes.
+     * @return A clean string without ANSI codes.
+     */
+    public static String stripAnsiCodes(String input) {
+        if (input == null) return null;
+        return input.replaceAll(ANSI_REGEX, "");
+    }
+    
+
     /**
      * Escape a give String to make it safe to be printed or stored.
      *

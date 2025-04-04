@@ -643,6 +643,9 @@
       "fontColor": "theme",
       "disabledFontColor": "disabled-font",
       "imageUp": "iconic-plus"
+    },
+    "clipboard": {
+      "imageUp": "iconic-clipboard"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {

@@ -10,6 +10,8 @@ package gaiasky.script;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.iface.ConsoleInterface;
+import gaiasky.util.Logger;
+import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 
@@ -24,7 +26,6 @@ import java.util.Map;
  * The user interface part of the console in implemented in {@link ConsoleInterface}.
  */
 public class ConsoleManager {
-
     private final Array<Message> messages = new Array<>();
     private final Array<String> cmdHistory = new Array<>();
     private Map<String, Array<Method>> methodMap;
@@ -37,6 +38,14 @@ public class ConsoleManager {
      * @param time The message creation time.
      */
     public record Message(String msg, MsgType type, Instant time) {
+
+        /**
+         * Returns the message with any ANSI codes stripped.
+         * @return The message with no ANIS codes.
+         */
+        public String cleanMessage() {
+            return TextUtils.stripAnsiCodes(msg);
+        }
     }
 
     /**

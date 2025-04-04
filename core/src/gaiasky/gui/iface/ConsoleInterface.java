@@ -33,6 +33,8 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.Instant;
@@ -40,6 +42,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The graphical user interface that displays and manages the console window at the bottom of the main window.
+ */
 public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(ConsoleInterface.class.getSimpleName());
 
@@ -53,6 +58,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private final Table output;
     private final OwnScrollPane outputScroll;
     private final OwnTextIconButton close;
+    private final OwnTextIconButton copyToClipboard;
     private final OwnLabel prompt;
     int historyIndex = -1;
     float pad = 10f;
@@ -85,6 +91,25 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             return false;
         });
         close.addListener(new OwnTextTooltip(I18n.msg("gui.close"), skin));
+
+        var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        copyToClipboard = new OwnTextIconButton("", skin, "clipboard");
+        copyToClipboard.setSize(33, 30);
+        copyToClipboard.addListener(event -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                // Copy all output messages to clipboard.
+                if (!manager.messages().isEmpty()) {
+                    var buffer = new StringBuilder();
+                    for(var m : manager.messages()) {
+                        buffer.append(m.cleanMessage()).append('\n');
+                    }
+                    var selection = new StringSelection(buffer.toString());
+                    clipboard.setContents(selection, selection);
+                }
+            }
+            return false;
+        });
+        copyToClipboard.addListener(new OwnTextTooltip(I18n.msg("gui.clipboard.copy"), skin));
 
         prompt = new OwnLabel(">", skin, "header-s");
 
@@ -177,10 +202,12 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         mainTable.pad(pad);
         mainTable.setBackground("bg-pane-border-dark");
         mainTable.center();
-        mainTable.add(new OwnLabel("  " + I18n.msg("gui.console.title"), getSkin(), "header-s")).left().padBottom(pad);
+        mainTable.add(new OwnLabel("  " + I18n.msg("gui.console.title"), getSkin(), "header-s")).left().expandX().padBottom(pad);
+        mainTable.add(copyToClipboard).right().padBottom(pad).padRight(pad);
         mainTable.add(close).right().padBottom(pad).row();
-        mainTable.add(outputScroll).colspan(2).width(w).left().padLeft(pad).fillX().row();
-        mainTable.add(inputTable).colspan(2).left().width(w).padLeft(pad).fillX().pad(0);
+
+        mainTable.add(outputScroll).colspan(3).width(w).left().padLeft(pad).fillX().row();
+        mainTable.add(inputTable).colspan(3).left().width(w).padLeft(pad).fillX().pad(0);
         mainTable.pack();
 
         // Add to parent.
@@ -238,6 +265,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             ConsoleManager.Message msg = new ConsoleManager.Message(messageText, type, Instant.now());
             addMessageWidget(msg);
             manager.messages().add(msg);
+            logger.info(String.format("%s: %s", msg.time(), msg.msg()));
         }
     }
 
@@ -247,8 +275,22 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         status.setColor(msg.type().getTagColor());
         var message = constructMessage(msg);
 
+        var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        var clipboardButton = new OwnTextIconButton("", getSkin(), "clipboard");
+        clipboardButton.setSize(29, 26);
+        clipboardButton.addListener(event -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                // Copy message to clipboard.
+                var selection = new StringSelection(msg.cleanMessage());
+                clipboard.setContents(selection, selection);
+            }
+            return false;
+        });
+        clipboardButton.addListener(new OwnTextTooltip(I18n.msg("gui.clipboard.copy"), getSkin()));
+
         output.add(status).left().top().padRight(pad * 2f);
-        output.add(message).left().top().row();
+        output.add(message).left().top().expandX().padRight(pad*2f);
+        output.add(clipboardButton).left().top().padRight(pad*2f).row();
 
         var coordinates = status.localToAscendantCoordinates(output, vec2.set(status.getX(), status.getY()));
         outputScroll.scrollTo(coordinates.x, coordinates.y, status.getWidth(), status.getHeight());
