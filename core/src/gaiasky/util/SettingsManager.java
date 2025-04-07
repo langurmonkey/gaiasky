@@ -54,13 +54,7 @@ public class SettingsManager {
     public SettingsManager(boolean vr) {
         super();
         try {
-            String propsFileProperty = System.getProperty("properties.file");
-            if (propsFileProperty == null || propsFileProperty.isEmpty()) {
-                propsFileProperty = initConfigFile(vr);
-            }
 
-            File confFile = new File(propsFileProperty);
-            InputStream fis = new FileInputStream(confFile);
 
             // This should work for the normal execution
             InputStream vis = GaiaSkyDesktop.class.getResourceAsStream("/version");
@@ -72,7 +66,14 @@ public class SettingsManager {
             vp.load(vis);
 
             initializeMapper();
-            settings = mapper.readValue(fis, Settings.class);
+
+            // Initialize settings object.
+            String propsFileProperty = System.getProperty("properties.file");
+            if (propsFileProperty == null || propsFileProperty.isEmpty()) {
+                propsFileProperty = initConfigFile(vr);
+            }
+            File confFile = new File(propsFileProperty);
+            settings = loadSettings(confFile);
 
         } catch (Exception e) {
             logger.error(e);
@@ -92,6 +93,18 @@ public class SettingsManager {
         } catch (Exception e) {
             logger.error(e);
         }
+    }
+
+    /**
+     * Loads a {@link Settings} object from a YAML configuration file and returns it.
+     *
+     * @param configFile The YAML configuration file.
+     *
+     * @return The {@link Settings} object.
+     */
+    public Settings loadSettings(File configFile) throws IOException {
+        var fis = new FileInputStream(configFile);
+        return mapper.readValue(fis, Settings.class);
     }
 
     public static void initialize(boolean vr) throws Exception {
@@ -193,11 +206,6 @@ public class SettingsManager {
     public static boolean setSettingsInstance(Settings settings) {
         return Settings.setSettingsReference(settings);
     }
-
-    public void setSettingsReference(Settings settings) {
-        this.settings = settings;
-    }
-
 
     private void initializeMapper() {
         YAMLFactory yaml = new YAMLFactory();

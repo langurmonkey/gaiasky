@@ -441,10 +441,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Logger.level = cliArgs.debug ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
 
         // Update back-buffer resolution.
-        if (Gdx.graphics != null && settings != null && (settings.graphics.backBufferResolution[0] <= 0 || settings.graphics.backBufferResolution[1] <= 0)) {
-            settings.graphics.backBufferResolution[0] = (int) (Gdx.graphics.getWidth() * settings.graphics.backBufferScale);
-            settings.graphics.backBufferResolution[1] = (int) (Gdx.graphics.getWidth() * settings.graphics.backBufferScale);
-        }
+        settings.graphics.updateBackBufferResolution();
 
         // Initialize array pool.
         Pools.get(Array.class, 200);
@@ -1532,7 +1529,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     final boolean stereoMode = (Boolean) data[0];
                     if (stereoMode && guiRegistry.current != stereoGui) {
                         guiRegistry.change(stereoGui);
-                    } else if (!stereoMode && guiRegistry.previous != stereoGui) {
+                    } else if (!stereoMode && guiRegistry.previous != null && guiRegistry.previous != stereoGui) {
                         IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
                         guiRegistry.change(guiRegistry.previous, prev);
                     }

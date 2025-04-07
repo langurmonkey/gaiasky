@@ -10,10 +10,7 @@ package gaiasky.gui.bookmarks;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.Logger;
-import gaiasky.util.Settings;
-import gaiasky.util.SysUtils;
-import gaiasky.util.TextUtils;
+import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -39,7 +36,8 @@ public class BookmarksManager implements IObserver {
 
     public BookmarksManager() {
         initDefault();
-        EventManager.instance.subscribe(this, Event.BOOKMARKS_ADD, Event.BOOKMARKS_REMOVE, Event.BOOKMARKS_REMOVE_ALL, Event.BOOKMARKS_MOVE, Event.BOOKMARKS_MOVE_UP, Event.BOOKMARKS_MOVE_DOWN);
+        EventManager.instance.subscribe(this, Event.BOOKMARKS_ADD, Event.BOOKMARKS_REMOVE, Event.BOOKMARKS_REMOVE_ALL, Event.BOOKMARKS_MOVE, Event.BOOKMARKS_MOVE_UP,
+                Event.BOOKMARKS_MOVE_DOWN);
     }
 
     private void initDefault() {
@@ -76,8 +74,11 @@ public class BookmarksManager implements IObserver {
      * @param dst    The destination file.
      * @param backup Whether to create a backup of dst if it exists.
      */
-    private void overwriteBookmarksFile(Path src, Path dst, boolean backup) {
-        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : I18n.msg("error.file.exists.readable", src != null ? src.getFileName().toString() : "null");
+    private void overwriteBookmarksFile(Path src,
+                                        Path dst,
+                                        boolean backup) {
+        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : I18n.msg("error.file.exists.readable",
+                src != null ? src.getFileName().toString() : "null");
         assert dst != null : I18n.msg("notif.null.not", "dest");
         if (backup && dst.toFile().exists() && dst.toFile().canRead()) {
             Date date = Calendar.getInstance().getTime();
@@ -108,7 +109,6 @@ public class BookmarksManager implements IObserver {
         }
     }
 
-
     /**
      * Gets the version from the given bookmarks file by reading the first line.
      *
@@ -122,8 +122,7 @@ public class BookmarksManager implements IObserver {
             var firstLine = l.get().strip();
             if (!firstLine.isBlank()) {
                 if (firstLine.startsWith("#v")) {
-                    int version = Parser.parseIntException(firstLine.substring(2));
-                    return version;
+                    return Parser.parseIntException(firstLine.substring(2));
                 } else {
                     logger.warn(I18n.msg("error.file.version", path));
                 }
@@ -150,7 +149,9 @@ public class BookmarksManager implements IObserver {
         return getBookmarksByType(bookmarks, new ArrayList<>(), true);
     }
 
-    public List<BookmarkNode> getBookmarksByType(List<BookmarkNode> bookmarks, List<BookmarkNode> result, boolean folder) {
+    public List<BookmarkNode> getBookmarksByType(List<BookmarkNode> bookmarks,
+                                                 List<BookmarkNode> result,
+                                                 boolean folder) {
         if (bookmarks != null) {
             for (BookmarkNode bookmark : bookmarks) {
                 if (bookmark.folder == folder)
@@ -168,7 +169,7 @@ public class BookmarksManager implements IObserver {
             nodes = new HashMap<>();
             this.bookmarks = new ArrayList<>();
             for (String bookmark : bookmarks) {
-                insertBookmark(bookmark, false);
+                insertBookmark(bookmark, bookmark.endsWith("/"));
             }
             return this.bookmarks;
         } catch (IOException e) {
@@ -185,7 +186,8 @@ public class BookmarksManager implements IObserver {
         return contains;
     }
 
-    public boolean containsNameRec(String name, BookmarkNode node) {
+    public boolean containsNameRec(String name,
+                                   BookmarkNode node) {
         if (node.name.equals(name)) {
             return true;
         } else if (node.children != null) {
@@ -224,11 +226,16 @@ public class BookmarksManager implements IObserver {
         }
     }
 
-    private void buildContent(StringBuilder content, List<BookmarkNode> bookmarks) {
+    private void buildContent(StringBuilder content,
+                              List<BookmarkNode> bookmarks) {
         for (BookmarkNode b : bookmarks) {
             if (b.children == null || b.children.isEmpty()) {
                 // Write
-                content.append("\n").append(b.path.toString());
+                if (b.folder && !b.path.toString().endsWith("/")) {
+                    content.append("\n").append(b.path.toString()).append("/");
+                } else {
+                    content.append("\n").append(b.path.toString());
+                }
             } else {
                 // Down one level
                 buildContent(content, b.children);
@@ -239,11 +246,13 @@ public class BookmarksManager implements IObserver {
     /**
      * Adds a bookmark with the given path.
      *
-     * @param path The path to add.
+     * @param path   The path to add.
+     * @param folder Whether this bookmark is a folder.
      *
      * @return True if added.
      */
-    public synchronized boolean addBookmark(String path, boolean folder) {
+    public synchronized boolean addBookmark(String path,
+                                            boolean folder) {
         boolean added = false;
         if (bookmarks != null) {
             added = insertBookmark(path, folder);
@@ -259,7 +268,11 @@ public class BookmarksManager implements IObserver {
      *
      * @return Whether the bookmark was inserted.
      */
-    private synchronized boolean insertBookmark(String path, boolean folder) {
+    private synchronized boolean insertBookmark(String path,
+                                                boolean folder) {
+        if (folder && path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
         Path p = new BookmarkPath(path);
         if (!nodes.containsKey(p)) {
             BookmarkNode node = new BookmarkNode(p, folder);
@@ -288,13 +301,35 @@ public class BookmarksManager implements IObserver {
     }
 
     /**
+     * Removes the settings file of the give bookmark, if it exists.
+     *
+     * @param bookmark The bookmark.
+     *
+     * @return True if the settings file was removed, false otherwise.
+     */
+    public synchronized boolean remove(BookmarkNode bookmark) {
+        if (bookmark.uuid != null) {
+            Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
+            Path settingsFile = parent.resolve(bookmark.uuid);
+            try {
+                Files.deleteIfExists(settingsFile);
+                return true;
+            } catch (IOException e) {
+                logger.error(I18n.msg("error.file.delete", settingsFile.toAbsolutePath().toString()), e);
+            }
+        }
+        return false;
+    }
+
+    /**
      * Removes a bookmark by its path.
      *
-     * @param path The path to remove
+     * @param path The path to remove.
+     * @param move Indicates whether this remove operation is part of a move operation, to prevent the deletion of data.
      *
      * @return True if removed.
      */
-    public synchronized boolean removeBookmark(String path) {
+    public synchronized boolean removeBookmark(String path, boolean move) {
         Path p = new BookmarkPath(path);
         if (nodes != null && nodes.containsKey(p)) {
             BookmarkNode n = nodes.get(p);
@@ -305,6 +340,9 @@ public class BookmarksManager implements IObserver {
                 bookmarks.remove(n);
             }
             nodes.remove(p);
+            if (!move) {
+                remove(n);
+            }
             return true;
         }
         return false;
@@ -328,6 +366,7 @@ public class BookmarksManager implements IObserver {
                     it.remove();
                     bookmark.parent = null;
                     nodes.remove(bookmark.path);
+                    remove(bookmark);
                     nRemoved++;
                 } else {
                     nRemoved += removeBookmarksByNameRec(name, bookmark, it);
@@ -338,13 +377,16 @@ public class BookmarksManager implements IObserver {
         return 0;
     }
 
-    private synchronized int removeBookmarksByNameRec(String name, BookmarkNode bookmark, Iterator<BookmarkNode> itr) {
+    private synchronized int removeBookmarksByNameRec(String name,
+                                                      BookmarkNode bookmark,
+                                                      Iterator<BookmarkNode> itr) {
         int nRemoved = 0;
         if (bookmark.name.equals(name)) {
             // Remove from parent
             itr.remove();
             bookmark.parent = null;
             nodes.remove(bookmark.path);
+            remove(bookmark);
             nRemoved++;
         } else if (bookmark.children != null) {
             Iterator<BookmarkNode> it = bookmark.children.iterator();
@@ -366,7 +408,9 @@ public class BookmarksManager implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
             case BOOKMARKS_ADD -> {
                 Object d0 = data[0];
@@ -374,51 +418,76 @@ public class BookmarksManager implements IObserver {
                     // Simple object bookmark.
                     boolean folder = (boolean) data[1];
                     if (addBookmark(name, folder)) {
-                        logger.info("Bookmark added: " + name);
+                        persistBookmarks();
+                        logger.info(I18n.msg("gui.bookmark.add.ok", name));
                     } else {
-                        logger.error("Failed to add bookmark: " + name);
+                        logger.error(I18n.msg("gui.bookmark.add.error", name));
                     }
                 } else {
                     // Position bookmark.
-                    Vector3b pos = (Vector3b) d0;
-                    Vector3d dir = (Vector3d) data[1];
-                    Vector3d up = (Vector3d) data[2];
-                    Instant t = (Instant) data[3];
-                    String name = (String) data[4];
-                    boolean folder = (boolean) data[5];
-                    String id = generateId(false);
-                    String text = String.format("{%s|%s|%s|%s|%s|%s}", str(pos), str(dir), str(up), t.toString(), name, id);
+                    Vector3b pos = data[0] != null ? (Vector3b) d0 : null;
+                    Vector3d dir = data[1] != null ? (Vector3d) data[1] : null;
+                    Vector3d up = data[2] != null ? (Vector3d) data[2] : null;
+                    Instant t = data[3] != null ? (Instant) data[3] : null;
+                    Settings s = data[4] != null ? (Settings) data[4] : null;
+                    String name = (String) data[5];
+                    boolean folder = (boolean) data[6];
+
+                    // Generate ID to link settings.
+                    String id = generateId(s != null);
+
+                    // Persist settings.
+                    if (s != null) {
+                        Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
+                        Path settingsFile = parent.resolve(id);
+                        try {
+                            Files.createDirectories(parent);
+                            Files.deleteIfExists(settingsFile);
+                        } catch (IOException e) {
+                            logger.error(I18n.msg("error.directory.create", parent.toAbsolutePath().toString()), e);
+                        }
+                        SettingsManager.persistSettings(s, settingsFile.toFile());
+                    }
+                    String text = String.format("{%s|%s|%s|%s|%s|%s}", str(pos), str(dir), str(up), str(t), name, str(id));
                     if (addBookmark(text, folder)) {
-                        logger.info("Bookmark added: " + text);
+                        persistBookmarks();
+                        logger.info(I18n.msg("gui.bookmark.add.ok", text));
                     } else {
-                        logger.error("Failed to add bookmark: " + text);
+                        logger.error(I18n.msg("gui.bookmark.add.error", text));
                     }
                 }
             }
             case BOOKMARKS_REMOVE -> {
                 String name = (String) data[0];
-                if (removeBookmark(name))
-                    logger.info("Bookmark removed: " + name);
+                if (removeBookmark(name, false)) {
+                    persistBookmarks();
+                    logger.info(I18n.msg("gui.bookmark.remove.ok", name));
+                }
             }
             case BOOKMARKS_REMOVE_ALL -> {
                 String name = (String) data[0];
                 int removed = removeBookmarksByName(name);
-                logger.info(removed + " bookmarks with name " + name + " removed");
+                if (removed > 0) {
+                    persistBookmarks();
+                    logger.info(I18n.msg("gui.bookmark.remove.name.ok", removed, name));
+                }
             }
             case BOOKMARKS_MOVE -> {
                 BookmarkNode src = (BookmarkNode) data[0];
                 BookmarkNode dest = (BookmarkNode) data[1];
                 if (dest == null) {
                     // Move to root
-                    removeBookmark(src.path.toString());
+                    removeBookmark(src.path.toString(), true);
                     addBookmark(src.text, false);
+                    persistBookmarks();
                 } else {
                     // Move to destination folder
                     if (dest.folder) {
-                        removeBookmark(src.path.toString());
+                        removeBookmark(src.path.toString(), true);
                         addBookmark(dest.path.resolve(src.text).toString(), false);
+                        persistBookmarks();
                     } else {
-                        logger.error("Destination is not a folder: " + dest);
+                        logger.error(I18n.msg("error.destination.notdir", dest));
                     }
                 }
             }
@@ -434,6 +503,7 @@ public class BookmarksManager implements IObserver {
                 if (idx0 > 0) {
                     list.remove(idx0);
                     list.add(idx0 - 1, bookmark);
+                    persistBookmarks();
                 }
             }
             case BOOKMARKS_MOVE_DOWN -> {
@@ -448,6 +518,7 @@ public class BookmarksManager implements IObserver {
                 if (idx1 < list.size() - 1) {
                     list.remove(idx1);
                     list.add(idx1 + 1, bookmark);
+                    persistBookmarks();
                 }
             }
             default -> {
@@ -456,11 +527,19 @@ public class BookmarksManager implements IObserver {
     }
 
     private String str(Vector3b v) {
-        return "[" + v.x.toString() + "," + v.y.toString() + "," + v.z.toString() + "]";
+        return v != null ? "[" + v.x.toString() + "," + v.y.toString() + "," + v.z.toString() + "]" : "null";
     }
 
     private String str(Vector3d v) {
-        return "[" + v.x + "," + v.y + "," + v.z + "]";
+        return v != null ? "[" + v.x + "," + v.y + "," + v.z + "]" : "null";
+    }
+
+    private String str(Instant t) {
+        return t != null ? t.toString() : "null";
+    }
+
+    private String str(String s) {
+        return s != null ? s : "null";
     }
 
     public static class BookmarkNode {
@@ -473,7 +552,8 @@ public class BookmarksManager implements IObserver {
         /**
          * Regular expression for a nullable vector with three components.
          */
-        private static final String VEC3_REGEX = "(" + NULL_TOKEN + "|\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?])";
+        private static final String VEC3_REGEX =
+                "(" + NULL_TOKEN + "|\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?])";
         /**
          * Regular expression that defines the format of positional bookmarks, which is:
          * <p><code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name|id}</code></p>
@@ -518,10 +598,6 @@ public class BookmarksManager implements IObserver {
          */
         public String uuid;
         /**
-         * Settings object, for settings bookmarks.
-         */
-        public Settings settings;
-        /**
          * The full path.
          */
         public Path path;
@@ -538,7 +614,8 @@ public class BookmarksManager implements IObserver {
          */
         public boolean folder;
 
-        public BookmarkNode(Path path, boolean folder) {
+        public BookmarkNode(Path path,
+                            boolean folder) {
             this.path = path;
             this.text = this.path.getFileName().toString().strip();
             this.folder = folder;
@@ -548,7 +625,7 @@ public class BookmarksManager implements IObserver {
         public void initializeText() {
             if (this.text != null) {
                 if (this.text.matches(POS_BOOKMARK_REGEX)) {
-                    // Position bookmark.
+                    // Location bookmark.
                     var tokens = this.text.substring(1, this.text.length() - 1).split("\\|");
                     var pos = tokens[0];
                     var dir = tokens[1];
@@ -570,6 +647,30 @@ public class BookmarksManager implements IObserver {
                     this.name = this.text;
                 }
             }
+        }
+
+        /**
+         * This method loads the settings file for this bookmark.
+         * This operation should happen every time a bookmark is made 'active'.
+         */
+        public Settings loadSettingsFromFile() {
+            // Load settings file into Settings object.
+            if (this.uuid != null) {
+                Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
+                Path settingsFile = parent.resolve(this.uuid);
+                try {
+                    var settings = SettingsManager.instance.loadSettings(settingsFile.toFile());
+                    settings.setParent(settings);
+                    // Runtime.
+                    settings.runtime = Settings.settings.runtime.clone();
+                    settings.runtime.inputEnabled = true;
+                    settings.runtime.setParent(settings);
+                    return settings;
+                } catch (IOException e) {
+                    logger.error(String.format("Could not load settings file: %s", settingsFile.toAbsolutePath().toString()), e);
+                }
+            }
+            return null;
         }
 
         private Vector3d vectorFromString(String vectorString) {

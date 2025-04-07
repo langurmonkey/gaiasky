@@ -12,6 +12,8 @@ import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProject
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.view.FocusView;
+import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 
 import static gaiasky.util.Settings.*;
 
@@ -97,7 +99,24 @@ public enum Event {
 
     /** Shows window to give a name to the new position bookmark. **/
     SHOW_ADD_POSITION_BOOKMARK,
-    /** Add bookmark. Contains the path and a boolean indicating if it is a folder. **/
+    /**
+     * <p>Add bookmark. Contains the path and a boolean indicating if it is a folder. The parameters it contains depend on the bookmark type:</p>
+     * <p>Object bookmarks:</p>
+     * <ol start='0'>
+     *     <li>name ({@link String}) -- name of the bookmark</li>
+     *     <li>folder ({@link Boolean}) -- whether it is a folder node (false for actual bookmarks)</li>
+     * </ol>
+     * <p>Location bookmarks:</p>
+     * <ol start='0'>
+     *     <li>camera position ({@link Vector3b}, may be null)</li>
+     *     <li>camera direction ({@link Vector3d}, may be null)</li>
+     *     <li>camera up ({@link Vector3d}, may be null)</li>
+     *     <li>time ({@link java.time.Instant}, may be null)</li>
+     *     <li>settings ({@link gaiasky.util.Settings}, may be null)</li>
+     *     <li>name ({@link String}) -- name of the bookmark</li>
+     *     <li>folder ({@link Boolean}) -- whether it is a folder node (false for actual bookmarks)</li>
+     * </ol>
+     *  **/
     BOOKMARKS_ADD,
     /** Remove bookmark. Contains the path to remove. **/
     BOOKMARKS_REMOVE,

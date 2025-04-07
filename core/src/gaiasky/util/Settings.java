@@ -7,6 +7,7 @@
 
 package gaiasky.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
@@ -61,8 +62,8 @@ public class Settings extends SettingsObject {
      * Version = major.minor.rev-seq -> 1.2.5 major=1; minor=2; rev=5; seq=0
      * Version = major * 1000000 + minor * 10000 + rev * 100 + seq
      * So 1.2.5   -> 1020500
-     *    2.1.7   -> 2010700
-     *    3.5.3-1 -> 3050301
+     * 2.1.7   -> 2010700
+     * 3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      **/
     public static final int SOURCE_VERSION = 3060601;
@@ -302,7 +303,7 @@ public class Settings extends SettingsObject {
     }
 
     @Override
-    protected void setupListeners() {
+    public void setupListeners() {
         if (this.camrecorder != null)
             camrecorder.setupListeners();
         if (this.controls != null)
@@ -1047,6 +1048,19 @@ public class Settings extends SettingsObject {
          */
         public int[] proceduralGenerationResolution = new int[]{3000, 1500};
 
+        /**
+         * Updates the back-buffer resolution array using the current resolution and back-buffer scale setting.
+         */
+        public void updateBackBufferResolution() {
+            if (backBufferResolution == null) {
+                backBufferResolution = new int[2];
+            }
+            if (Gdx.graphics != null && settings != null && (backBufferResolution[0] <= 0 || backBufferResolution[1] <= 0)) {
+                backBufferResolution[0] = (int) (Gdx.graphics.getWidth() * backBufferScale);
+                backBufferResolution[1] = (int) (Gdx.graphics.getWidth() * backBufferScale);
+            }
+        }
+
         public void setQuality(final String qualityString) {
             this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
         }
@@ -1087,8 +1101,7 @@ public class Settings extends SettingsObject {
                     }
                     case BACKBUFFER_SCALE_CMD -> {
                         backBufferScale = (Float) data[0];
-                        backBufferResolution[0] = (int) FastMath.round(resolution[0] * backBufferScale);
-                        backBufferResolution[1] = (int) FastMath.round(resolution[1] * backBufferScale);
+                        updateBackBufferResolution();
                     }
                     case PROCEDURAL_GENERATION_RESOLUTION_CMD -> {
                         int w = (Integer) data[0];
@@ -1132,6 +1145,7 @@ public class Settings extends SettingsObject {
         public void apply() {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, fpsLimit);
             // EventManager.publish(Event.BACKBUFFER_SCALE_CMD, this, (float) backBufferScale);
+            updateBackBufferResolution();
 
             fullScreen.apply();
         }
@@ -1819,10 +1833,8 @@ public class Settings extends SettingsObject {
                                final Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
-                        case PM_NUM_FACTOR_CMD ->
-                                number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
-                        case PM_LEN_FACTOR_CMD ->
-                                length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
+                        case PM_NUM_FACTOR_CMD -> number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
+                        case PM_LEN_FACTOR_CMD -> length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
                         case PM_COLOR_MODE_CMD -> colorMode = MathUtilsDouble.clamp((int) data[0], 0, 5);
                         case PM_ARROWHEADS_CMD -> arrowHeads = (boolean) data[0];
                     }
@@ -2403,8 +2415,7 @@ public class Settings extends SettingsObject {
                     case MINIMAP_TOGGLE_CMD -> minimap.active = !minimap.active;
                     case PLANETARIUM_APERTURE_CMD -> modeCubemap.planetarium.aperture = (float) data[0];
                     case PLANETARIUM_ANGLE_CMD -> modeCubemap.planetarium.angle = (float) data[0];
-                    case PLANETARIUM_GEOMETRYWARP_FILE_CMD ->
-                            modeCubemap.planetarium.sphericalMirrorWarp = (Path) data[0];
+                    case PLANETARIUM_GEOMETRYWARP_FILE_CMD -> modeCubemap.planetarium.sphericalMirrorWarp = (Path) data[0];
                     case POINTER_GUIDES_CMD -> {
                         if (data.length > 0 && data[0] != null) {
                             pointer.guides.active = (boolean) data[0];
@@ -2506,9 +2517,9 @@ public class Settings extends SettingsObject {
 
             // Those need to run in the main thread, as they may need the OpenGL context.
             GaiaSky.postRunnable(() -> {
-                //     EventManager.publish(Event.STEREOSCOPIC_CMD, this, modeStereo.active);
-                //     EventManager.publish(Event.STEREO_PROFILE_CMD, this, modeStereo.profile.ordinal());
-                //     EventManager.publish(Event.CUBEMAP_CMD, this, modeCubemap.active, modeCubemap.projection);
+                EventManager.publish(Event.STEREOSCOPIC_CMD, this, modeStereo.active);
+                EventManager.publish(Event.STEREO_PROFILE_CMD, this, modeStereo.profile.ordinal());
+                EventManager.publish(Event.CUBEMAP_CMD, this, modeCubemap.active, modeCubemap.projection);
                 EventManager.publish(Event.MINIMAP_DISPLAY_CMD, this, minimap.active);
 
                 EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
@@ -3721,7 +3732,7 @@ public class Settings extends SettingsObject {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case ANTIALIASING_CMD -> antialiasing.type = (AntialiasType) data[0];
-                    case FXAA_QUALITY_CMD -> antialiasing.quality = MathUtils.clamp((Integer)data[0], 0, 2);
+                    case FXAA_QUALITY_CMD -> antialiasing.quality = MathUtils.clamp((Integer) data[0], 0, 2);
                     case BLOOM_CMD -> bloom.intensity = (float) data[0];
                     case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
                     case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
@@ -3741,15 +3752,11 @@ public class Settings extends SettingsObject {
                         reprojection.active = (Boolean) data[0];
                         reprojection.mode = (ReprojectionMode) data[1];
                     }
-                    case BRIGHTNESS_CMD ->
-                            levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
-                    case CONTRAST_CMD ->
-                            levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
+                    case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
+                    case CONTRAST_CMD -> levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
                     case HUE_CMD -> levels.hue = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
-                    case SATURATION_CMD ->
-                            levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
-                    case GAMMA_CMD ->
-                            levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
+                    case SATURATION_CMD -> levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
+                    case GAMMA_CMD -> levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
                     case TONEMAPPING_TYPE_CMD -> {
                         ToneMapping newTM;
                         if (data[0] instanceof String) {
@@ -3759,8 +3766,7 @@ public class Settings extends SettingsObject {
                         }
                         toneMapping.type = newTM;
                     }
-                    case EXPOSURE_CMD ->
-                            toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+                    case EXPOSURE_CMD -> toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
                     case UPSCALE_FILTER_CMD -> upscaleFilter = (UpscaleFilter) data[0];
                     default -> {
                     }
@@ -3966,6 +3972,7 @@ public class Settings extends SettingsObject {
             public void dispose() {
             }
         }
+
         public enum AntialiasType {
             NONE(0),
             FXAA(-1),
