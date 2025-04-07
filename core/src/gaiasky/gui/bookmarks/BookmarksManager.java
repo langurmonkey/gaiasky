@@ -243,6 +243,7 @@ public class BookmarksManager implements IObserver {
      * Adds a bookmark with the given path.
      *
      * @param path The path to add.
+     * @param folder Whether this bookmark is a folder.
      *
      * @return True if added.
      */
@@ -292,6 +293,13 @@ public class BookmarksManager implements IObserver {
         return false;
     }
 
+    /**
+     * Removes the settings file of the give bookmark, if it exists.
+     *
+     * @param bookmark The bookmark.
+     *
+     * @return True if the settings file was removed, false otherwise.
+     */
     public synchronized boolean remove(BookmarkNode bookmark) {
         if (bookmark.uuid != null) {
             Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
@@ -310,10 +318,11 @@ public class BookmarksManager implements IObserver {
      * Removes a bookmark by its path.
      *
      * @param path The path to remove.
+     * @param move Indicates whether this remove operation is part of a move operation, to prevent the deletion of data.
      *
      * @return True if removed.
      */
-    public synchronized boolean removeBookmark(String path) {
+    public synchronized boolean removeBookmark(String path, boolean move) {
         Path p = new BookmarkPath(path);
         if (nodes != null && nodes.containsKey(p)) {
             BookmarkNode n = nodes.get(p);
@@ -324,7 +333,9 @@ public class BookmarksManager implements IObserver {
                 bookmarks.remove(n);
             }
             nodes.remove(p);
-            remove(n);
+            if (!move) {
+                remove(n);
+            }
             return true;
         }
         return false;
@@ -441,7 +452,7 @@ public class BookmarksManager implements IObserver {
             }
             case BOOKMARKS_REMOVE -> {
                 String name = (String) data[0];
-                if (removeBookmark(name)) {
+                if (removeBookmark(name, false)) {
                     persistBookmarks();
                     logger.info(I18n.msg("gui.bookmark.remove.ok", name));
                 }
@@ -459,13 +470,13 @@ public class BookmarksManager implements IObserver {
                 BookmarkNode dest = (BookmarkNode) data[1];
                 if (dest == null) {
                     // Move to root
-                    removeBookmark(src.path.toString());
+                    removeBookmark(src.path.toString(), true);
                     addBookmark(src.text, false);
                     persistBookmarks();
                 } else {
                     // Move to destination folder
                     if (dest.folder) {
-                        removeBookmark(src.path.toString());
+                        removeBookmark(src.path.toString(), true);
                         addBookmark(dest.path.resolve(src.text).toString(), false);
                         persistBookmarks();
                     } else {
@@ -635,7 +646,7 @@ public class BookmarksManager implements IObserver {
          * This method loads the settings file for this bookmark.
          * This operation should happen every time a bookmark is made 'active'.
          */
-        public Settings loadSettingsFromFile(){
+        public Settings loadSettingsFromFile() {
             // Load settings file into Settings object.
             if (this.uuid != null) {
                 Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
