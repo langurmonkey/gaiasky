@@ -580,10 +580,6 @@ public class BookmarksManager implements IObserver {
          */
         public String uuid;
         /**
-         * Settings object, for settings bookmarks.
-         */
-        public Settings settings;
-        /**
          * The full path.
          */
         public Path path;
@@ -628,27 +624,35 @@ public class BookmarksManager implements IObserver {
                     this.direction = vectorFromString(dir);
                     this.up = vectorFromString(up);
                     this.time = instant.equals(NULL_TOKEN) ? null : Instant.parse(instant);
-                    // Load settings file into Settings object.
-                    if (this.uuid != null) {
-                        Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
-                        Path settingsFile = parent.resolve(this.uuid);
-                        try {
-                            this.settings = SettingsManager.instance.loadSettings(settingsFile.toFile());
-                            this.settings.setParent(this.settings);
-                            // Runtime.
-                            this.settings.runtime = Settings.settings.runtime.clone();
-                            this.settings.runtime.inputEnabled = true;
-                            this.settings.runtime.setParent(this.settings);
-                        } catch (IOException e) {
-                            logger.error(String.format("Could not load settings file: %s", settingsFile.toAbsolutePath().toString()), e);
-                        }
-                    }
-
                 } else {
                     // Regular bookmark, only object name.
                     this.name = this.text;
                 }
             }
+        }
+
+        /**
+         * This method loads the settings file for this bookmark.
+         * This operation should happen every time a bookmark is made 'active'.
+         */
+        public Settings loadSettingsFromFile(){
+            // Load settings file into Settings object.
+            if (this.uuid != null) {
+                Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
+                Path settingsFile = parent.resolve(this.uuid);
+                try {
+                    var settings = SettingsManager.instance.loadSettings(settingsFile.toFile());
+                    settings.setParent(settings);
+                    // Runtime.
+                    settings.runtime = Settings.settings.runtime.clone();
+                    settings.runtime.inputEnabled = true;
+                    settings.runtime.setParent(settings);
+                    return settings;
+                } catch (IOException e) {
+                    logger.error(String.format("Could not load settings file: %s", settingsFile.toAbsolutePath().toString()), e);
+                }
+            }
+            return null;
         }
 
         private Vector3d vectorFromString(String vectorString) {

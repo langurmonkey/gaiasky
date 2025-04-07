@@ -139,7 +139,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 && selected.node.direction == null
                                 && selected.node.up == null
                                 && selected.node.time == null
-                                && selected.node.settings == null) {
+                                && selected.node.uuid == null) {
                             // Object bookmark, only object name.
                             String name = selected.node.name;
                             if (scene.index().containsEntity(name)) {
@@ -180,16 +180,22 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                     EventManager.publish(Event.CAMERA_UP_CMD, bookmarksTree, (Object) new double[]{u.x, u.y, u.z});
                                 if (selected.node.time != null)
                                     EventManager.publish(Event.TIME_CHANGE_CMD, bookmarksTree, selected.node.time);
-                                if (selected.node.settings != null) {
+
+                                // Settings.
+                                if (selected.node.uuid != null)
                                     GaiaSky.postRunnable(() -> {
-                                        var version = Settings.settings.version.clone();
-                                        if (SettingsManager.setSettingsInstance(selected.node.settings)) {
-                                            Settings.settings.setupListeners();
-                                            Settings.settings.version = version;
-                                            Settings.settings.apply();
+                                        // Try to load settings.
+                                        var settings = selected.node.loadSettingsFromFile();
+                                        if (settings != null) {
+                                            var version = Settings.settings.version.clone();
+                                            if (SettingsManager.setSettingsInstance(settings)) {
+                                                Settings.settings.setupListeners();
+                                                Settings.settings.version = version;
+                                                Settings.settings.apply();
+                                            }
                                         }
                                     });
-                                }
+
                             });
                         }
                     }
@@ -360,8 +366,9 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
             TreeNode node = new TreeNode(bookmark, skin);
             if (bookmark.folder)
                 node.setIcon(folderIcon);
-            else
+            else {
                 node.setIcon(bookmarkIcon);
+            }
             bookmarksTree.add(node);
             genSubtree(node, bookmark);
         }
