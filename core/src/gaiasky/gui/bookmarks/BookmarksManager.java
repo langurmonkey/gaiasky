@@ -169,7 +169,7 @@ public class BookmarksManager implements IObserver {
             nodes = new HashMap<>();
             this.bookmarks = new ArrayList<>();
             for (String bookmark : bookmarks) {
-                insertBookmark(bookmark, false);
+                insertBookmark(bookmark, bookmark.endsWith("/"));
             }
             return this.bookmarks;
         } catch (IOException e) {
@@ -231,7 +231,11 @@ public class BookmarksManager implements IObserver {
         for (BookmarkNode b : bookmarks) {
             if (b.children == null || b.children.isEmpty()) {
                 // Write
-                content.append("\n").append(b.path.toString());
+                if (b.folder && !b.path.toString().endsWith("/")) {
+                    content.append("\n").append(b.path.toString()).append("/");
+                } else {
+                    content.append("\n").append(b.path.toString());
+                }
             } else {
                 // Down one level
                 buildContent(content, b.children);
@@ -242,7 +246,7 @@ public class BookmarksManager implements IObserver {
     /**
      * Adds a bookmark with the given path.
      *
-     * @param path The path to add.
+     * @param path   The path to add.
      * @param folder Whether this bookmark is a folder.
      *
      * @return True if added.
@@ -266,6 +270,9 @@ public class BookmarksManager implements IObserver {
      */
     private synchronized boolean insertBookmark(String path,
                                                 boolean folder) {
+        if (folder && path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
         Path p = new BookmarkPath(path);
         if (!nodes.containsKey(p)) {
             BookmarkNode node = new BookmarkNode(p, folder);
