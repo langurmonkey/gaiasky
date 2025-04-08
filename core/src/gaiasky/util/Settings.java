@@ -3055,6 +3055,7 @@ public class Settings extends SettingsObject {
             public float scale;
             public long animationMs = 600;
             public boolean newUI = true;
+            public boolean expandOnMouseOver = false;
             public boolean modeChangeInfo;
             public DistanceUnits distanceUnits;
 

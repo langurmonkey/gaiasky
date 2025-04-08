@@ -19,15 +19,16 @@ public class ContainerPane extends Table {
     public ContainerPane(Skin skin, String title, final Actor actor) {
         super(skin);
         final float pad10 = 10f;
-        final float pad20 = 10f;
 
         background("bg-pane-border-dark");
 
         OwnLabel titleLabel = new OwnLabel(title, skin, "header");
         add(titleLabel).top().center().row();
-        add(new Separator(skin, "small")).top().left().growX().padBottom(pad20 * 2f).row();
+        add(new Separator(skin, "small")).top().left().growX().padBottom(pad10 * 2f).row();
         add(actor);
         pack();
 
     }
+
+
 }

@@ -8,6 +8,8 @@
 package gaiasky.gui.iface;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -15,15 +17,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.components.*;
 import gaiasky.gui.main.ContainerPane;
 import gaiasky.gui.main.KeyBindings;
-import gaiasky.gui.components.*;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Scene;
 import gaiasky.util.CatalogManager;
@@ -43,10 +43,6 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
     private final OwnTextIconButton buttonMinimap;
 
     private final float buttonWidth = 48f, buttonHeight = 48f;
-    /**
-     * Keeps track of the last button activated.
-     */
-    private OwnTextButton lastActiveButton = null;
 
     /**
      * Map names to panes.
@@ -219,8 +215,6 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         add(tableButtons).left().top().growY();
         add(tableComponents).left().top().padTop(pad10 * 8f);
 
-        lastActiveButton = buttonTime;
-
         EventManager.instance.subscribe(this, Event.GUI_FOLD_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
                 Event.EXPAND_COLLAPSE_PANE_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD);
     }
@@ -233,6 +227,23 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         return createComponentButton(skin, pad, 0f, buttonStyle, title, component, action);
     }
 
+    /**
+     * Closes the given pane.
+     *
+     * @param pane The pane to close.
+     */
+    private void close(Actor pane) {
+        pane.clearActions();
+        pane.addAction(Actions.sequence(
+                Actions.alpha(1f),
+                Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds() * 0.5f),
+                Actions.run(activeComponentCell::clearActor)
+        ));
+    }
+    /** Reference to the task that closes the current pane. **/
+    private Timer.Task closeTask;
+
+
     private OwnTextIconButton createComponentButton(Skin skin, float pad, float padTop, String buttonStyle, String title, GuiComponent component, String action) {
         OwnTextIconButton button = new OwnTextIconButton("", skin, buttonStyle);
         button.setSize(buttonWidth, buttonHeight);
@@ -241,28 +252,77 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         tableComponentButtons.add(button).left().top().padBottom(pad).row();
 
         ContainerPane pane = new ContainerPane(skin, title, component.getActor());
+        if (Settings.settings.program.ui.expandOnMouseOver) {
+            pane.addListener(new InputListener() {
+                @Override
+                public boolean mouseMoved(InputEvent event, float x, float y) {
+                    // Cancel previous close task.
+                    if (closeTask != null) {
+                        closeTask.cancel();
+                    }
+                    closeTask = new Timer.Task() {
+                        @Override
+                        public void run() {
+                            close(pane);
+                        }
+                    };
+                    Timer.schedule(closeTask, 4);
+                    return false;
+                }
+
+            });
+        }
 
         // Add to maps.
         String key = component.getClass().getSimpleName();
         paneMap.put(key, pane);
         buttonMap.put(key, button);
 
-        // Add button tooltip.
-        if (action != null && !action.isBlank()) {
-            String[] shortcutKeys = KeyBindings.instance.getStringKeys(action, true);
-            if(shortcutKeys != null && shortcutKeys.length > 0) {
-                button.addListener(new OwnTextHotkeyTooltip(title, shortcutKeys, skin));
+        if (!Settings.settings.program.ui.expandOnMouseOver) {
+            // Add button tooltip.
+            if (action != null && !action.isBlank()) {
+                String[] shortcutKeys = KeyBindings.instance.getStringKeys(action, true);
+                if (shortcutKeys != null && shortcutKeys.length > 0) {
+                    button.addListener(new OwnTextHotkeyTooltip(title, shortcutKeys, skin));
+                } else {
+                    button.addListener(new OwnTextTooltip(title, skin));
+                }
             } else {
                 button.addListener(new OwnTextTooltip(title, skin));
             }
-        } else {
-            button.addListener(new OwnTextTooltip(title, skin));
-        }
 
-        button.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                if (button.isChecked()) {
-                    // Add pane.
+            button.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    if (button.isChecked()) {
+                        //Add pane.
+                        pane.clearActions();
+                        activeComponentCell.clearActor();
+                        selectComponentButton(button);
+                        activeComponentCell.padTop(padTop);
+                        activeComponentCell.setActor(pane);
+                        pane.addAction(Actions.sequence(
+                                Actions.alpha(0f),
+                                Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds() * 0.5f)));
+                    } else {
+                        // Remove pane.
+                        pane.clearActions();
+                        pane.addAction(Actions.sequence(
+                                Actions.alpha(1f),
+                                Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds() * 0.5f),
+                                Actions.run(activeComponentCell::clearActor)
+                        ));
+                    }
+                }
+                return false;
+            });
+        } else {
+            button.addListener(new InputListener() {
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
+                    if (pointer != -1) return;
+                    Actor actor = event.getListenerActor();
+                    if (fromActor != null && fromActor.isDescendantOf(actor)) return;
+                    //Add pane.
                     pane.clearActions();
                     activeComponentCell.clearActor();
                     selectComponentButton(button);
@@ -271,19 +331,21 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                     pane.addAction(Actions.sequence(
                             Actions.alpha(0f),
                             Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds() * 0.5f)));
-                } else {
-                    // Remove pane.
-                    pane.clearActions();
-                    pane.addAction(Actions.sequence(
-                            Actions.alpha(1f),
-                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds() * 0.5f),
-                            Actions.run(activeComponentCell::clearActor)
-                    ));
+
+                    // Add automatic close task.
+                    if (closeTask != null) {
+                        closeTask.cancel();
+                    }
+                    closeTask = new Timer.Task() {
+                        @Override
+                        public void run() {
+                            close(pane);
+                        }
+                    };
+                    Timer.schedule(closeTask, 4);
                 }
-                lastActiveButton = button;
-            }
-            return false;
-        });
+            });
+        }
 
         return button;
     }
@@ -373,4 +435,5 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
             }
         }
     }
+
 }

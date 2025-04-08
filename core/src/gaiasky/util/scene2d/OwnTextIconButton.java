@@ -169,9 +169,6 @@ public class OwnTextIconButton extends OwnTextButton {
                 this.checked = style.checked;
             if (style.checkedFocused != null)
                 this.checkedFocused = style.checkedFocused;
-
         }
-
     }
-
 }

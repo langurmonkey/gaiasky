@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 public class OwnImageButton extends ImageButton {
     OwnImageButton me;
     SystemCursor cursor;
+    private float ownWidth = 0f, ownHeight = 0f;
 
     public OwnImageButton(Skin skin) {
         super(skin);
@@ -84,5 +85,30 @@ public class OwnImageButton extends ImageButton {
     public void draw(Batch batch, float parentAlpha) {
         updateImage();
         super.draw(batch, parentAlpha);
+    }
+
+    @Override
+    public void setSize(float width, float height) {
+        ownWidth = width;
+        ownHeight = height;
+        super.setSize(width, height);
+    }
+
+    @Override
+    public float getPrefWidth() {
+        if (ownWidth != 0) {
+            return ownWidth;
+        } else {
+            return super.getPrefWidth();
+        }
+    }
+
+    @Override
+    public float getPrefHeight() {
+        if (ownHeight != 0) {
+            return ownHeight;
+        } else {
+            return super.getPrefHeight();
+        }
     }
 }
