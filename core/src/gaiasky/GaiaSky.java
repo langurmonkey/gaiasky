@@ -1529,7 +1529,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     final boolean stereoMode = (Boolean) data[0];
                     if (stereoMode && guiRegistry.current != stereoGui) {
                         guiRegistry.change(stereoGui);
-                    } else if (!stereoMode && guiRegistry.previous != null && guiRegistry.previous != stereoGui) {
+                    } else if (!stereoMode && guiRegistry.previous != null && guiRegistry.previous != stereoGui && guiRegistry.previous != spacecraftGui) {
+                        // From stereo mode we can only go back to main GUI mode.
                         IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
                         guiRegistry.change(guiRegistry.previous, prev);
                     }
