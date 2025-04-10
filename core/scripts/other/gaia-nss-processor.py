@@ -1,6 +1,6 @@
 import pyvo, json, random, math
 import numpy as np
-import astropy.units as u
+from astropy import units
 
 # Gaia source IDs to process
 source_ids = [
@@ -68,35 +68,88 @@ def epoch_to_julian_day(epoch):
     days_per_year = 365.25  # Average number of days in a year
     return JD_J2000 + days_per_year * (epoch - 2000)
 
-def thiele_innes_to_campbell(A, B, F, G):
-    # Compute semi-major axis, in mas
-    a = np.sqrt(A**2 + B**2 + F**2 + G**2)
+def thiele_innes_to_campbell(A, B, F, G, parallax, verify=False):
+    """
+    Converts Thiele-Innes elements (A, B, F, G in mas) to Campbell elements.
+    The relation between Thiele-Innes and Campbell elements is as follows:
 
-    # Compute inclination, in radians
-    cos_i = (A*G - B*F) / (a**2)
-    cos_i = np.clip(cos_i, -1.0, 1.0)  # numerical safety
+    A = a * (cos ω * cos Ω - sin ω * sin Ω * cos i)
+    B = a * (cos ω * sin Ω + sin ω * cos Ω * cos i)
+    F = -a * (sin ω * cos Ω + cos ω * sin Ω * cos i)
+    G = -a * (sin ω * sin Ω - cos ω * cos Ω * cos i)
+
+    Inputs: A, B, F, G, and parallax in mas.
+    
+    Returns: semimajor axis (km, mas), inclination, Omega, omega (radians & degrees)
+    """
+    # Convert to arcsec for internal calculations
+    A_asec = A * 1e-3
+    B_asec = B * 1e-3
+    F_asec = F * 1e-3
+    G_asec = G * 1e-3
+
+    # See following article for formulas:
+    # https://arxiv.org/html/2502.20553v1
+
+    # Step 1: Compute a^2
+    u = A_asec**2 + B_asec**2 + F_asec**2 + G_asec**2
+    v = A_asec * G_asec - B_asec * F_asec
+    a_asec_squared = u / 2.0 + np.sqrt((u / (2.0 - v) * (u / (2.0 + v))))
+    a_asec = np.sqrt(a_asec_squared)
+    a_mas = a_asec * 1e3  # back to mas
+
+    # Step 2: Compute cos(i)
+    w = u / v
+    c1 = (w - np.sqrt(w**2 - 4.0)) / 2.0
+    c2 = (w + np.sqrt(w**2 - 4.0)) / 2.0
+    cos_i = c1 if w > 0 else c2
     i = np.arccos(cos_i)
 
-    # Compute Omega and omega (from atan2 formulas)
-    # This gives two angles whose sum is constant
-    Omega_plus_omega = np.arctan2(B - F, A + G)
-    Omega_minus_omega = np.arctan2(B + F, A - G)
+    # Step 3: Compute Omega + omega and Omega - omega
+    X = A_asec + G_asec
+    Y = B_asec - F_asec
+    Z = B_asec + F_asec
+    W = A_asec - G_asec
 
-    # Now solve for Ω and ω
-    Omega = (Omega_plus_omega + Omega_minus_omega) / 2
-    omega = (Omega_plus_omega - Omega_minus_omega) / 2
+    sum_angle = np.arctan2(Y, X)
+    diff_angle = np.arctan2(Z, W)
 
-    # Normalize angles to [0, 2π)
+    Omega = (sum_angle + diff_angle) / 2
+    omega = (sum_angle - diff_angle) / 2
+
+    # Normalize angles to [0, 2pi)
     Omega = Omega % (2 * np.pi)
     omega = omega % (2 * np.pi)
 
-    # Convert to degrees for readability
+    # Convert semimajor axis to AU then to km
+    a_au = a_asec / (parallax * 1e-3)
+    a_km = (a_au * units.au).to(units.km).value
+
+    # Verification
+    if verify:
+        Ac = a_mas * (np.cos(omega) * np.cos(Omega) - np.sin(omega) * np.sin(Omega) * np.cos(i))
+        Bc = a_mas * (np.cos(omega) * np.sin(Omega) + np.sin(omega) * np.cos(Omega) * np.cos(i))
+        Fc = a_mas * (-np.sin(omega) * np.cos(Omega) - np.cos(omega) * np.sin(Omega) * np.cos(i))
+        Gc = a_mas * (-np.sin(omega) * np.sin(Omega) + np.cos(omega) * np.cos(Omega) * np.cos(i))
+
+        print("\nVerification:")
+        print(f"A: {A:.6f} vs {Ac:.6f} (diff: {A - Ac:.2e})")
+        print(f"B: {B:.6f} vs {Bc:.6f} (diff: {B - Bc:.2e})")
+        print(f"F: {F:.6f} vs {Fc:.6f} (diff: {F - Fc:.2e})")
+        print(f"G: {G:.6f} vs {Gc:.6f} (diff: {G - Gc:.2e})")
+
     return {
-        'a_mas': a,
+        'a_km': a_km,
+        'a_mas': a_mas,
+        'i_rad': i,
         'i_deg': np.degrees(i),
+        'Omega_rad': Omega,
         'Omega_deg': np.degrees(Omega),
+        'omega_rad': omega,
         'omega_deg': np.degrees(omega)
     }
+
+
 
 def bp_rp_to_bv(row):
     """
@@ -180,7 +233,7 @@ for row in results:
             continue
 
     distance_pc = 1000.0 / parallax
-    distance_km = distance_pc * 30856775812800.0
+    distance_km = (distance_pc * units.pc).to(units.km).value
 
     ra = row['ra']
     if not ra or math.isnan(ra):
@@ -205,7 +258,7 @@ for row in results:
 
     # Period
     period = row['period'] # days
-    period_s = period * 86400.0
+    period_s = (period * units.d).to(units.s).value
 
     # === Orbital parameters ===
     # Convert Thiele-Innes to Campbell's elements
@@ -217,12 +270,12 @@ for row in results:
         print(f"SKIP {sid}: missing Thieles-Inner elements")
         continue  # not enough info
 
-    campbell = thiele_innes_to_campbell(A, B, F, G)
+    campbell = thiele_innes_to_campbell(A, B, F, G, parallax)
 
     # Step 1: semi-major axis (a1)
     a_mas = campbell['a_mas']
     a_au = (a_mas * distance_pc) / 1000.0
-    a_km = a_au * 149597870.7
+    a_km = (a_au * units.au).to(units.km).value
 
     # Step 2: inclination (i)
     i = campbell['i_deg']
@@ -236,13 +289,10 @@ for row in results:
     # Estimate eccentricity if available
     e = row['eccentricity'] if row['eccentricity'] is not None else 0.0
 
-    
-
     # --- Center ---
     center_obj = {
         "names": [center_name],
-        "size": 50.0,
-        "colorbv": 0.81,
+        "size": 5.0,
         "componentTypes": ["Others"],
         "parent": "dr3-nss-hook",
         "archetype": "Invisible",
