@@ -21,26 +21,25 @@ def thiele_innes_to_campbell(A, B, F, G, parallax):
 
     # See following article for formulas:
     # https://arxiv.org/html/2502.20553v1
+    # And the appendix here:
+    # https://www.aanda.org/articles/aa/pdf/2023/06/aa43969-22.pdf
 
-    # Step 1: Compute a^2
+    # STEP 1: Compute a^2
     u = A_asec**2 + B_asec**2 + F_asec**2 + G_asec**2
     v = A_asec * G_asec - B_asec * F_asec
     a_asec_squared = u / 2.0 + np.sqrt((u / (2.0 - v) * (u / (2.0 + v))))
     a_asec = np.sqrt(a_asec_squared)
     a_mas = a_asec * 1e3  # back to mas
+    # Convert semimajor axis to AU then to km
+    a_au = a_asec / (parallax * 1e-3)
+    a_km = (a_au * units.au).to(units.km).value
 
-    # Step 2: Compute cos(i)
-    w = u / v
-    c1 = (w - np.sqrt(w**2 - 4.0)) / 2.0
-    c2 = (w + np.sqrt(w**2 - 4.0)) / 2.0
-    cos_i = c1 if w > 0 else c2
-    i = np.arccos(cos_i)
-
-    # Step 3: Compute Omega + omega and Omega - omega
+    # Step 2: Compute Omega + omega and Omega - omega
     X = A_asec + G_asec
     Y = B_asec - F_asec
     Z = B_asec + F_asec
     W = A_asec - G_asec
+
 
     sum_angle = np.arctan2(Y, X)
     diff_angle = np.arctan2(Z, W)
@@ -52,9 +51,24 @@ def thiele_innes_to_campbell(A, B, F, G, parallax):
     Omega = Omega % (2 * np.pi)
     omega = omega % (2 * np.pi)
 
-    # Convert semimajor axis to AU then to km
-    a_au = a_asec / (parallax * 1e-3)
-    a_km = (a_au * units.au).to(units.km).value
+    # Step 3: Compute cos(i)
+    # method 1: https://www.aanda.org/articles/aa/pdf/2023/06/aa43969-22.pdf
+    L = F_asec - B_asec
+    M = A_asec - G_asec
+    d1 = np.abs(X * np.cos(diff_angle))
+    d2 = np.abs(L * np.sin(diff_angle))
+    if d1 >= d2:
+        i1 = 2.0 * np.arctan(np.sqrt(np.abs((M) * np.cos(sum_angle)) / d1))
+    else:
+        i1 = 2.0 * np.arctan(np.sqrt(np.abs((Z) * np.sin(sum_angle)) / d2))
+    # method 2: https://arxiv.org/html/2502.20553v1
+    w = u / v
+    c1 = (w - np.sqrt(w**2 - 4.0)) / 2.0
+    c2 = (w + np.sqrt(w**2 - 4.0)) / 2.0
+    cos_i = c1 if w > 0 else c2
+    i2 = np.arccos(cos_i)
+
+    i = i2
 
     # Verification
     Ac = a_mas * (np.cos(omega) * np.cos(Omega) - np.sin(omega) * np.sin(Omega) * np.cos(i))
