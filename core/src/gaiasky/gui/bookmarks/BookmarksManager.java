@@ -7,6 +7,7 @@
 
 package gaiasky.gui.bookmarks;
 
+import com.badlogic.gdx.utils.Null;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -232,7 +233,7 @@ public class BookmarksManager implements IObserver {
             if (b.children == null || b.children.isEmpty()) {
                 // Write
                 if (b.folder && !b.path.toString().endsWith("/")) {
-                    content.append("\n").append(b.path.toString()).append("/");
+                    content.append("\n").append(b.path).append("/");
                 } else {
                     content.append("\n").append(b.path.toString());
                 }
@@ -424,14 +425,15 @@ public class BookmarksManager implements IObserver {
                         logger.error(I18n.msg("gui.bookmark.add.error", name));
                     }
                 } else {
-                    // Position bookmark.
+                    // Location bookmark.
                     Vector3b pos = data[0] != null ? (Vector3b) d0 : null;
                     Vector3d dir = data[1] != null ? (Vector3d) data[1] : null;
                     Vector3d up = data[2] != null ? (Vector3d) data[2] : null;
                     Instant t = data[3] != null ? (Instant) data[3] : null;
-                    Settings s = data[4] != null ? (Settings) data[4] : null;
-                    String name = (String) data[5];
-                    boolean folder = (boolean) data[6];
+                    String focus = data[4] != null ? (String) data[4] : null;
+                    Settings s = data[5] != null ? (Settings) data[5] : null;
+                    String name = (String) data[6];
+                    boolean folder = (boolean) data[7];
 
                     // Generate ID to link settings.
                     String id = generateId(s != null);
@@ -448,7 +450,7 @@ public class BookmarksManager implements IObserver {
                         }
                         SettingsManager.persistSettings(s, settingsFile.toFile());
                     }
-                    String text = String.format("{%s|%s|%s|%s|%s|%s}", str(pos), str(dir), str(up), str(t), name, str(id));
+                    String text = String.format("{%s|%s|%s|%s|%s|%s|%s}", str(pos), str(dir), str(up), str(t), name, str(id), str(focus));
                     if (addBookmark(text, folder)) {
                         persistBookmarks();
                         logger.info(I18n.msg("gui.bookmark.add.ok", text));
@@ -556,21 +558,22 @@ public class BookmarksManager implements IObserver {
                 "(" + NULL_TOKEN + "|\\[[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?])";
         /**
          * Regular expression that defines the format of positional bookmarks, which is:
-         * <p><code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name|id}</code></p>
-         * All terms may be null.
+         * <p><code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name|id|focus}</code></p>
+         * All terms may be null, except the name of the bookmark.
          */
-        public static final String POS_BOOKMARK_REGEX = "\\{" + VEC3_REGEX +
+        public static final String LOC_BOOKMARK_REGEX = "\\{" + VEC3_REGEX +
                 "\\|" + VEC3_REGEX +
                 "\\|" + VEC3_REGEX +
                 "\\|(?:" + NULL_TOKEN + "|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z)" +
                 "\\|[^|,\\\\]+" +
-                "(\\|(?:" + NULL_TOKEN + "|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?}";
+                "(\\|(?:" + NULL_TOKEN + "|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?" +
+                "(\\|(?:" + NULL_TOKEN + "|[^|,\\\\]+))?}";
 
         /**
          * <p>The text of the bookmark in the bookmarks.txt file.
          * This coincides with the name for regular bookmarks. For
          * positional bookmarks, this has the format:</p>
-         * <code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name}</code>
+         * <code>{[x,y,z]|[dx,dy,dz]|[ux,uy,uz]|instant|name|id|focus}</code>
          */
         public String text;
         /**
@@ -580,23 +583,35 @@ public class BookmarksManager implements IObserver {
         /**
          * Camera position, for positional bookmarks.
          */
+        @Null
         public Vector3d position;
         /**
          * Camera direction, for positional bookmarks.
          */
+        @Null
         public Vector3d direction;
         /**
          * Camera up vector, for positional bookmarks.
          */
+        @Null
         public Vector3d up;
         /**
-         * Time, for positional bookmarks.
+         * Time, for location bookmarks.
          */
+        @Null
         public Instant time;
         /**
-         * The UUID, for positional bookmarks.
+         * The UUID, for location bookmarks.
          */
+        @Null
         public String uuid;
+        /**
+         * The name of the focus object in location bookmarks.
+         * If this is set, the camera is set to focus mode with this focus when the bookmark is activated.
+         * Leave null to use free camera mode.
+         */
+        @Null
+        public String focus;
         /**
          * The full path.
          */
@@ -624,7 +639,7 @@ public class BookmarksManager implements IObserver {
 
         public void initializeText() {
             if (this.text != null) {
-                if (this.text.matches(POS_BOOKMARK_REGEX)) {
+                if (this.text.matches(LOC_BOOKMARK_REGEX)) {
                     // Location bookmark.
                     var tokens = this.text.substring(1, this.text.length() - 1).split("\\|");
                     var pos = tokens[0];
@@ -633,15 +648,17 @@ public class BookmarksManager implements IObserver {
                     var instant = tokens[3];
                     var name = tokens[4];
                     var uuid = tokens.length > 5 ? tokens[5] : null;
+                    var focus = tokens.length > 6 ? tokens[6] : null;
 
                     // Name can't be null.
                     this.name = name;
                     // These are nullable.
-                    this.uuid = uuid != null && uuid.equals(NULL_TOKEN) ? null : uuid;
+                    this.uuid = fromString(uuid);
                     this.position = vectorFromString(pos);
                     this.direction = vectorFromString(dir);
                     this.up = vectorFromString(up);
-                    this.time = instant.equals(NULL_TOKEN) ? null : Instant.parse(instant);
+                    this.time = instantFromString(instant);
+                    this.focus = fromString(focus);
                 } else {
                     // Regular bookmark, only object name.
                     this.name = this.text;
@@ -679,6 +696,14 @@ public class BookmarksManager implements IObserver {
             }
             var tokens = vectorString.substring(1, vectorString.length() - 1).split(",");
             return new Vector3d(Parser.parseDouble(tokens[0]), Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]));
+        }
+
+        private Instant instantFromString(String t) {
+            return t.equals(NULL_TOKEN) ? null : Instant.parse(t);
+        }
+
+        private String fromString(String str) {
+            return str == null || str.equals(NULL_TOKEN) ? null : str;
         }
 
         public void insert(BookmarkNode node) {

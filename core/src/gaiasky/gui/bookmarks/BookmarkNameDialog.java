@@ -7,13 +7,13 @@
 
 package gaiasky.gui.bookmarks;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
@@ -21,14 +21,17 @@ import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.scene2d.Separator;
-import gaiasky.util.validator.*;
+import gaiasky.util.validator.FolderValidator;
+import gaiasky.util.validator.IValidator;
+import gaiasky.util.validator.LengthValidator;
+import gaiasky.util.validator.StringValidator;
 
-public class BookmarkNameDialog extends GenericDialog {
+public class BookmarkNameDialog extends GenericDialog implements IObserver {
     private static int SEQ_NUM = 0;
 
     private OwnTextField bookmarkName;
     private OwnLabel errorText;
-    private OwnCheckBox positionCb, orientationCb, timeCb, settingsCb;
+    private OwnCheckBox positionCb, orientationCb, timeCb, settingsCb, focusCb;
 
     public BookmarkNameDialog(Stage stage,
                               Skin skin) {
@@ -58,7 +61,7 @@ public class BookmarkNameDialog extends GenericDialog {
 
         // Validator: folder, character, length.
         IValidator folderValidator = new FolderValidator();
-        IValidator stringValidator = new StringValidator(folderValidator, new Character[] { '{', '}', '|', ',' });
+        IValidator stringValidator = new StringValidator(folderValidator, new Character[]{'{', '}', '|', ','});
         var val = new LengthValidator(stringValidator, 1, 30);
         bookmarkName.setValidator(val);
 
@@ -90,6 +93,16 @@ public class BookmarkNameDialog extends GenericDialog {
             }
             return false;
         }));
+        focusCb = new OwnCheckBox(I18n.msg("gui.bookmark.cb.focus"), skin, pad10);
+        focusCb.setChecked(false);
+        updateFocusCheckbox();
+        focusCb.addListener((event -> {
+            if (event instanceof ChangeEvent) {
+                check();
+                return true;
+            }
+            return false;
+        }));
         settingsCb = new OwnCheckBox(I18n.msg("gui.bookmark.cb.settings"), skin, pad10);
         settingsCb.setChecked(false);
         settingsCb.addListener((event -> {
@@ -110,10 +123,12 @@ public class BookmarkNameDialog extends GenericDialog {
         content.add(positionCb).pad(pad, 0, pad, pad).left().colspan(2).row();
         content.add(orientationCb).pad(pad, 0, pad, pad).left().colspan(2).row();
         content.add(timeCb).pad(pad, 0, pad, pad).left().colspan(2).row();
+        content.add(focusCb).pad(pad, 0, pad, pad).left().colspan(2).row();
         content.add(settingsCb).pad(pad, 0, pad, pad).left().colspan(2).padBottom(pad20).row();
 
         content.add(errorText).center().colspan(2);
 
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD);
     }
 
     public void resetName() {
@@ -127,10 +142,11 @@ public class BookmarkNameDialog extends GenericDialog {
         var dir = orientationCb.isChecked() ? cam.getDirection() : null;
         var up = orientationCb.isChecked() ? cam.getUp() : null;
         var time = timeCb.isChecked() ? GaiaSky.instance.time.getTime() : null;
+        var focus = focusCb.isChecked() ? GaiaSky.instance.getCameraManager().getFocus().getName() : null;
         var settings = settingsCb.isChecked() ? Settings.settings.clone() : null;
 
         if (check()) {
-            EventManager.publish(Event.BOOKMARKS_ADD, this, pos, dir, up, time, settings, bookmarkName.getText(), false);
+            EventManager.publish(Event.BOOKMARKS_ADD, this, pos, dir, up, time, focus, settings, bookmarkName.getText(), false);
             return true;
         }
         return false;
@@ -138,6 +154,7 @@ public class BookmarkNameDialog extends GenericDialog {
 
     /**
      * Checks that the inputs are fine, and returns true if there are no errors.
+     *
      * @return True if no errors are found.
      */
     private boolean check() {
@@ -146,7 +163,7 @@ public class BookmarkNameDialog extends GenericDialog {
             acceptButton.setDisabled(true);
             return false;
         }
-        if (!positionCb.isChecked() && !orientationCb.isChecked() && !timeCb.isChecked() && !settingsCb.isChecked()) {
+        if (!positionCb.isChecked() && !orientationCb.isChecked() && !timeCb.isChecked() && !focusCb.isChecked() && !settingsCb.isChecked()) {
             error(I18n.msg("gui.bookmark.error.cb"));
             acceptButton.setDisabled(true);
             return false;
@@ -155,6 +172,12 @@ public class BookmarkNameDialog extends GenericDialog {
         error(null);
         acceptButton.setDisabled(false);
         return true;
+    }
+
+    private void updateFocusCheckbox() {
+        if (focusCb != null) {
+            focusCb.setDisabled(!GaiaSky.instance.getCameraManager().getMode().isFocus());
+        }
     }
 
     private void error(String info) {
@@ -173,5 +196,12 @@ public class BookmarkNameDialog extends GenericDialog {
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.CAMERA_MODE_CMD) {
+            updateFocusCheckbox();
+        }
     }
 }

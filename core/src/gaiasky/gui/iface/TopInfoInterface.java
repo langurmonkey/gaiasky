@@ -168,16 +168,18 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             } else {
                 e = (Entity) data[0];
             }
-            if (Mapper.focus.has(e)) {
-                view.setEntity(e);
-                f = view;
-            }
-            if (f != null) {
-                String candidate = f.getCandidateName();
-                if (candidate != null) {
-                    lastFocusName = TextUtils.capString(candidate, maxNameLen);
-                    focus.setText(I18n.msg("gui.top.focus", lastFocusName));
-                    s1.setText("|");
+            if (e != null) {
+                if (Mapper.focus.has(e)) {
+                    view.setEntity(e);
+                    f = view;
+                }
+                if (f != null) {
+                    String candidate = f.getCandidateName();
+                    if (candidate != null) {
+                        lastFocusName = TextUtils.capString(candidate, maxNameLen);
+                        focus.setText(I18n.msg("gui.top.focus", lastFocusName));
+                        s1.setText("|");
+                    }
                 }
             }
         }

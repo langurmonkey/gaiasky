@@ -112,6 +112,7 @@ public enum Event {
      *     <li>camera direction ({@link Vector3d}, may be null)</li>
      *     <li>camera up ({@link Vector3d}, may be null)</li>
      *     <li>time ({@link java.time.Instant}, may be null)</li>
+     *     <li>focus ({@link String}, may be null)</li>
      *     <li>settings ({@link gaiasky.util.Settings}, may be null)</li>
      *     <li>name ({@link String}) -- name of the bookmark</li>
      *     <li>folder ({@link Boolean}) -- whether it is a folder node (false for actual bookmarks)</li>

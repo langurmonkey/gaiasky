@@ -59,6 +59,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     protected VerticalGroup infoTable;
     protected OwnLabel infoMessage1, infoMessage2;
     private boolean events = true;
+    private boolean updateSelection = true;
 
     public BookmarksComponent(Skin skin,
                               Stage stage) {
@@ -132,6 +133,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksTree.addListener(event -> {
             if (events)
                 if (event instanceof ChangeEvent ce) {
+                    // Activate bookmark.
                     Actor actor = ce.getTarget();
                     TreeNode selected = (TreeNode) ((Tree) actor).getSelectedNode();
                     if (selected != null && !selected.hasChildren()) {
@@ -171,30 +173,54 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 var p = selected.node.position;
                                 var d = selected.node.direction;
                                 var u = selected.node.up;
-                                EventManager.publish(Event.CAMERA_MODE_CMD, bookmarksTree, CameraMode.FREE_MODE, true);
-                                if (p != null)
-                                    EventManager.publish(Event.CAMERA_POS_CMD, bookmarksTree, (Object) new double[]{p.x, p.y, p.z});
-                                if (d != null)
-                                    EventManager.publish(Event.CAMERA_DIR_CMD, bookmarksTree, (Object) new double[]{d.x, d.y, d.z});
-                                if (u != null)
-                                    EventManager.publish(Event.CAMERA_UP_CMD, bookmarksTree, (Object) new double[]{u.x, u.y, u.z});
+                                var f = selected.node.focus;
+                                var t = selected.node.time;
+
+                                // First time.
                                 if (selected.node.time != null)
-                                    EventManager.publish(Event.TIME_CHANGE_CMD, bookmarksTree, selected.node.time);
+                                    EventManager.publish(Event.TIME_CHANGE_CMD, bookmarksTree, t);
 
                                 // Settings.
-                                if (selected.node.uuid != null)
-                                    GaiaSky.postRunnable(() -> {
-                                        // Try to load settings.
-                                        var settings = selected.node.loadSettingsFromFile();
-                                        if (settings != null) {
-                                            var version = Settings.settings.version.clone();
-                                            if (SettingsManager.setSettingsInstance(settings)) {
-                                                Settings.settings.setupListeners();
-                                                Settings.settings.version = version;
-                                                Settings.settings.apply();
-                                            }
+                                if (selected.node.uuid != null) {
+                                    var settings = selected.node.loadSettingsFromFile();
+                                    if (settings != null) {
+                                        var version = Settings.settings.version.clone();
+                                        if (SettingsManager.setSettingsInstance(settings)) {
+                                            Settings.settings.setupListeners();
+                                            Settings.settings.version = version;
+                                            Settings.settings.apply();
                                         }
-                                    });
+                                    }
+                                }
+
+                                // In the next frame, we apply the camera transformations.
+                                GaiaSky.postRunnable(()->{
+                                    // Camera position.
+                                    if (p != null)
+                                        EventManager.publish(Event.CAMERA_POS_CMD, bookmarksTree, (Object) new double[]{p.x, p.y, p.z});
+
+                                    // Focus.
+                                    if (f == null) {
+                                        // No focus, set to free.
+                                        EventManager.publish(Event.CAMERA_MODE_CMD, bookmarksTree, CameraMode.FREE_MODE, true);
+                                    } else {
+                                        updateSelection = false;
+                                        // We have a focus object.
+                                        EventManager.publish(Event.CAMERA_MODE_CMD, bookmarksTree, CameraMode.FREE_MODE, true);
+                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, bookmarksTree, f, true);
+                                        EventManager.publish(Event.CAMERA_MODE_CMD, bookmarksTree, CameraMode.FOCUS_MODE, true);
+                                        EventManager.publish(Event.CAMERA_CENTER_FOCUS_CMD, bookmarksTree, false);
+                                        updateSelection = true;
+                                    }
+
+                                    // Camera orientation.
+                                    if (d != null)
+                                        EventManager.publish(Event.CAMERA_DIR_CMD, bookmarksTree, (Object) new double[]{d.x, d.y, d.z});
+                                    if (u != null)
+                                        EventManager.publish(Event.CAMERA_UP_CMD, bookmarksTree, (Object) new double[]{u.x, u.y, u.z});
+
+                                });
+
 
                             });
                         }
@@ -206,7 +232,6 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                         TreeNode target = bookmarksTree.getNodeAt(tmpCoords.y);
                         // Context menu!
                         if (target != null) {
-                            //selectBookmark(target.getValue(), true);
                             GaiaSky.postRunnable(() -> {
                                 ContextMenu cm = new ContextMenu(skin, "default");
                                 // New folder...
@@ -468,17 +493,19 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                        final Object... data) {
         switch (event) {
             case FOCUS_CHANGED -> {
-                // Update focus selection in focus list
-                FocusView focus = null;
-                if (data[0] instanceof String) {
-                    view.setEntity(scene.getEntity((String) data[0]));
-                    focus = view;
-                } else if (data[0] instanceof FocusView) {
-                    focus = (FocusView) data[0];
-                }
-                // Select only if data[1] is true
-                if (focus != null) {
-                    selectBookmark(focus.getName(), false);
+                if (updateSelection) {
+                    // Update focus selection in focus list
+                    FocusView focus = null;
+                    if (data[0] instanceof String) {
+                        view.setEntity(scene.getEntity((String) data[0]));
+                        focus = view;
+                    } else if (data[0] instanceof FocusView) {
+                        focus = (FocusView) data[0];
+                    }
+                    // Select only if data[1] is true
+                    if (focus != null) {
+                        selectBookmark(focus.getName(), false);
+                    }
                 }
             }
             case BOOKMARKS_ADD -> {
@@ -487,7 +514,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                 if (d0 instanceof String) {
                     name = (String) d0;
                 } else {
-                    name = (String) data[5];
+                    name = (String) data[6];
                 }
                 reloadBookmarksTree();
                 selectBookmark(name, false);
