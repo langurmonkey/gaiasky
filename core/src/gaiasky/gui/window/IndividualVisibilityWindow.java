@@ -95,7 +95,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                     Image icon = new Image(skin.getDrawable(ct.style));
                     button = new OwnTextIconButton("", icon, skin, "toggle");
                 } else {
-                    button = new OwnTextButton(name, skin, "toggle");
+                    continue;
                 }
                 // Name is the key
                 button.setName(ct.key);
