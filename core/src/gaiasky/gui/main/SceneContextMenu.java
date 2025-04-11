@@ -412,7 +412,7 @@ public class SceneContextMenu extends ContextMenu {
         MenuItem bookmarkPosition = new MenuItem(I18n.msg("context.bookmark.pos"), skin, skin.getDrawable("iconic-star"));
         bookmarkPosition.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_ADD_POSITION_BOOKMARK, this);
+                EventManager.publish(Event.SHOW_ADD_POSITION_BOOKMARK_ACTION, this);
             }
             return false;
         });

@@ -98,7 +98,7 @@ public enum Event {
     WINDOW_RESOLUTION_INFO,
 
     /** Shows window to give a name to the new position bookmark. **/
-    SHOW_ADD_POSITION_BOOKMARK,
+    SHOW_ADD_POSITION_BOOKMARK_ACTION,
     /**
      * <p>Add bookmark. Contains the path and a boolean indicating if it is a folder. The parameters it contains depend on the bookmark type:</p>
      * <p>Object bookmarks:</p>
@@ -129,6 +129,8 @@ public enum Event {
     BOOKMARKS_MOVE_UP,
     /** Moves the bookmark down in the list of its parent. **/
     BOOKMARKS_MOVE_DOWN,
+    /** Shows the bookmark information dialog for the given bookmark node. **/
+    SHOW_BOOKMARK_INFO_ACTION,
 
     /** Shows and hides the console. Contains a boolean with the state, which is optional. Otherwise we toggle the console. **/
     CONSOLE_CMD,

@@ -181,21 +181,15 @@ public class ExternalInformationUpdater {
     }
 
 
-    private static class GaiaArchiveButtonListener implements EventListener {
-        private final FocusView focus;
-
-        public GaiaArchiveButtonListener(FocusView focus) {
-            super();
-            this.focus = focus;
-        }
+    private record GaiaArchiveButtonListener(FocusView focus) implements EventListener {
 
         @Override
-        public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_ARCHIVE_VIEW_CMD, this, focus);
-                return true;
+            public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_ARCHIVE_VIEW_CMD, this, focus);
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
-    }
 }

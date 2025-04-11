@@ -26,11 +26,11 @@ public class BookmarkButton extends OwnTextIconButton {
     private final FocusView view;
 
     public BookmarkButton(BookmarkNode bookmark, Skin skin) {
-        super(TextUtils.capString(bookmark.name, 16), skin, bookmark.folder ? "bookmarks-folder" : "bookmarks-bookmark");
+        super(TextUtils.capString(bookmark.name, 16), skin, bookmark.isTypeFolder() ? "bookmarks-folder" : "bookmarks-bookmark");
         this.bookmark = bookmark;
         this.view = new FocusView();
 
-        if (!bookmark.folder) {
+        if (!bookmark.isTypeFolder()) {
             this.addListener((event) -> {
                 if (event instanceof ChangeListener.ChangeEvent ce) {
                     var scene = GaiaSky.instance.scene;

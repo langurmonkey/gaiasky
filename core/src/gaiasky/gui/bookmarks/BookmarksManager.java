@@ -155,7 +155,7 @@ public class BookmarksManager implements IObserver {
                                                  boolean folder) {
         if (bookmarks != null) {
             for (BookmarkNode bookmark : bookmarks) {
-                if (bookmark.folder == folder)
+                if (bookmark.isTypeFolder() == folder)
                     result.add(bookmark);
                 getBookmarksByType(bookmark.children, result, folder);
             }
@@ -182,19 +182,19 @@ public class BookmarksManager implements IObserver {
     public boolean containsName(String name) {
         boolean contains = false;
         for (BookmarkNode bookmark : bookmarks) {
-            contains = contains || containsNameRec(name, bookmark);
+            contains = contains || containsNameRecursive(name, bookmark);
         }
         return contains;
     }
 
-    public boolean containsNameRec(String name,
-                                   BookmarkNode node) {
+    public boolean containsNameRecursive(String name,
+                                         BookmarkNode node) {
         if (node.name.equals(name)) {
             return true;
         } else if (node.children != null) {
             boolean contains = false;
             for (BookmarkNode child : node.children) {
-                contains = contains | containsNameRec(name, child);
+                contains = contains | containsNameRecursive(name, child);
             }
             return contains;
         }
@@ -232,7 +232,7 @@ public class BookmarksManager implements IObserver {
         for (BookmarkNode b : bookmarks) {
             if (b.children == null || b.children.isEmpty()) {
                 // Write
-                if (b.folder && !b.path.toString().endsWith("/")) {
+                if (b.isTypeFolder() && !b.path.toString().endsWith("/")) {
                     content.append("\n").append(b.path).append("/");
                 } else {
                     content.append("\n").append(b.path.toString());
@@ -484,7 +484,7 @@ public class BookmarksManager implements IObserver {
                     persistBookmarks();
                 } else {
                     // Move to destination folder
-                    if (dest.folder) {
+                    if (dest.isTypeFolder()) {
                         removeBookmark(src.path.toString(), true);
                         addBookmark(dest.path.resolve(src.text).toString(), false);
                         persistBookmarks();
@@ -549,7 +549,7 @@ public class BookmarksManager implements IObserver {
         /**
          * Token to use for null values.
          */
-        private static final String NULL_TOKEN = "null";
+        public static final String NULL_TOKEN = "null";
 
         /**
          * Regular expression for a nullable vector with three components.
@@ -577,7 +577,7 @@ public class BookmarksManager implements IObserver {
          */
         public String text;
         /**
-         * The name of this node
+         * The name of this node.
          */
         public String name;
         /**
@@ -624,22 +624,32 @@ public class BookmarksManager implements IObserver {
          * Children, if any.
          */
         public List<BookmarkNode> children;
-        /**
-         * Is it a folder?
-         */
-        public boolean folder;
+
+        /** Type of bookmark enum. **/
+        public enum BookmarkType {
+            FOLDER, OBJECT, LOCATION
+        }
+
+        public final BookmarkType type;
 
         public BookmarkNode(Path path,
                             boolean folder) {
             this.path = path;
             this.text = this.path.getFileName().toString().strip();
-            this.folder = folder;
+            // Bookmark type.
+            if (folder) {
+                this.type = BookmarkType.FOLDER;
+            } else if (this.text.matches(LOC_BOOKMARK_REGEX)) {
+                this.type = BookmarkType.LOCATION;
+            } else {
+                this.type = BookmarkType.OBJECT;
+            }
             initializeText();
         }
 
         public void initializeText() {
             if (this.text != null) {
-                if (this.text.matches(LOC_BOOKMARK_REGEX)) {
+                if (isTypeLocation()) {
                     // Location bookmark.
                     var tokens = this.text.substring(1, this.text.length() - 1).split("\\|");
                     var pos = tokens[0];
@@ -659,8 +669,8 @@ public class BookmarksManager implements IObserver {
                     this.up = vectorFromString(up);
                     this.time = instantFromString(instant);
                     this.focus = fromString(focus);
-                } else {
-                    // Regular bookmark, only object name.
+                } else  {
+                    // Object or folder bookmark, only name.
                     this.name = this.text;
                 }
             }
@@ -721,13 +731,33 @@ public class BookmarksManager implements IObserver {
                 children = new ArrayList<>(4);
         }
 
+        /**
+         * Counts the number of bookmarks this bookmark contains. If it is a leaf bookmark (location or object), this method returns 1.
+         * If it is a folder bookmark, it returns the number of leaf bookmarks within.
+         *
+         * @return The number of contained bookmarks in this bookmark.
+         */
+        public int countBookmarksRec() {
+            if (isTypeFolder()) {
+                int num = 0;
+                if (children != null) {
+                    for (var c : children) {
+                        num += c.countBookmarksRec();
+                    }
+                }
+                return num;
+            } else {
+                return 1;
+            }
+        }
+
         @Override
         public String toString() {
             return path.toString();
         }
 
         public BookmarkNode getFirstFolderAncestor() {
-            if (folder)
+            if (isTypeFolder())
                 return this;
             else if (parent != null)
                 return parent.getFirstFolderAncestor();
@@ -744,6 +774,33 @@ public class BookmarksManager implements IObserver {
                 current = current.parent;
             }
             return false;
+        }
+
+        /**
+         * Checks if this bookmark is a folder (i.e. of type {@link BookmarkType#FOLDER}).
+         *
+         * @return True if this is a folder.
+         */
+        public boolean isTypeFolder() {
+            return type != null && type.equals(BookmarkType.FOLDER);
+        }
+
+        /**
+         * Checks if this bookmark is of type {@link BookmarkType#OBJECT}.
+         *
+         * @return True if this is an object bookmark.
+         */
+        public boolean isTypeObject() {
+            return type != null && type.equals(BookmarkType.OBJECT);
+        }
+
+        /**
+         * Checks if this bookmark is of type {@link BookmarkType#LOCATION}.
+         *
+         * @return True if this is a location bookmark.
+         */
+        public boolean isTypeLocation() {
+            return type != null && type.equals(BookmarkType.LOCATION);
         }
     }
 }

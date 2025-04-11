@@ -24,8 +24,10 @@ import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.BookmarkInfoDialog;
 import gaiasky.gui.api.IGui;
 import gaiasky.gui.bookmarks.BookmarkNameDialog;
+import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.gui.datasets.DatasetLoadDialog;
 import gaiasky.gui.window.*;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -88,7 +90,8 @@ public class GuiRegistry implements IObserver {
     private AboutWindow aboutWindow;
     private SearchDialog searchDialog;
     private DateDialog dateDialog;
-    private BookmarkNameDialog bookmarkNameDialog;
+    private BookmarkNameDialog locationBookmarkDialog;
+    private BookmarkInfoDialog bookmarkInfoDialog;
     /**
      * Keyframes window.
      **/
@@ -132,7 +135,7 @@ public class GuiRegistry implements IObserver {
                 Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION,
                 Event.SHOW_RESTART_ACTION,
                 Event.CLOSE_ALL_GUI_WINDOWS_CMD, Event.SHOW_DATE_TIME_EDIT_ACTION,
-                Event.SHOW_ADD_POSITION_BOOKMARK);
+                Event.SHOW_ADD_POSITION_BOOKMARK_ACTION, Event.SHOW_BOOKMARK_INFO_ACTION);
     }
 
     public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
@@ -547,12 +550,21 @@ public class GuiRegistry implements IObserver {
                     dateDialog.updateTime(GaiaSky.instance.time.getTime(), Settings.settings.program.timeZone.getTimeZone());
                     dateDialog.show(stage);
                 }
-                case SHOW_ADD_POSITION_BOOKMARK -> {
-                    if (bookmarkNameDialog == null) {
-                        bookmarkNameDialog = new BookmarkNameDialog(stage, skin);
+                case SHOW_ADD_POSITION_BOOKMARK_ACTION -> {
+                    if (locationBookmarkDialog == null) {
+                        locationBookmarkDialog = new BookmarkNameDialog(stage, skin);
                     }
-                    bookmarkNameDialog.resetName();
-                    bookmarkNameDialog.show(stage);
+                    locationBookmarkDialog.resetName();
+                    locationBookmarkDialog.show(stage);
+                }
+                case SHOW_BOOKMARK_INFO_ACTION -> {
+                    if (bookmarkInfoDialog == null) {
+                        bookmarkInfoDialog = new BookmarkInfoDialog(stage, skin);
+                    }
+                    var bookmark = (BookmarksManager.BookmarkNode) data[0];
+                    bookmarkInfoDialog.updateView(bookmark);
+                    bookmarkInfoDialog.show(stage);
+
                 }
                 case UI_THEME_RELOAD_INFO -> {
                     if (keyframesWindow != null) {

@@ -1297,7 +1297,7 @@ public class GamepadGui extends AbstractGui {
             button.setSize(w, h);
 
             // Add listener to folders.
-            if (node.folder) {
+            if (node.isTypeFolder()) {
                 final int rowIndex = row;
                 button.addListener((event) -> {
                     if (event instanceof ChangeEvent) {
@@ -1339,7 +1339,7 @@ public class GamepadGui extends AbstractGui {
                 }
 
 
-                if (selectedBookmark.bookmark.folder) {
+                if (selectedBookmark.bookmark.isTypeFolder()) {
                     // If it is a folder, we need to populate the next.
                     fillBookmarksColumn(bookmarkColumns, fi + 1, selectedBookmark.bookmark.children, currentModel, bw, bh, false);
                 } else {

@@ -194,7 +194,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 }
 
                                 // In the next frame, we apply the camera transformations.
-                                GaiaSky.postRunnable(()->{
+                                GaiaSky.postRunnable(() -> {
                                     // Camera position.
                                     if (p != null)
                                         EventManager.publish(Event.CAMERA_POS_CMD, bookmarksTree, (Object) new double[]{p.x, p.y, p.z});
@@ -234,10 +234,24 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                         if (target != null) {
                             GaiaSky.postRunnable(() -> {
                                 ContextMenu cm = new ContextMenu(skin, "default");
+
+                                // Bookmark info
+                                MenuItem info = new MenuItem(I18n.msg("gui.bookmark.context.info", target.getValue()), skin, skin.getDrawable("iconic-info"));
+                                info.addListener(evt -> {
+                                    if (evt instanceof ChangeEvent) {
+                                        EventManager.publish(Event.SHOW_BOOKMARK_INFO_ACTION, info, target.node);
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                cm.addItem(info);
+
+                                cm.addSeparator();
+
                                 // New folder...
                                 BookmarkNode parent = target.node.getFirstFolderAncestor();
                                 String parentName = "/" + (parent == null ? "" : parent.path.toString());
-                                MenuItem newDirectory = new MenuItem(I18n.msg("gui.bookmark.context.newfolder", parentName), skin);
+                                MenuItem newDirectory = new MenuItem(I18n.msg("gui.bookmark.context.newfolder", parentName), skin, skin.getDrawable("iconic-folder"));
                                 newDirectory.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
                                         NewBookmarkFolderDialog newBookmarkFolderDialog = new NewBookmarkFolderDialog(parent != null ? parent.path.toString() : "/", skin,
@@ -255,7 +269,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 });
                                 cm.addItem(newDirectory);
                                 // Delete
-                                MenuItem delete = new MenuItem(I18n.msg("gui.bookmark.context.delete", target.getValue()), skin);
+                                MenuItem delete = new MenuItem(I18n.msg("gui.bookmark.context.delete", target.getValue()), skin, skin.getDrawable("iconic-delete"));
                                 delete.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
                                         EventManager.publish(Event.BOOKMARKS_REMOVE, delete, target.node.path.toString());
@@ -269,7 +283,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 cm.addSeparator();
 
                                 // Move up and down
-                                MenuItem moveUp = new MenuItem(I18n.msg("gui.bookmark.context.move.up"), skin);
+                                MenuItem moveUp = new MenuItem(I18n.msg("gui.bookmark.context.move.up"), skin, skin.getDrawable("iconic-arrow-top"));
                                 moveUp.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
                                         EventManager.publish(Event.BOOKMARKS_MOVE_UP, moveUp, target.node);
@@ -279,7 +293,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                     return false;
                                 });
                                 cm.addItem(moveUp);
-                                MenuItem moveDown = new MenuItem(I18n.msg("gui.bookmark.context.move.down"), skin);
+                                MenuItem moveDown = new MenuItem(I18n.msg("gui.bookmark.context.move.down"), skin, skin.getDrawable("iconic-arrow-bottom"));
                                 moveDown.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
                                         EventManager.publish(Event.BOOKMARKS_MOVE_DOWN, moveDown, target.node);
@@ -292,7 +306,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
 
                                 // Move to...
                                 if (target.node.parent != null) {
-                                    MenuItem move = new MenuItem(I18n.msg("gui.bookmark.context.move", target.getValue(), "/"), skin);
+                                    MenuItem move = new MenuItem(I18n.msg("gui.bookmark.context.move", target.getValue(), "/"), skin, skin.getDrawable("iconic-move"));
                                     move.addListener(evt -> {
                                         if (evt instanceof ChangeEvent) {
                                             EventManager.publish(Event.BOOKMARKS_MOVE, move, target.node, null);
@@ -306,7 +320,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 List<BookmarkNode> folders = GaiaSky.instance.getBookmarksManager().getFolders();
                                 for (BookmarkNode folder : folders) {
                                     if (!target.node.isDescendantOf(folder)) {
-                                        MenuItem mv = new MenuItem(I18n.msg("gui.bookmark.context.move", target.getValue(), "/" + folder.path.toString()), skin);
+                                        MenuItem mv = new MenuItem(I18n.msg("gui.bookmark.context.move", target.getValue(), "/" + folder.path.toString()), skin, skin.getDrawable("iconic-move"));
                                         mv.addListener(evt -> {
                                             if (evt instanceof ChangeEvent) {
                                                 EventManager.publish(Event.BOOKMARKS_MOVE, mv, target.node, folder);
@@ -328,7 +342,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 ContextMenu cm = new ContextMenu(skin, "default");
                                 // New folder...
                                 String parentName = "/";
-                                MenuItem newDirectory = new MenuItem(I18n.msg("gui.bookmark.context.newfolder", parentName), skin);
+                                MenuItem newDirectory = new MenuItem(I18n.msg("gui.bookmark.context.newfolder", parentName), skin, skin.getDrawable("iconic-folder"));
                                 newDirectory.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
                                         NewBookmarkFolderDialog nbfd = new NewBookmarkFolderDialog("/", skin, stage);
@@ -389,7 +403,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksTree.clearChildren();
         for (BookmarkNode bookmark : bookmarks) {
             TreeNode node = new TreeNode(bookmark, skin);
-            if (bookmark.folder)
+            if (bookmark.isTypeFolder())
                 node.setIcon(folderIcon);
             else {
                 node.setIcon(bookmarkIcon);
@@ -405,7 +419,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         if (bookmark.children != null && !bookmark.children.isEmpty()) {
             for (BookmarkNode child : bookmark.children) {
                 TreeNode tn = new TreeNode(child, skin);
-                if (child.folder)
+                if (child.isTypeFolder())
                     tn.setIcon(folderIcon);
                 else
                     tn.setIcon(bookmarkIcon);
