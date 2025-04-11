@@ -11,11 +11,13 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
@@ -33,6 +35,9 @@ public class ErrorDialog implements ApplicationListener {
     private final Exception cause;
     private final String message;
     private Stage ui;
+    private ScreenViewport vp;
+    private SpriteBatch sb;
+    private Skin skin;
 
     public ErrorDialog(Exception cause, String message) {
         this.cause = cause;
@@ -41,27 +46,41 @@ public class ErrorDialog implements ApplicationListener {
 
     @Override
     public void create() {
-        ui = new Stage();
+        var height = Gdx.graphics.getHeight();
+        var unitsPerPixel = 1f / ((float) height / 1000f) * Settings.settings.program.ui.scale;
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        this.vp = vp;
+        this.sb = new SpriteBatch();
+        ui = new Stage(this.vp, this.sb);
         FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         if (!fh.exists()) {
             // Default to dark-green
             Settings.settings.program.ui.theme = "dark-green";
             fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         }
-        Skin skin = new Skin(fh);
+        skin = new Skin(fh);
+
+        rebuildUI();
+
+        Gdx.input.setInputProcessor(ui);
+    }
+
+    private void rebuildUI(){
 
         Table t = new Table(skin);
         t.setFillParent(true);
+        ui.clear();
         ui.addActor(t);
 
         // Title
         OwnLabel title = new OwnLabel(I18n.msg("error.crash.title"), skin, "header-large");
         // Subtitle
         String msg;
-        if(cause != null) {
+        if (cause != null) {
             if (cause.getLocalizedMessage() != null) {
                 msg = cause.getLocalizedMessage();
-            } else if (cause.getMessage() != null){
+            } else if (cause.getMessage() != null) {
                 msg = cause.getMessage();
             } else {
                 msg = cause.getClass().getSimpleName();
@@ -124,12 +143,14 @@ public class ErrorDialog implements ApplicationListener {
         t.add(stackTraceScroll).left().padBottom(80).row();
 
         t.add(b).center().row();
-
-        Gdx.input.setInputProcessor(ui);
     }
 
     @Override
     public void resize(int width, int height) {
+        var unitsPerPixel = 1f / ((float) height / 1000f) * Settings.settings.program.ui.scale;
+        vp.setUnitsPerPixel(unitsPerPixel);
+        vp.update(width, height, true);
+        sb.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
     }
 
     @Override
@@ -138,7 +159,6 @@ public class ErrorDialog implements ApplicationListener {
 
         ui.act(Gdx.graphics.getDeltaTime());
         ui.draw();
-
     }
 
     @Override

@@ -460,7 +460,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         window = cliArgs.headless ? null : ((Lwjgl3Graphics) graphics).getWindow();
 
         // Log basic info.
-        assert settings != null;
         logger.info(settings.version.version, I18n.msg("gui.build", settings.version.build));
         logger.info(I18n.msg("notif.info.displaymode", graphics.getWidth(), graphics.getHeight(), Gdx.graphics.isFullscreen()));
         logger.info(I18n.msg("notif.info.device", GL30.glGetString(GL30.GL_RENDERER)));

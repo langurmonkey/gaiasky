@@ -67,7 +67,7 @@ public class GlobalResources {
      */
     public static final DecimalFormat nfSci;
     /** Textures. **/
-    private Map<String, Texture> textures;
+    private final Map<String, Texture> textures;
 
     static {
         nf = new DecimalFormat("#########.###");
