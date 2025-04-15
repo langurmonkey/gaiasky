@@ -38,7 +38,7 @@ public class PackUITextures {
 
         // Themes
         Map<String, String> themes = Map.of(
-                "default", "#FCBA4C"
+                "default", "#FFB300"
                 //,"blue", "#92A1BF"
         );
 
