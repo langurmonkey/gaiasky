@@ -66,6 +66,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
 
     private Logger.LoggerLevel level;
     private String message;
+    private boolean initialized = false;
 
     private final String black = "\033[30m";
     private final String red = "\033[31m";
@@ -100,7 +101,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                 // Copy all output messages to clipboard.
                 if (!manager.messages().isEmpty()) {
                     var buffer = new StringBuilder();
-                    for(var m : manager.messages()) {
+                    for (var m : manager.messages()) {
                         buffer.append(m.cleanMessage()).append('\n');
                     }
                     var selection = new StringSelection(buffer.toString());
@@ -184,13 +185,14 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         pack();
 
         if (manager.messages().isEmpty()) {
-            addOutputInfo(blue + I18n.msg("gui.console.welcome"));
+            addOutputInfo(blue + I18n.msg("gui.console.welcome") + reset);
             addOutputInfo("");
         } else {
             restoreConsoleMessages();
         }
 
         EventManager.instance.subscribe(this, Event.POST_NOTIFICATION);
+        initialized = true;
     }
 
     private void rebuildMainTable() {
@@ -265,7 +267,9 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             ConsoleManager.Message msg = new ConsoleManager.Message(messageText, type, Instant.now());
             addMessageWidget(msg);
             manager.messages().add(msg);
-            logger.info(String.format("%s: %s", msg.time(), msg.msg()));
+            if (initialized) {
+                logger.info(String.format("%s: %s", msg.time(), msg.msg()));
+            }
         }
     }
 
@@ -289,8 +293,8 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         clipboardButton.addListener(new OwnTextTooltip(I18n.msg("gui.clipboard.copy"), getSkin()));
 
         output.add(status).left().top().padRight(pad * 2f);
-        output.add(message).left().top().expandX().padRight(pad*2f);
-        output.add(clipboardButton).left().top().padRight(pad*2f).row();
+        output.add(message).left().top().expandX().padRight(pad * 2f);
+        output.add(clipboardButton).left().top().padRight(pad * 2f).row();
 
         var coordinates = status.localToAscendantCoordinates(output, vec2.set(status.getX(), status.getY()));
         outputScroll.scrollTo(coordinates.x, coordinates.y, status.getWidth(), status.getHeight());
@@ -526,7 +530,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                     addOutputInfo(blue + I18n.msg("gui.console.shortcuts") + reset + ":");
                     manager.shortcutMap().keySet().stream().sorted().forEach(a -> {
                         var b = manager.shortcutMap().get(a);
-                        addOutputInfo("  " + a + yellow + " :=: " + green + b);
+                        addOutputInfo("  " + a + yellow + " :=: " + green + b + reset);
                     });
                 } else {
                     addOutputError(I18n.msg("gui.console.cmd.parameters", cmd));
