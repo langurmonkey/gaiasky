@@ -105,77 +105,77 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackUITextures)
         // *****************************
-        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        compileOnly "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS
         // ************
 
         // OpenXR
-        api group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
+        implementation group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
+        implementation group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
         runtimeOnly "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
         runtimeOnly "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-windows"
 
         // LibGDX
-        api group: "com.badlogicgames.gdx", name: "gdx", version: "$gdxVersion"
-        api group: "com.badlogicgames.gdx", name: "gdx-backend-lwjgl3", version: "$gdxVersion"
+        implementation group: "com.badlogicgames.gdx", name: "gdx", version: "$gdxVersion"
+        implementation group: "com.badlogicgames.gdx", name: "gdx-backend-lwjgl3", version: "$gdxVersion"
         runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
         // gdx-controllers:2.+ bases up on SDL 2.0.12
-        api group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-core", version: "$gdxcontrollersVersion"
-        api group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-desktop", version: "$gdxcontrollersVersion"
+        implementation group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-core", version: "$gdxcontrollersVersion"
+        implementation group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-desktop", version: "$gdxcontrollersVersion"
 
         // Ashley
-        api group: "com.badlogicgames.ashley", name: "ashley", version: "$ashleyVersion"
+        implementation group: "com.badlogicgames.ashley", name: "ashley", version: "$ashleyVersion"
 
         // STIL library to load datasets
-        api group: "uk.ac.starlink", name: "stil", version: "$stilVersion"
+        implementation group: "uk.ac.starlink", name: "stil", version: "$stilVersion"
         // JSAMP for SAMP communication
-        api group: "uk.ac.starlink", name: "jsamp", version: "$jsampVersion"
+        implementation group: "uk.ac.starlink", name: "jsamp", version: "$jsampVersion"
         // Apfloat for arbitrary precision floating point numbers
-        api group: "org.apfloat", name: "apfloat", version: "$apfloatVersion"
+        implementation group: "org.apfloat", name: "apfloat", version: "$apfloatVersion"
 
         // File utilities
-        api group: "commons-io", name: "commons-io", version: "$commonsioVersion"
+        implementation group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         // Command line arguments
-        api group: "org.jcommander", name: "jcommander", version: "$jcommanderVersion"
+        implementation group: "org.jcommander", name: "jcommander", version: "$jcommanderVersion"
         // Fast math
-        api group: "net.jafama", name: "jafama", version: "$jafamaVersion"
+        implementation group: "net.jafama", name: "jafama", version: "$jafamaVersion"
         // Tar
-        api group: "org.kamranzafar", name: "jtar", version: "$jtarVersion"
+        implementation group: "org.kamranzafar", name: "jtar", version: "$jtarVersion"
 
         // Scripting
-        api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
+        implementation group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         // System information
-        api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
+        implementation group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
         // Yaml
-        api group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
-        api group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"
-        api group: "com.fasterxml.jackson.datatype", name: "jackson-datatype-jsr310", version: "$jacksonVersion"
+        implementation group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
+        implementation group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"
+        implementation group: "com.fasterxml.jackson.datatype", name: "jackson-datatype-jsr310", version: "$jacksonVersion"
 
         // ****************
         // REST SERVER DEPS
         // ****************
-        api group: "org.slf4j", name: "slf4j-nop", version: "$slf4jVersion"
-        api group: "com.sparkjava", name: "spark-core", version: "$sparkjavaVersion"
+        implementation group: "org.slf4j", name: "slf4j-nop", version: "$slf4jVersion"
+        implementation group: "com.sparkjava", name: "spark-core", version: "$sparkjavaVersion"
 
         // *******************
         // VULNERABILITY FIXES
         // *******************
         // CVE-2023-26049
-        api group: "org.eclipse.jetty", name: "jetty-xml", version: "$jettyVersion"
-        api group: "org.eclipse.jetty", name: "jetty-http", version: "$jettyVersion"
-        api group: "org.eclipse.jetty", name: "jetty-server", version: "$jettyVersion"
+        implementation group: "org.eclipse.jetty", name: "jetty-xml", version: "$jettyVersion"
+        implementation group: "org.eclipse.jetty", name: "jetty-http", version: "$jettyVersion"
+        implementation group: "org.eclipse.jetty", name: "jetty-server", version: "$jettyVersion"
         // CVE-2022-45690
-        api group: "org.json", name: "json", version: "$jsonVersion"
+        implementation group: "org.json", name: "json", version: "$jsonVersion"
         // CVE-2016-5002
-        api group: "org.apache.xmlrpc", name: "xmlrpc", version: "$xmlrpcVersion"
+        implementation group: "org.apache.xmlrpc", name: "xmlrpc", version: "$xmlrpcVersion"
 
         // *************
         // INTERNAL DEPS
         // *************
-        api files("../assets")
+        implementation files("../assets")
     }
 
     jar {
