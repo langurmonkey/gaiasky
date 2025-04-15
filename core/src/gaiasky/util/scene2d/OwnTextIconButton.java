@@ -59,6 +59,12 @@ public class OwnTextIconButton extends OwnTextButton {
         this.skin = skin;
         setIcon(up);
     }
+    public OwnTextIconButton(String text, int contentAlign, Image up, Skin skin, String styleName) {
+        super(text, skin, styleName);
+        this.skin = skin;
+        this.contentAlign = contentAlign;
+        setIcon(up);
+    }
 
     public void setContentAlign(int align) {
         this.contentAlign = align;
