@@ -158,12 +158,6 @@
       "g": "%theme_g%",
       "r": "%theme_r%"
     },
-    "theme2": {
-      "a": 1,
-      "b": "%theme2_b%",
-      "g": "%theme2_g%",
-      "r": "%theme2_r%"
-    },
     "highlight": {
       "a": 1,
       "b": 0.04509,
@@ -961,7 +955,7 @@
     },
     "header-s": {
       "font": "title-20",
-      "fontColor": "theme2"
+      "fontColor": "theme"
     },
     "question": {
       "font": "ui-22",

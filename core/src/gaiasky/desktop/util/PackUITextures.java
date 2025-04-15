@@ -38,7 +38,7 @@ public class PackUITextures {
 
         // Themes
         Map<String, String> themes = Map.of(
-                "default", "#FFB300"
+                "default", "#f4b400"
                 //,"blue", "#92A1BF"
         );
 
@@ -53,19 +53,18 @@ public class PackUITextures {
                 // Process
                 TexturePacker.process(x2settings, gs + String.format("/assets/skins/raw/%s/", key), gs + String.format("/assets/skins/%s/", key), key);
 
-                // Generate theme2 color (more bright)
-                float[] hsb = Color.RGBtoHSB(theme.getRed(), theme.getGreen(), theme.getBlue(), null);
-                int rgb = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * 1.2f);
-                Color theme2 = new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, theme.getAlpha());
-
                 // Process and copy theme JSON fil
                 File templateFile = new File(gs + "/assets/skins/source/source.json");
                 File outputDir = new File(gs + String.format("/assets/skins/%s/", key));
-                if (!outputDir.exists()) outputDir.mkdirs();
+                if (!outputDir.exists()) {
+                    if (outputDir.mkdirs()) {
+                        System.out.println("Created output directory");
+                    }
+                }
                 File outputFile = new File(outputDir, key + ".json");
 
                 String jsonTemplate = Files.readString(templateFile.toPath());
-                String result = replaceColors(jsonTemplate, theme, theme2);
+                String result = replaceColors(jsonTemplate, theme);
 
                 Files.writeString(outputFile.toPath(), result);
                 System.out.println("Written to: " + outputFile.getAbsolutePath());
@@ -79,14 +78,11 @@ public class PackUITextures {
 
     }
 
-    private static String replaceColors(String template, Color theme, Color theme2) {
+    private static String replaceColors(String template, Color theme) {
         return template
                 .replace("\"%theme_r%\"", format(theme.getRed()))
                 .replace("\"%theme_g%\"", format(theme.getGreen()))
-                .replace("\"%theme_b%\"", format(theme.getBlue()))
-                .replace("\"%theme2_r%\"", format(theme2.getRed()))
-                .replace("\"%theme2_g%\"", format(theme2.getGreen()))
-                .replace("\"%theme2_b%\"", format(theme2.getBlue()));
+                .replace("\"%theme_b%\"", format(theme.getBlue()));
     }
 
     private static String format(int value) {

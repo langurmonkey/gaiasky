@@ -111,7 +111,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         });
         copyToClipboard.addListener(new OwnTextTooltip(I18n.msg("gui.clipboard.copy"), skin));
 
-        prompt = new OwnLabel(">", skin, "header-s");
+        prompt = new OwnLabel(">", skin, "header");
 
         input = new OwnTextField("", skin, "monospace-txt");
 
@@ -200,9 +200,9 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         outputScroll.setWidth(w);
         Table mainTable = new Table(getSkin());
         mainTable.pad(pad);
-        mainTable.setBackground("bg-pane-border-dark");
+        mainTable.setBackground("bg-pane-border");
         mainTable.center();
-        mainTable.add(new OwnLabel("  " + I18n.msg("gui.console.title"), getSkin(), "header-s")).left().expandX().padBottom(pad);
+        mainTable.add(new OwnLabel("  " + I18n.msg("gui.console.title"), getSkin(), "header")).left().expandX().padBottom(pad);
         mainTable.add(copyToClipboard).right().padBottom(pad).padRight(pad);
         mainTable.add(close).right().padBottom(pad).row();
 
