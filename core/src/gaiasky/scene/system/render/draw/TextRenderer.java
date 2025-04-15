@@ -10,7 +10,7 @@ package gaiasky.scene.system.render.draw;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.system.FontRenderSystem;
+import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
@@ -22,11 +22,11 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 
-public class TextRenderer extends FontRenderSystem {
+public class TextRenderer extends AbstractRenderSystem {
 
     private final ExtSpriteBatch batch;
     private final LabelView view;
-    public BitmapFont fontDistanceField, font2d, fontTitles;
+    public BitmapFont fontDistanceField;
 
     public TextRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(sceneRenderer, rg, alphas, new ExtShaderProgram[] { program });
@@ -35,11 +35,9 @@ public class TextRenderer extends FontRenderSystem {
         this.view = new LabelView();
     }
 
-    public TextRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
+    public TextRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField) {
         this(sceneRenderer, rg, alphas, batch, program);
 
-        this.font2d = font2d;
-        this.fontTitles = fontTitles;
         if (fontDistanceField != null) {
             this.fontDistanceField = fontDistanceField;
             this.fontDistanceField.getData().setScale(0.6f);

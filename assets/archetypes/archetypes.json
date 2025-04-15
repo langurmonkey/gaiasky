@@ -284,7 +284,6 @@
             "parent": "SceneGraphNode",
             "components": [
                 "Fade",
-                "Title",
                 "Label"
             ],
             "aliases": [

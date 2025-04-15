@@ -16,10 +16,10 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.I3DTextRenderable;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
+import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
@@ -155,7 +155,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     @Override
-    public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void render(ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         if (label.renderConsumer != null && renderText()) {
             label.renderConsumer.apply(renderSystem, this, batch, shader, sys, rc, camera);
         }

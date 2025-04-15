@@ -66,7 +66,7 @@ public class Settings extends SettingsObject {
      * 3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      **/
-    public static final int SOURCE_VERSION = 3060601;
+    public static final int SOURCE_VERSION = 3060801;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the
@@ -3059,18 +3059,21 @@ public class Settings extends SettingsObject {
             public boolean modeChangeInfo;
             public DistanceUnits distanceUnits;
 
+            /**
+             * Set the UI theme. For now, we only have one.
+             *
+             * @param theme The theme.
+             */
+            @JsonProperty("theme")
+            public void setTheme(String theme) {
+                if (!Objects.equals(theme, "default")) {
+                    theme = "default";
+                }
+                this.theme = theme;
+            }
+
             public void setScale(Float scale) {
                 this.scale = MathUtils.clamp(scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX);
-            }
-
-            @JsonIgnore
-            public boolean isUINightMode() {
-                return theme.contains("night");
-            }
-
-            @JsonIgnore
-            public boolean isHiDPITheme() {
-                return scale > 1.5;
             }
 
             @JsonIgnore

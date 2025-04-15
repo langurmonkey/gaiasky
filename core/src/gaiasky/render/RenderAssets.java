@@ -48,7 +48,7 @@ public class RenderAssets {
     public ExtShaderProgram distanceFieldFontShader;
     public ExtShaderProgram[] billboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders, primitiveGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
     public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbVertexLightingThruster, mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation, mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
-    public BitmapFont font2d, font3d, fontTitles;
+    public BitmapFont fontDistanceFiled;
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
 
@@ -172,8 +172,7 @@ public class RenderAssets {
         BitmapFontParameter bfp = new BitmapFontParameter();
         bfp.magFilter = TextureFilter.Linear;
         bfp.minFilter = TextureFilter.Linear;
-        manager.load("skins/fonts/main-font.fnt", BitmapFont.class, bfp);
-        manager.load("skins/fonts/font2d.fnt", BitmapFont.class, bfp);
+        manager.load("skins/fonts/font-distance-field.fnt", BitmapFont.class, bfp);
         manager.load("skins/fonts/font-titles.fnt", BitmapFont.class, bfp);
 
     }
@@ -329,10 +328,7 @@ public class RenderAssets {
         mbCloud = new IntModelBatch(cloud);
 
         // Fonts - all of these are distance field fonts
-        font3d = manager.get("skins/fonts/main-font.fnt");
-        font2d = manager.get("skins/fonts/font2d.fnt");
-        font2d.getData().setScale(0.5f);
-        fontTitles = manager.get("skins/fonts/font-titles.fnt");
+        fontDistanceFiled = manager.get("skins/fonts/font-distance-field.fnt");
 
         // Sprites
         spriteBatch = globalResources.getExtSpriteBatch();

@@ -64,23 +64,16 @@ public class TimeComponent extends GuiComponent implements IObserver {
     @Override
     public void initialize(float componentWidth) {
         KeyBindings kb = KeyBindings.instance;
-        boolean redTheme = skin.getAtlas().getTextures().first().toString().contains("night-red");
 
         // Time
-        date = new OwnLabel("date UT", skin, "msg-33");
+        date = new OwnLabel("date UT", skin, "big");
         date.setWidth(componentWidth - 65);
         date.setAlignment(Align.center);
-        if (redTheme) {
-            date.setColor(Color.RED);
-        }
         date.setName("label date");
 
-        time = new OwnLabel("time UT", skin, "msg-33");
+        time = new OwnLabel("time UT", skin, "big");
         time.setWidth(componentWidth - 65);
         time.setAlignment(Align.center);
-        if (redTheme) {
-            time.setColor(Color.RED);
-        }
         time.setName("label time");
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
@@ -95,12 +88,12 @@ public class TimeComponent extends GuiComponent implements IObserver {
         // BWD label.
         warpBackward = new OwnLabel(I18n.msg("gui.time.bwd"), skin, "msg-15");
         warpBackward.setAlignment(Align.left);
-        warpBackward.setColor(redTheme ? Color.RED : Color.GRAY);
+        warpBackward.setColor(Color.GRAY);
 
         // FWD label.
         warpForward = new OwnLabel(I18n.msg("gui.time.fwd"), skin, "msg-15");
         warpForward.setAlignment(Align.right);
-        warpForward.setColor(redTheme ? Color.RED : Color.GRAY);
+        warpForward.setColor(Color.GRAY);
 
         // Warp factor.
         warp = new OwnLabel("", skin, "big");

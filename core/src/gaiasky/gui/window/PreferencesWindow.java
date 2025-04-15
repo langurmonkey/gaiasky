@@ -1382,23 +1382,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
 
         StringComobBoxBean[] themes = new StringComobBoxBean[]{
-                new StringComobBoxBean(I18n.msg("gui.theme.darkgreen"), "dark-green"),
-                new StringComobBoxBean(I18n.msg("gui.theme.darkblue"), "dark-blue"),
-                new StringComobBoxBean(I18n.msg("gui.theme.darkorange"), "dark-orange"),
-                new StringComobBoxBean(I18n.msg("gui.theme.nightred"), "night-red")};
+                new StringComobBoxBean(I18n.msg("gui.theme.default"), "default")};
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(selectWidth);
         theme.setItems(themes);
-        int themeIndex;
-        if (settings.program.ui.theme.contains("dark-green")) {
-            themeIndex = 0;
-        } else if (settings.program.ui.theme.contains("dark-blue")) {
-            themeIndex = 1;
-        } else if (settings.program.ui.theme.contains("dark-orange")) {
-            themeIndex = 2;
-        } else {
-            themeIndex = 3;
-        }
+        int themeIndex = 0;
         theme.setSelectedIndex(themeIndex);
 
         // SCALING
@@ -2836,7 +2824,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             settings.graphics.quality = GraphicsQuality.values()[bean.value];
         }
 
-        if(GaiaSky.instance.isExternalView()) {
+        if (GaiaSky.instance.isExternalView()) {
             // Apply width/height of external view window.
             var ev = GaiaSky.instance.gaiaSkyView;
             ev.graphics.setWindowedMode((int) evwField.getIntValue(1920), (int) evhField.getIntValue(1080));

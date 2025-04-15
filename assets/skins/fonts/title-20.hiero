@@ -1,4 +1,4 @@
-font.name=C059
+font.name=Inter Display Black
 font.size=20
 font.bold=false
 font.italic=false
@@ -6,7 +6,7 @@ font.gamma=0.0
 font.mono=false
 
 font2.file=/home/tsagrista/.local/share/fonts/ttf/scifi/conthrax-sb.ttf
-font2.use=true
+font2.use=false
 
 pad.top=1
 pad.right=1

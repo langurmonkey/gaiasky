@@ -362,7 +362,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
         var toggleSizeTooltip = new OwnTextTooltip(I18n.msg("gui.minimize.pane"), skin);
         toggleSize.addListener(toggleSizeTooltip);
-        toggleSize.setColor(ColorUtils.gYellowC);
         toggleSize.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 if (maximized) {

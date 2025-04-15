@@ -586,21 +586,6 @@
         "unit": "BillboardDataset[]"
       }
     },
-    "Title": {
-      "description": "Defines attributes related to two-dimensional titles.",
-      "scale:Text2D": {
-        "description": "Scale factor to scale up or down the title.",
-        "unit": "Double"
-      },
-      "lines:Text2D": {
-        "description": "Whether to render frame lines above and below the title or not.",
-        "unit": "Boolean"
-      },
-      "align:Text2D": {
-        "description": "The horizontal alignment of the title. Center (1), left (8) or right (16).",
-        "unit": "Integer"
-      }
-    },
     "Axis": {
       "description": "Defines attributes related to reference system axes.",
       "axesColors": {

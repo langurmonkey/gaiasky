@@ -30,6 +30,7 @@ import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.gui.vr.FixedScreenViewport;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 import gaiasky.util.TipsGenerator;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
@@ -121,7 +122,7 @@ public class LoadingGui extends AbstractGui {
         // Funny text.
         loadingTextGenerator = new LoadingTextGenerator();
         lastFunnyTime = 0;
-        spin = new OwnLabel("0", skin, "main-title-xs");
+        spin = new OwnLabel("0", skin, "main-title-s");
         spin.setColor(skin.getColor("theme"));
 
         centerContent.add(titleGroup).width(1300).center().padBottom(pad30 * 2f).row();
@@ -204,7 +205,7 @@ public class LoadingGui extends AbstractGui {
             spin.setText(I18n.msg("gui.loading"));
         } else {
             try {
-                spin.setText(loadingTextGenerator.next());
+                spin.setText(TextUtils.capitalise(loadingTextGenerator.next()));
             } catch (Exception e) {
                 spin.setText(I18n.msg("gui.loading"));
             }

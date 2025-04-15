@@ -39,7 +39,6 @@ public class Families {
             octrees,
             constellations,
             boundaries,
-            titles,
             keyframes,
             shapes,
             perimeters,
@@ -74,7 +73,6 @@ public class Families {
         octrees = Family.all(Octree.class).exclude(TagNoProcess.class).get();
         constellations = Family.all(Constel.class).exclude(TagNoProcess.class).get();
         boundaries = Family.all(Boundaries.class).exclude(TagNoProcess.class).get();
-        titles = Family.all(Title.class).exclude(TagNoProcess.class).get();
         keyframes = Family.all(Keyframes.class).exclude(TagNoProcess.class).get();
         shapes = Family.all(Shape.class).exclude(TagNoProcess.class).get();
         perimeters = Family.all(Perimeter.class).exclude(TagNoProcess.class).get();

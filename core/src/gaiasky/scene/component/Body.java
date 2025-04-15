@@ -72,7 +72,7 @@ public class Body implements Component, ICopy {
      * Base RGB color.
      */
     public float[] color;
-    public float[] labelColor = Settings.settings != null && Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
+    public float[] labelColor = new float[] { 1, 1, 1, 1 };
 
     /**
      * The bounding sphere of this object collides with the camera, preventing it from entering its radius.

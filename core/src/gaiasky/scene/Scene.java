@@ -246,7 +246,6 @@ public class Scene {
             addInitializer(new MeshInitializer(setUp, families.meshes, priority++));
             addInitializer(new GridRecInitializer(setUp, families.gridRecs, priority++));
             addInitializer(new RulerInitializer(setUp, families.rulers, priority++));
-            addInitializer(new TitleInitializer(setUp, families.titles, priority++));
             addInitializer(new KeyframeInitializer(this, setUp, families.keyframes, priority++));
             addInitializer(new ShapeInitializer(setUp, families.shapes, priority++));
             addInitializer(new LocInitializer(setUp, families.locations, priority++));
@@ -337,7 +336,6 @@ public class Scene {
             addUpdater(new GridRecUpdater(families.gridRecs, priority++));
             addUpdater(new RulerUpdater(families.rulers, priority++));
             addUpdater(new AxesUpdater(families.axes, priority++));
-            addUpdater(new TitleUpdater(families.titles, priority++));
             addUpdater(new KeyframeUpdater(families.keyframes, priority++));
             addUpdater(new ShapeUpdater(families.shapes, priority++));
             addUpdater(new LocUpdater(families.locations, priority++));
@@ -363,7 +361,6 @@ public class Scene {
             addExtractor(newExtractor(GridRecExtractor.class, families.gridRecs, priority++, sceneRenderer));
             addExtractor(newExtractor(RulerExtractor.class, families.rulers, priority++, sceneRenderer));
             addExtractor(newExtractor(AxesExtractor.class, families.axes, priority++, sceneRenderer));
-            addExtractor(newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer));
             addExtractor(newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer));
             addExtractor(newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer));
             addExtractor(newExtractor(LocExtractor.class, families.locations, priority++, sceneRenderer));

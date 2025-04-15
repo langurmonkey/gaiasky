@@ -259,12 +259,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new ModelRenderer(this, MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
-            case FONT_ANNOTATION -> {
-                // ANNOTATIONS - (grids)
-                system = new TextRenderer(this, FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
-                system.addPreRunnables(regularBlendR, noDepthTestR);
-                system.addPostRunnables(clearDepthR);
-            }
             case LINE -> system = getLineCPURenderSystem();
             case LINE_GPU -> system = getLineGPURenderSystem();
             case POINT -> system = new PointPrimitiveRenderSystem(this, POINT, alphas, renderAssets.pointShaders);
@@ -339,7 +333,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case MODEL_VERT_STAR -> // MODEL STARS
                     system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
             case FONT_LABEL -> // LABELS
-                    system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
+                    system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.fontDistanceFiled);
             case BILLBOARD_SSO -> {
                 system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.billboardShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
@@ -384,10 +378,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new ParticleEffectsRenderer(this, PARTICLE_EFFECTS, alphas, renderAssets.particleEffectShaders);
                 system.addPreRunnables(additiveBlendR, noDepthTestR);
                 system.addPostRunnables(regularBlendR);
-            }
-            case SHAPE -> {
-                system = new ShapeRenderer(this, SHAPE, alphas, globalResources.getShapeShader());
-                system.addPreRunnables(regularBlendR, depthTestR);
             }
             case SPRITE -> {
                 system = new SpriteRenderer(this, SPRITE, alphas, globalResources.getSpriteShader());

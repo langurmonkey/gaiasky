@@ -45,16 +45,16 @@ public class ComponentTypes extends BitSet {
     }
 
     /**
-     * Checks if all the t bits in this bit set are also set in other.
+     * Checks if all the t bits in this bit set are also set in the other.
      *
      * @param other The bit set to check against
      *
      * @return True if all the bits set to true in this bit set are also true in
-     * other. Returns false otherwise
+     * the other. Returns false otherwise
      */
     public boolean allSetLike(ComponentTypes other) {
-        long thisval = this.toLongArray()[0];
-        return (thisval & other.toLongArray()[0]) == thisval;
+        long thisVal = this.toLongArray()[0];
+        return (thisVal & other.toLongArray()[0]) == thisVal;
     }
 
     /**
@@ -117,9 +117,8 @@ public class ComponentTypes extends BitSet {
         Effects("icon-elem-effects"),
         Axes("icon-elem-axes"),
         VelocityVectors("icon-elem-arrows"),
-        Titles("icon-elem-titles"),
-
         Keyframes("icon-elem-keyframes"),
+
         Others("icon-elem-others"),
 
         // ALWAYS LAST

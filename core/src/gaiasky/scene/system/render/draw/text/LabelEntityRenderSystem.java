@@ -13,15 +13,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
-import gaiasky.render.api.I3DTextRenderable;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.component.StarSet;
-import gaiasky.scene.component.Title;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.*;
@@ -52,7 +49,7 @@ public class LabelEntityRenderSystem {
     public LabelEntityRenderSystem() {
     }
 
-    public void renderLocation(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderLocation(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var body = view.body;
         var graph = view.graph;
 
@@ -72,10 +69,10 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAngle", view.label.forceLabel ? 2f : (float) (body.solidAngleApparent * scaffolding.locVaMultiplier * Constants.U_TO_KM));
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", view.label.forceLabel ? 1f : scaffolding.locThresholdLabel / (float) Constants.DISTANCE_SCALE_FACTOR);
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), labelPosition, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), 0.025f, 0.1f, view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), labelPosition, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), 0.025f, 0.1f, view.label.forceLabel);
     }
 
-    public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var body = view.body;
         var sa = Mapper.sa.get(view.getEntity());
 
@@ -85,26 +82,10 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", view.label.forceLabel ? 1f : (float) sa.thresholdLabel / view.label.labelBias);
 
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), labelPosition, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), labelPosition, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
     }
 
-    public void renderTitle(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        var title = view.getComponent(Title.class);
-
-        shader.setUniformf("u_viewAngle", view.label.forceLabel ? 2f : (float) view.body.solidAngleApparent);
-        shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thLabel", 1f);
-
-        // Resize batch
-        batch.setProjectionMatrix(batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
-
-        // Text
-        render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, view.text(), 0, 96f, title.scale * 1.6f, title.align);
-
-        title.lineHeight = ((TextRenderer) sys).fontTitles.getLineHeight();
-    }
-
-    public void renderRuler(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderRuler(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         // 3D distance font
         Vector3d labelPosition = D31;
         view.textPosition(camera, labelPosition);
@@ -112,10 +93,10 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
 
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), labelPosition, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), labelPosition, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
     }
 
-    public void renderRecursiveGrid(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderRecursiveGrid(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var gr = Mapper.gridRec.get(view.getEntity());
         var body = view.body;
 
@@ -145,16 +126,16 @@ public class LabelEntityRenderSystem {
             float min = 0.025f * ff;
             float max = 0.05f * ff;
             if (gr.d01 / body.distToCamera > 0.1f) {
-                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond(), gr.p01, body.distToCamera, view.textScale(), (float) (gr.d01 * 1e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
+                render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond(), gr.p01, body.distToCamera, view.textScale(), (float) (gr.d01 * 1e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
             }
             d = GlobalResources.doubleToDistanceString(gr.d02, du);
             if (gr.d02 / body.distToCamera > 0.1f) {
-                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond(), gr.p02, body.distToCamera, view.textScale(), (float) (gr.d02 * 1e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
+                render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond(), gr.p02, body.distToCamera, view.textScale(), (float) (gr.d02 * 1e-3d * camera.getFovFactor()), view.getRadius(), min, max, view.label.forceLabel);
             }
         }
     }
 
-    private void renderDistanceLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera, double dist, String text) {
+    private void renderDistanceLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera, double dist, String text) {
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thLabel", 1);
@@ -176,46 +157,46 @@ public class LabelEntityRenderSystem {
         label.labelPosition.set(dist, 0d, 0d);
         if (transform.matrix != null) label.labelPosition.mul(transform.matrix);
         label.labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
 
         // -X
         label.labelPosition.set(-dist, 0d, 0d);
         if (transform.matrix != null) label.labelPosition.mul(transform.matrix);
         label.labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
 
         // +Z
         label.labelPosition.set(0d, 0d, dist);
         if (transform.matrix != null) label.labelPosition.mul(transform.matrix);
         label.labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
 
         // -Z
         label.labelPosition.set(0d, 0d, -dist);
         if (transform.matrix != null) label.labelPosition.mul(transform.matrix);
         label.labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, text, label.labelPosition.put(D33), view.body.distToCamera, view.textScale(), size, view.getRadius(), min, max, view.label.forceLabel);
     }
 
-    public void renderMesh(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderMesh(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = D31;
         view.textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
     }
 
-    public void renderConstellation(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderConstellation(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = D31;
         view.textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thLabel", 1);
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
     }
 
-    public void renderCelestial(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderCelestial(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         // 3D distance font
         Vector3d pos = D31;
         view.textPosition(camera, pos);
@@ -223,29 +204,29 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAnglePow", view.label.forceLabel ? 1f : view.label.solidAnglePow);
         shader.setUniformf("u_thLabel", view.label.forceLabel ? 1f : (float) view.sa.thresholdLabel / view.label.labelBias);
 
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
     }
 
-    public void renderCluster(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderCluster(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = D31;
         view.textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", view.label.forceLabel ? 2f : (float) view.body.solidAngle * 500f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
 
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
     }
 
-    public void renderBillboardSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderBillboardSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var pos = D31;
         view.textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
     }
 
-    public void renderParticleSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderParticleSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
 
         var set = view.particleSet;
 
@@ -256,7 +237,7 @@ public class LabelEntityRenderSystem {
             shader.setUniformf("u_viewAngle", 90f);
             shader.setUniformf("u_viewAnglePow", 1f);
             shader.setUniformf("u_thLabel", 1f);
-            render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, pos.len(), view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, pos.len(), view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
         }
 
         // Particle labels.
@@ -294,14 +275,14 @@ public class LabelEntityRenderSystem {
                         }
 
                         textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, pb.names()[0], labelPosition, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+                        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, pb.names()[0], labelPosition, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
                     }
                 }
             }
         }
     }
 
-    public void renderStarSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderStarSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var set = view.starSet;
 
         // Dataset label.
@@ -311,7 +292,7 @@ public class LabelEntityRenderSystem {
             shader.setUniformf("u_viewAngle", 90f);
             shader.setUniformf("u_viewAnglePow", 1f);
             shader.setUniformf("u_thLabel", 1f);
-            render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, pos.len(), view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
+            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, pos.len(), view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.label.forceLabel);
         }
 
         if (view.starSet.renderParticleLabels) {
@@ -342,7 +323,7 @@ public class LabelEntityRenderSystem {
     /**
      * Renders the label for a single star in a star group.
      */
-    private boolean renderStarLabel(LabelView view, StarSet set, int idx, Vector3b starPosition, float thresholdLabel, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    private boolean renderStarLabel(LabelView view, StarSet set, int idx, Vector3b starPosition, float thresholdLabel, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         boolean forceLabel = set.forceLabel.contains(idx);
         IParticleRecord star = set.pointData.get(idx);
         starPosition = set.fetchPosition(star, set.cPosD, starPosition, set.currDeltaYears);
@@ -376,7 +357,7 @@ public class LabelEntityRenderSystem {
                 }
 
                 textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                return render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, star.names()[0], labelPosition, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
+                return render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, star.names()[0], labelPosition, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
             } else {
                 return false;
             }
@@ -392,7 +373,7 @@ public class LabelEntityRenderSystem {
         verticalOffset = 0;
     }
 
-    public void renderGridAnnotations(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderGridAnnotations(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var entity = view.getEntity();
         var grid = Mapper.grid.get(entity);
 
@@ -426,7 +407,7 @@ public class LabelEntityRenderSystem {
             effectsPos(F31, camera);
             if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                 D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
-                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angle(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
+                render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, angle(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
             }
 
         }
@@ -437,13 +418,13 @@ public class LabelEntityRenderSystem {
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                     D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
-                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
+                    render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
                 }
                 F31.set(Coordinates.sphericalToCartesian(0, FastMath.toRadians(-angle), -distToCamera, D31).valuesf()).mul(grid.annotTransform);
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                     D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
-                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
+                    render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
                 }
             }
         }
@@ -470,12 +451,12 @@ public class LabelEntityRenderSystem {
             // Horizontal grid.
             y = 5f;
             for (int xi = xStep; xi <= w - xStep; xi += xStep) {
-                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, "|", xi - 50, y, 0.95f * labelSize, Align.center);
+                render2DLabel(batch, shader, rc, sys.fontDistanceField, "|", xi - 50, y, 0.95f * labelSize, Align.center);
             }
             // Vertical grid.
             x = w - 5;
             for (int yi = yStep + 5; yi <= h - yStep + 5; yi += yStep) {
-                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, "-", x - 145, yi, 0.95f * labelSize, Align.right);
+                render2DLabel(batch, shader, rc, sys.fontDistanceField, "-", x - 145, yi, 0.95f * labelSize, Align.right);
             }
 
             // Horizontal.
@@ -492,7 +473,7 @@ public class LabelEntityRenderSystem {
                 Coordinates.cartesianToSpherical(vecDouble, out);
 
                 var text = angle((float) FastMath.toDegrees(out.x)) + "/" + angleSign((float) FastMath.toDegrees(out.y));
-                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, text, x - 50 * scale, y, 0.45f * labelSize, Align.center);
+                render2DLabel(batch, shader, rc, sys.fontDistanceField, text, x - 50 * scale, y, 0.45f * labelSize, Align.center);
             }
 
             // Vertical.
@@ -510,7 +491,7 @@ public class LabelEntityRenderSystem {
                 Coordinates.cartesianToSpherical(vecDouble, out);
 
                 var text = angle((float) FastMath.toDegrees(out.x)) + "/" + angleSign((float) FastMath.toDegrees(out.y));
-                render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, text, x - 145, y + offsetY, 0.45f * labelSize, Align.right);
+                render2DLabel(batch, shader, rc, sys.fontDistanceField, text, x - 145, y + offsetY, 0.45f * labelSize, Align.right);
             }
         }
     }
@@ -546,13 +527,13 @@ public class LabelEntityRenderSystem {
         }
     }
 
-    public void renderKeyframe(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderKeyframe(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var kf = Mapper.keyframes.get(view.getEntity());
         if (kf.selected != null) renderKeyframeLabel(view, kf, kf.selected, batch, shader, sys, rc, camera);
         if (kf.highlighted != null) renderKeyframeLabel(view, kf, kf.highlighted, batch, shader, sys, rc, camera);
     }
 
-    private void renderKeyframeLabel(LabelView view, Keyframes kfs, Keyframe kf, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    private void renderKeyframeLabel(LabelView view, Keyframes kfs, Keyframe kf, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = D31;
         getTextPositionKeyframe(camera, pos, kf);
         float distToCam = (float) D32.set(kf.pos).add(camera.getInversePos()).len();
@@ -561,7 +542,7 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_thLabel", 1);
         shader.setUniform4fv("u_color", textColour(kfs, kf), 0, 4);
 
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, getText(kf), pos, distToCam, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor() * distToCam, view.getRadius(), view.label.forceLabel);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, getText(kf), pos, distToCam, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor() * distToCam, view.getRadius(), view.label.forceLabel);
     }
 
     public float[] textColour(Keyframes kfs, Keyframe kf) {
@@ -649,7 +630,7 @@ public class LabelEntityRenderSystem {
             shader.setUniformf("u_pos", labelPosition.put(F31));
 
             // Enable or disable blending
-            ((I3DTextRenderable) view).textDepthBuffer();
+            view.textDepthBuffer();
 
             DecalUtils.drawFont3D(font, batch, labelText, (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z, size, rot, camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
             return true;

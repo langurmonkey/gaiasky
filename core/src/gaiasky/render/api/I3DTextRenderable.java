@@ -8,8 +8,8 @@
 package gaiasky.render.api;
 
 import gaiasky.render.RenderingContext;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
@@ -28,11 +28,11 @@ public interface I3DTextRenderable extends IRenderable {
      *
      * @param batch  The sprite batch
      * @param shader The shader
-     * @param sys    The font render system
+     * @param sys    The text renderer
      * @param rc     The render context
      * @param camera The camera
      */
-    void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera);
+    void render(ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera);
 
     /**
      * Returns an array with the text colour in the fashion [r, g, b, a]

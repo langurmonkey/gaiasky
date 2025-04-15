@@ -9,8 +9,8 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
@@ -62,7 +62,7 @@ public class Label implements Component {
     public Consumer<LabelView> depthBufferConsumer = LabelView::defaultTextDepthBuffer;
 
     /** The label rendering code. **/
-    public Consumer7<LabelEntityRenderSystem, LabelView, ExtSpriteBatch, ExtShaderProgram, FontRenderSystem, RenderingContext, ICamera> renderConsumer;
+    public Consumer7<LabelEntityRenderSystem, LabelView, ExtSpriteBatch, ExtShaderProgram, TextRenderer, RenderingContext, ICamera> renderConsumer;
 
 
     public void setForceLabel(Boolean force) {

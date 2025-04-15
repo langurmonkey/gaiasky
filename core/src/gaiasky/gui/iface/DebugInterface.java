@@ -95,7 +95,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra = new Table(skin);
 
         var toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
-        toggleSize.setColor(ColorUtils.gYellowC);
         var toggleSizeTooltip = new OwnTextTooltip(I18n.msg("gui.maximize.pane"), skin);
         toggleSize.addListener(toggleSizeTooltip);
         toggleSize.addListener(new ClickListener() {
