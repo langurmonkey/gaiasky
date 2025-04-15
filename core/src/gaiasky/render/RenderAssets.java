@@ -173,7 +173,6 @@ public class RenderAssets {
         bfp.magFilter = TextureFilter.Linear;
         bfp.minFilter = TextureFilter.Linear;
         manager.load("skins/fonts/font-distance-field.fnt", BitmapFont.class, bfp);
-        manager.load("skins/fonts/font-titles.fnt", BitmapFont.class, bfp);
 
     }
 
