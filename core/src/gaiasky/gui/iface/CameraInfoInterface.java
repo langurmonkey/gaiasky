@@ -87,13 +87,12 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
         view = new FocusView();
 
-        float buttonSize = 24f;
-        float imgSize = 28.8f;
         pad15 = 24f;
         pad10 = 16f;
         pad5 = 8f;
         pad3 = 4.8f;
         pad1 = 1.6f;
+        bw = 41f;
 
         focusInfo = new Table();
         focusInfo.pad(pad5);
@@ -148,13 +147,13 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         RADECViewLabel = new OwnLabel(I18n.msg("gui.focusinfo.alpha") + "/" + I18n.msg("gui.focusinfo.delta"), skin, "hud");
         RADECViewLabel.setWidth(labelWidth);
         Button pointerImgBtn1 = new OwnTextIconButton("", skin, "pointer");
-        pointerImgBtn1.setSize(imgSize, imgSize);
+        pointerImgBtn1.setSize(bw, bw);
         pointerImgBtn1.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.pointer"), skin));
         Button pointerImgBtn2 = new OwnTextIconButton("", skin, "pointer");
-        pointerImgBtn2.setSize(imgSize, imgSize);
+        pointerImgBtn2.setSize(bw, bw);
         pointerImgBtn2.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.pointer"), skin));
         Button viewImgBtn = new OwnTextIconButton("", skin, "eye");
-        viewImgBtn.setSize(imgSize, imgSize);
+        viewImgBtn.setSize(bw, bw);
         viewImgBtn.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.view"), skin));
 
         // Camera
@@ -188,7 +187,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
         // GoTo, LandOn and LandAt
         goTo = new OwnTextIconButton("", skin, "go-to");
-        goTo.setSize(buttonSize, buttonSize);
         goTo.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 EventManager.publish(Event.NAVIGATE_TO_OBJECT, goTo, currentFocus);
@@ -200,7 +198,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         goTo.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.goto"), skin));
 
         landOn = new OwnTextIconButton("", skin, "land-on");
-        landOn.setSize(buttonSize, buttonSize);
         landOn.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 EventManager.publish(Event.LAND_ON_OBJECT, landOn, currentFocus);
@@ -212,7 +209,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         landOn.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.landon"), skin));
 
         landAt = new OwnTextIconButton("", skin, "land-at");
-        landAt.setSize(buttonSize, buttonSize);
         landAt.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LAND_AT_LOCATION_CMD, landAt, currentFocus);
@@ -223,11 +219,9 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         landAt.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.landat"), skin));
 
         refreshOrbit = new OwnTextIconButton("", skin, "reload");
-        refreshOrbit.setSize(buttonSize, buttonSize);
         // This is filled later on.
 
         proceduralGeneration = new OwnTextIconButton("", skin, "fork");
-        proceduralGeneration.setSize(buttonSize, buttonSize);
         proceduralGeneration.addListener((event) -> {
             var view = (FocusView) currentFocus;
             if (currentFocus != null && Mapper.atmosphere.has(view.getEntity()) && event instanceof ChangeEvent) {
@@ -258,8 +252,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             return false;
         });
 
-        bw = FastMath.max(landOn.getWidth(), landAt.getWidth());
-        bw += 6.0f;
 
         goTo.setSize(bw, bw);
         landOn.setSize(bw, bw);
