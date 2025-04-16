@@ -22,16 +22,18 @@ public class PackUITextures {
     public static void main(String[] args) {
         TexturePacker.Settings x1settings = new TexturePacker.Settings();
         x1settings.scale[0] = 1f;
-        x1settings.jpegQuality = 0.8f;
+        x1settings.jpegQuality = 0.95f;
         x1settings.paddingX = 2;
         x1settings.paddingY = 2;
+        x1settings.filterMag = Texture.TextureFilter.Linear;
+        x1settings.filterMin = Texture.TextureFilter.Linear;
         TexturePacker.Settings x2settings = new TexturePacker.Settings();
-        x2settings.scale[0] = 1.55f;
-        x2settings.jpegQuality = 0.8f;
-        x2settings.paddingX = 1;
-        x2settings.paddingY = 1;
+        x2settings.scale[0] = 1.5f;
+        x2settings.jpegQuality = 0.95f;
+        x2settings.paddingX = 2;
+        x2settings.paddingY = 2;
         x2settings.filterMag = Texture.TextureFilter.Linear;
-        x2settings.filterMin = Texture.TextureFilter.MipMapLinearLinear;
+        x2settings.filterMin = Texture.TextureFilter.Linear;
 
         // Use current path variable
         String gs = (new java.io.File("")).getAbsolutePath();
@@ -39,7 +41,7 @@ public class PackUITextures {
         // Themes
         Map<String, String> themes = Map.of(
                 "default", "#f4b400"
-                //,"blue", "#92A1BF"
+                //"blue", "#0083ed"
         );
 
         for (var key : themes.keySet()) {

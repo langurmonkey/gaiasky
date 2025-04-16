@@ -19,11 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -47,7 +44,6 @@ import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
 import gaiasky.util.scene2d.*;
-import gaiasky.util.scene2d.MenuItem;
 import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -55,7 +51,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.kamranzafar.jtar.TarEntry;
 import org.kamranzafar.jtar.TarInputStream;
 
-import java.awt.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -64,8 +59,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -534,7 +529,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
                 // Install, update or enable/disable.
                 Actor installOrSelect;
-                float installOrSelectSize = 40f;
+                float installOrSelectSize = 43f;
                 if (mode == DatasetMode.AVAILABLE || dataset.outdated) {
                     var install = new OwnTextIconButton("", skin, "install");
                     install.setContentAlign(Align.center);
