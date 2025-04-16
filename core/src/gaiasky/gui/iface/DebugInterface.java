@@ -44,7 +44,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel debugDynRes;
     private final OwnLabel fps;
     private final OwnLabel spf;
-    private final OwnSlider queueStatus;
     /** Lock object for synchronization **/
     private final Object lock;
     private final Skin skin;
@@ -54,7 +53,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final DecimalFormat spfFormatter;
     private final DecimalFormat memFormatter;
     private final DecimalFormat timeFormatter;
-    private int previousQueueSize = 0, currentQueueMax = 0;
     private boolean maximized;
 
     public DebugInterface(Skin skin, Object lock) {
@@ -272,15 +270,12 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         /* OCTANTS */
         debugOcObserved = new OwnLabel("", skin, "hud");
         debugOcQueue = new OwnLabel("", skin, "hud");
-        queueStatus = new OwnSlider(0, 100, 1, false, skin, "default-horizontal");
-        queueStatus.setValue(0);
 
         Table octantsTable = new Table(skin);
         octantsTable.add(new OwnLabel(I18n.msg("gui.debug.lod.observed"), skin, "hud")).right().padRight(pad10);
         octantsTable.add(debugOcObserved).right().row();
         octantsTable.add(new OwnLabel(I18n.msg("gui.debug.lod.queue"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
         octantsTable.add(debugOcQueue).right().padBottom(pad05).row();
-        octantsTable.add(queueStatus).center().colspan(2).padTop(pad05);
 
         Label lodLabel = new OwnLabel(I18n.msg("gui.debug.lod"), skin, "hud-big");
         lodLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.lod.info"), skin));
@@ -390,14 +385,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     // Text
                     debugOcObserved.setText(observed);
                     debugOcQueue.setText(queueSize);
-
-                    // Slider
-                    if (previousQueueSize < queueSize) {
-                        // Reset status
-                        currentQueueMax = queueSize;
-                    }
-                    queueStatus.setValue(queueSize * 100f / currentQueueMax);
-                    previousQueueSize = queueSize;
                 }
             }
             case DEBUG_DYN_RES -> {

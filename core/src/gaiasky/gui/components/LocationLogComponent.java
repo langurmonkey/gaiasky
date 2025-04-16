@@ -67,6 +67,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
     private void refresh() {
         locations.clear();
         LinkedList<LocationRecord> locations = LocationLogManager.instance().getLocations();
+        var bw = 40f;
 
         for (int i = locations.size() - 1; i >= 0; i--) {
             LocationRecord lr = locations.get(i);
@@ -74,7 +75,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             // Create location
             Label num = new OwnLabel(locations.size() - i + ":", skin, "default-blue");
             num.setWidth(30f);
-            Label name = new OwnLabel(TextUtils.capString(lr.name, 14), skin, "default");
+            Label name = new OwnLabel(TextUtils.capString(lr.name, 12), skin, "default");
             name.addListener(new OwnTextTooltip(lr.name, skin));
             name.setWidth(165f);
             Label time = new OwnLabel("(" + lr.elapsedString() + ")", skin, "msg-17");
@@ -84,7 +85,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
 
             OwnTextIconButton goToLoc = new OwnTextIconButton("", skin, "go-to");
             goToLoc.addListener(new OwnTextTooltip(I18n.msg("gui.locationlog.goto.location", lr.entryTime), skin));
-            goToLoc.setSize(30f, 30f);
+            goToLoc.setSize(bw, bw);
             goToLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.CAMERA_MODE_CMD, goToLoc, CameraManager.CameraMode.FREE_MODE);
@@ -100,7 +101,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
 
             OwnTextIconButton goToObj = new OwnTextIconButton("", skin, "land-on");
             goToObj.addListener(new OwnTextTooltip(I18n.msg("gui.locationlog.goto.object", lr.entryTime), skin));
-            goToObj.setSize(30f, 30f);
+            goToObj.setSize(bw, bw);
             goToObj.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     GaiaSky.postRunnable(() -> ((EventScriptingInterface) GaiaSky.instance.scripting()).setCameraFocusInstantAndGo(lr.name, false));
@@ -114,9 +115,9 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             recordTable.add(time).left();
 
             Table mainTable = new Table(skin);
-            mainTable.add(recordTable).left().padRight(pad12 * 1.5f);
-            mainTable.add(goToLoc).left().padRight(pad8);
-            mainTable.add(goToObj).left().padRight(pad8);
+            mainTable.add(recordTable).left().padRight(pad12);
+            mainTable.add(goToLoc).left().padRight(pad6);
+            mainTable.add(goToObj).left();
 
             this.locations.addActor(mainTable);
         }
