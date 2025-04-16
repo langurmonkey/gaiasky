@@ -33,8 +33,6 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.Instant;
@@ -93,7 +91,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         });
         close.addListener(new OwnTextTooltip(I18n.msg("gui.close"), skin));
 
-        var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        var clipboard = Gdx.app.getClipboard();
         copyToClipboard = new OwnTextIconButton("", skin, "clipboard");
         copyToClipboard.setSize(33, 30);
         copyToClipboard.addListener(event -> {
@@ -104,8 +102,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                     for (var m : manager.messages()) {
                         buffer.append(m.cleanMessage()).append('\n');
                     }
-                    var selection = new StringSelection(buffer.toString());
-                    clipboard.setContents(selection, selection);
+                    clipboard.setContents(buffer.toString());
                 }
             }
             return false;
@@ -279,14 +276,13 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         status.setColor(msg.type().getTagColor());
         var message = constructMessage(msg);
 
-        var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        var clipboard = Gdx.app.getClipboard();
         var clipboardButton = new OwnTextIconButton("", getSkin(), "clipboard");
         clipboardButton.setSize(29, 26);
         clipboardButton.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 // Copy message to clipboard.
-                var selection = new StringSelection(msg.cleanMessage());
-                clipboard.setContents(selection, selection);
+                clipboard.setContents(msg.cleanMessage());
             }
             return false;
         });
