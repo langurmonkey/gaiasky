@@ -1309,11 +1309,6 @@
       "knobBefore": "progress-knob-before"
     },
     "small-horizontal": {
-      "background": "progress-s-bg",
-      "knob": "progress-s-knob",
-      "knobBefore": "progress-s-knob-before"
-    },
-    "tiny-horizontal": {
       "background": "progress-t-bg",
       "knob": "progress-t-knob",
       "knobBefore": "progress-t-knob-before"
