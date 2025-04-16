@@ -268,7 +268,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             addMessageWidget(msg);
             manager.messages().add(msg);
             if (initialized) {
-                logger.info(String.format("%s: %s", msg.time(), msg.msg()));
+                logger.info(String.format("%s: %s", msg.time(), msg.cleanMessage()));
             }
         }
     }
