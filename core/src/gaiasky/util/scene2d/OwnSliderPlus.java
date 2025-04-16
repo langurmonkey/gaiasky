@@ -40,7 +40,7 @@ public class OwnSliderPlus extends Slider {
     private Color labelColorBackup;
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin, String labelStyle) {
-        super(min, max, stepSize, false, skin.get("big-horizontal", OwnSliderStyle.class));
+        super(min, max, stepSize, false, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, mapMin, mapMax, labelStyle);
     }
@@ -50,7 +50,7 @@ public class OwnSliderPlus extends Slider {
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
-        super(min, max, stepSize, false, skin.get("big-horizontal", OwnSliderStyle.class));
+        super(min, max, stepSize, false, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, "default");
     }
@@ -62,13 +62,13 @@ public class OwnSliderPlus extends Slider {
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin) {
-        super(min, max, stepSize, vertical, skin.get("big-horizontal", OwnSliderStyle.class));
+        super(min, max, stepSize, vertical, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String labelStyleName) {
-        super(min, max, stepSize, vertical, skin.get("big-horizontal", OwnSliderStyle.class));
+        super(min, max, stepSize, vertical, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, labelStyleName);
     }

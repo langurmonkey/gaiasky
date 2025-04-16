@@ -895,16 +895,6 @@
       "knob": "default-slider-knob",
       "knobBefore": "default-slider-knob-before-vertical"
     },
-    "big-horizontal": {
-      "background": "big-slider",
-      "backgroundFocused": "big-slider-focused",
-      "backgroundOver": "big-slider-over",
-      "knob": "big-slider-knob",
-      "knobOver": "big-slider-knob-over",
-      "knobBefore": "big-slider-knob-before",
-      "knobBeforeFocused": "big-slider-knob-before-focused",
-      "knobBeforeOver": "big-slider-knob-before-over"
-    },
     "time-warp": {
       "background": "huge-slider",
       "backgroundOver": "huge-slider-over",
@@ -1296,7 +1286,7 @@
   "com.badlogic.gdx.scenes.scene2d.ui.Touchpad$TouchpadStyle": {
     "default": {
       "background": "default-pane",
-      "knob": "default-round-large"
+      "knob": "default-round"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Tree$TreeStyle": {
