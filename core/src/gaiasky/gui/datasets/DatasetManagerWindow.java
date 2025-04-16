@@ -613,7 +613,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 versionSize.addActor(size);
 
                 // Progress.
-                var progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "tiny-horizontal");
+                var progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "small-horizontal");
                 progress.setPrefWidth(850f);
                 progress.setValue(60f);
                 progress.setVisible(false);
