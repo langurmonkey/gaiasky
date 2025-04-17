@@ -904,7 +904,6 @@ public class GamepadGui extends AbstractGui {
 
         // Star brightness
         starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin, "header-raw");
-        graphicsModel[0][0] = starBrightness;
         starBrightness.setWidth(ww);
         starBrightness.setHeight(sh);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
@@ -918,7 +917,6 @@ public class GamepadGui extends AbstractGui {
 
         // Magnitude multiplier
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-        graphicsModel[0][1] = magnitudeMultiplier;
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
@@ -933,7 +931,6 @@ public class GamepadGui extends AbstractGui {
 
         // Star glow factor
         starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR, Constants.SLIDER_STEP_TINY * 0.1f, false, skin, "header-raw");
-        graphicsModel[0][2] = starGlowFactor;
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
         starGlowFactor.setWidth(ww);
         starGlowFactor.setHeight(sh);
@@ -948,7 +945,6 @@ public class GamepadGui extends AbstractGui {
 
         // Point size
         pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-        graphicsModel[0][3] = pointSize;
         pointSize.setWidth(ww);
         pointSize.setHeight(sh);
         pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
@@ -963,7 +959,6 @@ public class GamepadGui extends AbstractGui {
 
         // Base star level
         starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-        graphicsModel[0][4] = starBaseLevel;
         starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
         starBaseLevel.setWidth(ww);
         starBaseLevel.setHeight(sh);
@@ -978,7 +973,6 @@ public class GamepadGui extends AbstractGui {
 
         // Bloom
         bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-        graphicsModel[0][5] = bloomSlider;
         bloomSlider.setWidth(ww);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity);
@@ -992,7 +986,6 @@ public class GamepadGui extends AbstractGui {
 
         // Unsharp mask
         unsharpMaskSlider = new OwnSliderPlus(I18n.msg("gui.unsharpmask"), Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-        graphicsModel[0][6] = unsharpMaskSlider;
         unsharpMaskSlider.setWidth(ww);
         unsharpMaskSlider.setHeight(sh);
         unsharpMaskSlider.setValue(Settings.settings.postprocess.unsharpMask.factor);
@@ -1007,7 +1000,6 @@ public class GamepadGui extends AbstractGui {
         if (!vr) {
             // Lens flare
             lensFlare = new OwnSliderPlus(I18n.msg("gui.lensflare"), Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-            graphicsModel[1][0] = lensFlare;
             lensFlare.setWidth(ww);
             lensFlare.setHeight(sh);
             lensFlare.setValue(Settings.settings.postprocess.lensFlare.strength);
@@ -1020,7 +1012,6 @@ public class GamepadGui extends AbstractGui {
             });
             // Star glow
             starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
-            graphicsModel[1][1] = starGlowButton;
             starGlowButton.setWidth(ww);
             starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
             starGlowButton.addListener(event -> {
@@ -1034,10 +1025,12 @@ public class GamepadGui extends AbstractGui {
             // Motion blur
             motionBlur = new OwnSliderPlus(I18n.msg("gui.motionblur"), Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
             motionBlur.setWidth(ww);
+            motionBlur.setHeight(sh);
             motionBlur.setMappedValue(Settings.settings.postprocess.motionBlur.strength);
             motionBlur.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.MOTION_BLUR_CMD, motionBlur, motionBlur.getMappedValue());
+                    return true;
                 }
                 return false;
             });
@@ -1045,7 +1038,6 @@ public class GamepadGui extends AbstractGui {
 
         /* Reset defaults */
         OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
-        graphicsModel[1][3] = resetDefaults;
         resetDefaults.align(Align.center);
         resetDefaults.setWidth(ww);
         resetDefaults.addListener(new OwnTextTooltip(I18n.msg("gui.resetdefaults.tooltip"), skin));
@@ -1060,22 +1052,41 @@ public class GamepadGui extends AbstractGui {
 
         // Add to table.
         if (!vr) {
+            graphicsModel[0][0] = starBrightness;
+            graphicsModel[0][1] = magnitudeMultiplier;
+            graphicsModel[0][2] = starGlowFactor;
+            graphicsModel[0][3] = pointSize;
+            graphicsModel[0][4] = starBaseLevel;
+            graphicsModel[0][5] = bloomSlider;
+            graphicsModel[0][6] = unsharpMaskSlider;
+            graphicsModel[1][0] = lensFlare;
+            graphicsModel[1][1] = starGlowButton;
+            graphicsModel[1][2] = motionBlur;
+            graphicsModel[1][4] = resetDefaults;
             // Regular mode (gamepad).
             graphicsT.add(starBrightness).padBottom(pad10).padRight(pad40);
             graphicsT.add(lensFlare).padBottom(pad10).row();
             graphicsT.add(magnitudeMultiplier).padBottom(pad10).padRight(pad40);
             graphicsT.add(starGlowButton).padBottom(pad10).row();
             graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad40);
-            //graphicsT.add(motionBlurButton).padBottom(pad10).row();
+            graphicsT.add(motionBlur).padBottom(pad10).row();
             graphicsT.add(pointSize).padBottom(pad10).padRight(pad40);
-            graphicsT.add(resetDefaults).padBottom(pad10).row();
+            graphicsT.add().padBottom(pad10).row();
             graphicsT.add(starBaseLevel).padBottom(pad10).padRight(pad40);
-            graphicsT.add().row();
+            graphicsT.add(resetDefaults).padBottom(pad10).row();
             graphicsT.add(bloomSlider).padBottom(pad10).padRight(pad40);
             graphicsT.add().row();
             graphicsT.add(unsharpMaskSlider).padBottom(pad10).padRight(pad40);
             graphicsT.add().row();
         } else {
+            graphicsModel[0][0] = starBrightness;
+            graphicsModel[0][1] = starGlowFactor;
+            graphicsModel[0][2] = starBaseLevel;
+            graphicsModel[0][3] = bloomSlider;
+            graphicsModel[1][0] = magnitudeMultiplier;
+            graphicsModel[1][1] = pointSize;
+            graphicsModel[1][2] = unsharpMaskSlider;
+            graphicsModel[1][4] = resetDefaults;
             // VR mode.
             graphicsT.add(starBrightness).padBottom(pad10).padRight(pad40);
             graphicsT.add(magnitudeMultiplier).padBottom(pad10).row();
@@ -1244,7 +1255,7 @@ public class GamepadGui extends AbstractGui {
 
         Table padTable = new Table(skin);
         padTable.pad(pad30);
-        padTable.setBackground("table-border");
+        padTable.setBackground("bg-pane-border");
         if (vr) {
             var topCell = padTable.add(topLine).center().colspan(2);
             topCell.row();

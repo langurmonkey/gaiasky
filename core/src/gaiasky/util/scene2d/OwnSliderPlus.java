@@ -101,7 +101,7 @@ public class OwnSliderPlus extends Slider {
             public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
                 if (actor == me) {
                     if (focused)
-                        me.setLabelColor(ColorUtils.ddBrownC);
+                        me.setLabelColor(skin.getColor("theme"));
                     else
                         me.restoreLabelColor();
                 }
