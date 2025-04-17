@@ -218,13 +218,13 @@ public class WelcomeGui extends AbstractGui {
     private void buildWaitingUI() {
         // Render message.
         if (!Settings.settings.program.offlineMode) {
-            this.updateUnitsPerPixel(1f);
+            this.updateUnitsPerPixel(2.2f);
             var table = new Table(skin);
             table.setFillParent(true);
             table.bottom().right().padBottom(40f).padRight(40f);
             var gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
             table.add(gaiaSky).bottom().right().padBottom(30f).row();
-            var msg = new OwnLabel(I18n.msg("gui.welcome.datasets.updates"), skin, "header");
+            var msg = new OwnLabel(I18n.msg("gui.welcome.datasets.updates"), skin);
             table.add(msg).bottom().right();
             stage.addActor(table);
         }
