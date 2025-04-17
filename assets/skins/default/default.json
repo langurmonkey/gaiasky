@@ -1265,12 +1265,6 @@
       "background": "dark-grey"
     }
   },
-  "com.badlogic.gdx.scenes.scene2d.ui.Touchpad$TouchpadStyle": {
-    "default": {
-      "background": "default-pane",
-      "knob": "default-round"
-    }
-  },
   "com.badlogic.gdx.scenes.scene2d.ui.Tree$TreeStyle": {
     "default": {
       "minus": "tree-minus",
