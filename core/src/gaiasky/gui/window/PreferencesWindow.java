@@ -290,7 +290,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Low
         OwnTextButton low = new OwnTextButton(I18n.msg("gui.presets.low"), skin);
         low.setWidth(buttonWidth);
-        low.setColor(ColorUtils.gBlueC);
         low.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -332,7 +331,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Medium
         OwnTextButton medium = new OwnTextButton(I18n.msg("gui.presets.med"), skin);
         medium.setWidth(buttonWidth);
-        medium.setColor(ColorUtils.gBlueC);
         medium.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -366,7 +364,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // High
         OwnTextButton high = new OwnTextButton(I18n.msg("gui.presets.high"), skin);
         high.setWidth(buttonWidth);
-        high.setColor(ColorUtils.gBlueC);
         high.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -1754,14 +1751,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controls.add(new OwnLabel(I18n.msg("gui.keymappings.action"), skin, "header")).padBottom(pad18).left();
         controls.add(new OwnLabel(I18n.msg("gui.keymappings.keys"), skin, "header")).padBottom(pad18).left().row();
 
-        controls.add(new OwnLabel(I18n.msg("action.forward"), skin, "huge")).left().padRight(pad18).padBottom(pad10);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.UP).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.backward"), skin, "huge")).left().padRight(pad18).padBottom(pad10);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.left"), skin, "huge")).left().padRight(pad18).padBottom(pad10);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.right"), skin, "huge")).left().padRight(pad18).padBottom(pad10);
-        controls.add(new OwnLabel(GSKeys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink-big")).padBottom(pad10).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.forward"), skin )).left().padRight(pad34).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.UP).toUpperCase(), skin, "mono-pink")).padBottom(pad10).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.backward"), skin)).left().padRight(pad34).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink")).padBottom(pad10).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.left"), skin)).left().padRight(pad34).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink")).padBottom(pad10).left().row();
+        controls.add(new OwnLabel(I18n.msg("action.right"), skin)).left().padRight(pad34).padBottom(pad10);
+        controls.add(new OwnLabel(GSKeys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink")).padBottom(pad10).left().row();
 
         // Controls
         boolean plus = false;
@@ -1771,14 +1768,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             for (int j = 1; j < action.length; j++) {
                 String[] keys = action[j].split("\\+");
                 for (int k = 0; k < keys.length; k++) {
-                    keysGroup.addActor(new OwnLabel(keys[k].trim().replace('_', '-').replace("PL", "+"), skin, "mono-pink-big"));
+                    keysGroup.addActor(new OwnLabel(keys[k].trim().replace('_', '-').replace("PL", "+"), skin, "mono-pink"));
                     if (k < keys.length - 1)
-                        keysGroup.addActor(new OwnLabel("+", skin, "huge"));
+                        keysGroup.addActor(new OwnLabel("+", skin));
                 }
                 if (j < action.length - 1)
-                    keysGroup.addActor(new OwnLabel("/", skin, "huge"));
+                    keysGroup.addActor(new OwnLabel("/", skin));
             }
-            controls.add(new OwnLabel(action[0], skin, "huge")).left().padRight(pad18).padBottom(pad10);
+            controls.add(new OwnLabel(action[0], skin)).left().padRight(pad34).padBottom(pad10);
             controls.add(keysGroup).padBottom(pad10).left().row();
         }
 

@@ -154,9 +154,9 @@
     },
     "theme": {
       "a": 1,
-      "b": 0.0000,
-      "g": 0.7059,
-      "r": 0.9569
+      "b": 0.2745,
+      "g": 0.5843,
+      "r": 0.6980
     },
     "highlight": {
       "a": 1,
@@ -242,24 +242,6 @@
       "focused": "default-round-sel",
       "font": "title-27",
       "fontColor": "white",
-      "disabledFontColor": "dark-gray"
-    },
-    "download": {
-      "down": "default-round-down",
-      "up": "default-round",
-      "over": "default-round-sel",
-      "disabled": "default-round-disabled",
-      "font": "title-21",
-      "fontColor": "theme",
-      "disabledFontColor": "dark-gray"
-    },
-    "download-big": {
-      "down": "default-round-down",
-      "up": "default-round",
-      "over": "default-round-sel",
-      "disabled": "default-round-disabled",
-      "font": "title-27",
-      "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
     "toggle": {
@@ -1309,11 +1291,6 @@
       "knobBefore": "progress-knob-before"
     },
     "small-horizontal": {
-      "background": "progress-s-bg",
-      "knob": "progress-s-knob",
-      "knobBefore": "progress-s-knob-before"
-    },
-    "tiny-horizontal": {
       "background": "progress-t-bg",
       "knob": "progress-t-knob",
       "knobBefore": "progress-t-knob-before"

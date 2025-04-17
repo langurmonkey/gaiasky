@@ -285,7 +285,7 @@ public class WelcomeGui extends AbstractGui {
         OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
         gaiaSky.setFontScale(1.5f);
         OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
-        version.setColor(skin.getColor("blue"));
+        version.setColor(skin.getColor("theme"));
         Table title = new Table(skin);
         title.add(gaiaSky).bottom().left().padBottom(pad16).row();
         title.add(version).bottom().left().padRight(pad16);

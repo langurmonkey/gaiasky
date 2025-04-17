@@ -3066,9 +3066,6 @@ public class Settings extends SettingsObject {
              */
             @JsonProperty("theme")
             public void setTheme(String theme) {
-                if (!Objects.equals(theme, "default")) {
-                    theme = "default";
-                }
                 this.theme = theme;
             }
 

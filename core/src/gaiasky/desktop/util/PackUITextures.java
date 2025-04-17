@@ -40,8 +40,13 @@ public class PackUITextures {
 
         // Themes
         Map<String, String> themes = Map.of(
-                "default", "#f4b400"
-                //"blue", "#0083ed"
+                "default", "#b29546"
+                //"grey", "#949494",
+                //"yellow", "#b29546",
+                //"red", "#d37070",
+                //"turquoise", "#46b2a2",
+                //"blue", "#709fd3",
+                //"green", "#84ba94"
         );
 
         for (var key : themes.keySet()) {
@@ -92,7 +97,7 @@ public class PackUITextures {
     }
 
     public static class PurpleReplacer {
-        public static void generateTheme(String inputPath, String outputPath, Color color) throws Exception {
+        public static void generateTheme(String inputPath, String outputPath, Color themeColor) throws Exception {
             File inputDir = new File(inputPath);
             File outputDir = new File(outputPath);
 
@@ -116,17 +121,30 @@ public class PackUITextures {
                 for (int y = 0; y < img.getHeight(); y++) {
                     for (int x = 0; x < img.getWidth(); x++) {
                         int argb = img.getRGB(x, y);
-                        Color currentColor = new Color(argb, true);
+                        Color purpleColor = new Color(argb, true);
 
-                        if (isPurple(currentColor)) {
-                            float[] hsb = Color.RGBtoHSB(currentColor.getRed(), currentColor.getGreen(), currentColor.getBlue(), null);
-                            float brightness = hsb[2];
-                            float saturation = hsb[1];
+                        if (isPurple(purpleColor)) {
+                            // Weighted average of saturation and brightness
+                            var weightPurpleSat = 0.3f;
+                            var weightTargetSat = 0.7f;
+                            var weightPurpleBr = 0.3f;
+                            var weightTargetBr = 0.7f;
 
-                            float targetHue = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null)[0];
-                            int rgb = Color.HSBtoRGB(targetHue, saturation, brightness);
+                            var purpleHSB = Color.RGBtoHSB(purpleColor.getRed(), purpleColor.getGreen(), purpleColor.getBlue(), null);
+                            var purpleSat = purpleHSB[1];
+                            var purpleBr = purpleHSB[2];
 
-                            Color newColor = new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, currentColor.getAlpha());
+                            var isTargetGrayscale = themeColor.getRed() == themeColor.getBlue() && themeColor.getBlue() == themeColor.getGreen();
+                            var targetHSB = Color.RGBtoHSB(themeColor.getRed(), themeColor.getGreen(), themeColor.getBlue(), null);
+                            var targetHue = targetHSB[0];
+                            var targetSat = targetHSB[1];
+                            var targetBr = targetHSB[2];
+
+                            var finalSat = isTargetGrayscale ? 0.0f :  purpleSat * weightPurpleSat + targetSat * weightTargetSat;
+                            var finalBr = purpleBr * weightPurpleBr + targetBr * weightTargetBr;
+                            int rgb = Color.HSBtoRGB(targetHue, finalSat, finalBr);
+
+                            Color newColor = new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, purpleColor.getAlpha());
                             img.setRGB(x, y, newColor.getRGB());
                         }
                     }
