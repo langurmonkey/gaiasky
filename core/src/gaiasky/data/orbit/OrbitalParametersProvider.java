@@ -48,20 +48,24 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             OrbitComponent params = parameter.orbitalParamaters;
             Vector3d out = new Vector3d();
             try {
+                if(parameter.name.contains("Swift")){
+                    int abc = 3;
+                }
                 double period = params.period; // in days
                 double epoch = params.epoch; // in days
 
                 data = new PointCloudData();
                 data.period = period;
+                var n = 2.0 * FastMath.PI / (period * 86400.0);  // mean motion (rad/s)
 
-                // Step time in days, a full period over number of samples starting at epoch
-                double t_step = period / (parameter.numSamples - 1.0);
-                double t = 0.0;
 
-                for (int n = 0; n < parameter.numSamples; n++) {
-                    params.loadDataPoint(out, t);
+                for (int i = 0; i < parameter.numSamples; i++) {
+                    var nu = 2.0 * FastMath.PI * i / parameter.numSamples;
+                    var tJd = params.trueAnomalyToTime(nu, n);
 
-                    if (n == parameter.numSamples - 1) {
+                    params.loadDataPoint(out, nu);
+
+                    if (i == parameter.numSamples - 1) {
                         // Close orbit
                         double sx = data.getX(0);
                         double sy = data.getY(0);
@@ -75,9 +79,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                         data.y.add(out.y);
                         data.z.add(out.z);
                     }
-                    data.time.add(AstroUtils.julianDateToInstant(epoch + t));
-
-                    t += t_step;
+                    data.time.add(AstroUtils.julianDateToInstant(tJd));
                 }
 
                 EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, parameter.name);

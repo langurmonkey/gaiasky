@@ -121,34 +121,42 @@ public class OrbitComponent {
         this.externalMu = true;
     }
 
+    public double trueAnomalyToTime(double nuRad, double meanMotionRadPerSec) {
+        // Convert true anomaly to eccentric anomaly E
+        double tanHalfNu = Math.tan(nuRad / 2.0);
+        double sqrtFactor = Math.sqrt((1 - e) / (1 + e));
+        double E = 2.0 * Math.atan2(tanHalfNu * sqrtFactor, 1.0);
+
+        // Normalize E to [0, 2π)
+        E = E % (2 * Math.PI);
+        if (E < 0) {
+            E += 2 * Math.PI;
+        }
+
+        // Compute mean anomaly
+        double M = E - e * Math.sin(E);
+
+        // Time since epoch in seconds
+        double deltaT = M / meanMotionRadPerSec;
+
+        // Return time in Julian Date
+        return epoch + deltaT / 86400.0;
+    }
+
     public void loadDataPoint(Vector3d out, Instant t) {
         double tjd = AstroUtils.getJulianDate(t);
         loadDataPoint(out, tjd - epoch);
     }
 
-    public void keplerianToCartesian(Vector3d out, double dtDays) {
+    public void keplerianToCartesian(Vector3d out, double nu) {
         computeMu(true);
-        double targetJD = dtDays + epoch;
 
         double inc = FastMath.toRadians(i);
         double raan = FastMath.toRadians(ascendingnode);
         double argp = FastMath.toRadians(argofpericenter);
-        double M0 = FastMath.toRadians(meananomaly);
 
-        double deltaT = (targetJD - epoch) * 86400.0;
-
-        double n = 2 * FastMath.PI / (period * 86400.0);
-
-        double M = (M0 + n * deltaT) % (2 * FastMath.PI);
-        if (M < 0) M += 2 * FastMath.PI;
-
-        double E = solveKepler(M, e);
-
-        double nu = 2 * FastMath.atan2(FastMath.sqrt(1 + e) * FastMath.sin(E / 2),
-                FastMath.sqrt(1 - e) * FastMath.cos(E / 2));
-
-        double r = semimajoraxis * (1 - e * FastMath.cos(E));
-
+        // Distance
+        double r = semimajoraxis * (1 - e * e) / (1 + e * FastMath.cos(nu));
         // Perifocal coordinates
         double x_pf = r * FastMath.cos(nu);
         double y_pf = r * FastMath.sin(nu);
@@ -193,18 +201,6 @@ public class OrbitComponent {
         out.set(rVec[1], rVec[2], rVec[0]).scl(Constants.KM_TO_U);
     }
 
-    private double solveKepler(double M, double e) {
-        double E = (e < 0.8) ? M : FastMath.PI;
-        for (int i = 0; i < 100; i++) {
-            double f = E - e * FastMath.sin(E) - M;
-            double fp = 1 - e * FastMath.cos(E);
-            double dE = -f / fp;
-            E += dE;
-            if (Math.abs(dE) < 1e-10) break;
-        }
-        return E;
-    }
-
     private double[] matVecMul(double[][] mat, double[] vec) {
         double[] result = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -213,8 +209,8 @@ public class OrbitComponent {
         return result;
     }
 
-    public void loadDataPoint(Vector3d out, double dtDays) {
-        keplerianToCartesian(out, dtDays);
+    public void loadDataPoint(Vector3d out, double nu) {
+        keplerianToCartesian(out, nu);
     }
 
     // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
