@@ -48,11 +48,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             OrbitComponent params = parameter.orbitalParamaters;
             Vector3d out = new Vector3d();
             try {
-                if(parameter.name.contains("Swift")){
-                    int abc = 3;
-                }
                 double period = params.period; // in days
-                double epoch = params.epoch; // in days
 
                 data = new PointCloudData();
                 data.period = period;
