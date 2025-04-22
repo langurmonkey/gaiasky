@@ -18,6 +18,11 @@ sourceSets {
             srcDirs = ['src']
         }
     }
+    test {
+        java {
+            srcDirs = ["test"]
+        }
+    }
 }
 
 project.ext.mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
@@ -74,7 +79,8 @@ abstract class GaiaSkyRun extends JavaExec {
     public void setup() {
         systemProperties['properties.file'] = ''
         systemProperties['assets.location'] = './assets/'
-        systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
+        systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'
+        // logging levels (e.g. REST server warn, info, debug)
         systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
 
         minHeapSize = "3g"
@@ -369,7 +375,7 @@ tasks.register('downloadAndExtractJRE') {
             from tarTree(resources.gzip(jreArchivePath))
             into project.tmpDir
         }
-        
+
         // Delete package
         delete "$jreArchivePath"
 
@@ -494,7 +500,7 @@ tasks.register('createDebian') {
         // Take item lines and use '*' instead of '-'
         def notesList = new File("$distDir/releasenotes.txt").text.readLines()
         String notesStr = ""
-        for ( line in notesList ) {
+        for (line in notesList) {
             def l = line.strip()
             if (l.startsWith("-")) {
                 notesStr += l.replace('- ', ' * ')
@@ -540,7 +546,7 @@ static def getVersionRevision(String tagRev) {
         tagVersion = tagVersion.substring(0, tagVersion.lastIndexOf("-"))
         tagRevision = v.substring(v.lastIndexOf("-") + 1)
     }
-    return [ tagVersion, tagRevision ]
+    return [tagVersion, tagRevision]
 }
 
 tasks.register('prepareInstall4jScript') {
@@ -634,6 +640,10 @@ tasks.register('pack') {
         }
 
     }
+}
+
+test {
+    useJUnit() // explicitly use the JUnit 4 test framework
 }
 
 eclipse {
