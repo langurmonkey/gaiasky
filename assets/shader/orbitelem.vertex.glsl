@@ -41,71 +41,84 @@ out float v_textureIndex;
 #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
-#define M_TO_U 1e-9
+#define KM_TO_U 1e-6
 #define D_TO_S 86400.0
 
 // see https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
 vec4 keplerToCartesian() {
-    // sqrt(mu/a^3), with a in m
-    float sqrtMuOverA3 = a_orbitelems01.x;
+    // Period (d)
+    float period = a_orbitelems01.x;
+    // Epoch (jd)
     float epoch = a_orbitelems01.y;
-    // Semi-major axis
+    // Semi-major axis (km)
     float a = a_orbitelems01.z;
     // Eccentricity
     float e = a_orbitelems01.w;
-    // Inclination
+    // Inclination (rad)
     float i = a_orbitelems02.x;
-    // Longitude of ascending node
-    float omega_lan = a_orbitelems02.y;
-    // Argument of periapsis
-    float omega_ap = a_orbitelems02.z;
-    // Mean anomaly at epoch 
+    // Longitude of ascending node (rad)
+    float raan = a_orbitelems02.y;
+    // Argument of periapsis (rad)
+    float argp = a_orbitelems02.z;
+    // Mean anomaly at epoch (rad)
     float M0 = a_orbitelems02.w;
-    
-    // 1
+
+    // Time since epoch in seconds
     vec2 epoch_d = ds_set(epoch);
     vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(D_TO_S));
     float deltat = deltat_d.x;
 
-    float M = M0 + deltat * sqrtMuOverA3;
-    
-    // 2
-    float E = M;
-    for(int j = 0; j < 2; j++) {
-        E = E - ((E - e * sin(E) - M) / ( 1.0 - e * cos(E))); 
+    // Mean motion (rad/s)
+    float n = PI2 / (period * D_TO_S);
+
+    // Mean anomaly at target time
+    float M = mod(M0 + n * deltat, PI2);
+
+    // Solve Kepler’s equation: M = E - e * sin(E)
+    float E = (e < 0.8) ? M : PI;
+    for (int i = 0; i < 100; ++i) { // Newton-Raphson iteration
+        float f = E - e * sin(E) - M;
+        float fPrime = 1.0 - e * cos(E);
+        float dE = -f / fPrime;
+        E += dE;
+        if (abs(dE) < 1e-10) break;
     }
-    float E_t = E;
-    
-    // 3
-    float nu_t = 2.0 * atan(sqrt(1.0 + e) * sin(E_t / 2.0), sqrt(1.0 - e) * cos(E_t / 2.0)); 
-            
-    // 4
-    float rc_t = a * (1.0 - e * cos(E_t));
-    
-    // 5
-    float ox = rc_t * cos(nu_t);
-    float oy = rc_t * sin(nu_t);
 
+    // True anomaly
+    float sinE2 = sin(E * 0.5);
+    float cosE2 = cos(E * 0.5);
+    float nu = 2.0 * atan(sqrt((1.0 + e) / (1.0 - e)) * sinE2, cosE2);
 
-    // 6
-    float sinomega = sin(omega_ap);
-    float cosomega = cos(omega_ap);
-    float sinOMEGA = sin(omega_lan);
-    float cosOMEGA = cos(omega_lan);
-    float cosi = cos(i);
-    float sini = sin(i);
-    
-    float x = ox * (cosomega * cosOMEGA - sinomega * cosi * sinOMEGA) - oy * (sinomega * cosOMEGA + cosomega * cosi * sinOMEGA);
-    float y = ox * (cosomega * sinOMEGA + sinomega * cosi * cosOMEGA) + oy * (cosomega * cosi * cosOMEGA - sinomega * sinOMEGA);
-    float z = ox * (sinomega * sini) + oy * (cosomega * sini);
-    
-    // 7
-    float fac = M_TO_U * u_vrScale;
-    x *= fac;
-    y *= fac;
-    z *= fac;
-    
-    return vec4(y, z, x, 1.0);
+    // Distance
+    float r = a * (1.0 - e * cos(E));
+
+    // Perifocal coordinates.
+    float xpf = r * cos(nu);
+    float ypf = r * sin(nu);
+    float zpf = 0.0;
+
+    float cosO = cos(raan);
+    float sinO = sin(raan);
+    float cosI = cos(i);
+    float sinI = sin(i);
+    float cosW = cos(argp);
+    float sinW = sin(argp);
+
+    mat3 R = mat3(
+            vec3(cosO * cosW - sinO * sinW * cosI,
+                -cosO * sinW - sinO * cosW * cosI,
+                sinO * sinI),
+            vec3(sinO * cosW + cosO * sinW * cosI,
+                -sinO * sinW + cosO * cosW * cosI,
+                -cosO * sinI),
+            vec3(sinW * sinI,
+                cosW * sinI,
+                cosI)
+        );
+
+    vec3 position = vec3(xpf, ypf, zpf) * R;
+
+    return vec4(position.yzx * KM_TO_U * u_vrScale, 1.0);
 }
 
 void main() {
@@ -122,13 +135,13 @@ void main() {
     float dist = length(pos);
 
     #ifdef relativisticEffects
-        pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
+    pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
-    
+
     #ifdef gravitationalWaves
-        pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
-    
+
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
     float quadSize = clamp(a_size * u_sizeFactor * u_vrScale, u_sizeLimits.x * dist, u_sizeLimits.y * dist);

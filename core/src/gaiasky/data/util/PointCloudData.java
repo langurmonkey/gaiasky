@@ -15,12 +15,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PointCloudData {
+public class PointCloudData implements Cloneable {
     private final Vector3d v0;
     private final Vector3d v1;
     // Values of x, y, z in world coordinates
-    public List<Double> x, y, z;
-    public List<Instant> time;
+    public ArrayList<Double> x;
+    public ArrayList<Double> y;
+    public ArrayList<Double> z;
+    public ArrayList<Instant> time;
     // Period in days
     public double period = -1;
     private Instant start, end;
@@ -348,4 +350,17 @@ public class PointCloudData {
         }
     }
 
+    @Override
+    public PointCloudData clone() {
+        try {
+            PointCloudData clone = (PointCloudData) super.clone();
+            clone.x = new ArrayList(x);
+            clone.y = new ArrayList(y);
+            clone.z = new ArrayList(z);
+            clone.time = new ArrayList(time);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

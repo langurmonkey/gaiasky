@@ -17,6 +17,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import gaiasky.data.api.IOrbitDataProvider;
+import gaiasky.scene.component.Trajectory.OrbitSamplingStrategy;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Logger;
 
@@ -58,6 +59,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         public double orbitalPeriod;
         public double multiplier = 1;
         public int numSamples;
+        public OrbitSamplingStrategy sampling;
         public String name;
         public OrbitComponent orbitalParamaters;
         public Entity entity;
@@ -68,38 +70,60 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
             this.providerClass = providerClass;
         }
 
-        public OrbitDataLoaderParameters(String name, Class<? extends IOrbitDataProvider> providerClass, double orbitalPeriod, int numSamples) {
+        public OrbitDataLoaderParameters(String name,
+                                         Class<? extends IOrbitDataProvider> providerClass,
+                                         double orbitalPeriod, int numSamples,
+                                         OrbitSamplingStrategy sampling) {
             this(providerClass);
             this.name = name;
             this.orbitalPeriod = orbitalPeriod;
             this.numSamples = numSamples;
+            this.sampling = sampling;
         }
 
-        public OrbitDataLoaderParameters(String name, Class<? extends IOrbitDataProvider> providerClass, OrbitComponent orbitalParameters, double multiplier) {
+        public OrbitDataLoaderParameters(String name,
+                                         Class<? extends IOrbitDataProvider> providerClass,
+                                         OrbitComponent orbitalParameters,
+                                         double multiplier) {
             this(providerClass);
             this.name = name;
             this.orbitalParamaters = orbitalParameters;
             this.multiplier = multiplier;
         }
 
-        public OrbitDataLoaderParameters(String name, Class<? extends IOrbitDataProvider> providerClass, OrbitComponent orbitalParameters, double multiplier, int numSamples) {
+        public OrbitDataLoaderParameters(String name,
+                                         Class<? extends IOrbitDataProvider> providerClass,
+                                         OrbitComponent orbitalParameters,
+                                         double multiplier,
+                                         int numSamples,
+                                         OrbitSamplingStrategy sampling) {
             this(providerClass);
             this.name = name;
             this.orbitalParamaters = orbitalParameters;
             this.multiplier = multiplier;
             this.numSamples = numSamples;
+            this.sampling = sampling;
         }
 
-        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, double orbitalPeriod, int numSamples) {
+        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass,
+                                         String name,
+                                         Date ini,
+                                         double orbitalPeriod,
+                                         int numSamples,
+                                         OrbitSamplingStrategy sampling) {
             this(providerClass);
             this.name = name;
             this.ini = ini;
             this.orbitalPeriod = orbitalPeriod;
             this.numSamples = numSamples;
+            this.sampling = sampling;
         }
 
-        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, double orbitalPeriod) {
-            this(providerClass, name, ini, orbitalPeriod, -1);
+        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass,
+                                         String name,
+                                         Date ini,
+                                         double orbitalPeriod) {
+            this(providerClass, name, ini, orbitalPeriod, -1, OrbitSamplingStrategy.TIME);
         }
 
         public void setIni(Date date) {

@@ -125,16 +125,16 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(trajectory.bodyColor[0], trajectory.bodyColor[1], trajectory.bodyColor[2], trajectory.bodyColor[3]);
 
                                 // ORBIT ELEMENTS 01
-                                tempVerts[curr.vertexIdx + elems01Offset] = (float) FastMath.sqrt(oc.mu / FastMath.pow(oc.semimajoraxis * 1000d, 3d));
+                                tempVerts[curr.vertexIdx + elems01Offset] = (float) FastMath.sqrt(oc.mu / FastMath.pow(oc.semiMajorAxis * 1000d, 3d));
                                 tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                                tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
+                                tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semiMajorAxis * 1000d); // In metres
                                 tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
                                 // ORBIT ELEMENTS 02
                                 tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsDouble.degRad);
+                                tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingNode * MathUtilsDouble.degRad);
+                                tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argOfPericenter * MathUtilsDouble.degRad);
+                                tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meanAnomaly * MathUtilsDouble.degRad);
 
                                 // SIZE
                                 tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize;

@@ -8,16 +8,21 @@
 package gaiasky.scene.record;
 
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.math.Matrix3d;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
 import java.time.Instant;
 import java.util.Objects;
 
+import static gaiasky.util.math.MathUtilsDouble.PI2;
+
 public class OrbitComponent {
+    protected static final Logger.Log logger = Logger.getLogger(OrbitComponent.class);
 
     /** Source file **/
     public String source;
@@ -26,22 +31,26 @@ public class OrbitComponent {
     /** Base epoch in julian days **/
     public double epoch;
     /** Semi major axis of the ellipse, in Km. **/
-    public double semimajoraxis;
+    public double semiMajorAxis;
     /** Eccentricity of the ellipse, in degrees. **/
     public double e;
     /** Inclination, angle between the reference plane and the orbital plane, in degrees. **/
     public double i;
     /** Longitude of the ascending node in degrees. **/
-    public double ascendingnode;
+    public double ascendingNode;
     /** Argument of perihelion in degrees. **/
-    public double argofpericenter;
+    public double argOfPericenter;
     /** Mean anomaly at epoch, in degrees. **/
-    public double meananomaly;
+    public double meanAnomaly;
     /** G*M of central body (gravitational constant). Defaults to the Sun's. In km^3/s^2. **/
     public double mu = 1.32712440041e11;
-
     /** Flag when mu is set externally. **/
     private boolean externalMu = false;
+
+    /** Auxiliary rotation matrix. **/
+    private final Matrix3d Rx = new Matrix3d();
+    /** Auxiliary vector. **/
+    private final Vector3d vAux = new Vector3d();
 
     public OrbitComponent() {
 
@@ -60,7 +69,7 @@ public class OrbitComponent {
     }
 
     public void setSemiMajorAxis(Double semiMajorAxis) {
-        this.semimajoraxis = semiMajorAxis;
+        this.semiMajorAxis = semiMajorAxis;
     }
 
     public void setSemimajoraxis(Double setmiMajorAxis) {
@@ -76,7 +85,7 @@ public class OrbitComponent {
     }
 
     public void setAscendingNode(Double ascendingNode) {
-        this.ascendingnode = ascendingNode;
+        this.ascendingNode = ascendingNode;
     }
 
     public void setAscendingnode(Double ascendingNode) {
@@ -84,7 +93,7 @@ public class OrbitComponent {
     }
 
     public void setArgOfPericenter(Double argOfPericenter) {
-        this.argofpericenter = argOfPericenter;
+        this.argOfPericenter = argOfPericenter;
     }
 
     public void setArgofpericenter(Double argOfPericenter) {
@@ -92,7 +101,7 @@ public class OrbitComponent {
     }
 
     public void setMeanAnomaly(Double meanAnomaly) {
-        this.meananomaly = meanAnomaly;
+        this.meanAnomaly = meanAnomaly;
     }
 
     public void setMeananomaly(Double meanAnomaly) {
@@ -105,8 +114,8 @@ public class OrbitComponent {
      * are set as mu=4 pi^2 a^3 / T^2.
      */
     public void computeMu(boolean km3s2) {
-        if (period > 0 && semimajoraxis > 0 && !externalMu) {
-            double a = semimajoraxis; // In km.
+        if (period > 0 && semiMajorAxis > 0 && !externalMu) {
+            double a = semiMajorAxis; // In km.
             // Compute mu from period and semi-major axis.
             double T = period * Nature.D_TO_S; // d to s.
             this.mu = (4.0 * FastMath.PI * FastMath.PI * a * a * a) / (T * T);
@@ -121,52 +130,149 @@ public class OrbitComponent {
         this.externalMu = true;
     }
 
-    public double trueAnomalyToTime(double nuRad, double meanMotionRadPerSec) {
+    /**
+     * Convert a true anomaly (nu) in the current orbit to the Julian days since epoch.
+     *
+     * @param nuRad The true anomaly, in radians.
+     *
+     * @return The Julian days since epoch corresponding to the given true anomaly.
+     */
+    public double trueAnomalyToTime(double nuRad) {
+        // Mean motion in rad/day
+        var n = PI2 / period;
         // Convert true anomaly to eccentric anomaly E
-        double tanHalfNu = Math.tan(nuRad / 2.0);
-        double sqrtFactor = Math.sqrt((1 - e) / (1 + e));
-        double E = 2.0 * Math.atan2(tanHalfNu * sqrtFactor, 1.0);
+        double tanHalfNu = FastMath.tan(nuRad / 2.0);
+        double sqrtFactor = FastMath.sqrt((1 - e) / (1 + e));
+        double E = 2.0 * FastMath.atan2(tanHalfNu * sqrtFactor, 1.0);
 
-        // Normalize E to [0, 2π)
-        E = E % (2 * Math.PI);
-        if (E < 0) {
-            E += 2 * Math.PI;
-        }
+        E = (E + PI2) % PI2;
 
         // Compute mean anomaly
-        double M = E - e * Math.sin(E);
+        double M = E - e * FastMath.sin(E);
 
-        // Time since epoch in seconds
-        double deltaT = M / meanMotionRadPerSec;
+        // Mean anomaly at epoch
+        double M0 = FastMath.toRadians(meanAnomaly);
 
-        // Return time in Julian Date
-        return epoch + deltaT / 86400.0;
+        // Time since epoch in days
+        double deltaT = (M - M0) / n;
+
+        // Return time in Julian days since epoch
+        return deltaT;
     }
 
+    /**
+     * Load the point (cartesian position vector) in the orbit for the given time.
+     *
+     * @param out The vector to store the result.
+     * @param t   The time as a {@link Instant}.
+     */
     public void loadDataPoint(Vector3d out, Instant t) {
         double tjd = AstroUtils.getJulianDate(t);
-        loadDataPoint(out, tjd - epoch);
+        keplerianToCartesianTime(out, tjd - epoch);
     }
 
-    public void keplerianToCartesian(Vector3d out, double nu) {
+    /**
+     * Loads the orbit cartesian position vector for the given time.
+     *
+     * @param out    The vector to store the result.
+     * @param dtDays The time as Julian days from epoch.
+     */
+    public void loadDataPoint(Vector3d out, double dtDays) {
+        keplerianToCartesianTime(out, dtDays);
+    }
+
+    /**
+     * Gets the mean anomaly at the given delta time from epoch.
+     *
+     * @param dtDays The delta time in days.
+     *
+     * @return The mean anomaly in radians.
+     */
+    public double getMeanAnomalyAt(double dtDays) {
+        // Mean orbital motion [rad/day]
+        double n = PI2 / period;
+        // Mean anomaly at epoch
+        double M0 = FastMath.toRadians(meanAnomaly);
+        // Mean anomaly at epoch + dt
+        double M = (M0 + n * dtDays) % PI2;
+        if (M < 0) M += PI2;
+        return M;
+    }
+
+    /**
+     * Gets the true anomaly for the given solution to Kepler's equation.
+     *
+     * @param E Solution to Kepler's equation.
+     *
+     * @return The true anomaly.
+     */
+    public double getTrueAnomaly(double E) {
+        return 2.0 * FastMath.atan2(FastMath.sqrt(1.0 + e) * FastMath.sin(E / 2.0),
+                FastMath.sqrt(1.0 - e) * FastMath.cos(E / 2.0));
+    }
+
+    /**
+     * Solves Kepler's equation: M = E - e * sin(E)
+     *
+     * @param M The mean anomaly at the time.
+     * @param e The eccentricity.
+     *
+     * @return The solution to Kepler's equation, E.
+     */
+    public double solveKepler(double M, double e) {
+        double E = (e < 0.8) ? M : FastMath.PI;
+        for (int i = 0; i < 100; i++) {
+            double f = E - e * FastMath.sin(E) - M;
+            double fPrime = 1.0 - e * FastMath.cos(E);
+            double dE = -f / fPrime;
+            E += dE;
+            if (FastMath.abs(dE) < 1.0e-10) break;
+        }
+        return E;
+    }
+
+
+    public double timeToTrueAnomaly(double dtDays) {
+        // Mean anomaly at time.
+        double M = getMeanAnomalyAt(dtDays);
+        // Solve eccentric anomaly with Kepler's equations.
+        double E = solveKepler(M, e);
+        // True anomaly at target time.
+        return getTrueAnomaly(E);
+    }
+
+    /**
+     * Get the cartesian position vector for the given delta time from epoch.
+     *
+     * @param out    The vector to store the result.
+     * @param dtDays The Julian days from epoch.
+     */
+    public void keplerianToCartesianTime(Vector3d out, double dtDays) {
         computeMu(true);
 
         double inc = FastMath.toRadians(i);
-        double raan = FastMath.toRadians(ascendingnode);
-        double argp = FastMath.toRadians(argofpericenter);
+        double raan = FastMath.toRadians(ascendingNode);
+        double argp = FastMath.toRadians(argOfPericenter);
 
-        // Distance
-        double r = semimajoraxis * (1 - e * e) / (1 + e * FastMath.cos(nu));
-        // Perifocal coordinates
-        double x_pf = r * FastMath.cos(nu);
-        double y_pf = r * FastMath.sin(nu);
-        double z_pf = 0;
+        // Mean anomaly at time.
+        double M = getMeanAnomalyAt(dtDays);
+        // Solve Kepler's equations.
+        double E = solveKepler(M, e);
+        // True anomaly at target time.
+        double nu = getTrueAnomaly(E);
+        // Radius
+        double r = semiMajorAxis * (1 - e * FastMath.cos(E));
+
+        // Perifocal coordinates.
+        double xPf = r * FastMath.cos(nu);
+        double yPf = r * FastMath.sin(nu);
+        double zPf = 0;
 
         // Uncomment for velocity vector.
         //double p = semimajoraxis * (1 - e * e);
-        //double vx_pf = -FastMath.sqrt(mu / p) * FastMath.sin(nu);
-        //double vy_pf = FastMath.sqrt(mu / p) * (e + FastMath.cos(nu));
-        //double vz_pf = 0;
+        //double vxPf = -FastMath.sqrt(mu / p) * FastMath.sin(nu);
+        //double vyPf = FastMath.sqrt(mu / p) * (e + FastMath.cos(nu));
+        //double vzPf = 0;
 
         // Rotation matrix
         double cosO = FastMath.cos(raan);
@@ -176,51 +282,98 @@ public class OrbitComponent {
         double cosW = FastMath.cos(argp);
         double sinW = FastMath.sin(argp);
 
-        double[][] R = new double[][]{
-                {
-                        cosO * cosW - sinO * sinW * cosI,
-                        -cosO * sinW - sinO * cosW * cosI,
-                        sinO * sinI
-                },
-                {
-                        sinO * cosW + cosO * sinW * cosI,
-                        -sinO * sinW + cosO * cosW * cosI,
-                        -cosO * sinI
-                },
-                {
-                        sinW * sinI,
-                        cosW * sinI,
-                        cosI
-                }
-        };
+        Rx.val[Matrix3d.M00] = cosO * cosW - sinO * sinW * cosI;
+        Rx.val[Matrix3d.M01] = -cosO * sinW - sinO * cosW * cosI;
+        Rx.val[Matrix3d.M02] = sinO * sinI;
 
-        double[] rVec = matVecMul(R, new double[]{x_pf, y_pf, z_pf});
-        //double[] vVec = matVecMul(R, new double[]{vx_pf, vy_pf, vz_pf});
+        Rx.val[Matrix3d.M10] = sinO * cosW + cosO * sinW * cosI;
+        Rx.val[Matrix3d.M11] = -sinO * sinW + cosO * cosW * cosI;
+        Rx.val[Matrix3d.M12] = -cosO * sinI;
+
+        Rx.val[Matrix3d.M20] = sinW * sinI;
+        Rx.val[Matrix3d.M21] = cosW * sinI;
+        Rx.val[Matrix3d.M22] = cosI;
+
+        // Position
+        vAux.set(xPf, yPf, zPf);
+        vAux.mul(Rx);
+        // Velocity
+        //vAux.set(vxPf, vyPf, vzPf);
+        //vAux.traMul(mAux);
 
         // From regular XYZ to X'Y'Z' (Gaia Sky coordinates).
-        out.set(rVec[1], rVec[2], rVec[0]).scl(Constants.KM_TO_U);
+        out.set(vAux.y, vAux.z, vAux.x).scl(Constants.KM_TO_U);
     }
 
-    private double[] matVecMul(double[][] mat, double[] vec) {
-        double[] result = new double[3];
-        for (int i = 0; i < 3; i++) {
-            result[i] = mat[i][0] * vec[0] + mat[i][1] * vec[1] + mat[i][2] * vec[2];
-        }
-        return result;
+    /**
+     * Get the cartesian position vector for the given true anomaly (nu).
+     *
+     * @param out The vector to store the result.
+     * @param nu  The true anomaly.
+     */
+    public void keplerianToCartesianNu(Vector3d out, double nu) {
+        computeMu(true);
+
+        double inc = FastMath.toRadians(i);
+        double raan = FastMath.toRadians(ascendingNode);
+        double argp = FastMath.toRadians(argOfPericenter);
+
+        // Distance
+        double r = semiMajorAxis * (1 - e * e) / (1 + e * FastMath.cos(nu));
+        // Perifocal coordinates
+        double xPf = r * FastMath.cos(nu);
+        double yPf = r * FastMath.sin(nu);
+        double zPf = 0;
+
+        // Uncomment for velocity vector.
+        //double p = semimajoraxis * (1 - e * e);
+        //double vxPf = -FastMath.sqrt(mu / p) * FastMath.sin(nu);
+        //double vyPf = FastMath.sqrt(mu / p) * (e + FastMath.cos(nu));
+        //double vzPf = 0;
+
+        // Rotation matrix
+        double cosO = FastMath.cos(raan);
+        double sinO = FastMath.sin(raan);
+        double cosI = FastMath.cos(inc);
+        double sinI = FastMath.sin(inc);
+        double cosW = FastMath.cos(argp);
+        double sinW = FastMath.sin(argp);
+
+        Rx.val[Matrix3d.M00] = cosO * cosW - sinO * sinW * cosI;
+        Rx.val[Matrix3d.M01] = -cosO * sinW - sinO * cosW * cosI;
+        Rx.val[Matrix3d.M02] = sinO * sinI;
+
+        Rx.val[Matrix3d.M10] = sinO * cosW + cosO * sinW * cosI;
+        Rx.val[Matrix3d.M11] = -sinO * sinW + cosO * cosW * cosI;
+        Rx.val[Matrix3d.M12] = -cosO * sinI;
+
+        Rx.val[Matrix3d.M20] = sinW * sinI;
+        Rx.val[Matrix3d.M21] = cosW * sinI;
+        Rx.val[Matrix3d.M22] = cosI;
+
+        // Position
+        vAux.set(xPf, yPf, zPf);
+        vAux.mul(Rx);
+        // Velocity
+        //vAux.set(vxPf, vyPf, vzPf);
+        //vAux.traMul(mAux);
+
+        // From regular XYZ to X'Y'Z' (Gaia Sky coordinates).
+        out.set(vAux.y, vAux.z, vAux.x).scl(Constants.KM_TO_U);
     }
 
-    public void loadDataPoint(Vector3d out, double nu) {
-        keplerianToCartesian(out, nu);
+    public void loadDataPointNu(Vector3d out, double nu) {
+        keplerianToCartesianNu(out, nu);
     }
 
     // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
     @Deprecated
     public void loadDataPointReneSchwarz(Vector3d out, double dtDays) {
         computeMu(false);
-        double a = semimajoraxis * Nature.KM_TO_M; // km to m
-        double M0 = meananomaly * MathUtilsDouble.degRad;
-        double omega_lan = ascendingnode * MathUtilsDouble.degRad;
-        double omega_ap = argofpericenter * MathUtilsDouble.degRad;
+        double a = semiMajorAxis * Nature.KM_TO_M; // km to m
+        double M0 = meanAnomaly * MathUtilsDouble.degRad;
+        double omega_lan = ascendingNode * MathUtilsDouble.degRad;
+        double omega_ap = argOfPericenter * MathUtilsDouble.degRad;
         double ic = i * MathUtilsDouble.degRad;
 
         // 1
@@ -235,7 +388,7 @@ public class OrbitComponent {
         double E_t = E;
 
         // 3
-        double nu_t = 2d * FastMath.atan2(Math.sqrt(1.0 + e) * FastMath.sin(E_t / 2.0), FastMath.sqrt(1.0 - e) * FastMath.cos(E_t / 2.0));
+        double nu_t = 2d * FastMath.atan2(FastMath.sqrt(1.0 + e) * FastMath.sin(E_t / 2.0), FastMath.sqrt(1.0 - e) * FastMath.cos(E_t / 2.0));
 
         // 4
         double rc_t = a * (1.0 - e * FastMath.cos(E_t));
@@ -267,7 +420,7 @@ public class OrbitComponent {
     @Override
     public String toString() {
         String desc;
-        desc = Objects.requireNonNullElseGet(source, () -> "{epoch: " + epoch + ", period: " + period + ", e: " + e + ", i: " + i + ", sma: " + semimajoraxis + "}");
+        desc = Objects.requireNonNullElseGet(source, () -> "{epoch: " + epoch + ", period: " + period + ", e: " + e + ", i: " + i + ", sma: " + semiMajorAxis + "}");
         return desc;
     }
 

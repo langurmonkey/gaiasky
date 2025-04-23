@@ -58,7 +58,7 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         if (verts.pointCloudData != null) {
             if (verts.pointCloudData.hasTime()) {
                 long now = time.getTime().toEpochMilli();
-                long t0 = verts.pointCloudData.time.get(0).toEpochMilli();
+                long t0 = verts.pointCloudData.time.getFirst().toEpochMilli();
                 long t1 = verts.pointCloudData.time.get(verts.pointCloudData.getNumPoints() - 1).toEpochMilli();
 
                 long t1t0 = t1 - t0;
@@ -124,9 +124,9 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
             if (transformFunction != null)
                 localTransformD.mul(transformFunction);
 
-            localTransformD.rotate(0, 1, 0, oc.argofpericenter)
+            localTransformD.rotate(0, 1, 0, oc.argOfPericenter)
                     .rotate(0, 0, 1, oc.i)
-                    .rotate(0, 1, 0, oc.ascendingnode);
+                    .rotate(0, 1, 0, oc.ascendingNode);
         }
         localTransformD.putIn(graph.localTransform);
     }

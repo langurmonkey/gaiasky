@@ -45,7 +45,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private final Vector3b ecl = new Vector3b();
     PointCloudData data;
 
-    public static void main(String[] args) {
+    public static void main() {
         try {
             // Assets location
             String ASSETS_LOC = Settings.ASSETS_LOC;
@@ -68,7 +68,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             for (int i = 0; i < bodies.length; i++) {
                 String b = bodies[i];
                 double period = periods[i];
-                OrbitDataLoaderParameters param = new OrbitDataLoaderParameters(me.getClass(), b, now, period, 500);
+                OrbitDataLoaderParameters param = new OrbitDataLoaderParameters(me.getClass(), b, now, period, 500, Trajectory.OrbitSamplingStrategy.TIME);
                 me.load(null, param);
 
             }

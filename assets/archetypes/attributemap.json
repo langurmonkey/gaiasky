@@ -301,6 +301,10 @@
         "description": "Override the number of samples to be used for this orbit. Gaia Sky computes the number of samples internally, but in some cases it may be necessary to override it to give orbits more detail.",
         "unit": "Integer"
       },
+      "sampling": {
+        "description": "Strategy to use to sample the orbit. Can be ``time``, to sample the orbit uniformly in time, or ``nu``, to sample the orbit uniformly in true anomaly. Defaults to ``time``.",
+        "unit": "Double"
+      },
       "orbitScaleFactor": {
         "description": "Multiplicative factor to scale the orbit data points when they are being loaded.",
         "unit": "Double",

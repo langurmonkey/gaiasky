@@ -50,7 +50,13 @@ public class TrajectoryInitializer extends AbstractInitSystem {
                     try {
                         trajectory.providerInstance = ClassReflection.newInstance(trajectory.providerClass);
                         trajectory.providerInstance.initialize(entity, trajectory);
-                        trajectory.providerInstance.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, trajectory.numSamples), trajectory.newMethod);
+                        trajectory.providerInstance.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0],
+                                trajectory.providerClass,
+                                trajectory.oc,
+                                trajectory.multiplier,
+                                trajectory.numSamples,
+                                trajectory.sampling),
+                                trajectory.newMethod);
                         verts.pointCloudData = trajectory.providerInstance.getData();
 
                         // Transform data using affine transformations.
@@ -107,7 +113,7 @@ public class TrajectoryInitializer extends AbstractInitSystem {
 
         if (trajectory.body != null) {
             var bodyBase = Mapper.base.get(trajectory.body);
-            trajectory.params = new OrbitDataLoaderParameters(bodyBase.names[0], null, trajectory.oc.period, 600);
+            trajectory.params = new OrbitDataLoaderParameters(bodyBase.names[0], null, trajectory.oc.period, 600, trajectory.sampling);
             trajectory.params.entity = entity;
         }
 

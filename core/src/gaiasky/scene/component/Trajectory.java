@@ -58,6 +58,20 @@ public class Trajectory implements Component {
      * Number of samples for the orbit data provider.
      **/
     public int numSamples = 100;
+
+    /**
+     * Sampling strategy for the orbit component.
+     */
+    public enum OrbitSamplingStrategy {
+        /** Orbit sampling is done uniformly in time. **/
+        TIME,
+        /** Orbit sampling is done uniformly in nu (true anomaly). **/
+        NU
+    }
+
+    /** Strategy to use to sample the orbit. **/
+    public OrbitSamplingStrategy sampling = OrbitSamplingStrategy.TIME;
+
     public long orbitStartMs, orbitEndMs;
     /**
      * Whether the orbit must be refreshed when out of bounds
@@ -264,6 +278,15 @@ public class Trajectory implements Component {
     public void setNumSamples(Long numSamples) {
         this.numSamples = FastMath.toIntExact(numSamples);
     }
+
+    public void setSampling(String sampling) {
+        try {
+            this.sampling = OrbitSamplingStrategy.valueOf(sampling.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            logger.error("Unknown orbit sampling value: " + sampling, e);
+        }
+    }
+
 
     public void setFadeDistanceUp(Double distUp) {
         this.distUp = distUp.floatValue();

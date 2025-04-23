@@ -11,7 +11,6 @@ package gaiasky;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import org.junit.After;
 import org.junit.Assert;
@@ -40,12 +39,12 @@ public class OrbitComponentTest {
         OrbitComponent oc = new OrbitComponent();
         oc.period = 365.25;
         oc.epoch = 2451545.0;
-        oc.semimajoraxis = 149597870.7;  // 1 AU
+        oc.semiMajorAxis = 149597870.7;  // 1 AU
         oc.e = 0.0167;
         oc.i = 0.00005;
-        oc.ascendingnode = -11.26064;
-        oc.argofpericenter = 114.20783;
-        oc.meananomaly = 358.617;  // at epoch
+        oc.ascendingNode = -11.26064;
+        oc.argOfPericenter = 114.20783;
+        oc.meanAnomaly = 358.617;  // at epoch
         oc.mu =1.32712440018e11;
 
         Vector3d out = new Vector3d();

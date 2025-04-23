@@ -105,9 +105,9 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             transform.idt();
         }
         if (!isNewMethod()) {
-            transform.rotate(0, 1, 0, orbitalParams.argofpericenter);
+            transform.rotate(0, 1, 0, orbitalParams.argOfPericenter);
             transform.rotate(0, 0, 1, orbitalParams.i);
-            transform.rotate(0, 1, 0, orbitalParams.ascendingnode);
+            transform.rotate(0, 1, 0, orbitalParams.ascendingNode);
         } else {
             if (entity != null && Mapper.trajectory.get(entity).model.isExtrasolar()) {
                 transform.rotate(0, 1, 0, 90);
