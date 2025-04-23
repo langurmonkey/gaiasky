@@ -302,7 +302,7 @@
         "unit": "Integer"
       },
       "sampling": {
-        "description": "Strategy to use to sample the orbit. Can be ``time``, to sample the orbit uniformly in time, or ``nu``, to sample the orbit uniformly in true anomaly. Defaults to ``time``.",
+        "description": "Strategy to use to sample the orbit. |brsp| **Values:** |br| ``time`` -- sample orbit uniformly in time (default). |br| ``nu`` -- sample orbit uniformly in true anomaly. Do not use with a ``bodyRepresentation`` other than ``only_orbit``.",
         "unit": "Double"
       },
       "orbitScaleFactor": {
