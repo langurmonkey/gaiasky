@@ -20,6 +20,7 @@ import java.time.Instant;
 /**
  * VSOP87 coordinates using an implementation based on binary data files.
  */
+@Deprecated
 public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements iVSOP87 {
 
     private static final String dataFile = "$data/default-data/vsop87/vsop87a.bin";

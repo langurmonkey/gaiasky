@@ -45,16 +45,8 @@ public class BillboardDataset {
     public BlendMode blending = BlendMode.ADDITIVE;
 
     /**
-<<<<<<< HEAD
-     * Maximum particle size for each graphics quality mode. It has 4 entries, from LOW to ULTRA.
-     * See {@link GraphicsQuality}.
-||||||| parent of d7beec427 (feat: change antialiasing settings from only type to type and quality.)
-     * Maximum particle size for each graphics quality mode. It has 4 entries, from LOW to ULTRA.
-     * See {@link gaiasky.util.Settings.GraphicsQuality}.
-=======
      * Maximum particle size for each texture quality mode. It has 4 entries, from LOW to ULTRA.
      * See {@link GraphicsQuality}.
->>>>>>> d7beec427 (feat: change antialiasing settings from only type to type and quality.)
      **/
     public double[] maxSizes;
 

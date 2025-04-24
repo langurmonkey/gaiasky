@@ -95,7 +95,7 @@
     "Coordinates": {
       "description": "Defines attributes that provide coordinates and positions to objects.",
       "coordinatesProvider": {
-        "description": "The coordinates provider object for this object. The coordinates provider computes the position of the object for each time. This is an object containing, at least, the full reference to a Java class that implements ``IBodyCoordinates`` in the \"impl\" attribute. Examples are ``gaiasky.util.coord.StaticCoordinates`` or ``gaiasky.util.coord.OrbitLintCoordinates``. See :ref:`coordinate-providers` for more information.",
+        "description": "The coordinates provider object for this object. The coordinates provider computes the position of the object for each time. This is an object containing, at least, the full reference to a Java class that implements ``IBodyCoordinates`` in the \"impl\" attribute. |brsp| **Values:** |ul| |li| ``gaiasky.util.coord.StaticCoordinates`` |eli| |li|  ``gaiasky.util.coord.ComposedTimedOrbitCoordinates`` |eli| |li| ``gaiasky.util.coord.PythonBodyCoordinates`` |eli| |li| ``gaiasky.util.coord.SpacecraftCoordinates`` |eli| |li| ``gaiasky.util.coord.TimedOrbitCoordinates`` |eli| |li|  ``gaiasky.util.coord.OrbitLintCoordinates`` |eli| |li| ``gaiasky.util.coord.chebyshev.ChebyshevEphemeris`` |eli| |li| ``gaiasky.util.coord.HeliotropicOrbitCoordinates`` |eli| |li| ``gaiasky.util.coord.VSOP2000`` |eli| |eul| See :ref:`coordinate-providers` for more information.",
         "unit": "Map",
         "aliases": [
           "coordinates"
@@ -105,14 +105,14 @@
     "Orientation": {
       "description": "Defines the orientation model of objects. Can be defined as a rigid rotation (given parameters like rotation period, axial tilt, etc.) or via quaternion-based orientations.",
       "rotation": {
-        "description": "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes ``angularVelocity``, ``period``, ``axialtilt``, ``inclination``, ``ascendingNode`` and ``meridianAngle``. See :ref:`rotation` for more information.",
+        "description": "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes: |brsp| |ul| |li| ``angularVelocity`` -- in :math:`deg/h`. |eli| |li| ``period`` -- in days. |eli| |li| ``axialTilt`` -- in degrees. |eli| |li| ``inclination`` -- in degrees. |eli| |li| ``ascendingNode`` -- in degrees. |eli| |li| ``meridianAngle`` -- in degrees. |eli| |eul| |br| See :ref:`rotation` for more information.",
         "unit": "Map",
         "aliases": [
           "rigidRotation"
         ]
       },
       "orientationProvider": {
-        "description": "Provider class for the quaternion orientations.",
+        "description": "Provider class for the quaternion orientations. |brsp| **Values:** |ul| |li| ``gaiasky.util.gaia.GaiaAttitudeServer`` |eli| |li| ``gaiasky.data.orientation.LVLHOrientationServer`` |eli| |li| ``gaiasky.data.orientation.QuaternionNlerpOrientationServer`` |eli| |li| ``gaiasky.data.orientation.QuaternionSlerpOrientationServer`` |eli| |eul|",
         "unit": "String",
         "aliases": [
           "provider:HeliotropicSatellite",
@@ -168,21 +168,21 @@
     "ProperMotion": {
       "description": "Defines proper motion attributes.",
       "muAlpha": {
-        "description": "Proper motion in right ascension, the :math:`\\mu_{\\alpha\\star}`, in mas/yr.",
+        "description": "Proper motion in right ascension, the :math:`\\mu_{\\alpha\\star}`, in :math:`mas/yr`.",
         "unit": "Double",
         "aliases": [
           "muAlphaMasYr"
         ]
       },
       "muDelta": {
-        "description": "Proper motion in declination, the :math:`\\mu_{\\delta}`, in mas/yr.",
+        "description": "Proper motion in declination, the :math:`\\mu_{\\delta}`, in :math:`mas/yr`.",
         "unit": "Double",
         "aliases": [
           "muDeltaMasYr"
         ]
       },
       "radialVelocity": {
-        "description": "The radial velocity, in km/s.",
+        "description": "The radial velocity, in :math:`km/s`.",
         "unit": "Double",
         "aliases": [
           "rv",
@@ -227,18 +227,18 @@
     "Trajectory": {
       "description": "Defines attributes related to orbits and trajectory objects. See :ref:`orbits` for more information.",
       "orbitProvider": {
-        "description": "In *Orbit* archetype objects, this is the fully-qualified Java class that provides orbit data. This class needs to implement ``IOrbitDataProvider``. |brsp| **Values:** |br| ``gaiasky.data.orbit.OrbitalParametersProvider`` -- orbit is defined with orbital elements. |br| ``gaiasky.data.orbit.OrbitFileDataProvider`` -- orbit defined from a file of 3D sample points, in Km. |brsp| See :ref:`orbits` for more information.",
+        "description": "In *Orbit* archetype objects, this is the fully-qualified Java class that provides orbit data. This class needs to implement ``IOrbitDataProvider``. |brsp| **Values:** |ul| |li| ``gaiasky.data.orbit.OrbitalParametersProvider`` -- orbit is defined with orbital elements. |eli| |li| ``gaiasky.data.orbit.OrbitFileDataProvider`` -- orbit defined from a file of 3D sample points, in Km. |eli| |eul| |brsp| See :ref:`orbits` for more information.",
         "unit": "String",
         "aliases": [
           "provider"
         ]
       },
       "orbit": {
-        "description": "The orbit component, containing some additional information, like the orbital elements, the period, etc. See :ref:`orbits` for a full description of the format and possible values of this attribute.",
+        "description": "This map defines the Keplerian elements for orbits with ``orbitProvider`` set to ``[...].OrbitalParametersProvider``. |brsp| **Attributes:** |br| |ul| |li| ``period`` -- the period in days. |eli| |li| ``epoch`` -- the epoch in Julian days. |eli| |li| ``semiMajorAxis`` -- the semi-major axis, in km. |eli| |li| ``e`` -- the eccentricity. |eli| |li| ``i`` -- the inclination, in degrees. |eli| |li| ``ascendingNode`` -- longitude of the ascending node, in degrees. |eli| |li| ``argOfPericenter`` -- argument of the periapsis, in degrees. |eli| |li| ``meanAnomaly`` -- the mean anomaly at epoch, M0, in degrees. |eli| |li| ``mu`` -- :math:`G*M` of the central body (gravitational constant), in :math:`km^3/s^2`. Defaults to the Sun's. |eli| |eul| |brsp| See :ref:`Orbital Elements <orbital-elements>` for more information and examples.",
         "unit": "Map"
       },
       "orientationModel": {
-        "description": "The orientation model of this orbit. |brsp| **Values:** |br| ``default`` -- the default orientation. |br| ``extrasolar_system`` -- orientation for extrasolar systems. See :ref:`orbits` for more information.",
+        "description": "The orientation model of this orbit. |brsp| **Values:** |ul| |li| ``default`` -- the default orientation, where the reference plane is the equator. Use this for orbits in the Solar System. |eli| |li| ``extrasolar_system`` -- orientation for extrasolar systems. |eli| |eul| |brsp| See :ref:`orbits` for more information.",
         "unit": "String",
         "aliases": [
           "model:Orbit"
@@ -252,11 +252,11 @@
         ]
       },
       "bodyRepresentation": {
-        "description": "The body representation type for this orbit/trajectory. This only works with orbits defined via orbital elements. |brsp| **Values:** |br| ``only_orbit`` -- the body is not visually represented at all. |br| ``only_body`` -- only the body is visually represented, no line. |br| ``body_and_orbit`` -- both body and orbit line are represented.",
+        "description": "The body representation type for this orbit/trajectory. This only works with orbits defined via orbital elements. |brsp| **Values:** |ul| |li| ``only_orbit`` -- the body is not visually represented at all. |eli| |li| ``only_body`` -- only the body is visually represented, no line. |eli| |li| ``body_and_orbit`` -- both body and orbit line are represented. |eli| |eul|",
         "unit": "String"
       },
       "bodyColor": {
-        "description": "Body color. Color to use to represent the body in orbital elements trajectories, when the ``bodyRepresentation`` attribute enables the representation of the body for this trajectory.",
+        "description": "Body color as an RGBA array. Color to use to represent the body in orbital elements trajectories, when the ``bodyRepresentation`` attribute enables the representation of the body for this trajectory.",
         "unit": "Double[4]",
         "aliases": [
           "pointColor",
@@ -264,18 +264,18 @@
         ]
       },
       "pointSize": {
-        "description": "The size of the point at the head of the trajectory in object-less orbits (orbits that are not attached to any object). Examples of this are asteroids, where orbits are defined via the orbital elements, and not all orbits are attached to an asteroid object for performance purposes. In these cases, the size of the point at the head of the orbit is set in this property.",
+        "description": "Orbits that are not attached to any model object can optionally show a particle with the position of the object (see ``onlyBody`` and ``bodyRepresentation`` parameters). This parameter controls size of the particle at the head of the trajectory in orbits that are not attached to any object. Examples of this are asteroids, where orbits are defined via the orbital elements, and not all orbits are attached to an asteroid object for performance purposes.",
         "unit": "Double",
         "aliases": [
           "pointsize"
         ]
       },
       "closedLoop": {
-        "description": "Define whether the loop must be closed or not (i.e. join the end point with the start point). Defaults to true, which is the value for periodic orbits.",
+        "description": "Define whether the trajectory must be closed or not, i.e., join the end point with the start point. Defaults to ``true``, which is the value for periodic orbits. Non-periodic trajectories must set this to ``false``.",
         "unit": "Boolean"
       },
       "orbitTrail": {
-        "description": "Whether to fade the orbit as it gets further away from the head (or object), in the opposite direction of travel. By default, the head is mapped to an opacity of 1, and the tail is mapped to an opacity of 0.",
+        "description": "Whether to fade the trajectory line as it gets further away from the head (or object), in the opposite direction of travel. By default, the head is mapped to an opacity of 1, and the tail is mapped to an opacity of 0.",
         "unit": "Boolean",
         "aliases": [
           "orbittrail",
@@ -283,7 +283,7 @@
         ]
       },
       "trailMap": {
-        "description": "Modify the tail mapping value in case ``orbitTrail`` is set to ``true``. This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity value of 0. The default value is 0. Set it to 0.5 to have a trail from the object to half the orbit. This enables having shorter trails, while improving the performance due to less lines being rendered.",
+        "description": "Bottom mapping position of the trail. Only active if ``orbitTrail`` is set to ``true``. This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity value of 0. The default value is 0. Set it to 0.5 to have a trail from the object to half the orbit. This enables having shorter trails, while improving the performance due to less lines being rendered.",
         "unit": "Double"
       },
       "trailMinOpacity": {
@@ -291,33 +291,33 @@
         "unit": "Double"
       },
       "newMethod": {
-        "description": "Internal parameter. Changes the way in which transformations are applied to the orbit objects. Asteroids have this set to true.",
+        "description": "Internal parameter. Changes the way in which transformations are applied to the orbit objects. Defaults to ``true``.",
         "unit": "Boolean",
         "aliases": [
           "newmethod"
         ]
       },
       "numSamples": {
-        "description": "Override the number of samples to be used for this orbit. Gaia Sky computes the number of samples internally, but in some cases it may be necessary to override it to give orbits more detail.",
+        "description": "Orbits defined as Keplerian elements must be sampled into points before rendering. This parameter overrides the default number of samples to be used for this orbit. Gaia Sky computes the number of samples internally from the period and the semi-major axis, but in some cases it may be necessary to override it to give orbits more detail.",
         "unit": "Integer"
       },
       "sampling": {
-        "description": "Strategy to use to sample the orbit. |brsp| **Values:** |br| ``time`` -- sample orbit uniformly in time (default). |br| ``nu`` -- sample orbit uniformly in true anomaly. Do not use with a ``bodyRepresentation`` other than ``only_orbit``.",
+        "description": "Orbits defined as Keplerian elements must be sampled into points before rendering. This parameter overrides the strategy used to sample the orbit from the orbital elements. |brsp| **Values:** |ul| |li| ``time`` -- sample orbit uniformly in time (default). |eli| |li| ``nu`` -- sample orbit uniformly in true anomaly. This is useful for high-eccentricity orbits where there is a high velocity difference between the periapsis and apoapsis, like in the case of comets. Do not use with a ``bodyRepresentation`` other than ``only_orbit``. |eli| |eul|",
         "unit": "Double"
       },
       "orbitScaleFactor": {
-        "description": "Multiplicative factor to scale the orbit data points when they are being loaded.",
+        "description": "Multiplicative factor to scale the orbit data points when they are being loaded. Each point (x,y,z) is scaled linearly by this factor.",
         "unit": "Double",
         "aliases": [
           "multiplier"
         ]
       },
       "fadeDistanceUp": {
-        "description": "Override the distance at which the orbit becomes totally invisible. In internal units. If not overridden, this is computed internally from the radius of the attached body.",
+        "description": "Orbits attached to an object fade out as the camera gets closer to such object. The transparency of the orbit is computed as a linear interpolation between ``fadeDistanceUp`` (mapped to transparency=1, or opacity=0) and ``fadeDistanceDown`` (mapped to transparency=0, or opacity=1). This parameter overrides the distance from the object at which the orbit becomes totally invisible, in internal units. If not overridden, this is computed internally from the radius of the attached object.",
         "unit": "Double"
       },
       "fadeDistanceDown": {
-        "description": "Override the distance at which the orbit starts to fade out. In internal units. If not overridden, this is computed internally from the radius of the attached body.",
+        "description": "Orbits attached to an object fade out as the camera gets closer to such object. The transparency of the orbit is computed as a linear interpolation between ``fadeDistanceUp`` (mapped to transparency=1, or opacity=0) and ``fadeDistanceDown`` (mapped to transparency=0, or opacity=1). This parameter overrides the distance from the object at which the orbit starts to fade out, in internal units. If not overridden, this is computed internally from the radius of the attached body.",
         "unit": "Double"
       },
       "refreshRate": {
@@ -328,7 +328,7 @@
     "ModelScaffolding": {
       "description": "Defines attributes related objects with 3D models.",
       "referencePlane": {
-        "description": "The reference plane to use for this model object. |brsp| **Values:** |br| ``ecliptic`` |br| ``galactic`` |br| ``equatorial``",
+        "description": "The reference plane to use for this model object. |brsp| **Values:** |ul| |li| ``ecliptic`` |eli| |li| ``galactic`` |eli| |li| ``equatorial`` |eli| |eul|",
         "unit": "String",
         "aliases": [
           "refPlane",
@@ -387,11 +387,11 @@
     "Volume": {
       "description": "Defines a volume to be rendered inside a model, typically a bounding box.",
       "vertexShader": {
-        "description": "The vertex shader to use. Prefix with `$data` to use a shader in a dataset. Defaults to the PBR vertex shader.",
+        "description": "The vertex shader to use. Prefix with ``\"$data/\"`` to use a shader in a dataset. Defaults to the PBR vertex shader.",
         "unit": "String"
       },
       "fragmentShader": {
-        "description": "The fragment shader to use. Prefix with `$data` to use a shader in a dataset.",
+        "description": "The fragment shader to use. Prefix with ``\"$data/\"`` to use a shader in a dataset.",
         "unit": "String"
       }
     },
@@ -429,7 +429,7 @@
     "RefSysTransform": {
       "description": "Defines an arbitrary reference system transformation via a 4x4 matrix. See :ref:`ref-sys-transform` for more information.",
       "transformFunction": {
-        "description": "Defines a transformation matrix to apply to the position of the object. The name of the transformation to apply. |brsp| **Values:** |br| ``equatorialToEcliptic`` |br| ``eclipticToEquatorial`` |br| ``equatorialToGalactic`` |br| ``galacticToEquatorial`` |br| ``eclipticToGalactic`` |br| ``galacticToEcliptic`` |brsp| See :ref:`ref-sys-transform` for more information.",
+        "description": "Defines a transformation matrix to apply to the position of the object. The name of the transformation to apply. |brsp| **Values:** |ul| |li| ``equatorialToEcliptic`` |eli| |li| ``eclipticToEquatorial`` |eli| |li| ``equatorialToGalactic`` |eli| |li| ``galacticToEquatorial`` |eli| |li| ``eclipticToGalactic`` |eli| |li| ``galacticToEcliptic`` |eli| |eul| |brsp| See :ref:`ref-sys-transform` for more information.",
         "unit": "String",
         "aliases": [
           "transformName"
@@ -469,14 +469,14 @@
         "unit": "Double[3] | Double"
       },
       "transformations": {
-        "description": "Describe the transformations directly in a map, with 'impl', and whatever attributes. The usage of the attributes 'translate', 'scale' and 'rotate' is strongly recommended over this.",
+        "description": "Describe the transformations directly in a map, with 'impl', and whatever attributes. The usage of the attributes ``translate``, ``scale`` and ``rotate`` is strongly recommended over this.",
         "unit": "Map"
       }
     },
     "Fade": {
       "description": "Defines the properties that control the fading in and out of the object.",
       "fadeIn": {
-        "description": "The starting and ending fade-in distances, in parsecs, from the reference system origin (unless 'fadeObjectName' or 'fadePosition' are defined, in which case the distances are relative to the given object or position), where the object starts and ends its fade-in transition. ",
+        "description": "The starting and ending fade-in distances, in parsecs, from the reference system origin (unless ``fadeObjectName`` or ``fadePosition`` are defined, in which case the distances are relative to the given object or position), where the object starts and ends its fade-in transition. ",
         "unit": "Double[2]",
         "aliases": [
           "fadein"
@@ -512,7 +512,7 @@
     "DatasetDescription": {
       "description": "Contains metadata about the dataset represented by this object. All objects with this component get an entry in the datasets list.",
       "catalogInfo": {
-        "description": "A map containing the metadata for the catalog represented by this object. The map can contain the attributes 'name', 'description', 'type' (INTERNAL|SCRIPT|LOD|SAMP|UI), 'nParticles', 'sizebytes'. See :ref:`catalog-formats` for more information.",
+        "description": "A map containing the metadata for the catalog represented by this object. |brsp| **Attributes:** |ul| |li| ``name`` -- the name of the catalog. |eli| |li| ``description`` -- description of the catalog. |eli| |li| ``type`` -- catalog type, for informative purposes. One of ``INTERNAL``, ``SCRIPT``, ``LOD``, ``SAMP``, ``UI``. |eli| |li| ``nParticles`` -- number of particles contained in the catalog. |eli| |li| ``sizeBytes`` -- size in bytes of the catalog file. |eli| |eul| |brsp| See :ref:`catalog-formats` for more information.",
         "unit": "Map",
         "aliases": [
           "datasetInfo",
@@ -586,7 +586,7 @@
     "BillboardSet": {
       "description": "Defines attributes related to billboard set objects.",
       "data:BillboardGroup": {
-        "description": "A list of ``BillboardDataset`` objects. Mainly used for the Milky Way model. Each object contains 'impl', 'file', 'type', 'size', 'intensity', 'layers', and 'maxsizes'. See the Milky Way object in the ``universe.json`` file in the default data pack for an example.",
+        "description": "A list of ``BillboardDataset`` objects. Mainly used for the Milky Way model. |brsp| Each object contains: |ul| |li| ``impl`` -- implementation class. This should be ``gaiasky.scenegraph.particle.BillboardDataset``. |eli| |li| ``file`` -- source file location. |eli| |li| ``type`` -- particle type. For ``BillboardDataset`` s, this is one of ``POINT``, ``DUST``, ``BULGE``, ``STAR``, ``HII``, ``GALAXY``, ``OTHER``. |eli| |li| ``size`` -- particle size. Defaults to 1. |eli| |li| ``intensity`` -- the intensity factor. Defaults to 1. |eli| |li| ``layers`` -- texture layer indices to use for this set. |eli| |li| ``maxSizes`` -- array with 4 components containing the maximum size for each graphics quality setting (low, medium, high, ultra). |eli| |li| ``completion`` -- array with 4 components containing the completion rate per graphics quality setting (low, medium, high, ultra) in [0,1]. If set to [0.5, 0.5, 0.5, 1.0], half of the particles will be used in all graphics quality settings except ultra, which will use all particles. |eli| |eul| |brsp| See the Milky Way object in the ``universe.json`` file in the `default data pack <https://gaiasky.space/resources/datasets/#default-data>`__ for an example.",
         "unit": "BillboardDataset[]"
       }
     },
@@ -620,7 +620,7 @@
         "unit": "Boolean"
       },
       "locationMarkerTexture": {
-        "description": "Location marker texture (image). Set to 'none' to disable maker. Possible values are 'none', 'default', 'flag', 'city', or a path to a PNG image. If the path directs to a data package, the format is '$data/[package-name]/path/to/file.png'.",
+        "description": "Location marker texture (image). Set to ``none`` to disable maker. |brsp| **Possible values are:** |ul| |li| ``none`` -- disable marker. |eli| |li| ``default`` -- use the default marker, a cross. |eli| |li| ``flag`` -- use an icon of a flag as marker. |eli| |li| ``city`` -- use an icon of a city as marker. |eli| |li| Path to a PNG image. If the path directs to a data package, the format is ``$data/[package-name]/path/to/file.png``. |eli| |eul|",
         "unit": "String",
         "aliases": [
           "markerTexture"
@@ -755,15 +755,15 @@
         "unit": "String"
       },
       "modelType": {
-        "description": "The model type to use for this particle set. |brsp| **Values:** |br| ``quad`` -- render billboards. |br| ``sphere`` render UV spheres. |br| ``icosphere`` render icosahedron-based spheres. |brsp| Defaults to 'quad'. This is only used in extended particle groups. To enable extended particle groups, you need to set 'type' to 'PARTICLES_EXT' in the 'providerParams' map.",
+        "description": "The model type to use for this particle set. A new model will be constructed from this type and additional parameters and rendered using instancing. This is only relevant if ``modelFile`` is not used. |brsp| **Values:** |ul| |li| ``sphere`` -- UV sphere. |eli| |li| ``icosphere`` -- Icosahedron-based sphere. |eli| |li| ``octahedronsphere`` -- Octahedron sphere. |eli| |li| ``plane``, ``patch``, ``surface``, ``billboard`` -- a flat quad composed of two triangles. For billboards. |eli| |li| ``disc`` -- a flat disc. |eli| |li| ``twofacedbillboard`` -- a two planes, or billboards, in the same position and facing in opposite directions. |eli| |li| ``cylinder`` -- a simple cylinder. |eli| |li| ``cone`` -- a cone. |eli| |li| ``cube``, ``box`` -- a cube. |eli| |li| ``ring`` -- Ringed planet. |eli| |eul| |brsp| Defaults to ``quad``. This is only used in extended particle groups. To enable extended particle groups, you need to set ``type`` to ``PARTICLES_EXT`` in the ``providerParams`` map. Check out  `ModelCache <https://codeberg.org/gaiasky/gaiasky/src/branch/master/core/src/gaiasky/util/ModelCache.java#L46>`__ for more info.",
         "unit": "String"
       },
       "modelParams": {
-        "description": "Model parameters in a map. Usually, the 'diameter', 'width', 'height', 'recursion' or 'quality' go here. For more info, see the  ``gaiasky.util.ModeCache`` class. This is only used in extended particle groups.",
+        "description": "Model parameters in a map. Usually, the ``diameter``, ``width``, ``height``, ``recursion`` or ``quality`` go here. For more info, see the  `ModelCache <https://codeberg.org/gaiasky/gaiasky/src/branch/master/core/src/gaiasky/util/ModelCache.java#L46>`__ class. This is only used in extended particle groups.",
         "unit": "Map<String,Object>"
       },
       "modelPrimitive": {
-        "description": "The GL primitive to use. |brsp| **Values:** |br| ``GL_TRIANGLES`` |br| ``GL_TRIANGLE_STRIP`` |br| ``GL_TRIANGLE_FAN`` |br| ``GL_LINES`` |br| ``GL_LINE_STRIP`` |br| ``GL_LINE_LOOP`` |brsp| Defaults to ``GL_TRIANGLES``. The ``GL_LINE`` primitives enable wireframe rendering, which is currently only supported by sphere and ico-sphere model types. This is only used in extended particle groups.",
+        "description": "The GL primitive to use. |brsp| **Values:** |ul| |li| ``GL_TRIANGLES`` |eli| |li| ``GL_TRIANGLE_STRIP`` |eli| |li| ``GL_TRIANGLE_FAN`` |eli| |li| ``GL_LINES`` |eli| |li| ``GL_LINE_STRIP`` |eli| |li| ``GL_LINE_LOOP`` |eli| |eul| |brsp| Defaults to ``GL_TRIANGLES``. The ``GL_LINE`` primitives enable wireframe rendering, which is currently only supported by sphere and ico-sphere model types. This is only used in extended particle groups.",
         "unit": "String"
       },
       "proximityDescriptorsLocation": {

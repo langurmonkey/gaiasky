@@ -14,6 +14,7 @@ import org.apfloat.Apfloat;
 
 import java.time.Instant;
 
+@Deprecated
 public class MoonAACoordinates extends AbstractOrbitCoordinates {
 
     private final Vector3d aux = new Vector3d();
