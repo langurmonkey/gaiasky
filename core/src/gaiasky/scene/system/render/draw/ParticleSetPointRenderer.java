@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -222,12 +223,16 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                 if (set.textureArray != null) {
                     set.textureArray.bind(0);
                 }
+                // Shading style.
+                shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
+                shaderProgram.setUniformi("u_shadingStyle", set.shadingStyle.ordinal());
+
                 float meanDist = (float) (set.getMeanDistance());
 
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                 shaderProgram.setUniformf("u_falloff", set.profileDecay);
                 shaderProgram.setUniformf("u_sizeFactor",
-                        (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.1)) * sizeFactor * meanDist / (
+                        (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.3)) * sizeFactor * meanDist / (
                                 camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                 shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()),
                         (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));

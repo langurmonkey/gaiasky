@@ -13,6 +13,10 @@ uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform vec2 u_solidAngleMap;
 uniform float u_proximityThreshold;
+// App run time in seconds.
+uniform float u_appTime;
+// Shading style: 0: default, 1: twinkle.
+uniform int u_shadingStyle;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -32,33 +36,35 @@ uniform mat4 u_transform;
 
 // INPUT
 // Regular attributes
-layout (location=0) in vec4 a_position;
-layout (location=1) in vec2 a_texCoord0;
+layout(location = 0) in vec4 a_position;
+layout(location = 1) in vec2 a_texCoord0;
 // Instanced attributes
-layout (location=2) in vec3 a_starPos;
-layout (location=3) in vec3 a_pm;
-layout (location=4) in vec4 a_color;
-layout (location=5) in float a_size;
+layout(location = 2) in vec3 a_starPos;
+layout(location = 3) in vec3 a_pm;
+layout(location = 4) in vec4 a_color;
+layout(location = 5) in float a_size;
 
 // OUTPUT
 out vec4 v_col;
 out vec2 v_uv;
 
 #ifdef relativisticEffects
-    #include <shader/lib/relativity.glsl>
+#include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-    #include <shader/lib/gravwaves.glsl>
+#include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
+
+#include <shader/lib/goldennoise.glsl>
 
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
 
 void main() {
-	// Lengths
-	float l0 = LEN0;
-	float l1 = l0 * 1e3;
+    // Lengths
+    float l0 = LEN0;
+    float l1 = l0 * 1e3;
 
     vec3 particlePos = a_starPos.xyz;
     if (u_transformFlag) {
@@ -83,11 +89,11 @@ void main() {
     float dist = length(pos);
 
     #ifdef relativisticEffects
-    	pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
+    pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
 
     #ifdef gravitationalWaves
-        pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
     float solidAngle;
@@ -106,8 +112,17 @@ void main() {
         quadSize = 0.25e-5 * (tan(solidAngle) * dist) * u_alphaSizeBr.y;
     }
 
+    // Shading style
+    float shadingStyleFactor = 1.0;
+    if (u_shadingStyle == 1) {
+        float noise = abs(gold_noise(vec2(float(gl_InstanceID)), 2334.943));
+        //float reflectionFactor = (1.0 + dot(normalize(pos), normalize(particlePos / vrScale))) * 0.5;
+        shadingStyleFactor = clamp(pow(
+                    abs(sin(mod(u_appTime + noise * 6.0, 3.141597))), 2.0), 0.5, 1.5);
+    }
+
     // Proximity.
-    float fadeFactor = 1.0;
+    float fadeFactor = shadingStyleFactor;
     if (u_proximityThreshold > 0.0) {
         fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
     }

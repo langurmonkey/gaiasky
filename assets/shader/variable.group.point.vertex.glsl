@@ -21,6 +21,10 @@ uniform float u_brightnessPower;
 // VR scale factor
 uniform float u_vrScale;
 uniform float u_proximityThreshold;
+// App run time in seconds.
+uniform float u_appTime;
+// Shading style: 0: default, 1: twinkle.
+uniform int u_shadingStyle;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -33,22 +37,22 @@ uniform bool u_transformFlag = false;
 uniform mat4 u_transform;
 
 // INPUT
-layout (location=0) in vec3 a_position;
-layout (location=1) in vec3 a_pm;
-layout (location=2) in vec4 a_color;
-layout (location=3) in float a_nVari;
+layout(location = 0) in vec3 a_position;
+layout(location = 1) in vec3 a_pm;
+layout(location = 2) in vec4 a_color;
+layout(location = 3) in float a_nVari;
 // Magnitudes
-layout (location=4) in vec4 a_vmags1;
-layout (location=5) in vec4 a_vmags2;
-layout (location=6) in vec4 a_vmags3;
-layout (location=7) in vec4 a_vmags4;
-layout (location=8) in vec4 a_vmags5;
+layout(location = 4) in vec4 a_vmags1;
+layout(location = 5) in vec4 a_vmags2;
+layout(location = 6) in vec4 a_vmags3;
+layout(location = 7) in vec4 a_vmags4;
+layout(location = 8) in vec4 a_vmags5;
 // Times
-layout (location=9) in vec4 a_vtimes1;
-layout (location=10) in vec4 a_vtimes2;
-layout (location=11) in vec4 a_vtimes3;
-layout (location=12) in vec4 a_vtimes4;
-layout (location=13) in vec4 a_vtimes5;
+layout(location = 9) in vec4 a_vtimes1;
+layout(location = 10) in vec4 a_vtimes2;
+layout(location = 11) in vec4 a_vtimes3;
+layout(location = 12) in vec4 a_vtimes4;
+layout(location = 13) in vec4 a_vtimes5;
 
 // OUTPUT
 out vec4 v_col;
@@ -61,6 +65,8 @@ out vec4 v_col;
 #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
+#include <shader/lib/goldennoise.glsl>
+
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
 
@@ -71,9 +77,9 @@ float idx(vec4[N_VECS] v, int i) {
 }
 
 void main() {
-	// Lengths
-	float l0 = LEN0 * u_vrScale;
-	float l1 = l0 * 1e3;
+    // Lengths
+    float l0 = LEN0 * u_vrScale;
+    float l1 = l0 * 1e3;
 
     vec3 particlePos = a_position.xyz;
     if (u_transformFlag) {
@@ -108,11 +114,11 @@ void main() {
     }
 
     #ifdef relativisticEffects
-    	pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
+    pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
 
     #ifdef gravitationalWaves
-        pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
     vec4[N_VECS] mags;
@@ -137,9 +143,9 @@ void main() {
     float size = idx(mags, 0);
     for (int i = 0; i < nVari - 1; i++) {
         float x0 = idx(times, i) - t0;
-        float x1 = idx(times, i+1) - t0;
+        float x1 = idx(times, i + 1) - t0;
         if (t >= x0 && t <= x1) {
-            size = lint(t, x0, x1, idx(mags, i), idx(mags, i+1));
+            size = lint(t, x0, x1, idx(mags, i), idx(mags, i + 1));
             break;
         } else {
             // Next
@@ -159,8 +165,17 @@ void main() {
         pointSize = 0.2e4 * solidAngle * u_alphaSizeBrRc.y * cubemapFactor;
     }
 
+    // Shading style
+    float shadingStyleFactor = 1.0;
+    if (u_shadingStyle == 1) {
+        float noise = abs(gold_noise(vec2(float(gl_VertexID)), 2334.943));
+        //float reflectionFactor = (1.0 + dot(normalize(pos), normalize(particlePos / vrScale))) * 0.5;
+        shadingStyleFactor = clamp(pow(
+                    abs(sin(mod(u_appTime + noise * 6.0, 3.141597))), 2.0), 0.5, 1.5);
+    }
+
     // Proximity.
-    float fadeFactor = 1.0;
+    float fadeFactor = shadingStyleFactor;
     if (u_proximityThreshold > 0.0) {
         fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
     }

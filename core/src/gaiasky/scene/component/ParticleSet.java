@@ -22,6 +22,7 @@ import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.FilterView;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
@@ -36,7 +37,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParticleSet implements Component, IDisposable {
 
@@ -197,6 +197,16 @@ public class ParticleSet implements Component, IDisposable {
      * Reference to the texture array containing the textures for this set, if any. Applies only to quads.
      **/
     public TextureArray textureArray;
+
+    public enum ShadingStyle {
+        /** No special shading, only default color determination. **/
+        DEFAULT,
+        /** Apply random twinkling of particles in (app) time. **/
+        TWINKLE
+    }
+
+    /** Shading style to use for this set. **/
+    public ShadingStyle shadingStyle = ShadingStyle.DEFAULT;
 
     /**
      * Temporary storage for the mean position of this particle set, if it is given externally.
@@ -545,6 +555,14 @@ public class ParticleSet implements Component, IDisposable {
         this.textureFiles = textures;
     }
 
+    public void setShadingStyle(String style) {
+        try {
+            this.shadingStyle = ShadingStyle.valueOf(style.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            Logger.getLogger(this.getClass().getSimpleName()).error("Error setting shading style: " + style, e);
+        }
+    }
+
     public void setRenderParticles(Boolean renderParticles) {
         this.renderParticles = renderParticles;
     }
@@ -612,9 +630,11 @@ public class ParticleSet implements Component, IDisposable {
     public void setProximityThreshold(Double thRadians) {
         this.proximityThreshold = thRadians;
     }
+
     public void setProximityThresholdRad(Double thRadians) {
         setProximityThreshold(thRadians);
     }
+
     public void setProximityThresholdDeg(Double thDegrees) {
         setProximityThreshold(Math.toRadians(thDegrees));
     }

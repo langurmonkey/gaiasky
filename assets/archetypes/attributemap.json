@@ -750,6 +750,13 @@
         "description": "If present, this attribute is used to assign textures to particles. It should be an integer attribute in [1,n], where n is the number of textures. If the value of the attribute is out of this range, it is clamped. The attribute value is used as an index to query the texture array, where the textures are sorted using the natural order of their file names. If the attribute is of any other type, Gaia Sky will do its best to use it to assign textures as well, but no guarantees.",
         "unit": "String"
       },
+      "shadingStyle": {
+        "description": "Special shading style to apply to the particles of this set. |brsp| **Values** |ul| |li| ``default`` -- no special shading (default). |eli| |li| ``twinkle`` -- particles twinkle randomly with (app) time. |eli| |eul|",
+        "unit": "String",
+        "aliases": [
+          "shadingstyle"
+        ]
+      },
       "modelFile": {
         "description": "Path to the model file to use (``obj``, ``obj.gz`` ``g3db``, ``g3dj``, ``gltf``, ``glb``). If present, the ``modelType`` and ``modelParams`` attributes are ignored. The model should have only positions (vector-3), normals (vector-3), and texture coordinates (vector-2) as vertex attributes. Only the first mesh of the model is used. Textures, lighting and material are ignored. This is only used in extended particle groups.",
         "unit": "String"
@@ -855,6 +862,13 @@
         "aliases": [
           "fixedAngularSizeDeg:StarGroup",
           "fixedAngularSizeRad:StarGroup"
+        ]
+      },
+      "shadingStyle:StarGroup": {
+        "description": "Special shading style to apply to the particles of this set. |brsp| **Values** |ul| |li| ``default`` -- no special shading (default). |eli| |li| ``twinkle`` -- particles twinkle randomly with (app) time. |eli| |eul|",
+        "unit": "String",
+        "aliases": [
+          "shadingstyle:StarGroup"
         ]
       },
       "renderParticles:StarGroup": {

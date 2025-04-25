@@ -12,6 +12,10 @@ uniform int u_cubemap;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
 uniform float u_proximityThreshold;
+// App run time in seconds.
+uniform float u_appTime;
+// Shading style: 0: default, 1: twinkle.
+uniform int u_shadingStyle;
 // Arbitrary affine transformation(s)
 uniform bool u_transformFlag = false;
 uniform mat4 u_transform;
@@ -34,8 +38,10 @@ out float v_textureIndex;
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
- #include <shader/lib/gravwaves.glsl>
+#include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
+
+#include <shader/lib/goldennoise.glsl>
 
 void main() {
     vec3 particlePos = a_position.xyz;
@@ -67,20 +73,29 @@ void main() {
         cubemapSizeFactor = 1.0 - cosphi * 0.65;
     }
 
+    // Shading style
+    float shadingStyleFactor = 1.0;
+    if (u_shadingStyle == 1) {
+        float noise = abs(gold_noise(vec2(float(gl_VertexID)), 2334.943));
+        //float reflectionFactor = (1.0 + dot(normalize(pos), normalize(particlePos / vrScale))) * 0.5;
+        shadingStyleFactor = clamp(pow(
+                    (1.0 + sin(mod(u_appTime + noise * 6.0, 3.141597))) / 2.0, 5.0), 0.0, 1.0);
+    }
+
     // Proximity.
-    float fadeFactor = 1.0;
+    float fadeFactor = shadingStyleFactor;
     if (u_proximityThreshold > 0.0) {
         fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
     }
 
     #ifdef relativisticEffects
-        pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
+    pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
-    
+
     #ifdef gravitationalWaves
-        pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
-    
+
     v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
     v_textureIndex = a_textureIndex;
 

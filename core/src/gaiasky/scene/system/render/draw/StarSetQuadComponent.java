@@ -19,7 +19,6 @@ public class StarSetQuadComponent {
     protected float[] alphaSizeBr, opacityLimits, opacityLimitsHlShowAll;
     protected float starPointSize, brightnessPower;
     protected float minQuadSolidAngle;
-    protected int fovMode;
     protected Texture starTex;
 
     public void setStarTexture(String starTexture) {

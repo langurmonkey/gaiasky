@@ -61,7 +61,6 @@ public class FileChooser extends GenericDialog {
     private TextField fileNameInput;
     private Label acceptedFiles;
     private OwnTextField location;
-    private OwnTextIconButton newDirectory;
     private List<FileListItem> fileList;
     private float scrollPaneWidth;
     private float maxPathLength;
@@ -210,7 +209,7 @@ public class FileChooser extends GenericDialog {
 
         if (target == FileChooserTarget.DIRECTORIES || target == FileChooserTarget.ALL) {
             // New directory button
-            newDirectory = new OwnTextIconButton(I18n.msg("gui.fc.newdirectory"), skin, "add");
+            OwnTextIconButton newDirectory = new OwnTextIconButton(I18n.msg("gui.fc.newdirectory"), skin, "add");
             newDirectory.setWidth(245f);
             newDirectory.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
