@@ -490,7 +490,6 @@ public class WelcomeGui extends AbstractGui {
             return false;
         });
         preferences.pack();
-        preferences.setSize(about.getWidth(), about.getWidth());
 
         // Add to button list.
         buttonList.add(preferences);
