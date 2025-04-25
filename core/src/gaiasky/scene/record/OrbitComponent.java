@@ -131,36 +131,6 @@ public class OrbitComponent {
     }
 
     /**
-     * Convert a true anomaly (nu) in the current orbit to the Julian days since epoch.
-     *
-     * @param nuRad The true anomaly, in radians.
-     *
-     * @return The Julian days since epoch corresponding to the given true anomaly.
-     */
-    public double trueAnomalyToTime(double nuRad) {
-        // Mean motion in rad/day
-        var n = PI2 / period;
-        // Convert true anomaly to eccentric anomaly E
-        double tanHalfNu = FastMath.tan(nuRad / 2.0);
-        double sqrtFactor = FastMath.sqrt((1 - e) / (1 + e));
-        double E = 2.0 * FastMath.atan2(tanHalfNu * sqrtFactor, 1.0);
-
-        E = (E + PI2) % PI2;
-
-        // Compute mean anomaly
-        double M = E - e * FastMath.sin(E);
-
-        // Mean anomaly at epoch
-        double M0 = FastMath.toRadians(meanAnomaly);
-
-        // Time since epoch in days
-        double deltaT = (M - M0) / n;
-
-        // Return time in Julian days since epoch
-        return deltaT;
-    }
-
-    /**
      * Load the point (cartesian position vector) in the orbit for the given time.
      *
      * @param out The vector to store the result.
@@ -231,7 +201,41 @@ public class OrbitComponent {
         return E;
     }
 
+    /**
+     * Convert a true anomaly (nu) in the current orbit to the Julian days since epoch.
+     *
+     * @param nuRad The true anomaly, in radians.
+     *
+     * @return The Julian days since epoch corresponding to the given true anomaly.
+     */
+    public double trueAnomalyToTime(double nuRad) {
+        // Mean motion in rad/day
+        var n = PI2 / period;
+        // Convert true anomaly to eccentric anomaly E
+        double tanHalfNu = FastMath.tan(nuRad / 2.0);
+        double sqrtFactor = FastMath.sqrt((1 - e) / (1 + e));
+        double E = 2.0 * FastMath.atan2(tanHalfNu * sqrtFactor, 1.0);
 
+        E = (E + PI2) % PI2;
+
+        // Compute mean anomaly
+        double M = E - e * FastMath.sin(E);
+
+        // Mean anomaly at epoch
+        double M0 = FastMath.toRadians(meanAnomaly);
+
+        // Time since epoch in days
+        double deltaT = (M - M0) / n;
+
+        // Return time in Julian days since epoch
+        return deltaT;
+    }
+
+    /**
+     * Convert the given time from epoch (in days) to the true anomaly angle.
+     * @param dtDays The time from epoch, in days.
+     * @return The true anomaly, in radians.
+     */
     public double timeToTrueAnomaly(double dtDays) {
         // Mean anomaly at time.
         double M = getMeanAnomalyAt(dtDays);
