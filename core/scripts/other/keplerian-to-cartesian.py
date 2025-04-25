@@ -1,3 +1,32 @@
+#!/usr/bin/env python
+
+"""
+Orbit Simulator and Anisotropic Cloud Generator
+
+This script simulates an orbit based on orbital mechanics equations and generates
+anisotropic particle clouds based on the generated orbital states. The user can
+choose to sample the orbit in time or in true anomaly (nu), and optionally generate
+the anisotropic clouds and print the results.
+
+Usage:
+    python keplerian-to-cartesian.py [options]
+
+Options:
+    --sample-time          Sample the orbit in time.
+    --sample-nu            Sample the orbit in true anomaly (nu).
+    --generate-clouds      Generate anisotropic particle clouds.
+    --print-samples        Print out the generated orbit samples.
+    --print-cloud          Print out cloud particle data.
+    --n-samples=<n>        Number of samples to generate (default: 5000).
+    --sigma-cross-km=<km>  Cross-track dispersion for particle clouds in km (default: 5000000.0).
+    --mu-km3s2=<mu>        Gravitational constant in km^3/s^2 (default: 1.32712440018e11).
+    --help                 Show this help message.
+
+Example usage:
+    python keplerian-to-cartesian.py --sample_time --generate_clouds --n_samples=1000 --sigma_cross_km=1000000.0
+    python keplerian-to-cartesian.py --sample_nu --print_samples
+"""
+
 import argparse
 import numpy as np
 
