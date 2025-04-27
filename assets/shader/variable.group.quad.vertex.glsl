@@ -19,10 +19,6 @@ uniform vec2 u_solidAngleMap;
 // VR scale factor
 uniform float u_vrScale;
 uniform float u_proximityThreshold;
-// App run time in seconds.
-uniform float u_appTime;
-// Shading style: 0: default, 1: twinkle.
-uniform int u_shadingStyle;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -71,8 +67,6 @@ out vec2 v_uv;
 #ifdef gravitationalWaves
 #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
-
-#include <shader/lib/goldennoise.glsl>
 
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
@@ -165,17 +159,8 @@ void main() {
         quadSize = (tan(solidAngle) * dist) * u_alphaSizeBr.y * 0.25e-5;
     }
 
-    // Shading style
-    float shadingStyleFactor = 1.0;
-    if (u_shadingStyle == 1) {
-        float noise = abs(gold_noise(vec2(float(gl_InstanceID)), 2334.943));
-        //float reflectionFactor = (1.0 + dot(normalize(pos), normalize(particlePos / vrScale))) * 0.5;
-        shadingStyleFactor = clamp(pow(
-                    abs(sin(mod(u_appTime + noise * 6.0, 3.141597))), 2.0), 0.5, 1.5);
-    }
-
     // Proximity.
-    float fadeFactor = shadingStyleFactor;
+    float fadeFactor = 1.0;
     if (u_proximityThreshold > 0.0) {
         fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
     }

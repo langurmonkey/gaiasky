@@ -211,10 +211,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 // Affine transformations.
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
-                // Shading style.
-                shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
-                shaderProgram.setUniformi("u_shadingStyle", set.shadingStyle.ordinal());
-
                 // Opacity limits.
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
