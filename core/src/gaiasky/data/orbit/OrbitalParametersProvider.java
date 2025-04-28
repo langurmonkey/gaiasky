@@ -34,7 +34,7 @@ import static gaiasky.util.math.MathUtilsDouble.PI2;
  */
 public class OrbitalParametersProvider implements IOrbitDataProvider {
     /** The data that holds the orbit. **/
-    PointCloudData data;
+    private PointCloudData data;
 
     @Override
     public void initialize(Entity entity, Trajectory trajectory) {
@@ -83,21 +83,17 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
         for (int i = 0; i < parameter.numSamples; i++) {
             params.loadDataPoint(out, t);
 
+            var time = AstroUtils.julianDateToInstant(epoch + t);
             if (i == parameter.numSamples - 1) {
                 // Close orbit
                 double sx = data.getX(0);
                 double sy = data.getY(0);
                 double sz = data.getZ(0);
-                data.x.add(sx);
-                data.y.add(sy);
-                data.z.add(sz);
+                data.addPoint(sx, sy, sz, time);
             } else {
                 // Add point
-                data.x.add(out.x);
-                data.y.add(out.y);
-                data.z.add(out.z);
+                data.addPoint(out.x, out.y, out.z, time);
             }
-            data.time.add(AstroUtils.julianDateToInstant(epoch + t));
 
             t += tStep;
         }
@@ -128,47 +124,23 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
             var dtDays = params.trueAnomalyToTime(nu);
 
+            var time = AstroUtils.julianDateToInstant(params.epoch + dtDays);
             if (i == parameter.numSamples - 1) {
                 // Close orbit
                 double sx = data.getX(0);
                 double sy = data.getY(0);
                 double sz = data.getZ(0);
-                data.x.add(sx);
-                data.y.add(sy);
-                data.z.add(sz);
+                data.addPoint(sx, sy, sz, time);
             } else {
                 // Add point
-                data.x.add(out.x);
-                data.y.add(out.y);
-                data.z.add(out.z);
+                data.addPoint(out.x, out.y, out.z, time);
             }
-            data.time.add(AstroUtils.julianDateToInstant(params.epoch + dtDays));
 
             nu += nuStep;
         }
 
-        // We need to sort orbit points in time.
-        record DataPoint(Instant t, double x, double y, double z) {
-        }
-
-        List<DataPoint> dataList = new ArrayList<>();
-        for (int i = 0; i < data.time.size(); i++) {
-            dataList.add(new DataPoint(data.time.get(i), data.x.get(i), data.y.get(i), data.z.get(i)));
-        }
-        // Sort by time
-        dataList.sort(Comparator.comparing(dp -> dp.t));
-
-        // Unpack back into separate lists
-        data.x.clear();
-        data.y.clear();
-        data.z.clear();
-        data.time.clear();
-        for (DataPoint dp : dataList) {
-            data.time.add(dp.t);
-            data.x.add(dp.x);
-            data.y.add(dp.y);
-            data.z.add(dp.z);
-        }
+        // Sort samples by time.
+        data.samples.sort(Comparator.comparing(PointCloudData.PointSample::time));
     }
 
     public void loadOld(String file, OrbitDataLoaderParameters parameter) {
@@ -199,10 +171,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             data = new PointCloudData();
             for (Vector3d point : samples) {
                 point.mul(transform);
-                data.x.add(point.x);
-                data.y.add(point.y);
-                data.z.add(point.z);
-                data.time.add(Instant.now());
+                data.addPoint(point.x, point.y, point.z, Instant.now());
             }
             EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, parameter.name);
         } catch (Exception e) {

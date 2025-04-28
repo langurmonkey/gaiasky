@@ -23,8 +23,8 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D33 = new Vector3d();
 
-    private GraphUpdater graphUpdater;
-    private VertsView view;
+    private final GraphUpdater graphUpdater;
+    private final VertsView view;
 
     public KeyframeUpdater(Family family, int priority) {
         super(family, priority);
@@ -56,16 +56,19 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
             Vector3d p1 = D32;
             view.setEntity(vo);
             PointCloudData p = view.getPointCloud();
-            p0.set(p.x.get(0), p.y.get(0), p.z.get(0));
-            p1.set(p.x.get(1), p.y.get(1), p.z.get(1));
+            var pt0 = p.samples.get(0);
+            p0.set(pt0.x(), pt0.y(), pt0.z());
+            var pt1 = p.samples.get(1);
+            p1.set(pt1.x(), pt1.y(), pt1.z());
 
             Vector3d c = D33.set(camera.getPos());
             double len = FastMath.max(1e-9, FastMath.atan(0.03) * c.dst(p0));
 
             Vector3d v = c.set(p1).sub(p0).nor().scl(len);
-            p.x.set(1, p0.x + v.x);
-            p.y.set(1, p0.y + v.y);
-            p.z.set(1, p0.z + v.z);
+            p.samples.set(1, new PointCloudData.PointSample(
+                    p0.x + v.x,
+                    p0.y + v.y,
+                    p0.z + v.z));
 
             view.markForUpdate();
         }

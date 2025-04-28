@@ -61,15 +61,11 @@ public class FileDataLoader {
                     // Valid data line.
                     long t = parseTime(tokens[0].trim());
                     if (t != last) {
-                        orbitData.time.add(Instant.ofEpochMilli(t));
-
                         Vector3d pos = new Vector3d(parsed(tokens[1]), parsed(tokens[2]), parsed(tokens[3]));
                         // Kilometers to internal units.
                         pos.scl(Constants.KM_TO_U);
 
-                        orbitData.x.add(pos.x);
-                        orbitData.y.add(pos.y);
-                        orbitData.z.add(pos.z);
+                        orbitData.addPoint(pos, Instant.ofEpochMilli(t));
 
                         last = t;
                     }

@@ -160,13 +160,8 @@ public class KeyframesView extends BaseView {
         synchronized (verts) {
             verts.setEntity(vo);
             PointCloudData p = verts.getPointCloud();
-            p.x.set(0, pos.x);
-            p.y.set(0, pos.y);
-            p.z.set(0, pos.z);
-
-            p.x.set(1, pos.x + vec.x);
-            p.y.set(1, pos.y + vec.y);
-            p.z.set(1, pos.z + vec.z);
+            p.samples.set(0, new PointCloudData.PointSample(pos));
+            p.samples.set(1, new PointCloudData.PointSample(pos.x + vec.x, pos.y + vec.y, pos.z + vec.z));
             verts.markForUpdate();
         }
     }
@@ -248,13 +243,8 @@ public class KeyframesView extends BaseView {
                 double[] targ = (i % 2 == 0) ? dirs : ups;
                 Entity vo = kf.orientations.get(i);
                 PointCloudData p = Mapper.verts.get(vo).pointCloudData;
-                p.x.set(0, kts[i / 2 * 3]);
-                p.y.set(0, kts[i / 2 * 3 + 1]);
-                p.z.set(0, kts[i / 2 * 3 + 2]);
-
-                p.x.set(1, kts[i / 2 * 3] + targ[j]);
-                p.y.set(1, kts[i / 2 * 3 + 1] + targ[j + 1]);
-                p.z.set(1, kts[i / 2 * 3 + 2] + targ[j + 2]);
+                p.samples.set(0, new PointCloudData.PointSample(kts[i / 2 * 3],kts[i / 2 * 3 + 1], kts[i / 2 * 3 + 2] ));
+                p.samples.set(1, new PointCloudData.PointSample(kts[i / 2 * 3] + targ[j],kts[i / 2 * 3 + 1] + targ[j+1], kts[i / 2 * 3 + 2]+targ[j+2] ));
 
                 if (i % 2 == 1)
                     j += 3;

@@ -120,10 +120,7 @@ public class HeliotropicOrbitDataLoader {
                     boolean add = count == 0 || previousAddedTime == null || (time.toEpochMilli() - previousAddedTime.toEpochMilli() >= maxMsSep);
 
                     if (add) {
-                        orbitData.time.add(time);
-                        orbitData.x.add(posHel.x * Constants.KM_TO_U);
-                        orbitData.y.add(posHel.y * Constants.KM_TO_U);
-                        orbitData.z.add(posHel.z * Constants.KM_TO_U);
+                        orbitData.addPoint(posHel.x * Constants.KM_TO_U, posHel.y * Constants.KM_TO_U, posHel.z * Constants.KM_TO_U, time);
                         previousAddedTime = time;
                     }
                     count++;
@@ -215,10 +212,11 @@ public class HeliotropicOrbitDataLoader {
         bw.newLine();
         long iniTime = -1;
 
-        int n = data.x.size();
+        int n = data.samples.size();
         for (int i = 0; i < n; i++) {
-            Vector3d pos = new Vector3d(data.x.get(i), data.y.get(i), data.z.get(i));
-            Instant t = data.time.get(i);
+            var p = data.samples.get(i);
+            Vector3d pos = new Vector3d(p.x(), p.y(), p.z());
+            Instant t = p.time();
 
             long time = iniTime < 0 ? 0 : t.toEpochMilli() - iniTime;
             if (time == 0) {

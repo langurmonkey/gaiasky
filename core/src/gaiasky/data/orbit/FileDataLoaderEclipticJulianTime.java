@@ -48,13 +48,10 @@ public class FileDataLoaderEclipticJulianTime {
                     Matrix4d transform = new Matrix4d();
                     transform.scl(Constants.KM_TO_U);
                     if (!t.equals(last)) {
-                        orbitData.time.add(t.toInstant());
 
                         Vector3d pos = new Vector3d(parsed(tokens[1]), parsed(tokens[2]), parsed(tokens[3]));
                         pos.mul(transform);
-                        orbitData.x.add(pos.y);
-                        orbitData.y.add(pos.z);
-                        orbitData.z.add(pos.x);
+                        orbitData.addPoint(pos, t.toInstant());
                         last.setTime(t.getTime());
                     }
                 }

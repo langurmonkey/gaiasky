@@ -127,29 +127,27 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         for (int i = 0; i <= numSamples; i++) {
             coordinates.coordinates.getEclipticCartesianCoordinates(d, ecl);
             ecl.mul(Coordinates.eclToEq()).scl(1);
-            data.x.add(ecl.x.doubleValue());
-            data.y.add(ecl.y.doubleValue());
-            data.z.add(ecl.z.doubleValue());
-            data.time.add(d);
+            data.samples.add(new PointCloudData.PointSample(ecl.x.doubleValue(), ecl.y.doubleValue(), ecl.z.doubleValue(), d));
 
             d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);
         }
 
         // Close the circle
-        data.x.add(data.x.get(0));
-        data.y.add(data.y.get(0));
-        data.z.add(data.z.get(0));
+        var first = data.samples.get(0);
         d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);
-        data.time.add(Instant.ofEpochMilli(d.toEpochMilli()));
+        data.samples.add(new PointCloudData.PointSample(first.x(), first.y(), first.z(), d));
 
 
         // Apply multiplier if necessary.
         if (parameter.multiplier != 1f) {
-            int n = data.x.size();
+            int n = data.samples.size();
             for (int i = 0; i < n; i++) {
-                data.x.set(i, data.x.get(i) * parameter.multiplier);
-                data.y.set(i, data.y.get(i) * parameter.multiplier);
-                data.z.set(i, data.z.get(i) * parameter.multiplier);
+                var p = data.samples.get(i);
+                data.samples.set(i, new PointCloudData.PointSample(
+                        p.x() * parameter.multiplier,
+                        p.y() * parameter.multiplier,
+                        p.z() * parameter.multiplier,
+                        p.time()));
             }
         }
 

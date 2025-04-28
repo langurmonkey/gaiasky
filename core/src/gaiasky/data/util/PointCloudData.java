@@ -13,29 +13,59 @@ import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.List;
 
 public class PointCloudData implements Cloneable {
     private final Vector3d v0;
     private final Vector3d v1;
-    // Values of x, y, z in world coordinates
-    public ArrayList<Double> x;
-    public ArrayList<Double> y;
-    public ArrayList<Double> z;
-    public ArrayList<Instant> time;
-    // Period in days
+
+    /**
+     * A sample in the point cloud.
+     *
+     * @param x    The X component.
+     * @param y    The Y component.
+     * @param z    The Z component.
+     * @param time The time.
+     */
+    public record PointSample(double x, double y, double z, Instant time) {
+
+        public PointSample(double x, double y, double z) {
+            this(x, y, z, null);
+        }
+
+        public PointSample(Vector3d v) {
+            this(v.x, v.y, v.z, null);
+        }
+
+        public PointSample(Vector3d v, Instant t) {
+            this(v.x, v.y, v.z, t);
+        }
+
+        public void put(Vector3 v) {
+            v.set((float) x, (float) y, (float) z);
+        }
+
+        public void put(Vector3d v) {
+            v.set(x, y, z);
+        }
+
+        public void put(Vector3b v) {
+            v.set(x, y, z);
+        }
+    }
+
+    /** The samples of this point cloud. **/
+    public ArrayList<PointSample> samples;
+    /** Period in days. **/
     public double period = -1;
     private Instant start, end;
+
 
     public PointCloudData() {
         this(16);
     }
 
     public PointCloudData(int capacity) {
-        x = new ArrayList<>(capacity);
-        y = new ArrayList<>(capacity);
-        z = new ArrayList<>(capacity);
-        time = new ArrayList<>(capacity);
+        samples = new ArrayList<>(capacity);
 
         v0 = new Vector3d();
         v1 = new Vector3d();
@@ -45,20 +75,17 @@ public class PointCloudData implements Cloneable {
      * Clears all data
      **/
     public void clear() {
-        x.clear();
-        y.clear();
-        z.clear();
-        time.clear();
+        samples.clear();
         v0.setZero();
         v1.setZero();
     }
 
     public boolean isEmpty() {
-        return x.isEmpty() && y.isEmpty() && z.isEmpty();
+        return samples.isEmpty();
     }
 
     public boolean hasTime() {
-        return time != null && !time.isEmpty();
+        return samples != null && !samples.isEmpty() && samples.get(0).time != null;
     }
 
     /**
@@ -72,51 +99,26 @@ public class PointCloudData implements Cloneable {
         if (points.length % 3 == 0) {
             int nPoints = points.length / 3;
             for (int i = 0; i < nPoints; i++) {
-                x.add(points[i * 3]);
-                y.add(points[i * 3 + 1]);
-                z.add(points[i * 3 + 2]);
+                var sample = new PointSample(points[i * 3], points[i * 3 + 1], points[i * 3 + 2], null);
+                samples.add(sample);
             }
         }
     }
 
-    /**
-     * Same as {@link PointCloudData#addPoints(double[])} but with an array list
-     *
-     * @param points The points to add to this point cloud
-     */
-    public void addPoints(ArrayList points) {
-        if (points.size() % 3 == 0) {
-            int nPoints = points.size() / 3;
-            for (int i = 0; i < nPoints; i++) {
-                x.add((double) points.get(i * 3));
-                y.add((double) points.get(i * 3 + 1));
-                z.add((double) points.get(i * 3 + 2));
-            }
-        }
+    public void addPoint(Vector3d point, Instant t) {
+        samples.add(new PointSample(point, t));
     }
 
-    /**
-     * Adds a single point o this point cloud
-     *
-     * @param point The point
-     */
     public void addPoint(Vector3d point) {
-        x.add(point.x);
-        y.add(point.y);
-        z.add(point.z);
+        samples.add(new PointSample(point));
     }
 
-    /**
-     * Adds a single point to the cloud
-     *
-     * @param x The x component
-     * @param y The y component
-     * @param z The z component
-     */
+    public void addPoint(double x, double y, double z, Instant t) {
+        samples.add(new PointSample(x, y, z, t));
+    }
+
     public void addPoint(double x, double y, double z) {
-        this.x.add(x);
-        this.y.add(y);
-        this.z.add(z);
+        samples.add(new PointSample(x, y, z));
     }
 
     /**
@@ -127,64 +129,40 @@ public class PointCloudData implements Cloneable {
      * @param index The data index.
      */
     public void loadPoint(Vector3d v, int index) {
-        v.set(x.get(index), y.get(index), z.get(index));
+        samples.get(index).put(v);
     }
 
     public void loadPoint(Vector3b v, int index) {
-        v.set(x.get(index), y.get(index), z.get(index));
-    }
-
-    public Instant loadTime(int index) {
-        return time.get(index);
+        samples.get(index).put(v);
     }
 
     public int getNumPoints() {
-        return x.size();
+        return samples.size();
     }
 
     public double getX(int index) {
-        return x.get(index);
-    }
-
-    public void setX(int index, double value) {
-        x.set(index, value);
+        return samples.get(index).x;
     }
 
     public double getY(int index) {
-        return y.get(index);
-    }
-
-    public void setY(int index, double value) {
-        y.set(index, value);
+        return samples.get(index).y;
     }
 
     public double getZ(int index) {
-        return z.get(index);
-    }
-
-    public void setZ(int index, double value) {
-        z.set(index, value);
+        return samples.get(index).z;
     }
 
     public void setPoint(Vector3d v, int index) {
-        x.set(index, v.x);
-        y.set(index, v.y);
-        z.set(index, v.z);
-    }
-
-    public void setPoint(Vector3b v, int index) {
-        x.set(index, v.x.doubleValue());
-        y.set(index, v.y.doubleValue());
-        z.set(index, v.z.doubleValue());
+        samples.set(index, new PointSample(v));
     }
 
     public Instant getDate(int index) {
-        return time.get(index);
+        return samples.get(index).time;
     }
 
     public Instant getStart() {
         if (start == null) {
-            start = time.get(0);
+            start = samples.get(0).time;
         }
         return start;
     }
@@ -195,7 +173,7 @@ public class PointCloudData implements Cloneable {
 
     public Instant getEnd() {
         if (end == null) {
-            end = time.get(time.size() - 1);
+            end = samples.get(samples.size() - 1).time;
         }
         return end;
     }
@@ -212,7 +190,7 @@ public class PointCloudData implements Cloneable {
      * @param index The index of the point to load.
      */
     public void loadPointF(Vector3 v, int index) {
-        v.set(x.get(index).floatValue(), y.get(index).floatValue(), z.get(index).floatValue());
+        samples.get(index).put(v);
     }
 
     /**
@@ -221,6 +199,7 @@ public class PointCloudData implements Cloneable {
      *
      * @param v       The vector to store the result.
      * @param instant The time as an instant.
+     *
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, Instant instant) {
@@ -237,25 +216,27 @@ public class PointCloudData implements Cloneable {
      *
      * @param v      The vector
      * @param timeMs The time in milliseconds
+     *
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, long timeMs) {
         // Data is sorted
-        int idx = binarySearch(time, timeMs);
+        int idx = binarySearch(samples, timeMs);
 
-        if (idx < 0 || idx >= time.size()) {
+        if (idx < 0 || idx >= samples.size()) {
             // No data for this time
             return false;
         }
 
-        if (time.get(idx).toEpochMilli() == timeMs) {
-            v.set(x.get(idx), y.get(idx), z.get(idx));
+
+        if (samples.get(idx).time.toEpochMilli() == timeMs) {
+            samples.get(idx).put(v);
         } else {
             // Interpolate
             loadPoint(v0, idx);
             loadPoint(v1, idx + 1);
-            Instant t0 = time.get(idx);
-            Instant t1 = time.get(idx + 1);
+            Instant t0 = samples.get(idx).time;
+            Instant t1 = samples.get(idx + 1).time;
 
             double scl = (double) (timeMs - t0.toEpochMilli()) / (t1.toEpochMilli() - t0.toEpochMilli());
             v.set(v1.sub(v0).scl(scl).add(v0));
@@ -265,21 +246,21 @@ public class PointCloudData implements Cloneable {
 
     public boolean loadPoint(Vector3b v, long timeMs) {
         // Data is sorted
-        int idx = binarySearch(time, timeMs);
+        int idx = binarySearch(samples, timeMs);
 
-        if (idx < 0 || idx >= time.size()) {
+        if (idx < 0 || idx >= samples.size()) {
             // No data for this time
             return false;
         }
 
-        if (time.get(idx).toEpochMilli() == timeMs) {
-            v.set(x.get(idx), y.get(idx), z.get(idx));
+        if (samples.get(idx).time.toEpochMilli() == timeMs) {
+            samples.get(idx).put(v);
         } else {
             // Interpolate
             loadPoint(v0, idx);
             loadPoint(v1, idx + 1);
-            Instant t0 = time.get(idx);
-            Instant t1 = time.get(idx + 1);
+            Instant t0 = samples.get(idx).time;
+            Instant t1 = samples.get(idx + 1).time;
 
             double scl = (double) (timeMs - t0.toEpochMilli()) / (t1.toEpochMilli() - t0.toEpochMilli());
             v.set(v1.sub(v0).scl(scl).add(v0));
@@ -307,33 +288,34 @@ public class PointCloudData implements Cloneable {
      * Gets the bounding indices for the given date. If the date is out of range, it wraps.
      *
      * @param instant The date
+     *
      * @return The two indices
      */
     public int getIndex(Instant instant) {
-        return binarySearch(time, getWrapTimeMs(instant));
+        return binarySearch(samples, getWrapTimeMs(instant));
     }
 
     public int getIndex(long wrappedTimeMs) {
-        return binarySearch(time, wrappedTimeMs);
+        return binarySearch(samples, wrappedTimeMs);
     }
 
-    private int binarySearch(List<Instant> times, Instant elem) {
-        return binarySearch(times, elem.toEpochMilli());
+    private int binarySearch(ArrayList<PointSample> samples, Instant elem) {
+        return binarySearch(samples, elem.toEpochMilli());
     }
 
-    private int binarySearch(List<Instant> times, long time) {
-        if (time >= times.get(0).toEpochMilli() && time <= times.get(times.size() - 1).toEpochMilli()) {
-            return binarySearch(times, time, 0, times.size() - 1);
+    private int binarySearch(ArrayList<PointSample> samples, long time) {
+        if (time >= samples.get(0).time.toEpochMilli() && time <= samples.get(samples.size() - 1).time.toEpochMilli()) {
+            return binarySearch(samples, time, 0, samples.size() - 1);
         } else {
             return -1;
         }
     }
 
-    private int binarySearch(List<Instant> times, long time, int i0, int i1) {
+    private int binarySearch(ArrayList<PointSample> samples, long time, int i0, int i1) {
         if (i0 > i1) {
             return -1;
         } else if (i0 == i1) {
-            if (times.get(i0).toEpochMilli() > time) {
+            if (samples.get(i0).time.toEpochMilli() > time) {
                 return i0 - 1;
             } else {
                 return i0;
@@ -341,12 +323,12 @@ public class PointCloudData implements Cloneable {
         }
 
         int mid = (i0 + i1) / 2;
-        if (times.get(mid).toEpochMilli() == time) {
+        if (samples.get(mid).time.toEpochMilli() == time) {
             return mid;
-        } else if (times.get(mid).toEpochMilli() < time) {
-            return binarySearch(times, time, mid + 1, i1);
+        } else if (samples.get(mid).time.toEpochMilli() < time) {
+            return binarySearch(samples, time, mid + 1, i1);
         } else {
-            return binarySearch(times, time, i0, mid);
+            return binarySearch(samples, time, i0, mid);
         }
     }
 
@@ -354,10 +336,7 @@ public class PointCloudData implements Cloneable {
     public PointCloudData clone() {
         try {
             PointCloudData clone = (PointCloudData) super.clone();
-            clone.x = new ArrayList(x);
-            clone.y = new ArrayList(y);
-            clone.z = new ArrayList(z);
-            clone.time = new ArrayList(time);
+            clone.samples = new ArrayList<>(this.samples);
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

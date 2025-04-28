@@ -51,11 +51,14 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
                 }
                 data = odl.load(is);
                 if (parameter.multiplier != 1f) {
-                    int n = data.x.size();
+                    int n = data.samples.size();
                     for (int i = 0; i < n; i++) {
-                        data.x.set(i, data.x.get(i) * parameter.multiplier);
-                        data.y.set(i, data.y.get(i) * parameter.multiplier);
-                        data.z.set(i, data.z.get(i) * parameter.multiplier);
+                        var p = data.samples.get(i);
+                        data.samples.set(i, new PointCloudData.PointSample(
+                                p.x() * parameter.multiplier ,
+                                p.y() * parameter.multiplier,
+                                p.z() * parameter.multiplier,
+                                p.time()));
                     }
                 }
                 EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, file);

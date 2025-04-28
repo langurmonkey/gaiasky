@@ -59,16 +59,16 @@ public class PathReSampler {
 
         provider.load(dataFile, params);
         var data = provider.getData();
-        logger.info("Data loaded from " + data.getStart() + " to " + data.getEnd() + " with " + data.x.size() + " points.");
+        logger.info("Data loaded from " + data.getStart() + " to " + data.getEnd() + " with " + data.samples.size() + " points.");
 
-        Vector3d[] points = new Vector3d[data.x.size()];
-        for (int i = 0; i < data.x.size(); i++) {
+        Vector3d[] points = new Vector3d[data.samples.size()];
+        for (int i = 0; i < data.samples.size(); i++) {
             points[i] = new Vector3d(data.getX(i), data.getY(i), data.getZ(i));
         }
 
         CatmullRomSplineDouble<Vector3d> spline = new CatmullRomSplineDouble<>(points, true);
-        long start = data.time.get(0).toEpochMilli();
-        long end = data.time.get(data.time.size() - 1).toEpochMilli();
+        long start = data.samples.get(0).time().toEpochMilli();
+        long end = data.samples.get(data.samples.size() - 1).time().toEpochMilli();
 
         int n = TARGET_POINTS;
         Vector3d[] fp = new Vector3d[n];

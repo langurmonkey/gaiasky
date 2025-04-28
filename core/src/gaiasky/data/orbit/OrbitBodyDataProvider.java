@@ -117,20 +117,14 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                         break;
                     }
                     aux1.mul(Coordinates.eclToEq());
-                    data.x.add(aux1.x.doubleValue());
-                    data.y.add(aux1.y.doubleValue());
-                    data.z.add(aux1.z.doubleValue());
-                    data.time.add(d);
+                    data.addPoint(aux1.x.doubleValue(), aux1.y.doubleValue(), aux1.z.doubleValue(), d);
 
                     d = Instant.ofEpochMilli(d.toEpochMilli() + stepMs);
                     t += stepMs;
                 }
                 // Close the circle.
-                data.x.add(data.x.get(0));
-                data.y.add(data.y.get(0));
-                data.z.add(data.z.get(0));
-                d = Instant.ofEpochMilli(d.toEpochMilli() + stepMs);
-                data.time.add(Instant.ofEpochMilli(d.toEpochMilli()));
+                var f = data.samples.get(0);
+                data.addPoint(f.x(), f.y(), f.z(), d);
 
                 if (writeData) {
                     try {
