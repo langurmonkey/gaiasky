@@ -22,14 +22,16 @@ import net.jafama.FastMath;
  * Record class to store particles of all kinds.
  * @param id The particle identifier.
  * @param names The name array.
- * @param d Double-precision floating point values. See indices starting at {@link Particle#I_X} for contents.
+ * @param x X component of position vector at epoch.
+ * @param y Y component of position vector at epoch.
+ * @param z Z component of position vector at epoch.
  * @param f Single-precision floating point values. See indices starting at {@link Particle#I_FPMX} for contents.
  * @param extra Map with extra attributes.
  * @param variable Variable stars data.
  */
 public record Particle(long id,
                        String[] names,
-                       double[] d,
+                       double x, double y, double z,
                        float[] f,
                        ObjectMap<UCD, Object> extra,
                        Variable variable) implements IParticleRecord {
@@ -38,10 +40,6 @@ public record Particle(long id,
     private static final TLV3D aux3d1 = new TLV3D();
     private static final TLV3D aux3d2 = new TLV3D();
 
-    /* Double data type indices in double indirection table. */
-    public static final int I_X = 0;
-    public static final int I_Y = 1;
-    public static final int I_Z = 2;
     /* Float data type indices in float indirection table. */
     public static final int I_FPMX = 0;
     public static final int I_FPMY = 1;
@@ -62,11 +60,11 @@ public record Particle(long id,
      */
     public Particle(long id,
                     String[] names,
-                    double[] d,
+                    double x, double y, double z,
                     float[] f) {
         this(id,
              names,
-             d,
+             x, y, z,
              f,
              null,
              null);
@@ -80,7 +78,7 @@ public record Particle(long id,
                     double z) {
         this(id,
              names,
-             new double[]{x, y, z},
+             x, y, z,
              null,
              null,
              null);
@@ -95,7 +93,7 @@ public record Particle(long id,
                     ObjectMap<UCD, Object> extra) {
         this(id,
              names,
-             new double[]{x, y, z},
+             x, y, z,
              null,
              extra,
              null);
@@ -119,7 +117,7 @@ public record Particle(long id,
                     float size) {
         this(id,
              names,
-             new double[]{x, y, z},
+             x, y, z,
              new float[]{vx, vy, vz, muAlpha, muDelta, radVel, appMag, absMag, color, size},
              null,
              null);
@@ -144,7 +142,7 @@ public record Particle(long id,
                     ObjectMap<UCD, Object> extra) {
         this(id,
              names,
-             new double[]{x, y, z},
+             x, y, z,
              new float[]{vx, vy, vz, muAlpha, muDelta, radVel, appMag, absMag, color, size},
              extra,
              null);
@@ -171,7 +169,7 @@ public record Particle(long id,
                     ObjectMap<UCD, Object> extra) {
         this(id,
              names,
-             new double[]{x, y, z},
+             x, y, z,
              new float[]{vx, vy, vz, muAlpha, muDelta, radVel, appMag, absMag, color, size, (float) hip, tEff},
              extra,
              null);
@@ -199,7 +197,7 @@ public record Particle(long id,
                     Variable vari) {
         this(id,
              names,
-             new double[]{x, y, z},
+             x, y, z,
              new float[]{vx, vy, vz, muAlpha, muDelta, radVel, appMag, absMag, color, size, (float) hip, tEff},
              extra,
              vari);
@@ -223,35 +221,14 @@ public record Particle(long id,
         return variable != null;
     }
 
-    public double x() {
-        return d[I_X];
-    }
-
-    public double y() {
-        return d[I_Y];
-    }
-
-    public double z() {
-        return d[I_Z];
-    }
-
     @Override
     public double[] rawDoubleData() {
-        return d;
+        return null;
     }
 
     @Override
     public float[] rawFloatData() {
         return f;
-    }
-
-    @Override
-    public void setPos(double x,
-                       double y,
-                       double z) {
-        d[I_X] = x;
-        d[I_Y] = y;
-        d[I_Z] = z;
     }
 
     @Override

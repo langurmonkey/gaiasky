@@ -16,6 +16,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.math.Vector3dTransformer;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -54,11 +55,12 @@ public class BillboardDataset {
         super();
     }
 
-    public boolean initialize(PointDataProvider provider, boolean reload) {
+    public boolean initialize(PointDataProvider provider, Vector3dTransformer tr, boolean reload) {
         if (file != null && !file.isBlank()) {
             Pair<List<IParticleRecord>, String> p;
-            p = reloadFile(provider, file, fileUnpack, data);
-            reload = reload || !p.getSecond().equals(fileUnpack);
+            p = reloadFile(provider, file, fileUnpack, tr, data);
+            reload = reload || !p.getSecond()
+                    .equals(fileUnpack);
             data = p.getFirst();
             fileUnpack = p.getSecond();
             return reload;
@@ -66,9 +68,11 @@ public class BillboardDataset {
         return false;
     }
 
-    private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<IParticleRecord> curr) {
+    private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk,
+                                                           Vector3dTransformer tr, List<IParticleRecord> curr) {
         String upk = GlobalResources.unpackAssetPath(Settings.settings.data.dataFile(src));
         if (srcUpk == null || !srcUpk.equals(upk)) {
+            prov.setVector3dTransformer(tr);
             return new Pair<>(prov.loadData(upk), upk);
         } else {
             return new Pair<>(curr, srcUpk);
@@ -153,6 +157,7 @@ public class BillboardDataset {
      * Alias to {@link #setMaxSize(Double)}.
      *
      * @param maxSize The maximum size in degrees.
+     *
      * @deprecated Use {@link #setMaxSize(Double)} instead.
      */
     @Deprecated
@@ -183,6 +188,7 @@ public class BillboardDataset {
      * Alias to {@link #setMaxSizes(double[])}.
      *
      * @param maxSizes The maximum size per graphics quality, in degrees.
+     *
      * @deprecated Use {@link #setMaxSizes(double[])} instead.
      */
     @Deprecated

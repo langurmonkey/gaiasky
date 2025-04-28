@@ -108,7 +108,7 @@ public class BinaryVersion3 implements BinaryIO {
             }
         }
 
-        return new Particle(id, names, dataD, dataF);
+        return new Particle(id, names, dataD[0], dataD[1], dataD[2], dataF);
     }
 
     @Override

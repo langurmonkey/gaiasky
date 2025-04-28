@@ -24,6 +24,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3dTransformer;
 import net.jafama.FastMath;
 
 import java.io.*;
@@ -175,6 +176,11 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
     @Override
     public void setTransformMatrix(Matrix4d matrix) {
+        // Not used.
+    }
+
+    @Override
+    public void setVector3dTransformer(Vector3dTransformer tr) {
         // Not used.
     }
 

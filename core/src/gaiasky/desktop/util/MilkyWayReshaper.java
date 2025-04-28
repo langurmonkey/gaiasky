@@ -72,18 +72,18 @@ public class MilkyWayReshaper {
 
                 if (particles.size() > 0) {
                     FileWriter fw = new FileWriter(out);
-                    int ntokens = particles.get(0).rawDoubleData().length;
-                    if (ntokens == 3) {
+                    int nTokens = particles.get(0).rawDoubleData().length;
+                    if (nTokens == 3) {
                         // Position
                         fw.write("X Y Z\n");
-                    } else if (ntokens == 4) {
+                    } else if (nTokens == 4) {
                         // Position + size
                         fw.write("X Y Z size\n");
-                    } else if (ntokens == 7) {
+                    } else if (nTokens == 7) {
                         // Position + size + color
                         fw.write("X Y Z size r g b\n");
                     } else {
-                        logger.error("ERROR - Incorrect number of fields: " + ntokens);
+                        logger.error("ERROR - Incorrect number of fields: " + nTokens);
                         continue;
                     }
                     int particle = 0;

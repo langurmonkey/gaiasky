@@ -16,6 +16,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3dTransformer;
 import gaiasky.util.parse.Parser;
 
 import java.io.BufferedReader;
@@ -35,6 +36,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
 
     private Matrix4d transform;
+    private Vector3dTransformer transformer;
     private final Vector3d aux = new Vector3d();
 
     public List<IParticleRecord> loadData(String file) {
@@ -87,6 +89,13 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                             point[1] = aux.y;
                             point[2] = aux.z;
                         }
+                        if (transformer != null) {
+                            aux.set(point);
+                            transformer.transform(aux);
+                            point[0] = aux.x;
+                            point[1] = aux.y;
+                            point[2] = aux.z;
+                        }
                         pointData.add(new PointParticleRecord(point));
                     } catch (NumberFormatException e) {
                         // Skip line
@@ -120,6 +129,10 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     @Override
     public void setTransformMatrix(Matrix4d matrix) {
         this.transform = matrix;
+    }
+
+    public void setVector3dTransformer(Vector3dTransformer transformer) {
+        this.transformer = transformer;
     }
 
     @Override

@@ -104,6 +104,6 @@ public abstract class BinaryIOBase implements BinaryIO {
             names = namesConcat.toString().split(Constants.nameSeparatorRegex);
         }
 
-        return new Particle(id, names, dataD, dataF);
+        return new Particle(id, names, dataD[0], dataD[1], dataD[2], dataF);
     }
 }

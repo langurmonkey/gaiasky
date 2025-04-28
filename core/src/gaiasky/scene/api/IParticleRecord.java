@@ -25,10 +25,6 @@ public interface IParticleRecord {
 
     double z();
 
-    void setPos(double x,
-                double y,
-                double z);
-
     Vector3d pos(Vector3d aux);
 
     boolean hasProperMotion();

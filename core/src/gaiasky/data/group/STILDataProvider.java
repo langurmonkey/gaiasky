@@ -336,6 +336,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (transform != null) {
                                 p.realPosition.mul(transform);
                             }
+                            if (transformer != null) {
+                                transformer.transform(p.realPosition);
+                            }
 
                             // Find out RA/DEC/Dist
                             Vector3d sph = new Vector3d();

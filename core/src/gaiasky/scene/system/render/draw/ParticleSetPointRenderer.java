@@ -67,9 +67,12 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     }
 
     protected void offsets(MeshData curr) {
-        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        additionalOffset = curr.mesh.getVertexAttribute(OwnUsage.Additional) != null ? curr.mesh.getVertexAttribute(OwnUsage.Additional).offset / 4 : 0;
-        textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getVertexAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
+        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(
+                Usage.ColorPacked).offset / 4 : 0;
+        additionalOffset = curr.mesh.getVertexAttribute(OwnUsage.Additional) != null ? curr.mesh.getVertexAttribute(
+                OwnUsage.Additional).offset / 4 : 0;
+        textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getVertexAttribute(
+                OwnUsage.TextureIndex).offset / 4 : 0;
     }
 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
@@ -86,8 +89,11 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
-        shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
-        shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
+        shaderProgram.setUniformf("u_camPos", camera.getCurrent()
+                .getPos()
+                .put(aux1));
+        shaderProgram.setUniformf("u_camDir", camera.getCurrent()
+                .getCamera().direction);
         shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
         addEffectsUniforms(shaderProgram, camera);
     }
@@ -123,7 +129,9 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                 for (int i = 0; i < n; i++) {
                     if (utils.filter(i, set, desc) && set.isVisible(i)) {
                         IParticleRecord pb = set.get(i);
-                        double[] p = pb.rawDoubleData();
+                        double x = pb.x();
+                        double y = pb.y();
+                        double z = pb.z();
 
                         // SIZE, CMAP_VALUE
                         tempVerts[curr.vertexIdx + additionalOffset] =
@@ -140,7 +148,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                                 } else if (value instanceof String str) {
                                     // Try to parse it as integer, otherwise, use hash code.
                                     try {
-                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0, nTextures - 1);
+                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0,
+                                                                       nTextures - 1);
                                     } catch (NumberFormatException ignored) {
                                         textureIndex = value.hashCode() % nTextures;
                                     }
@@ -159,8 +168,12 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                         if (hl.isHighlighted()) {
                             if (hlCmap) {
                                 // Color map
-                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().getNumber(pb), hl.getHlcmmin(), hl.getHlcmmax());
-                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
+                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma()
+                                        .getNumber(pb), hl.getHlcmmin(), hl.getHlcmmax());
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0],
+                                                                                                 (float) color[1],
+                                                                                                 (float) color[2],
+                                                                                                 hl.getHlcmAlpha());
                             } else {
                                 // Plain
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
@@ -185,7 +198,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
                             } else {
                                 if (colorMin != null && colorMax != null) {
-                                    double dist = FastMath.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                    double dist = FastMath.sqrt(x * x + y * y + z * z);
                                     // fac = 0 -> colorMin,  fac = 1 -> colorMax
                                     double fac = (dist - minDistance) / (maxDistance - minDistance);
                                     interpolateColor(colorMin, colorMax, c, fac);
@@ -196,16 +209,18 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                                     g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                     b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                 }
-                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1),
-                                        MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1),
+                                                                                                 MathUtils.clamp(c[1] + g, 0, 1),
+                                                                                                 MathUtils.clamp(c[2] + b, 0, 1),
+                                                                                                 MathUtils.clamp(c[3], 0, 1));
                             }
                         }
 
                         // POSITION
                         final int idx = curr.vertexIdx;
-                        tempVerts[idx] = (float) p[0];
-                        tempVerts[idx + 1] = (float) p[1];
-                        tempVerts[idx + 2] = (float) p[2];
+                        tempVerts[idx] = (float) x;
+                        tempVerts[idx + 1] = (float) y;
+                        tempVerts[idx + 2] = (float) z;
 
                         curr.vertexIdx += curr.vertexSize;
                         numAdded++;
@@ -232,10 +247,10 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                 shaderProgram.setUniformf("u_falloff", set.profileDecay);
                 shaderProgram.setUniformf("u_sizeFactor",
-                        (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.3)) * sizeFactor * meanDist / (
-                                camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                                          (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.3)) * sizeFactor * meanDist / (
+                                                  camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                 shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()),
-                        (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
+                                          (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
                 shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));

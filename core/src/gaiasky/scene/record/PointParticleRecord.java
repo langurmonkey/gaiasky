@@ -40,13 +40,6 @@ public record PointParticleRecord(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public void setPos(double x, double y, double z) {
-        data[0] = x;
-        data[1] = y;
-        data[2] = z;
-    }
-
-    @Override
     public String[] names() {
         return null;
     }

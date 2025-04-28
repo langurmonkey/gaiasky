@@ -69,7 +69,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                         float[] alphas,
                                         ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
-        extended = rg.toString().contains("PARTICLE_GROUP_EXT");
+        extended = rg.toString()
+                .contains("PARTICLE_GROUP_EXT");
 
         rand = new Random(123);
         cmap = new Colormap();
@@ -98,21 +99,27 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     @Override
     protected void offsets1(MeshData curr,
                             InstancedModel model) {
-        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
-        model.sizeOffset = curr.mesh.getInstancedAttribute(OwnUsage.Size) != null ? curr.mesh.getInstancedAttribute(OwnUsage.Size).offset / 4 : 0;
-        model.textureIndexOffset = curr.mesh.getInstancedAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getInstancedAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
+        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(
+                Usage.ColorPacked).offset / 4 : 0;
+        model.sizeOffset = curr.mesh.getInstancedAttribute(OwnUsage.Size) != null ? curr.mesh.getInstancedAttribute(
+                OwnUsage.Size).offset / 4 : 0;
+        model.textureIndexOffset = curr.mesh.getInstancedAttribute(
+                OwnUsage.TextureIndex) != null ? curr.mesh.getInstancedAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
         model.particlePosOffset =
-                curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
+                curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(
+                        OwnUsage.ObjectPosition).offset / 4 : 0;
         if (extended) {
             model.properMotionOffset =
-                    curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
+                    curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(
+                            OwnUsage.ProperMotion).offset / 4 : 0;
         }
     }
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-        shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        shaderProgram.setUniformf("u_camPos", camera.getPos()
+                .put(aux1));
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }
@@ -135,7 +142,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             int n = set.pointData.size();
             var model = getModel(set, getOffset(render));
             if (!inGpu(render)) {
-                int offset = addMeshData(model, model.numVertices, n, model.numIndices, set.modelFile, set.modelType, set.modelPrimitive);
+                int offset = addMeshData(model, model.numVertices, n, model.numIndices, set.modelFile, set.modelType,
+                                         set.modelPrimitive);
                 setModel(offset, model);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
@@ -151,7 +159,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 for (int i = 0; i < n; i++) {
                     if (utils.filter(i, set, desc) && set.isVisible(i)) {
                         IParticleRecord particle = set.get(i);
-                        double[] p = particle.rawDoubleData();
+                        double x = particle.x();
+                        double y = particle.y();
+                        double z = particle.z();
 
                         // SIZE
                         if (extended && particle.hasSize()) {
@@ -171,7 +181,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                 } else if (value instanceof String str) {
                                     // Try to parse it as integer, otherwise, use hash code.
                                     try {
-                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0, nTextures - 1);
+                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0,
+                                                                       nTextures - 1);
                                     } catch (NumberFormatException ignored) {
                                         textureIndex = value.hashCode() % nTextures;
                                     }
@@ -190,12 +201,15 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         if (hl.isHighlighted()) {
                             if (hlCmap) {
                                 // Color map.
-                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().getNumber(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2],
+                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma()
+                                        .getNumber(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
+                                        (float) color[0], (float) color[1], (float) color[2],
                                         hl.getHlcmAlpha());
                             } else {
                                 // Plain highlight color.
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1],
+                                                                                                                  c[2], c[3]);
                             }
                         } else {
                             if (extended && particle.hasColor() && Float.isFinite(particle.col())) {
@@ -213,14 +227,15 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                         g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                         b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                     }
-                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1),
+                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
+                                            MathUtils.clamp(c[0] + r, 0, 1),
                                             MathUtils.clamp(c[1] + g, 0, 1),
                                             MathUtils.clamp(c[2] + b, 0, 1),
                                             MathUtils.clamp(c[3], 0, 1));
 
                                 } else {
                                     if (colorMin != null && colorMax != null) {
-                                        double dist = FastMath.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                        double dist = FastMath.sqrt(x * x + y * y + z * z);
                                         // fac = 0 -> colorMin,  fac = 1 -> colorMax
                                         double fac = (dist - minDistance) / (maxDistance - minDistance);
                                         interpolateColor(colorMin, colorMax, c, fac);
@@ -231,7 +246,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                         g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                         b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                     }
-                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1),
+                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
+                                            MathUtils.clamp(c[0] + r, 0, 1),
                                             MathUtils.clamp(c[1] + g, 0, 1),
                                             MathUtils.clamp(c[2] + b, 0, 1),
                                             MathUtils.clamp(c[3], 0, 1));
@@ -240,9 +256,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         }
 
                         // PARTICLE POSITION
-                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset] = (float) p[0];
-                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 1] = (float) p[1];
-                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 2] = (float) p[2];
+                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset] = (float) x;
+                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 1] = (float) y;
+                        model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 2] = (float) z;
 
                         if (extended) {
                             // PROPER MOTION
@@ -302,13 +318,14 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                 shaderProgram.setUniformf("u_falloff", set.profileDecay);
-                shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * sizeFactor), (float) (set.particleSizeLimits[1] * sizeFactor));
+                shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * sizeFactor),
+                                          (float) (set.particleSizeLimits[1] * sizeFactor));
                 if (extended) {
                     shaderProgram.setUniformf("u_sizeFactor", (float) (sizeFactor / Constants.DISTANCE_SCALE_FACTOR));
                 } else {
                     double s = .3e-4f;
                     shaderProgram.setUniformf("u_sizeFactor",
-                            (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                                              (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                 }
                 shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 
@@ -325,7 +342,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 }
             }
         } else {
-            throw new RuntimeException("No suitable model found for type '" + set.modelType + "' and primitive '" + set.modelPrimitive + "'");
+            throw new RuntimeException(
+                    "No suitable model found for type '" + set.modelType + "' and primitive '" + set.modelPrimitive + "'");
         }
     }
 

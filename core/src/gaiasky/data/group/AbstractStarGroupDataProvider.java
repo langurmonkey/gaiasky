@@ -18,6 +18,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.io.ByteBufferInputStream;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3dTransformer;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
@@ -46,6 +47,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
     protected Matrix4d transform;
+    protected Vector3dTransformer transformer;
     protected Set<Long> mustLoadIds = null;
     protected List<AdditionalCols> additional;
     /**
@@ -534,6 +536,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     @Override
     public void setTransformMatrix(Matrix4d transform) {
         this.transform = transform;
+    }
+
+    @Override
+    public void setVector3dTransformer(Vector3dTransformer tr) {
+        this.transformer = tr;
     }
 
     /**

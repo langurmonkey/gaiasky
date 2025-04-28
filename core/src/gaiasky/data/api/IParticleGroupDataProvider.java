@@ -9,6 +9,7 @@ package gaiasky.data.api;
 
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3dTransformer;
 
 import java.io.InputStream;
 import java.util.List;
@@ -82,4 +83,10 @@ public interface IParticleGroupDataProvider {
      * @param matrix The transform matrix.
      */
     void setTransformMatrix(Matrix4d matrix);
+
+    /**
+     * Sets a vector-3 transformer to apply to the positions.
+     * @param tr The transformer class.
+     */
+    void setVector3dTransformer(Vector3dTransformer tr);
 }
