@@ -865,7 +865,7 @@
         ]
       },
       "shadingStyle:StarGroup": {
-        "description": "Special shading style to apply to the particles of this set. |brsp| **Values** |ul| |li| ``default`` -- no special shading (default). |eli| |li| ``twinkle`` -- particles twinkle randomly with (app) time. |eli| |eul|",
+        "description": "Special shading style to apply to the particles of this set. |brsp| **Values** |ul| |li| ``default`` -- no special shading (default). |eli| |li| ``twinkle`` -- particles twinkle randomly with (app) time. Does not work on variable star sets. |eli| |eul|",
         "unit": "String",
         "aliases": [
           "shadingstyle:StarGroup"

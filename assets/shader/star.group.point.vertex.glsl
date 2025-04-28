@@ -115,7 +115,7 @@ void main() {
     // Shading style
     float shadingStyleFactor = 1.0;
     if (u_shadingStyle == 1) {
-        float noise = abs(gold_noise(vec2(float(gl_VertexID)), 2334.943));
+        float noise = abs(gold_noise(vec2(float(gl_VertexID * 0.001)), 2334.943));
         //float reflectionFactor = (1.0 + dot(normalize(pos), normalize(particlePos / vrScale))) * 0.5;
         shadingStyleFactor = clamp(pow(
                     abs(sin(mod(u_appTime + noise * 6.0, 3.141597))), 2.0), 0.5, 1.5);

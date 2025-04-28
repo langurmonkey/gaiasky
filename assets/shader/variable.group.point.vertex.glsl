@@ -21,10 +21,6 @@ uniform float u_brightnessPower;
 // VR scale factor
 uniform float u_vrScale;
 uniform float u_proximityThreshold;
-// App run time in seconds.
-uniform float u_appTime;
-// Shading style: 0: default, 1: twinkle.
-uniform int u_shadingStyle;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -165,17 +161,8 @@ void main() {
         pointSize = 0.2e4 * solidAngle * u_alphaSizeBrRc.y * cubemapFactor;
     }
 
-    // Shading style
-    float shadingStyleFactor = 1.0;
-    if (u_shadingStyle == 1) {
-        float noise = abs(gold_noise(vec2(float(gl_VertexID)), 2334.943));
-        //float reflectionFactor = (1.0 + dot(normalize(pos), normalize(particlePos / vrScale))) * 0.5;
-        shadingStyleFactor = clamp(pow(
-                    abs(sin(mod(u_appTime + noise * 6.0, 3.141597))), 2.0), 0.5, 1.5);
-    }
-
     // Proximity.
-    float fadeFactor = shadingStyleFactor;
+    float fadeFactor = 1.0;
     if (u_proximityThreshold > 0.0) {
         fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
     }
