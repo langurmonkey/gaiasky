@@ -74,7 +74,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
 
         // Component buttons, top-left.
         tableComponentButtons = new Table(skin);
-        tableButtons.add(tableComponentButtons).left().top().padTop(pad20 * 4f).padRight(pad10).row();
+        tableButtons.add(tableComponentButtons).left().top().padTop(pad20 * 5f).padRight(pad10).row();
 
         activeComponentCell = tableComponents.add().left().top();
 

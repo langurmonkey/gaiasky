@@ -174,7 +174,7 @@ public class FullGui extends AbstractGui {
         topInfoInterface.pad(pad5, pad, pad5, pad);
         ti = new Container<>(topInfoInterface);
         ti.setFillParent(true);
-        ti.top();
+        ti.top().left();
         ti.pad(pad);
         interfaces.add(topInfoInterface);
 

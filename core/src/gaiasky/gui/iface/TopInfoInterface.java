@@ -9,6 +9,8 @@ package gaiasky.gui.iface;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -21,6 +23,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.ClickableLabel;
 import gaiasky.util.scene2d.OwnLabel;
@@ -78,32 +81,39 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "mono");
         pace.setName("pace tii");
 
+        // Datetime table.
+        var timeTable = new Table(skin);
+        timeTable.add(date).center().padRight(pad);
+        timeTable.add(time).center().padRight(pad);
+        timeTable.add(pace).center();
+
+
         focus = new OwnLabel("", skin, "mono");
         focus.setName("focus tii");
-        focus.setColor(0.2f, 1f, 0.4f, 1f);
+        focus.setColor(ColorUtils.gGreenC);
 
         s1 = new OwnLabel("|", skin, "mono");
 
         closest = new OwnLabel("", skin, "mono");
         closest.setName("closest tii");
-        closest.setColor(0.3f, 0.5f, 1f, 1f);
+        closest.setColor(ColorUtils.gBlueC);
 
         OwnLabel s2 = new OwnLabel("|", skin, "mono");
 
         OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(Settings.settings.scene.homeObject, maxNameLen)), skin, "mono");
         home.setName("home tii");
-        home.setColor(1f, 0.7f, 0.1f, 1f);
+        home.setColor(ColorUtils.aOrangeC);
 
-        this.add(date).left().padRight(pad);
-        this.add(time).left().padRight(pad);
-        this.add(pace).left().padRight(pad * 2f);
-        this.add(focus).left().padRight(pad);
-        this.add(s1).left().padRight(pad);
-        this.add(closest).left().padRight(pad);
-        this.add(s2).left().padRight(pad);
-        this.add(home).left();
+        // Objects table
+        var objectsTable = new Table(skin);
+        objectsTable.add(home).left().padRight(pad);
+        objectsTable.add(s1).left().padRight(pad);
+        objectsTable.add(focus).left().padRight(pad);
+        objectsTable.add(s2).left().padRight(pad);
+        objectsTable.add(closest).left();
 
-        pack();
+        this.add(timeTable).left().row();
+        this.add(objectsTable).colspan(3).left().padTop(pad * 0.3f).left();
 
         EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_STATE_CMD,
                                         Event.CAMERA_CLOSEST_INFO, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
@@ -186,6 +196,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         default -> {
         }
         }
+        pack();
     }
 
     public void programmaticUpdate() {
