@@ -13,9 +13,8 @@ import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.ParticleRecord;
-import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
-import gaiasky.scene.record.VariableRecord;
+import gaiasky.scene.record.Particle;
+import gaiasky.scene.record.Variable;
 import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
 import gaiasky.util.*;
 import gaiasky.util.color.BVToTeff_ballesteros;
@@ -79,8 +78,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         lastIndexMap = new HashMap<>();
         // Logging level to WARN.
         try {
-            java.util.logging.Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING);
-            java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.WARNING);
+            java.util.logging.Logger.getLogger("uk.ac.starlink")
+                    .setLevel(Level.WARNING);
+            java.util.logging.Logger.getLogger("org.astrogrid")
+                    .setLevel(Level.WARNING);
             factory = new StarTableFactory();
             countsPerMag = new long[22];
             initLists();
@@ -185,7 +186,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                            Object[] row) {
         for (UCD ucd : UCDs) {
             try {
-                String str = row[ucd.index].toString().strip();
+                String str = row[ucd.index].toString()
+                        .strip();
                 return new Pair<>(ucd, str);
             } catch (Exception e) {
                 // not working, try next
@@ -199,7 +201,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         Array<Pair<UCD, String>> strings = new Array<>(false, 2);
         for (UCD ucd : UCDs) {
             try {
-                String str = row[ucd.index].toString().strip();
+                String str = row[ucd.index].toString()
+                        .strip();
                 strings.add(new Pair<>(ucd, str));
             } catch (Exception e) {
                 // not working, try next
@@ -313,7 +316,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             assert b != null;
                             PositionType pt = ucdParser.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
                             // Check negative parallaxes -> Use default for consistency
-                            if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
+                            if (pt.isParallax() && (c.getSecond() == null || c.getSecond()
+                                    .isNaN() || c.getSecond() <= 0)) {
                                 c.setSecond(Constants.DEFAULT_PARALLAX);
                                 unitC = "mas";
                                 nInvalidParallaxes++;
@@ -400,7 +404,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                         }
                                     } else {
                                         // We hope size is already in parsecs.
-                                        sizePc = sizePair.getSecond().floatValue();
+                                        sizePc = sizePair.getSecond()
+                                                .floatValue();
                                     }
                                     if (TextUtils.containsOrMatches(UCDParser.radiusColNames, sizeUcd.colName, true)) {
                                         // Radius, need to multiply by 2 to get diameter.
@@ -428,7 +433,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 if (colPair == null) {
                                     colorIndex = (float) Constants.DEFAULT_COLOR;
                                 } else {
-                                    colorIndex = colPair.getSecond().floatValue();
+                                    colorIndex = colPair.getSecond()
+                                            .floatValue();
                                 }
                             } else {
                                 // Default color index for stars, NaN for others.
@@ -473,8 +479,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     }
                                     idx++;
                                 }
-                                variMagsDouble = magnitudesList.stream().mapToDouble(Double::doubleValue).toArray();
-                                variTimes = timesList.stream().mapToDouble(Double::doubleValue).toArray();
+                                variMagsDouble = magnitudesList.stream()
+                                        .mapToDouble(Double::doubleValue)
+                                        .toArray();
+                                variTimes = timesList.stream()
+                                        .mapToDouble(Double::doubleValue)
+                                        .toArray();
                                 nVari = variMagsDouble.length;
 
                                 // FOLD
@@ -526,7 +536,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 Pair<UCD, Double> tEffPair = getDoubleUcd(ucdParser.TEFF, row);
                                 if (tEffPair != null) {
                                     // Use value from table.
-                                    tEff = tEffPair.getSecond().floatValue();
+                                    tEff = tEffPair.getSecond()
+                                            .floatValue();
                                 } else {
                                     // Use color index.
                                     tEff = (float) bvToTEff.bvToTeff(colorIndex);
@@ -576,7 +587,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (hip < 0 && hasCol(ColId.hip)) {
                                 int hipIndex = idx(ColId.hip);
                                 var hipNum = row[hipIndex];
-                                if(hipNum instanceof Integer hn) {
+                                if (hipNum instanceof Integer hn) {
                                     hip = hn;
                                 }
                             }
@@ -596,9 +607,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdParser.NAME, row);
                                 Array<String> namesArray = new Array<>(false, namePairs.length);
                                 for (Pair<UCD, String> pair : namePairs) {
-                                    String[] currNames = pair.getSecond().split(Constants.nameSeparatorRegex);
+                                    String[] currNames = pair.getSecond()
+                                            .split(Constants.nameSeparatorRegex);
                                     for (String actualName : currNames) {
-                                        if (actualName != null && !actualName.isEmpty() && !TextUtils.contains(forbiddenNameValues, actualName, true)) {
+                                        if (actualName != null && !actualName.isEmpty()
+                                                && !TextUtils.contains(forbiddenNameValues, actualName, true)) {
                                             namesArray.add(actualName);
                                         }
                                     }
@@ -622,74 +635,49 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS
                                     || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {
-                                var type = ParticleRecordType.STAR;
 
-                                IParticleRecord pr;
-                                if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
-                                    pr = new VariableRecord();
-                                    var vr = (VariableRecord) pr;
-                                    vr.setNVari(nVari);
-                                    vr.setPeriod(pf);
-                                    vr.setVariMags(variMags);
-                                    vr.setVariTimes(variTimes);
-                                } else {
-                                    pr = new ParticleRecord(type);
-                                }
-                                pr.setId(id);
-                                pr.setNames(names);
-                                pr.setPos(p.realPosition.x, p.realPosition.y, p.realPosition.z);
-                                pr.setVelocityVector(pm.x, pm.y, pm.z);
-                                pr.setProperMotion((float) muAlphaStar, (float) muDelta, (float) radVel);
-                                pr.setMag((float) appMag, (float) absMag);
-                                pr.setCol(colorPacked);
-                                pr.setSize((float) sizePc);
-                                pr.setHip(hip);
-                                // Extra
+                                // Extra attributes.
                                 ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
                                 if (ucdParser.TEFF.isEmpty()) {
                                     UCD tEffUCD = new UCD("phys.temperature.effective", "teff", "K", -1);
                                     extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(tEffUCD, tEff);
-                                    pr.setTeff(tEff);
                                 } else {
                                     extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(ucdParser.TEFF.first(), tEff);
-                                    pr.setTeff(tEff);
                                 }
-                                pr.setExtraAttributes(extraAttributes);
+
+                                // Construct record.
+                                IParticleRecord pr;
+                                if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
+                                    var vari = new Variable(nVari, pf, variMags, variTimes);
+                                    pr = new Particle(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
+                                                      (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
+                                                      (float) absMag, colorPacked, (float) sizePc, hip, tEff, extraAttributes, vari);
+                                } else {
+                                    pr = new Particle(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
+                                                      (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
+                                                      (float) absMag, colorPacked, (float) sizePc, hip, tEff, extraAttributes);
+                                }
 
                                 list.add(pr);
 
                                 int appMagClamp = (int) MathUtilsDouble.clamp(appMag, 0, 21);
                                 countsPerMag[appMagClamp] += 1;
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
-                                var type = ParticleRecordType.PARTICLE;
-
-                                IParticleRecord pr = new ParticleRecord(type);
-                                pr.setId(id);
-                                pr.setNames(names);
-                                pr.setPos(p.realPosition.x, p.realPosition.y, p.realPosition.z);
-                                // Extra
+                                // Extra attributes.
                                 ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
-                                pr.setExtraAttributes(extraAttributes);
-
+                                // Record.
+                                var pr = new Particle(id, names, (float) p.realPosition.x, (float) p.realPosition.y, (float) p.realPosition.z,
+                                                      extraAttributes);
                                 list.add(pr);
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES_EXT) {
-                                var type = ParticleRecordType.PARTICLE_EXT;
-
-                                IParticleRecord pr = new ParticleRecord(type);
-                                pr.setId(id);
-                                pr.setNames(names);
-                                pr.setPos(p.realPosition.x, p.realPosition.y, p.realPosition.z);
-                                pr.setVelocityVector(pm.x, pm.y, pm.z);
-                                pr.setProperMotion((float) muAlphaStar, (float) muDelta, (float) radVel);
-                                pr.setMag((float) appMag, (float) absMag);
-                                pr.setCol(colorPacked);
-                                pr.setSize((float) (sizePc * Constants.PC_TO_U));
-                                // Extra
+                                // Extra attributes.
                                 ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
-                                pr.setExtraAttributes(extraAttributes);
-
+                                // Record.
+                                var pr = new Particle(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
+                                                      (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
+                                                      (float) absMag, colorPacked, (float) sizePc, extraAttributes);
                                 list.add(pr);
                             }
 
@@ -727,7 +715,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     protected boolean hasCol(ColId colId) {
         for (var ci : columnInfoList) {
-            if (ci.getName().equals(colId.name())) {
+            if (ci.getName()
+                    .equals(colId.name())) {
                 return true;
             }
         }
@@ -737,7 +726,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     protected int idx(ColId colId) {
         int idx = 0;
         for (var ci : columnInfoList) {
-            if (ci.getName().equals(colId.name())) {
+            if (ci.getName()
+                    .equals(colId.name())) {
                 return idx;
             }
             idx++;

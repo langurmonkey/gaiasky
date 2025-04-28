@@ -8,7 +8,6 @@
 package gaiasky.data.api;
 
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.ParticleRecord;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -28,7 +27,7 @@ public interface BinaryIO {
      *
      * @return The star.
      */
-    ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) throws IOException;
+    IParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) throws IOException;
 
     /**
      * Read a star from the input stream.
@@ -40,7 +39,7 @@ public interface BinaryIO {
      *
      * @throws IOException If the read fails.
      */
-    ParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException;
+    IParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException;
 
     /**
      * Write the star bean to the output stream.

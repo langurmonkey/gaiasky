@@ -13,8 +13,8 @@ import gaiasky.data.group.reader.IDataReader;
 import gaiasky.data.group.reader.InputStreamDataReader;
 import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.ParticleRecord;
-import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
+import gaiasky.scene.record.Particle;
+import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Loads and writes binary data into particle groups ({@link ParticleRecordType#PARTICLE_EXT}).
+ * Loads and writes binary data into particle groups ({@link ParticleType#PARTICLE_EXT}).
  * The format is:
  *
  * <ul>
@@ -103,29 +103,26 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
     public List<IParticleRecord> readData(InputStream in, double factor) {
         List<IParticleRecord> data = null;
-        DataInputStream data_in = new DataInputStream(in);
 
-        try {
-            data_in.mark(0);
-            int size = data_in.readInt();
-            boolean extra = data_in.readBoolean();
-            this.extra.set(extra);
-
-            data = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
-                if (particleNumberCap < 0 || i < particleNumberCap) {
-                    data.add(readParticleRecord(data_in, factor));
-                }
-            }
-
-        } catch (IOException e) {
-            logger.error(e);
-        } finally {
+        try (DataInputStream data_in = new DataInputStream(in)) {
             try {
-                data_in.close();
+                data_in.mark(0);
+                int size = data_in.readInt();
+                boolean extra = data_in.readBoolean();
+                this.extra.set(extra);
+
+                data = new ArrayList<>(size);
+                for (int i = 0; i < size; i++) {
+                    if (particleNumberCap < 0 || i < particleNumberCap) {
+                        data.add(readParticleRecord(data_in, factor));
+                    }
+                }
+
             } catch (IOException e) {
                 logger.error(e);
             }
+        } catch (IOException e) {
+            logger.error(e);
         }
 
         return data;
@@ -182,17 +179,17 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
     }
 
     @Override
-    public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) throws IOException {
+    public IParticleRecord readParticleRecord(MappedByteBuffer mem, double factor) throws IOException {
         return readParticleRecord(new MappedBufferDataReader(mem), factor);
     }
 
     @Override
-    public ParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException {
+    public IParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException {
         return readParticleRecord(new InputStreamDataReader(in), factor);
     }
 
-    public ParticleRecord readParticleRecord(IDataReader in, double factor) throws IOException {
-        var pType = extra.get() ? ParticleRecordType.PARTICLE_EXT : ParticleRecordType.PARTICLE;
+    public IParticleRecord readParticleRecord(IDataReader in, double factor) throws IOException {
+        var pType = extra.get() ? ParticleType.PARTICLE_EXT : ParticleType.PARTICLE;
 
         // ID
         long id = in.readLong();
@@ -206,7 +203,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
             StringBuilder namesConcat = new StringBuilder();
             for (int i = 0; i < nameLength; i++)
                 namesConcat.append(in.readChar());
-            names = namesConcat.toString().split(Constants.nameSeparatorRegex);
+            names = namesConcat.toString()
+                    .split(Constants.nameSeparatorRegex);
         }
 
         // XYZ
@@ -214,9 +212,10 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         final double deltaDeg = in.readDouble();
         final double distPc = in.readDouble();
         var pos = Coordinates.sphericalToCartesian(alphaDeg * MathUtilsDouble.degRad,
-                deltaDeg * MathUtilsDouble.degRad,
-                distPc * Constants.PC_TO_U,
-                aux3d1);
+                                                   deltaDeg * MathUtilsDouble.degRad,
+                                                   distPc * Constants.PC_TO_U,
+                                                   aux3d1);
+        pos.scl(factor);
 
         // PROPER MOTION
         float muAlpha = 0;
@@ -229,7 +228,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
         // VELOCITY VECTOR
-        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg), FastMath.toRadians(deltaDeg), distPc, aux3d2);
+        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg), FastMath.toRadians(deltaDeg),
+                                                                      distPc, aux3d2);
 
         // MAGNITUDE
         float appMag;
@@ -258,51 +258,38 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
 
-        ParticleRecord particle = null;
+        Particle p = null;
         switch (pType) {
             case PARTICLE -> {
-                particle = new ParticleRecord(pType);
-                particle.setId(id);
-                particle.setNames(names);
-                particle.setPos(pos.x, pos.y, pos.z);
+                p = new Particle(id, names, pos.x, pos.y, pos.z);
             }
             case PARTICLE_EXT -> {
-                particle = new ParticleRecord(pType);
-                particle.setId(id);
-                particle.setNames(names);
-                particle.setPos(pos.x, pos.y, pos.z);
-                particle.setProperMotion(muAlpha, muDelta, radVel);
-                particle.setVelocityVector(velocityVector.x, velocityVector.y, velocityVector.z);
-                particle.setMag(appMag, absMag);
-                particle.setSize(size);
-                particle.setCol(color);
+                p = new Particle(id, names, pos.x, pos.y, pos.z, muAlpha, muDelta, radVel, (float) velocityVector.x, (float) velocityVector.y,
+                                 (float) velocityVector.z, appMag, absMag, size, color);
             }
         }
 
-        return particle;
+        return p;
     }
 
 
     public void writeData(List<IParticleRecord> data, OutputStream out, boolean extra) {
         // Wrap the FileOutputStream with a DataOutputStream
-        DataOutputStream data_out = new DataOutputStream(out);
-        try {
-            // Number of particles
-            data_out.writeInt(data.size());
-            data_out.writeBoolean(extra);
-            this.extra.set(extra);
-            for (IParticleRecord sb : data) {
-                writeParticleRecord(sb, data_out);
-            }
-
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
+        try (DataOutputStream dataOut = new DataOutputStream(out)) {
             try {
-                data_out.close();
-            } catch (IOException e) {
+                // Number of particles
+                dataOut.writeInt(data.size());
+                dataOut.writeBoolean(extra);
+                this.extra.set(extra);
+                for (IParticleRecord sb : data) {
+                    writeParticleRecord(sb, dataOut);
+                }
+
+            } catch (Exception e) {
                 logger.error(e);
             }
+        } catch (IOException e) {
+            logger.error(e);
         }
 
     }

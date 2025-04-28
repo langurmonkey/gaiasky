@@ -12,7 +12,8 @@ import gaiasky.data.group.reader.IDataReader;
 import gaiasky.data.group.reader.InputStreamDataReader;
 import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.ParticleRecord;
+import gaiasky.scene.record.Particle;
+import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Constants;
 import gaiasky.util.parse.Parser;
 
@@ -33,31 +34,31 @@ public class BinaryVersion3 implements BinaryIO {
     }
 
     @Override
-    public ParticleRecord readParticleRecord(MappedByteBuffer mem,
-                                             double factor) throws IOException {
+    public IParticleRecord readParticleRecord(MappedByteBuffer mem,
+                                              double factor) throws IOException {
         return readParticleRecord(new MappedBufferDataReader(mem), factor);
     }
 
     @Override
-    public ParticleRecord readParticleRecord(DataInputStream in,
-                                             double factor) throws IOException {
+    public IParticleRecord readParticleRecord(DataInputStream in,
+                                              double factor) throws IOException {
         return readParticleRecord(new InputStreamDataReader(in), factor);
     }
 
-    public ParticleRecord readParticleRecord(IDataReader in,
-                                             double factor) throws IOException {
-        double[] dataD = new double[ParticleRecord.ParticleRecordType.STAR.doubleArraySize];
-        float[] dataF = new float[ParticleRecord.ParticleRecordType.STAR.floatArraySize];
+    public IParticleRecord readParticleRecord(IDataReader in,
+                                              double factor) throws IOException {
+        double[] dataD = new double[ParticleType.STAR.doubleArraySize];
+        float[] dataF = new float[ParticleType.STAR.floatArraySize];
         int floatOffset = 0;
         // Double
         for (int i = 0; i < 3; i++) {
-            if (i < ParticleRecord.ParticleRecordType.STAR.doubleArraySize) {
+            if (i < ParticleType.STAR.doubleArraySize) {
                 // Goes to double array
                 dataD[i] = in.readDouble();
                 dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
-                int idx = i - ParticleRecord.ParticleRecordType.STAR.doubleArraySize;
+                int idx = i - ParticleType.STAR.doubleArraySize;
                 dataF[idx] = (float) in.readDouble();
                 floatOffset = idx + 1;
             }
@@ -67,48 +68,47 @@ public class BinaryVersion3 implements BinaryIO {
             int idx = i + floatOffset;
             dataF[idx] = in.readFloat();
             // Scale proper motions and size
-            if (idx <= ParticleRecord.I_FPMZ || idx == ParticleRecord.I_FSIZE)
+            if (idx <= Particle.I_FPMZ || idx == Particle.I_FSIZE)
                 dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
         // The last one is actually the TEFF.
-        dataF[ParticleRecord.I_FTEFF] = dataF[ParticleRecord.I_FHIP];
-        dataF[ParticleRecord.I_FHIP] = -1;
+        dataF[Particle.I_FTEFF] = dataF[Particle.I_FHIP];
+        dataF[Particle.I_FHIP] = -1;
 
         // ID
-        Long id = in.readLong();
+        long id = in.readLong();
 
         // NAME
         int nameLength = in.readInt();
         String[] names;
         if (nameLength == 0) {
-            names = new String[]{id.toString()};
+            names = new String[]{Long.toString(id)};
         } else {
             StringBuilder namesConcat = new StringBuilder();
             for (int i = 0; i < nameLength; i++)
                 namesConcat.append(in.readChar());
-            names = namesConcat.toString().split(Constants.nameSeparatorRegex);
+            names = namesConcat.toString()
+                    .split(Constants.nameSeparatorRegex);
         }
 
         // Version 3: we take the HIP number from the names array.
         // HIP from names.
-        var hipName = Arrays.stream(names).filter(name -> name.startsWith("HIP ")).toList();
+        var hipName = Arrays.stream(names)
+                .filter(name -> name.startsWith("HIP "))
+                .toList();
         if (!hipName.isEmpty()) {
-            var name = hipName.get(0).trim();
+            var name = hipName.get(0)
+                    .trim();
             // We parse the hip id from the string (e.g. we take "2334" from "HIP 2334").
             if (name.length() > 4) {
                 try {
-                    dataF[ParticleRecord.I_FHIP] = Parser.parseIntException(name.substring(4));
-                } catch (NumberFormatException e) {
-                    dataF[ParticleRecord.I_FHIP] = -1;
+                    dataF[Particle.I_FHIP] = Parser.parseIntException(name.substring(4));
+                } catch (NumberFormatException ignored) {
                 }
-            } else {
-                dataF[ParticleRecord.I_FHIP] = -1;
             }
-        } else {
-            dataF[ParticleRecord.I_FHIP] = -1;
         }
 
-        return new ParticleRecord(ParticleRecord.ParticleRecordType.STAR, dataD, dataF, id, names);
+        return new Particle(id, names, dataD, dataF);
     }
 
     @Override

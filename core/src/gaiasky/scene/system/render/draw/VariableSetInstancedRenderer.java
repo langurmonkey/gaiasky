@@ -23,7 +23,7 @@ import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
-import gaiasky.scene.record.VariableRecord;
+import gaiasky.scene.record.Particle;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -134,7 +134,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
 
                 for (int i = 0; i < n; i++) {
                     if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                        VariableRecord particle = (VariableRecord) set.get(i);
+                        Particle particle = (Particle) set.get(i);
+                        var vari = particle.variable();
                         if (!Double.isFinite(particle.size())) {
                             logger.debug("Star " + particle.id() + " has a non-finite size");
                             continue;
@@ -151,10 +152,10 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                         }
 
                         // VARIABLE STARS (magnitudes and times)
-                        model.instanceAttributes[curr.instanceIdx + model.nVariOffset] = particle.nVari;
-                        for (int k = 0; k < particle.nVari; k++) {
-                            model.instanceAttributes[curr.instanceIdx + model.variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
-                            model.instanceAttributes[curr.instanceIdx + model.variTimesOffset + k] = (float) particle.variTime(k);
+                        model.instanceAttributes[curr.instanceIdx + model.nVariOffset] = vari.nVari();
+                        for (int k = 0; k < vari.nVari(); k++) {
+                            model.instanceAttributes[curr.instanceIdx + model.variMagsOffset + k] = (float) (vari.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
+                            model.instanceAttributes[curr.instanceIdx + model.variTimesOffset + k] = (float) vari.variTime(k);
                         }
 
                         // PROPER MOTION [u/yr]

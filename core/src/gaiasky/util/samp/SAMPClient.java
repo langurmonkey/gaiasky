@@ -245,7 +245,7 @@ public class SAMPClient implements IObserver {
                                 ParticleSet pg = Mapper.particleSet.has(node) ? Mapper.particleSet.get(node) : Mapper.starSet.get(node);
                                 if (pg.data() != null && !pg.data().isEmpty() && EntityUtils.isVisibilityOn(node)) {
                                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg.getRandomParticleName());
+                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg.getFirstParticleName());
                                 }
                             } else if (graph.children != null && !graph.children.isEmpty() && EntityUtils.isVisibilityOn(graph.children.get(0))) {
                                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);

@@ -8,9 +8,9 @@
 package gaiasky.scene.api;
 
 import com.badlogic.gdx.utils.ObjectMap;
-import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
+import gaiasky.scene.record.ParticleType;
+import gaiasky.scene.record.Variable;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 
 public interface IParticleRecord {
@@ -52,20 +52,9 @@ public interface IParticleRecord {
     boolean hasName(String candidate,
                     boolean matchCase);
 
-    void setNames(String... names);
-
-    void setName(String name);
-
-    void addName(String name);
-
-    void addNames(String... names);
-
     float appMag();
 
     float absMag();
-
-    void setMag(float appmag,
-                float absmag);
 
     boolean hasColor();
 
@@ -83,8 +72,6 @@ public interface IParticleRecord {
 
     double radius();
 
-    void setId(long id);
-
     long id();
 
     void setHip(int hip);
@@ -97,14 +84,6 @@ public interface IParticleRecord {
 
 
     float radvel();
-
-    void setProperMotion(float mualpha,
-                         float mudelta,
-                         float radvel);
-
-    OctreeNode octant();
-
-    void setOctant(OctreeNode octant);
 
     /**
      * Distance in internal units. Beware, does the computation on the fly.
@@ -166,6 +145,7 @@ public interface IParticleRecord {
 
     /**
      * Returns the effective temperature, in K.
+     *
      * @return The effective temperature in K.
      */
     float teff();
@@ -180,34 +160,43 @@ public interface IParticleRecord {
 
     /**
      * Gets the extra attributes map.
+     *
      * @return The map.
      */
     ObjectMap<UCD, Object> getExtra();
 
     /**
      * Gets the extra data filed with the given name.
+     *
      * @param name The name of the data filed to get.
+     *
      * @return The data field, or null if it does not exist.
      */
     Object getExtra(String name);
 
     /**
      * Gets the extra data filed with the given UCD.
+     *
      * @param ucd The UCD of the data filed to get.
+     *
      * @return The data field, or null if it does not exist.
      */
     Object getExtra(UCD ucd);
 
     /**
      * Gets the extra data filed with the given name, as a double number.
+     *
      * @param name The name of the data filed to get.
+     *
      * @return The data field as a double, or NaN if it does not exist or is not a number.
      */
     double getExtraNumber(String name);
 
     /**
      * Gets the extra data filed with the given UCD, as a double number.
+     *
      * @param ucd The UCD of the data filed to get.
+     *
      * @return The data field as a double, or NaN if it does not exist or is not a number.
      */
     double getExtraNumber(UCD ucd);
@@ -219,5 +208,20 @@ public interface IParticleRecord {
      *
      * @return The type.
      */
-    ParticleRecordType getType();
+    ParticleType getType();
+
+
+    /**
+     * Returns the {@link Variable} instance.
+     *
+     * @return The variable instance.
+     */
+    Variable variable();
+
+    /**
+     * Returns whether this particle record has a {@link Variable} attached, making it a variable star.
+     *
+     * @return True if this record is a variable star.
+     */
+    boolean isVariable();
 }

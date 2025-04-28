@@ -9,18 +9,10 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 
-public class PointParticleRecord implements IParticleRecord {
-
-    private final double[] data;
-
-    public PointParticleRecord(double[] data) {
-        this.data = data;
-    }
+public record PointParticleRecord(double[] data) implements IParticleRecord {
 
     @Override
     public double[] rawDoubleData() {
@@ -75,26 +67,6 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public void setNames(String... names) {
-
-    }
-
-    @Override
-    public void setName(String name) {
-
-    }
-
-    @Override
-    public void addName(String name) {
-
-    }
-
-    @Override
-    public void addNames(String... names) {
-
-    }
-
-    @Override
     public double pmx() {
         return 0;
     }
@@ -122,11 +94,6 @@ public class PointParticleRecord implements IParticleRecord {
     @Override
     public float absMag() {
         return 0;
-    }
-
-    @Override
-    public void setMag(float appmag, float absmag) {
-
     }
 
     @Override
@@ -160,11 +127,6 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public void setId(long id) {
-
-    }
-
-    @Override
     public long id() {
         return 0;
     }
@@ -195,11 +157,6 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public void setProperMotion(float mualpha, float mudelta, float radvel) {
-
-    }
-
-    @Override
     public double[] rgb() {
         return data.length >= 7 ? new double[] { data[4], data[5], data[6] } : null;
     }
@@ -207,16 +164,6 @@ public class PointParticleRecord implements IParticleRecord {
     @Override
     public boolean hasSize() {
         return false;
-    }
-
-    @Override
-    public OctreeNode octant() {
-        return null;
-    }
-
-    @Override
-    public void setOctant(OctreeNode octant) {
-
     }
 
     @Override
@@ -298,8 +245,18 @@ public class PointParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public ParticleRecordType getType() {
-        return ParticleRecordType.FAKE;
+    public ParticleType getType() {
+        return ParticleType.FAKE;
+    }
+
+    @Override
+    public Variable variable() {
+        return null;
+    }
+
+    @Override
+    public boolean isVariable() {
+        return false;
     }
 
     @Override

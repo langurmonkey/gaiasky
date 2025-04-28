@@ -19,7 +19,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.ModelComponent;
-import gaiasky.scene.record.VariableRecord;
 import gaiasky.util.*;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -66,10 +65,11 @@ public class ParticleUtils {
 
     public double getVariableSizeScaling(final StarSet set, final int idx) {
         IParticleRecord ipr = set.pointData.get(idx);
-        if (ipr instanceof VariableRecord vr) {
-            double[] times = vr.variTimes;
-            float[] sizes = vr.variMags;
-            int n = vr.nVari;
+        if (ipr.isVariable()) {
+            var vari = ipr.variable();
+            double[] times = vari.variTimes();
+            float[] sizes = vari.variMags();
+            int n = vari.nVari();
 
             // Days since epoch
             double t = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
@@ -81,7 +81,7 @@ public class ParticleUtils {
                 double x0 = times[i] - t0;
                 double x1 = times[i + 1] - t0;
                 if (t >= x0 && t <= x1) {
-                    return MathUtilsDouble.lint(t, x0, x1, sizes[i], sizes[i + 1]) / vr.size();
+                    return MathUtilsDouble.lint(t, x0, x1, sizes[i], sizes[i + 1]) / ipr.size();
                 }
             }
         }

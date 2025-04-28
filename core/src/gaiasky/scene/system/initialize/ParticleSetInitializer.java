@@ -23,8 +23,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.ParticleUtils;
-import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
-import gaiasky.scene.record.VariableRecord;
+import gaiasky.scene.record.ParticleType;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
@@ -100,7 +99,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (starSet != null) {
             // Stars.
             // Is it a catalog of variable stars?
-            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.get(0) instanceof VariableRecord;
+            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.get(0).isVariable();
             // We need the sorting data ALWAYS, not only when numLabels > 0.
             // We use them to draw the close-up stars.
             initSortingData(entity, starSet, starSet);
@@ -238,7 +237,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 }
                 provider.setTransformMatrix(transform.matrix);
                 set.setData(provider.loadData(set.datafile, set.factor));
-                set.isExtended = !set.data().isEmpty() && set.data().get(0).getType() == ParticleRecordType.PARTICLE_EXT;
+                set.isExtended = !set.data().isEmpty() && set.data().get(0).getType() == ParticleType.PARTICLE_EXT;
 
                 if (provider instanceof STILDataProvider stil) {
                     set.setColumnInfoList(stil.getColumnInfoList());

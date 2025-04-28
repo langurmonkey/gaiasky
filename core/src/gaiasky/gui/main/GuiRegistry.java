@@ -483,7 +483,7 @@ public class GuiRegistry implements IObserver {
                                                         var set = view.getSet();
                                                         if (set.data() != null && !set.data().isEmpty() && EntityUtils.isVisibilityOn(ci.entity)) {
                                                             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getRandomParticleName());
+                                                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getFirstParticleName());
                                                         }
                                                     } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
                                                             view.getGraph().children.get(0))) {

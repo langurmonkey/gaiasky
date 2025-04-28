@@ -11,8 +11,9 @@ import gaiasky.data.api.BinaryIO;
 import gaiasky.data.group.reader.IDataReader;
 import gaiasky.data.group.reader.InputStreamDataReader;
 import gaiasky.data.group.reader.MappedBufferDataReader;
-import gaiasky.scene.record.ParticleRecord;
-import gaiasky.scene.record.ParticleRecord.ParticleRecordType;
+import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.record.Particle;
+import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Constants;
 
 import java.io.DataInputStream;
@@ -37,31 +38,31 @@ public abstract class BinaryIOBase implements BinaryIO {
     }
 
     @Override
-    public ParticleRecord readParticleRecord(MappedByteBuffer mem,
+    public IParticleRecord readParticleRecord(MappedByteBuffer mem,
                                              double factor) throws IOException {
         return readParticleRecord(new MappedBufferDataReader(mem), factor);
     }
 
     @Override
-    public ParticleRecord readParticleRecord(DataInputStream in,
-                                             double factor) throws IOException {
+    public IParticleRecord readParticleRecord(DataInputStream in,
+                                              double factor) throws IOException {
         return readParticleRecord(new InputStreamDataReader(in), factor);
     }
 
-    public ParticleRecord readParticleRecord(IDataReader in,
+    public IParticleRecord readParticleRecord(IDataReader in,
                                              double factor) throws IOException {
-        double[] dataD = new double[ParticleRecordType.STAR.doubleArraySize];
-        float[] dataF = new float[ParticleRecordType.STAR.floatArraySize];
+        double[] dataD = new double[ParticleType.STAR.doubleArraySize];
+        float[] dataF = new float[ParticleType.STAR.floatArraySize];
         int floatOffset = 0;
         // Double
         for (int i = 0; i < nDoubles; i++) {
-            if (i < ParticleRecordType.STAR.doubleArraySize) {
+            if (i < ParticleType.STAR.doubleArraySize) {
                 // Goes to double array
                 dataD[i] = in.readDouble();
                 dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
-                int idx = i - ParticleRecordType.STAR.doubleArraySize;
+                int idx = i - ParticleType.STAR.doubleArraySize;
                 dataF[idx] = (float) in.readDouble();
                 floatOffset = idx + 1;
             }
@@ -71,13 +72,13 @@ public abstract class BinaryIOBase implements BinaryIO {
             int idx = i + floatOffset;
             dataF[idx] = in.readFloat();
             // Scale proper motions and size
-            if (idx <= ParticleRecord.I_FPMZ || idx == ParticleRecord.I_FSIZE)
+            if (idx <= Particle.I_FPMZ || idx == Particle.I_FSIZE)
                 dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
         // Version 2: we have the HIP number in the data file.
         if (hipId) {
             // HIP
-            dataF[ParticleRecord.I_FHIP] = in.readInt();
+            dataF[Particle.I_FHIP] = in.readInt();
         }
 
         // TYCHO
@@ -89,13 +90,13 @@ public abstract class BinaryIOBase implements BinaryIO {
         }
 
         // ID
-        Long id = in.readLong();
+        long id = in.readLong();
 
         // NAME
         int nameLength = in.readInt();
         String[] names;
         if (nameLength == 0) {
-            names = new String[]{id.toString()};
+            names = new String[]{Long.toString(id)};
         } else {
             StringBuilder namesConcat = new StringBuilder();
             for (int i = 0; i < nameLength; i++)
@@ -103,6 +104,6 @@ public abstract class BinaryIOBase implements BinaryIO {
             names = namesConcat.toString().split(Constants.nameSeparatorRegex);
         }
 
-        return new ParticleRecord(ParticleRecordType.STAR, dataD, dataF, id, names);
+        return new Particle(id, names, dataD, dataF);
     }
 }

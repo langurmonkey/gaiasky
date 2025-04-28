@@ -588,7 +588,7 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return The name of a random particle
      */
-    public String getRandomParticleName() {
+    public String getFirstParticleName() {
         if (pointData != null)
             for (IParticleRecord pb : pointData) {
                 if (pb.names() != null && pb.names().length > 0)
