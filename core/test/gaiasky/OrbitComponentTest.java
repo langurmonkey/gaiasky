@@ -35,7 +35,7 @@ public class OrbitComponentTest {
     }
 
     @Test
-    public void test() {
+    public void testKeplerianElements() {
         OrbitComponent oc = new OrbitComponent();
         oc.period = 365.25;
         oc.epoch = 2451545.0;

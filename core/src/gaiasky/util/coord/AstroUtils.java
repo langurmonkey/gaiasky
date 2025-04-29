@@ -79,6 +79,7 @@ public class AstroUtils {
      * Get julian date from a double reference epoch, as a Gregorian calendar year plus fraction.
      *
      * @param refEpoch The reference epoch as a Gregorian calendar year.
+     *
      * @return The julian date.
      */
     public static double getJulianDate(double refEpoch) {
@@ -92,6 +93,7 @@ public class AstroUtils {
      * Caches the last Sun's longitude for future use.
      *
      * @param date The time for which the longitude must be calculated.
+     *
      * @return The Sun's longitude in [deg].
      */
     public static double getSunLongitude(Instant date) {
@@ -115,6 +117,7 @@ public class AstroUtils {
      * @param date The instant date.
      * @param aux  Auxiliary double vector.
      * @param out  The out vector with geocentric [lambda, beta, r] in radians and kilometres.
+     *
      * @return The out vector with geocentric [lambda, beta, r] in radians and kilometres.
      */
     public static Vector3b moonEclipticCoordinates(Instant date, Vector3d aux, Vector3b out) {
@@ -146,9 +149,16 @@ public class AstroUtils {
         double S = FastMath.toRadians(50.03 + 0.033459652 * d);
         double P = FastMath.toRadians(238.95 + 0.003968789 * d);
 
-        double lonEcl = 238.9508 + 0.00400703 * d - 19.799 * FastMath.sin(P) + 19.848 * FastMath.cos(P) + 0.897 * FastMath.sin(2.0 * P) - 4.956 * FastMath.cos(2.0 * P) + 0.610 * FastMath.sin(3.0 * P) + 1.211 * FastMath.cos(3.0 * P) - 0.341 * FastMath.sin(4.0 * P) - 0.190 * FastMath.cos(4.0 * P) + 0.128 * FastMath.sin(5.0 * P) - 0.034 * FastMath.cos(5.0 * P) - 0.038 * FastMath.sin(6.0 * P) + 0.031 * FastMath.cos(6.0 * P) + 0.020 * FastMath.sin(S - P) - 0.010 * FastMath.cos(S - P);
-        double latEcl = -3.9082 - 5.453 * FastMath.sin(P) - 14.975 * FastMath.cos(P) + 3.527 * FastMath.sin(2.0 * P) + 1.673 * FastMath.cos(2.0 * P) - 1.051 * FastMath.sin(3.0 * P) + 0.328 * FastMath.cos(3.0 * P) + 0.179 * FastMath.sin(4.0 * P) - 0.292 * FastMath.cos(4.0 * P) + 0.019 * FastMath.sin(5.0 * P) + 0.100 * FastMath.cos(5.0 * P) - 0.031 * FastMath.sin(6.0 * P) - 0.026 * FastMath.cos(6.0 * P) + 0.011 * FastMath.cos(S - P);
-        double r = 40.72 + 6.68 * FastMath.sin(P) + 6.90 * FastMath.cos(P) - 1.18 * FastMath.sin(2.0 * P) - 0.03 * FastMath.cos(2.0 * P) + 0.15 * FastMath.sin(3.0 * P) - 0.14 * FastMath.cos(3.0 * P);
+        double lonEcl = 238.9508 + 0.00400703 * d - 19.799 * FastMath.sin(P) + 19.848 * FastMath.cos(P) + 0.897 * FastMath.sin(
+                2.0 * P) - 4.956 * FastMath.cos(2.0 * P) + 0.610 * FastMath.sin(3.0 * P) + 1.211 * FastMath.cos(3.0 * P) - 0.341 * FastMath.sin(
+                4.0 * P) - 0.190 * FastMath.cos(4.0 * P) + 0.128 * FastMath.sin(5.0 * P) - 0.034 * FastMath.cos(5.0 * P) - 0.038 * FastMath.sin(
+                6.0 * P) + 0.031 * FastMath.cos(6.0 * P) + 0.020 * FastMath.sin(S - P) - 0.010 * FastMath.cos(S - P);
+        double latEcl = -3.9082 - 5.453 * FastMath.sin(P) - 14.975 * FastMath.cos(P) + 3.527 * FastMath.sin(2.0 * P) + 1.673 * FastMath.cos(
+                2.0 * P) - 1.051 * FastMath.sin(3.0 * P) + 0.328 * FastMath.cos(3.0 * P) + 0.179 * FastMath.sin(4.0 * P) - 0.292 * FastMath.cos(
+                4.0 * P) + 0.019 * FastMath.sin(5.0 * P) + 0.100 * FastMath.cos(5.0 * P) - 0.031 * FastMath.sin(6.0 * P) - 0.026 * FastMath.cos(
+                6.0 * P) + 0.011 * FastMath.cos(S - P);
+        double r = 40.72 + 6.68 * FastMath.sin(P) + 6.90 * FastMath.cos(P) - 1.18 * FastMath.sin(2.0 * P) - 0.03 * FastMath.cos(
+                2.0 * P) + 0.15 * FastMath.sin(3.0 * P) - 0.14 * FastMath.cos(3.0 * P);
 
         out.set(Math.toRadians(lonEcl), FastMath.toRadians(latEcl), Nature.AU_TO_KM * r);
     }
@@ -157,6 +167,7 @@ public class AstroUtils {
      * Gets the Julian date number given the Gregorian calendar quantities.
      *
      * @param gregorian Whether to use the Gregorian or the Julian calendar.
+     *
      * @return The julian date number.
      */
     public static double getJulianDate(int year, int month, int day, int hour, int min, int sec, int nanos, boolean gregorian) {
@@ -171,6 +182,7 @@ public class AstroUtils {
      * Gets the Julian Date for the given date. It uses a cache.
      *
      * @param instant The date.
+     *
      * @return The Julian Date.
      */
     public static synchronized double getJulianDateCache(Instant instant) {
@@ -202,6 +214,7 @@ public class AstroUtils {
      * be negative.
      *
      * @param date The date.
+     *
      * @return The elapsed days.
      */
     public static double getDaysSinceJ2000(Instant date) {
@@ -214,6 +227,7 @@ public class AstroUtils {
      *
      * @param date     The date.
      * @param epoch_jd The reference epoch in julian days.
+     *
      * @return The elapsed milliseconds.
      */
     public static double getMsSince(Instant date, double epoch_jd) {
@@ -226,6 +240,7 @@ public class AstroUtils {
      *
      * @param date     The date.
      * @param epoch_jd The reference epoch in julian days.
+     *
      * @return The elapsed days
      */
     public static double getDaysSince(Instant date, double epoch_jd) {
@@ -236,6 +251,7 @@ public class AstroUtils {
      * Gets the Gregorian calendar quantities given the Julian date.
      *
      * @param julianDate The Julian date.
+     *
      * @return Vector with [year, month, day, hour, min, sec, nanos].
      */
     public static long[] getCalendarDay(double julianDate) {
@@ -279,7 +295,9 @@ public class AstroUtils {
      * @param year  The year
      * @param month The month in [1:12]
      * @param day   The day in the month, starting at 1
+     *
      * @return The Julian date
+     *
      * @deprecated This does not work well!
      */
     @Deprecated
@@ -298,7 +316,9 @@ public class AstroUtils {
      * @param year  The year
      * @param month The month in [1:12]
      * @param day   The day in the month, starting at 1
+     *
      * @return The Julian date
+     *
      * @see <a href="http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberJulianCalendar(int year, int month, int day) {
@@ -315,6 +335,7 @@ public class AstroUtils {
      * Is a given year in the Gregorian calendar a leap year ?
      *
      * @param year The year.
+     *
      * @return Whether the year in the Gregorian calendar is a leap year.
      */
     public static boolean isLeapYearGregorian(int year) {
@@ -328,6 +349,7 @@ public class AstroUtils {
      * @param year  The year.
      * @param month The month.
      * @param day   The day.
+     *
      * @return The julian day number.
      */
     public static double getJulianDayNumberGregorian(int year, int month, int day) {
@@ -357,6 +379,7 @@ public class AstroUtils {
      * @param min   The minute in 0-1440
      * @param sec   The second in 0-86400
      * @param nanos The nanoseconds
+     *
      * @return The day fraction
      */
     public static double getDayFraction(int hour, int min, int sec, int nanos) {
@@ -367,7 +390,9 @@ public class AstroUtils {
      * Gets the day quantities from the day fraction
      *
      * @param dayFraction The day fraction.
+     *
      * @return [hours, minutes, seconds, nanos].
+     *
      * @deprecated Not used anymore.
      */
     @Deprecated
@@ -398,6 +423,7 @@ public class AstroUtils {
      * Time T measured in Julian centuries from the Epoch J2000.0.
      *
      * @param julianDate The julian date.
+     *
      * @return The time in julian centuries.
      */
     public static double T(double julianDate) {
@@ -418,15 +444,17 @@ public class AstroUtils {
      * @param ra          Right ascension in radians.
      * @param dec         Declination in radians.
      * @param distPc      Distance in parsecs to the star.
+     *
      * @return The proper motion vector in internal_units/year.
      */
-    public static Vector3d properMotionsToCartesian(double muAlphaStar, double muDelta, double radVel, double ra, double dec, double distPc, Vector3d out) {
+    public static Vector3d properMotionsToCartesian(double muAlphaStar, double muDelta, double radVel, double ra, double dec, double distPc,
+                                                    Vector3d out) {
         double ma = muAlphaStar * Nature.MILLIARCSEC_TO_ARCSEC;
         double md = muDelta * Nature.MILLIARCSEC_TO_ARCSEC;
 
         // Multiply arcsec/yr with distance in parsecs gives a linear velocity. The factor 4.74 converts result to km/s
-        double vta = ma * distPc * 4.74d;
-        double vtd = md * distPc * 4.74d;
+        double vta = ma * distPc * Nature.ARCSEC_PER_YEAR_TO_KMS;
+        double vtd = md * distPc * Nature.ARCSEC_PER_YEAR_TO_KMS;
 
         double cosAlpha = FastMath.cos(ra);
         double sinAlpha = FastMath.sin(ra);
@@ -452,10 +480,64 @@ public class AstroUtils {
     }
 
     /**
+     * Converts a cartesian velocity vector [vx,vy,vz] into proper motions + radial velocity.
+     * See <a href="http://www.astronexus.com/a-a/motions-long-term">this article</a>.
+     *
+     * @param vx     The X component of the cartesian velocity vector in internal_units/year.
+     * @param vy     The Y component of the cartesian velocity vector internal_units/year.
+     * @param vz     The Z component of the cartesian velocity vector internal_units/year.
+     * @param ra     Right ascension in radians.
+     * @param dec    Declination in radians.
+     * @param distPc Distance in parsecs to the star.
+     *
+     * @return The proper motions (muAlpha, muDelta) in mas/yr, and the radial velocity in km/s.
+     */
+    public static Vector3d cartesianToProperMotions(double vx, double vy, double vz,
+                                                    double ra, double dec, double distPc,
+                                                    Vector3d out) {
+        // Precompute constants for conversion
+        double kmPerYearToInternal = Constants.U_TO_KM / Nature.Y_TO_S;
+        double arcsecPerYearToKm = Nature.ARCSEC_PER_YEAR_TO_KMS * distPc;
+
+        // Convert from internal units/year to km/s
+        double vxKms = vz * kmPerYearToInternal;
+        double vyKms = vx * kmPerYearToInternal;
+        double vzKms = vy * kmPerYearToInternal;
+
+        // Unit vectors
+        double cosA = FastMath.cos(ra);
+        double sinA = FastMath.sin(ra);
+        double cosD = FastMath.cos(dec);
+        double sinD = FastMath.sin(dec);
+
+        double rx = cosD * cosA;
+        double ry = cosD * sinA;
+        double rz = sinD;
+
+        double ax = -sinA;
+        double ay = cosA;
+        double az = 0.0;
+
+        double dx = -cosA * sinD;
+        double dy = -sinA * sinD;
+        double dz =  cosD;
+
+        double vr  = vxKms * rx + vyKms * ry + vzKms * rz;
+        double vta = vxKms * ax + vyKms * ay + vzKms * az;
+        double vtd = vxKms * dx + vyKms * dy + vzKms * dz;
+
+        double muAlphaStar = (vta / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
+        double muDelta     = (vtd / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
+
+        return out.set(muAlphaStar, muDelta, vr);
+    }
+
+    /**
      * Converts an apparent magnitude to an absolute magnitude given the distance in parsecs.
      *
      * @param distPc The distance to the star in parsecs.
      * @param appMag The apparent magnitude.
+     *
      * @return The absolute magnitude.
      */
     public static double apparentToAbsoluteMagnitude(double distPc, double appMag) {
@@ -468,6 +550,7 @@ public class AstroUtils {
      *
      * @param distPc The distance to the star in parsecs.
      * @param absMag The absolute magnitude.
+     *
      * @return The apparent magnitude at the given distance.
      */
     public static double absoluteToApparentMagnitude(double distPc, double absMag) {
@@ -479,6 +562,7 @@ public class AstroUtils {
      * Computes the pseudo-size of a star from the absolute magnitude.
      *
      * @param absMag The absolute magnitude of the star.
+     *
      * @return The pseudo-size of this star, mainly used for rendering purposes.
      * It has no physical meaning and has no relation to the actual physical size of the star.
      */
