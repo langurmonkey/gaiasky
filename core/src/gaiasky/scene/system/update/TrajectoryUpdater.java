@@ -58,8 +58,8 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         if (verts.pointCloudData != null) {
             if (verts.pointCloudData.hasTime()) {
                 long now = time.getTime().toEpochMilli();
-                long t0 = verts.pointCloudData.samples.get(0).time().toEpochMilli();
-                long t1 = verts.pointCloudData.samples.get(verts.pointCloudData.getNumPoints() - 1).time().toEpochMilli();
+                long t0 = verts.pointCloudData.samples.get(0).toEpochMilli();
+                long t1 = verts.pointCloudData.samples.get(verts.pointCloudData.getNumPoints() - 1).toEpochMilli();
 
                 long t1t0 = t1 - t0;
                 long nowt0 = (now - t0) % t1t0;

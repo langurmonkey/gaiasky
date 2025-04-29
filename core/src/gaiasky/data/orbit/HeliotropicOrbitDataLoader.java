@@ -28,6 +28,7 @@ public class HeliotropicOrbitDataLoader {
     int count = 0;
     // Maximum time between accepted samples
     long maxMsSep = (long) (12d * Nature.H_TO_MS);
+
     public HeliotropicOrbitDataLoader() {
         super();
 
@@ -174,7 +175,8 @@ public class HeliotropicOrbitDataLoader {
         Vector3d upDirection = new Vector3d(0, 1, 0);
         // We get the Up direction of the ecliptic in equatorial coordinates
         upDirection.mul(Coordinates.eclToEq());
-        return pos.cpy().rotate(upDirection, AstroUtils.getSunLongitude(t) - origin);
+        return pos.cpy()
+                .rotate(upDirection, AstroUtils.getSunLongitude(t) - origin);
     }
 
     private float getYearFraction(int year, int month, int day, int hour, int min, int sec) {
@@ -201,10 +203,14 @@ public class HeliotropicOrbitDataLoader {
     public void writeDistVsTimeData(String filePath, PointCloudData data) throws Exception {
         File file = new File(filePath);
         if (file.exists()) {
-            file.delete();
+            if (!file.delete()) {
+                logger.warn("Could not delete file: " + file);
+            }
         }
         if (!file.exists()) {
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                logger.warn("Could not create file: " + file);
+            }
         }
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
@@ -216,15 +222,15 @@ public class HeliotropicOrbitDataLoader {
         for (int i = 0; i < n; i++) {
             var p = data.samples.get(i);
             Vector3d pos = new Vector3d(p.x(), p.y(), p.z());
-            Instant t = p.time();
+            long t = p.toEpochMilli();
 
-            long time = iniTime < 0 ? 0 : t.toEpochMilli() - iniTime;
+            long time = iniTime < 0 ? 0 : t - iniTime;
             if (time == 0) {
-                iniTime = t.toEpochMilli();
+                iniTime = t;
             }
-            float timey = getYearFraction(iniTime + time);
+            float timeYearFraction = getYearFraction(iniTime + time);
 
-            bw.write(time + " " + timey + " " + pos.len());
+            bw.write(time + " " + timeYearFraction + " " + pos.len());
             bw.newLine();
 
         }

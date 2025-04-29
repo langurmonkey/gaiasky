@@ -23,9 +23,7 @@ import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 import static gaiasky.util.math.MathUtilsDouble.PI2;
 
@@ -140,7 +138,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
         }
 
         // Sort samples by time.
-        data.samples.sort(Comparator.comparing(PointCloudData.PointSample::time));
+        data.samples.sort(Comparator.comparing(PointCloudData.PointSample::seconds));
     }
 
     public void loadOld(String file, OrbitDataLoaderParameters parameter) {

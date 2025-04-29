@@ -45,7 +45,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private final Vector3b ecl = new Vector3b();
     PointCloudData data;
 
-    public static void main() {
+    public static void main(String[] args) {
         try {
             // Assets location
             String ASSETS_LOC = Settings.ASSETS_LOC;
@@ -74,7 +74,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(OrbitSamplerDataProvider.class.getSimpleName()).error(e);
         }
 
     }
@@ -147,7 +147,8 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
                         p.x() * parameter.multiplier,
                         p.y() * parameter.multiplier,
                         p.z() * parameter.multiplier,
-                        p.time()));
+                        p.seconds(),
+                        p.nanos()));
             }
         }
 

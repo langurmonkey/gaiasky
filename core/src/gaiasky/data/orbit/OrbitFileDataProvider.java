@@ -58,7 +58,8 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
                                 p.x() * parameter.multiplier ,
                                 p.y() * parameter.multiplier,
                                 p.z() * parameter.multiplier,
-                                p.time()));
+                                p.seconds(),
+                                p.nanos()));
                     }
                 }
                 EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, file);

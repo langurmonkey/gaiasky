@@ -9,6 +9,7 @@ package gaiasky.data.orbit;
 
 import gaiasky.data.util.PointCloudData;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,27 +20,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class OrbitDataWriter {
+    private static final Logger.Log logger = Logger.getLogger(OrbitDataWriter.class.getSimpleName());
+
     /**
      * Dumps the current orbit data to the given file
      *
      * @param filePath The path to the file to write
      * @param data     The OrbitData instance
-     *
-     * @throws IOException
      */
     public static void writeOrbitData(String filePath, PointCloudData data) throws IOException {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss").withLocale(Locale.US).withZone(ZoneOffset.UTC);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss")
+                .withLocale(Locale.US)
+                .withZone(ZoneOffset.UTC);
 
         File f = new File(filePath);
         if (f.exists() && f.isFile()) {
-            f.delete();
+            if (!f.delete()) {
+                logger.warn("Could not delete file: " + f);
+            }
         }
 
         if (f.isDirectory()) {
             throw new RuntimeException("File is directory: " + filePath);
         }
 
-        f.createNewFile();
+        if (!f.createNewFile()) {
+            logger.warn("Could not create file: " + f);
+        }
 
         FileWriter fw = new FileWriter(filePath);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -49,7 +56,8 @@ public class OrbitDataWriter {
 
         for (int i = 0; i < n; i++) {
             var p = data.samples.get(i);
-            bw.write(df.format(p.time()) + " " + (p.x() * Constants.U_TO_KM) + " " + (p.y() * Constants.U_TO_KM) + " " + (p.z() * Constants.U_TO_KM));
+            bw.write(df.format(
+                    p.toInstant()) + " " + (p.x() * Constants.U_TO_KM) + " " + (p.y() * Constants.U_TO_KM) + " " + (p.z() * Constants.U_TO_KM));
             bw.newLine();
         }
 

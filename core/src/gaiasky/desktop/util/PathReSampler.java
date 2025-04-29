@@ -67,8 +67,8 @@ public class PathReSampler {
         }
 
         CatmullRomSplineDouble<Vector3d> spline = new CatmullRomSplineDouble<>(points, true);
-        long start = data.samples.get(0).time().toEpochMilli();
-        long end = data.samples.get(data.samples.size() - 1).time().toEpochMilli();
+        long start = data.samples.get(0).toEpochMilli();
+        long end = data.samples.get(data.samples.size() - 1).toEpochMilli();
 
         int n = TARGET_POINTS;
         Vector3d[] fp = new Vector3d[n];
