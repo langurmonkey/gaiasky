@@ -26,15 +26,15 @@ public class BinaryVersion2 extends BinaryIOBase {
         out.writeDouble(sb.z());
 
         // 10 floats
-        out.writeFloat((float) sb.pmx());
-        out.writeFloat((float) sb.pmy());
-        out.writeFloat((float) sb.pmz());
-        out.writeFloat(sb.mualpha());
-        out.writeFloat(sb.mudelta());
-        out.writeFloat(sb.radvel());
+        out.writeFloat(sb.vx());
+        out.writeFloat(sb.vy());
+        out.writeFloat(sb.vz());
+        out.writeFloat(sb.muAlpha());
+        out.writeFloat(sb.muDelta());
+        out.writeFloat(sb.radVel());
         out.writeFloat(sb.appMag());
         out.writeFloat(sb.absMag());
-        out.writeFloat(sb.col());
+        out.writeFloat(sb.color());
         out.writeFloat(sb.size());
 
         // HIP

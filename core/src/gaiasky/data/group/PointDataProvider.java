@@ -9,7 +9,7 @@ package gaiasky.data.group;
 
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.PointParticleRecord;
+import gaiasky.scene.record.ParticleVector;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -80,7 +80,11 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                         double[] point = new double[tokensLength];
                         for (int j = 0; j < tokensLength; j++) {
                             // We use regular parser because of scientific notation
-                            point[j] = Parser.parseDouble(tokens[j]) * factor;
+                            if (j < 3) {
+                                point[j] = Parser.parseDouble(tokens[j]) * factor;
+                            } else {
+                                point[j] = Parser.parseDouble(tokens[j]);
+                            }
                         }
                         if (transform != null) {
                             aux.set(point);
@@ -96,7 +100,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                             point[1] = aux.y;
                             point[2] = aux.z;
                         }
-                        pointData.add(new PointParticleRecord(point));
+                        pointData.add(new ParticleVector(point));
                     } catch (NumberFormatException e) {
                         // Skip line
                     }

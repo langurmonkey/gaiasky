@@ -1020,7 +1020,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (isSet()) {
             var set = getSet();
             if (set.focus != null && set.focus.hasProperMotion())
-                return set.focus.mualpha();
+                return set.focus.muAlpha();
             else
                 return 0;
         } else if (Mapper.pm.has(entity)) {
@@ -1038,7 +1038,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (isSet()) {
             var set = getSet();
             if (set.focus != null && set.focus.hasProperMotion())
-                return set.focus.mudelta();
+                return set.focus.muDelta();
             else
                 return 0;
         } else if (isValid() && Mapper.pm.has(entity)) {
@@ -1056,7 +1056,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (isSet()) {
             var set = getSet();
             if (set.focus != null && set.focus.hasProperMotion())
-                return set.focus.radvel();
+                return set.focus.radVel();
             else
                 return 0;
         } else if (isValid() && Mapper.pm.has(entity)) {

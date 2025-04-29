@@ -26,7 +26,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
-import gaiasky.scene.record.Particle;
+import gaiasky.scene.record.ParticleVariable;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -154,8 +154,7 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                             int numAdded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                                    var particle = (Particle) set.get(i);
-                                    var vari = particle.variable();
+                                    var particle = (ParticleVariable) set.get(i);
                                     if (!Double.isFinite(particle.size())) {
                                         logger.debug("Star " + particle.id() + " has a non-finite size");
                                         continue;
@@ -171,14 +170,14 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                                     }
 
                                     // VARIABLE STARS (magnitudes and times)
-                                    tempVerts[curr.vertexIdx + nVariOffset] = vari.nVari();
-                                    for (int k = 0; k < vari.nVari(); k++) {
+                                    tempVerts[curr.vertexIdx + nVariOffset] = particle.nVari();
+                                    for (int k = 0; k < particle.nVari(); k++) {
                                         if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = FastMath.max(10f, (float) (vari.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor);
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = FastMath.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor);
                                         } else {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (vari.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
                                         }
-                                        tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) vari.variTime(k);
+                                        tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) particle.variTime(k);
                                     }
 
                                     // POSITION [u]
@@ -187,9 +186,9 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                                     tempVerts[curr.vertexIdx + 2] = (float) particle.z();
 
                                     // PROPER MOTION [u/yr]
-                                    tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
+                                    tempVerts[curr.vertexIdx + pmOffset] = (float) particle.vx();
+                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.vy();
+                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.vz();
 
                                     curr.vertexIdx += curr.vertexSize;
                                     numAdded++;

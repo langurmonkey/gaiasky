@@ -212,9 +212,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                                                                                                   c[2], c[3]);
                             }
                         } else {
-                            if (extended && particle.hasColor() && Float.isFinite(particle.col())) {
+                            if (extended && particle.hasColor() && Float.isFinite(particle.color())) {
                                 // Use particle color.
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = particle.col();
+                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = particle.color();
                             } else {
                                 // Generate color.
                                 if (set.colorFromTexture && set.textureArray != null && textureIndex >= 0f) {
@@ -263,9 +263,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         if (extended) {
                             // PROPER MOTION
                             if (particle.hasProperMotion()) {
-                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = (float) particle.pmx();
-                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = (float) particle.pmy();
-                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = (float) particle.pmz();
+                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = (float) particle.vx();
+                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = (float) particle.vy();
+                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = (float) particle.vz();
                             } else {
                                 model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = 0f;
                                 model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = 0f;

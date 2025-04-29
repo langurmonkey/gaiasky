@@ -195,7 +195,7 @@ public class Proximity {
     }
 
     public NearbyRecord convert(IParticleRecord pr, NearbyRecord c, ICamera camera, double deltaYears) {
-        c.pm.set(pr.pmx(), pr.pmy(), pr.pmz()).scl(deltaYears);
+        c.pm.set(pr.vx(), pr.vy(), pr.vz()).scl(deltaYears);
         c.absolutePos.set(pr.x(), pr.y(), pr.z()).add(c.pm);
         c.pos.set(c.absolutePos).sub(camera.getPos());
         c.size = pr.size();
@@ -205,7 +205,7 @@ public class Proximity {
         c.type = TYPE_STAR_GROUP;
 
         Color col = new Color();
-        Color.abgr8888ToColor(col, pr.col());
+        Color.abgr8888ToColor(col, pr.color());
         c.col[0] = col.r;
         c.col[1] = col.g;
         c.col[2] = col.b;

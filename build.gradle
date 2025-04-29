@@ -184,6 +184,11 @@ project(":core") {
         // *********
         testImplementation group: "junit", name: "junit", version: "$junitVersion"
         testRuntimeOnly group: "org.junit.platform", name: "junit-platform-launcher", version: "1.+"
+
+        // **********
+        // DEBUG DEPS
+        // **********
+        //implementation group: "org.openjdk.jol", name: "jol-core", version: "+"
     }
 
     jar {

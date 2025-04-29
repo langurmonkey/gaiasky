@@ -7,6 +7,8 @@
 
 package gaiasky.scene.record;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
@@ -17,44 +19,53 @@ import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
-import uk.ac.bristol.star.cdf.Variable;
+
 
 /**
- * Record class to store particles of all kinds.
+ * Record class to store extended particles. These are particles with proper motions, magnitudes, colors and sizes.
  *
- * @param id    The particle identifier.
- * @param names The name array.
- * @param x     X component of position vector at epoch.
- * @param y     Y component of position vector at epoch.
- * @param z     Z component of position vector at epoch.
- * @param extra Map with extra attributes.
+ * @param id       The particle identifier.
+ * @param names    The name array.
+ * @param x        X component of position vector at epoch.
+ * @param y        Y component of position vector at epoch.
+ * @param z        Z component of position vector at epoch.
+ * @param muAlpha  The proper motion in alpha*, in mas/y.
+ * @param muDelta  The proper motion in delta, in mas/y.
+ * @param radVel   The radial velocity, in km/s.
+ * @param vx       X component of the velocity vector.
+ * @param vy       Y component of the velocity vector.
+ * @param vz       Z component of the velocity vector.
+ * @param appMag   Apparent magnitude.
+ * @param absMag   Absolute magnitude.
+ * @param color    Packed color.
+ * @param size     Size.
+ * @param extra    Map with extra attributes.
  */
-public record Particle(long id,
-                       String[] names,
-                       double x,
-                       double y,
-                       double z,
-                       ObjectMap<UCD, Object> extra) implements IParticleRecord {
+public record ParticleExt(long id,
+                          String[] names,
+                          double x,
+                          double y,
+                          double z,
+                          float muAlpha,
+                          float muDelta,
+                          float radVel,
+                          float vx,
+                          float vy,
+                          float vz,
+                          float appMag,
+                          float absMag,
+                          float color,
+                          float size,
+                          ObjectMap<UCD, Object> extra) implements IParticleRecord {
 
     // Aux vectors.
     private static final TLV3D aux3d1 = new TLV3D();
     private static final TLV3D aux3d2 = new TLV3D();
 
-    /**
-     * Constructor for particles or stars. Pass in the lists directly.
-     */
-    public Particle(long id,
-                    String[] names,
-                    double x, double y, double z) {
-        this(id,
-             names,
-             x, y, z, null);
-    }
-
 
     @Override
     public ParticleType getType() {
-        return ParticleType.PARTICLE;
+        return ParticleType.PARTICLE_EXT;
     }
 
     @Override
@@ -91,22 +102,7 @@ public record Particle(long id,
 
     @Override
     public boolean hasProperMotion() {
-        return false;
-    }
-
-    @Override
-    public float vx() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float vy() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float vz() {
-        return Float.NaN;
+        return true;
     }
 
     @Override
@@ -143,6 +139,38 @@ public record Particle(long id,
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean hasColor() {
+        return true;
+    }
+
+    @Override
+    public double[] rgb() {
+        Color c = new Color(NumberUtils.floatToIntColor(color));
+        return new double[]{c.r, c.g, c.b};
+    }
+
+    @Override
+    public boolean hasSize() {
+        return true;
+    }
+
+    @Override
+    public double radius() {
+        return size() * Constants.STAR_SIZE_FACTOR;
+    }
+
+
+    @Override
+    public long id() {
+        return id;
+    }
+
+    @Override
+    public int hip() {
+        return -1;
     }
 
     /**
@@ -239,6 +267,11 @@ public record Particle(long id,
     }
 
     @Override
+    public float tEff() {
+        return -1;
+    }
+
+    @Override
     public void setExtraAttributes(ObjectMap<UCD, Object> e) {
         extra.clear();
         extra.putAll(e);
@@ -319,77 +352,4 @@ public record Particle(long id,
     public ObjectMap.Keys<UCD> extraKeys() {
         return extra.keys();
     }
-
-    /* UNUSED METHODS BELOW */
-
-    @Override
-    public float appMag() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float absMag() {
-        return Float.NaN;
-    }
-
-    @Override
-    public boolean hasColor() {
-        return false;
-    }
-
-    @Override
-    public float color() {
-        return Float.NaN;
-    }
-
-    @Override
-    public double[] rgb() {
-        return new double[0];
-    }
-
-    @Override
-    public boolean hasSize() {
-        return false;
-    }
-
-    @Override
-    public float size() {
-        return Float.NaN;
-    }
-
-    @Override
-    public double radius() {
-        return Float.NaN;
-    }
-
-    @Override
-    public long id() {
-        return id;
-    }
-
-    @Override
-    public int hip() {
-        return -1;
-    }
-
-    @Override
-    public float muAlpha() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float muDelta() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float radVel() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float tEff() {
-        return Float.NaN;
-    }
-
 }

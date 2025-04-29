@@ -12,7 +12,7 @@ import gaiasky.data.group.reader.IDataReader;
 import gaiasky.data.group.reader.InputStreamDataReader;
 import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.Particle;
+import gaiasky.scene.record.ParticleStar;
 import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Constants;
 import gaiasky.util.parse.Parser;
@@ -47,18 +47,18 @@ public class BinaryVersion3 implements BinaryIO {
 
     public IParticleRecord readParticleRecord(IDataReader in,
                                               double factor) throws IOException {
-        double[] dataD = new double[ParticleType.STAR.doubleArraySize];
-        float[] dataF = new float[ParticleType.STAR.floatArraySize];
+        double[] dataD = new double[3];
+        float[] dataF = new float[12];
         int floatOffset = 0;
         // Double
         for (int i = 0; i < 3; i++) {
-            if (i < ParticleType.STAR.doubleArraySize) {
+            if (i < dataD.length) {
                 // Goes to double array
                 dataD[i] = in.readDouble();
                 dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
-                int idx = i - ParticleType.STAR.doubleArraySize;
+                int idx = i - dataD.length;
                 dataF[idx] = (float) in.readDouble();
                 floatOffset = idx + 1;
             }
@@ -68,12 +68,12 @@ public class BinaryVersion3 implements BinaryIO {
             int idx = i + floatOffset;
             dataF[idx] = in.readFloat();
             // Scale proper motions and size
-            if (idx <= Particle.I_FPMZ || idx == Particle.I_FSIZE)
+            if (idx <= 2 || idx == 9)
                 dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
         // The last one is actually the TEFF.
-        dataF[Particle.I_FTEFF] = dataF[Particle.I_FHIP];
-        dataF[Particle.I_FHIP] = -1;
+        dataF[11] = dataF[10];
+        dataF[10] = -1;
 
         // ID
         long id = in.readLong();
@@ -102,13 +102,14 @@ public class BinaryVersion3 implements BinaryIO {
             // We parse the hip id from the string (e.g. we take "2334" from "HIP 2334").
             if (name.length() > 4) {
                 try {
-                    dataF[Particle.I_FHIP] = Parser.parseIntException(name.substring(4));
+                    dataF[10] = Parser.parseIntException(name.substring(4));
                 } catch (NumberFormatException ignored) {
                 }
             }
         }
 
-        return new Particle(id, names, dataD[0], dataD[1], dataD[2], dataF);
+        return new ParticleStar(id, names, dataD[0], dataD[1], dataD[2], dataF[0], dataF[1], dataF[2], dataF[3], dataF[4], dataF[5], dataF[6],
+                                dataF[7], dataF[8], dataF[9], (int) dataF[10], dataF[11], null);
     }
 
     @Override
@@ -120,17 +121,17 @@ public class BinaryVersion3 implements BinaryIO {
         out.writeDouble(sb.z());
 
         // 11 floats
-        out.writeFloat((float) sb.pmx());
-        out.writeFloat((float) sb.pmy());
-        out.writeFloat((float) sb.pmz());
-        out.writeFloat(sb.mualpha());
-        out.writeFloat(sb.mudelta());
-        out.writeFloat(sb.radvel());
+        out.writeFloat(sb.vx());
+        out.writeFloat(sb.vy());
+        out.writeFloat(sb.vz());
+        out.writeFloat(sb.muAlpha());
+        out.writeFloat(sb.muDelta());
+        out.writeFloat(sb.radVel());
         out.writeFloat(sb.appMag());
         out.writeFloat(sb.absMag());
-        out.writeFloat(sb.col());
+        out.writeFloat(sb.color());
         out.writeFloat(sb.size());
-        out.writeFloat(sb.teff());
+        out.writeFloat(sb.tEff());
 
         // ID
         out.writeLong(sb.id());

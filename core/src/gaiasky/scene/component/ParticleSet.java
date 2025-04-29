@@ -688,7 +688,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public double getTEff() {
-        return isStars ? focus.teff() : -1;
+        return isStars ? focus.tEff() : -1;
     }
 
     /**
@@ -903,9 +903,9 @@ public class ParticleSet implements Component, IDisposable {
                                         double deltaYears) {
         Vector3d pm = D32.set(0, 0, 0);
         if (pb.hasProperMotion()) {
-            pm.set(pb.pmx(),
-                    pb.pmy(),
-                    pb.pmz()).scl(deltaYears);
+            pm.set(pb.vx(),
+                    pb.vy(),
+                    pb.vz()).scl(deltaYears);
         }
         Vector3d destination = out.set(pb.x(), pb.y(), pb.z());
         // Apply affine transformations, if any.
@@ -945,9 +945,9 @@ public class ParticleSet implements Component, IDisposable {
                                   double deltaYears) {
         Vector3d pm = D32;
         if (pb.hasProperMotion()) {
-            pm.set(pb.pmx(),
-                    pb.pmy(),
-                    pb.pmz()).scl(deltaYears);
+            pm.set(pb.vx(),
+                    pb.vy(),
+                    pb.vz()).scl(deltaYears);
         } else {
             pm.set(0, 0, 0);
         }

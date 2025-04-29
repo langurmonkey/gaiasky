@@ -66,10 +66,9 @@ public class ParticleUtils {
     public double getVariableSizeScaling(final StarSet set, final int idx) {
         IParticleRecord ipr = set.pointData.get(idx);
         if (ipr.isVariable()) {
-            var vari = ipr.variable();
-            double[] times = vari.variTimes();
-            float[] sizes = vari.variMags();
-            int n = vari.nVari();
+            double[] times = ipr.variTimes();
+            float[] sizes = ipr.variMags();
+            int n = ipr.nVari();
 
             // Days since epoch
             double t = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
@@ -111,7 +110,7 @@ public class ParticleUtils {
     }
 
     public float getColor(int index, ParticleSet set, Highlight highlight) {
-        return highlight.highlighted ? Color.toFloatBits(highlight.hlc[0], highlight.hlc[1], highlight.hlc[2], highlight.hlc[3]) : set.pointData.get(index).col();
+        return highlight.highlighted ? Color.toFloatBits(highlight.hlc[0], highlight.hlc[1], highlight.hlc[2], highlight.hlc[3]) : set.pointData.get(index).color();
     }
 
     public float[] getColor(Body body, Highlight highlight) {

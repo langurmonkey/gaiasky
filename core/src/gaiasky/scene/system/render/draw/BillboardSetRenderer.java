@@ -34,6 +34,7 @@ import gaiasky.scene.component.BillboardSet;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.BillboardDataset.ParticleType;
+import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -217,17 +218,17 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
         int nLayers = bd.layers.length;
 
-        int i = 0;
         for (IParticleRecord particle : data) {
             if (completion == 1f || StdRandom.uniform() <= completion) {
                 int layer = StdRandom.uniform(nLayers);
                 for (int vert = 0; vert < 4; vert++) {
+                    var pv = (ParticleVector) particle;
                     // Vertex POSITION
                     ad.vertices[ad.vertexIdx + posOffset] = vertPos[vert].getFirst();
                     ad.vertices[ad.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
                     // COLOR
-                    double[] doubleData = particle.rawDoubleData();
+                    double[] doubleData = pv.data();
                     float[] col = doubleData.length >= 7 ? new float[]{(float) doubleData[4], (float) doubleData[5], (float) doubleData[6]} : cg.generateColor();
                     col[0] = MathUtilsDouble.clamp(col[0], 0f, 1f);
                     col[1] = MathUtilsDouble.clamp(col[1], 0f, 1f);
@@ -255,7 +256,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                 }
                 ad.quadIndices();
             }
-            i++;
         }
         return ad;
     }

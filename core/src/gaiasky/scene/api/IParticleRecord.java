@@ -9,15 +9,11 @@ package gaiasky.scene.api;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.record.ParticleType;
-import gaiasky.scene.record.Variable;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.ucd.UCD;
+import uk.ac.bristol.star.cdf.Variable;
 
 public interface IParticleRecord {
-
-    double[] rawDoubleData();
-
-    float[] rawFloatData();
 
     double x();
 
@@ -29,15 +25,11 @@ public interface IParticleRecord {
 
     boolean hasProperMotion();
 
-    double pmx();
+    float vx();
 
-    double pmy();
+    float vy();
 
-    double pmz();
-
-    void setVelocityVector(double vx,
-                           double vy,
-                           double vz);
+    float vz();
 
     String[] names();
 
@@ -45,8 +37,7 @@ public interface IParticleRecord {
 
     boolean hasName(String candidate);
 
-    boolean hasName(String candidate,
-                    boolean matchCase);
+    boolean hasName(String candidate, boolean matchCase);
 
     float appMag();
 
@@ -54,9 +45,7 @@ public interface IParticleRecord {
 
     boolean hasColor();
 
-    float col();
-
-    void setCol(float col);
+    float color();
 
     double[] rgb();
 
@@ -64,22 +53,18 @@ public interface IParticleRecord {
 
     float size();
 
-    void setSize(float size);
-
     double radius();
 
     long id();
 
-    void setHip(int hip);
-
     int hip();
 
-    float mualpha();
+    float muAlpha();
 
-    float mudelta();
+    float muDelta();
 
 
-    float radvel();
+    float radVel();
 
     /**
      * Distance in internal units. Beware, does the computation on the fly.
@@ -137,14 +122,12 @@ public interface IParticleRecord {
      */
     double b();
 
-    void setTeff(float teff);
-
     /**
      * Returns the effective temperature, in K.
      *
      * @return The effective temperature in K.
      */
-    float teff();
+    float tEff();
 
     void setExtraAttributes(ObjectMap<UCD, Object> extra);
 
@@ -206,18 +189,30 @@ public interface IParticleRecord {
      */
     ParticleType getType();
 
-
-    /**
-     * Returns the {@link Variable} instance.
-     *
-     * @return The variable instance.
-     */
-    Variable variable();
-
     /**
      * Returns whether this particle record has a {@link Variable} attached, making it a variable star.
      *
      * @return True if this record is a variable star.
      */
     boolean isVariable();
+
+    /**
+     * @return The number of variable star samples
+     */
+    int nVari();
+
+    /**
+     * @return The variability period in days.
+     */
+    double period();
+
+    /**
+     * @return The vector with the variable star magnitudes.
+     */
+    float[] variMags();
+
+    /**
+     * @return The vector with the variable star times corresponding to the magnitudes.
+     */
+    double[] variTimes();
 }

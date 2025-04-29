@@ -2253,7 +2253,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 IParticleRecord sb = set.getCandidateBean();
                 if (sb != null) {
                     double[] rgb = sb.rgb();
-                    return new double[]{sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appMag(), rgb[0], rgb[1], rgb[2]};
+                    return new double[]{sb.ra(), sb.dec(), sb.parallax(), sb.muAlpha(), sb.muDelta(), sb.radVel(), sb.appMag(), rgb[0], rgb[1], rgb[2]};
                 }
             }
         }

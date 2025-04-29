@@ -8,6 +8,7 @@
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.IntMap;
 import gaiasky.event.Event;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -36,7 +37,7 @@ public class ConstellationRadio extends EntityRadio {
         synchronized (constel) {
             if (!constel.allLoaded) {
                 int nPairs = constel.ids.size;
-                Map<Integer, IPosition> hipMap = scene.index().getHipMap();
+                IntMap<IPosition> hipMap = scene.index().getHipMap();
                 constel.allLoaded = true;
                 for (int i = 0; i < nPairs; i++) {
                     int[] pair = constel.ids.get(i);

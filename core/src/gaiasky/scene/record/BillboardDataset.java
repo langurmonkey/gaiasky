@@ -36,13 +36,13 @@ public class BillboardDataset {
     public int[] layers;
     // Array with completion rate per texture quality (to skip data).
     public float[] completion;
-    // Render size factor
+    // Render size factor.
     public float size = 1;
-    // The intensity factor
+    // The intensity factor.
     public float intensity = 1;
-    // Whether to allow depth writes when rendering
+    // Whether to allow depth writes when rendering.
     public boolean depthMask = false;
-    // The blending mode
+    // The blending mode.
     public BlendMode blending = BlendMode.ADDITIVE;
 
     /**

@@ -12,24 +12,14 @@ package gaiasky.scene.record;
  */
 public enum ParticleType {
     /** Simple positional particles. **/
-    PARTICLE(3, 0, new int[]{0, 1, 2}, new int[]{}),
-    /** Stars. **/
-    STAR(3, 12, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}),
+    PARTICLE,
     /** Extended particles, with proper motions, colors and sizes. **/
-    PARTICLE_EXT(3, 10, new int[]{0, 1, 2}, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
+    PARTICLE_EXT,
+    /** Stars. **/
+    STAR,
+    /** Variable stars. **/
+    VARIABLE,
     /** Fake particle record, not implemented by this class! **/
-    FAKE(0, 0, null, null);
+    FAKE;
 
-    final public int doubleArraySize, floatArraySize;
-    final int[] doubleIndexIndirection, floatIndexIndirection;
-
-    ParticleType(int doubleArraySize,
-                       int floatArraySize,
-                       int[] doubleIndexIndirection,
-                       int[] floatIndexIndirection) {
-        this.doubleArraySize = doubleArraySize;
-        this.floatArraySize = floatArraySize;
-        this.doubleIndexIndirection = doubleIndexIndirection;
-        this.floatIndexIndirection = floatIndexIndirection;
-    }
 }

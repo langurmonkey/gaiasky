@@ -180,9 +180,9 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                                 tempVerts[curr.vertexIdx + 2] = (float) particle.z();
 
                                 // PROPER MOTION [u/yr]
-                                tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
+                                tempVerts[curr.vertexIdx + pmOffset] = (float) particle.vx();
+                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.vy();
+                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.vz();
 
                                 curr.vertexIdx += curr.vertexSize;
                                 numAdded++;

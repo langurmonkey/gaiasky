@@ -8,11 +8,11 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.IntMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.Position;
 import gaiasky.scene.view.PositionView;
-import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
@@ -34,7 +34,7 @@ public class Index {
      * Map from integer to position with all Hipparcos stars, for the
      * constellations.
      **/
-    protected final Map<Integer, IPosition> hipMap;
+    protected final IntMap<IPosition> hipMap;
 
     /** The archetypes container. **/
     protected Archetypes archetypes;
@@ -53,7 +53,7 @@ public class Index {
         index = new ConcurrentHashMap<>((int) (numberEntities * 1.25), 0.9f, 1);
 
         // HIP map with 121k * 1.25
-        hipMap = new ConcurrentHashMap<>(151250, 0.9f, 1);
+        hipMap = new IntMap<>(151250, 0.9f);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Index {
         }
     }
 
-    public Map<Integer, IPosition> getHipMap() {
+    public IntMap<IPosition> getHipMap() {
         return hipMap;
     }
 
@@ -189,9 +189,9 @@ public class Index {
                 for (IParticleRecord pb : stars) {
                     if (pb.hip() > 0) {
                         hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
-                                pb.pmx(),
-                                pb.pmy(),
-                                pb.pmz()));
+                                pb.vx(),
+                                pb.vy(),
+                                pb.vz()));
                     }
                 }
             }

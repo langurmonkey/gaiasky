@@ -12,17 +12,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.ucd.UCD;
 
-public record PointParticleRecord(double[] data) implements IParticleRecord {
-
-    @Override
-    public double[] rawDoubleData() {
-        return data;
-    }
-
-    @Override
-    public float[] rawFloatData() {
-        return null;
-    }
+public record ParticleVector(double[] data) implements IParticleRecord {
 
     @Override
     public double x() {
@@ -60,23 +50,18 @@ public record PointParticleRecord(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public double pmx() {
+    public float vx() {
         return 0;
     }
 
     @Override
-    public double pmy() {
+    public float vy() {
         return 0;
     }
 
     @Override
-    public double pmz() {
+    public float vz() {
         return 0;
-    }
-
-    @Override
-    public void setVelocityVector(double vx, double vy, double vz) {
-
     }
 
     @Override
@@ -95,23 +80,13 @@ public record PointParticleRecord(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public float col() {
+    public float color() {
         return 0;
-    }
-
-    @Override
-    public void setCol(float col) {
-
     }
 
     @Override
     public float size() {
         return data.length >= 4 ? (float) data[3] : 0;
-    }
-
-    @Override
-    public void setSize(float size) {
-
     }
 
     @Override
@@ -125,33 +100,28 @@ public record PointParticleRecord(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public void setHip(int hip) {
-
-    }
-
-    @Override
     public int hip() {
         return 0;
     }
 
     @Override
-    public float mualpha() {
+    public float muAlpha() {
         return 0;
     }
 
     @Override
-    public float mudelta() {
+    public float muDelta() {
         return 0;
     }
 
     @Override
-    public float radvel() {
+    public float radVel() {
         return 0;
     }
 
     @Override
     public double[] rgb() {
-        return data.length >= 7 ? new double[] { data[4], data[5], data[6] } : null;
+        return data.length >= 7 ? new double[]{data[4], data[5], data[6]} : null;
     }
 
     @Override
@@ -213,12 +183,7 @@ public record PointParticleRecord(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public void setTeff(float teff) {
-
-    }
-
-    @Override
-    public float teff() {
+    public float tEff() {
         return 0;
     }
 
@@ -243,13 +208,28 @@ public record PointParticleRecord(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public Variable variable() {
-        return null;
+    public boolean isVariable() {
+        return false;
     }
 
     @Override
-    public boolean isVariable() {
-        return false;
+    public int nVari() {
+        return 0;
+    }
+
+    @Override
+    public double period() {
+        return 0;
+    }
+
+    @Override
+    public float[] variMags() {
+        return new float[0];
+    }
+
+    @Override
+    public double[] variTimes() {
+        return new double[0];
     }
 
     @Override

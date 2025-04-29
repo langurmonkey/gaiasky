@@ -9,6 +9,7 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.utils.IntMap;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -70,7 +71,7 @@ public class ConstellationInitializer extends AbstractInitSystem {
             if (constel.lines == null) {
                 constel.lines = new IPosition[nPairs][];
             }
-            Map<Integer, IPosition> hipMap = scene.index().getHipMap();
+            IntMap<IPosition> hipMap = scene.index().getHipMap();
             constel.allLoaded = true;
             for (int i = 0; i < nPairs; i++) {
                 int[] pair = constel.ids.get(i);

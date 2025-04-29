@@ -14,6 +14,7 @@ import gaiasky.data.group.reader.InputStreamDataReader;
 import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.Particle;
+import gaiasky.scene.record.ParticleExt;
 import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -234,7 +235,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
         // VELOCITY VECTOR
-        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg), FastMath.toRadians(deltaDeg),
+        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg),
+                                                                      FastMath.toRadians(deltaDeg),
                                                                       distPc, aux3d2);
 
         // MAGNITUDE
@@ -264,14 +266,14 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
 
-        Particle p = null;
+        IParticleRecord p = null;
         switch (pType) {
             case PARTICLE -> {
-                p = new Particle(id, names, pos.x, pos.y, pos.z);
+                p = new Particle(id, names, pos.x, pos.y, pos.z, null);
             }
             case PARTICLE_EXT -> {
-                p = new Particle(id, names, pos.x, pos.y, pos.z, muAlpha, muDelta, radVel, (float) velocityVector.x, (float) velocityVector.y,
-                                 (float) velocityVector.z, appMag, absMag, size, color);
+                p = new ParticleExt(id, names, pos.x, pos.y, pos.z, muAlpha, muDelta, radVel, (float) velocityVector.x, (float) velocityVector.y,
+                                    (float) velocityVector.z, appMag, absMag, color, size, null);
             }
         }
 
@@ -328,15 +330,15 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
         if (extra.get()) {
             // PROPER MOTION.
-            out.writeFloat(sb.mualpha());
-            out.writeFloat(sb.mudelta());
-            out.writeFloat(sb.radvel());
+            out.writeFloat(sb.muAlpha());
+            out.writeFloat(sb.muDelta());
+            out.writeFloat(sb.radVel());
 
             // MAGNITUDE.
             out.writeFloat(sb.appMag());
 
             // COLOR.
-            out.writeFloat(sb.col());
+            out.writeFloat(sb.color());
 
             // SIZE.
             out.writeFloat(sb.size());

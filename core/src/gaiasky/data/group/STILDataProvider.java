@@ -14,7 +14,9 @@ import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.Particle;
-import gaiasky.scene.record.Variable;
+import gaiasky.scene.record.ParticleExt;
+import gaiasky.scene.record.ParticleStar;
+import gaiasky.scene.record.ParticleVariable;
 import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
 import gaiasky.util.*;
 import gaiasky.util.color.BVToTeff_ballesteros;
@@ -36,6 +38,7 @@ import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
 import net.jafama.FastMath;
+import uk.ac.bristol.star.cdf.Variable;
 import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;
@@ -653,14 +656,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Construct record.
                                 IParticleRecord pr;
                                 if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
-                                    var vari = new Variable(nVari, pf, variMags, variTimes);
-                                    pr = new Particle(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
-                                                      (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
-                                                      (float) absMag, colorPacked, (float) sizePc, hip, tEff, extraAttributes, vari);
+                                    pr = new ParticleVariable(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
+                                                              (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z,
+                                                              (float) appMag, (float) absMag, colorPacked, (float) sizePc, hip, tEff, nVari, pf,
+                                                              variMags, variTimes, extraAttributes);
                                 } else {
-                                    pr = new Particle(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
-                                                      (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
-                                                      (float) absMag, colorPacked, (float) sizePc, hip, tEff, extraAttributes);
+                                    pr = new ParticleStar(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
+                                                          (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
+                                                          (float) absMag, colorPacked, (float) sizePc, hip, tEff, extraAttributes);
                                 }
 
                                 list.add(pr);
@@ -678,9 +681,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Extra attributes.
                                 ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
                                 // Record.
-                                var pr = new Particle(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
-                                                      (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
-                                                      (float) absMag, colorPacked, (float) sizePc, extraAttributes);
+                                var pr = new ParticleExt(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
+                                                         (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
+                                                         (float) absMag, colorPacked, (float) sizePc, extraAttributes);
                                 list.add(pr);
                             }
 

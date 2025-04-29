@@ -13,12 +13,12 @@ import gaiasky.util.i18n.I18n;
 public final class AttributeMualpha extends AttributeAbstract implements IAttribute {
     @Override
     public Object get(IParticleRecord bean) {
-        return bean.mualpha();
+        return bean.muAlpha();
     }
 
     @Override
     public double getNumber(IParticleRecord bean) {
-        return bean.mualpha();
+        return bean.muAlpha();
     }
 
     public String getUnit() {

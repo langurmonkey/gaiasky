@@ -185,7 +185,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 IParticleRecord d = starSet.pointData.get(i);
 
                 // Pm
-                Vector3d dx = D32.set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
+                Vector3d dx = D32.set(d.vx(), d.vy(), d.vz()).scl(deltaYears);
                 // Pos
                 Vector3d x = D31.set(d.x(), d.y(), d.z()).add(dx);
 
@@ -233,7 +233,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 IParticleRecord d = particleSet.pointData.get(i);
 
                 // Pm
-                Vector3d dx = D32.set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
+                Vector3d dx = D32.set(d.vx(), d.vy(), d.vz()).scl(deltaYears);
                 // Pos
                 Vector3d pos = D31.set(d.x(), d.y(), d.z()).add(dx);
 

@@ -24,17 +24,17 @@ public class BinaryVersion0 extends BinaryIOBase {
         out.writeDouble(sb.x());
         out.writeDouble(sb.y());
         out.writeDouble(sb.z());
-        out.writeDouble(sb.pmx());
-        out.writeDouble(sb.pmy());
-        out.writeDouble(sb.pmz());
-        out.writeDouble(sb.mualpha());
-        out.writeDouble(sb.mudelta());
-        out.writeDouble(sb.radvel());
+        out.writeDouble(sb.vx());
+        out.writeDouble(sb.vy());
+        out.writeDouble(sb.vz());
+        out.writeDouble(sb.muAlpha());
+        out.writeDouble(sb.muDelta());
+        out.writeDouble(sb.radVel());
 
         // 4 floats
         out.writeFloat(sb.appMag());
         out.writeFloat(sb.absMag());
-        out.writeFloat(sb.col());
+        out.writeFloat(sb.color());
         out.writeFloat(sb.size());
 
         // HIP
