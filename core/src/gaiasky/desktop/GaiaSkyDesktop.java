@@ -28,7 +28,6 @@ import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.gui.main.KeyBindings;
 import gaiasky.render.ScreenModeCmd;
 import gaiasky.rest.RESTServer;
-import gaiasky.scene.record.ParticleStar;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Logger.LoggerLevel;
@@ -36,7 +35,6 @@ import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
-import org.openjdk.jol.info.ClassLayout;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -138,8 +136,6 @@ public class GaiaSkyDesktop implements IObserver {
      * @param args CLI arguments (see {@link CLIArgs}).
      */
     public static void main(final String[] args) {
-        System.out.println(ClassLayout.parseClass(ParticleStar.class).toPrintable());
-
         Thread.currentThread().setName("gaiasky-main-thread");
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         cliArgs = new CLIArgs();
