@@ -16,11 +16,11 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class AstroUtils {
 
@@ -69,6 +69,8 @@ public class AstroUtils {
     private static final NslSun nslSun = new NslSun();
     private static Instant cacheSunLongitudeDate = Instant.now();
     private static double cacheSunLongitude;
+
+    private static final Instant gregorianSwitch = Instant.parse("1582-10-15T00:00:00.000Z");
 
     static {
         Instant d = (LocalDateTime.of(2000, 1, 1, 0, 0, 0)).toInstant(ZoneOffset.UTC);
@@ -206,7 +208,7 @@ public class AstroUtils {
         int min = date.getMinute();
         int sec = date.getSecond();
         int nanos = date.getNano();
-        return getJulianDate(year, month, day, hour, min, sec, nanos, true);
+        return getJulianDate(year, month, day, hour, min, sec, nanos, instant.isAfter(gregorianSwitch));
     }
 
     /**
