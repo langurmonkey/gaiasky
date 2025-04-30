@@ -12,6 +12,11 @@ import gaiasky.scene.api.IParticleRecord;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * Implements data writing for versions 0 and 1.
+ * It uses double precision for positions, velocity vectors and proper motions, and single precisions for everything else.
+ * Version 0 also includes Tycho identifiers.
+ */
 public class BinaryVersion0 extends BinaryIOBase {
 
     public BinaryVersion0() {

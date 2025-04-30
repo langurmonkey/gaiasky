@@ -56,7 +56,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *             <li>float (4 bytes) -- mu alpha</li>
  *             <li>float (4 bytes) -- mu delta</li>
  *             <li>float (4 bytes) -- radial velocity</li>
+ *             <li>float (4 bytes) -- vx</li>
+ *             <li>float (4 bytes) -- vy</li>
+ *             <li>float (4 bytes) -- vz</li>
  *             <li>float (4 bytes) -- apparent magnitude</li>
+ *             <li>float (4 bytes) -- absolute magnitude</li>
  *             <li>float (4 bytes) -- packed color</li>
  *             <li>float (4 bytes) -- size</li>
  *         </ul>

@@ -7,6 +7,9 @@
 
 package gaiasky.data.group;
 
+/**
+ * Version 1, in contrast with 0, excludes Tycho identifiers from the format.
+ */
 public class BinaryVersion1 extends BinaryVersion0 {
 
     public BinaryVersion1() {

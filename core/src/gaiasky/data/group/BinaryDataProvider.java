@@ -19,6 +19,10 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Reads binary files using the infrastructure under {@link BinaryIO}. The format includes a header token
+ * and a version number. Depending on the version number a different loader is activated.
+ */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     static {
         logger = Logger.getLogger(BinaryDataProvider.class);
@@ -68,27 +72,24 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     public void writeData(List<IParticleRecord> data, OutputStream out, int version) {
         // Wrap the FileOutputStream with a DataOutputStream.
-        DataOutputStream data_out = new DataOutputStream(out);
-        try {
-            if (version >= 2) {
-                // In new version, write token as negative int. version afterward.
-                data_out.writeInt(-1);
-                data_out.writeInt(version);
-            }
-            // Number of stars.
-            data_out.writeInt(data.size());
-            for (IParticleRecord sb : data) {
-                binaryVersions[version].writeParticleRecord(sb, data_out);
-            }
-
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
+        try (DataOutputStream data_out = new DataOutputStream(out)) {
             try {
-                data_out.close();
-            } catch (IOException e) {
+                if (version >= 2) {
+                    // In new version, write token as negative int. version afterward.
+                    data_out.writeInt(-1);
+                    data_out.writeInt(version);
+                }
+                // Number of stars.
+                data_out.writeInt(data.size());
+                for (IParticleRecord sb : data) {
+                    binaryVersions[version].writeParticleRecord(sb, data_out);
+                }
+
+            } catch (Exception e) {
                 logger.error(e);
             }
+        } catch (IOException e) {
+            logger.error(e);
         }
 
     }

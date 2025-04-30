@@ -13,7 +13,6 @@ import gaiasky.data.group.reader.InputStreamDataReader;
 import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleStar;
-import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Constants;
 import gaiasky.util.parse.Parser;
 
@@ -24,8 +23,8 @@ import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
 /**
- * The binary version 3 includes the effective temperature, t_eff, and does not have the hip number (already in names
- * array).
+ * The binary version 3 includes the effective temperature, t_eff, and does not have the hip number as a
+ * floating point number, as it is already in the names array.
  */
 public class BinaryVersion3 implements BinaryIO {
 
@@ -108,7 +107,7 @@ public class BinaryVersion3 implements BinaryIO {
             }
         }
 
-        return new ParticleStar(id, names, dataD[0], dataD[1], dataD[2], dataF[0], dataF[1], dataF[2], dataF[3], dataF[4], dataF[5], dataF[6],
+        return new ParticleStar(id, names, dataD[0], dataD[1], dataD[2], dataF[3], dataF[4], dataF[5], dataF[0], dataF[1], dataF[2], dataF[6],
                                 dataF[7], dataF[8], dataF[9], (int) dataF[10], dataF[11], null);
     }
 

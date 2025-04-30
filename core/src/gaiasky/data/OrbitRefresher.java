@@ -11,9 +11,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.api.IOrbitDataProvider;
-import gaiasky.data.orbit.OrbitBodyDataProvider;
-import gaiasky.data.orbit.OrbitFileDataProvider;
-import gaiasky.data.orbit.OrbitSamplerDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
@@ -83,8 +80,6 @@ public class OrbitRefresher implements IObserver {
      * The orbit refresher thread.
      */
     protected static class OrbitUpdaterThread extends ServiceThread {
-        // TODO Remove this and rely only on the object provider.
-        private final OrbitSamplerDataProvider provider;
         private final Array<OrbitDataLoaderParameters> toLoad;
 
         private final TrajectoryUtils utils = new TrajectoryUtils();
@@ -92,7 +87,6 @@ public class OrbitRefresher implements IObserver {
         public OrbitUpdaterThread(final OrbitRefresher orbitRefresher) {
             super();
             this.toLoad = new Array<>();
-            this.provider = new OrbitSamplerDataProvider();
             this.task = () -> {
                 /* ----------- PROCESS REQUESTS ----------- */
                 while (!orbitRefresher.toLoadQueue.isEmpty()) {
@@ -118,8 +112,6 @@ public class OrbitRefresher implements IObserver {
                                     IOrbitDataProvider objectProvider = trajectory.providerInstance;
                                     if (Mapper.tagHeliotropic.has(entity)) {
                                         currentProvider = objectProvider;
-                                    } else if (objectProvider == null || objectProvider instanceof OrbitFileDataProvider) {
-                                        currentProvider = this.provider;
                                     } else {
                                         currentProvider = objectProvider;
                                     }

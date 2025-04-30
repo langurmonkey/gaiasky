@@ -12,6 +12,10 @@ import gaiasky.scene.api.IParticleRecord;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * The binary version 2 is more compact than version 0 and 1, as it uses double precision only for positions. The rest of the attributes
+ * (velocity vector, proper motions, radial velocity, magnitudes, color, size, HIP) use single precision.
+ */
 public class BinaryVersion2 extends BinaryIOBase {
 
     protected BinaryVersion2() {

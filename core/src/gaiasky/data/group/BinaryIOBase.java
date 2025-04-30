@@ -19,6 +19,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 
+/**
+ * Implements the base data loading for binary versions 0, 1, and 2.
+ */
 public abstract class BinaryIOBase implements BinaryIO {
     protected final int nDoubles;
     protected final int nFloats;
@@ -104,7 +107,7 @@ public abstract class BinaryIOBase implements BinaryIO {
                     .split(Constants.nameSeparatorRegex);
         }
 
-        return new ParticleStar(id, names, dataD[0], dataD[1], dataD[2], dataF[0], dataF[1], dataF[2], dataF[3], dataF[4], dataF[5], dataF[6],
+        return new ParticleStar(id, names, dataD[0], dataD[1], dataD[2], dataF[3], dataF[4], dataF[5], dataF[0], dataF[1], dataF[2], dataF[6],
                                 dataF[7], dataF[8], dataF[9], (int) dataF[10], dataF[11], null);
     }
 }

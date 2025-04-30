@@ -11,15 +11,14 @@ package gaiasky.scene.record;
  * Enumeration to identify the type of record.
  */
 public enum ParticleType {
-    /** Simple positional particles. **/
+    /** Simple positional particles. Corresponds to {@link Particle}. **/
     PARTICLE,
-    /** Extended particles, with proper motions, colors and sizes. **/
+    /** Extended particles, with proper motions, colors and sizes. Corresponds to {@link ParticleExt}. **/
     PARTICLE_EXT,
-    /** Stars. **/
+    /** Stars. Corresponds to {@link ParticleStar}. **/
     STAR,
-    /** Variable stars. **/
+    /** Variable stars. Corresponds to {@link ParticleVariable}. **/
     VARIABLE,
-    /** Fake particle record, not implemented by this class! **/
-    FAKE;
-
+    /** Particle implemented as a double array. Can hold anything. Corresponds to {@link ParticleVector}. **/
+    VECTOR;
 }

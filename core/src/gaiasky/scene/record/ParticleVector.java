@@ -204,7 +204,7 @@ public record ParticleVector(double[] data) implements IParticleRecord {
 
     @Override
     public ParticleType getType() {
-        return ParticleType.FAKE;
+        return ParticleType.VECTOR;
     }
 
     @Override
