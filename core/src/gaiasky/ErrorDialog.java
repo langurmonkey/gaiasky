@@ -11,20 +11,23 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 /**
  * Gaia Sky main error dialog implementation. This is implemented as a standalone application that
@@ -33,15 +36,13 @@ import java.io.StringWriter;
 public class ErrorDialog implements ApplicationListener {
 
     private final Exception cause;
-    private final String message;
     private Stage ui;
     private ScreenViewport vp;
     private SpriteBatch sb;
     private Skin skin;
 
-    public ErrorDialog(Exception cause, String message) {
+    public ErrorDialog(Exception cause) {
         this.cause = cause;
-        this.message = message;
     }
 
     @Override
@@ -51,7 +52,7 @@ public class ErrorDialog implements ApplicationListener {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         this.vp = vp;
-        this.sb = new SpriteBatch();
+        this.sb = initializeSpriteBatch();
         ui = new Stage(this.vp, this.sb);
         FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         if (!fh.exists()) {
@@ -60,13 +61,21 @@ public class ErrorDialog implements ApplicationListener {
             fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         }
         skin = new Skin(fh);
+        // Linear filtering.
+        ObjectMap<String, BitmapFont> fonts = skin.getAll(BitmapFont.class);
+        for (String key : fonts.keys()) {
+            fonts.get(key)
+                    .getRegion()
+                    .getTexture()
+                    .setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        }
 
         rebuildUI();
 
         Gdx.input.setInputProcessor(ui);
     }
 
-    private void rebuildUI(){
+    private void rebuildUI() {
 
         Table t = new Table(skin);
         t.setFillParent(true);
@@ -83,7 +92,8 @@ public class ErrorDialog implements ApplicationListener {
             } else if (cause.getMessage() != null) {
                 msg = cause.getMessage();
             } else {
-                msg = cause.getClass().getSimpleName();
+                msg = cause.getClass()
+                        .getSimpleName();
             }
         } else {
             msg = "-";
@@ -93,30 +103,18 @@ public class ErrorDialog implements ApplicationListener {
         OwnLabel urlLabel = new OwnLabel(I18n.msg("error.crash.exception.1"), skin, "header-s");
         Link url = new Link(Settings.REPO_ISSUES, skin, Settings.REPO_ISSUES);
         OwnLabel applicationMessageLabel = new OwnLabel(I18n.msg("error.crash.applicationmessage"), skin, "header-s");
-        OwnLabel applicationMessage = new OwnLabel(message != null ? message : "-", skin, "default");
+        OwnLabel crashLocLabel = new OwnLabel(I18n.msg("error.crash.exception.2"), skin);
+        OwnLabel crashLoc = new OwnLabel(TextUtils.capString(SysUtils.getCrashReportsDir()
+                                                                     .toString(), 50), skin, "hud-subheader");
+        crashLoc.addListener(new OwnTextTooltip(SysUtils.getCrashReportsDir()
+                                                        .toString(), skin));
 
-        // Stack trace
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        if (cause != null && cause.getCause() != null) {
-            cause.getCause().printStackTrace(pw);
-        }
-        String stackStr = sw.toString();
-        long lines = TextUtils.countLines(stackStr);
-        OwnTextArea stackTraceTextArea = new OwnTextArea(stackStr, skin, "default");
-        stackTraceTextArea.setPrefRows(15);
-        stackTraceTextArea.setWidth(800);
-        stackTraceTextArea.setHeight(lines * 35);
-
-        OwnScrollPane stackTraceScroll = new OwnScrollPane(stackTraceTextArea, skin, "minimalist");
-        stackTraceScroll.setWidth(820);
-        stackTraceScroll.setHeight(400);
-        stackTraceScroll.setFadeScrollBars(false);
-        OwnLabel stackTraceLabel = new OwnLabel(I18n.msg("error.crash.stacktrace"), skin, "header-s");
+        // Crash image
+        Image img = new Image(new Texture(Gdx.files.internal("img/crash.png")));
 
         // Close button
         Button b = new OwnTextButton(I18n.msg("gui.close"), skin, "default");
-        b.setWidth(400);
+        b.setWidth(400f);
         b.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 Gdx.app.postRunnable(() -> {
@@ -127,22 +125,106 @@ public class ErrorDialog implements ApplicationListener {
             }
             return true;
         });
-        b.pad(10);
+        b.pad(10f);
 
+        Table left = new Table(skin);
         // Add to table
-        t.add(title).left().padBottom(10).row();
-        t.add(subtitle).left().padBottom(30).row();
+        left.add(title)
+                .left()
+                .padBottom(10f)
+                .row();
+        left.add(subtitle)
+                .left()
+                .padBottom(30f)
+                .row();
 
-        t.add(urlLabel).left().padBottom(10).row();
-        t.add(url).left().padBottom(30).row();
+        left.add(urlLabel)
+                .left()
+                .padBottom(10f)
+                .row();
+        left.add(url)
+                .left()
+                .padBottom(30f)
+                .row();
 
-        t.add(applicationMessageLabel).left().padBottom(10).row();
-        t.add(applicationMessage).left().padBottom(30).row();
+        left.add(applicationMessageLabel)
+                .left()
+                .padBottom(10f)
+                .row();
+        left.add(crashLocLabel)
+                .left()
+                .padBottom(10f)
+                .row();
+        left.add(crashLoc)
+                .left()
+                .padBottom(30f)
+                .row();
 
-        t.add(stackTraceLabel).left().padBottom(10).row();
-        t.add(stackTraceScroll).left().padBottom(80).row();
+        t.add(left)
+                .left();
+        t.add(img)
+                .left()
+                .row();
 
-        t.add(b).center().row();
+        // Stack trace
+        int lines = 0;
+        if (cause != null && cause.getStackTrace() != null) {
+            var stringBuilder = new StringBuilder();
+            var st = cause.getStackTrace();
+            for (var elem : st) {
+                stringBuilder.append(elem.toString())
+                        .append("\n");
+                lines++;
+            }
+            OwnTextArea stackTraceTextArea = new OwnTextArea(stringBuilder.toString(), skin, "default");
+            stackTraceTextArea.setPrefRows(15f);
+            stackTraceTextArea.setWidth(800f);
+            stackTraceTextArea.setHeight(lines * 35f);
+
+            OwnScrollPane stackTraceScroll = new OwnScrollPane(stackTraceTextArea, skin, "minimalist");
+            stackTraceScroll.setWidth(820f);
+            stackTraceScroll.setHeight(400f);
+            stackTraceScroll.setFadeScrollBars(false);
+            OwnLabel stackTraceLabel = new OwnLabel(I18n.msg("error.crash.stacktrace"), skin, "header-s");
+
+            t.add(stackTraceLabel)
+                    .colspan(2)
+                    .left()
+                    .padBottom(10f)
+                    .row();
+            t.add(stackTraceScroll)
+                    .colspan(2)
+                    .left()
+                    .padBottom(10f)
+                    .row();
+
+            OwnTextButton copy = new OwnTextButton(I18n.msg("error.crash.copy"), skin);
+            copy.addListener((event) -> {
+                if (event instanceof ChangeListener.ChangeEvent) {
+                    Gdx.app.getClipboard()
+                            .setContents(stringBuilder.toString());
+                }
+                return false;
+            });
+            t.add(copy)
+                    .colspan(2)
+                    .left()
+                    .padBottom(80f)
+                    .row();
+
+        }
+
+        t.add(b)
+                .colspan(2)
+                .center()
+                .row();
+    }
+
+    private SpriteBatch initializeSpriteBatch() {
+        var spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"),
+                                             Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        // Sprite batch - uses screen resolution
+        return new SpriteBatch(100, spriteShader);
     }
 
     @Override
@@ -150,7 +232,8 @@ public class ErrorDialog implements ApplicationListener {
         var unitsPerPixel = 1f / ((float) height / 1000f) * Settings.settings.program.ui.scale;
         vp.setUnitsPerPixel(unitsPerPixel);
         vp.update(width, height, true);
-        sb.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        sb.getProjectionMatrix()
+                .setToOrtho2D(0, 0, width, height);
     }
 
     @Override

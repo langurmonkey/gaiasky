@@ -38,7 +38,6 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.gdx.loader.WarpMeshReader;

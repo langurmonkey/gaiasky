@@ -7,8 +7,6 @@
 
 package gaiasky.util.gaia;
 
-import gaiasky.util.coord.Coordinates;
-import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;

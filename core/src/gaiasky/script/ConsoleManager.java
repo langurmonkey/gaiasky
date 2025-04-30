@@ -10,7 +10,6 @@ package gaiasky.script;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.iface.ConsoleInterface;
-import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;

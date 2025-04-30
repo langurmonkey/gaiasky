@@ -59,8 +59,8 @@ import static gaiasky.event.Event.*;
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
     private final GlobalResources globalResources;
-    private final CatalogManager catalogManager;
     private final FocusView view;
+    private CatalogManager catalogManager;
     protected ControlsWindow controlsWindow;
     protected ControlsInterface controlsInterface;
     protected Container<CameraInfoInterface> fi;
@@ -88,11 +88,10 @@ public class FullGui extends AbstractGui {
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
 
-    public FullGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources, final CatalogManager catalogManager) {
+    public FullGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.globalResources = globalResources;
-        this.catalogManager = catalogManager;
         this.view = new FocusView();
     }
 
@@ -112,6 +111,7 @@ public class FullGui extends AbstractGui {
     @Override
     public void doneLoading(AssetManager assetManager) {
         interfaces = new Array<>();
+        catalogManager = assetManager.get("gaiasky-assets", GaiaSkyAssets.class).catalogManager;
 
         buildGui();
 

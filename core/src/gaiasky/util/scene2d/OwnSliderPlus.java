@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Null;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnSlider.OwnSliderStyle;
 

@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;

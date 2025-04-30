@@ -7,8 +7,6 @@
 
 package gaiasky.util.coord.vsop87;
 
-import gaiasky.util.coord.IBodyCoordinates;
-
 public class DummyVSOP87 extends AbstractVSOP87 {
     public DummyVSOP87() {
         super();

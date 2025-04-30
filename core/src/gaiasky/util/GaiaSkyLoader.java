@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.render.MainPostProcessor;
+import gaiasky.script.ConsoleManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
 import gaiasky.script.ScriptingServer;
@@ -57,9 +58,12 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
             // Init timer thread
             Timer.instance();
 
+            // Catalog manager.
+            assets.catalogManager = new CatalogManager();
+
             // Scripting server.
             if (!parameter.noScripting) {
-                assets.scriptingInterface = new EventScriptingInterface(parameter.gaiaSky.assetManager, parameter.gaiaSky.getCatalogManager());
+                assets.scriptingInterface = new EventScriptingInterface(parameter.gaiaSky.assetManager, assets.catalogManager);
                 ScriptingServer.initialize(assets.scriptingInterface);
             }
 
@@ -67,8 +71,9 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
             assets.bookmarksManager = new BookmarksManager();
 
             // SAMP client.
-            assets.sampClient = new SAMPClient(parameter.gaiaSky.getCatalogManager());
-            assets.sampClient.initialize(parameter.gaiaSky.getGlobalResources().getSkin());
+            assets.sampClient = new SAMPClient(assets.catalogManager);
+            assets.sampClient.initialize(parameter.gaiaSky.getGlobalResources()
+                                                 .getSkin());
 
             // SVT.
             assets.svtManager = new SVTManager();
@@ -76,6 +81,9 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
             // Post processor.
             assets.postProcessor = new MainPostProcessor(null);
             assets.postProcessor.initialize(manager);
+
+            // Console manager.
+            assets.consoleManager = new ConsoleManager();
         }
     }
 

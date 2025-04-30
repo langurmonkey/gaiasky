@@ -22,7 +22,10 @@ import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.Link;
+import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.text.DecimalFormat;
 

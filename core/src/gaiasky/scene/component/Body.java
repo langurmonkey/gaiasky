@@ -11,7 +11,6 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Settings;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 

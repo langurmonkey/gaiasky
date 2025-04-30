@@ -16,11 +16,11 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class AstroUtils {
 

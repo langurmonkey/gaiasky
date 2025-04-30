@@ -32,16 +32,24 @@ public class I18n {
      */
     public static void initialize() {
         if (messages == null || objects == null) {
-            forceInit(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"));
+            if (!forceInit(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"))) {
+                logger.warn("I18n resource not found.");
+            }
         }
     }
 
     public static void initialize(Path main, Path objects) {
-        forceInit(Gdx.files.absolute(main.toAbsolutePath().toString()), Gdx.files.absolute(objects.toAbsolutePath().toString()));
+        if (forceInit(Gdx.files.absolute(main.toAbsolutePath()
+                                                 .toString()), Gdx.files.absolute(objects.toAbsolutePath()
+                                                                                          .toString()))) {
+            logger.warn("I18n resource not found.");
+        }
     }
 
     public static void initialize(FileHandle main, FileHandle objects) {
-        forceInit(main, objects);
+        if (!forceInit(main, objects)) {
+            logger.warn("I18n resource not found.");
+        }
     }
 
     public static boolean forceInit(FileHandle main, FileHandle objects) {

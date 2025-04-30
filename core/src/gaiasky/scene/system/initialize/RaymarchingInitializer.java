@@ -21,7 +21,6 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnTextureLoader;

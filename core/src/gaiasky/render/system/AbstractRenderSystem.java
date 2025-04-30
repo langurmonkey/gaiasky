@@ -21,7 +21,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.Vector3d;
 
 import java.util.Comparator;
 import java.util.List;

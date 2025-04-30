@@ -8,7 +8,6 @@
 package gaiasky.util;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;

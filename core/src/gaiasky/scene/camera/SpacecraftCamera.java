@@ -21,7 +21,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.input.SpacecraftGamepadListener;
 import gaiasky.input.SpacecraftMouseKbdListener;
-import gaiasky.render.RenderAssets;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;

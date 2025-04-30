@@ -31,8 +31,8 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 public class IndividualVisibilityWindow extends GenericDialog implements IObserver {
 

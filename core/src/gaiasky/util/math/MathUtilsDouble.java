@@ -7,7 +7,6 @@
 
 package gaiasky.util.math;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import net.jafama.FastMath;
 import org.apfloat.Apfloat;

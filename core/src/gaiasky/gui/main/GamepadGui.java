@@ -17,8 +17,8 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -53,8 +53,8 @@ import net.jafama.FastMath;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 public class GamepadGui extends AbstractGui {
     private static final Logger.Log logger = Logger.getLogger(GamepadGui.class.getSimpleName());

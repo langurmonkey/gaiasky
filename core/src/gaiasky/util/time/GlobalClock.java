@@ -19,8 +19,6 @@ import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 import java.time.Instant;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.Arrays;
 
 /**

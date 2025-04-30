@@ -9,11 +9,7 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.entity.RulerRadio;
-import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;

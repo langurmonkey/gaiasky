@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.RenderAssets;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;

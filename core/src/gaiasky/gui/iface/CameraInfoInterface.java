@@ -28,7 +28,6 @@ import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -38,7 +37,6 @@ import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
-import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 

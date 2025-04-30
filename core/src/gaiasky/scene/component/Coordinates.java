@@ -9,10 +9,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.utils.Array;
-import gaiasky.util.coord.ComposedTimedOrbitCoordinates;
 import gaiasky.util.coord.IBodyCoordinates;
-import gaiasky.util.coord.TimedOrbitCoordinates;
 
 public class Coordinates implements Component, ICopy {
 

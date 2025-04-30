@@ -22,8 +22,6 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
-import java.util.Map;
-
 public class ConstellationInitializer extends AbstractInitSystem {
 
     private final Scene scene;

@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.postprocess.util.FullscreenQuad;
-import gaiasky.render.util.ShaderLoader;
 
 public abstract class Filter<T> implements Disposable {
 

@@ -10,8 +10,8 @@ package gaiasky.input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.gui.window.GenericDialog;
 import gaiasky.gui.api.IGamepadMappings;
+import gaiasky.gui.window.GenericDialog;
 
 public class WindowGamepadListener extends GuiGamepadListener {
 

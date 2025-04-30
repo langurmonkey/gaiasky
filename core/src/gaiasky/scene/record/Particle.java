@@ -17,7 +17,6 @@ import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
-import uk.ac.bristol.star.cdf.Variable;
 
 /**
  * Record class to store particles of all kinds.

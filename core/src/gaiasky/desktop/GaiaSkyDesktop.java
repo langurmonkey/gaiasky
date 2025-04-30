@@ -565,19 +565,19 @@ public class GaiaSkyDesktop implements IObserver {
                         runGaiaSky(cfg);
                     } catch (GdxRuntimeException e1) {
                         logger.error(I18n.msg("error.opengl", MIN_OPENGL, MIN_GLSL));
-                        showDialogOGL(e, I18n.msg("dialog.opengl.title"), I18n.msg("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
+                        showDialogOGL(e, I18n.msg("dialog.opengl.title"));
                     }
                 } else {
                     logger.error(I18n.msg("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
-                    showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash.exception.2", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    showDialogOGL(e, I18n.msg("error.crash.title"));
                 }
             } else {
                 logger.error(I18n.msg("error.java", REQUIRED_JAVA_VERSION));
-                showDialogOGL(e, I18n.msg("dialog.java.title"), I18n.msg("dialog.java.message", REQUIRED_JAVA_VERSION));
+                showDialogOGL(e, I18n.msg("dialog.java.title"));
             }
         } catch (Exception e) {
             logger.error(e);
-            showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash.exception.2", SysUtils.getCrashReportsDir()));
+            showDialogOGL(e, I18n.msg("error.crash.title"));
         }
     }
 
@@ -631,8 +631,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void showDialogOGL(final Exception ex,
-                               final String title,
-                               final String message) {
+                               final String title) {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
@@ -640,7 +639,7 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setResizable(true);
         cfg.setTitle(title);
 
-        new Lwjgl3Application(new ErrorDialog(ex, message), cfg);
+        new Lwjgl3Application(new ErrorDialog(ex), cfg);
     }
 
     @Override

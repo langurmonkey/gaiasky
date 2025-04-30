@@ -12,7 +12,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.render.RenderAssets;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.math.Vector3b;

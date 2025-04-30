@@ -23,7 +23,6 @@ import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
-import gaiasky.scene.record.ParticleStar;
 import gaiasky.scene.record.ParticleVariable;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;

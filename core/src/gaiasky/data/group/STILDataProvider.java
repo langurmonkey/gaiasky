@@ -38,7 +38,6 @@ import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
 import net.jafama.FastMath;
-import uk.ac.bristol.star.cdf.Variable;
 import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;

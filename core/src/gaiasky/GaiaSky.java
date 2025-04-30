@@ -23,8 +23,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
-import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
 import gaiasky.data.OctreeLoader;
@@ -60,8 +60,8 @@ import gaiasky.script.ConsoleManager;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
-import gaiasky.util.Logger;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.coord.vsop87.VSOP87Binary;
@@ -83,7 +83,6 @@ import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.screenshot.ScreenshotsManager;
 import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -99,14 +98,14 @@ import org.lwjgl.opengl.GL30;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.*;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Gaia Sky application code. Manages the application lifecycle, including initialization, main loop, and disposal.
  */
-public class GaiaSky implements ApplicationListener, IObserver {
+public final class GaiaSky implements ApplicationListener, IObserver {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /**
@@ -153,6 +152,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * The asset manager.
      */
     public AssetManager assetManager;
+    /**
+     * Holds some assets.
+     */
+    public GaiaSkyAssets gaiaSkyAssets;
     /**
      * The main camera manager.
      */
@@ -201,10 +204,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
      **/
     private Runnable updateRenderProcess;
     /**
-     * Main post processor.
-     **/
-    private IPostProcessor postProcessor;
-    /**
      * The session start time, in milliseconds.
      */
     private long startTime;
@@ -250,29 +249,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     private GlobalResources globalResources;
     /**
-     * The global catalog manager.
-     */
-    private CatalogManager catalogManager;
-    /**
-     * The console manager
-     */
-    private ConsoleManager consoleManager;
-    /**
-     * The scripting interface.
-     */
-    private IScriptingInterface scripting;
-    /**
      * Main executor service, used to run asynchronous tasks in separate threads.
      */
     private GaiaSkyExecutorService executorService;
-    /**
-     * The bookmarks' manager.
-     */
-    private BookmarksManager bookmarksManager;
-    /**
-     * The SAMP client.
-     */
-    private SAMPClient sampClient;
     private long startNanos = System.nanoTime();
     private long lastResizeTime = Long.MAX_VALUE;
     private int resizeWidth, resizeHeight;
@@ -333,7 +312,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 final var h = settings.runtime.openXr ? settings.graphics.backBufferResolution[1] : (int) (th * settings.graphics.backBufferScale);
                 /* RENDER THE SCENE. */
                 sceneRenderer.clearScreen();
-                var ppb = postProcessor.getPostProcessBean(RenderType.screen);
+                var ppb = gaiaSkyAssets.postProcessor.getPostProcessBean(RenderType.screen);
                 if (ppb != null) sceneRenderer.render(cameraManager, t, w, h, tw, th, null, ppb);
 
                 // Render the GUI, setting the viewport.
@@ -519,12 +498,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Init global resources -- Can't be postponed!
         this.globalResources = new GlobalResources(assetManager);
-
-        // Catalog manager.
-        this.catalogManager = new CatalogManager();
-
-        // Console manager.
-        this.consoleManager = new ConsoleManager();
 
         // Initialise master manager.
         MasterManager.initialize();
@@ -738,10 +711,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         }
 
         // Collect assets.
-        scripting = assets.scriptingInterface;
-        bookmarksManager = assets.bookmarksManager;
-        sampClient = assets.sampClient;
-        postProcessor = assets.postProcessor;
+        this.gaiaSkyAssets = assets;
 
         /*
          * Fetch scene object.
@@ -780,7 +750,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Initialize input multiplexer to handle various input processors.
         inputMultiplexer.clear();
-        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, catalogManager);
+        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, gaiaSkyAssets.catalogManager);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -854,7 +824,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         final var debugTask10 = new Task() {
             @Override
             public void run() {
-                EventManager.publish(Event.SAMP_INFO, this, sampClient.getStatus());
+                EventManager.publish(Event.SAMP_INFO, this, gaiaSkyAssets.sampClient.getStatus());
             }
         };
 
@@ -902,7 +872,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     var satellites = scene.findEntitiesByFamily(scene.getFamilies().satellites);
                     for (var satellite : satellites) {
                         var base = Mapper.base.get(satellite);
-                        scripting.setObjectSizeScaling(base.getName(), Constants.DISTANCE_SCALE_FACTOR / 10.0);
+                        gaiaSkyAssets.scriptingInterface.setObjectSizeScaling(base.getName(), Constants.DISTANCE_SCALE_FACTOR / 10.0);
                     }
                 }
             };
@@ -993,7 +963,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             guis.clear();
         }
 
-        mainGui = new FullGui(globalResources.getSkin(), graphics, unitsPerPixel, globalResources, catalogManager);
+        mainGui = new FullGui(globalResources.getSkin(), graphics, unitsPerPixel, globalResources);
         mainGui.initialize(assetManager, globalResources.getSpriteBatch());
 
         debugGui = new DebugGui(globalResources.getSkin(), graphics, unitsPerPixel);
@@ -1029,7 +999,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         final var settings = Settings.settings;
         // Reinitialise registry to listen to relevant events.
         if (guiRegistry != null) guiRegistry.dispose();
-        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, catalogManager);
+        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, gaiaSkyAssets.catalogManager);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
 
         // Unregister all current GUIs.
@@ -1082,7 +1052,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Dispose.
         if (saveState && !crashed.get()) {
             SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
-            if (bookmarksManager != null) bookmarksManager.persistBookmarks();
+            if (gaiaSkyAssets.bookmarksManager != null) gaiaSkyAssets.bookmarksManager.persistBookmarks();
         }
 
         ScriptingServer.dispose();
@@ -1116,8 +1086,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         }
 
         // Post processor.
-        if (postProcessor != null) {
-            postProcessor.dispose();
+        if (gaiaSkyAssets.postProcessor != null) {
+            gaiaSkyAssets.postProcessor.dispose();
         }
 
         // Clear temp.
@@ -1168,14 +1138,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 frames++;
             }
         } catch (Throwable t) {
-            // Report the crash.
-            CrashReporter.reportCrash(t, logger);
-            // Set up crash window.
-            crashGui = new CrashGui(globalResources.getSkin(), graphics, 1f / Settings.settings.program.ui.scale, t);
-            crashGui.initialize(assetManager, globalResources.getSpriteBatch());
-            Gdx.input.setInputProcessor(crashGui.getGuiStage());
             // Flag up.
             crashed.set(true);
+            GaiaSky.postRunnable(() -> Gdx.app.exit());
         }
 
         // Create UI window if needed.
@@ -1372,7 +1337,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 if (loadingGui != null) loadingGui.resizeImmediate(width, height);
             } else {
                 if (resizePostProcessors) {
-                    postProcessor.resizeImmediate(renderWidth, renderHeight, width, height);
+                    gaiaSkyAssets.postProcessor.resizeImmediate(renderWidth, renderHeight, width, height);
                 }
 
                 if (resizeGuis) {
@@ -1412,7 +1377,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @return The main scripting interface object of Gaia Sky.
      */
     public IScriptingInterface scripting() {
-        return this.scripting;
+        return gaiaSkyAssets.scriptingInterface;
     }
 
     /**
@@ -1429,7 +1394,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public BookmarksManager getBookmarksManager() {
-        return this.bookmarksManager;
+        return gaiaSkyAssets.bookmarksManager;
     }
 
     public ICamera getICamera() {
@@ -1445,7 +1410,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public IPostProcessor getPostProcessor() {
-        return this.postProcessor;
+        return gaiaSkyAssets.postProcessor;
     }
 
     public CLIArgs getCliArgs() {
@@ -1470,7 +1435,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     public Optional<CatalogInfo> getCatalogInfoFromEntity(Entity entity) {
         if (Mapper.datasetDescription.has(entity)) {
-            return catalogManager.getByEntity(entity);
+            return gaiaSkyAssets.catalogManager.getByEntity(entity);
         }
         return Optional.empty();
     }
@@ -1704,11 +1669,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public CatalogManager getCatalogManager() {
-        return this.catalogManager;
+        return gaiaSkyAssets.catalogManager;
     }
 
     public ConsoleManager getConsoleManager() {
-        return this.consoleManager;
+        return gaiaSkyAssets.consoleManager;
     }
 
     /**

@@ -11,8 +11,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.component.BillboardSet;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
@@ -20,8 +18,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
-
-import java.util.List;
 
 public class BillboardSetInitializer extends AbstractInitSystem {
 
