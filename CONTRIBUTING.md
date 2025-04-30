@@ -129,7 +129,7 @@ The loading screen of Gaia Sky displays funny sentences which are automatically 
 Right now we have translation files for Bulgarian, English (UK and US), German, French, Catalan, Spanish and Slovenian. The level of completion varies from language to language. You can compute it by running:
 
 ```bash
-gradlew core:runTranslationStatus
+gradlew core:translationStatus
 ```
 
 The status is only checked for the main `gsbundle[lang-code].properties` file, as the objects file can't be complete because the number of objects that may, at some point, be loaded into Gaia Sky is infinite.
@@ -152,7 +152,7 @@ Usage: translationstatus [options]
 You can pass CLI arguments to the application via Java like this:
 
 ```bash
-gradlew core:runTranslationStatus --args='-s -u'
+gradlew core:translationStatus --args='-s -u'
 ```
 
 The status of the different translations as of 2022-11-30 is as follows.

@@ -110,7 +110,7 @@ tasks.register('run', GaiaSkyRun) {
     setup()
 }
 
-tasks.register('runTranslationStatus', JavaExec) {
+tasks.register('translationStatus', JavaExec) {
     dependsOn jar
     description = 'Runs the I18n status program, which generates statistics about the current status of the translation files.'
     systemProperties['assets.location'] = './assets/'

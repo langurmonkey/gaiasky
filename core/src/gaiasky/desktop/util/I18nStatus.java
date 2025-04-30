@@ -29,6 +29,10 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Prints information on the translation status of Gaia Sky for each supported language.
+ * Run this with <code>gradlew core:translationStatus</code>.
+ */
 public class I18nStatus {
     private static final Log logger = Logger.getLogger(I18nStatus.class);
 
