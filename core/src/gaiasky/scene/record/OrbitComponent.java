@@ -93,7 +93,7 @@ public class OrbitComponent {
     }
 
     public void setArgOfPericenter(Double argOfPericenter) {
-        this.argOfPericenter = argOfPericenter;
+        this.argOfPericenter = (argOfPericenter + 180) % 360;
     }
 
     public void setArgofpericenter(Double argOfPericenter) {
@@ -255,8 +255,8 @@ public class OrbitComponent {
         computeMu(true);
 
         double inc = FastMath.toRadians(i);
-        double raan = FastMath.toRadians(ascendingNode);
-        double argp = FastMath.toRadians(argOfPericenter);
+        double ascNode = FastMath.toRadians(ascendingNode);
+        double argP = FastMath.toRadians(argOfPericenter);
 
         // Mean anomaly at time.
         double M = getMeanAnomalyAt(dtDays);
@@ -279,12 +279,12 @@ public class OrbitComponent {
         //double vzPf = 0;
 
         // Rotation matrix
-        double cosO = FastMath.cos(raan);
-        double sinO = FastMath.sin(raan);
+        double cosO = FastMath.cos(ascNode);
+        double sinO = FastMath.sin(ascNode);
         double cosI = FastMath.cos(inc);
         double sinI = FastMath.sin(inc);
-        double cosW = FastMath.cos(argp);
-        double sinW = FastMath.sin(argp);
+        double cosW = FastMath.cos(argP);
+        double sinW = FastMath.sin(argP);
 
         Rx.val[Matrix3d.M00] = cosO * cosW - sinO * sinW * cosI;
         Rx.val[Matrix3d.M01] = -cosO * sinW - sinO * cosW * cosI;
@@ -319,8 +319,8 @@ public class OrbitComponent {
         computeMu(true);
 
         double inc = FastMath.toRadians(i);
-        double raan = FastMath.toRadians(ascendingNode);
-        double argp = FastMath.toRadians(argOfPericenter);
+        double ascNode = FastMath.toRadians(ascendingNode);
+        double argP = FastMath.toRadians(argOfPericenter);
 
         // Distance
         double r = semiMajorAxis * (1 - e * e) / (1 + e * FastMath.cos(nu));
@@ -336,12 +336,12 @@ public class OrbitComponent {
         //double vzPf = 0;
 
         // Rotation matrix
-        double cosO = FastMath.cos(raan);
-        double sinO = FastMath.sin(raan);
+        double cosO = FastMath.cos(ascNode);
+        double sinO = FastMath.sin(ascNode);
         double cosI = FastMath.cos(inc);
         double sinI = FastMath.sin(inc);
-        double cosW = FastMath.cos(argp);
-        double sinW = FastMath.sin(argp);
+        double cosW = FastMath.cos(argP);
+        double sinW = FastMath.sin(argP);
 
         Rx.val[Matrix3d.M00] = cosO * cosW - sinO * sinW * cosI;
         Rx.val[Matrix3d.M01] = -cosO * sinW - sinO * cosW * cosI;
