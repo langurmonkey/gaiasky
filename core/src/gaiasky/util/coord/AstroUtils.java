@@ -19,6 +19,9 @@ import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Astronomical utilities. Contains functions to convert Julian dates, reference systems, and more.
+ */
 public class AstroUtils {
 
     /**
