@@ -62,6 +62,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -1014,7 +1015,7 @@ public class DatasetManagerWindow extends GenericDialog {
             });
         };
 
-        ChecksumRunnable finish = (digest) -> {
+        Consumer<String> finish = (digest) -> {
             String errorMsg = null;
             // Unpack.
             int errors = 0;

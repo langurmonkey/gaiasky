@@ -16,6 +16,9 @@ import gaiasky.util.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Maps attribute names to components, so that the data loading is seamless.
+ */
 public class AttributeMap {
     private static final Logger.Log logger = Logger.getLogger(AttributeMap.class);
 

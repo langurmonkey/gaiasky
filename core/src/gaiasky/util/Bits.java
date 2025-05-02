@@ -11,6 +11,9 @@ import net.jafama.FastMath;
 
 import java.util.Arrays;
 
+/**
+ * Implements an arbitrarily large array of bits using an array of long integers.
+ */
 public class Bits {
     public static int DEFAULT_LENGTH = 120;
     long[] bits = { 0 };
@@ -20,12 +23,12 @@ public class Bits {
 
     /**
      * Creates a bit set whose initial size is large enough to explicitly represent bits with indices in the range 0 through
-     * nbits-1.
+     * nBits-1.
      *
-     * @param nbits the initial size of the bit set
+     * @param nBits the initial size of the bit set
      */
-    public Bits(int nbits) {
-        checkCapacity(nbits >>> 6);
+    public Bits(int nBits) {
+        checkCapacity(nBits >>> 6);
     }
 
     public static Bits empty() {
@@ -249,7 +252,7 @@ public class Bits {
         }
         for (word++; word < bitsLength; word++) {
             if (word == 0) {
-                return word << 6;
+                return 0;
             }
             bitsAtWord = bits[word];
             for (int i = 0; i < 64; i++) {
@@ -392,7 +395,7 @@ public class Bits {
         final int word = length() >>> 6;
         int hash = 0;
         for (int i = 0; word >= i; i++) {
-            hash = 127 * hash + (int) (bits[i] ^ (bits[i] >>> 32));
+            hash = 127 * hash + Long.hashCode(bits[i]);
         }
         return hash;
     }

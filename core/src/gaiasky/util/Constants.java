@@ -12,6 +12,9 @@ import gaiasky.event.EventManager;
 import net.jafama.FastMath;
 import org.apfloat.Apfloat;
 
+/**
+ * Random constants holder.
+ */
 public class Constants {
 
     /** Default resolution: width. **/

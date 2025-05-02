@@ -15,6 +15,9 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Scanner;
 
+/**
+ * Generates funny sentences from different chunks.
+ */
 public class LoadingTextGenerator {
     private static final int MAX_KEYS = 100;
     private final String[] verbs;
@@ -23,7 +26,6 @@ public class LoadingTextGenerator {
     private final String[][] set;
 
     public LoadingTextGenerator() {
-        Locale locale = I18n.getLocaleFromLanguageTag(Settings.settings.program.getLocale());
         verbs = read("funny.verb.");
         adjectives = read("funny.adjective.", 4);
         objects = read("funny.object.");

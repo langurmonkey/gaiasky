@@ -19,6 +19,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * An archetype is a blueprint to build an object instance in the ECS. It maintains a set with the component classes
+ * of the archetype and a reference to a possible parent.
+ */
 public class Archetype {
 
     private final Engine engine;

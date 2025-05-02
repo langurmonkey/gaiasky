@@ -7,6 +7,9 @@
 
 package gaiasky.util;
 
+/**
+ * Consumer interfaces for more than 2 objects, missing in the standard library.
+ */
 public class Consumers {
     @FunctionalInterface
     public interface Consumer3<One, Two, Three> {

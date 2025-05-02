@@ -16,6 +16,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * Fast implementation of map where keys are generic {@link Object}s of type {@link K} and values are double-precision integers.
+ * Tries to avoid allocations as much as possible.
+ *
+ * @param <K> Key object type.
+ */
 public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
     public int size;
     /**

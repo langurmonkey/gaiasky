@@ -11,6 +11,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.*;
 
+/**
+ * ECS families.
+ */
 public class Families {
 
     public final Family roots,

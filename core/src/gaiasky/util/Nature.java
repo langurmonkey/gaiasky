@@ -10,7 +10,7 @@ package gaiasky.util;
 import net.jafama.FastMath;
 
 /**
- * Constants in nature.
+ * Constants in nature, mostly to convert units.
  */
 public class Nature {
 

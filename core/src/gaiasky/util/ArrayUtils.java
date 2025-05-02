@@ -13,6 +13,13 @@ import java.util.Arrays;
  * Utilities to work with arrays.
  */
 public class ArrayUtils {
+    /**
+     * Concatenates the given arrays into a new array.
+     * @param array1 The first array.
+     * @param array2 The second array.
+     * @return A new array which contains array1 + array2.
+     * @param <T> Array element types.
+     */
     public static <T> T[] concatWithArrayCopy(T[] array1, T[] array2) {
         T[] result = Arrays.copyOf(array1, array1.length + array2.length);
         System.arraycopy(array2, 0, result, array1.length, array2.length);

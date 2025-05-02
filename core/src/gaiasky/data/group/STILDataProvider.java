@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
 /**
@@ -241,7 +242,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public List<IParticleRecord> loadData(DataSource ds,
                                           double factor,
                                           Runnable preCallback,
-                                          RunnableLongLong updateCallback,
+                                          BiConsumer<Long, Long> updateCallback,
                                           Runnable postCallback) {
         try {
             if (factory != null) {
@@ -692,7 +693,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         }
                         i++;
                         if (updateCallback != null && i % step == 0) {
-                            updateCallback.run(i, count);
+                            updateCallback.accept(i, count);
                         }
                     }
                     if (nInvalidParallaxes > 0) {

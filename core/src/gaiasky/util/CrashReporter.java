@@ -35,6 +35,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Manages crashes in Gaia Sky by logging and saving stack traces.
+ */
 public class CrashReporter {
 
     public static void reportCrash(Throwable t, Log logger) {
@@ -121,30 +124,25 @@ public class CrashReporter {
             // LOG FILE
             List<MessageBean> logMessages = NotificationsInterface.getHistorical();
             Path logFile = dir.resolve("gaiasky_log_" + suffixString + ".txt");
-            BufferedWriter writer = null;
-            try {
-                writer = new BufferedWriter(new FileWriter(logFile.toFile()));
-                for (MessageBean b : logMessages) {
-                    writer.write(b.formatMessage(true));
-                    writer.newLine();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile.toFile()))) {
+                try {
+                    for (MessageBean b : logMessages) {
+                        writer.write(b.formatMessage(true));
+                        writer.newLine();
+                    }
+                } catch (Exception e) {
+                    if (logger != null) {
+                        logger.error("Writing log crashed... Inception level 1 achieved! :_D", e);
+                    } else {
+                        System.err.println("Writing log crashed... Inception level 1 achieved! :_D");
+                        e.printStackTrace(System.err);
+                    }
                 }
             } catch (Exception e) {
-                if (logger != null) {
-                    logger.error("Writing log crashed... Inception level 1 achieved! :_D", e);
-                } else {
-                    System.err.println("Writing log crashed... Inception level 1 achieved! :_D");
-                    e.printStackTrace(System.err);
-                }
-            } finally {
-                try {
-                    // Close the writer regardless of what happens...
-                    if (writer != null)
-                        writer.close();
-                } catch (Exception e) {
-                    if (logger != null)
-                        logger.error("Closing writer crashed (inception level 2 achieved!)", e);
-                }
+                if (logger != null)
+                    logger.error("Closing writer crashed (inception level 2 achieved!)", e);
             }
+            // Close the writer regardless of what happens...
             return logFile;
         } else {
             System.err.println("Log directory (" + dir.toAbsolutePath() + ") does not exist or is not writable");

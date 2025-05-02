@@ -23,6 +23,9 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;
 
+/**
+ * Utilities for the Graphical User Interface.
+ */
 public class GuiUtils {
 
     private static final ThreadLocal<Vector2> vec2 = ThreadLocal.withInitial(Vector2::new);
@@ -32,7 +35,6 @@ public class GuiUtils {
 
             @Override
             protected void build() {
-                String text;
                 OwnLabel msg = new OwnLabel(message, skin);
                 content.add(msg).pad(pad18).row();
 
@@ -223,10 +225,6 @@ public class GuiUtils {
         exitDialog.show(stage);
     }
 
-    public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, Skin skin) {
-        return getTooltipHorizontalGroup(actor, tooltipText, 12.8f, skin);
-    }
-
     public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, float space, Skin skin) {
         HorizontalGroup hg = new HorizontalGroup();
         hg.space(space);
@@ -335,23 +333,6 @@ public class GuiUtils {
     }
 
     /**
-     * Recursively get all scroll panes in the given group.
-     *
-     * @param group The group to test.
-     * @param list  The output list where to put the scroll panes.
-     */
-    public static void getScrollPanes(Group group, Array<OwnScrollPane> list) {
-        for (var actor : group.getChildren()) {
-            if (actor instanceof OwnScrollPane) {
-                list.add((OwnScrollPane) actor);
-                getScrollPanes((WidgetGroup) actor, list);
-            } else if (actor instanceof WidgetGroup) {
-                getScrollPanes((WidgetGroup) actor, list);
-            }
-        }
-    }
-
-    /**
      * Get all input widgets recursively.
      *
      * @param actors The list of actors.
@@ -422,37 +403,5 @@ public class GuiUtils {
      */
     public static boolean isNotDisabled(Actor actor) {
         return !(actor instanceof Disableable) || !((Disableable) actor).isDisabled();
-    }
-
-    /**
-     * Check if the actor currently has a change listener attached.
-     *
-     * @param actor The actor.
-     * @return True if the actor has a change listener.
-     */
-    public static boolean hasChangeListener(Actor actor) {
-        var listeners = actor.getListeners();
-        for (var listener : listeners) {
-            if (listener instanceof ChangeListener) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if the given object is a descendant of the given group.
-     *
-     * @param object The object.
-     * @param parent The group.
-     * @return True if the object is in the group.
-     */
-    public static boolean isDescendentOf(Actor object, WidgetGroup parent) {
-        var p = object.getParent();
-        while (p != null && p != parent) {
-            p = p.getParent();
-        }
-
-        return p != null;
     }
 }

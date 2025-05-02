@@ -17,6 +17,9 @@ import gaiasky.util.tree.OctreeNode;
 
 import java.util.*;
 
+/**
+ * Central manager for {@link CatalogInfo} objects.
+ */
 public class CatalogManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CatalogManager.class);
 

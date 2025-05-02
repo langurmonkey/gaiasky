@@ -28,6 +28,9 @@ import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.svt.SVTManager;
 
+/**
+ * Loads {@link GaiaSkyAssets}.
+ */
 public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSkyLoaderParameters> {
 
     private GaiaSkyAssets assets;

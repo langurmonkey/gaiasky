@@ -14,6 +14,9 @@ import gaiasky.script.IScriptingInterface;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.svt.SVTManager;
 
+/**
+ * Gaia Sky high-level asset holder.
+ */
 public class GaiaSkyAssets {
     public IScriptingInterface scriptingInterface;
     public IPostProcessor postProcessor;

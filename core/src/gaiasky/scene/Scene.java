@@ -41,6 +41,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * The main scene, which contains the engine, the index, the archetypes, and more.
+ */
 public class Scene {
     public static final String ROOT_NAME = "Universe";
     private static final Logger.Log logger = Logger.getLogger(Scene.class);

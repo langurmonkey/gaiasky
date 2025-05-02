@@ -45,6 +45,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
+/**
+ * Contains resources that don't change during the runtime of the application.
+ */
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
     private static final Vector3d aux = new Vector3d();

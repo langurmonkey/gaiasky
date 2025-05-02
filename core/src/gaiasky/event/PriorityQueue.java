@@ -10,6 +10,10 @@ package gaiasky.event;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectSet;
 
+/**
+ * Simple implementation of a priority queue.
+ * @param <E> Object type.
+ */
 public class PriorityQueue<E extends Comparable<E>> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 11;
@@ -91,7 +95,6 @@ public class PriorityQueue<E extends Comparable<E>> {
      *
      * @return the head of this queue
      */
-    @SuppressWarnings("unchecked")
     public E peek() {
         return size == 0 ? null : (E) queue[0];
     }
@@ -103,7 +106,6 @@ public class PriorityQueue<E extends Comparable<E>> {
      *
      * @return the element at the specified index in this queue.
      */
-    @SuppressWarnings("unchecked")
     public E get(int index) {
         return index >= size ? null : (E) queue[index];
     }
@@ -126,7 +128,6 @@ public class PriorityQueue<E extends Comparable<E>> {
      *
      * @return the head of this queue, or {@code null} if this queue is empty.
      */
-    @SuppressWarnings("unchecked")
     public E poll() {
         if (size == 0)
             return null;
@@ -148,7 +149,6 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @param k the position to fill
      * @param x the item to insert
      */
-    @SuppressWarnings("unchecked")
     private void siftUp(int k, E x) {
         while (k > 0) {
             int parent = (k - 1) >>> 1;
@@ -168,7 +168,6 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @param k the position to fill
      * @param x the item to insert
      */
-    @SuppressWarnings("unchecked")
     private void siftDown(int k, E x) {
         int half = size >>> 1; // loop while a non-leaf
         while (k < half) {

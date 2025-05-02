@@ -18,6 +18,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Holds the archetypes, loaded from <code>archetypes.json</code>.
+ */
 public class Archetypes {
     private static final Logger.Log logger = Logger.getLogger(Archetypes.class);
 

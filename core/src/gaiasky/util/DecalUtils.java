@@ -22,6 +22,9 @@ import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
+/**
+ * Utilities related to decals and billboards.
+ */
 public class DecalUtils {
 
     static Vector3 tmp, tmp2, tmp3;

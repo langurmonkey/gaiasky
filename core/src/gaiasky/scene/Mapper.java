@@ -11,6 +11,9 @@ import com.badlogic.ashley.core.ComponentMapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.*;
 
+/**
+ * Contains component mappers for many types.
+ */
 public class Mapper {
     // Data components
     public static final ComponentMapper<Base> base = ComponentMapper.getFor(Base.class);

@@ -23,6 +23,9 @@ import net.jafama.FastMath;
 import java.time.Instant;
 import java.util.LinkedList;
 
+/**
+ * Manages the location log model.
+ */
 public class LocationLogManager implements IObserver {
     protected static final Log logger = Logger.getLogger(LocationLogManager.class);
 

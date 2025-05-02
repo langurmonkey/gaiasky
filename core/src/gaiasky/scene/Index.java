@@ -24,6 +24,9 @@ import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Index, which maintains dictionaries with name-object pairs.
+ */
 public class Index {
     private static final Logger.Log logger = Logger.getLogger(Index.class);
 

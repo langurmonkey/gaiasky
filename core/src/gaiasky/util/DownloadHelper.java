@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.function.Consumer;
 
 public class DownloadHelper {
     private static final Log logger = Logger.getLogger(DownloadHelper.class);
@@ -35,7 +36,7 @@ public class DownloadHelper {
      * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
      * when finished.
      */
-    public static HttpRequest downloadFile(String url, FileHandle to, boolean offlineMode, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
+    public static HttpRequest downloadFile(String url, FileHandle to, boolean offlineMode, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, Consumer<String> finish, Runnable fail, Runnable cancel) {
 
         if (url.startsWith("file://")) {
             // Local file!
@@ -47,7 +48,7 @@ public class DownloadHelper {
                 try {
                     Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                     // Run finish with empty digest
-                    finish.run("");
+                    finish.accept("");
                 } catch (IOException e) {
                     logger.error(I18n.msg("error.file.copy", srcString, to.path()));
                 } catch (Exception e) {
@@ -98,7 +99,7 @@ public class DownloadHelper {
         }
     }
 
-    public static void sendRequest(HttpRequest request, String url, boolean resume, FileHandle to, long startSize, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
+    public static void sendRequest(HttpRequest request, String url, boolean resume, FileHandle to, long startSize, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, Consumer<String> finish, Runnable fail, Runnable cancel) {
         // Send the request, listen for the response
         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
             private boolean cancelled = false;
@@ -154,7 +155,7 @@ public class DownloadHelper {
                             if (updateSpeed) {
                                 long elapsedMs = currentTimeMs - lastTimeMs;
                                 long readInterval = read - lastRead;
-                                bytesPerMs = readInterval / elapsedMs;
+                                bytesPerMs = (double) readInterval / elapsedMs;
                             }
 
                             // Run progress runnable
@@ -196,7 +197,7 @@ public class DownloadHelper {
                                         if (updateSpeed) {
                                             long elapsedMs = currentTimeMs - lastTimeMs;
                                             long readInterval = read - lastRead;
-                                            bytesPerMs = readInterval / elapsedMs;
+                                            bytesPerMs = (double) readInterval / elapsedMs;
                                         }
 
                                         // Run progress runnable
@@ -210,7 +211,7 @@ public class DownloadHelper {
                             }
                             byte[] digestBytes = md.digest();
                             String digest = bytesToHex(digestBytes);
-                            finish.run(digest);
+                            finish.accept(digest);
                         }
                     } catch (Exception e) {
                         logger.error(e);
@@ -226,8 +227,8 @@ public class DownloadHelper {
 
             private String bytesToHex(byte[] hash) {
                 StringBuilder hexString = new StringBuilder(2 * hash.length);
-                for (int i = 0; i < hash.length; i++) {
-                    String hex = Integer.toHexString(0xff & hash[i]);
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
                     if (hex.length() == 1) {
                         hexString.append('0');
                     }

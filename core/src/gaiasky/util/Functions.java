@@ -7,6 +7,9 @@
 
 package gaiasky.util;
 
+/**
+ * Function interfaces missing in the standard library.
+ */
 public class Functions {
     @FunctionalInterface
     public interface Function2<One, Two, R> {
