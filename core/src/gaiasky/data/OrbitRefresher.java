@@ -26,6 +26,9 @@ import gaiasky.util.concurrent.ServiceThread;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * Implements the orbit data update operation for the orbits that need refreshing.
+ */
 public class OrbitRefresher implements IObserver {
     // Maximum number of pages to send to load every batch.
     protected static final int MAX_LOAD_CHUNK = 5;

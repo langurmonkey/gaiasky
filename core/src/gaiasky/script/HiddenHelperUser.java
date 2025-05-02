@@ -19,6 +19,9 @@ import gaiasky.scene.view.FocusView;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * This class mimics a user by sending commands through the event system.
+ */
 public class HiddenHelperUser implements IObserver {
 
     private static HiddenHelperUser hhu;

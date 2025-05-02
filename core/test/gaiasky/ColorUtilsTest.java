@@ -5,13 +5,17 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util.color;
+package gaiasky;
 
 import com.badlogic.gdx.graphics.Color;
+import net.jafama.FastMath;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ColorUtilsTest {
 
-    public static void main(String[] args) {
+    @Test
+    public void test() {
 
         convert(0.1f, 0.2f, 0.3f, 0.4f);
         convert(0.0f, 0.0f, 0.0f, 0.0f);
@@ -26,18 +30,18 @@ public class ColorUtilsTest {
 
     }
 
-    private static void fromBinary(int val) {
+    private void fromBinary(int val) {
         Color color = new Color();
         Color.rgba8888ToColor(color, val);
         System.out.println(color.r + "," + color.g + "," + color.b + "," + color.a);
     }
 
-    private static void toBinary(float r, float g, float b, float a) {
+    private  void toBinary(float r, float g, float b, float a) {
         float col = Color.toFloatBits(r, g, b, a);
         System.out.println(Integer.toBinaryString(Float.floatToIntBits(col)));
     }
 
-    private static void convert(float r, float g, float b, float a) {
+    private void convert(float r, float g, float b, float a) {
         System.out.println("IN - r=" + r + " g=" + g + " b=" + b + " a=" + a);
 
         float packed = Color.toFloatBits(r, g, b, a);
@@ -56,5 +60,14 @@ public class ColorUtilsTest {
 
         System.out.println("OUT - r=" + out.r + " g=" + out.g + " b=" + out.b + " a=" + out.a);
         System.out.println();
+
+        Assert.assertEquals(clamp(r), out.r, 0.01);
+        Assert.assertEquals(clamp(g), out.g, 0.01);
+        Assert.assertEquals(clamp(b), out.b, 0.01);
+        Assert.assertEquals(clamp(a), out.a, 0.01);
+    }
+
+    private float clamp(float v) {
+        return (float) FastMath.max(0.0, FastMath.min(1.0, v));
     }
 }

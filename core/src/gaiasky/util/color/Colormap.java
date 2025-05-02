@@ -9,6 +9,9 @@ package gaiasky.util.color;
 
 import gaiasky.util.math.MathUtilsDouble;
 
+/**
+ * Implementation of several colormaps.
+ */
 public class Colormap {
     // Value is assumed to be normalized in [0,1] in all cases
 

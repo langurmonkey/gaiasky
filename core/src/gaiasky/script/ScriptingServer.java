@@ -19,6 +19,9 @@ import py4j.Py4JServerConnection;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Scripting server manager.
+ */
 public class ScriptingServer {
     private static final Logger.Log logger = Logger.getLogger(ScriptingServer.class);
     private static final AtomicInteger connections = new AtomicInteger(0);

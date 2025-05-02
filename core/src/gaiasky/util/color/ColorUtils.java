@@ -19,6 +19,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Utility functions related to colors.
+ */
 public class ColorUtils {
 
     /*

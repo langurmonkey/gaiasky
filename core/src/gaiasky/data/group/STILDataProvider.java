@@ -19,7 +19,7 @@ import gaiasky.scene.record.ParticleStar;
 import gaiasky.scene.record.ParticleVariable;
 import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
 import gaiasky.util.*;
-import gaiasky.util.color.BVToTeff_ballesteros;
+import gaiasky.util.color.BVToTeffBallesteros;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -287,7 +287,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 int noPeriods = 0;
 
                 if (ucdParser.hasPos) {
-                    BVToTeff_ballesteros bvToTEff = new BVToTeff_ballesteros();
+                    BVToTeffBallesteros bvToTEff = new BVToTeffBallesteros();
 
                     int nInvalidParallaxes = 0;
                     long i = 0L;

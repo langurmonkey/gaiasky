@@ -9,13 +9,13 @@ package gaiasky.util.color;
 
 import net.jafama.FastMath;
 
-public class BVToTeff_ballesteros {
+public class BVToTeffBallesteros {
     private final double a;
     private final double b;
     private final double c;
     private final double T0;
 
-    public BVToTeff_ballesteros() {
+    public BVToTeffBallesteros() {
         a = 0.92;
         b = 1.7;
         c = 0.62;

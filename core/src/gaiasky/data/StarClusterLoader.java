@@ -45,6 +45,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Loads star clusters in CSV or in STIL-supported formats.
+ * @deprecated Modern cluster catalogs use the {@link gaiasky.data.group.STILDataProvider}.
+ */
+@Deprecated
 public class StarClusterLoader extends AbstractSceneLoader {
     private static final Log logger = Logger.getLogger(StarClusterLoader.class);
     boolean active = true;
@@ -76,18 +81,14 @@ public class StarClusterLoader extends AbstractSceneLoader {
             if (filePaths != null) {
                 for (String file : filePaths) {
                     FileHandle f = Settings.settings.data.dataFileHandle(file);
-                    InputStream is = f.read();
-                    try {
-                        loadClustersCsv(is, clusters);
-                    } catch (IOException e) {
-                        logger.error(e);
-                    } finally {
+                    try (InputStream is = f.read()) {
                         try {
-                            is.close();
+                            loadClustersCsv(is, clusters);
                         } catch (IOException e) {
                             logger.error(e);
                         }
-
+                    } catch (IOException e) {
+                        logger.error(e);
                     }
                 }
             } else if (dataSource != null) {
@@ -364,9 +365,9 @@ public class StarClusterLoader extends AbstractSceneLoader {
     private Map<ClusterProperties, Integer> parseHeader(StarTable table) {
         Map<ClusterProperties, Integer> indices = new HashMap<>();
 
-        int ncols = table.getColumnCount();
+        int nColumns = table.getColumnCount();
 
-        for (int i = 0; i < ncols; i++) {
+        for (int i = 0; i < nColumns; i++) {
             ColumnInfo ci = table.getColumnInfo(i);
             String cName = ci.getName();
 

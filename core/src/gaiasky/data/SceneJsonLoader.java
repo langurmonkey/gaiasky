@@ -30,6 +30,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Manages the overall scene loading form JSON files.
+ */
 public class SceneJsonLoader {
     private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
     private static final Map<String, Entity> globalIndex = new HashMap<>();
