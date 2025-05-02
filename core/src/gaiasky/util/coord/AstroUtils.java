@@ -11,14 +11,11 @@ import gaiasky.util.Constants;
 import gaiasky.util.LruCache;
 import gaiasky.util.Nature;
 import gaiasky.util.Pair;
-import gaiasky.util.coord.moon.MoonMeeusCoordinates;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +84,7 @@ public class AstroUtils {
     public static double getJulianDate(double refEpoch) {
         int year = (int) refEpoch;
         double part = refEpoch - year;
-        return getJulianDate(year, 1, 1, 0, 0, 0, 0, true) + JD_TO_Y * part;
+        return getJulianDateUTC(year, 1, 1, 0, 0, 0, 0, true) + JD_TO_Y * part;
     }
 
     /**
@@ -112,67 +109,51 @@ public class AstroUtils {
     }
 
     /**
-     * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Returns a
-     * vector with the geocentric ecliptic longitude (&lambda;) in radians, the ecliptic
-     * latitude (&beta;) in radians and the distance in kilometers.
+     * Computes the Julian Date (JD) for a given date and time with nanosecond precision,
+     * using either the Julian or Gregorian calendar depending on the date.
+     * <p>
+     * The calendar transition is determined by comparing the input against a predefined
+     * {@code gregorianSwitch} {@link Instant}, after which the Gregorian calendar is used.
+     * The input quantities are assumed to be in UTC.
      *
-     * @param date The instant date.
-     * @param aux  Auxiliary double vector.
-     * @param out  The out vector with geocentric [lambda, beta, r] in radians and kilometres.
+     * @param year  the year component of the date
+     * @param month the month component of the date (1 = January, ..., 12 = December)
+     * @param day   the day of the month (1-31)
+     * @param hour  the hour of the day (0–23)
+     * @param min   the minute of the hour (0–59)
+     * @param sec   the second of the minute (0–59)
+     * @param nanos the nanosecond of the second (0–999,999,999)
      *
-     * @return The out vector with geocentric [lambda, beta, r] in radians and kilometres.
+     * @return the Julian Date corresponding to the given date and time
+     *
+     * @throws DateTimeException if the date-time values are invalid
      */
-    public static Vector3b moonEclipticCoordinates(Instant date, Vector3d aux, Vector3b out) {
-        MoonMeeusCoordinates.moonEclipticCoordinates(getJulianDateCache(date), aux);
-        return out.set(aux);
-    }
-
-
-    /**
-     * Spherical ecliptic coordinates of Pluto at the given date.
-     *
-     * @param date The date.
-     * @param out  The out vector with [lambda, beta, r] in radians and kilometres.
-     */
-    public static void plutoEclipticCoordinates(Instant date, Vector3b out) {
-        if (Constants.notWithinVSOPTime(date.toEpochMilli()))
-            return;
-        plutoEclipticCoordinates(getDaysSinceJ2000(date), out);
-    }
-
-    /**
-     * Spherical ecliptic coordinates of pluto at the given date. See
-     * <a href="http://www.stjarnhimlen.se/comp/ppcomp.html">here</a>.
-     *
-     * @param d   Julian date.
-     * @param out The out vector with [lambda, beta, r] in radians and kilometres.
-     */
-    private static void plutoEclipticCoordinates(double d, Vector3b out) {
-        double S = FastMath.toRadians(50.03 + 0.033459652 * d);
-        double P = FastMath.toRadians(238.95 + 0.003968789 * d);
-
-        double lonEcl = 238.9508 + 0.00400703 * d - 19.799 * FastMath.sin(P) + 19.848 * FastMath.cos(P) + 0.897 * FastMath.sin(
-                2.0 * P) - 4.956 * FastMath.cos(2.0 * P) + 0.610 * FastMath.sin(3.0 * P) + 1.211 * FastMath.cos(3.0 * P) - 0.341 * FastMath.sin(
-                4.0 * P) - 0.190 * FastMath.cos(4.0 * P) + 0.128 * FastMath.sin(5.0 * P) - 0.034 * FastMath.cos(5.0 * P) - 0.038 * FastMath.sin(
-                6.0 * P) + 0.031 * FastMath.cos(6.0 * P) + 0.020 * FastMath.sin(S - P) - 0.010 * FastMath.cos(S - P);
-        double latEcl = -3.9082 - 5.453 * FastMath.sin(P) - 14.975 * FastMath.cos(P) + 3.527 * FastMath.sin(2.0 * P) + 1.673 * FastMath.cos(
-                2.0 * P) - 1.051 * FastMath.sin(3.0 * P) + 0.328 * FastMath.cos(3.0 * P) + 0.179 * FastMath.sin(4.0 * P) - 0.292 * FastMath.cos(
-                4.0 * P) + 0.019 * FastMath.sin(5.0 * P) + 0.100 * FastMath.cos(5.0 * P) - 0.031 * FastMath.sin(6.0 * P) - 0.026 * FastMath.cos(
-                6.0 * P) + 0.011 * FastMath.cos(S - P);
-        double r = 40.72 + 6.68 * FastMath.sin(P) + 6.90 * FastMath.cos(P) - 1.18 * FastMath.sin(2.0 * P) - 0.03 * FastMath.cos(
-                2.0 * P) + 0.15 * FastMath.sin(3.0 * P) - 0.14 * FastMath.cos(3.0 * P);
-
-        out.set(Math.toRadians(lonEcl), FastMath.toRadians(latEcl), Nature.AU_TO_KM * r);
+    public static double getJulianDateUTC(int year, int month, int day, int hour, int min, int sec, int nanos) {
+        ZonedDateTime zdt = ZonedDateTime.of(
+                year, month, day,
+                hour, min, sec,
+                nanos,
+                ZoneOffset.UTC
+        );
+        var instant = zdt.toInstant();
+        return getJulianDateUTC(year, month, day, hour, min, sec, nanos, instant.isAfter(gregorianSwitch));
     }
 
     /**
-     * Gets the Julian date number given the Gregorian calendar quantities.
+     * Gets the Julian date number given the year, month, day, hour, minute, second, and nanosecond quantities in UTC.
      *
+     * @param year      the year component of the date
+     * @param month     the month component of the date (1 = January, ..., 12 = December)
+     * @param day       the day of the month (1-31)
+     * @param hour      the hour of the day (0–23)
+     * @param min       the minute of the hour (0–59)
+     * @param sec       the second of the minute (0–59)
+     * @param nanos     the nanosecond of the second (0–999,999,999)
      * @param gregorian Whether to use the Gregorian or the Julian calendar.
      *
      * @return The julian date number.
      */
-    public static double getJulianDate(int year, int month, int day, int hour, int min, int sec, int nanos, boolean gregorian) {
+    private static double getJulianDateUTC(int year, int month, int day, int hour, int min, int sec, int nanos, boolean gregorian) {
         if (gregorian) {
             return getJulianDayNumberGregorian(year, month, day) + getDayFraction(hour, min, sec, nanos);
         } else {
@@ -181,7 +162,7 @@ public class AstroUtils {
     }
 
     /**
-     * Gets the Julian Date for the given date. It uses a cache.
+     * Gets the Julian Date for the given {@link Instant}. It uses a cache.
      *
      * @param instant The date.
      *
@@ -198,6 +179,13 @@ public class AstroUtils {
         }
     }
 
+    /**
+     * Gets the Julian date from a given {@link Instant}. Instants are by definition in UTC.
+     *
+     * @param instant The instant.
+     *
+     * @return The Julian date.
+     */
     public static double getJulianDate(Instant instant) {
         LocalDateTime date = LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
         int year = date.getYear();
@@ -208,7 +196,7 @@ public class AstroUtils {
         int min = date.getMinute();
         int sec = date.getSecond();
         int nanos = date.getNano();
-        return getJulianDate(year, month, day, hour, min, sec, nanos, instant.isAfter(gregorianSwitch));
+        return getJulianDateUTC(year, month, day, hour, min, sec, nanos, instant.isAfter(gregorianSwitch));
     }
 
     /**
@@ -384,7 +372,7 @@ public class AstroUtils {
      *
      * @return The day fraction
      */
-    public static double getDayFraction(int hour, int min, int sec, int nanos) {
+    private static double getDayFraction(int hour, int min, int sec, int nanos) {
         return hour / 24.0 + min / 1440.0 + (sec + nanos / 1.0E9) / 86400.0;
     }
 
@@ -522,14 +510,14 @@ public class AstroUtils {
 
         double dx = -cosA * sinD;
         double dy = -sinA * sinD;
-        double dz =  cosD;
+        double dz = cosD;
 
-        double vr  = vxKms * rx + vyKms * ry + vzKms * rz;
+        double vr = vxKms * rx + vyKms * ry + vzKms * rz;
         double vta = vxKms * ax + vyKms * ay + vzKms * az;
         double vtd = vxKms * dx + vyKms * dy + vzKms * dz;
 
         double muAlphaStar = (vta / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
-        double muDelta     = (vtd / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
+        double muDelta = (vtd / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
 
         return out.set(muAlphaStar, muDelta, vr);
     }
@@ -664,6 +652,43 @@ public class AstroUtils {
         if (spTypeTable != null) {
             spTypeTable.add(new Pair<>(tEff, spType));
         }
+    }
+
+    /**
+     * Spherical ecliptic coordinates of Pluto at the given date.
+     *
+     * @param date The date.
+     * @param out  The out vector with [lambda, beta, r] in radians and kilometres.
+     */
+    public static void plutoEclipticCoordinates(Instant date, Vector3b out) {
+        if (Constants.notWithinVSOPTime(date.toEpochMilli()))
+            return;
+        plutoEclipticCoordinates(getDaysSinceJ2000(date), out);
+    }
+
+    /**
+     * Spherical ecliptic coordinates of pluto at the given date. See
+     * <a href="http://www.stjarnhimlen.se/comp/ppcomp.html">here</a>.
+     *
+     * @param d   Julian date.
+     * @param out The out vector with [lambda, beta, r] in radians and kilometres.
+     */
+    private static void plutoEclipticCoordinates(double d, Vector3b out) {
+        double S = FastMath.toRadians(50.03 + 0.033459652 * d);
+        double P = FastMath.toRadians(238.95 + 0.003968789 * d);
+
+        double lonEcl = 238.9508 + 0.00400703 * d - 19.799 * FastMath.sin(P) + 19.848 * FastMath.cos(P) + 0.897 * FastMath.sin(
+                2.0 * P) - 4.956 * FastMath.cos(2.0 * P) + 0.610 * FastMath.sin(3.0 * P) + 1.211 * FastMath.cos(3.0 * P) - 0.341 * FastMath.sin(
+                4.0 * P) - 0.190 * FastMath.cos(4.0 * P) + 0.128 * FastMath.sin(5.0 * P) - 0.034 * FastMath.cos(5.0 * P) - 0.038 * FastMath.sin(
+                6.0 * P) + 0.031 * FastMath.cos(6.0 * P) + 0.020 * FastMath.sin(S - P) - 0.010 * FastMath.cos(S - P);
+        double latEcl = -3.9082 - 5.453 * FastMath.sin(P) - 14.975 * FastMath.cos(P) + 3.527 * FastMath.sin(2.0 * P) + 1.673 * FastMath.cos(
+                2.0 * P) - 1.051 * FastMath.sin(3.0 * P) + 0.328 * FastMath.cos(3.0 * P) + 0.179 * FastMath.sin(4.0 * P) - 0.292 * FastMath.cos(
+                4.0 * P) + 0.019 * FastMath.sin(5.0 * P) + 0.100 * FastMath.cos(5.0 * P) - 0.031 * FastMath.sin(6.0 * P) - 0.026 * FastMath.cos(
+                6.0 * P) + 0.011 * FastMath.cos(S - P);
+        double r = 40.72 + 6.68 * FastMath.sin(P) + 6.90 * FastMath.cos(P) - 1.18 * FastMath.sin(2.0 * P) - 0.03 * FastMath.cos(
+                2.0 * P) + 0.15 * FastMath.sin(3.0 * P) - 0.14 * FastMath.cos(3.0 * P);
+
+        out.set(Math.toRadians(lonEcl), FastMath.toRadians(latEcl), Nature.AU_TO_KM * r);
     }
 
 }

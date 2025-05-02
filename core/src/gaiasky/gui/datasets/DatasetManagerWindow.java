@@ -199,7 +199,6 @@ public class DatasetManagerWindow extends GenericDialog {
             tabInstalledText = I18n.msg("gui.download.tab.installed");
         }
 
-        tabButtons = new Array<>();
 
         final OwnTextButton tabAvail = new OwnTextButton(I18n.msg("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad10);
@@ -207,9 +206,6 @@ public class DatasetManagerWindow extends GenericDialog {
         final OwnTextButton tabInstalled = new OwnTextButton(tabInstalledText, skin, "toggle-big");
         tabInstalled.pad(pad10);
         tabInstalled.setWidth(tabWidth);
-
-        tabButtons.add(tabAvail);
-        tabButtons.add(tabInstalled);
 
         tabGroup.addActor(tabAvail);
         tabGroup.addActor(tabInstalled);

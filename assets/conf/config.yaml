@@ -325,7 +325,7 @@ scene:
 # Program configuration.
 #
 program:
-  # The default time zone to use. One of [UTC|SYSTEM_DEFAULT].
+  # The default time zone to use for displaying dates and times. One of [UTC|SYSTEM_DEFAULT].
   timeZone: UTC
   # Enable safe mode, which disables advanced graphics features.
   # In this mode, OpenGL 3.3 is used.
