@@ -543,7 +543,7 @@ public class GaiaSkyDesktop implements IObserver {
             consoleLogger.unsubscribe();
 
             runGaiaSky(cfg);
-        } catch (GdxRuntimeException e) {
+        } catch (Exception e) {
             checkLogger(consoleLogger);
             logger.error(e);
             if (gs != null) {
@@ -554,29 +554,6 @@ public class GaiaSkyDesktop implements IObserver {
                     logger.error(I18n.msg("error.dispose"), e1);
                 }
             }
-            if (!JAVA_VERSION_PROBLEM_FLAG) {
-                if (gs != null && !gs.windowCreated) {
-                    // Probably, OpenGL 4.x is not supported and window creation failed
-                    logger.error(I18n.msg("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
-                    setSafeMode(cfg);
-                    consoleLogger.unsubscribe();
-
-                    try {
-                        runGaiaSky(cfg);
-                    } catch (GdxRuntimeException e1) {
-                        logger.error(I18n.msg("error.opengl", MIN_OPENGL, MIN_GLSL));
-                        showDialogOGL(e, I18n.msg("dialog.opengl.title"));
-                    }
-                } else {
-                    logger.error(I18n.msg("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
-                    showDialogOGL(e, I18n.msg("error.crash.title"));
-                }
-            } else {
-                logger.error(I18n.msg("error.java", REQUIRED_JAVA_VERSION));
-                showDialogOGL(e, I18n.msg("dialog.java.title"));
-            }
-        } catch (Exception e) {
-            logger.error(e);
             showDialogOGL(e, I18n.msg("error.crash.title"));
         }
     }

@@ -335,7 +335,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         if (settings.graphics.fpsLimit > 0.0) {
             // If FPS limit is on, dynamic resolution is off.
             targetFrameRate(settings.graphics.fpsLimit);
-        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.timeSinceMillis(startTimeScene) > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 1000 && !settings.runtime.openXr) {
+        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.timeSinceMillis(
+                startTimeScene) > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 1000 && !settings.runtime.openXr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate.
             // Use a low-pass filter.
             fps = MathUtilsDouble.lowPass(1f / graphics.getDeltaTime(), fps, 10f);
@@ -467,7 +468,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
         // Tooltips.
         TooltipManager.getInstance().initialTime = 1f;
-        TooltipManager.getInstance().hideAll();
+        TooltipManager.getInstance()
+                .hideAll();
 
         // Initialize asset manager.
         final FileHandleResolver internalResolver = new InternalFileHandleResolver();
@@ -644,7 +646,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 xrDriver.pollEvents();
 
                 if (settings.graphics.resolution[0] != xrDriver.getWidth()) {
-                    logger.info("Resizing to XR system values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
+                    logger.info(
+                            "Resizing to XR system values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
                     // Do not resize the screen!
                     settings.graphics.backBufferResolution[1] = xrDriver.getHeight();
                     settings.graphics.backBufferResolution[0] = xrDriver.getWidth();
@@ -719,7 +722,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         if (assetManager.isLoaded(sceneName)) {
             scene = assetManager.get(sceneName);
         } else {
-            throw new RuntimeException("Error loading scene from data load string: " + sceneName + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
+            throw new RuntimeException(
+                    "Error loading scene from data load string: " + sceneName + ", and files: " + TextUtils.concatenate(File.pathSeparator,
+                                                                                                                        settings.data.dataFiles));
         }
 
 
@@ -738,7 +743,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
          * Complete scene renderer loading.
          */
         sceneRenderer.doneLoading(assetManager);
-        sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) FastMath.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) FastMath.round(graphics.getHeight() * settings.graphics.backBufferScale));
+        sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) FastMath.round(graphics.getWidth() * settings.graphics.backBufferScale),
+                             (int) FastMath.round(graphics.getHeight() * settings.graphics.backBufferScale));
 
         // Camera.
         cameraManager.doneLoading(assetManager);
@@ -775,7 +781,11 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events.
-        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE, Event.GO_HOME_INSTANT_CMD);
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE,
+                                        Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD,
+                                        Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD,
+                                        Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE,
+                                        Event.GO_HOME_INSTANT_CMD);
 
         // Re-enable input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -804,13 +814,17 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 // Current session time.
                 EventManager.publish(Event.DEBUG_TIME, this, getRunTimeSeconds());
                 // Memory.
-                EventManager.publish(Event.DEBUG_RAM, this, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
+                EventManager.publish(Event.DEBUG_RAM, this, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(),
+                                     MemInfo.getMaxMemory());
                 // V-RAM.
                 EventManager.publish(Event.DEBUG_VRAM, this, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
                 // Threads.
-                EventManager.publish(Event.DEBUG_THREADS, this, executorService.getPool().getActiveCount(), executorService.getPool().getPoolSize());
+                EventManager.publish(Event.DEBUG_THREADS, this, executorService.getPool()
+                        .getActiveCount(), executorService.getPool()
+                                             .getPoolSize());
                 // Dynamic resolution.
-                EventManager.publish(Event.DEBUG_DYN_RES, this, dynamicResolutionLevel, settings.graphics.dynamicResolutionScale[dynamicResolutionLevel]);
+                EventManager.publish(Event.DEBUG_DYN_RES, this, dynamicResolutionLevel,
+                                     settings.graphics.dynamicResolutionScale[dynamicResolutionLevel]);
                 // Octree objects.
                 if (OctreeLoader.instance != null) {
                     // Observed objects.
@@ -837,7 +851,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         final var startCapturing = new Task() {
             @Override
             public void run() {
-                LocationLogManager.instance().startCapturing();
+                LocationLogManager.instance()
+                        .startCapturing();
             }
         };
         Timer.schedule(startCapturing, 1f);
@@ -945,7 +960,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             var t = new Task() {
                 @Override
                 public void run() {
-                    logger.info("The home object '" + settings.scene.homeObject + "' is invisible due to its type(s): " + Mapper.base.get(homeObject).ct);
+                    logger.info(
+                            "The home object '" + settings.scene.homeObject + "' is invisible due to its type(s): " + Mapper.base.get(homeObject).ct);
                 }
             };
             Timer.schedule(t, 1);
@@ -1052,7 +1068,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         // Dispose.
         if (saveState && !crashed.get()) {
             SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
-            if (gaiaSkyAssets.bookmarksManager != null) gaiaSkyAssets.bookmarksManager.persistBookmarks();
+            if (gaiaSkyAssets != null && gaiaSkyAssets.bookmarksManager != null) gaiaSkyAssets.bookmarksManager.persistBookmarks();
         }
 
         ScriptingServer.dispose();
@@ -1086,7 +1102,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         }
 
         // Post processor.
-        if (gaiaSkyAssets.postProcessor != null) {
+        if (gaiaSkyAssets != null && gaiaSkyAssets.postProcessor != null) {
             gaiaSkyAssets.postProcessor.dispose();
         }
 
@@ -1100,11 +1116,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
         // OpenXR context.
         if (xrDriver != null) xrDriver.dispose();
-
-        // GLFW crashes on glfwDestroyWindow() on Wayland.
-        if (SysUtils.isLinux() && SysUtils.isWayland()) {
-            System.exit(0);
-        }
     }
 
     public void resetDynamicResolution() {
@@ -1118,7 +1129,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public FrameBuffer getBackRenderBuffer() {
-        return sceneRenderer.getRenderProcess().getResultBuffer();
+        return sceneRenderer.getRenderProcess()
+                .getResultBuffer();
     }
 
     public void setCrashed(boolean crashed) {
@@ -1127,20 +1139,14 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
     @Override
     public void render() {
-        try {
-            if (running.get() && !crashed.get() && updateRenderProcess != null) {
-                // Run the render process.
-                updateRenderProcess.run();
-            } else if (crashGui != null) {
-                // Crash information.
-                assetManager.update();
-                renderGui(crashGui);
-                frames++;
-            }
-        } catch (Throwable t) {
-            // Flag up.
-            crashed.set(true);
-            GaiaSky.postRunnable(() -> Gdx.app.exit());
+        if (running.get() && !crashed.get() && updateRenderProcess != null) {
+            // Run the render process.
+            updateRenderProcess.run();
+        } else if (crashGui != null) {
+            // Crash information.
+            assetManager.update();
+            renderGui(crashGui);
+            frames++;
         }
 
         // Create UI window if needed.
@@ -1231,7 +1237,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         }
 
         // Update GravWaves params
-        RelativisticEffectsManager.getInstance().update(time, cameraManager.current);
+        RelativisticEffectsManager.getInstance()
+                .update(time, cameraManager.current);
 
         // Update scene graph in a thread (sync for now).
         updateProcess.run();
@@ -1306,7 +1313,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             lastResizeTime = System.currentTimeMillis();
 
             if (renderBatch != null) {
-                renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+                renderBatch.getProjectionMatrix()
+                        .setToOrtho2D(0, 0, width, height);
             }
 
             Settings.settings.graphics.resolution[0] = width;
@@ -1323,7 +1331,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         }
     }
 
-    public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis, boolean resizeScreenConf) {
+    public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis,
+                                boolean resizeScreenConf) {
         try {
             final var settings = Settings.settings;
             final var renderWidth = (int) FastMath.round(width * settings.graphics.backBufferScale);

@@ -29,20 +29,23 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Gaia Sky main error dialog implementation. This is implemented as a standalone application that
  * displays an error to the user. Used when a very bad, unrecoverable crash happens.
  */
 public class ErrorDialog implements ApplicationListener {
 
-    private final Exception cause;
+    private final Exception exception;
     private Stage ui;
     private ScreenViewport vp;
     private SpriteBatch sb;
     private Skin skin;
 
-    public ErrorDialog(Exception cause) {
-        this.cause = cause;
+    public ErrorDialog(Exception exception) {
+        this.exception = exception;
     }
 
     @Override
@@ -86,13 +89,13 @@ public class ErrorDialog implements ApplicationListener {
         OwnLabel title = new OwnLabel(I18n.msg("error.crash.title"), skin, "header-large");
         // Subtitle
         String msg;
-        if (cause != null) {
-            if (cause.getLocalizedMessage() != null) {
-                msg = cause.getLocalizedMessage();
-            } else if (cause.getMessage() != null) {
-                msg = cause.getMessage();
+        if (exception != null) {
+            if (exception.getLocalizedMessage() != null) {
+                msg = exception.getLocalizedMessage();
+            } else if (exception.getMessage() != null) {
+                msg = exception.getMessage();
             } else {
-                msg = cause.getClass()
+                msg = exception.getClass()
                         .getSimpleName();
             }
         } else {
@@ -167,19 +170,16 @@ public class ErrorDialog implements ApplicationListener {
                 .row();
 
         // Stack trace
-        int lines = 0;
-        if (cause != null && cause.getStackTrace() != null) {
-            var stringBuilder = new StringBuilder();
-            var st = cause.getStackTrace();
-            for (var elem : st) {
-                stringBuilder.append(elem.toString())
-                        .append("\n");
-                lines++;
-            }
-            OwnTextArea stackTraceTextArea = new OwnTextArea(stringBuilder.toString(), skin, "default");
+        if (exception != null && exception.getStackTrace() != null) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exception.printStackTrace(pw);
+            String sStackTrace = sw.toString();
+            long lines = TextUtils.countLines(sStackTrace);
+            OwnTextArea stackTraceTextArea = new OwnTextArea(sStackTrace, skin, "default");
             stackTraceTextArea.setPrefRows(15f);
             stackTraceTextArea.setWidth(800f);
-            stackTraceTextArea.setHeight(lines * 35f);
+            stackTraceTextArea.setHeight(lines * 55f);
 
             OwnScrollPane stackTraceScroll = new OwnScrollPane(stackTraceTextArea, skin, "minimalist");
             stackTraceScroll.setWidth(820f);
@@ -202,7 +202,7 @@ public class ErrorDialog implements ApplicationListener {
             copy.addListener((event) -> {
                 if (event instanceof ChangeListener.ChangeEvent) {
                     Gdx.app.getClipboard()
-                            .setContents(stringBuilder.toString());
+                            .setContents(sStackTrace);
                 }
                 return false;
             });
