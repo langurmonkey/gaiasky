@@ -8,8 +8,6 @@
 package gaiasky.gui.window;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -85,7 +83,8 @@ public class DateDialog extends GenericDialog {
         HorizontalGroup tabGroup = new HorizontalGroup();
         tabGroup.align(Align.center);
         float tabWidth = 300f;
-        final OwnTextButton tabUTC = new OwnTextButton(I18n.msg("gui.time.time.zone", timeZone.getDisplayName(TextStyle.SHORT, I18n.locale)), skin, "toggle-big");
+        final OwnTextButton tabUTC = new OwnTextButton(I18n.msg("gui.time.time.zone", timeZone.getDisplayName(TextStyle.SHORT, I18n.locale)), skin,
+                                                       "toggle-big");
         tabUTC.pad(pad10);
         tabUTC.setWidth(tabWidth);
         final OwnTextButton tabJD = new OwnTextButton(I18n.msg("gui.time.julian"), skin, "toggle-big");
@@ -173,10 +172,10 @@ public class DateDialog extends GenericDialog {
         day.setMaxLength(2);
         day.setWidth(inputWidth);
         day.addListener(event -> {
-            if (event instanceof InputEvent ie) {
-                if (ie.getType() == Type.keyTyped) {
+            if (event instanceof ChangeEvent ce) {
+                if (ce.getTarget() == day && !day.getText()
+                        .isEmpty())
                     return checkFullDate();
-                }
             }
             return false;
         });
@@ -193,10 +192,10 @@ public class DateDialog extends GenericDialog {
         year.setMaxLength(8);
         year.setWidth(inputWidth);
         year.addListener(event -> {
-            if (event instanceof InputEvent ie) {
-                if (ie.getType() == Type.keyTyped) {
+            if (event instanceof ChangeEvent ce) {
+                if (ce.getTarget() == year && !year.getText()
+                        .isEmpty())
                     return checkFullDate();
-                }
             }
             return false;
         });
@@ -222,10 +221,10 @@ public class DateDialog extends GenericDialog {
         hour.setMaxLength(2);
         hour.setWidth(inputWidth);
         hour.addListener(event -> {
-            if (event instanceof InputEvent ie) {
-                if (ie.getType() == Type.keyTyped) {
+            if (event instanceof ChangeEvent ce) {
+                if (ce.getTarget() == hour && !hour.getText()
+                        .isEmpty())
                     return checkFullDate();
-                }
             }
             return false;
         });
@@ -235,10 +234,10 @@ public class DateDialog extends GenericDialog {
         min.setMaxLength(2);
         min.setWidth(inputWidth);
         min.addListener(event -> {
-            if (event instanceof InputEvent ie) {
-                if (ie.getType() == Type.keyTyped) {
+            if (event instanceof ChangeEvent ce) {
+                if (ce.getTarget() == min && !min.getText()
+                        .isEmpty())
                     return checkFullDate();
-                }
             }
             return false;
         });
@@ -248,10 +247,10 @@ public class DateDialog extends GenericDialog {
         sec.setMaxLength(2);
         sec.setWidth(inputWidth);
         sec.addListener(event -> {
-            if (event instanceof InputEvent ie) {
-                if (ie.getType() == Type.keyTyped) {
+            if (event instanceof ChangeEvent ce) {
+                if (ce.getTarget() == sec && !sec.getText()
+                        .isEmpty())
                     return checkFullDate();
-                }
             }
             return false;
         });
@@ -315,11 +314,11 @@ public class DateDialog extends GenericDialog {
         jd = new OwnTextField("", skin, jdValidator);
         jd.setWidth(inputWidth);
         jd.addListener(event -> {
-            if (event instanceof InputEvent ie) {
-                if (ie.getType() == Type.keyTyped) {
+            if (event instanceof ChangeEvent ce) {
+                if (ce.getTarget() == jd && !jd.getText()
+                        .isEmpty())
                     checkJulian();
-                    return true;
-                }
+                return true;
             }
             return false;
         });
@@ -403,7 +402,8 @@ public class DateDialog extends GenericDialog {
         try {
             var ldt = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()),
                                        Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
-            var instant = ldt.atZone(timeZone).toInstant();
+            var instant = ldt.atZone(timeZone)
+                    .toInstant();
             updateCurrent(instant);
 
             return true;
