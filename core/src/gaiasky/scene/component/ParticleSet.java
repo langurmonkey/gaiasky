@@ -298,13 +298,7 @@ public class ParticleSet implements Component, IDisposable {
     // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
     // Indices list buffer 1.
-    public Integer[] indices1;
-    // Indices list buffer 2.
-    public Integer[] indices2;
-    // Active indices list.
-    public Integer[] active;
-    // Background indices list (the one we sort).
-    public Integer[] background;
+    public int[] indices1;
 
     // Visibility array with 1 (visible) or 0 (hidden) for each particle.
     public byte[] visibilityArray;

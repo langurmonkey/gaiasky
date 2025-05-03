@@ -241,13 +241,13 @@ public class LabelEntityRenderSystem {
         }
 
         // Particle labels.
-        var active = view.particleSet.active;
+        var active = view.particleSet.indices1;
         if (view.particleSet.renderParticleLabels && active != null) {
             float thresholdLabel = 1f;
             var pointData = view.particleSet.pointData;
             int n = FastMath.min(pointData.size(), view.particleSet.numLabels);
             for (int i = 0; i < n; i++) {
-                if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
+                if (active[i] >= 0 && set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     IParticleRecord pb = pointData.get(active[i]);
                     if (pb.names() != null) {
                         Vector3b particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
@@ -299,14 +299,14 @@ public class LabelEntityRenderSystem {
             float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
 
             var pointData = set.pointData;
-            var active = set.active;
+            var active = set.indices1;
 
             Vector3b starPosition = B31;
             int n = FastMath.min(pointData.size(), set.numLabels);
             for (int i = 0; i < n; i++) {
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     int idx = active[i];
-                    if (!renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera)) {
+                    if (idx >=0 && !renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera)) {
                         // Only render until the first is not rendered.
                         break;
                     }

@@ -50,7 +50,8 @@ public class BillboardEntityRenderSystem implements IObserver {
 
     private void initRenderAttributes() {
         if (GaiaSky.instance != null) {
-            fovFactor = GaiaSky.instance.getCameraManager().getFovFactor();
+            fovFactor = GaiaSky.instance.getCameraManager()
+                    .getFovFactor();
         } else {
             fovFactor = 1f;
         }
@@ -187,11 +188,15 @@ public class BillboardEntityRenderSystem implements IObserver {
         boolean focusRendered = false;
         int n = FastMath.min(set.numBillboards, set.pointData.size());
         for (int i = 0; i < n; i++) {
-            renderCloseUpStar(set, highlight, desc, set.active[i], fovFactor, set.cPosD, camera, shader, mesh, thPointTimesFovFactor, alpha);
-            focusRendered = focusRendered || set.active[i] == set.focusIndex;
+            if (set.indices1[i] >= 0) {
+                renderCloseUpStar(set, highlight, desc, set.indices1[i], fovFactor, set.cPosD, camera, shader, mesh,
+                                  thPointTimesFovFactor, alpha);
+                focusRendered = focusRendered || set.indices1[i] == set.focusIndex;
+            }
         }
         if (set.focus != null && !focusRendered) {
-            renderCloseUpStar(set, highlight, desc, set.focusIndex, fovFactor, set.cPosD, camera, shader, mesh, thPointTimesFovFactor, alpha);
+            renderCloseUpStar(set, highlight, desc, set.focusIndex, fovFactor, set.cPosD, camera, shader, mesh,
+                              thPointTimesFovFactor, alpha);
         }
     }
 
@@ -263,7 +268,8 @@ public class BillboardEntityRenderSystem implements IObserver {
             // Bring it a tad closer to the camera to prevent occlusion with orbit.
             // Only for models.
             float len = billboardPosition.len();
-            billboardPosition.nor().scl(len * 0.99f);
+            billboardPosition.nor()
+                    .scl(len * 0.99f);
         } else {
             // Projection matrix for star corona.
             shader.setUniformMatrix("u_matrix", camera.getCamera().view);
@@ -318,7 +324,8 @@ public class BillboardEntityRenderSystem implements IObserver {
 
         shader.setUniformf("u_pos", graph.translation.put(F31));
         shader.setUniformf("u_size", body.size);
-        shader.setUniformf("u_color", body.color[0] * fa, body.color[1] * fa, body.color[2] * fa, body.color[3] * alpha * base.opacity * 6.5f);
+        shader.setUniformf("u_color", body.color[0] * fa, body.color[1] * fa, body.color[2] * fa,
+                           body.color[3] * alpha * base.opacity * 6.5f);
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }

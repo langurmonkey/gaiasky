@@ -391,14 +391,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         particleSet.metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order
-        particleSet.indices1 = new Integer[pointData.size()];
-        particleSet.indices2 = new Integer[pointData.size()];
+        particleSet.indices1 = new int[pointData.size()];
         for (int i = 0; i < pointData.size(); i++) {
-            particleSet.indices1[i] = i;
-            particleSet.indices2[i] = i;
+            particleSet.indices1[i] = -1;
         }
-        particleSet.active = particleSet.indices1;
-        particleSet.background = particleSet.indices2;
 
         // Initialize updater task
         particleSet.updaterTask = new ParticleSetUpdaterTask(entity, particleSet, starSet);

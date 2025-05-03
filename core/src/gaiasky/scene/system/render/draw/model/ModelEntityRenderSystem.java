@@ -439,7 +439,7 @@ public class ModelEntityRenderSystem {
                     // We need to fetch the position again, for the camera position is different in stereoscopic mode.
                     var pos = set.fetchPosition(set.get(idx), GaiaSky.instance.getICamera().getPos(), v3b1, set.currDeltaYears);
                     mc.instance.transform.idt().translate((float) pos.x.doubleValue(), (float) pos.y.doubleValue(), (float) pos.z.doubleValue()).scl(
-                            (float) (set.getRadius(set.active[0]) * 2d * variableScaling));
+                            (float) (set.getRadius(set.indices1[0]) * 2d * variableScaling));
                     if (relativistic) {
                         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
                     }

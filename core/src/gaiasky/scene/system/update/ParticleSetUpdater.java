@@ -58,14 +58,17 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
     private void updateCommon(ICamera camera, ParticleSet set) {
         // Update proximity loading.
         if (set.proximityLoadingFlag) {
-            int idxNearest = set.active[0];
-            var bean = set.pointData.get(idxNearest);
-            if (bean != null) {
+            int idxNearest = set.indices1[0];
+            IParticleRecord bean;
+            if (idxNearest >= 0 && (bean = set.pointData.get(idxNearest)) != null) {
                 var sa = set.getSolidAngleApparent(idxNearest);
-                var beanSelected = camera.getMode().isFocus()
-                        && camera.getFocus().isValid()
+                var beanSelected = camera.getMode()
+                        .isFocus()
+                        && camera.getFocus()
+                        .isValid()
                         && ((FocusView) camera.getFocus()).getSet() == set
-                        && camera.getFocus().hasName(bean.names()[0]);
+                        && camera.getFocus()
+                        .hasName(bean.names()[0]);
                 if (!set.proximityLoaded.contains(idxNearest)) {
                     // About 4 degrees.
                     if (sa > set.proximityThreshold) {
@@ -75,12 +78,15 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                         if (Files.exists(path)) {
                             // Remove current bean from index.
                             for (var key : bean.names()) {
-                                var k = key.toLowerCase().trim();
-                                GaiaSky.instance.scene.index().remove(k);
+                                var k = key.toLowerCase()
+                                        .trim();
+                                GaiaSky.instance.scene.index()
+                                        .remove(k);
                             }
                             // Load descriptor.
                             // Only re-focus (select) if our current focus is the object in question.
-                            GaiaSky.postRunnable(() -> GaiaSky.instance.scripting().loadJsonDataset(name, path.toString(), beanSelected, true));
+                            GaiaSky.postRunnable(() -> GaiaSky.instance.scripting()
+                                    .loadJsonDataset(name, path.toString(), beanSelected, true));
                             set.proximityLoaded.add(idxNearest);
                         } else {
                             set.proximityLoaded.add(idxNearest);
@@ -89,7 +95,8 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                     }
                 } else if (!set.proximityMissing.contains(idxNearest) && beanSelected) {
                     // Already loaded. Do focus transition.
-                    GaiaSky.instance.scripting().setCameraFocus(bean.names()[0]);
+                    GaiaSky.instance.scripting()
+                            .setCameraFocus(bean.names()[0]);
                 }
             }
         }
@@ -119,16 +126,17 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                                StarSet set,
                                DatasetDescription datasetDesc) {
         // Fade node visibility
-        if (set.active != null && set.active.length > 0 && set.pointData != null) {
+        if (set.indices1 != null && set.indices1.length > 0 && set.pointData != null) {
             updateParticleSet(camera, set);
 
             // Update close stars
             int j = 0;
             for (int i = 0; i < FastMath.min(set.proximity.updating.length, set.pointData.size()); i++) {
-                if (utils.filter(set.active[i], set, datasetDesc)
-                        && set.isVisible(set.active[i])) {
-                    IParticleRecord closeStar = set.pointData.get(set.active[i]);
-                    set.proximity.set(j, set.active[i], closeStar, camera, set.currDeltaYears);
+                if (set.indices1[i] >= 0
+                        && utils.filter(set.indices1[i], set, datasetDesc)
+                        && set.isVisible(set.indices1[i])) {
+                    IParticleRecord closeStar = set.pointData.get(set.indices1[i]);
+                    set.proximity.set(j, set.indices1[i], closeStar, camera, set.currDeltaYears);
                     camera.checkClosestParticle(set.proximity.updating[j]);
 
                     // Model distance

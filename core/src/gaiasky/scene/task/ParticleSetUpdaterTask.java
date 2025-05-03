@@ -22,6 +22,7 @@ import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
+import gaiasky.util.IntPriorityQueue;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3d;
@@ -30,6 +31,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.PriorityQueue;
 import java.util.function.BiConsumer;
 
 import static gaiasky.scene.task.ParticleSetUpdaterTask.UpdateStage.*;
@@ -54,14 +56,12 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     private final Base base;
     /** Reference to the particle set component. **/
     private final ParticleSet particleSet;
-    /** Reference to the star set component. **/
-    private final StarSet starSet;
     /** Consumer method that updates the metadata. **/
-    private final BiConsumer<ITimeFrameProvider, ICamera> updateConsumer;
+    private final BiConsumer<ITimeFrameProvider, ICamera> updateMetadataConsumer;
     /** Reference to the dataset description component. **/
     private final DatasetDescription datasetDescription;
     private final ParticleUtils utils;
-    private final Comparator<Integer> comp;
+    private final IntPriorityQueue reusableQueue;
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D34 = new Vector3d();
@@ -78,21 +78,26 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     /** Contains the stage that needs to be run next for this updater. **/
     private UpdateStage stage;
 
+    private static final int K = 50;
+
     public ParticleSetUpdaterTask(Entity entity,
                                   ParticleSet particleSet,
                                   StarSet starSet) {
         this.base = Mapper.base.get(entity);
-        this.particleSet = particleSet;
-        this.starSet = starSet;
+        if (starSet != null) {
+            this.particleSet = starSet;
+        } else {
+            this.particleSet = particleSet;
+        }
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
-        this.comp = new ParticleSetComparator(this.particleSet);
+        this.reusableQueue = new IntPriorityQueue(K, (a, b) -> Double.compare(this.particleSet.metadata[a], this.particleSet.metadata[b]));
         this.stage = SORT;
 
-        if (this.starSet != null) {
-            updateConsumer = this::updateMetadataStars;
+        if (starSet != null) {
+            updateMetadataConsumer = this::updateMetadataParticlesExt;
         } else {
-            updateConsumer = this.particleSet.isExtended ? this::updateMetadataParticlesExt : this::updateMetadataParticles;
+            updateMetadataConsumer = this.particleSet.isExtended ? this::updateMetadataParticlesExt : this::updateMetadataParticles;
         }
 
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
@@ -119,7 +124,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                     && (t > UPDATE_INTERVAL_S_2
                     || (particleSet.lastSortCameraPos.dst2d(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
                     || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_S))) {
-                GaiaSky.instance.getExecutorService().execute(this);
             }
         }
     }
@@ -137,17 +141,42 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             case METADATA -> {
                 // Prepare metadata to sort.
                 stage = BUSY;
-                updateConsumer.accept(time, camera);
+                updateMetadataConsumer.accept(time, camera);
                 stage = SORT;
             }
             case SORT -> {
                 stage = BUSY;
-                // Sort background list of indices.
-                Arrays.parallelSort(particleSet.background, comp);
+
+                final int K = 50; // or dynamic based on zoom level, etc.
+
+                var count = particleSet.pointData.size();
+                var metadata = particleSet.metadata;
+                var topK = reusableQueue;
+                topK.clear();
+
+                for (int i = 0; i < count; i++) {
+                    if (utils.filter(i, particleSet, datasetDescription)) {
+                        if (topK.size() < K) {
+                            topK.add(i);
+                        } else if (metadata[i] < metadata[topK.peek()]) {
+                            topK.poll();
+                            topK.add(i);
+                        }
+                    }
+                }
+
+                // Now move topK to array and sort it (optional)
+                int[] topIndices = reusableQueue.toSortedArray();
+                var targetIndices = particleSet.indices1;
+                System.arraycopy(topIndices, 0, targetIndices, 0, topIndices.length);
+
+                // If you want to fill the rest with -1 or pad with something else:
+                for (int i = topIndices.length; i < count; i++) {
+                    targetIndices[i] = -1;
+                }
 
                 // Synchronously with the render thread, update indices, lastSortTime and updating state.
                 GaiaSky.postRunnable(() -> {
-                    swapBuffers();
                     particleSet.lastSortCameraPos.set(camera.getPos());
                     particleSet.lastSortTime = GaiaSky.instance.getT();
                     stage = METADATA;
@@ -155,45 +184,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             }
         }
 
-    }
-
-    private void swapBuffers() {
-        if (particleSet.active == particleSet.indices1) {
-            particleSet.active = particleSet.indices2;
-            particleSet.background = particleSet.indices1;
-        } else {
-            particleSet.active = particleSet.indices1;
-            particleSet.background = particleSet.indices2;
-        }
-    }
-
-    /**
-     * Updates the star metadata information, used mainly for sorting. For stars, we propagate the positions
-     * with the proper motion and weigh the number using the pseudo-size, which is a proxy to the magnitude.
-     *
-     * @param time   The time frame provider.
-     * @param camera The camera.
-     */
-    private void updateMetadataStars(ITimeFrameProvider time,
-                                     ICamera camera) {
-        // Stars, propagate proper motion, weigh with pseudo-size.
-        Vector3d camPos = camera.getPos().tov3d(D34);
-        double deltaYears = AstroUtils.getMsSince(time.getTime(), starSet.epochJd) * Nature.MS_TO_Y;
-        if (starSet.pointData != null) {
-            int n = starSet.pointData.size();
-            for (int i = 0; i < n; i++) {
-                IParticleRecord d = starSet.pointData.get(i);
-
-                // Pm
-                Vector3d dx = D32.set(d.vx(), d.vy(), d.vz()).scl(deltaYears);
-                // Pos
-                Vector3d x = D31.set(d.x(), d.y(), d.z()).add(dx);
-
-                starSet.metadata[i] = utils.filter(i, starSet, datasetDescription) ?
-                        -((d.size() / camPos.dst2(x)) / camera.getFovFactor()) :
-                        Double.MAX_VALUE;
-            }
-        }
     }
 
     /**
@@ -224,7 +214,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
      */
     private void updateMetadataParticlesExt(ITimeFrameProvider time,
                                             ICamera camera) {
-        // Particles, only distance.
+        // Extended particles and stars, propagate proper motion, weigh with pseudo-size.
         Vector3d camPos = camera.getPos().tov3d(D34);
         double deltaYears = AstroUtils.getMsSince(time.getTime(), particleSet.epochJd) * Nature.MS_TO_Y;
         if (particleSet.pointData != null) {
@@ -263,15 +253,4 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         EventManager.instance.removeAllSubscriptions(this);
     }
 
-    /**
-     * User order in metadata arrays to compare indices in this particle set.
-     */
-    private record ParticleSetComparator(ParticleSet set) implements Comparator<Integer> {
-
-        @Override
-        public int compare(Integer i1,
-                           Integer i2) {
-            return Double.compare(set.metadata[i1], set.metadata[i2]);
-        }
-    }
 }
