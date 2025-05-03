@@ -241,7 +241,7 @@ public class LabelEntityRenderSystem {
         }
 
         // Particle labels.
-        var active = view.particleSet.indices1;
+        var active = view.particleSet.indices;
         if (view.particleSet.renderParticleLabels && active != null) {
             float thresholdLabel = 1f;
             var pointData = view.particleSet.pointData;
@@ -304,7 +304,7 @@ public class LabelEntityRenderSystem {
             float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
 
             var pointData = set.pointData;
-            var active = set.indices1;
+            var active = set.indices;
 
             Vector3b starPosition = B31;
             int n = FastMath.min(pointData.size(), set.numLabels);

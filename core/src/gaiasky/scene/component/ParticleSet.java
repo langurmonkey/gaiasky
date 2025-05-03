@@ -297,11 +297,11 @@ public class ParticleSet implements Component, IDisposable {
     private final Object indexSync = new Object();
     // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
-    // Indices list buffer 1.
-    public int[] indices1;
+    // Indices list buffer.
+    public int[] indices;
 
-    // Visibility array with 1 (visible) or 0 (hidden) for each particle.
-    public byte[] visibilityArray;
+    /** Indices of stars that are not visible. **/
+    public IntSet invisibilityArray;
 
     // Reference to the entity.
     public Entity entity;
@@ -369,10 +369,7 @@ public class ParticleSet implements Component, IDisposable {
         if (regenerateIndex)
             regenerateIndex();
         // Initialize visibility - all visible
-        this.visibilityArray = new byte[pointData.size()];
-        for (int i = 0; i < pointData.size(); i++) {
-            this.visibilityArray[i] = (byte) 1;
-        }
+        this.invisibilityArray = new IntSet();
     }
 
     public void setColumnInfoList(List<ColumnInfo> columnInfoList) {
@@ -731,7 +728,7 @@ public class ParticleSet implements Component, IDisposable {
      * @return The visibility of the particle
      */
     public boolean isVisible(int index) {
-        return visibilityArray != null && visibilityArray[index] != (byte) 0;
+        return !invisibilityArray.contains(index);
     }
 
     public void setVisible(boolean visible,
@@ -754,10 +751,14 @@ public class ParticleSet implements Component, IDisposable {
     public void setVisible(int index,
                            boolean visible,
                            Render render) {
-        if (index >= 0 && index < visibilityArray.length) {
-            boolean previousVisibility = this.visibilityArray[index] != 0;
-            this.visibilityArray[index] = (byte) (visible ? 1 : 0);
-            if (previousVisibility != visible) {
+        if (index >= 0 && index < pointData.size()) {
+            boolean changed;
+            if (visible) {
+                changed = this.invisibilityArray.remove(index);
+            } else {
+                changed = this.invisibilityArray.add(index);
+            }
+            if (changed) {
                 markForUpdate(render);
             }
         }

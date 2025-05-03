@@ -387,13 +387,14 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                                  StarSet starSet) {
         var pointData = particleSet.pointData;
 
-        // Metadata
+        // Metadata array.
         particleSet.metadata = new double[pointData.size()];
 
-        // Initialise indices list with natural order
-        particleSet.indices1 = new int[pointData.size()];
-        for (int i = 0; i < pointData.size(); i++) {
-            particleSet.indices1[i] = -1;
+        // Initialise indices list with natural order.
+        var K = FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels);
+        particleSet.indices = new int[K];
+        for (int i = 0; i < K; i++) {
+            particleSet.indices[i] = -1;
         }
 
         // Initialize updater task

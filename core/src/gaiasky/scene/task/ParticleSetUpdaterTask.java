@@ -173,11 +173,11 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
                 // Now move topK to array and sort it (optional)
                 int[] topIndices = this.reusableQueue.toSortedArray();
-                var targetIndices = particleSet.indices1;
+                var targetIndices = particleSet.indices;
                 System.arraycopy(topIndices, 0, targetIndices, 0, topIndices.length);
 
                 // If you want to fill the rest with -1 or pad with something else:
-                for (int i = topIndices.length; i < totalCount; i++) {
+                for (int i = topIndices.length; i < targetIndices.length; i++) {
                     targetIndices[i] = -1;
                 }
 

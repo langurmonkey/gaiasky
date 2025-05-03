@@ -188,10 +188,10 @@ public class BillboardEntityRenderSystem implements IObserver {
         boolean focusRendered = false;
         int n = FastMath.min(set.numBillboards, set.pointData.size());
         for (int i = 0; i < n; i++) {
-            if (set.indices1[i] >= 0) {
-                renderCloseUpStar(set, highlight, desc, set.indices1[i], fovFactor, set.cPosD, camera, shader, mesh,
+            if (set.indices[i] >= 0) {
+                renderCloseUpStar(set, highlight, desc, set.indices[i], fovFactor, set.cPosD, camera, shader, mesh,
                                   thPointTimesFovFactor, alpha);
-                focusRendered = focusRendered || set.indices1[i] == set.focusIndex;
+                focusRendered = focusRendered || set.indices[i] == set.focusIndex;
             }
         }
         if (set.focus != null && !focusRendered) {

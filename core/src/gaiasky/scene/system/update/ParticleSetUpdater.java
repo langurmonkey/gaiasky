@@ -58,7 +58,7 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
     private void updateCommon(ICamera camera, ParticleSet set) {
         // Update proximity loading.
         if (set.proximityLoadingFlag) {
-            int idxNearest = set.indices1[0];
+            int idxNearest = set.indices[0];
             IParticleRecord bean;
             if (idxNearest >= 0 && (bean = set.pointData.get(idxNearest)) != null) {
                 var sa = set.getSolidAngleApparent(idxNearest);
@@ -126,17 +126,17 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                                StarSet set,
                                DatasetDescription datasetDesc) {
         // Fade node visibility
-        if (set.indices1 != null && set.indices1.length > 0 && set.pointData != null) {
+        if (set.indices != null && set.indices.length > 0 && set.pointData != null) {
             updateParticleSet(camera, set);
 
             // Update close stars
             int j = 0;
             for (int i = 0; i < FastMath.min(set.proximity.updating.length, set.pointData.size()); i++) {
-                if (set.indices1[i] >= 0
-                        && utils.filter(set.indices1[i], set, datasetDesc)
-                        && set.isVisible(set.indices1[i])) {
-                    IParticleRecord closeStar = set.pointData.get(set.indices1[i]);
-                    set.proximity.set(j, set.indices1[i], closeStar, camera, set.currDeltaYears);
+                if (set.indices[i] >= 0
+                        && utils.filter(set.indices[i], set, datasetDesc)
+                        && set.isVisible(set.indices[i])) {
+                    IParticleRecord closeStar = set.pointData.get(set.indices[i]);
+                    set.proximity.set(j, set.indices[i], closeStar, camera, set.currDeltaYears);
                     camera.checkClosestParticle(set.proximity.updating[j]);
 
                     // Model distance

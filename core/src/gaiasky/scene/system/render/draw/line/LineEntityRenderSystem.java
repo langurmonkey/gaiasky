@@ -425,12 +425,12 @@ public class LineEntityRenderSystem {
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
         int n = (int) getMaxProperMotionLines(entity, set);
         for (int i = n - 1; i >= 0; i--) {
-            if (set.indices1[i] < 0) {
+            if (set.indices[i] < 0) {
                 // We are done.
                 break;
             }
-            IParticleRecord star = set.pointData.get(set.indices1[i]);
-            float radius = (float) (set.getSize(set.indices1[i]) * Constants.STAR_SIZE_FACTOR);
+            IParticleRecord star = set.pointData.get(set.indices[i]);
+            float radius = (float) (set.getSize(set.indices[i]) * Constants.STAR_SIZE_FACTOR);
             // Position
             Vector3b lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
             // Proper motion
