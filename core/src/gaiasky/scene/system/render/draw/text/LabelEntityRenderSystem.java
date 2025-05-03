@@ -247,8 +247,13 @@ public class LabelEntityRenderSystem {
             var pointData = view.particleSet.pointData;
             int n = FastMath.min(pointData.size(), view.particleSet.numLabels);
             for (int i = 0; i < n; i++) {
-                if (active[i] >= 0 && set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
-                    IParticleRecord pb = pointData.get(active[i]);
+                int idx = active[i];
+                if (idx < 0) {
+                    // Done.
+                    break;
+                }
+                if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
+                    IParticleRecord pb = pointData.get(idx);
                     if (pb.names() != null) {
                         Vector3b particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
                         float distToCamera = (float) particlePosition.lenDouble();
@@ -270,7 +275,7 @@ public class LabelEntityRenderSystem {
                         // Also fade labels in proximity.
                         var size = pb.hasSize() ? pb.size() : view.body.size;
                         var sa = size / distToCamera;
-                        if (set.proximityLoadingFlag && set.proximityLoaded.contains(active[i]) && sa > set.proximityThreshold * 0.5) {
+                        if (set.proximityLoadingFlag && set.proximityLoaded.contains(idx) && sa > set.proximityThreshold * 0.5) {
                             alpha *= (float) MathUtilsDouble.lint(sa, set.proximityThreshold * 0.5f, set.proximityThreshold * 1.5f, 1.0, 0.0);
                         }
 
@@ -304,9 +309,13 @@ public class LabelEntityRenderSystem {
             Vector3b starPosition = B31;
             int n = FastMath.min(pointData.size(), set.numLabels);
             for (int i = 0; i < n; i++) {
+                int idx = active[i];
+                if (idx < 0) {
+                    // Done.
+                    break;
+                }
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
-                    int idx = active[i];
-                    if (idx >=0 && !renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera)) {
+                    if (!renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera)) {
                         // Only render until the first is not rendered.
                         break;
                     }
