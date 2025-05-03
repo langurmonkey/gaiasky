@@ -125,7 +125,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
                 view.body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
                 var distPc = view.getPos().lenDouble() * Constants.U_TO_PC;
 
-                Vector3d pmv = AstroUtils.properMotionsToCartesian(pm.pmSph.x, pm.pmSph.y, pm.pmSph.z, FastMath.toRadians(view.getAlpha()), FastMath.toRadians(view.getDelta()), distPc, new Vector3d());
+                Vector3d pmv = gaiasky.util.coord.Coordinates.properMotionsToCartesian(pm.pmSph.x, pm.pmSph.y, pm.pmSph.z, FastMath.toRadians(view.getAlpha()), FastMath.toRadians(view.getDelta()), distPc, new Vector3d());
                 pmv.put(pm.pm);
             }
             pm.hasPm = pm.pm.len2() != 0;

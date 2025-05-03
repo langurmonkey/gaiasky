@@ -239,7 +239,7 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
         // VELOCITY VECTOR
-        Vector3d velocityVector = AstroUtils.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg),
+        Vector3d velocityVector = Coordinates.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg),
                                                                       FastMath.toRadians(deltaDeg),
                                                                       distPc, aux3d2);
 

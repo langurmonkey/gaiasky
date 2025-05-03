@@ -222,7 +222,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
     private void addCluster(String[] names, double ra, double raRad, double dec, double decRad, double dist, double distPc, double muAlphaStar, double muDelta, double radVel, double radiusDeg, int nStars, Array<Entity> list) {
         Vector3b pos = Coordinates.sphericalToCartesian(raRad, decRad, new Apfloat(dist, Constants.PREC), new Vector3b());
 
-        Vector3d pmv = AstroUtils.properMotionsToCartesian(muAlphaStar, muDelta, radVel, FastMath.toRadians(ra), FastMath.toRadians(dec), distPc, new Vector3d());
+        Vector3d pmv = Coordinates.properMotionsToCartesian(muAlphaStar, muDelta, radVel, FastMath.toRadians(ra), FastMath.toRadians(dec), distPc, new Vector3d());
 
         Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
         Vector3 pmSph = new Vector3((float) (muAlphaStar), (float) (muDelta), (float) radVel);
