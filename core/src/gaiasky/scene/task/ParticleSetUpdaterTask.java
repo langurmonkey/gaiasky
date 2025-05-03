@@ -28,10 +28,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.PriorityQueue;
 import java.util.function.BiConsumer;
 
 import static gaiasky.scene.task.ParticleSetUpdaterTask.UpdateStage.*;
@@ -124,6 +121,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                     && (t > UPDATE_INTERVAL_S_2
                     || (particleSet.lastSortCameraPos.dst2d(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
                     || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_S))) {
+                GaiaSky.instance.getExecutorService().execute(this);
             }
         }
     }
