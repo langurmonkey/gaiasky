@@ -93,9 +93,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
+        this.K = FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels);
         this.reusableQueue = new IntPriorityQueue(K, (a, b) -> Double.compare(this.particleSet.metadata[a],
                                                                               this.particleSet.metadata[b]));
-        this.K = FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels);
         this.stage = SORT;
 
         if (starSet != null) {
