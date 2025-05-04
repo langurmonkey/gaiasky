@@ -211,8 +211,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 // not working, try next
             }
         }
-        @SuppressWarnings("unchecked")
-        Pair<UCD, String>[] result = new Pair[strings.size];
+        Pair<UCD, String>[] result;
+        result = new Pair[strings.size];
         int i = 0;
         for (Pair<UCD, String> value : strings) {
             result[i++] = value;
@@ -327,6 +327,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
 
                             Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitC, pt);
+                            p.realPosition.scl(factor);
 
                             double distPc = p.realPosition.len();
                             if ((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distPc) || distPc < 0) {
