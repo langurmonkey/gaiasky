@@ -302,10 +302,10 @@ public class ArchiveViewWindow extends GenericDialog {
                         ImageButton tooltip = new ImageButton(skin, "tooltip");
                         tooltip.addListener(new OwnTextTooltip(data[0][col], skin));
                         // Label.
-                        var text = TextUtils.capString(data[2][col], 43);
+                        var text = TextUtils.capString(data[2][col], 70);
                         var label = new OwnLabel(text, skin, "header-blue");
                         label.addListener(new OwnTextTooltip(data[2][col], skin));
-                        label.setWidth(Math.max(label.getWidth(), 710f));
+                        label.setWidth(Math.max(label.getWidth(), 880f));
 
                         hg.addActor(label);
                         hg.addActor(tooltip);

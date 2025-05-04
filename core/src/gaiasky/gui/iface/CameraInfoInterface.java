@@ -60,7 +60,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
-    protected OwnLabel focusIdExpand;
     protected HorizontalGroup focusActionsGroup;
     protected IFocus currentFocus;
     DecimalFormat nf;
@@ -106,8 +105,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusName = new OwnLabel("", skin, "hud-header");
         focusType = new OwnLabel("", skin, "hud-subheader");
         focusId = new OwnLabel("", skin, "hud");
-        focusIdExpand = new OwnLabel("(?)", skin, "question");
-        focusIdExpand.setVisible(false);
         focusNames = new Table(skin);
         focusRA = new OwnLabel("", skin, "hud");
         focusDEC = new OwnLabel("", skin, "hud");
@@ -234,7 +231,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         objectVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
-                EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, objectVisibility, currentFocus, currentFocus.getName(), !objectVisibility.isChecked());
+                EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, objectVisibility, currentFocus, currentFocus.getName(),
+                                     !objectVisibility.isChecked());
                 return true;
             }
             return false;
@@ -244,7 +242,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         labelVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
-                EventManager.publish(Event.FORCE_OBJECT_LABEL_CMD, labelVisibility, currentFocus, currentFocus.getName(), !labelVisibility.isChecked());
+                EventManager.publish(Event.FORCE_OBJECT_LABEL_CMD, labelVisibility, currentFocus, currentFocus.getName(),
+                                     !labelVisibility.isChecked());
                 return true;
             }
             return false;
@@ -283,70 +282,194 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         camVel.setWidth(w);
 
         // FOCUS INFO
-        focusInfo.add(focusName).width(width).left().colspan(2).padBottom(pad5).row();
-        focusInfo.add(focusActionsGroup).width(width).left().colspan(2).padBottom(pad5).row();
-        focusInfo.add(focusType).left().padBottom(pad5).colspan(2).row();
-        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.id"), skin, "hud")).left();
-        focusInfo.add(hg(focusId, focusIdExpand)).left().padLeft(pad15).row();
-        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.names"), skin, "hud")).left().padBottom(pad5);
-        focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad15).row();
+        focusInfo.add(focusName)
+                .width(width)
+                .left()
+                .colspan(2)
+                .padBottom(pad5)
+                .row();
+        focusInfo.add(focusActionsGroup)
+                .width(width)
+                .left()
+                .colspan(2)
+                .padBottom(pad5)
+                .row();
+        focusInfo.add(focusType)
+                .left()
+                .padBottom(pad5)
+                .colspan(2)
+                .row();
+        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.id"), skin, "hud"))
+                .left();
+        focusInfo.add(focusId)
+                .left()
+                .padLeft(pad15)
+                .row();
+        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.names"), skin, "hud"))
+                .left()
+                .padBottom(pad5);
+        focusInfo.add(focusNames)
+                .left()
+                .padBottom(pad5)
+                .padLeft(pad15)
+                .row();
         if (!vr) {
-            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.alpha"), skin, "hud")).left();
-            focusInfo.add(focusRA).left().padLeft(pad15).row();
-            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.delta"), skin, "hud")).left();
-            focusInfo.add(focusDEC).left().padLeft(pad15).row();
-            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.mualpha"), skin, "hud")).left();
-            focusInfo.add(focusMuAlpha).left().padLeft(pad15).row();
-            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.mudelta"), skin, "hud")).left();
-            focusInfo.add(focusMuDelta).left().padLeft(pad15).row();
-            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.radvel"), skin, "hud")).left();
-            focusInfo.add(focusRadVel).left().padLeft(pad15).row();
-            focusInfo.add(appMagEarthLabel).left();
-            focusInfo.add(focusAppMagEarth).left().padLeft(pad15).row();
-            focusInfo.add(appMagCameraLabel).left();
-            focusInfo.add(focusAppMagCamera).left().padLeft(pad15).row();
-            focusInfo.add(absMagLabel).left();
-            focusInfo.add(focusAbsMag).left().padLeft(pad15).row();
+            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.alpha"), skin, "hud"))
+                    .left();
+            focusInfo.add(focusRA)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
+            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.delta"), skin, "hud"))
+                    .left();
+            focusInfo.add(focusDEC)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
+            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.mualpha"), skin, "hud"))
+                    .left();
+            focusInfo.add(focusMuAlpha)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
+            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.mudelta"), skin, "hud"))
+                    .left();
+            focusInfo.add(focusMuDelta)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
+            focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.radvel"), skin, "hud"))
+                    .left();
+            focusInfo.add(focusRadVel)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
+            focusInfo.add(appMagEarthLabel)
+                    .left();
+            focusInfo.add(focusAppMagEarth)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
+            focusInfo.add(appMagCameraLabel)
+                    .left();
+            focusInfo.add(focusAppMagCamera)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
+            focusInfo.add(absMagLabel)
+                    .left();
+            focusInfo.add(focusAbsMag)
+                    .left()
+                    .padLeft(pad15)
+                    .row();
         }
-        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.angle"), skin, "hud")).left();
-        focusInfo.add(focusAngle).left().padLeft(pad15).row();
-        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.sol"), skin, "hud")).left();
-        focusInfo.add(focusDistSol).left().padLeft(pad15).row();
-        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.cam"), skin, "hud")).left();
-        focusInfo.add(focusDistCam).left().padLeft(pad15).row();
-        focusInfo.add(radiusSptLabel = new OwnLabel(I18n.msg("gui.focusinfo.radius"), skin, "hud")).left();
-        focusInfo.add(focusRadiusSpt).left().padLeft(pad15).row();
-        focusInfo.add(tEffLabel = new OwnLabel(I18n.msg("gui.focusinfo.teff"), skin, "hud")).left();
-        focusInfo.add(focusTEff).left().padLeft(pad15).row();
-        focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
+        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.angle"), skin, "hud"))
+                .left();
+        focusInfo.add(focusAngle)
+                .left()
+                .padLeft(pad15)
+                .row();
+        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.sol"), skin, "hud"))
+                .left();
+        focusInfo.add(focusDistSol)
+                .left()
+                .padLeft(pad15)
+                .row();
+        focusInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.cam"), skin, "hud"))
+                .left();
+        focusInfo.add(focusDistCam)
+                .left()
+                .padLeft(pad15)
+                .row();
+        focusInfo.add(radiusSptLabel = new OwnLabel(I18n.msg("gui.focusinfo.radius"), skin, "hud"))
+                .left();
+        focusInfo.add(focusRadiusSpt)
+                .left()
+                .padLeft(pad15)
+                .row();
+        focusInfo.add(tEffLabel = new OwnLabel(I18n.msg("gui.focusinfo.teff"), skin, "hud"))
+                .left();
+        focusInfo.add(focusTEff)
+                .left()
+                .padLeft(pad15)
+                .row();
+        focusInfo.add(moreInfo)
+                .left()
+                .colspan(2)
+                .padBottom(pad5)
+                .padTop(pad10);
 
         // POINTER INFO
         if (!vr) {
-            pointerInfo.add(pointerName).width(width).left().colspan(3).row();
-            pointerInfo.add(pointerImgBtn1).left().padRight(pad3);
-            pointerInfo.add(RADECPointerLabel).left();
-            pointerInfo.add(pointerRADEC).expandX().left().padLeft(pad5).row();
-            pointerInfo.add(pointerImgBtn2).left().padRight(pad3);
-            pointerInfo.add(lonLatLabel).left();
-            pointerInfo.add(pointerLonLat).expandX().left().padLeft(pad5).row();
-            pointerInfo.add(viewImgBtn).left().padRight(pad3);
-            pointerInfo.add(RADECViewLabel).left();
-            pointerInfo.add(viewRADEC).expandX().left().padLeft(pad5);
+            pointerInfo.add(pointerName)
+                    .width(width)
+                    .left()
+                    .colspan(3)
+                    .row();
+            pointerInfo.add(pointerImgBtn1)
+                    .left()
+                    .padRight(pad3);
+            pointerInfo.add(RADECPointerLabel)
+                    .left();
+            pointerInfo.add(pointerRADEC)
+                    .expandX()
+                    .left()
+                    .padLeft(pad5)
+                    .row();
+            pointerInfo.add(pointerImgBtn2)
+                    .left()
+                    .padRight(pad3);
+            pointerInfo.add(lonLatLabel)
+                    .left();
+            pointerInfo.add(pointerLonLat)
+                    .expandX()
+                    .left()
+                    .padLeft(pad5)
+                    .row();
+            pointerInfo.add(viewImgBtn)
+                    .left()
+                    .padRight(pad3);
+            pointerInfo.add(RADECViewLabel)
+                    .left();
+            pointerInfo.add(viewRADEC)
+                    .expandX()
+                    .left()
+                    .padLeft(pad5);
         }
 
         // CAMERA INFO
-        cameraInfo.add(camName).width(width).left().colspan(2).row();
-        cameraInfo.add(new OwnLabel(I18n.msg("gui.camera.track"), skin, "hud")).left();
-        cameraInfo.add(camTracking).left().padLeft(pad15).row();
-        cameraInfo.add(new OwnLabel(I18n.msg("gui.camera.vel"), skin, "hud")).left();
-        cameraInfo.add(camVel).left().padLeft(pad15).row();
-        cameraInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.sol"), skin, "hud")).left();
-        cameraInfo.add(camDistSol).left().padLeft(pad15);
+        cameraInfo.add(camName)
+                .width(width)
+                .left()
+                .colspan(2)
+                .row();
+        cameraInfo.add(new OwnLabel(I18n.msg("gui.camera.track"), skin, "hud"))
+                .left();
+        cameraInfo.add(camTracking)
+                .left()
+                .padLeft(pad15)
+                .row();
+        cameraInfo.add(new OwnLabel(I18n.msg("gui.camera.vel"), skin, "hud"))
+                .left();
+        cameraInfo.add(camVel)
+                .left()
+                .padLeft(pad15)
+                .row();
+        cameraInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.sol"), skin, "hud"))
+                .left();
+        cameraInfo.add(camDistSol)
+                .left()
+                .padLeft(pad15);
 
         // RULER INFO
-        rulerInfo.add(rulerName).left().row();
-        rulerInfo.add(rulerNameGroup).left().row();
-        rulerInfo.add(rulerDist).left();
+        rulerInfo.add(rulerName)
+                .left()
+                .row();
+        rulerInfo.add(rulerNameGroup)
+                .left()
+                .row();
+        rulerInfo.add(rulerDist)
+                .left();
 
         // MINIMIZE/MAXIMIZE
         Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
@@ -357,38 +480,48 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 if (maximized) {
                     // Minimize.
                     maximized = false;
-                    content.addAction(Actions.sequence(Actions.alpha(1f), Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()), Actions.run(() -> {
-                        contentCell.setActor(null);
-                        toggleSize.setText("(+)");
-                        toggleSizeTooltip.setText(I18n.msg("gui.maximize.pane"));
-                    })));
+                    content.addAction(Actions.sequence(Actions.alpha(1f),
+                                                       Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                                                       Actions.run(() -> {
+                                                           contentCell.setActor(null);
+                                                           toggleSize.setText("(+)");
+                                                           toggleSizeTooltip.setText(I18n.msg("gui.maximize.pane"));
+                                                       })));
                 } else {
                     // Maximize.
                     maximized = true;
                     contentCell.setActor(content);
-                    content.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()), Actions.run(() -> {
-                        toggleSize.setText("(-)");
-                        toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
-                    })));
+                    content.addAction(Actions.sequence(Actions.alpha(0f),
+                                                       Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                                                       Actions.run(() -> {
+                                                           toggleSize.setText("(-)");
+                                                           toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
+                                                       })));
                 }
                 pack();
             }
         });
 
-        focusInfoCell = content.add(focusInfo).left();
+        focusInfoCell = content.add(focusInfo)
+                .left();
         content.row();
-        content.add(pointerInfo).left();
+        content.add(pointerInfo)
+                .left();
         content.row();
-        content.add(cameraInfo).left();
+        content.add(cameraInfo)
+                .left();
         content.row();
-        rulerCell = content.add(rulerInfo).left();
+        rulerCell = content.add(rulerInfo)
+                .left();
         if (maximized) {
             contentCell = add(content);
         } else {
             contentCell = add();
         }
         row();
-        add(toggleSize).right().pad(pad5).row();
+        add(toggleSize).right()
+                .pad(pad5)
+                .row();
         pack();
         rulerCell.clearActor();
 
@@ -399,20 +532,15 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
         pos = new Vector3d();
         posb = new Vector3b();
-        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED, Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR, Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD);
-    }
-
-    private HorizontalGroup hg(Actor... actors) {
-        HorizontalGroup hg = new HorizontalGroup();
-        for (Actor a : actors)
-            hg.addActor(a);
-        return hg;
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE,
+                                        Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED,
+                                        Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR,
+                                        Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD);
     }
 
     private void unsubscribe() {
         EventManager.instance.removeAllSubscriptions(this);
     }
-
 
     private EventListener lastRefreshListener = null;
 
@@ -430,7 +558,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     view.setEntity(v.getEntity());
                 }
                 currentFocus = view;
-                final int focusFieldMaxLength = 25;
+                final int focusFieldMaxLength = 14;
 
                 // ID
                 boolean cappedId = false;
@@ -445,11 +573,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 if (id.isEmpty()) {
                     id = "-";
                 }
-                String idString = id;
-                if (id.length() > focusFieldMaxLength) {
-                    idString = TextUtils.capString(id, focusFieldMaxLength);
-                    cappedId = true;
-                }
+                var idString = TextUtils.capString(id, focusFieldMaxLength);
 
                 // Link
                 boolean vis = Mapper.atmosphere.has(view.getEntity());
@@ -491,7 +615,9 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
                 // Type
                 try {
-                    focusType.setText(I18n.msg("element." + ComponentType.values()[view.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular"));
+                    focusType.setText(I18n.msg("element." + ComponentType.values()[view.getCt()
+                            .getFirstOrdinal()].toString()
+                            .toLowerCase() + ".singular"));
                 } catch (Exception e) {
                     focusType.setText("");
                 }
@@ -501,7 +627,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
                 // Bookmark
                 bookmark.setProgrammaticChangeEvents(false);
-                bookmark.setChecked(GaiaSky.instance.getBookmarksManager().containsName(currentFocus.getName()));
+                bookmark.setChecked(GaiaSky.instance.getBookmarksManager()
+                                            .containsName(currentFocus.getName()));
                 bookmark.setProgrammaticChangeEvents(true);
 
                 // Visible
@@ -509,20 +636,15 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 objectVisibility.addListener(new OwnTextTooltip(I18n.msg("action.visibility", currentFocus.getName()), skin));
 
                 // Force label
-                labelVisibility.setCheckedNoFire(!currentFocus.isForceLabel(currentFocus.getName().toLowerCase().trim()));
+                labelVisibility.setCheckedNoFire(!currentFocus.isForceLabel(currentFocus.getName()
+                                                                                    .toLowerCase()
+                                                                                    .trim()));
                 labelVisibility.addListener(new OwnTextTooltip(I18n.msg("action.forcelabel", currentFocus.getName()), skin));
 
                 // Id, names
                 focusId.setText(idString);
                 focusId.clearListeners();
-                if (cappedId) {
-                    focusId.addListener(new OwnTextTooltip(id, skin));
-                    focusIdExpand.addListener(new OwnTextTooltip(id, skin));
-                    focusIdExpand.setVisible(true);
-                } else {
-                    focusIdExpand.clearListeners();
-                    focusIdExpand.setVisible(false);
-                }
+                focusId.addListener(new OwnTextTooltip(id, skin));
                 String objectName = TextUtils.capString(view.getLocalizedName(), focusFieldMaxLength);
                 focusName.setText(objectName);
                 focusName.clearListeners();
@@ -544,12 +666,15 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                             chars++;
                         }
                         if (i < names.length - 1 && chars > 14) {
-                            focusNames.add(currGroup).left().row();
+                            focusNames.add(currGroup)
+                                    .left()
+                                    .row();
                             currGroup = new HorizontalGroup();
                             chars = 0;
                         }
                     }
-                    if (chars > 0) focusNames.add(currGroup).left();
+                    if (chars > 0) focusNames.add(currGroup)
+                            .left();
                 } else {
                     focusNames.add(new OwnLabel("-", skin));
                 }
@@ -640,7 +765,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     absMagLabel.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
                     focusAbsMag.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.absmag.tooltip"), skin));
                 }
-                if (ComponentType.values()[view.getCt().getFirstOrdinal()] == ComponentType.Stars) {
+                if (ComponentType.values()[view.getCt()
+                        .getFirstOrdinal()] == ComponentType.Stars) {
                     tEffLabel.setVisible(true);
                     focusTEff.setVisible(true);
 
@@ -671,13 +797,16 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 focusAngle.setText(GlobalResources.formatNumber(Math.toDegrees((double) data[1]) % 360) + deg);
 
                 // Dist to cam
-                Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], settings.program.ui.distanceUnits);
+                Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0],
+                                                                                      settings.program.ui.distanceUnits);
                 focusDistCam.setText(GlobalResources.formatNumber(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
 
                 // Dist to sol
                 if (data.length > 4) {
-                    Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4], settings.program.ui.distanceUnits);
-                    focusDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
+                    Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4],
+                                                                                          settings.program.ui.distanceUnits);
+                    focusDistSol.setText(
+                            GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
                 }
 
                 // Apparent magnitude from camera
@@ -694,9 +823,11 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             case CAMERA_MOTION_UPDATE -> {
                 final Vector3b campos = (Vector3b) data[0];
                 double velInternalPerSecond = (double) data[1] * Constants.KM_TO_U * Nature.S_TO_H;
-                Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond, Settings.settings.program.ui.distanceUnits);
+                Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond,
+                                                                                     Settings.settings.program.ui.distanceUnits);
                 camVel.setText(GlobalResources.formatNumber(velStr.getFirst()) + " " + velStr.getSecond());
-                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), settings.program.ui.distanceUnits);
+                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(),
+                                                                                      settings.program.ui.distanceUnits);
                 camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
             }
             case CAMERA_TRACKING_OBJECT_UPDATE -> {
@@ -789,7 +920,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     public void programmaticUpdate() {
         ICamera camera = GaiaSky.instance.getICamera();
         notify(Event.CAMERA_MODE_CMD, this, camera.getMode());
-        if (camera.getMode().isFocus()) {
+        if (camera.getMode()
+                .isFocus()) {
             notify(Event.FOCUS_CHANGED, this, camera.getFocus());
         }
     }
