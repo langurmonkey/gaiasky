@@ -29,18 +29,18 @@ import net.jafama.FastMath;
  * @param x         X component of position vector at epoch.
  * @param y         Y component of position vector at epoch.
  * @param z         Z component of position vector at epoch.
- * @param muAlpha   The proper motion in alpha*, in mas/y.
- * @param muDelta   The proper motion in delta, in mas/y.
- * @param radVel    The radial velocity, in km/s.
+ * @param muAlpha16 The proper motion in alpha*, in mas/y.
+ * @param muDelta16 The proper motion in delta, in mas/y.
+ * @param radVel16  The radial velocity, in km/s.
  * @param vx        X component of the velocity vector.
  * @param vy        Y component of the velocity vector.
  * @param vz        Z component of the velocity vector.
- * @param appMag    Apparent magnitude.
- * @param absMag    Absolute magnitude.
+ * @param appMag16  Apparent magnitude.
+ * @param absMag16  Absolute magnitude.
  * @param color     Packed color.
  * @param size      Size.
  * @param hip       HIP number.
- * @param tEff      Effective temperature.
+ * @param tEff16    Effective temperature.
  * @param nVari     Number of variable star samples.
  * @param period    Period in days.
  * @param variMags  Vector with magnitudes.
@@ -52,18 +52,18 @@ public record ParticleVariable(long id,
                                double x,
                                double y,
                                double z,
-                               float muAlpha,
-                               float muDelta,
-                               float radVel,
+                               short muAlpha16,
+                               short muDelta16,
+                               short radVel16,
                                float vx,
                                float vy,
                                float vz,
-                               float appMag,
-                               float absMag,
+                               short appMag16,
+                               short absMag16,
                                float color,
                                float size,
                                int hip,
-                               float tEff,
+                               short tEff16,
                                int nVari,
                                double period,
                                float[] variMags,
@@ -74,6 +74,32 @@ public record ParticleVariable(long id,
     private static final TLV3D aux3d1 = new TLV3D();
     private static final TLV3D aux3d2 = new TLV3D();
 
+    public ParticleVariable(long id,
+                            String[] names,
+                            double x,
+                            double y,
+                            double z,
+                            float muAlpha,
+                            float muDelta,
+                            float radVel,
+                            float vx,
+                            float vy,
+                            float vz,
+                            float appMag16,
+                            float absMag16,
+                            float color,
+                            float size,
+                            int hip,
+                            float tEff,
+                            int nVari,
+                            double period,
+                            float[] variMags,
+                            double[] variTimes,
+                            ObjectMap<UCD, Object> extra) {
+        this(id, names, x, y, z, Float.floatToFloat16(muAlpha), Float.floatToFloat16(muDelta), Float.floatToFloat16(radVel),
+             vx, vy, vz, Float.floatToFloat16(appMag16), Float.floatToFloat16(absMag16), color, size, hip,
+             Float.floatToFloat16(tEff), nVari, period, variMags, variTimes, extra);
+    }
 
     @Override
     public ParticleType getType() {
@@ -134,6 +160,16 @@ public record ParticleVariable(long id,
     }
 
     @Override
+    public float appMag() {
+        return Float.float16ToFloat(appMag16);
+    }
+
+    @Override
+    public float absMag() {
+        return Float.float16ToFloat(absMag16);
+    }
+
+    @Override
     public boolean hasColor() {
         return true;
     }
@@ -158,6 +194,21 @@ public record ParticleVariable(long id,
     @Override
     public long id() {
         return id;
+    }
+
+    @Override
+    public float muAlpha() {
+        return Float.float16ToFloat(muAlpha16);
+    }
+
+    @Override
+    public float muDelta() {
+        return Float.float16ToFloat(muDelta16);
+    }
+
+    @Override
+    public float radVel() {
+        return Float.float16ToFloat(radVel16);
     }
 
     /**
@@ -254,6 +305,11 @@ public record ParticleVariable(long id,
     }
 
     @Override
+    public float tEff() {
+        return Float.float16ToFloat(tEff16);
+    }
+
+    @Override
     public void setExtraAttributes(ObjectMap<UCD, Object> e) {
         extra.clear();
         extra.putAll(e);
@@ -269,7 +325,8 @@ public record ParticleVariable(long id,
         if (extra != null) {
             ObjectMap.Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
-                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
+                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(
+                        name))) {
                     return true;
                 }
             }
@@ -293,7 +350,8 @@ public record ParticleVariable(long id,
         if (extra != null) {
             ObjectMap.Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
-                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
+                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(
+                        name))) {
                     return extra.get(ucd);
                 }
             }
