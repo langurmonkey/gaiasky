@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  * @param color     Packed color.
  * @param size      Size.
  * @param hip       HIP number.
- * @param tEff16    Effective temperature.
+ * @param tEff      Effective temperature.
  * @param nVari     Number of variable star samples.
  * @param period    Period in days.
  * @param variMags  Vector with magnitudes.
@@ -63,7 +63,7 @@ public record ParticleVariable(long id,
                                float color,
                                float size,
                                int hip,
-                               short tEff16,
+                               float tEff,
                                int nVari,
                                double period,
                                float[] variMags,
@@ -302,11 +302,6 @@ public record ParticleVariable(long id,
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos,
                                                            aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.y;
-    }
-
-    @Override
-    public float tEff() {
-        return Float.float16ToFloat(tEff16);
     }
 
     @Override

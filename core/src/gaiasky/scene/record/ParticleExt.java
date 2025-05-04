@@ -24,31 +24,31 @@ import net.jafama.FastMath;
 /**
  * Record class to store extended particles. These are particles with proper motions, magnitudes, colors and sizes.
  *
- * @param id        The particle identifier.
- * @param names     The name array.
- * @param x         X component of position vector at epoch.
- * @param y         Y component of position vector at epoch.
- * @param z         Z component of position vector at epoch.
- * @param muAlpha16 The proper motion in alpha*, in mas/y.
- * @param muDelta16 The proper motion in delta, in mas/y.
- * @param radVel16  The radial velocity, in km/s.
- * @param vx        X component of the velocity vector.
- * @param vy        Y component of the velocity vector.
- * @param vz        Z component of the velocity vector.
- * @param appMag16  Apparent magnitude.
- * @param absMag16  Absolute magnitude.
- * @param color     Packed color.
- * @param size      Size.
- * @param extra     Map with extra attributes.
+ * @param id       The particle identifier.
+ * @param names    The name array.
+ * @param x        X component of position vector at epoch.
+ * @param y        Y component of position vector at epoch.
+ * @param z        Z component of position vector at epoch.
+ * @param muAlpha  The proper motion in alpha*, in mas/y.
+ * @param muDelta  The proper motion in delta, in mas/y.
+ * @param radVel   The radial velocity, in km/s.
+ * @param vx       X component of the velocity vector.
+ * @param vy       Y component of the velocity vector.
+ * @param vz       Z component of the velocity vector.
+ * @param appMag16 Apparent magnitude.
+ * @param absMag16 Absolute magnitude.
+ * @param color    Packed color.
+ * @param size     Size.
+ * @param extra    Map with extra attributes.
  */
 public record ParticleExt(long id,
                           String[] names,
                           double x,
                           double y,
                           double z,
-                          short muAlpha16,
-                          short muDelta16,
-                          short radVel16,
+                          float muAlpha,
+                          float muDelta,
+                          float radVel,
                           float vx,
                           float vy,
                           float vz,
@@ -201,21 +201,6 @@ public record ParticleExt(long id,
     @Override
     public int hip() {
         return -1;
-    }
-
-    @Override
-    public float muAlpha() {
-        return Float.float16ToFloat(muAlpha16);
-    }
-
-    @Override
-    public float muDelta() {
-        return Float.float16ToFloat(muDelta16);
-    }
-
-    @Override
-    public float radVel() {
-        return Float.float16ToFloat(radVel16);
     }
 
     /**
