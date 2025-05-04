@@ -391,7 +391,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         particleSet.metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order.
-        var K = FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels);
+        var K = FastMath.max(particleSet.numLabels, FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels));
         particleSet.indices = new int[K];
         for (int i = 0; i < K; i++) {
             particleSet.indices[i] = -1;
