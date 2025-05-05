@@ -1,15 +1,18 @@
 package gaiasky;
 
-import gaiasky.util.IntDoublePriorityQueue;
+import gaiasky.util.IntDoubleHeap;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class IntDoublePriorityQueueTest {
+/**
+ * Tests {@link IntDoubleHeap}.
+ */
+public class IntDoubleHeapTest {
 
     @Test
     public void test() {
 
-        IntDoublePriorityQueue queue = new IntDoublePriorityQueue();
+        IntDoubleHeap queue = new IntDoubleHeap(7);
         queue.add(1, 10.5);
         queue.add(2, 5.0);
         queue.add(3, 15.0);

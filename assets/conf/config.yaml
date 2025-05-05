@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 3060501
+configVersion: 3060801
 
 #
 # Data configuration
@@ -169,9 +169,9 @@ scene:
       # Enable or disable the star billboards when stars are close.
       billboard: true
       # Maximum number of star billboards per group.
-      numBillboard: 30
+      numBillboard: 15
       # Maximum number of labels per star group. Applies unless overwritten.
-      numLabels: 50
+      numLabels: 15
       # Maximum number of velocity vectors per star group.
       numVelocityVector: 300
     # Star threshold values.

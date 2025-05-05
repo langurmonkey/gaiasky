@@ -18,16 +18,17 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.ParticleSet;
-import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.IntDoubleHeap;
+import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -58,7 +59,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     /** Reference to the dataset description component. **/
     private final DatasetDescription datasetDescription;
     private final ParticleUtils utils;
-    private final IntDoublePriorityQueue reusableQueue;
+    private final IntDoubleHeap reusableQueue;
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D34 = new Vector3d();
@@ -81,21 +82,16 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     private final int K;
 
     public ParticleSetUpdaterTask(Entity entity,
-                                  ParticleSet particleSet,
-                                  StarSet starSet) {
+                                  ParticleSet particleSet) {
         this.base = Mapper.base.get(entity);
-        if (starSet != null) {
-            this.particleSet = starSet;
-        } else {
-            this.particleSet = particleSet;
-        }
+        this.particleSet = particleSet;
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
-        this.K = this.particleSet.numLabels;
-        this.reusableQueue = new IntDoublePriorityQueue(K);
+        this.K = this.particleSet.indices.length;
+        this.reusableQueue = new IntDoubleHeap(K);
         this.stage = SORT;
 
-        if (starSet != null) {
+        if (particleSet.isStars) {
             updateMetadataConsumer = this::updateMetadataParticlesExt;
         } else {
             updateMetadataConsumer = this.particleSet.isExtended ? this::updateMetadataParticlesExt : this::updateMetadataParticles;
@@ -157,14 +153,17 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 // Clear queue
                 this.reusableQueue.clear();
 
-                boolean bg = false;
                 for (int i = 0; i < totalCount; i++) {
                     var value = metadata[i];
                     if (reusableQueue.size() < K) {
                         reusableQueue.add(i, value);
-                    } else if (value < reusableQueue.peekLastValue()) {
-                        reusableQueue.removeLast();
-                        reusableQueue.add(i, value);
+                    } else {
+                        // Check against max value.
+                        int max = reusableQueue.maxIndex();
+                        if (value < reusableQueue.value(max)) {
+                            reusableQueue.remove(max);
+                            reusableQueue.add(i, value);
+                        }
                     }
                 }
 
@@ -204,6 +203,12 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
     }
 
+    private static final double INV_LOG10 = 1.0 / Math.log(10.0);
+
+    private static double log10Quick(double value) {
+        return FastMath.logQuick(value) * INV_LOG10;
+    }
+
     /**
      * Computes the current apparent magnitude given the absolute magnitude and distance squared.
      *
@@ -213,7 +218,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
      * @return The apparent magnitude at the given distance.
      */
     public static double apparentMag(float absMag, double distanceSquared) {
-        return 2.5 * FastMath.log10(distanceSquared) - 5.0 + absMag;
+        return 2.5 * log10Quick(distanceSquared * Constants.U_TO_PC * Constants.U_TO_PC) - 5.0 + absMag;
     }
 
     /**
@@ -233,6 +238,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             int n = particleSet.pointData.size();
             for (int i = 0; i < n; i++) {
                 IParticleRecord d = particleSet.pointData.get(i);
+                if (d.hasName("Betelgeuse")) {
+                    int ads = 3;
+                }
 
                 // Pm
                 Vector3d dx = D32.set(d.vx(), d.vy(), d.vz())
