@@ -681,7 +681,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Record.
                                 var pr = new ParticleExt(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
                                                          (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
-                                                         (float) absMag, colorPacked, (float) sizePc, extraAttributes);
+                                                         (float) absMag, colorPacked, (float) (sizePc * Constants.PC_TO_U), extraAttributes);
                                 list.add(pr);
                             }
 
