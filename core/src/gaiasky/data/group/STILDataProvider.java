@@ -44,10 +44,7 @@ import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
@@ -743,26 +740,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
 
-    private void exportCsv(double[] x,
-                           double[] y,
-                           int n,
-                           Path p,
-                           String... cols) {
-        try {
-            FileWriter myWriter = new FileWriter(p.toString());
-            if (cols != null && cols.length >= 2) {
-                myWriter.write(String.format("%1$s,%2$s\n", cols[0], cols[1]));
-            }
-            for (int i = 0; i < n; i++) {
-                myWriter.write(String.format("%1$f,%2$f\n", x[i], y[i]));
-            }
-            myWriter.close();
-        } catch (IOException e) {
-            logger.error(e);
-        }
-
-    }
-
     private ObjectMap<UCD, Object> initExtraAttributes(ObjectMap<UCD, Object> extra) {
         if (extra == null)
             extra = new ObjectMap<>(5);
@@ -780,31 +757,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             extraAttributes.put(extra, val);
         }
         return extraAttributes;
-    }
-
-    private double getStringAttributeValue(UCD extra,
-                                           Object o) {
-        double val;
-        String value = (String) o;
-        if (value == null || value.isEmpty()) {
-            return -1;
-        }
-
-        String key = extra.colName + ":" + value;
-        int index = 0;
-        if (stringAttributesMap.containsKey(key)) {
-            index = stringAttributesMap.get(key);
-        } else if (lastIndexMap.containsKey(extra.colName)) {
-            index = lastIndexMap.get(extra.colName);
-        }
-
-        val = index;
-
-        if (!stringAttributesMap.containsKey(key)) {
-            stringAttributesMap.put(key, index);
-            lastIndexMap.put(extra.colName, index + 1);
-        }
-        return val;
     }
 
     private boolean isOfType(DatasetLoadType type) {

@@ -73,13 +73,13 @@ public record ParticleExt(long id,
                        float vx,
                        float vy,
                        float vz,
-                       float appMag16,
-                       float absMag16,
+                       float appMag,
+                       float absMag,
                        float color,
                        float size,
                        ObjectMap<UCD, Object> extra) {
         this(id, names, x, y, z, Float.floatToFloat16(muAlpha), Float.floatToFloat16(muDelta), Float.floatToFloat16(radVel),
-             vx, vy, vz, Float.floatToFloat16(appMag16), Float.floatToFloat16(absMag16), color, size, extra);
+             vx, vy, vz, Float.floatToFloat16(appMag), Float.floatToFloat16(absMag), color, size, extra);
     }
 
 
