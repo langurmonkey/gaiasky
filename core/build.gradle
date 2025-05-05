@@ -6,7 +6,7 @@ apply plugin: "de.undercouch.download"
 import com.install4j.gradle.Install4jTask
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-JavaVersion minJavaVersion = JavaVersion.VERSION_17
+JavaVersion minJavaVersion = JavaVersion.VERSION_20
 java {
     sourceCompatibility = minJavaVersion
 }

@@ -35,8 +35,8 @@ import net.jafama.FastMath;
  * @param vx       X component of the velocity vector.
  * @param vy       Y component of the velocity vector.
  * @param vz       Z component of the velocity vector.
- * @param appMag   Apparent magnitude.
- * @param absMag   Absolute magnitude.
+ * @param appMag16 Apparent magnitude.
+ * @param absMag16 Absolute magnitude.
  * @param color    Packed color.
  * @param size     Size.
  * @param extra    Map with extra attributes.
@@ -52,8 +52,8 @@ public record ParticleExt(long id,
                           float vx,
                           float vy,
                           float vz,
-                          float appMag,
-                          float absMag,
+                          short appMag16,
+                          short absMag16,
                           float color,
                           float size,
                           ObjectMap<UCD, Object> extra) implements IParticleRecord {
@@ -61,6 +61,26 @@ public record ParticleExt(long id,
     // Aux vectors.
     private static final TLV3D aux3d1 = new TLV3D();
     private static final TLV3D aux3d2 = new TLV3D();
+
+    public ParticleExt(long id,
+                       String[] names,
+                       double x,
+                       double y,
+                       double z,
+                       float muAlpha,
+                       float muDelta,
+                       float radVel,
+                       float vx,
+                       float vy,
+                       float vz,
+                       float appMag16,
+                       float absMag16,
+                       float color,
+                       float size,
+                       ObjectMap<UCD, Object> extra) {
+        this(id, names, x, y, z, Float.floatToFloat16(muAlpha), Float.floatToFloat16(muDelta), Float.floatToFloat16(radVel),
+             vx, vy, vz, Float.floatToFloat16(appMag16), Float.floatToFloat16(absMag16), color, size, extra);
+    }
 
 
     @Override
@@ -139,6 +159,16 @@ public record ParticleExt(long id,
             }
         }
         return false;
+    }
+
+    @Override
+    public float appMag() {
+        return Float.float16ToFloat(appMag16);
+    }
+
+    @Override
+    public float absMag() {
+        return Float.float16ToFloat(absMag16);
     }
 
     @Override
@@ -287,7 +317,8 @@ public record ParticleExt(long id,
         if (extra != null) {
             ObjectMap.Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
-                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
+                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(
+                        name))) {
                     return true;
                 }
             }
@@ -311,7 +342,8 @@ public record ParticleExt(long id,
         if (extra != null) {
             ObjectMap.Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
-                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
+                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(
+                        name))) {
                     return extra.get(ucd);
                 }
             }

@@ -25,7 +25,7 @@ public class ElementsSetRadio extends EntityRadio {
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.GPU_DISPOSE_ORBITAL_ELEMENTS) {
             if (source == entity) {
-                initializer.initializeOrbitsWithOrbit(Mapper.graph.get(entity), Mapper.orbitElementsSet.get(entity));
+                initializer.initializeObjectsWithOrbit(Mapper.graph.get(entity), Mapper.orbitElementsSet.get(entity));
             }
         }
     }

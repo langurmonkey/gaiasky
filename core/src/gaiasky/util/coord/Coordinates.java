@@ -9,6 +9,7 @@ package gaiasky.util.coord;
 
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.util.Constants;
+import gaiasky.util.Nature;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
@@ -150,10 +151,13 @@ public class Coordinates {
      * @param alpha The &alpha; angle in degrees, between z and N.
      * @param beta  The &beta; angle in degrees, between y and Y.
      * @param gamma The &gamma; angle in degrees, Z and N.
+     *
      * @return The rotation matrix.
      */
     public static Matrix4d getRotationMatrix(double alpha, double beta, double gamma) {
-        return new Matrix4d().rotate(0, 1, 0, gamma).rotate(0, 0, 1, beta).rotate(0, 1, 0, alpha);
+        return new Matrix4d().rotate(0, 1, 0, gamma)
+                .rotate(0, 0, 1, beta)
+                .rotate(0, 1, 0, alpha);
     }
 
     /**
@@ -302,6 +306,7 @@ public class Coordinates {
      * @param alpha The right ascension in radians.
      * @param delta The declination in radians.
      * @param out   The out vector.
+     *
      * @return The out vector with the galactic longitude and latitude, in radians.
      */
     public static Vector2d equatorialToGalactic(double alpha, double delta, Vector2d out) {
@@ -327,6 +332,7 @@ public class Coordinates {
      * @param vec Vector with ecliptic longitude (&lambda;) and ecliptic
      *            latitude (&beta;) in radians.
      * @param out The output vector.
+     *
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
      * for chaining.
      */
@@ -340,16 +346,20 @@ public class Coordinates {
      * @param lambda Ecliptic longitude (&lambda;) in radians.
      * @param beta   Ecliptic latitude (&beta;) in radians.
      * @param out    The output vector.
+     *
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
      * for chaining.
      */
     public static Vector2d eclipticToEquatorial(double lambda, double beta, Vector2d out) {
 
-        double alpha = FastMath.atan2((Math.sin(lambda) * FastMath.cos(OBLIQUITY_RAD_J2000) - FastMath.tan(beta) * FastMath.sin(OBLIQUITY_RAD_J2000)), FastMath.cos(lambda));
+        double alpha = FastMath.atan2(
+                (Math.sin(lambda) * FastMath.cos(OBLIQUITY_RAD_J2000) - FastMath.tan(beta) * FastMath.sin(OBLIQUITY_RAD_J2000)),
+                FastMath.cos(lambda));
         if (alpha < 0) {
             alpha += FastMath.PI * 2;
         }
-        double delta = FastMath.asin(Math.sin(beta) * FastMath.cos(OBLIQUITY_RAD_J2000) + FastMath.cos(beta) * FastMath.sin(OBLIQUITY_RAD_J2000) * FastMath.sin(lambda));
+        double delta = FastMath.asin(Math.sin(beta) * FastMath.cos(OBLIQUITY_RAD_J2000) + FastMath.cos(beta) * FastMath.sin(
+                OBLIQUITY_RAD_J2000) * FastMath.sin(lambda));
 
         return out.set(alpha, delta);
     }
@@ -384,6 +394,7 @@ public class Coordinates {
      *            <li>The radius or distance to the point.</li>
      *            </ol>
      * @param out The output vector.
+     *
      * @return Output vector in Cartesian coordinates where x and z are on the
      * horizontal plane and y is in the up direction.
      */
@@ -404,6 +415,7 @@ public class Coordinates {
      * @param latitude  The latitude or declination, in radians.
      * @param radius    The radius or distance to the point.
      * @param out       The output vector.
+     *
      * @return Output vector with the Cartesian coordinates[x, y, z] where x and
      * z are on the horizontal plane and y is in the up direction, for
      * chaining.
@@ -415,6 +427,20 @@ public class Coordinates {
         return out;
     }
 
+    /**
+     * Converts from spherical to Cartesian coordinates, given a longitude
+     * (&alpha;), a latitude (&delta;) and the radius.
+     *
+     * @param longitude The longitude or right ascension angle, from the z direction
+     *                  to the x direction, in radians.
+     * @param latitude  The latitude or declination, in radians.
+     * @param radius    The radius or distance to the point.
+     * @param out       The output vector.
+     *
+     * @return Output vector with the Cartesian coordinates[x, y, z] where x and
+     * z are on the horizontal plane and y is in the up direction, for
+     * chaining.
+     */
     public static Vector3b sphericalToCartesian(double longitude, double latitude, Apfloat radius, Vector3b out) {
         out.x = radius.multiply(new Apfloat(Math.cos(latitude) * FastMath.sin(longitude), Constants.PREC));
         out.y = radius.multiply(new Apfloat(Math.sin(latitude), Constants.PREC));
@@ -428,6 +454,7 @@ public class Coordinates {
      * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
      * @param out Output vector.
+     *
      * @return Output vector containing the spherical coordinates.
      * <ol>
      * <li>The longitude or right ascension (&alpha;), from the z
@@ -478,6 +505,7 @@ public class Coordinates {
      * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
      * @param out Output vector.
+     *
      * @return Output vector containing the spherical coordinates.
      * <ol>
      * <li>The longitude or right ascension (&alpha;), from the z
@@ -536,6 +564,7 @@ public class Coordinates {
      * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
      * @param out Output vector.
+     *
      * @return Output vector containing the spherical coordinates.
      * <ol>
      * <li>The longitude or right ascension (&alpha;), from the z
@@ -561,22 +590,125 @@ public class Coordinates {
         Apfloat xsq = vec.x.multiply(vec.x);
         Apfloat ysq = vec.y.multiply(vec.y);
         Apfloat zsq = vec.z.multiply(vec.z);
-        Apfloat distance = ApfloatMath.sqrt(xsq.add(ysq).add(zsq));
+        Apfloat distance = ApfloatMath.sqrt(xsq.add(ysq)
+                                                    .add(zsq));
 
         Apfloat alpha = ApfloatMath.atan2(vec.x, vec.z);
         if (alpha.doubleValue() < 0) {
-            alpha = alpha.add(ApfloatMath.pi(Constants.PREC).multiply(new Apfloat(2, Constants.PREC)));
+            alpha = alpha.add(ApfloatMath.pi(Constants.PREC)
+                                      .multiply(new Apfloat(2, Constants.PREC)));
         }
 
         Apfloat delta;
-        if (zsq.add(xsq).doubleValue() == 0) {
-            Apfloat piOverTwo = ApfloatMath.pi(Constants.PREC).divide(new Apfloat(2, Constants.PREC));
+        if (zsq.add(xsq)
+                .doubleValue() == 0) {
+            Apfloat piOverTwo = ApfloatMath.pi(Constants.PREC)
+                    .divide(new Apfloat(2, Constants.PREC));
             delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(new Apfloat(-1, Constants.PREC)));
         } else {
             delta = ApfloatMath.atan(vec.y.divide(ApfloatMath.sqrt(zsq.add(xsq))));
         }
 
         return out.set(alpha, delta, distance);
+    }
+
+    /**
+     * Converts proper motions + radial velocity into a cartesian vector.
+     * See <a href="http://www.astronexus.com/a-a/motions-long-term">this article</a>.
+     *
+     * @param muAlphaStar Mu alpha star, in mas/yr.
+     * @param muDelta     Mu delta, in mas/yr.
+     * @param radVel      Radial velocity in km/s.
+     * @param ra          Right ascension in radians.
+     * @param dec         Declination in radians.
+     * @param distPc      Distance in parsecs to the star.
+     *
+     * @return The proper motion vector in internal_units/year.
+     */
+    public static Vector3d properMotionsToCartesian(double muAlphaStar, double muDelta, double radVel, double ra, double dec,
+                                                    double distPc,
+                                                    Vector3d out) {
+        double ma = muAlphaStar * Nature.MILLIARCSEC_TO_ARCSEC;
+        double md = muDelta * Nature.MILLIARCSEC_TO_ARCSEC;
+
+        // Multiply arcsec/yr with distance in parsecs gives a linear velocity. The factor 4.74 converts result to km/s
+        double vta = ma * distPc * Nature.ARCSEC_PER_YEAR_TO_KMS;
+        double vtd = md * distPc * Nature.ARCSEC_PER_YEAR_TO_KMS;
+
+        double cosAlpha = FastMath.cos(ra);
+        double sinAlpha = FastMath.sin(ra);
+        double cosDelta = FastMath.cos(dec);
+        double sinDelta = FastMath.sin(dec);
+
+        // +x to delta=0, alpha=0
+        // +y to delta=0, alpha=90
+        // +z to delta=90
+        // components in km/s
+
+        /*
+         * vx = (vR cos \delta cos \alpha) - (vTA sin \alpha) - (vTD sin \delta cos \alpha)
+         * vy = (vR cos \delta sin \alpha) + (vTA cos \alpha) - (vTD sin \delta sin \alpha)
+         * vz = vR sin \delta + vTD cos \delta
+         */
+        double vx = (radVel * cosDelta * cosAlpha) - (vta * sinAlpha) - (vtd * sinDelta * cosAlpha);
+        double vy = (radVel * cosDelta * sinAlpha) + (vta * cosAlpha) - (vtd * sinDelta * sinAlpha);
+        double vz = (radVel * sinDelta) + (vtd * cosDelta);
+
+        return (out.set(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
+
+    }
+
+    /**
+     * Converts a cartesian velocity vector [vx,vy,vz] into proper motions + radial velocity.
+     * See <a href="http://www.astronexus.com/a-a/motions-long-term">this article</a>.
+     *
+     * @param vx     The X component of the cartesian velocity vector in internal_units/year.
+     * @param vy     The Y component of the cartesian velocity vector internal_units/year.
+     * @param vz     The Z component of the cartesian velocity vector internal_units/year.
+     * @param ra     Right ascension in radians.
+     * @param dec    Declination in radians.
+     * @param distPc Distance in parsecs to the star.
+     *
+     * @return The proper motions (muAlpha, muDelta) in mas/yr, and the radial velocity in km/s.
+     */
+    public static Vector3d cartesianToProperMotions(double vx, double vy, double vz,
+                                                    double ra, double dec, double distPc,
+                                                    Vector3d out) {
+        // Precompute constants for conversion
+        double kmPerYearToInternal = Constants.U_TO_KM / Nature.Y_TO_S;
+        double arcsecPerYearToKm = Nature.ARCSEC_PER_YEAR_TO_KMS * distPc;
+
+        // Convert from internal units/year to km/s
+        double vxKms = vz * kmPerYearToInternal;
+        double vyKms = vx * kmPerYearToInternal;
+        double vzKms = vy * kmPerYearToInternal;
+
+        // Unit vectors
+        double cosA = FastMath.cos(ra);
+        double sinA = FastMath.sin(ra);
+        double cosD = FastMath.cos(dec);
+        double sinD = FastMath.sin(dec);
+
+        double rx = cosD * cosA;
+        double ry = cosD * sinA;
+        double rz = sinD;
+
+        double ax = -sinA;
+        double ay = cosA;
+        double az = 0.0;
+
+        double dx = -cosA * sinD;
+        double dy = -sinA * sinD;
+        double dz = cosD;
+
+        double vr = vxKms * rx + vyKms * ry + vzKms * rz;
+        double vta = vxKms * ax + vyKms * ay + vzKms * az;
+        double vtd = vxKms * dx + vyKms * dy + vzKms * dz;
+
+        double muAlphaStar = (vta / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
+        double muDelta = (vtd / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
+
+        return out.set(muAlphaStar, muDelta, vr);
     }
 
     public static Matrix4d getTransformD(String name) {

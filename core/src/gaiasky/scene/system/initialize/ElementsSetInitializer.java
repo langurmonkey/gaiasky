@@ -30,12 +30,11 @@ public class ElementsSetInitializer extends AbstractInitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-        var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
         var set = Mapper.orbitElementsSet.get(entity);
 
         // Check children which need updating every time
-        initializeOrbitsWithOrbit(graph, set);
+        initializeObjectsWithOrbit(graph, set);
 
         EventManager.instance.subscribe(new ElementsSetRadio(entity, this), Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
@@ -44,7 +43,7 @@ public class ElementsSetInitializer extends AbstractInitSystem {
      * Gather the children objects that need to be rendered as an orbit line into a list,
      * for they need to be updated every single frame.
      */
-    public void initializeOrbitsWithOrbit(GraphNode graph, OrbitElementsSet set) {
+    public void initializeObjectsWithOrbit(GraphNode graph, OrbitElementsSet set) {
         if (set.alwaysUpdate == null) {
             set.alwaysUpdate = new Array<>();
         } else {

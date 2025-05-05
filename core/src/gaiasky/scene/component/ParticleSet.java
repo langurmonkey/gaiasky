@@ -297,17 +297,11 @@ public class ParticleSet implements Component, IDisposable {
     private final Object indexSync = new Object();
     // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
-    // Indices list buffer 1.
-    public Integer[] indices1;
-    // Indices list buffer 2.
-    public Integer[] indices2;
-    // Active indices list.
-    public Integer[] active;
-    // Background indices list (the one we sort).
-    public Integer[] background;
+    // Indices list buffer.
+    public int[] indices;
 
-    // Visibility array with 1 (visible) or 0 (hidden) for each particle.
-    public byte[] visibilityArray;
+    /** Indices of stars that are not visible. **/
+    public IntSet invisibilityArray;
 
     // Reference to the entity.
     public Entity entity;
@@ -375,10 +369,7 @@ public class ParticleSet implements Component, IDisposable {
         if (regenerateIndex)
             regenerateIndex();
         // Initialize visibility - all visible
-        this.visibilityArray = new byte[pointData.size()];
-        for (int i = 0; i < pointData.size(); i++) {
-            this.visibilityArray[i] = (byte) 1;
-        }
+        this.invisibilityArray = new IntSet();
     }
 
     public void setColumnInfoList(List<ColumnInfo> columnInfoList) {
@@ -408,7 +399,8 @@ public class ParticleSet implements Component, IDisposable {
                 IParticleRecord pb = pointData.get(i);
                 if (pb.names() != null) {
                     final int idx = i;
-                    Arrays.stream(pb.names()).forEach(name -> index.put(name.toLowerCase(), idx));
+                    Arrays.stream(pb.names())
+                            .forEach(name -> index.put(name.toLowerCase(), idx));
                 }
             }
         }
@@ -559,7 +551,9 @@ public class ParticleSet implements Component, IDisposable {
         try {
             this.shadingStyle = ShadingStyle.valueOf(style.toUpperCase());
         } catch (IllegalArgumentException e) {
-            Logger.getLogger(this.getClass().getSimpleName()).error("Error setting shading style: " + style, e);
+            Logger.getLogger(this.getClass()
+                                     .getSimpleName())
+                    .error("Error setting shading style: " + style, e);
         }
     }
 
@@ -577,6 +571,17 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setNumLabels(Long numLabels) {
         this.numLabels = FastMath.toIntExact(numLabels);
+    }
+
+    public void updateNumLabelsValue(int n, Entity e) {
+        int newNumLabels = FastMath.min(n, pointData.size());
+        if (newNumLabels != numLabels) {
+            setNumLabels((long) newNumLabels);
+            // Update indices array with new length.
+            indices = new int[newNumLabels];
+            // Re-initialize updater task so that the new size is picked up.
+            updaterTask = new ParticleSetUpdaterTask(e, this);
+        }
     }
 
     public IParticleRecord get(int index) {
@@ -652,7 +657,8 @@ public class ParticleSet implements Component, IDisposable {
      * @return The size
      */
     public double getSize(int i) {
-        return pointData.get(i).size();
+        return pointData.get(i)
+                .size();
     }
 
     /**
@@ -666,7 +672,8 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setFocusIndex(String name) {
         synchronized (indexSync) {
-            candidateFocusIndex = index.getOrDefault(name.toLowerCase().trim(), -1);
+            candidateFocusIndex = index.getOrDefault(name.toLowerCase()
+                                                             .trim(), -1);
         }
     }
 
@@ -699,7 +706,8 @@ public class ParticleSet implements Component, IDisposable {
     public void updateFocus(ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
         Vector3b aux = this.fetchPosition(focus, cPosD, B31, currDeltaYears);
-        this.focusPosition.set(aux).add(camera.getPos());
+        this.focusPosition.set(aux)
+                .add(camera.getPos());
         this.focusDistToCamera = aux.lenDouble();
         this.focusSize = getFocusSize();
         this.focusSolidAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
@@ -737,7 +745,7 @@ public class ParticleSet implements Component, IDisposable {
      * @return The visibility of the particle
      */
     public boolean isVisible(int index) {
-        return visibilityArray != null && visibilityArray[index] != (byte) 0;
+        return !invisibilityArray.contains(index);
     }
 
     public void setVisible(boolean visible,
@@ -760,10 +768,14 @@ public class ParticleSet implements Component, IDisposable {
     public void setVisible(int index,
                            boolean visible,
                            Render render) {
-        if (index >= 0 && index < visibilityArray.length) {
-            boolean previousVisibility = this.visibilityArray[index] != 0;
-            this.visibilityArray[index] = (byte) (visible ? 1 : 0);
-            if (previousVisibility != visible) {
+        if (index >= 0 && index < pointData.size()) {
+            boolean changed;
+            if (visible) {
+                changed = this.invisibilityArray.remove(index);
+            } else {
+                changed = this.invisibilityArray.add(index);
+            }
+            if (changed) {
                 markForUpdate(render);
             }
         }
@@ -784,7 +796,8 @@ public class ParticleSet implements Component, IDisposable {
     public Vector3b getAbsolutePosition(String name,
                                         Instant date,
                                         Vector3b out) {
-        name = name.toLowerCase().trim();
+        name = name.toLowerCase()
+                .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
                 int idx = index.get(name);
@@ -851,7 +864,8 @@ public class ParticleSet implements Component, IDisposable {
      */
     public Vector3b getAbsolutePosition(String name,
                                         Vector3b out) {
-        name = name.toLowerCase().trim();
+        name = name.toLowerCase()
+                .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
                 int idx = index.get(name);
@@ -904,8 +918,9 @@ public class ParticleSet implements Component, IDisposable {
         Vector3d pm = D32.set(0, 0, 0);
         if (pb.hasProperMotion()) {
             pm.set(pb.vx(),
-                    pb.vy(),
-                    pb.vz()).scl(deltaYears);
+                   pb.vy(),
+                   pb.vz())
+                    .scl(deltaYears);
         }
         Vector3d destination = out.set(pb.x(), pb.y(), pb.z());
         // Apply affine transformations, if any.
@@ -919,7 +934,8 @@ public class ParticleSet implements Component, IDisposable {
             }
         }
         if (camPos != null && !camPos.hasNaN())
-            destination.sub(camPos).add(pm);
+            destination.sub(camPos)
+                    .add(pm);
         else
             destination.add(pm);
 
@@ -946,8 +962,9 @@ public class ParticleSet implements Component, IDisposable {
         Vector3d pm = D32;
         if (pb.hasProperMotion()) {
             pm.set(pb.vx(),
-                    pb.vy(),
-                    pb.vz()).scl(deltaYears);
+                   pb.vy(),
+                   pb.vz())
+                    .scl(deltaYears);
         } else {
             pm.set(0, 0, 0);
         }
@@ -1042,7 +1059,8 @@ public class ParticleSet implements Component, IDisposable {
         if (name == null) {
             return null;
         }
-        String base = name.toLowerCase(Locale.ROOT).replace(' ', '_');
+        String base = name.toLowerCase(Locale.ROOT)
+                .replace(' ', '_');
         if (I18n.hasObject(base)) {
             return I18n.obj(base);
         } else {
@@ -1051,12 +1069,15 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public long getCandidateId() {
-        return pointData.get(candidateFocusIndex).id();
+        return pointData.get(candidateFocusIndex)
+                .id();
     }
 
     public String getCandidateName() {
-        return pointData.get(candidateFocusIndex).names() != null ?
-                pointData.get(candidateFocusIndex).names()[0] : getName();
+        return pointData.get(candidateFocusIndex)
+                .names() != null ?
+                pointData.get(candidateFocusIndex)
+                        .names()[0] : getName();
     }
 
     public double getCandidateSolidAngleApparent() {
@@ -1069,7 +1090,8 @@ public class ParticleSet implements Component, IDisposable {
             Vector3d aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
             float size = candidate.hasSize() ? candidate.size() : 0.5e2f;
-            return (float) ((size / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
+            return (float) ((size / aux.sub(camera.getPos())
+                    .len()) / camera.getFovFactor());
         } else {
             return -1;
         }
@@ -1118,7 +1140,8 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setForceLabel(Boolean forceLabel,
                               String name) {
-        name = name.toLowerCase().trim();
+        name = name.toLowerCase()
+                .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
                 int idx = index.get(name);
@@ -1136,7 +1159,8 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public boolean isForceLabel(String name) {
-        name = name.toLowerCase().trim();
+        name = name.toLowerCase()
+                .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
                 int idx = index.get(name);
@@ -1148,7 +1172,8 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setLabelColor(float[] color,
                               String name) {
-        name = name.toLowerCase().trim();
+        name = name.toLowerCase()
+                .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
                 int idx = index.get(name);

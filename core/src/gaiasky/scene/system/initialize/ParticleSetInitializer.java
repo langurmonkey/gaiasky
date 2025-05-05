@@ -99,10 +99,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (starSet != null) {
             // Stars.
             // Is it a catalog of variable stars?
-            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.get(0).isVariable();
+            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.get(0)
+                    .isVariable();
             // We need the sorting data ALWAYS, not only when numLabels > 0.
             // We use them to draw the close-up stars.
-            initSortingData(entity, starSet, starSet);
+            initSortingData(entity, starSet);
 
             var model = Mapper.model.get(entity);
             // Star set.
@@ -114,7 +115,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         } else {
             // Particles.
             if (particleSet.numLabels > 0) {
-                initSortingData(entity, particleSet, null);
+                initSortingData(entity, particleSet);
             }
 
             // Model.
@@ -163,7 +164,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
         // Labels.
         label.label = true;
-        label.textScale = 0.5f;
+        label.textScale = 0.3f;
         label.renderFunction = LabelView::renderTextBase;
 
         // Textures.
@@ -185,7 +186,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                         }
                     } else {
                         // File.
-                        actualFilePaths.add(galLocationPath.toAbsolutePath().toString());
+                        actualFilePaths.add(galLocationPath.toAbsolutePath()
+                                                    .toString());
                     }
                 }
             }
@@ -227,7 +229,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             // Load data
             try {
                 Class<?> clazz = Class.forName(set.provider);
-                IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor().newInstance();
+                IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor()
+                        .newInstance();
                 if (set.providerParams != null) {
                     provider.setProviderParams(set.providerParams);
                 } else {
@@ -237,13 +240,17 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 }
                 provider.setTransformMatrix(transform.matrix);
                 set.setData(provider.loadData(set.datafile, set.factor));
-                set.isExtended = !set.data().isEmpty() && set.data().get(0).getType() == ParticleType.PARTICLE_EXT;
+                set.isExtended = !set.data()
+                        .isEmpty() && set.data()
+                        .get(0)
+                        .getType() == ParticleType.PARTICLE_EXT;
 
                 if (provider instanceof STILDataProvider stil) {
                     set.setColumnInfoList(stil.getColumnInfoList());
                 }
             } catch (Exception e) {
-                Logger.getLogger(this.getClass()).error(e);
+                Logger.getLogger(this.getClass())
+                        .error(e);
                 set.pointData = null;
             }
         }
@@ -285,7 +292,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             // Load data
             try {
                 Class<?> clazz = Class.forName(set.provider);
-                IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
+                IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor()
+                        .newInstance();
                 provider.setProviderParams(set.providerParams);
                 provider.setTransformMatrix(transform.matrix);
 
@@ -294,7 +302,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 set.setData(l);
 
             } catch (Exception e) {
-                Logger.getLogger(this.getClass()).error(e);
+                Logger.getLogger(this.getClass())
+                        .error(e);
                 set.pointData = null;
             }
         }
@@ -350,7 +359,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (set.meanPosition != null) {
             // Use given mean position.
             body.pos.set(set.meanPosition);
-        } else if (set.data() == null || set.data().isEmpty()) {
+        } else if (set.data() == null || set.data()
+                .isEmpty()) {
             // Mean position is 0.
             body.pos.set(0, 0, 0);
         } else {
@@ -358,7 +368,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             for (IParticleRecord point : set.data()) {
                 body.pos.add(point.x(), point.y(), point.z());
             }
-            body.pos.scl(1d / set.data().size());
+            body.pos.scl(1d / set.data()
+                    .size());
         }
     }
 
@@ -383,24 +394,22 @@ public class ParticleSetInitializer extends AbstractInitSystem {
     }
 
     private void initSortingData(Entity entity,
-                                 ParticleSet particleSet,
-                                 StarSet starSet) {
+                                 ParticleSet particleSet) {
         var pointData = particleSet.pointData;
 
-        // Metadata
+        // Metadata array.
         particleSet.metadata = new double[pointData.size()];
 
-        // Initialise indices list with natural order
-        particleSet.indices1 = new Integer[pointData.size()];
-        particleSet.indices2 = new Integer[pointData.size()];
-        for (int i = 0; i < pointData.size(); i++) {
-            particleSet.indices1[i] = i;
-            particleSet.indices2[i] = i;
+        // Initialise indices list with natural order.
+        var K = FastMath.max(particleSet.numLabels,
+                             FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels));
+        K = FastMath.min(pointData.size(), K);
+        particleSet.indices = new int[K];
+        for (int i = 0; i < K; i++) {
+            particleSet.indices[i] = -1;
         }
-        particleSet.active = particleSet.indices1;
-        particleSet.background = particleSet.indices2;
 
         // Initialize updater task
-        particleSet.updaterTask = new ParticleSetUpdaterTask(entity, particleSet, starSet);
+        particleSet.updaterTask = new ParticleSetUpdaterTask(entity, particleSet);
     }
 }

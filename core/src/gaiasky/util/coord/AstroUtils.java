@@ -319,7 +319,7 @@ public class AstroUtils {
         long y = year + 4800L - a;
         long m = month + 12L * a - 3L;
 
-        return day + ((153L * m + 2L) / 5L) + 365L * y + (y / 4L) - 32083.5;
+        return day + ((double) (153L * m + 2L) / 5L) + 365L * y + ((double) y / 4L) - 32083.5;
     }
 
     private static final double GREGORIAN_EPOCH = 1721425.5;
@@ -427,103 +427,6 @@ public class AstroUtils {
         return (julianDate - 2451545.0) / 365250.0;
     }
 
-    /**
-     * Converts proper motions + radial velocity into a cartesian vector.
-     * See <a href="http://www.astronexus.com/a-a/motions-long-term">this article</a>.
-     *
-     * @param muAlphaStar Mu alpha star, in mas/yr.
-     * @param muDelta     Mu delta, in mas/yr.
-     * @param radVel      Radial velocity in km/s.
-     * @param ra          Right ascension in radians.
-     * @param dec         Declination in radians.
-     * @param distPc      Distance in parsecs to the star.
-     *
-     * @return The proper motion vector in internal_units/year.
-     */
-    public static Vector3d properMotionsToCartesian(double muAlphaStar, double muDelta, double radVel, double ra, double dec, double distPc,
-                                                    Vector3d out) {
-        double ma = muAlphaStar * Nature.MILLIARCSEC_TO_ARCSEC;
-        double md = muDelta * Nature.MILLIARCSEC_TO_ARCSEC;
-
-        // Multiply arcsec/yr with distance in parsecs gives a linear velocity. The factor 4.74 converts result to km/s
-        double vta = ma * distPc * Nature.ARCSEC_PER_YEAR_TO_KMS;
-        double vtd = md * distPc * Nature.ARCSEC_PER_YEAR_TO_KMS;
-
-        double cosAlpha = FastMath.cos(ra);
-        double sinAlpha = FastMath.sin(ra);
-        double cosDelta = FastMath.cos(dec);
-        double sinDelta = FastMath.sin(dec);
-
-        // +x to delta=0, alpha=0
-        // +y to delta=0, alpha=90
-        // +z to delta=90
-        // components in km/s
-
-        /*
-         * vx = (vR cos \delta cos \alpha) - (vTA sin \alpha) - (vTD sin \delta cos \alpha)
-         * vy = (vR cos \delta sin \alpha) + (vTA cos \alpha) - (vTD sin \delta sin \alpha)
-         * vz = vR sin \delta + vTD cos \delta
-         */
-        double vx = (radVel * cosDelta * cosAlpha) - (vta * sinAlpha) - (vtd * sinDelta * cosAlpha);
-        double vy = (radVel * cosDelta * sinAlpha) + (vta * cosAlpha) - (vtd * sinDelta * sinAlpha);
-        double vz = (radVel * sinDelta) + (vtd * cosDelta);
-
-        return (out.set(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
-
-    }
-
-    /**
-     * Converts a cartesian velocity vector [vx,vy,vz] into proper motions + radial velocity.
-     * See <a href="http://www.astronexus.com/a-a/motions-long-term">this article</a>.
-     *
-     * @param vx     The X component of the cartesian velocity vector in internal_units/year.
-     * @param vy     The Y component of the cartesian velocity vector internal_units/year.
-     * @param vz     The Z component of the cartesian velocity vector internal_units/year.
-     * @param ra     Right ascension in radians.
-     * @param dec    Declination in radians.
-     * @param distPc Distance in parsecs to the star.
-     *
-     * @return The proper motions (muAlpha, muDelta) in mas/yr, and the radial velocity in km/s.
-     */
-    public static Vector3d cartesianToProperMotions(double vx, double vy, double vz,
-                                                    double ra, double dec, double distPc,
-                                                    Vector3d out) {
-        // Precompute constants for conversion
-        double kmPerYearToInternal = Constants.U_TO_KM / Nature.Y_TO_S;
-        double arcsecPerYearToKm = Nature.ARCSEC_PER_YEAR_TO_KMS * distPc;
-
-        // Convert from internal units/year to km/s
-        double vxKms = vz * kmPerYearToInternal;
-        double vyKms = vx * kmPerYearToInternal;
-        double vzKms = vy * kmPerYearToInternal;
-
-        // Unit vectors
-        double cosA = FastMath.cos(ra);
-        double sinA = FastMath.sin(ra);
-        double cosD = FastMath.cos(dec);
-        double sinD = FastMath.sin(dec);
-
-        double rx = cosD * cosA;
-        double ry = cosD * sinA;
-        double rz = sinD;
-
-        double ax = -sinA;
-        double ay = cosA;
-        double az = 0.0;
-
-        double dx = -cosA * sinD;
-        double dy = -sinA * sinD;
-        double dz = cosD;
-
-        double vr = vxKms * rx + vyKms * ry + vzKms * rz;
-        double vta = vxKms * ax + vyKms * ay + vzKms * az;
-        double vtd = vxKms * dx + vyKms * dy + vzKms * dz;
-
-        double muAlphaStar = (vta / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
-        double muDelta = (vtd / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
-
-        return out.set(muAlphaStar, muDelta, vr);
-    }
 
     /**
      * Converts an apparent magnitude to an absolute magnitude given the distance in parsecs.
