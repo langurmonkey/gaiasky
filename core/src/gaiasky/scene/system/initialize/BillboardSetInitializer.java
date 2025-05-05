@@ -53,7 +53,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         transformData(entity);
     }
 
-    public boolean reloadData(Entity entity) {
+    public void reloadData(Entity entity) {
         try {
             var billboard = Mapper.billboardSet.get(entity);
             var provider = new PointDataProvider();
@@ -62,12 +62,10 @@ public class BillboardSetInitializer extends AbstractInitSystem {
                 boolean reloadNeeded = dataset.initialize(provider, null, reload);
                 reload = reload || reloadNeeded;
             }
-            return reload;
         } catch (Exception e) {
             Logger.getLogger(this.getClass())
                     .error(e);
         }
-        return false;
     }
 
     public void transformData(Entity entity) {
