@@ -21,15 +21,13 @@ import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.Constants;
-import gaiasky.util.IntPriorityQueue;
-import gaiasky.util.Nature;
-import gaiasky.util.Settings;
+import gaiasky.util.*;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -46,7 +44,7 @@ import static gaiasky.scene.task.ParticleSetUpdaterTask.UpdateStage.*;
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
     // Minimum amount of time [s] between two update calls
-    protected static final double UPDATE_INTERVAL_S = 0.3;
+    protected static final double UPDATE_INTERVAL_S = 0.5;
     protected static final double UPDATE_INTERVAL_S_2 = UPDATE_INTERVAL_S * 2.0;
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
@@ -60,7 +58,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     /** Reference to the dataset description component. **/
     private final DatasetDescription datasetDescription;
     private final ParticleUtils utils;
-    private final IntPriorityQueue reusableQueue;
+    private final IntDoublePriorityQueue reusableQueue;
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D34 = new Vector3d();
@@ -80,7 +78,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     /**
      * This number should be larger than both {@link Settings.SceneSettings.ParticleSettings#numLabels} and {@link gaiasky.util.Settings.SceneSettings.StarSettings.GroupSettings#numLabels}.
      */
-    private static int K;
+    private final int K;
 
     public ParticleSetUpdaterTask(Entity entity,
                                   ParticleSet particleSet,
@@ -93,9 +91,8 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
-        this.K = FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels);
-        this.reusableQueue = new IntPriorityQueue(K, (a, b) -> Double.compare(this.particleSet.metadata[a],
-                                                                              this.particleSet.metadata[b]));
+        this.K = this.particleSet.numLabels;
+        this.reusableQueue = new IntDoublePriorityQueue(K);
         this.stage = SORT;
 
         if (starSet != null) {
@@ -160,26 +157,21 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 // Clear queue
                 this.reusableQueue.clear();
 
+                boolean bg = false;
                 for (int i = 0; i < totalCount; i++) {
-                    if (utils.filter(i, particleSet, datasetDescription)) {
-                        if (reusableQueue.size() < K) {
-                            reusableQueue.add(i);
-                        } else if (metadata[i] < metadata[reusableQueue.peek()]) {
-                            reusableQueue.poll();
-                            reusableQueue.add(i);
-                        }
+                    var value = metadata[i];
+                    if (reusableQueue.size() < K) {
+                        reusableQueue.add(i, value);
+                    } else if (value < reusableQueue.peekLastValue()) {
+                        reusableQueue.removeLast();
+                        reusableQueue.add(i, value);
                     }
                 }
 
                 // Now move topK to array and sort it (optional)
-                int[] topIndices = this.reusableQueue.toSortedArray();
+                int[] topIndices = this.reusableQueue.indexArray();
                 var targetIndices = particleSet.indices;
                 System.arraycopy(topIndices, 0, targetIndices, 0, topIndices.length);
-
-                // If you want to fill the rest with -1 or pad with something else:
-                for (int i = topIndices.length; i < targetIndices.length; i++) {
-                    targetIndices[i] = -1;
-                }
 
                 // Synchronously with the render thread, update indices, lastSortTime and updating state.
                 GaiaSky.postRunnable(() -> {
@@ -213,6 +205,18 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     }
 
     /**
+     * Computes the current apparent magnitude given the absolute magnitude and distance squared.
+     *
+     * @param absMag          The absolute magnitude.
+     * @param distanceSquared The distance^2 to the star.
+     *
+     * @return The apparent magnitude at the given distance.
+     */
+    public static double apparentMag(float absMag, double distanceSquared) {
+        return 2.5 * FastMath.log10(distanceSquared) - 5.0 + absMag;
+    }
+
+    /**
      * Updates the extended particle metadata information, used for sorting. In this case, the position (distance
      * from camera), the proper motion, and the size are important.
      *
@@ -237,8 +241,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 Vector3d pos = D31.set(d.x(), d.y(), d.z())
                         .add(dx);
 
+                // Use magnitude.
                 particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ?
-                        camPos.dst2(pos) / d.size() :
+                        apparentMag(d.absMag(), camPos.dst2(pos)) :
                         Double.MAX_VALUE;
             }
         }
