@@ -93,7 +93,7 @@ public class OrbitComponent {
     }
 
     public void setArgOfPericenter(Double argOfPericenter) {
-        this.argOfPericenter = (argOfPericenter + 180) % 360;
+        this.argOfPericenter = argOfPericenter;
     }
 
     public void setArgofpericenter(Double argOfPericenter) {

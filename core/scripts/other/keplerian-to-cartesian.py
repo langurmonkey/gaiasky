@@ -76,7 +76,7 @@ def solve_kepler(M, ecc, tol=1e-10, max_iter=100):
         if abs(delta) < tol:
             return E
 
-    raise RuntimeError(f"Kepler solver did not converge after {max_iter} iterations (M={M}, e={e})")
+    raise RuntimeError(f"Kepler solver did not converge after {max_iter} iterations (M={M}, e={ecc})")
 
 def true_anomaly(E, ecc):
     """
@@ -307,14 +307,71 @@ def generate_anisotropic_clouds(state_array, n_particles=100, sigma_cross_km=500
 
     return result
 
+def set_axes_equal(ax):
+    '''Set 3D plot axes to equal scale.'''
+    x_limits = ax.get_xlim3d()
+    y_limits = ax.get_ylim3d()
+    z_limits = ax.get_zlim3d()
+
+    x_range = abs(x_limits[1] - x_limits[0])
+    x_middle = np.mean(x_limits)
+    y_range = abs(y_limits[1] - y_limits[0])
+    y_middle = np.mean(y_limits)
+    z_range = abs(z_limits[1] - z_limits[0])
+    z_middle = np.mean(z_limits)
+
+    plot_radius = 0.5 * max([x_range, y_range, z_range])
+
+    ax.set_xlim3d([x_middle - plot_radius, x_middle + plot_radius])
+    ax.set_ylim3d([y_middle - plot_radius, y_middle + plot_radius])
+    ax.set_zlim3d([z_middle - plot_radius, z_middle + plot_radius])
+
+def plot_orbit(points):
+    import matplotlib.pyplot as plt
+
+    points.append(points[0])
+    points = [point[1] for point in points]
+    
+    points = np.array(points)
+    if points.ndim != 2 or points.shape[1] != 3:
+        raise ValueError(f"Expected shape (n, 3), got {points.shape}")
+
+    x, y, z = points[:, 0], points[:, 1], points[:, 2]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot(x, y, z, label="Orbit")
+    ax.scatter([0], [0], [0], color='orange', label='Central body')
+    ax.set_xlabel("x [km]")
+    ax.set_ylabel("y [km]")
+    ax.set_zlabel("z [km]")
+    ax.set_title("3D Orbit")
+    ax.legend()
+
+    set_axes_equal(ax)
+    plt.show()
+
+def parse_orbital_elements(arg):
+    try:
+        values = [float(x) for x in arg.split(',')]
+        if len(values) != 8:
+            raise ValueError("Expected 8 orbital elements")
+        keys = ['period', 'epoch', 'sma', 'ecc', 'inc', 'raan', 'argp', 'mean_anom']
+        return dict(zip(keys, values))
+    except Exception as e:
+        raise argparse.ArgumentTypeError(f"Invalid orbital elements: {e}")
+
 # Example usage
 def main():
     # Setup argument parser
     parser = argparse.ArgumentParser(description="Generate orbital samples and particle clouds.")
-    parser.add_argument('--sample-time', action='store_true', help="Sample orbital position in time")
-    parser.add_argument('--sample-nu', action='store_true', help="Sample orbital position in true anomaly")
-    parser.add_argument('--generate-clouds', action='store_true', help="Generate anisotropic particle clouds")
+    parser.add_argument("orbital_elements", type=parse_orbital_elements,
+                        help="Comma-separated list: period[d],epoch[jd],sma[km],ecc,inc[deg],raan[deg],argp[deg],mean_anom[deg]")
+    parser.add_argument('-t', '--sample-time', action='store_true', help="Sample orbital position in time")
+    parser.add_argument('-n', '--sample-nu', action='store_true', help="Sample orbital position in true anomaly")
+    parser.add_argument('-g', '--generate-clouds', action='store_true', help="Generate anisotropic particle clouds")
     parser.add_argument('--print-orbit', action='store_true', help="Print out orbit sample data to standard output")
+    parser.add_argument("--draw-orbit", action='store_true', help="Draw orbit using sampled true anomaly or time")
     parser.add_argument('--print-cloud', action='store_true', help="Print out cloud particle data to standard output")
     parser.add_argument('--n-particles', type=int, default=100, help="Number of particles in the cloud (default: 100)")
     parser.add_argument('--sigma-cross-km', type=float, default=500000.0, help="Cross-track dispersion in km (default: 500000.0 km)")
@@ -322,14 +379,24 @@ def main():
     args = parser.parse_args()
 
     # Orbital elements
-    period_days = 48681.19346262312
-    epoch_jd = 2450000.5
-    sma_km = 3903318039.031277657  # 1 AU
-    ecc = 0.963225755046038
-    inc_deg = 113.453816997171
-    raan_deg = 139.3811920815948
-    argp_deg = 152.9821676305871
-    mean_anom_deg = 7.631696167124212  # at epoch
+    elements = args.orbital_elements
+    period_days = elements['period']
+    epoch_jd = elements['epoch']
+    sma_km = elements['sma']  # 1 AU
+    ecc = elements['ecc']
+    inc_deg = elements['inc']
+    raan_deg = elements['raan']
+    argp_deg = elements['argp']
+    mean_anom_deg = elements['mean_anom']  # at epoch
+
+    # period_days = 48681.19346262312
+    # epoch_jd = 2450000.5
+    # sma_km = 3903318039.031277657  # 1 AU
+    # ecc = 0.963225755046038
+    # inc_deg = 113.453816997171
+    # raan_deg = 139.3811920815948
+    # argp_deg = 152.9821676305871
+    # mean_anom_deg = 7.631696167124212  # at epoch
     mu = 1.32712440018e11  # km^3/s^2 (Sun)
 
     if args.sample_time:
@@ -338,6 +405,9 @@ def main():
         result = sample_nu(period_days, epoch_jd, sma_km, ecc, inc_deg, raan_deg, argp_deg, mean_anom_deg, args.n_samples, args.print_orbit)
     else:
         raise ValueError("You must choose either --sample-time or --sample-nu.")
+
+    if args.draw_orbit:
+        plot_orbit(result)
 
     if args.generate_clouds:
         clouds = generate_anisotropic_clouds(result, n_particles=args.n_particles, sigma_cross_km=args.sigma_cross_km)
