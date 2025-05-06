@@ -460,13 +460,6 @@ public class WelcomeGui extends AbstractGui {
                 GaiaSky.postRunnable(Gdx.app::exit);
             }
         });
-        exitButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                GaiaSky.postRunnable(Gdx.app::exit);
-            }
-        });
         buttonList.add(exitButton);
 
         // Title

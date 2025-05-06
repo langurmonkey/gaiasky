@@ -158,6 +158,7 @@ tasks.register('copyToLib') {
             into project.distLib
             exclude "**/data"
             exclude "**/assets-bak"
+            exclude "**/metainfo"
             exclude "**/core-" + version + ".jar"
             exclude "dummyversion"
         }

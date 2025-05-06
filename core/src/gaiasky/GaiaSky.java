@@ -93,6 +93,7 @@ import gaiasky.vr.openxr.XrLoadStatus;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
 import net.jafama.FastMath;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;
