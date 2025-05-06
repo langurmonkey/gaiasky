@@ -21,10 +21,10 @@ import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
-import gaiasky.util.IntDoubleHeap;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
+import gaiasky.util.TopNBuffer;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -45,7 +45,7 @@ import static gaiasky.scene.task.ParticleSetUpdaterTask.UpdateStage.*;
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
     // Minimum amount of time [s] between two update calls
-    protected static final double UPDATE_INTERVAL_S = 0.5;
+    protected static final double UPDATE_INTERVAL_S = 2.0;
     protected static final double UPDATE_INTERVAL_S_2 = UPDATE_INTERVAL_S * 2.0;
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
@@ -59,27 +59,26 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     /** Reference to the dataset description component. **/
     private final DatasetDescription datasetDescription;
     private final ParticleUtils utils;
-    private final IntDoubleHeap reusableQueue;
+    private final TopNBuffer buffer;
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D34 = new Vector3d();
 
+    private final GaiaSkyExecutorService executor;
+
     enum UpdateStage {
-        // The Sort stage has finished, and the next stage is metadata.
+        /** Compute metadata. **/
         METADATA,
-        // The metadata stage has finished, and the next stage is sort.
-        SORT,
-        // The updater is busy right now.
+        /** First part of the sort. **/
+        SORT1,
+        /** Seconds part of the sort. **/
+        SORT2,
+        /** Working. **/
         BUSY
     }
 
     /** Contains the stage that needs to be run next for this updater. **/
     private UpdateStage stage;
-
-    /**
-     * This number should be larger than both {@link Settings.SceneSettings.ParticleSettings#numLabels} and {@link gaiasky.util.Settings.SceneSettings.StarSettings.GroupSettings#numLabels}.
-     */
-    private final int K;
 
     // Nested class holding the brightness lookup table
     private static class StarBrightness {
@@ -101,9 +100,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         this.particleSet = particleSet;
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
-        this.K = this.particleSet.indices.length;
-        this.reusableQueue = new IntDoubleHeap(K);
-        this.stage = SORT;
+        this.buffer = new TopNBuffer(this.particleSet.indices.length);
+        this.stage = SORT1;
+        this.executor = GaiaSky.instance.getExecutorService();
 
         if (particleSet.isStars) {
             updateMetadataConsumer = this::updateMetadataParticlesExt;
@@ -131,58 +130,63 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         if (pointData != null && !pointData.isEmpty() && pointData.get(0)
                 .names() != null) {
             double t = GaiaSky.instance.getT() - particleSet.lastSortTime;
-            if (stage != BUSY
-                    && base.opacity > 0
-                    && (t > UPDATE_INTERVAL_S_2
-                    || (particleSet.lastSortCameraPos.dst2d(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
-                    || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_S))) {
-                GaiaSky.instance.getExecutorService()
-                        .execute(this);
+            switch (stage) {
+                case METADATA -> {
+                    if (base.opacity > 0
+                            && (t > UPDATE_INTERVAL_S_2
+                            || (particleSet.lastSortCameraPos.dst2d(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
+                            || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_S))) {
+                        executor.execute(this);
+                    }
+                }
+                case SORT1, SORT2 -> {
+                    executor.execute(this);
+                }
             }
         }
     }
 
     @Override
     public void run() {
-        if (particleSet != null) {
-            updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
-        }
-    }
-
-    private void updateSorter(ITimeFrameProvider time,
-                              ICamera camera) {
+        var time = GaiaSky.instance.time;
+        var camera = GaiaSky.instance.getICamera();
         switch (stage) {
             case METADATA -> {
-                // Prepare metadata to sort.
+                // Compute metadata -- brightness proxy for every star.
                 stage = BUSY;
                 updateMetadataConsumer.accept(time, camera);
-                stage = SORT;
+                stage = SORT1;
             }
-            case SORT -> {
+            case SORT1 -> {
+                // Get K brightest star indices -- first half.
                 stage = BUSY;
 
                 var totalCount = particleSet.pointData.size();
                 var metadata = particleSet.metadata;
 
-                // Clear queue
-                this.reusableQueue.clear();
+                // Clear queue.
+                this.buffer.clear();
 
-                for (int i = 0; i < totalCount; i++) {
-                    var value = metadata[i];
-                    if (reusableQueue.size() < K) {
-                        reusableQueue.add(i, value);
-                    } else {
-                        // Check against max value.
-                        int max = reusableQueue.maxIndex();
-                        if (value < reusableQueue.value(max)) {
-                            reusableQueue.remove(max);
-                            reusableQueue.add(i, value);
-                        }
-                    }
+                // Offer first half of particles.
+                for (int i = 0; i < totalCount / 2; i++) {
+                    buffer.add(i, metadata[i]);
                 }
 
-                // Now move topK to array and sort it (optional)
-                int[] topIndices = this.reusableQueue.indexArray();
+                stage = SORT2;
+            }
+            case SORT2 -> {
+                // Get K brightest star indices -- second half.
+                stage = BUSY;
+
+                var totalCount = particleSet.pointData.size();
+                var metadata = particleSet.metadata;
+
+                for (int i = totalCount / 2; i < totalCount; i++) {
+                    buffer.add(i, metadata[i]);
+                }
+
+                // Now move top indices to array
+                int[] topIndices = this.buffer.indexArray();
                 var targetIndices = particleSet.indices;
                 System.arraycopy(topIndices, 0, targetIndices, 0, topIndices.length);
 
@@ -194,7 +198,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 });
             }
         }
-
     }
 
     /**
