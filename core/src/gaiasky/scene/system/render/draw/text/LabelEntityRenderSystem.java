@@ -346,7 +346,7 @@ public class LabelEntityRenderSystem {
             int n = active.length;
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
-                if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
+                if (idx >= 0 && set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
                 }
             }
