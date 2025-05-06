@@ -39,24 +39,17 @@ fi
 
 git -C $SRCDIR checkout $CO
 
-# Generate javadoc
-mkdir -p "/tmp/javadoc/$VERSION"
+# Run Javadoc
+cd $GS
+gradlew core:javadoc
 
-CLASSPATH_LIB_DIR="$(find $GS/releases -maxdepth 1 -type d -name 'gaiasky-*' -print -quit)/lib"
-if [ -z $CLASSPATH_LIB_DIR ]; then 
-    echo "Please build at least one version of Gaia Sky (gradlew core:dist) and try again"
-    exit 1
-fi
-
-
-echo "Using classpath: $CLASSPATH_LIB_DIR"
-$JAVA_HOME/bin/javadoc -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -classpath "$CLASSPATH_LIB_DIR/*" -subpackages gaiasky -doctitle "<b>Gaia Sky Javadoc</b>" -header "<strong><a href='https://gaiasky.space'>Gaia Sky</a></strong> | <a href='http://docs.gaiasky.space'>docs</a> | <a href='https://codeberg.org/gaiasky/'>source</a> " -bottom "<a href='https://gaiasky.space'>Gaia Sky website</a> | <a href='http://docs.gaiasky.space'>Project documentation</a> | <a href='https://codeberg.org/gaiasky/'>Code repository</a>" -encoding UTF-8 -docencoding utf-8 -charset utf-8
-
+# Renave
+mv "$GS/core/build/docs/javadoc" "$GS/core/build/docs/$VERSION"
 
 # Copy to server
-echo "Copying directory /tmp/javadoc/$VERSION to tsagrista@andromeda:/gaiasky/docs/javadoc/$VERSION"
+echo "Copying directory $GS/core/build/docs/javadoc/$VERSION to tsagrista@andromeda:/gaiasky/docs/javadoc/$VERSION"
     
-rsync -avh "/tmp/javadoc/$VERSION" "tsagrista@andromeda:/gaiasky/docs/javadoc/"
+rsync -avh "$GS/core/build/docs/javadoc/$VERSION" "tsagrista@andromeda:/gaiasky/docs/javadoc/"
 
 # Clean up
 #rm -rf /tmp/javadoc

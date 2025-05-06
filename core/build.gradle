@@ -71,6 +71,23 @@ sourceSets {
     }
 }
 
+javadoc {
+    destinationDir = file("${layout.buildDirectory.get()}/docs/javadoc")
+
+    options {
+        // Sets the HTML title of the generated documentation
+        docTitle = "Gaia Sky Javadoc"
+
+        // Sets the header text (appears at the top of each page)
+        header = "<strong><a href='https://gaiasky.space'>Gaia Sky</a></strong> | <a href='http://docs.gaiasky.space'>docs</a> | <a href='https://codeberg.org/gaiasky/'>source</a> "
+        // Bottom part.
+        bottom = "<a href='https://gaiasky.space'>Gaia Sky website</a> | <a href='http://docs.gaiasky.space'>Project documentation</a> | <a href='https://codeberg.org/gaiasky/'>Code repository</a>"
+
+        // Optional: sets the window title (browser tab)
+        windowTitle = "Gaia Sky Javadoc"
+    }
+}
+
 abstract class GaiaSkyRun extends JavaExec {
     public GaiaSkyRun() {
         mainClass = project.mainClassName as String
