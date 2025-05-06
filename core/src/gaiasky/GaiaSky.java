@@ -1119,6 +1119,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         if (xrDriver != null) xrDriver.dispose();
 
         // GLFW crashes on glfwDestroyWindow() on Wayland.
+        // TODO - this prevents the creation of the ErrorDialog, so error reporting is broken on Linux with Wayland!
         if (SysUtils.isLinux() && SysUtils.isWayland()) {
             System.exit(0);
         }
