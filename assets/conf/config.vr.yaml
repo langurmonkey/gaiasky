@@ -168,9 +168,9 @@ scene:
       # Enable or disable the star billboards when stars are close.
       billboard: true
       # Maximum number of star billboards per group.
-      numBillboard: 15
+      numBillboard: 10
       # Maximum number of labels per star group. Applies unless overwritten.
-      numLabels: 15
+      numLabels: 5
       # Maximum number of velocity vectors per star group.
       numVelocityVector: 300
     # Star threshold values.
