@@ -81,6 +81,20 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
      */
     private final int K;
 
+    // Nested class holding the brightness lookup table
+    private static class StarBrightness {
+        private static final float MIN_MAG = -10.0f;
+        private static final float STEP = 0.01f;
+        public static final float[] BRIGHTNESS_TABLE = new float[3001];
+
+        static {
+            for (int i = 0; i < BRIGHTNESS_TABLE.length; i++) {
+                float mag = MIN_MAG + i * STEP;
+                BRIGHTNESS_TABLE[i] = (float) Math.pow(10.0, -0.4 * mag);
+            }
+        }
+    }
+
     public ParticleSetUpdaterTask(Entity entity,
                                   ParticleSet particleSet) {
         this.base = Mapper.base.get(entity);
@@ -203,22 +217,19 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
     }
 
-    private static final double INV_LOG10 = 1.0 / Math.log(10.0);
-
-    private static double log10Quick(double value) {
-        return FastMath.logQuick(value) * INV_LOG10;
-    }
-
     /**
-     * Computes the current apparent magnitude given the absolute magnitude and distance squared.
+     * Computes a proxy to the star brightness given its absolute magnitude and distance squared.
+     * Uses a pre-computed table to avoid {@link FastMath#pow(double, double)} calls.
      *
      * @param absMag          The absolute magnitude.
      * @param distanceSquared The distance^2 to the star.
      *
-     * @return The apparent magnitude at the given distance.
+     * @return A proxy to the brightness, useful for comparing stars.
      */
-    public static double apparentMag(float absMag, double distanceSquared) {
-        return 2.5 * log10Quick(distanceSquared * Constants.U_TO_PC * Constants.U_TO_PC) - 5.0 + absMag;
+    public static double brightnessProxy(float absMag, double distanceSquared) {
+        int index = (int) Math.floor((absMag - StarBrightness.MIN_MAG) / StarBrightness.STEP);
+        if (index < 0 || index >= StarBrightness.BRIGHTNESS_TABLE.length) return 0f;
+        return -StarBrightness.BRIGHTNESS_TABLE[index] / distanceSquared;
     }
 
     /**
@@ -238,9 +249,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             int n = particleSet.pointData.size();
             for (int i = 0; i < n; i++) {
                 IParticleRecord d = particleSet.pointData.get(i);
-                if (d.hasName("Betelgeuse")) {
-                    int ads = 3;
-                }
 
                 // Pm
                 Vector3d dx = D32.set(d.vx(), d.vy(), d.vz())
@@ -251,7 +259,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
                 // Use magnitude.
                 particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ?
-                        apparentMag(d.absMag(), camPos.dst2(pos)) :
+                        brightnessProxy(d.absMag(), camPos.dst2(pos)) :
                         Double.MAX_VALUE;
             }
         }

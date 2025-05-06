@@ -283,10 +283,6 @@ public class LabelEntityRenderSystem {
             int n = FastMath.min(pointData.size(), view.particleSet.numLabels);
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
-                if (idx < 0) {
-                    // Done.
-                    break;
-                }
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     IParticleRecord pb = pointData.get(idx);
                     if (pb.names() != null) {
@@ -350,10 +346,6 @@ public class LabelEntityRenderSystem {
             int n = active.length;
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
-                if (idx < 0) {
-                    // Done.
-                    break;
-                }
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
                 }
@@ -380,9 +372,10 @@ public class LabelEntityRenderSystem {
         if (forceLabel) {
             radius = FastMath.max(radius, 1e4f);
         }
-        float solidAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 50.0f);
+        float solidAngle = (float) ((radius / distToCamera) * Settings.settings.scene.star.brightness * 100f);
 
-        if (forceLabel || solidAngle > thresholdLabel) {
+        var visibleCamera = camera.isVisible(solidAngle, starPosition.put(D32), distToCamera);
+        if (visibleCamera && (forceLabel || solidAngle > thresholdLabel)) {
             Vector3d labelPosition = D32.set(starPosition);
             textPosition(camera, labelPosition, distToCamera, solidAngle, radius);
 
@@ -391,17 +384,16 @@ public class LabelEntityRenderSystem {
             shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
             // Override object color
             shader.setUniform4fv("u_color", view.textColour(star.names()[0]), 0, 4);
-            double textSize = FastMath.tanh(solidAngle) * distToCamera * 1e5d;
-            float alpha = FastMath.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
 
             // Also fade labels in proximity.
+            float alpha = 1.0e-3f;
             var size = star.size() * Constants.STAR_SIZE_FACTOR;
             var sa = size / distToCamera;
             if (set.proximityLoadingFlag && set.proximityLoaded.contains(idx) && sa > set.proximityThreshold * 0.5) {
                 alpha *= (float) MathUtilsDouble.lint(sa, set.proximityThreshold * 0.5f, set.proximityThreshold * 1.5f, 1.0, 0.0);
             }
 
-            textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+            var textSize = alpha * distToCamera * 0.5f;
             render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, star.names()[0], labelPosition, distToCamera,
                           view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
         }
@@ -676,15 +668,15 @@ public class LabelEntityRenderSystem {
         DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
     }
 
-    protected boolean render3DLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera,
-                                    RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, double radius,
-                                    boolean forceLabel) {
-        return render3DLabel(view, batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, radius, -1, -1, forceLabel);
+    protected void render3DLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera,
+                                 RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, double radius,
+                                 boolean forceLabel) {
+        render3DLabel(view, batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, radius, -1, -1, forceLabel);
     }
 
-    protected boolean render3DLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera,
-                                    RenderingContext rc, String labelText, Vector3d labelPosition, double distToCamera, float scale, double size,
-                                    double radius, float minSizeDegrees, float maxSizeDegrees, boolean forceLabel) {
+    protected void render3DLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera,
+                                 RenderingContext rc, String labelText, Vector3d labelPosition, double distToCamera, float scale, double size,
+                                 double radius, float minSizeDegrees, float maxSizeDegrees, boolean forceLabel) {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", Settings.settings.scene.label.size * scale / camera.getFovFactor());
 
@@ -710,8 +702,6 @@ public class LabelEntityRenderSystem {
 
             DecalUtils.drawFont3D(font, batch, labelText, (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z, size, rot,
                                   camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
-            return true;
         }
-        return false;
     }
 }
