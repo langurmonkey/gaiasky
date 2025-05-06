@@ -43,13 +43,14 @@ git -C $SRCDIR checkout $CO
 cd $GS
 gradlew core:javadoc
 
-# Renave
+# Rename
+rm -rf "$GS/core/build/docs/$VERSION"
 mv "$GS/core/build/docs/javadoc" "$GS/core/build/docs/$VERSION"
 
 # Copy to server
-echo "Copying directory $GS/core/build/docs/javadoc/$VERSION to tsagrista@andromeda:/gaiasky/docs/javadoc/$VERSION"
+echo "Copying directory $GS/core/build/docs/$VERSION to tsagrista@andromeda:/gaiasky/docs/javadoc/$VERSION"
     
-rsync -avh "$GS/core/build/docs/javadoc/$VERSION" "tsagrista@andromeda:/gaiasky/docs/javadoc/"
+rsync -avh "$GS/core/build/docs/$VERSION" "tsagrista@andromeda:/gaiasky/docs/javadoc/"
 
 # Clean up
 #rm -rf /tmp/javadoc
