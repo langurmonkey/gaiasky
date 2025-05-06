@@ -539,7 +539,7 @@ public class WelcomeGui extends AbstractGui {
             enabledDatasets.forEach(ds -> {
                 var typeIcon = new OwnImage(skin.getDrawable(DatasetManagerWindow.getIcon(ds.type)));
                 typeIcon.setSize(30f, 30f);
-                var g = hg(typeIcon,new OwnLabel(TextUtils.capString(ds.name + " adsf adsf adsf adsf ", 32), skin));
+                var g = hg(typeIcon,new OwnLabel(TextUtils.capString(ds.name, 32), skin));
                 datasets.add(g)
                         .left()
                         .padBottom(pad16)
