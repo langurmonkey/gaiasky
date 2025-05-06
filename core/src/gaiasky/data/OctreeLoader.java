@@ -257,7 +257,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
             // Override number of labels in case we have a compact octree (~3 octants tops).
             if (root.octant.numChildrenRec + 1 < 4 && Settings.settings.scene.star.group.numLabels <= 50) {
-                long numLabels = FastMath.max(Settings.settings.scene.star.group.numLabels, (long) (100.0 / (root.octant.numChildrenRec + 1)));
+                long numLabels = FastMath.max(Settings.settings.scene.star.group.numLabels, (long) (50.0 / (root.octant.numChildrenRec + 1)));
                 updateNumLabelsRecursive(root.octant, numLabels);
             }
 
