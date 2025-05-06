@@ -139,9 +139,9 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                         model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
 
                         // PROPER MOTION [u/yr]
-                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = (float) particle.vx();
-                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = (float) particle.vy();
-                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = (float) particle.vz();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = particle.vx();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = particle.vy();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = particle.vz();
 
                         // STAR POSITION [u]
                         model.instanceAttributes[curr.instanceIdx + model.particlePosOffset] = (float) particle.x();
