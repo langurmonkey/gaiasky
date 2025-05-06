@@ -618,7 +618,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                     }
 
                     if (ok) {
-                        /* Invoke method */
+                        /* Invoke method. */
                         try {
                             // note: invoke may return null explicitly or because is void type
                             startNotificationCapture();

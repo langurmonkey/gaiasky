@@ -157,6 +157,8 @@ public class ConsoleManager {
         shortcutMap.put("camdir", "getCameraDirection");
         shortcutMap.put("setcamup", "setCameraUp");
         shortcutMap.put("camup", "getCameraUp");
+        shortcutMap.put("direquatorial", "setCameraDirectionEquatorial");
+        shortcutMap.put("dirgalactic", "setCameraDirectionGalactic");
 
         shortcutMap.put("screenshot", "saveScreenshot");
         shortcutMap.put("version", "getVersion");

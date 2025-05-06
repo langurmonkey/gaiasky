@@ -537,6 +537,26 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraDirection(double[] dir);
 
     /**
+     * Creates a smooth camera orientation transition from the current camera orientation
+     * to the given sky coordinates, in equatorial coordinates.
+     * This method sets the camera in free mode.
+     *
+     * @param alpha The right ascension, in decimal degrees.
+     * @param delta The declination, in decimal degrees.
+     */
+    void setCameraDirectionEquatorial(double alpha, double delta);
+
+    /**
+     * Creates a smooth camera orientation transition from the current camera orientation
+     * to the given sky coordinates, in galactic coordinates.
+     * This method sets the camera in free mode.
+     *
+     * @param l The galactic longitude, in decimal degrees.
+     * @param b The galactic latitude, in decimal degrees.
+     */
+    void setCameraDirectionGalactic(double l, double b);
+
+    /**
      * Sets the camera up vector to the given vector, in the internal reference system.
      * The <code>immediate</code> parameter enables setting the camera state
      * immediately without waiting for the possible current update
