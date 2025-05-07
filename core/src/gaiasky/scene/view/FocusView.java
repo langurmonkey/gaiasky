@@ -1130,6 +1130,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
         // Set highlight properties.
         this.hl.highlighted = state;
+        this.hl.dirty = true;
         if (state) {
             hl.hlplain = true;
             hl.hlallvisible = allVisible;
@@ -1170,6 +1171,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         markForUpdate();
 
         hl.highlighted = state;
+        hl.dirty = true;
         if (state) {
             hl.hlplain = false;
             hl.hlallvisible = allVisible;

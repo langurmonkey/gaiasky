@@ -17,7 +17,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 public class StarSetQuadComponent {
 
     protected float[] alphaSizeBr, opacityLimits, opacityLimitsHlShowAll;
-    protected float starPointSize, brightnessPower;
+    protected float starPointSize, brightnessPower, pointScale;
     protected float minQuadSolidAngle;
     protected Texture starTex;
 
@@ -43,9 +43,6 @@ public class StarSetQuadComponent {
         shaderProgram.setUniformf("u_solidAngleMap", 1.0e-10f, 2.0e-9f);
         starParameterUniforms(shaderProgram);
         shaderProgram.end();
-    }
-
-    private void updateSolidAngleMap(ExtShaderProgram shaderProgram) {
     }
 
     protected void starParameterUniforms(ExtShaderProgram shaderProgram) {
@@ -79,11 +76,21 @@ public class StarSetQuadComponent {
 
     protected void updateStarPointSize(float ps) {
         starPointSize = ps * 0.4f;
+        updateSizeAggregate();
     }
 
     protected void updateStarOpacityLimits(float min, float max) {
         opacityLimits[0] = min;
         opacityLimits[1] = max;
+    }
+
+    protected void updatePointScale(float ps) {
+        this.pointScale = ps;
+        updateSizeAggregate();
+    }
+
+    private void updateSizeAggregate() {
+        alphaSizeBr[1] = starPointSize * 1e6f * pointScale;
     }
 
     protected void setOpacityLimitsUniform(ExtShaderProgram shaderProgram, Highlight highlight) {

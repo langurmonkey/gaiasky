@@ -118,13 +118,13 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         var hl = Mapper.highlight.get(render.entity);
         var desc = Mapper.datasetDescription.get(render.entity);
 
-        float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             var model = getModel(set, getOffset(render));
             int n = set.data().size();
             if (!inGpu(render)) {
+                float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
                 int offset = addMeshData(model, model.numVertices, n, 0, set.modelFile, set.modelType, set.modelPrimitive);
                 setModel(offset, model);
                 setOffset(render, offset);
@@ -180,7 +180,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, count);
 
                 setInGpu(render, true);
-
             }
 
             /*
@@ -188,12 +187,17 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
              */
             curr = meshes.get(getOffset(render));
             if (curr != null) {
+                if (hl.dirty) {
+                    triComponent.updatePointScale(utils.getDatasetSizeFactor(render.entity, hl, desc));
+                    hl.dirty = false;
+                }
+
                 if (triComponent.starTex != null) {
                     triComponent.starTex.bind(0);
+                    shaderProgram.setUniformi("u_starTex", 0);
                 }
 
                 triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                 shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                 // Fixed size.
@@ -208,11 +212,11 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
                 shaderProgram.setUniformf("u_s", (float) curRt);
 
-                // Affine transformations.
-                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
-
                 // Opacity limits.
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
+
+                // Affine transformations.
+                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
                 try {
                     curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numVertices, getCount(render));
@@ -285,5 +289,4 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
         triComponent.touchStarParameters(getShaderProgram());
     }
-
 }

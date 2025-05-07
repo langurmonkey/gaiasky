@@ -316,7 +316,6 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
     @Override
     public void notify(Event event, Object source, Object... data) {
         if (isVisible() && pointSize != null && source != pointSize && event == Event.CATALOG_POINT_SIZE_SCALING_CMD) {
-            String datasetName = (String) data[0];
             double val = (Double) data[1];
             OwnSliderPlus slider = pointSize;
             slider.setProgrammaticChangeEvents(false);

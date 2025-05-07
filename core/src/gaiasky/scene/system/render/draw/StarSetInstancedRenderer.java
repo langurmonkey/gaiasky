@@ -25,6 +25,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
+import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -54,8 +55,8 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD,
-                Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CHANGED_CMD,
-                Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+                                        Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CHANGED_CMD,
+                                        Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     @Override
@@ -103,13 +104,13 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         var hl = Mapper.highlight.get(render.entity);
         var desc = Mapper.datasetDescription.get(render.entity);
 
-        float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             var model = getModel(set, getOffset(render));
             int n = set.data().size();
             if (!inGpu(render)) {
+                float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
                 int offset = addMeshData(model, model.numVertices, n, 0, set.modelFile, set.modelType, set.modelPrimitive);
                 setModel(offset, model);
                 setOffset(render, offset);
@@ -119,7 +120,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
                 for (int i = 0; i < n; i++) {
                     if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                        IParticleRecord particle = set.get(i);
+                        var particle = set.get(i);
                         if (!Double.isFinite(particle.size())) {
                             logger.debug("Star " + particle.id() + " has a non-finite size");
                             continue;
@@ -129,7 +130,10 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                         if (hlCmap) {
                             // Color map.
                             double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().getNumber(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0],
+                                                                                                              (float) color[1],
+                                                                                                              (float) color[2],
+                                                                                                              hl.getHlcmAlpha());
                         } else {
                             // Plain color.
                             model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.saturateColor(i, set, hl);
@@ -168,13 +172,17 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
              */
             curr = meshes.get(getOffset(render));
             if (curr != null) {
+                if (hl.dirty) {
+                    triComponent.updatePointScale(utils.getDatasetSizeFactor(render.entity, hl, desc));
+                    hl.dirty = false;
+                }
+
                 if (triComponent.starTex != null) {
                     triComponent.starTex.bind(0);
                     shaderProgram.setUniformi("u_starTex", 0);
                 }
 
                 triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                 shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                 // Fixed size.
@@ -189,7 +197,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                 // Opacity limits.
                 triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
-                // Affine transformation.
+                // Affine transformations.
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
                 try {
@@ -251,8 +259,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     inGpu.remove(renderable);
                 }
             }
-            case BILLBOARD_TEXTURE_IDX_CMD ->
-                    GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
+            case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
             default -> {
             }
         }

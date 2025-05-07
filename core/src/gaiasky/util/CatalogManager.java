@@ -12,6 +12,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.OctreeNode;
 
@@ -30,7 +31,12 @@ public class CatalogManager implements IObserver {
         super();
         ciMap = new HashMap<>();
         cis = new ArrayList<>(5);
-        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT, Event.CATALOG_POINT_SIZE_SCALING_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.CATALOG_ADD,
+                                        Event.CATALOG_REMOVE,
+                                        Event.CATALOG_VISIBLE,
+                                        Event.CATALOG_HIGHLIGHT,
+                                        Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
     public Collection<CatalogInfo> getCatalogInfos() {
@@ -83,60 +89,60 @@ public class CatalogManager implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case CATALOG_ADD -> {
-            CatalogInfo ci = (CatalogInfo) data[0];
-            boolean addToSg = (Boolean) data[1];
-            if (addToSg) {
-                // Insert object into scene graph
-                if (ci.entity != null) {
-                    EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
+            case CATALOG_ADD -> {
+                CatalogInfo ci = (CatalogInfo) data[0];
+                boolean addToSg = (Boolean) data[1];
+                if (addToSg) {
+                    // Insert object into scene graph
+                    if (ci.entity != null) {
+                        EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
+                    }
                 }
-            }
-            String key = ci.name;
-            if (ciMap.containsKey(key)) {
-                int i = 1;
-                String newKey = ci.name + " (" + i + ")";
-                while (ciMap.containsKey(newKey)) {
-                    i++;
-                    newKey = ci.name + " (" + i + ")";
+                String key = ci.name;
+                if (ciMap.containsKey(key)) {
+                    int i = 1;
+                    String newKey = ci.name + " (" + i + ")";
+                    while (ciMap.containsKey(newKey)) {
+                        i++;
+                        newKey = ci.name + " (" + i + ")";
+                    }
+                    ci.name = newKey;
+                    key = newKey;
                 }
-                ci.name = newKey;
-                key = newKey;
+                // Add to map and list
+                ciMap.put(key, ci);
+                cis.add(ci);
             }
-            // Add to map and list
-            ciMap.put(key, ci);
-            cis.add(ci);
-        }
-        case CATALOG_REMOVE -> {
-            CatalogInfo ci;
-            String dsName = (String) data[0];
-            if (ciMap.containsKey(dsName)) {
-                ci = ciMap.get(dsName);
-                EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.entity);
-                ci.removeCatalog();
-                ciMap.remove(dsName);
-                cis.remove(ci);
-            }
-        }
-        case CATALOG_VISIBLE -> {
-            CatalogInfo ci;
-            String dsName;
-            dsName = (String) data[0];
-            boolean visible = (Boolean) data[1];
-            if (ciMap.containsKey(dsName)) {
-                ci = ciMap.get(dsName);
-                if (!visible)
+            case CATALOG_REMOVE -> {
+                CatalogInfo ci;
+                String dsName = (String) data[0];
+                if (ciMap.containsKey(dsName)) {
+                    ci = ciMap.get(dsName);
                     EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.entity);
-                ci.setVisibility(visible);
-                logger.info(I18n.msg("notif.visibility." + (visible ? "on" : "off"), ci.name));
+                    ci.removeCatalog();
+                    ciMap.remove(dsName);
+                    cis.remove(ci);
+                }
             }
-        }
-        case CATALOG_HIGHLIGHT -> {
-            CatalogInfo ci;
-            ci = (CatalogInfo) data[0];
-            boolean highlight = (Boolean) data[1];
-            if (ci != null) {
-                ci.highlight(highlight);
+            case CATALOG_VISIBLE -> {
+                CatalogInfo ci;
+                String dsName;
+                dsName = (String) data[0];
+                boolean visible = (Boolean) data[1];
+                if (ciMap.containsKey(dsName)) {
+                    ci = ciMap.get(dsName);
+                    if (!visible)
+                        EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.entity);
+                    ci.setVisibility(visible);
+                    logger.info(I18n.msg("notif.visibility." + (visible ? "on" : "off"), ci.name));
+                }
+            }
+            case CATALOG_HIGHLIGHT -> {
+                CatalogInfo ci;
+                ci = (CatalogInfo) data[0];
+                boolean highlight = (Boolean) data[1];
+                if (ci != null) {
+                    ci.highlight(highlight);
 
                     if (ci.highlighted)
                         logger.info(I18n.msg("notif.highlight.on", ci.name));
@@ -154,6 +160,23 @@ public class CatalogManager implements IObserver {
                     if (ci.entity != null) {
                         var hl = Mapper.highlight.get(ci.entity);
                         hl.pointscaling = (float) scaling;
+                        hl.dirty = true;
+                        // Sink down the tree.
+                        var oc = Mapper.octant.get(ci.entity);
+                        if (oc != null && oc.octant != null) {
+                            var l = new ArrayList<OctreeNode>(oc.octant.numChildrenRec);
+                            oc.octant.addChildrenToList(l);
+                            for (var node : l) {
+                                if (node.objects != null && !node.objects.isEmpty()) {
+                                    for (var object : node.objects) {
+                                        var ov = (OctreeObjectView) object;
+                                        if (ov != null && ov.getEntity() != null && Mapper.highlight.has(ov.getEntity())) {
+                                            Mapper.highlight.get(ov.getEntity()).dirty = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
