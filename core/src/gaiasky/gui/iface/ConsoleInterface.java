@@ -82,7 +82,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         this.manager = manager;
 
         close = new OwnTextIconButton("", skin, "quit");
-        close.setSize(33, 30);
+        close.setSize(39, 35);
         close.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 closeConsole();
@@ -93,7 +93,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
 
         var clipboard = Gdx.app.getClipboard();
         copyToClipboard = new OwnTextIconButton("", skin, "clipboard");
-        copyToClipboard.setSize(33, 30);
+        copyToClipboard.setSize(39, 35);
         copyToClipboard.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 // Copy all output messages to clipboard.
@@ -171,6 +171,8 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         inputTable.add(input).left();
 
         output = new Table(skin);
+        output.setBackground("table-bg");
+        output.pad(pad);
         output.top().left();
         outputScroll = new OwnScrollPane(output, skin, "default-nobg");
         outputScroll.setHeight(400f);
@@ -278,7 +280,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
 
         var clipboard = Gdx.app.getClipboard();
         var clipboardButton = new OwnTextIconButton("", getSkin(), "clipboard");
-        clipboardButton.setSize(29, 26);
+        clipboardButton.setSize(36, 32);
         clipboardButton.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 // Copy message to clipboard.

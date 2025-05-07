@@ -18,9 +18,9 @@ public class OwnTextIconButton extends OwnTextButton {
     private final Skin skin;
     private Image icon;
     private TextIconButtonStyle style;
-    private float pad = 3.2f;
+    private float pad = 2f;
     private float space = -1;
-    private int contentAlign = Align.left;
+    private int contentAlign = Align.center;
 
     public OwnTextIconButton(String text, Skin skin, String styleName) {
         super(text, skin);
@@ -131,11 +131,11 @@ public class OwnTextIconButton extends OwnTextButton {
         clearChildren();
         if (Align.isRight(contentAlign)) {
             this.align(contentAlign);
-            add(getLabel()).align(contentAlign).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1.6f) : space);
-            add(this.icon).align(contentAlign).pad(pad).padRight(pad);
+            add(getLabel()).align(contentAlign).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1f) : space);
+            add(this.icon).align(contentAlign).pad(pad);
         } else {
             this.align(contentAlign);
-            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1.6f) : space);
+            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1f) : space);
             add(getLabel()).align(contentAlign).padRight(pad);
         }
     }
