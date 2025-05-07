@@ -774,7 +774,7 @@
         "unit": "String"
       },
       "proximityDescriptorsLocation": {
-        "description": "Location of directory that contains descriptor JSON files that bear the names of objects in the dataset. These get loaded whenever the camera gets close to a particle.",
+        "description": "Sometimes, it is desirable to load additional data whenever the camera gets close to specific particles. This attribute contains the location of a directory that contains descriptor JSON files that bear the names of objects in the dataset. These get loaded whenever the camera gets close to a particle. Whenever the solid angle of a particle gets over ``proximityThreshold``, the system checks this location for a file with the same name as that particle. If it exists, it is automatically loaded.",
         "unit": "String",
         "aliases": [
           "proximityDescriptors",
@@ -782,7 +782,7 @@
         ]
       },
       "proximityThreshold": {
-        "description": "Solid angle above which the proximity descriptor loading is triggered.",
+        "description": "Solid angle above which the proximity descriptor loading is triggered. See ``proximityDescriptorsLocation``. If proximity threshold is set, particles fade out as the solid angle overcomes this threshold to enable for the newly loaded representation to show up.",
         "unit": "Double",
         "aliases": [
           "proximityThresholdDeg",
@@ -862,13 +862,6 @@
         "aliases": [
           "fixedAngularSizeDeg:StarGroup",
           "fixedAngularSizeRad:StarGroup"
-        ]
-      },
-      "shadingStyle:StarGroup": {
-        "description": "Special shading style to apply to the particles of this set. |brsp| **Values** |ul| |li| ``default`` -- no special shading (default). |eli| |li| ``twinkle`` -- particles twinkle randomly with (app) time. Does not work on variable star sets. |eli| |eul|",
-        "unit": "String",
-        "aliases": [
-          "shadingstyle:StarGroup"
         ]
       },
       "renderParticles:StarGroup": {

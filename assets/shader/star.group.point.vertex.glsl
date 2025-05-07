@@ -16,11 +16,6 @@ uniform vec2 u_thAnglePoint;
 uniform float u_brightnessPower;
 // VR scale factor
 uniform float u_vrScale;
-uniform float u_proximityThreshold;
-// App run time in seconds.
-uniform float u_appTime;
-// Shading style: 0: default, 1: twinkle.
-uniform int u_shadingStyle;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -112,29 +107,21 @@ void main() {
         pointSize = 0.2e4 * solidAngle * u_alphaSizeBrRc.y * cubemapFactor;
     }
 
-    // Shading style
-    float shadingStyleFactor = 1.0;
-    if (u_shadingStyle == 1) {
-        float noise = abs(gold_noise(vec2(float(gl_VertexID * 0.001)), 2334.943));
-        shadingStyleFactor = clamp(pow(
-                    abs(sin(mod(u_appTime + noise * 6.0, 3.141597))), 2.0), 0.5, 1.5);
-    }
-
-    // Proximity.
-    float fadeFactor = shadingStyleFactor;
-    if (u_proximityThreshold > 0.0) {
-        fadeFactor = smoothstep(u_proximityThreshold * 1.5, u_proximityThreshold * 0.5, solidAngle);
-    }
-
+    // Fade out stars that get close. Billboard rendering takes over.
     float boundaryFade = smoothstep(l0, l1, dist);
-    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeBrRc.x * boundaryFade * fadeFactor, 0.0, 1.0));
+
+    // Color computation.
+    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeBrRc.x * boundaryFade, 0.0, 1.0));
+
+    // Performance trick: If the star is invisible, set it very small so that there is only one fragment, and
+    // set the color to 0 to discard it in the fragment shader.
+    if (v_col.a <= 1.0e-3 || dist < l0) {
+        pointSize = 0.0;
+        v_col = vec4(0.0, 0.0, 0.0, 0.0);
+    }
 
     vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;
     gl_PointSize = pointSize;
 
-    if (dist < l0) {
-        // The pixels of this star will be discarded in the fragment shader
-        v_col = vec4(0.0, 0.0, 0.0, 0.0);
-    }
 }

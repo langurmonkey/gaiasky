@@ -211,10 +211,6 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                         alphaSizeBrRc[1] = ((Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
                         shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
-                        // Shading style.
-                        shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
-                        shaderProgram.setUniformi("u_shadingStyle", set.shadingStyle.ordinal());
-
                         // Fixed size
                         shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
 
@@ -226,9 +222,6 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
 
                         // Affine transformation.
                         addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
-
-                        // Proximity descriptor loading.
-                        shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 
                         try {
                             curr.mesh.render(shaderProgram, GL20.GL_POINTS);

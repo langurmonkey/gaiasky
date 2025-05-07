@@ -234,9 +234,6 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                             // Affine transformations.
                             addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
-                            // Proximity descriptor loading.
-                            shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
-
                             try {
                                 curr.mesh.render(shaderProgram, GL20.GL_POINTS);
                             } catch (IllegalArgumentException e) {

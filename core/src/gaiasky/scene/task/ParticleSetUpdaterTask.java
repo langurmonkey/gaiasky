@@ -158,7 +158,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 stage = SORT1;
             }
             case SORT1 -> {
-                // Get K brightest star indices -- first half.
+                // Get K-brightest star indices -- first half.
                 stage = BUSY;
 
                 var totalCount = particleSet.pointData.size();
@@ -168,24 +168,26 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 this.buffer.clear();
 
                 // Offer first half of particles.
-                for (int i = 0; i < totalCount / 2; i++) {
+                int n = totalCount / 2;
+                for (int i = 0; i < n; i++) {
                     buffer.add(i, metadata[i]);
                 }
 
                 stage = SORT2;
             }
             case SORT2 -> {
-                // Get K brightest star indices -- second half.
+                // Get K-brightest star indices -- second half.
                 stage = BUSY;
 
                 var totalCount = particleSet.pointData.size();
                 var metadata = particleSet.metadata;
 
-                for (int i = totalCount / 2; i < totalCount; i++) {
+                int n = totalCount / 2 + 1;
+                for (int i = n; i < totalCount; i++) {
                     buffer.add(i, metadata[i]);
                 }
 
-                // Now move top indices to array
+                // Now move top indices to array.
                 int[] topIndices = this.buffer.indexArray();
                 var targetIndices = particleSet.indices;
                 System.arraycopy(topIndices, 0, targetIndices, 0, topIndices.length);
