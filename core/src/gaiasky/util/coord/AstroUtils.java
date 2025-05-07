@@ -315,11 +315,16 @@ public class AstroUtils {
      * @see <a href="http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberJulianCalendar(int year, int month, int day) {
-        long a = (14L - month) / 12L;
-        long y = year + 4800L - a;
-        long m = month + 12L * a - 3L;
+        if (month <= 2) {
+            year--;
+            month += 12;
+        }
 
-        return day + ((double) (153L * m + 2L) / 5L) + 365L * y + ((double) y / 4L) - 32083.5;
+        int A = (int) (365.25 * (year + 4716));
+        int B = (int) (30.6001 * (month + 1));
+        double JD = A + B + day - 1524.5;
+
+        return JD;
     }
 
     private static final double GREGORIAN_EPOCH = 1721425.5;

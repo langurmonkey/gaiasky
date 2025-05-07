@@ -26,8 +26,10 @@ public class AstroUtilsTest {
 
     @Test
     public void testJulianDates() {
-        testJulianDate("1099-12-19T12:00:00.000Z", 2122820.0);
+        testJulianDate("0099-12-19T10:00:00.00Z", 1757569.9166667);
+        testJulianDate("1099-12-19T12:00:00.00Z", 2122820.0);
         testJulianDate("1993-01-01T00:00:00.00Z", 2448988.5);
+        testJulianDate("1999-12-19T12:00:00.00Z", 2451532.0);
         testJulianDate("2000-01-01T00:00:00.00Z", 2451544.5);
         testJulianDate("2010-01-01T00:00:00.00Z", 2455197.5);
         testJulianDate("2013-01-01T00:30:00.00Z", 2456293.520833);

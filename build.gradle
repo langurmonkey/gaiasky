@@ -5,6 +5,7 @@ plugins {
     id "com.install4j.gradle" version "10.0.4"
     id "com.dorongold.task-tree" version "1.5"
     id "de.undercouch.download" version "4.1.1"
+    id 'me.champeau.jmh' version '0.6.8'
 }
 
 
@@ -31,6 +32,7 @@ allprojects {
         ashleyVersion = "1.7.4"
         jtarVersion = "2.+"
         junitVersion = "4.+"
+        jmhVersion = "1.+"
         // Vulnerability fixes
         jettyVersion = "10.0.24"
         jsonVersion = "20231013"
@@ -107,7 +109,13 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackUITextures)
         // *****************************
-        compileOnly "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        compileOnly group: "com.badlogicgames.gdx", name: "gdx-tools", version: "$gdxVersion"
+
+        // ************
+        // BENCHMARKING
+        // ************
+        implementation group: "org.openjdk.jmh", name: "jmh-core", version: "$jmhVersion"
+        annotationProcessor group: "org.openjdk.jmh", name: "jmh-generator-annprocess", version: "$jmhVersion"
 
         // ************
         // REGULAR DEPS
