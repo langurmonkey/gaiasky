@@ -80,7 +80,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     /** Contains the stage that needs to be run next for this updater. **/
     private UpdateStage stage;
 
-    // Nested class holding the brightness lookup table
+    /** Nested class holding the brightness lookup table. **/
     private static class StarBrightness {
         private static final float MIN_MAG = -10.0f;
         private static final float STEP = 0.01f;
