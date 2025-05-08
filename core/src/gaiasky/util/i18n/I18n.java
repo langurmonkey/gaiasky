@@ -70,7 +70,7 @@ public class I18n {
         } catch (MissingResourceException e) {
             logger.info(e.getLocalizedMessage());
             // Use default locale - en_GB
-            locale = new Locale("en", "GB");
+            locale = new Locale.Builder().setLanguage("en").setRegion("GB").build();
             try {
                 I18n.messages = I18NBundle.createBundle(main, locale, "UTF-8");
             } catch (Exception e2) {
@@ -85,7 +85,7 @@ public class I18n {
         } catch (MissingResourceException e) {
             logger.info(e.getLocalizedMessage());
             // Use default locale - en_GB
-            locale = new Locale("en", "GB");
+            locale = new Locale.Builder().setLanguage("en").setRegion("GB").build();
             try {
                 I18n.objects = I18NBundle.createBundle(objects, locale, "UTF-8");
             } catch (Exception e2) {
@@ -100,9 +100,9 @@ public class I18n {
     public static Locale getLocaleFromLanguageTag(String languageTag) {
         String[] tags = languageTag.split("-");
         if (tags.length > 1) {
-            return new Locale(tags[0], tags[1]);
+            return new Locale.Builder().setLanguage(tags[0]).setRegion(tags[1]).build();
         } else {
-            return new Locale(languageTag);
+            return new Locale.Builder().setLanguage(languageTag).build();
         }
     }
 
