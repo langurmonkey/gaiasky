@@ -166,7 +166,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnTextIconButton createTab(String title,
                                         Image img,
                                         Skin skin) {
-        OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), img, skin, "toggle-big");
+        OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), Align.left, img, skin, "toggle-big");
         tab.addListener(new OwnTextTooltip(title, skin));
         tab.pad(pad10);
         tab.setWidth(480f);

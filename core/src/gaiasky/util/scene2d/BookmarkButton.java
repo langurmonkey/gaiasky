@@ -10,6 +10,7 @@ package gaiasky.util.scene2d;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -26,7 +27,7 @@ public class BookmarkButton extends OwnTextIconButton {
     private final FocusView view;
 
     public BookmarkButton(BookmarkNode bookmark, Skin skin) {
-        super(TextUtils.capString(bookmark.name, 16), skin, bookmark.isTypeFolder() ? "bookmarks-folder" : "bookmarks-bookmark");
+        super(TextUtils.capString(bookmark.name, 16), Align.left, skin, bookmark.isTypeFolder() ? "bookmarks-folder" : "bookmarks-bookmark");
         this.bookmark = bookmark;
         this.view = new FocusView();
 
