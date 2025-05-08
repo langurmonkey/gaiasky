@@ -27,7 +27,6 @@ import gaiasky.scene.entity.StarSetUtils;
 import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scene.system.initialize.SceneGraphBuilderSystem;
-import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;

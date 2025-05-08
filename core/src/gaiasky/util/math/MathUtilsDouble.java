@@ -9,7 +9,6 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.math.RandomXS128;
 import net.jafama.FastMath;
-import org.apfloat.Apfloat;
 
 import java.util.Random;
 
@@ -494,7 +493,7 @@ public final class MathUtilsDouble {
         final double absB = FastMath.abs(b);
         final double diff = FastMath.abs(a - b);
 
-        if (a == b) {
+        if (a.equals(b)) {
             // shortcut, handles infinities
             return true;
         } else if (a == 0 || b == 0 || absA + absB < Double.MIN_NORMAL) {
@@ -508,33 +507,6 @@ public final class MathUtilsDouble {
         }
     }
 
-    /**
-     * Checks whether a is divisible by b, using the default precision.
-     *
-     * @param a First decimal number, represented by a string.
-     * @param b Second decimal number, represented by a string.
-     * @return Whether a % b == 0 at the default precision.
-     */
-    public static boolean divisible(String a,
-                                    String b) {
-        return divisible(a, b, Apfloat.DEFAULT);
-    }
-
-    /**
-     * Checks whether a is divisible by b, using the given floating-point precision.
-     *
-     * @param a         First decimal number, represented by a string.
-     * @param b         Second decimal number, represented by a string.
-     * @param precision The precision.
-     * @return Whether a % b == 0 at the given precision.
-     */
-    public static boolean divisible(String a,
-                                    String b,
-                                    long precision) {
-        Apfloat af = new Apfloat(a, precision);
-        Apfloat bf = new Apfloat(b, precision);
-        return af.mod(bf).doubleValue() == 0;
-    }
 
     /**
      * Implements a low-pass filter to smooth the input values.

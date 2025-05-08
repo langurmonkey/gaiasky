@@ -16,7 +16,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulati
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
@@ -183,6 +182,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Init Gaia Sky directories.
             SysUtils.mkdirs();
 
+            // Init constants.
             // Init properties file.
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {

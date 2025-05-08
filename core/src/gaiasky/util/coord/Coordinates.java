@@ -10,13 +10,8 @@ package gaiasky.util.coord;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.util.Constants;
 import gaiasky.util.Nature;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import net.jafama.FastMath;
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -311,7 +306,7 @@ public class Coordinates {
      */
     public static Vector2d equatorialToGalactic(double alpha, double delta, Vector2d out) {
         // To equatorial cartesian
-        Vector3d aux = new Vector3d(alpha, delta,  Constants.PC_TO_U);
+        Vector3d aux = new Vector3d(alpha, delta, Constants.PC_TO_U);
         sphericalToCartesian(aux, aux);
 
         // Rotate to galactic cartesian
@@ -329,9 +324,9 @@ public class Coordinates {
     /**
      * Transforms from spherical galactic coordinates to spherical equatorial coordinates.
      *
-     * @param l The galactic longitude in radians.
-     * @param b The galactic latitude in radians.
-     * @param out   The out vector.
+     * @param l   The galactic longitude in radians.
+     * @param b   The galactic latitude in radians.
+     * @param out The out vector.
      *
      * @return The out vector with the right ascension and declination, in radians.
      */
@@ -351,6 +346,7 @@ public class Coordinates {
 
         return out;
     }
+
     /**
      * Transforms from spherical ecliptic coordinates to spherical equatorial coordinates.
      *
@@ -427,7 +423,7 @@ public class Coordinates {
         return sphericalToCartesian(vec.x, vec.y, vec.z, out);
     }
 
-    public static Vector3b sphericalToCartesian(Vector3b vec, Vector3b out) {
+    public static Vector3Q sphericalToCartesian(Vector3Q vec, Vector3Q out) {
         return sphericalToCartesian(vec.x.doubleValue(), vec.y.doubleValue(), vec.z, out);
     }
 
@@ -466,10 +462,10 @@ public class Coordinates {
      * z are on the horizontal plane and y is in the up direction, for
      * chaining.
      */
-    public static Vector3b sphericalToCartesian(double longitude, double latitude, Apfloat radius, Vector3b out) {
-        out.x = radius.multiply(new Apfloat(Math.cos(latitude) * FastMath.sin(longitude), Constants.PREC));
-        out.y = radius.multiply(new Apfloat(Math.sin(latitude), Constants.PREC));
-        out.z = radius.multiply(new Apfloat(Math.cos(latitude) * FastMath.cos(longitude), Constants.PREC));
+    public static Vector3Q sphericalToCartesian(double longitude, double latitude, Quadruple radius, Vector3Q out) {
+        out.x.assign(radius).multiply(new Quadruple(Math.cos(latitude) * FastMath.sin(longitude)));
+        out.y.assign(radius).multiply(new Quadruple(Math.sin(latitude)));
+        out.z.assign(radius).multiply(new Quadruple(Math.cos(latitude) * FastMath.cos(longitude)));
         return out;
     }
 
@@ -539,7 +535,7 @@ public class Coordinates {
      * <li>The radius or distance to the point.</li>
      * </ol>
      */
-    public static Vector3d cartesianToSpherical(Vector3b vec, Vector3d out) {
+    public static Vector3d cartesianToSpherical(Vector3Q vec, Vector3d out) {
         /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
@@ -598,7 +594,7 @@ public class Coordinates {
      * <li>The radius or distance to the point.</li>
      * </ol>
      */
-    public static Vector3b cartesianToSpherical(Vector3b vec, Vector3b out) {
+    public static Vector3Q cartesianToSpherical(Vector3Q vec, Vector3Q out) {
         /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
@@ -612,26 +608,22 @@ public class Coordinates {
          * math.sqrt(xsq + ysq))
          */
 
-        Apfloat xsq = vec.x.multiply(vec.x);
-        Apfloat ysq = vec.y.multiply(vec.y);
-        Apfloat zsq = vec.z.multiply(vec.z);
-        Apfloat distance = ApfloatMath.sqrt(xsq.add(ysq)
-                                                    .add(zsq));
+        Quadruple xsq = vec.x.multiply(vec.x);
+        Quadruple ysq = vec.y.multiply(vec.y);
+        Quadruple zsq = vec.z.multiply(vec.z);
+        Quadruple distance = xsq.add(ysq).add(zsq).sqrt();
 
-        Apfloat alpha = ApfloatMath.atan2(vec.x, vec.z);
+        Quadruple alpha = QuadrupleMath.atan2(vec.x, vec.z);
         if (alpha.doubleValue() < 0) {
-            alpha = alpha.add(ApfloatMath.pi(Constants.PREC)
-                                      .multiply(new Apfloat(2, Constants.PREC)));
+            alpha.add(QuadrupleMath.pi2());
         }
 
-        Apfloat delta;
-        if (zsq.add(xsq)
-                .doubleValue() == 0) {
-            Apfloat piOverTwo = ApfloatMath.pi(Constants.PREC)
-                    .divide(new Apfloat(2, Constants.PREC));
-            delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(new Apfloat(-1, Constants.PREC)));
+        Quadruple delta;
+        if (zsq.add(xsq).doubleValue() == 0) {
+            Quadruple piOverTwo = QuadrupleMath.piOver2();
+            delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(Quadruple.valueOf(-1.0)));
         } else {
-            delta = ApfloatMath.atan(vec.y.divide(ApfloatMath.sqrt(zsq.add(xsq))));
+            delta = QuadrupleMath.atan(vec.y.divide(zsq.add(xsq).sqrt()));
         }
 
         return out.set(alpha, delta, distance);

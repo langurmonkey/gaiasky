@@ -25,15 +25,13 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.SpacecraftView;
-import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.SpacecraftCoordinates;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
-import org.apfloat.Apfloat;
 
 public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
@@ -42,9 +40,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      **/
     private final SpacecraftMouseKbdListener spacecraftMouseKbdListener;
     private final Vector3d aux1, aux2;
-    private final Vector3b aux1b;
-    private final Vector3b toDesired;
-    private final Vector3b desired;
+    private final Vector3Q aux1b;
+    private final Vector3Q toDesired;
+    private final Vector3Q desired;
     private final Vector3d scThrust;
 
     /*
@@ -61,7 +59,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      * Direction and up vectors.
      **/
     public Vector3d direction, up;
-    public Vector3b relPos;
+    public Vector3Q relPos;
     private Entity sc;
     private final SpacecraftView view;
     /**
@@ -73,7 +71,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      **/
     private final FocusView secondClosest;
     private final FocusView auxView;
-    private Vector3b scpos;
+    private Vector3Q scpos;
     private double targetDistance;
 
     public SpacecraftCamera(CameraManager parent) {
@@ -82,17 +80,17 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // Vectors
         direction = new Vector3d(1, 0, 0);
         up = new Vector3d(0, 1, 0);
-        relPos = new Vector3b();
-        toDesired = new Vector3b();
-        desired = new Vector3b();
+        relPos = new Vector3Q();
+        toDesired = new Vector3Q();
+        desired = new Vector3Q();
         aux1 = new Vector3d();
         aux2 = new Vector3d();
-        aux1b = new Vector3b();
+        aux1b = new Vector3Q();
         scThrust = new Vector3d();
         scForce = new Vector3d();
         scAccel = new Vector3d();
         scVel = new Vector3d();
-        scpos = new Vector3b();
+        scpos = new Vector3Q();
         scDir = new Vector3d();
         scUp = new Vector3d();
 
@@ -273,7 +271,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         camera.update();
 
-        posInv.set(pos).scl(new Apfloat(-1, Constants.PREC));
+        posInv.set(pos).scl(-1.0);
 
     }
 

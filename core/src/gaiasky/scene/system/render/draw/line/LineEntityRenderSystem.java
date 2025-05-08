@@ -29,7 +29,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 import net.jafama.FastMath;
@@ -49,7 +49,7 @@ public class LineEntityRenderSystem {
      * {@link LinePrimitiveRenderer}.
      **/
     private final LineView lineView;
-    private final Vector3b B31 = new Vector3b();
+    private final Vector3Q B31 = new Vector3Q();
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D33 = new Vector3d();
@@ -229,7 +229,7 @@ public class LineEntityRenderSystem {
 
         Vector3d p1 = D31;
         Vector3d p2 = D32;
-        Vector3b campos = camera.getPos();
+        Vector3Q campos = camera.getPos();
 
         lineView.setEntity(entity);
 
@@ -243,7 +243,7 @@ public class LineEntityRenderSystem {
         }
     }
 
-    private void getPosition(IPosition posBean, Vector3b camPos, Vector3d out, Constel constel) {
+    private void getPosition(IPosition posBean, Vector3Q camPos, Vector3d out, Constel constel) {
         Vector3d vel = D33.setZero();
         if (posBean.getVelocity() != null && !posBean.getVelocity().hasNaN()) {
             vel.set(posBean.getVelocity()).scl(constel.deltaYears);
@@ -432,7 +432,7 @@ public class LineEntityRenderSystem {
             IParticleRecord star = set.pointData.get(set.indices[i]);
             float radius = (float) (set.getSize(set.indices[i]) * Constants.STAR_SIZE_FACTOR);
             // Position
-            Vector3b lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
+            Vector3Q lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
             // Proper motion
             Vector3d pm = D32.set(star.vx(), star.vy(), star.vz()).scl(set.currDeltaYears);
             // Rest of attributes

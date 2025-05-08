@@ -33,7 +33,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.math.BoundingBoxDouble;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -67,7 +67,7 @@ public class ShadowMapRenderPass extends RenderPass {
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
-    private Vector3b aux1b, aux2b;
+    private Vector3Q aux1b, aux2b;
 
     public ShadowMapRenderPass(final SceneRenderer sceneRenderer) {
         super(sceneRenderer);
@@ -85,8 +85,8 @@ public class ShadowMapRenderPass extends RenderPass {
         aux1d = new Vector3d();
         aux2d = new Vector3d();
         aux3d = new Vector3d();
-        aux1b = new Vector3b();
-        aux2b = new Vector3b();
+        aux1b = new Vector3Q();
+        aux2b = new Vector3Q();
 
         // Build frame buffers and arrays
         buildShadowMapData();
@@ -248,7 +248,7 @@ public class ShadowMapRenderPass extends RenderPass {
             double entitySpan = EntityUtils.getModelSpan(candidate);
             var distCamCenter = (entitySpan * 2.0 / FastMath.tan(FastMath.toRadians(cameraLightIndividual.fieldOfView)));
             // Position, factor of radius
-            Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
+            Vector3Q objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
             for (int j = 0; j < NUM_SHADOW_CASTING_LIGHTS; j++) {
                 // Light direction depends on light.
                 Vector3 lightDir = aux1;
@@ -370,8 +370,8 @@ public class ShadowMapRenderPass extends RenderPass {
                 double entitySpan = EntityUtils.getModelSpan(candidate);
                 var distCamCenter = (entitySpan * 2.0 / FastMath.tan(FastMath.toRadians(cameraLightIndividual.fieldOfView)));
                 // Position, factor of radius
-                Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
-                Vector3b camPos = camera.getPos();
+                Vector3Q objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
+                Vector3Q camPos = camera.getPos();
                 Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
                 boolean intersect = IntersectorDouble.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos.put(aux1d), radius);
                 if (intersect) {

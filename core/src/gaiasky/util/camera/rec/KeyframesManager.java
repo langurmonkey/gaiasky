@@ -53,7 +53,7 @@ public class KeyframesManager implements IObserver {
     /**
      * Reference to current camera position.
      */
-    public Vector3b pos;
+    public Vector3Q pos;
     /**
      * Reference to current camera orientation.
      */
@@ -547,7 +547,7 @@ public class KeyframesManager implements IObserver {
             case UPDATE_CAM_RECORDER -> {
                 synchronized (this) {
                     t = (ITimeFrameProvider) data[0];
-                    pos = (Vector3b) data[1];
+                    pos = (Vector3Q) data[1];
                     dir = (Vector3d) data[2];
                     up = (Vector3d) data[3];
                 }

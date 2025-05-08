@@ -17,7 +17,7 @@ import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.util.Consumers.Consumer4;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 public class GraphNode implements Component, ICopy {
 
@@ -48,7 +48,7 @@ public class GraphNode implements Component, ICopy {
      * floating camera reference system. Add the camera position to this to get the
      * absolute position in the internal reference system.
      */
-    public Vector3b translation;
+    public Vector3Q translation;
 
     /**
      * Local transform matrix. Contains the transform matrix and the
@@ -165,7 +165,7 @@ public class GraphNode implements Component, ICopy {
         var copy = engine.createComponent(this.getClass());
         copy.parent = null;
         copy.parentName = parentName;
-        copy.translation = new Vector3b(translation);
+        copy.translation = new Vector3Q(translation);
         if (copy.children != null) {
             copy.children.clear();
         }

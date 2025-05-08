@@ -32,7 +32,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.Link;
@@ -75,7 +75,7 @@ public class DataInfoWindow extends GenericDialog {
 
     private final DecimalFormat nf;
     private final Vector3d pos;
-    private final Vector3b posb;
+    private final Vector3Q posb;
     private final float padBottom = 10f;
 
     final String colNameStyle = "header-blue";
@@ -88,7 +88,7 @@ public class DataInfoWindow extends GenericDialog {
         this.pad = 8f;
         this.nf = new DecimalFormat("##0.##");
         this.pos = new Vector3d();
-        this.posb = new Vector3b();
+        this.posb = new Vector3Q();
 
         setCancelText(I18n.msg("gui.close"));
         setModal(false);

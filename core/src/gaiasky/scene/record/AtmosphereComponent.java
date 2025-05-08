@@ -29,7 +29,7 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -93,7 +93,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         }
     }
 
-    public void update(Vector3b transform) {
+    public void update(Vector3Q transform) {
         transform.setToTranslation(localTransform).scl(size);
     }
 
@@ -173,7 +173,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
                                                   RotationComponent rigidRotation,
                                                   ModelScaffolding scaffolding,
                                                   Vector3d vrOffset) {
-        Vector3b parentTranslation = null;
+        Vector3Q parentTranslation = null;
         Entity parent = graph.parent;
         if (parent != null) {
             parentTranslation = Mapper.graph.get(parent).translation;
@@ -202,10 +202,10 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public void updateAtmosphericScatteringParams(Material mat,
                                                   float alpha,
                                                   boolean ground,
-                                                  Vector3b translation,
+                                                  Vector3Q translation,
                                                   RotationComponent rc,
                                                   String inverseRefPlaneTransform,
-                                                  Vector3b parentTranslation,
+                                                  Vector3Q parentTranslation,
                                                   Vector3d vrOffset) {
 
         translation.put(aux3);

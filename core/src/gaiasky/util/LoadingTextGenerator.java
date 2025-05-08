@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Scanner;
 

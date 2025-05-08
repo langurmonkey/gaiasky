@@ -7,22 +7,22 @@
 
 package gaiasky.scene.record;
 
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
 public class Position implements IPosition {
 
-    Vector3b pos;
+    Vector3Q pos;
     Vector3d vel;
 
     public Position(double x, double y, double z, double vx, double vy, double vz) {
-        this.pos = new Vector3b(x, y, z);
+        this.pos = new Vector3Q(x, y, z);
         this.vel = new Vector3d(vx, vy, vz);
     }
 
     @Override
-    public Vector3b getPosition() {
+    public Vector3Q getPosition() {
         return pos;
     }
 

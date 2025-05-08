@@ -5,7 +5,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 import java.nio.file.Path;
 import java.time.Instant;
@@ -55,7 +55,7 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
      * @param out  The vector to return the result.
      * @return The out vector if we could retrieve the position, or null if the time is out of range for the current data file.
      */
-    public Vector3b position(Instant date, final Vector3b out) {
+    public Vector3Q position(Instant date, final Vector3Q out) {
         if (!initialize()) {
             // Something is wrong.
             return null;
@@ -87,9 +87,9 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
      * @param out            The vector to put the result.
      * @return The out vector if we could retrieve the position, or null if the time is out of range for the current data file.
      */
-    private Vector3b evaluateChebyshev(final long nanosecondsTcb, final ChebyshevCoefficients.Header header,
+    private Vector3Q evaluateChebyshev(final long nanosecondsTcb, final ChebyshevCoefficients.Header header,
                                        final ChebyshevCoefficients.Coefficients coefficients,
-                                       final Vector3b out) {
+                                       final Vector3Q out) {
 
         // The index of the granule
         int iGranule;
@@ -216,24 +216,24 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
 
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant instant,
-                                                    Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant instant,
+                                                    Vector3Q out) {
         position(instant, out);
         Coordinates.cartesianToSpherical(out, out);
         return out;
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant instant,
-                                                    Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant instant,
+                                                    Vector3Q out) {
         position(instant, out);
         out.mul(Coordinates.eqToEcl());
         return out;
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant instant,
-                                                      Vector3b out) {
+    public Vector3Q getEquatorialCartesianCoordinates(Instant instant,
+                                                      Vector3Q out) {
         position(instant, out);
         return out;
     }

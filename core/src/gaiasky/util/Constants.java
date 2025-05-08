@@ -10,7 +10,9 @@ package gaiasky.util;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import net.jafama.FastMath;
-import org.apfloat.Apfloat;
+
+import gaiasky.util.math.Quadruple;
+import java.math.MathContext;
 
 /**
  * Random constants holder.
@@ -232,8 +234,6 @@ public class Constants {
     // TODO Use Wikipedia API to get localized content to the current language
     public static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
     public static final String URL_WIKI_API_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-    /** {@link Apfloat} default precision, in digits. **/
-    public static final int PREC = 30;
     /** Number of directional lights. **/
     public static final int N_DIR_LIGHTS = 3;
     /** Number of point lights. **/
@@ -313,6 +313,7 @@ public class Constants {
      * Logarithmic depth buffer constant. Controls the resolution close to the camera
      */
     private static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
+
     public static float getCameraK() {
         return (float) CAMERA_K;
     }
@@ -322,6 +323,7 @@ public class Constants {
      * Maximum age of part files, in milliseconds (6 hours).
      */
     private static final long PART_FILE_MAX_AGE_MS = 6 * 3600 * 1000;
+
     public static long getPartFileMaxAgeMs() {
         return PART_FILE_MAX_AGE_MS;
     }

@@ -180,7 +180,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         return this;
     }
 
-    public Vector3d set(final Vector3b vec) {
+    public Vector3d set(final Vector3Q vec) {
         if (vec != null)
             return this.set(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
         return this;
@@ -263,7 +263,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         return this;
     }
 
-    public Vector3d add(final Vector3b vec) {
+    public Vector3d add(final Vector3Q vec) {
         this.x += vec.x.doubleValue();
         this.y += vec.y.doubleValue();
         this.z += vec.z.doubleValue();
@@ -325,7 +325,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         return this.sub(vec.x, vec.y, vec.z);
     }
 
-    public Vector3d sub(final Vector3b vec) {
+    public Vector3d sub(final Vector3Q vec) {
         return this.sub(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
     }
 
@@ -442,7 +442,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         return FastMath.sqrt(a * a + b * b + c * c);
     }
 
-    public double dst(final Vector3b vec) {
+    public double dst(final Vector3Q vec) {
         final double a = vec.x.doubleValue() - x;
         final double b = vec.y.doubleValue() - y;
         final double c = vec.z.doubleValue() - z;
@@ -459,7 +459,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         return FastMath.sqrt(a * a + b * b + c * c);
     }
 
-    public double dst2(Vector3b vec) {
+    public double dst2(Vector3Q vec) {
         final double a = vec.x.doubleValue() - x;
         final double b = vec.y.doubleValue() - y;
         final double c = vec.z.doubleValue() - z;
@@ -502,7 +502,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
         return x * vector.x + y * vector.y + z * vector.z;
     }
 
-    public double dot(final Vector3b vector) {
+    public double dot(final Vector3Q vector) {
         return x * vector.x.doubleValue() + y * vector.y.doubleValue() + z * vector.z.doubleValue();
     }
 
@@ -1022,7 +1022,7 @@ public class Vector3d implements VectorDouble<Vector3d> {
     }
 
     /** Gets the angle in degrees between the two vectors **/
-    public double angle(Vector3b v) {
+    public double angle(Vector3Q v) {
         return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.lenDouble()), -1d, 1d));
     }
 

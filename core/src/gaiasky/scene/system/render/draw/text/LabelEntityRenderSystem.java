@@ -31,7 +31,7 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -44,7 +44,7 @@ public class LabelEntityRenderSystem {
     private final Vector3d D33 = new Vector3d();
     private final Vector3 F31 = new Vector3();
     private final Vector3 F32 = new Vector3();
-    private final Vector3b B31 = new Vector3b();
+    private final Vector3Q B31 = new Vector3Q();
 
     public LabelEntityRenderSystem() {
     }
@@ -155,7 +155,7 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thLabel", 1);
 
-        Vector3b v = B31.setZero();
+        Vector3Q v = B31.setZero();
         if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
             IFocus focus = camera.getFocus();
             focus.getAbsolutePosition(v);
@@ -286,7 +286,7 @@ public class LabelEntityRenderSystem {
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     IParticleRecord pb = pointData.get(idx);
                     if (pb.names() != null) {
-                        Vector3b particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
+                        Vector3Q particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
                         float distToCamera = (float) particlePosition.lenDouble();
                         float solidAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
 
@@ -342,7 +342,7 @@ public class LabelEntityRenderSystem {
 
             var active = set.indices;
 
-            Vector3b starPosition = B31;
+            Vector3Q starPosition = B31;
             int n = active.length;
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
@@ -361,7 +361,7 @@ public class LabelEntityRenderSystem {
     /**
      * Renders the label for a single star in a star group.
      */
-    private void renderStarLabel(LabelView view, StarSet set, int idx, Vector3b starPosition, float thresholdLabel, ExtSpriteBatch batch,
+    private void renderStarLabel(LabelView view, StarSet set, int idx, Vector3Q starPosition, float thresholdLabel, ExtSpriteBatch batch,
                                  ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         boolean forceLabel = set.forceLabel.contains(idx);
         IParticleRecord star = set.pointData.get(idx);

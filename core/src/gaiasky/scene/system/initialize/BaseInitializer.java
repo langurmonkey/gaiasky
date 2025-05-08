@@ -15,7 +15,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 public class BaseInitializer extends AbstractInitSystem {
 
@@ -40,7 +40,7 @@ public class BaseInitializer extends AbstractInitSystem {
         // Initialize base scene graph structures.
         if (graph != null) {
             graph.localTransform = new Matrix4();
-            graph.translation = new Vector3b();
+            graph.translation = new Vector3Q();
         }
 
         // Render reference.

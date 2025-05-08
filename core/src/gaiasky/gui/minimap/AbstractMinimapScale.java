@@ -19,7 +19,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 
 public abstract class AbstractMinimapScale implements IMinimapScale {
@@ -35,7 +35,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     protected double to, from;
 
     protected Vector3d aux3d1, aux3d2;
-    protected Vector3b aux3b1, aux3b2;
+    protected Vector3Q aux3b1, aux3b2;
     protected Vector2d aux2d1, aux2d2;
 
     protected Matrix4d trans;
@@ -50,8 +50,8 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     protected AbstractMinimapScale() {
         aux3d1 = new Vector3d();
         aux3d2 = new Vector3d();
-        aux3b1 = new Vector3b();
-        aux3b2 = new Vector3b();
+        aux3b1 = new Vector3Q();
+        aux3b2 = new Vector3Q();
         aux2d1 = new Vector2d();
         aux2d2 = new Vector2d();
     }

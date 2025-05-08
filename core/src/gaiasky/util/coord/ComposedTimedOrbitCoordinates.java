@@ -7,7 +7,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagNoProcess;
 import gaiasky.util.Logger;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 import java.lang.reflect.Method;
 import java.time.Instant;
@@ -61,7 +61,7 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
         }
     }
 
-    private Vector3b getGenericCoordinates(Instant instant, Vector3b out, Method method) {
+    private Vector3Q getGenericCoordinates(Instant instant, Vector3Q out, Method method) {
         var found = false;
         for (var c : coordinates) {
             if (c.isValid(instant)) {
@@ -94,10 +94,10 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant instant, Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant instant, Vector3Q out) {
         String method = "getEclipticSphericalCoordinates";
         try {
-            return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3b.class));
+            return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3Q.class));
         } catch (NoSuchMethodException nsme) {
             logger.error(nsme, "Method does not exist: " + method);
             return out;
@@ -105,10 +105,10 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant instant, Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant instant, Vector3Q out) {
         String method = "getEclipticCartesianCoordinates";
         try {
-            return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3b.class));
+            return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3Q.class));
         } catch (NoSuchMethodException nsme) {
             logger.error(nsme, "Method does not exist: " + method);
             return out;
@@ -116,10 +116,10 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out) {
+    public Vector3Q getEquatorialCartesianCoordinates(Instant instant, Vector3Q out) {
         String method = "getEquatorialCartesianCoordinates";
         try {
-            return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3b.class));
+            return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3Q.class));
         } catch (NoSuchMethodException nsme) {
             logger.error(nsme, "Method does not exist: " + method);
             return out;

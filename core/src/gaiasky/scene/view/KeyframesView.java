@@ -26,7 +26,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -416,7 +416,7 @@ public class KeyframesView extends BaseView {
             body.size = (float) (0.01 * Constants.KM_TO_U);
 
             var graph = Mapper.graph.get(focus);
-            graph.translation = new Vector3b();
+            graph.translation = new Vector3Q();
 
             scene.initializeEntity(focus);
 

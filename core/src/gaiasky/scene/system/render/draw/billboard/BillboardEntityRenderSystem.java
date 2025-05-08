@@ -26,13 +26,13 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 public class BillboardEntityRenderSystem implements IObserver {
 
     private final Vector3 F31 = new Vector3();
-    private final Vector3b B31 = new Vector3b();
+    private final Vector3Q B31 = new Vector3Q();
 
     private final Color c = new Color();
 
@@ -99,7 +99,7 @@ public class BillboardEntityRenderSystem implements IObserver {
                                    DatasetDescription desc,
                                    int idx,
                                    float fovFactor,
-                                   Vector3b cPosD,
+                                   Vector3Q cPosD,
                                    ICamera camera,
                                    ExtShaderProgram shader,
                                    IntMesh mesh,
@@ -112,7 +112,7 @@ public class BillboardEntityRenderSystem implements IObserver {
             double size = set.getSize(idx);
             double sizeVar = size * varScl;
             double radius = sizeVar * Constants.STAR_SIZE_FACTOR;
-            Vector3b starPos = set.fetchPosition(star, camera.getPos(), B31, set.currDeltaYears);
+            Vector3Q starPos = set.fetchPosition(star, camera.getPos(), B31, set.currDeltaYears);
             double distToCamera = starPos.lenDouble();
             double solidAngle = (size * Constants.STAR_SIZE_FACTOR / distToCamera);
 

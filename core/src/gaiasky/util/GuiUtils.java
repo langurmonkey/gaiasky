@@ -11,16 +11,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.Link;
+import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextTooltip;
 import net.jafama.FastMath;
 
 /**

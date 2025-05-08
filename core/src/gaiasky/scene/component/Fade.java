@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 public class Fade implements Component {
     /**
@@ -43,7 +43,7 @@ public class Fade implements Component {
     /**
      * The position to use in order to compute the fading distance.
      */
-    public Vector3b fadePosition;
+    public Vector3Q fadePosition;
 
     public void setFadein(double[] fadeIn) {
         setFadeIn(fadeIn);
@@ -117,10 +117,10 @@ public class Fade implements Component {
     }
 
     public void setFadePosition(Double fadePosition) {
-        this.fadePosition = new Vector3b(fadePosition, fadePosition, fadePosition);
+        this.fadePosition = new Vector3Q(fadePosition, fadePosition, fadePosition);
     }
 
     public void setFadePosition(double[] fadePosition) {
-        this.fadePosition = new Vector3b(fadePosition[0], fadePosition[1], fadePosition[2]);
+        this.fadePosition = new Vector3Q(fadePosition[0], fadePosition[1], fadePosition[2]);
     }
 }

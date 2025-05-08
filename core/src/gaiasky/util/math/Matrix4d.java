@@ -113,11 +113,11 @@ public class Matrix4d implements Serializable {
     static final Vector3d l_vez = new Vector3d();
     static final Vector3d l_vex = new Vector3d();
     static final Vector3d l_vey = new Vector3d();
-    static final Vector3b l_vezb = new Vector3b();
-    static final Vector3b l_vexb = new Vector3b();
-    static final Vector3b l_veyb = new Vector3b();
+    static final Vector3Q l_vezb = new Vector3Q();
+    static final Vector3Q l_vexb = new Vector3Q();
+    static final Vector3Q l_veyb = new Vector3Q();
     static final Vector3d tmpVec = new Vector3d();
-    static final Vector3b tmpVecb = new Vector3b();
+    static final Vector3Q tmpVecb = new Vector3Q();
     static final Matrix4d tmpMat = new Matrix4d();
     static final Vector3d right = new Vector3d();
     static final Vector3d tmpForward = new Vector3d();
@@ -1157,7 +1157,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setToLookAt(Vector3b direction, Vector3b up) {
+    public Matrix4d setToLookAt(Vector3Q direction, Vector3Q up) {
         l_vezb.set(direction).nor();
         l_vexb.set(direction).nor();
         l_vexb.crs(up).nor();
@@ -1194,7 +1194,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setToLookAt(Vector3b position, Vector3b target, Vector3b up) {
+    public Matrix4d setToLookAt(Vector3Q position, Vector3Q target, Vector3Q up) {
         tmpVecb.set(target).sub(position);
         setToLookAt(tmpVecb, up);
         this.mul(tmpMat.setToTranslation(-position.x.doubleValue(), -position.y.doubleValue(), -position.z.doubleValue()));

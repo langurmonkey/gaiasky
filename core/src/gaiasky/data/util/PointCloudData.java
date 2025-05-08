@@ -8,7 +8,7 @@
 package gaiasky.data.util;
 
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -54,7 +54,7 @@ public class PointCloudData implements Cloneable {
             v.set(x, y, z);
         }
 
-        public void put(Vector3b v) {
+        public void put(Vector3Q v) {
             v.set(x, y, z);
         }
 
@@ -158,7 +158,7 @@ public class PointCloudData implements Cloneable {
                 .put(v);
     }
 
-    public void loadPoint(Vector3b v, int index) {
+    public void loadPoint(Vector3Q v, int index) {
         samples.get(index)
                 .put(v);
     }
@@ -237,7 +237,7 @@ public class PointCloudData implements Cloneable {
         return loadPoint(v, instant.toEpochMilli());
     }
 
-    public boolean loadPoint(Vector3b v, Instant instant) {
+    public boolean loadPoint(Vector3Q v, Instant instant) {
         return loadPoint(v, instant.toEpochMilli());
     }
 
@@ -281,7 +281,7 @@ public class PointCloudData implements Cloneable {
         return true;
     }
 
-    public boolean loadPoint(Vector3b v, long timeMs) {
+    public boolean loadPoint(Vector3Q v, long timeMs) {
         // Data is sorted
         int idx = binarySearch(samples, timeMs);
 

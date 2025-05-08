@@ -25,7 +25,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
 import gaiasky.util.gdx.model.gltf.scene3d.scene.CascadeShadowMap;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 import java.util.List;
 
@@ -51,8 +51,8 @@ public class CascadedShadowMapRenderPass extends RenderPass {
     private final ModelEntityRenderSystem modelRenderer;
     private final CascadeShadowMap cascadeShadowMap;
     private DirectionalShadowLight baseLight;
-    private final Vector3b aux1b = new Vector3b();
-    private final Vector3b aux2b = new Vector3b();
+    private final Vector3Q aux1b = new Vector3Q();
+    private final Vector3Q aux2b = new Vector3Q();
     private final Vector3 aux = new Vector3();
     private final Color color = new Color();
 

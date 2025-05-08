@@ -22,7 +22,7 @@ import gaiasky.util.Functions.Function2;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -34,7 +34,7 @@ public class FocusHit {
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D33 = new Vector3d();
-    private final Vector3b B31 = new Vector3b();
+    private final Vector3Q B31 = new Vector3Q();
     private final FilterView filter;
 
     public FocusHit() {
@@ -135,7 +135,7 @@ public class FocusHit {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
 
-            Vector3b posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.getInversePos());
+            Vector3Q posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.getInversePos());
 
             if (camera.direction.dot(posb) > 0) {
                 // The star is in front of us
@@ -411,7 +411,7 @@ public class FocusHit {
             var entity = view.getEntity();
 
             Vector3 pos = F31;
-            Vector3b posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.posInv);
+            Vector3Q posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.posInv);
             pos.set(posb.valuesf());
 
             if (camera.direction.dot(posb) > 0) {
@@ -460,8 +460,8 @@ public class FocusHit {
         if (hitCondition(view)) {
             var entity = view.getEntity();
 
-            Vector3b aux = B31;
-            Vector3b posb = EntityUtils.getAbsolutePosition(entity, aux).add(camera.getInversePos());
+            Vector3Q aux = B31;
+            Vector3Q posb = EntityUtils.getAbsolutePosition(entity, aux).add(camera.getInversePos());
 
             if (camera.direction.dot(posb) > 0) {
                 // The star is in front of us

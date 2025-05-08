@@ -125,7 +125,7 @@ public interface IFocus {
      *
      * @return The position.
      */
-    Vector3b getPos();
+    Vector3Q getPos();
 
     /**
      * Gets the first ancestor of this node that is a star.
@@ -143,7 +143,7 @@ public interface IFocus {
      * @param out The out vector.
      * @return The absolute position, same as aux.
      */
-    Vector3b getAbsolutePosition(Vector3b out);
+    Vector3Q getAbsolutePosition(Vector3Q out);
 
     /**
      * Return the absolute position of the entity identified by
@@ -153,15 +153,15 @@ public interface IFocus {
      * @param out  Vector3d to put the return value.
      * @return The absolute position of the entity if it exists, null otherwise.
      */
-    Vector3b getAbsolutePosition(String name, Vector3b out);
+    Vector3Q getAbsolutePosition(String name, Vector3Q out);
 
     /**
-     * Same as {@link IFocus#getAbsolutePosition(Vector3b)}.
+     * Same as {@link IFocus#getAbsolutePosition(Vector3Q)}.
      *
      * @param out Vector3d where to put the return value.
      * @return The absolute position, same as aux.
      */
-    Vector3b getClosestAbsolutePos(Vector3b out);
+    Vector3Q getClosestAbsolutePos(Vector3Q out);
 
     /**
      * Gets the position in equatorial spherical coordinates.
@@ -181,7 +181,7 @@ public interface IFocus {
      * @param force  Whether to force the computation if time is off.
      * @return The aux vector for chaining.
      */
-    Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force);
+    Vector3Q getPredictedPosition(Vector3Q aux, ITimeFrameProvider time, ICamera camera, boolean force);
 
     /**
      * Gets the position of this entity at the given delta time in the future in the
@@ -191,7 +191,7 @@ public interface IFocus {
      * @param deltaTime Delta time in seconds.
      * @return The aux vector for chaining.
      */
-    Vector3b getPredictedPosition(Vector3b aux, double deltaTime);
+    Vector3Q getPredictedPosition(Vector3Q aux, double deltaTime);
 
     /**
      * Return the current distance to the camera in internal units.
@@ -272,27 +272,27 @@ public interface IFocus {
      * @param camPos The camera position.
      * @return The height of the projected position of the current camera.
      */
-    double getElevationAt(Vector3b camPos);
+    double getElevationAt(Vector3Q camPos);
 
     /**
-     * Same as {@link #getElevationAt(Vector3b)} but with the option to use the
+     * Same as {@link #getElevationAt(Vector3Q)} but with the option to use the
      * future position of the body instead of the current one.
      *
      * @param camPos            The camera position.
      * @param useFuturePosition Whether to use the future position or the current one.
      * @return The height of the projected position of the current camera on the surface.
      */
-    double getElevationAt(Vector3b camPos, boolean useFuturePosition);
+    double getElevationAt(Vector3Q camPos, boolean useFuturePosition);
 
     /**
-     * Same as {@link #getElevationAt(Vector3b)} but with the option to use the
+     * Same as {@link #getElevationAt(Vector3Q)} but with the option to use the
      * given future position of the body instead of the current one.
      *
      * @param camPos  The camera position.
      * @param nextPos The future position of this body to use.
      * @return The height of the projected position of the current camera on the surface.
      */
-    double getElevationAt(Vector3b camPos, Vector3b nextPos);
+    double getElevationAt(Vector3Q camPos, Vector3Q nextPos);
 
     /**
      * Return the height scale of this focus, or 0 if it has no height info.

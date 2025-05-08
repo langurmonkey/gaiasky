@@ -14,7 +14,7 @@ import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -56,7 +56,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant date, Vector3Q out) {
         getEclipticCartesianCoordinates(date, out);
 
         // To spherical
@@ -65,7 +65,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant date, Vector3Q out) {
         getEquatorialCartesianCoordinates(date, out);
         out.mul(Coordinates.eqToEcl());
 
@@ -73,7 +73,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEquatorialCartesianCoordinates(Instant date, Vector3Q out) {
         boolean inRange = getData().loadPoint(out, date);
         if(!periodic && !inRange) {
             return null;

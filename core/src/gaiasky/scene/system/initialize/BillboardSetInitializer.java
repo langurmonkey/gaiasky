@@ -18,7 +18,7 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3d;
 
 import java.util.List;
@@ -79,7 +79,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
 
         // Model
         Vector3d aux = D31;
-        Vector3b pos3b = body.pos;
+        Vector3Q pos3b = body.pos;
 
         // Transform all
         for (BillboardDataset bd : set.datasets) {

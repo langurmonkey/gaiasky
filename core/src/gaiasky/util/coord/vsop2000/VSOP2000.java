@@ -13,7 +13,7 @@ import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.vsop2000.VSOP2000Reader.VSOP2000Coordinate;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.nio.file.Path;
@@ -106,7 +106,7 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
      * @param out  The vector to return the result.
      */
     public void position(Instant date,
-                         Vector3b out) {
+                         Vector3Q out) {
         if (!initialize()) {
             // Something is wrong.
             return;
@@ -167,23 +167,23 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant instant,
-                                                    Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant instant,
+                                                    Vector3Q out) {
         position(instant, out);
         Coordinates.cartesianToSpherical(out, out);
         return out;
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant instant,
-                                                    Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant instant,
+                                                    Vector3Q out) {
         position(instant, out);
         return out;
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant instant,
-                                                      Vector3b out) {
+    public Vector3Q getEquatorialCartesianCoordinates(Instant instant,
+                                                      Vector3Q out) {
         position(instant, out);
         out.mul(Coordinates.eclToEq());
         return out;
