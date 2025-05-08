@@ -19,7 +19,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import gaiasky.GaiaSky;
 import gaiasky.util.Constants;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public class OortCloudMinimapScale extends AbstractMinimapScale {
 
@@ -38,7 +38,7 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
     @Override
     public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort) {
         super.initialize(ortho, sb, sr, font, side, sideshort, Constants.AU_TO_U, Constants.U_TO_AU, 100000, 1000);
-        trans = new Matrix4d();
+        trans = new Matrix4D();
     }
 
     @Override

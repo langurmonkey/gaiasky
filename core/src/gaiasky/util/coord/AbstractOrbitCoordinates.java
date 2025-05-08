@@ -15,7 +15,7 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
 
     protected String orbitName;
     protected boolean periodic = true;
-    protected Vector3d center;
+    protected Vector3D center;
     protected Entity entity;
     protected Entity owner;
     protected double scaling = 1d;
@@ -110,11 +110,11 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     }
 
     public void setCenterkm(double[] center) {
-        this.center = new Vector3d(center[0] * Constants.KM_TO_U, center[1] * Constants.KM_TO_U, center[2] * Constants.KM_TO_U);
+        this.center = new Vector3D(center[0] * Constants.KM_TO_U, center[1] * Constants.KM_TO_U, center[2] * Constants.KM_TO_U);
     }
 
     public void setCenterpc(double[] center) {
-        this.center = new Vector3d(center[0] * Constants.PC_TO_U, center[1] * Constants.PC_TO_U, center[2] * Constants.PC_TO_U);
+        this.center = new Vector3D(center[0] * Constants.PC_TO_U, center[1] * Constants.PC_TO_U, center[2] * Constants.PC_TO_U);
     }
 
     protected PointCloudData getData() {

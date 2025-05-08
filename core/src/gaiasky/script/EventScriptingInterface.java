@@ -109,9 +109,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     // Reference to the catalog manager
     private final CatalogManager catalogManager;
     // Auxiliary vectors
-    private final Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
+    private final Vector3D aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
     private final Vector3Q aux3b1, aux3b2, aux3b3, aux3b4, aux3b5;
-    private final Vector2d aux2d1;
+    private final Vector2D aux2d1;
     private final Set<AtomicBoolean> stops;
     private final FocusView focusView;
     private final VertsView vertsView;
@@ -136,18 +136,18 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         stops = new HashSet<>();
 
         // Auxiliary vectors
-        aux3d1 = new Vector3d();
-        aux3d2 = new Vector3d();
-        aux3d3 = new Vector3d();
-        aux3d4 = new Vector3d();
-        aux3d5 = new Vector3d();
-        aux3d6 = new Vector3d();
+        aux3d1 = new Vector3D();
+        aux3d2 = new Vector3D();
+        aux3d3 = new Vector3D();
+        aux3d4 = new Vector3D();
+        aux3d5 = new Vector3D();
+        aux3d6 = new Vector3D();
         aux3b1 = new Vector3Q();
         aux3b2 = new Vector3Q();
         aux3b3 = new Vector3Q();
         aux3b4 = new Vector3Q();
         aux3b5 = new Vector3Q();
-        aux2d1 = new Vector2d();
+        aux2d1 = new Vector2D();
 
         em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE, Event.SCENE_LOADED);
     }
@@ -437,7 +437,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public double[] getCameraPosition(String units) {
         if (checkDistanceUnits(units, "units")) {
             var u = DistanceUnits.valueOf(units.toUpperCase());
-            Vector3d campos = GaiaSky.instance.cameraManager.getPos()
+            Vector3D campos = GaiaSky.instance.cameraManager.getPos()
                     .tov3d(aux3d1);
             return new double[]{u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z)};
         }
@@ -487,7 +487,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public double[] getCameraDirection() {
-        Vector3d camDir = GaiaSky.instance.cameraManager.getDirection();
+        Vector3D camDir = GaiaSky.instance.cameraManager.getDirection();
         return new double[]{camDir.x, camDir.y, camDir.z};
     }
 
@@ -529,7 +529,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setCameraDirectionGalactic(double l, double b) {
         if (checkNum(b, -90.0, 90.0, "galactic latitude")) {
-            var eq = Coordinates.galacticToEquatorial(FastMath.toRadians(l), FastMath.toRadians(b), new Vector2d());
+            var eq = Coordinates.galacticToEquatorial(FastMath.toRadians(l), FastMath.toRadians(b), new Vector2D());
             setCameraDirectionEquatorial(FastMath.toDegrees(eq.x), FastMath.toDegrees(eq.y));
         }
     }
@@ -561,7 +561,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public double[] getCameraUp() {
-        Vector3d camUp = GaiaSky.instance.cameraManager.getUp();
+        Vector3D camUp = GaiaSky.instance.cameraManager.getUp();
         return new double[]{camUp.x, camUp.y, camUp.z};
     }
 
@@ -658,7 +658,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 double dist = radius / FastMath.tan(Math.toRadians(solidAngle / 2)) + radius;
 
                 // Up to ecliptic north pole
-                Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
+                Vector3D up = new Vector3D(0, 1, 0).mul(Coordinates.eclToEq());
 
                 Vector3Q focusPos = aux3b1;
                 focusView.getAbsolutePosition(focusPos);
@@ -672,17 +672,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 otherToFocus.set(focusPos)
                         .sub(otherPos)
                         .nor();
-                Vector3d focusToOther = aux3d4.set(otherToFocus);
+                Vector3D focusToOther = aux3d4.set(otherToFocus);
                 focusToOther.scl(-dist)
                         .rotate(up, rotation);
 
                 // New camera position
-                Vector3d newCamPos = aux3d5.set(focusToOther)
+                Vector3D newCamPos = aux3d5.set(focusToOther)
                         .add(focusPos)
                         .scl(Constants.U_TO_KM);
 
                 // New camera direction
-                Vector3d newCamDir = aux3d6.set(focusToOther);
+                Vector3D newCamDir = aux3d6.set(focusToOther);
                 newCamDir.scl(-1)
                         .nor();
 
@@ -933,7 +933,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             var entity = getEntity(name);
             var camera = GaiaSky.instance.cameraManager;
             Vector3 posFloat = new Vector3();
-            Vector3d posDouble = new Vector3d();
+            Vector3D posDouble = new Vector3D();
             Vector3Q posPrec = new Vector3Q();
             synchronized (focusView) {
                 focusView.setEntity(entity);
@@ -2025,7 +2025,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     focusView.getAbsolutePosition(camObj)
                             .add(cam.posInv)
                             .nor();
-                    Vector3d dir = cam.direction;
+                    Vector3D dir = cam.direction;
 
                     // Add forward movement while distance > target distance
                     boolean distanceNotMet = (focusView.getDistToCamera() - focusView.getRadius()) > target;
@@ -2065,7 +2065,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     em.post(Event.CAMERA_STOP, this);
 
                     // Roll till done
-                    Vector3d up = cam.up;
+                    Vector3D up = cam.up;
                     // aux1 <- camera-object
                     camObj = focusView.getAbsolutePosition(aux3b1)
                             .sub(cam.pos);
@@ -3429,7 +3429,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public double[] galacticToInternalCartesian(double l,
                                                 double b,
                                                 double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
+        Vector3D pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3D());
         pos.mul(Coordinates.galacticToEquatorial());
         return new double[]{pos.x, pos.y, pos.z};
     }
@@ -3444,7 +3444,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public double[] eclipticToInternalCartesian(double l,
                                                 double b,
                                                 double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
+        Vector3D pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3D());
         pos.mul(Coordinates.eclipticToEquatorial());
         return new double[]{pos.x, pos.y, pos.z};
     }
@@ -3459,7 +3459,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public double[] equatorialToInternalCartesian(double ra,
                                                   double dec,
                                                   double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
+        Vector3D pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3D());
         return new double[]{pos.x, pos.y, pos.z};
     }
 
@@ -3473,7 +3473,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                                   double y,
                                                   double z) {
         Vector3Q in = aux3b1.set(x, y, z);
-        Vector3d out = aux3d6;
+        Vector3D out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
         return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble()};
     }
@@ -3743,8 +3743,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public double[] rotate3(double[] vector,
                             double[] axis,
                             double angle) {
-        Vector3d v = aux3d1.set(vector);
-        Vector3d a = aux3d2.set(axis);
+        Vector3D v = aux3d1.set(vector);
+        Vector3D a = aux3d2.set(axis);
         return v.rotate(a, angle)
                 .values();
     }
@@ -3770,7 +3770,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public double[] rotate2(double[] vector,
                             double angle) {
-        Vector2d v = aux2d1.set(vector);
+        Vector2D v = aux2d1.set(vector);
         return v.rotate(angle)
                 .values();
     }
@@ -5769,15 +5769,15 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     class CameraTransitionRunnable implements Runnable {
         final Object lock;
-        final Vector3d v3d1, v3d2, v3d3;
+        final Vector3D v3d1, v3d2, v3d3;
         NaturalCamera cam;
         /** Duration of the position interpolation, in seconds. **/
         double posDuration;
         /** Duration of the orientation interpolation, in seconds. **/
         double orientationDuration;
         double elapsed, start;
-        Vector3d targetDir, targetUp;
-        PathDouble<Vector3d> posInterpolator;
+        Vector3D targetDir, targetUp;
+        PathDouble<Vector3D> posInterpolator;
         QuaternionDouble startOrientation, endOrientation, qd;
         Runnable end;
         /** Maps input x to output x for positions. **/
@@ -5920,8 +5920,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 this.posDuration = positionDurationSeconds;
             }
             if (type.isOrientation() && dir != null && up != null) {
-                this.targetDir = new Vector3d(dir).nor();
-                this.targetUp = new Vector3d(up).nor();
+                this.targetDir = new Vector3D(dir).nor();
+                this.targetUp = new Vector3D(up).nor();
                 this.orientationDuration = orientationDurationSeconds;
             }
             this.start = GaiaSky.instance.getT();
@@ -5953,9 +5953,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             }
 
             // Aux
-            v3d1 = new Vector3d();
-            v3d2 = new Vector3d();
-            v3d3 = new Vector3d();
+            v3d1 = new Vector3D();
+            v3d2 = new Vector3D();
+            v3d3 = new Vector3D();
             qd = new QuaternionDouble();
         }
 
@@ -5982,9 +5982,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          *
          * @return The linear interpolation path.
          */
-        private PathDouble<Vector3d> getPath(Vector3d p0,
+        private PathDouble<Vector3D> getPath(Vector3D p0,
                                              double[] p1) {
-            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1)};
+            Vector3D[] points = new Vector3D[]{new Vector3D(p0), new Vector3D(p1)};
             return new LinearDouble<>(points);
         }
 

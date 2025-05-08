@@ -18,8 +18,8 @@ import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.time.Instant;
@@ -67,7 +67,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
      */
     private void sampleOrbitInTime(OrbitDataLoaderParameters parameter) {
         OrbitComponent params = parameter.orbitalParamaters;
-        Vector3d out = new Vector3d();
+        Vector3D out = new Vector3D();
         double period = params.period; // in days
         double epoch = params.epoch; // in days
 
@@ -104,7 +104,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
      */
     private void sampleOrbitInNu(OrbitDataLoaderParameters parameter) {
         OrbitComponent params = parameter.orbitalParamaters;
-        Vector3d out = new Vector3d();
+        Vector3D out = new Vector3D();
         double period = params.period; // in days
 
         data = new PointCloudData();
@@ -153,21 +153,21 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
             int nSamples = FastMath.min(Math.max(50, (int) (a * 0.01)), 100);
             double step = 360d / nSamples;
-            Vector3d[] samples = new Vector3d[nSamples + 1];
+            Vector3D[] samples = new Vector3D[nSamples + 1];
             int i = 0;
             for (double angledeg = 0; angledeg < 360; angledeg += step) {
                 double angleRad = FastMath.toRadians(angledeg);
-                Vector3d point = new Vector3d(b * FastMath.sin(angleRad), 0d, a * FastMath.cos(angleRad));
+                Vector3D point = new Vector3D(b * FastMath.sin(angleRad), 0d, a * FastMath.cos(angleRad));
                 samples[i] = point;
                 i++;
             }
             // Last, to close the orbit.
             samples[i] = samples[0].cpy();
 
-            Matrix4d transform = new Matrix4d();
+            Matrix4D transform = new Matrix4D();
             transform.scl(Constants.KM_TO_U);
             data = new PointCloudData();
-            for (Vector3d point : samples) {
+            for (Vector3D point : samples) {
                 point.mul(transform);
                 data.addPoint(point.x, point.y, point.z, Instant.now());
             }

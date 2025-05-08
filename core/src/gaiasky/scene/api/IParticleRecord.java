@@ -9,7 +9,7 @@ package gaiasky.scene.api;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.record.ParticleType;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 import uk.ac.bristol.star.cdf.Variable;
 
@@ -21,7 +21,7 @@ public interface IParticleRecord {
 
     double z();
 
-    Vector3d pos(Vector3d aux);
+    Vector3D pos(Vector3D aux);
 
     boolean hasProperMotion();
 

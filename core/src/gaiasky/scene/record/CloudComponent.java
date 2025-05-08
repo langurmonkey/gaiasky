@@ -35,7 +35,7 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.svt.SVTManager;
 import net.jafama.FastMath;
 
@@ -83,7 +83,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     // Model parameters
     public Map<String, Object> params;
     Vector3 aux;
-    Vector3d aux3;
+    Vector3D aux3;
     private AssetManager manager;
     private final AtomicBoolean generated = new AtomicBoolean(false);
     private Texture cloudTex;
@@ -96,7 +96,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         mc.setBlendMode(BlendMode.COLOR);
         mc.initialize(null);
         aux = new Vector3();
-        aux3 = new Vector3d();
+        aux3 = new Vector3D();
     }
 
     public void initialize(String name, boolean force) {

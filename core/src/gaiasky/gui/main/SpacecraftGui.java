@@ -50,7 +50,7 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;
 
@@ -90,7 +90,7 @@ public class SpacecraftGui extends AbstractGui {
     // Reference to spacecraft camera rotation quaternion
     private Quaternion qf;
     // Reference to spacecraft camera velocity vector
-    private Vector3d vel;
+    private Vector3D vel;
     private float indicatorw, indicatorh, indicatorx, indicatory;
     private boolean thrustEvents = true;
 

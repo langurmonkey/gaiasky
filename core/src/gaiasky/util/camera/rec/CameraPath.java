@@ -8,7 +8,7 @@ import gaiasky.util.camera.rec.KeyframesManager.PathPart;
 import gaiasky.util.camera.rec.KeyframesManager.PathType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
@@ -131,8 +131,8 @@ public class CameraPath {
         final var q = new QuaternionDouble();
         final var q0 = new QuaternionDouble();
         final var q1 = new QuaternionDouble();
-        final var v3d1 = new Vector3d();
-        final var v3d2 = new Vector3d();
+        final var v3d1 = new Vector3D();
+        final var v3d2 = new Vector3D();
 
         /* Frame counter */
         frameRate = Settings.settings.camrecorder.targetFps;

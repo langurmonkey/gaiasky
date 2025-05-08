@@ -34,7 +34,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -182,7 +182,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                 // Reference system transform
                 var trans = Mapper.transform.get(first.entity);
                 var trajectory = Mapper.trajectory.get(first.entity);
-                Matrix4d refSysTransform = trans.matrix != null ? trans.matrix : null;
+                Matrix4D refSysTransform = trans.matrix != null ? trans.matrix : null;
                 if (refSysTransform != null) {
                     if (trajectory.model.isExtrasolar()) {
                         refSysTransform.putIn(maux).inv();

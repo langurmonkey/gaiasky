@@ -19,7 +19,7 @@ import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.time.Instant;
@@ -87,7 +87,7 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
     protected void updateLocalTransformHeliotropic(Instant date,
                                                    GraphNode graph,
                                                    Trajectory trajectory) {
-        Matrix4d localTransformD = trajectory.localTransformD;
+        Matrix4D localTransformD = trajectory.localTransformD;
 
         double sunLongitude = AstroUtils.getSunLongitude(date);
         graph.translation.setToTranslation(localTransformD)

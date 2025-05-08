@@ -23,7 +23,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.camera.Proximity.NearbyRecord;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public abstract class AbstractCamera implements ICamera {
@@ -36,7 +36,7 @@ public abstract class AbstractCamera implements ICamera {
     public double CAM_FAR;
 
     public Vector3Q pos, posInv, prevPos, dPos;
-    public Vector3d tmp, shift;
+    public Vector3D tmp, shift;
     /**
      * The main camera.
      **/
@@ -95,8 +95,8 @@ public abstract class AbstractCamera implements ICamera {
         prevPos = new Vector3Q();
         dPos = new Vector3Q();
         posInv = new Vector3Q();
-        shift = new Vector3d();
-        tmp = new Vector3d();
+        shift = new Vector3D();
+        tmp = new Vector3D();
         prevCombined = new Matrix4();
 
         camLeft = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
@@ -141,7 +141,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public void setPos(Vector3d pos) {
+    public void setPos(Vector3D pos) {
         this.pos.set(pos);
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public void setPreviousPos(Vector3d prevpos) {
+    public void setPreviousPos(Vector3D prevpos) {
         this.prevPos.set(prevpos);
     }
 
@@ -171,7 +171,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public void setDPos(Vector3d dPos) {
+    public void setDPos(Vector3D dPos) {
         this.dPos.set(dPos);
     }
 
@@ -213,7 +213,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public boolean isVisible(double viewAngle, Vector3d pos, double distToCamera) {
+    public boolean isVisible(double viewAngle, Vector3D pos, double distToCamera) {
         return (viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
     }
 
@@ -266,12 +266,12 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3d getShift() {
+    public Vector3D getShift() {
         return this.shift;
     }
 
     @Override
-    public void setShift(Vector3d shift) {
+    public void setShift(Vector3D shift) {
         this.shift.set(shift);
     }
 
@@ -363,7 +363,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3d getVelocity() {
+    public Vector3D getVelocity() {
         return null;
     }
 

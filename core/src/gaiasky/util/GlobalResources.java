@@ -32,7 +32,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
@@ -50,7 +50,7 @@ import java.util.stream.Stream;
  */
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
-    private static final Vector3d aux = new Vector3d();
+    private static final Vector3D aux = new Vector3D();
     private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
     // Global all-purpose sprite batch.
     private final SpriteBatch spriteBatch;
@@ -234,7 +234,7 @@ public class GlobalResources {
      *
      * @return True if the body is visible
      */
-    public static boolean isInView(Vector3Q point, double len, float coneAngle, Vector3d dir) {
+    public static boolean isInView(Vector3Q point, double len, float coneAngle, Vector3D dir) {
         return FastMath.acos(point.tov3d().dot(dir) / len) < coneAngle;
     }
 
@@ -251,7 +251,7 @@ public class GlobalResources {
      *
      * @return True if the body is visible
      */
-    public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
+    public static boolean isInView(Vector3D point, double len, float coneAngle, Vector3D dir) {
         return FastMath.acos(point.dot(dir) / len) < coneAngle;
     }
 
@@ -403,10 +403,10 @@ public class GlobalResources {
         return (float) (MathUtilsDouble.radiansToDegrees * FastMath.atan2(v2.y - v1.y, v2.x - v1.x));
     }
 
-    public static synchronized void applyRelativisticAberration(Vector3d pos, ICamera cam) {
+    public static synchronized void applyRelativisticAberration(Vector3D pos, ICamera cam) {
         // Relativistic aberration
         if (Settings.settings.runtime.relativisticAberration) {
-            Vector3d camDir = aux;
+            Vector3D camDir = aux;
             if (cam.getVelocity() != null)
                 camDir.set(cam.getVelocity()).nor();
             else

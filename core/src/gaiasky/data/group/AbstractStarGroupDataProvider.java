@@ -16,9 +16,8 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.io.ByteBufferInputStream;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
-import gaiasky.util.math.Vector3dTransformer;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
@@ -46,8 +45,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
-    protected Matrix4d transform;
-    protected Vector3dTransformer transformer;
+    protected Matrix4D transform;
     protected Set<Long> mustLoadIds = null;
     protected List<AdditionalCols> additional;
     /**
@@ -106,10 +104,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     public AbstractStarGroupDataProvider() {
         super();
-        // TODO This is for compatibility with Java 17.
-        var p = ForkJoinPool.commonPool();
-        parallelism = p.getParallelism();
-        p.shutdownNow();
+        try (var p = ForkJoinPool.commonPool()) {
+            parallelism = p.getParallelism();
+        }
     }
 
     public ColId colIdFromStr(final String name) {
@@ -352,16 +349,18 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name(s), x[km], y[km], z[km], absmag, appmag, r, g, b");
-            Vector3d gal = new Vector3d();
+            Vector3D gal = new Vector3D();
             int n = 0;
             for (IParticleRecord star : data) {
                 float[] col = colors.get(star.id());
                 double x = star.z();
                 double y = -star.x();
                 double z = star.y();
-                gal.set(x, y, z).scl(Constants.U_TO_KM);
+                gal.set(x, y, z)
+                        .scl(Constants.U_TO_KM);
                 gal.mul(Coordinates.equatorialToGalactic());
-                writer.println(TextUtils.concatenate(Constants.nameSeparator, star.names()) + sep + x + sep + y + sep + z + sep + star.absMag() + sep + star.appMag() + sep + col[0] + sep + col[1] + sep + col[2]);
+                writer.println(TextUtils.concatenate(Constants.nameSeparator,
+                                                     star.names()) + sep + x + sep + y + sep + z + sep + star.absMag() + sep + star.appMag() + sep + col[0] + sep + col[1] + sep + col[2]);
                 n++;
             }
             writer.close();
@@ -437,7 +436,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     private void loadAdditional(Path f, AdditionalCols addit) {
         if (Files.isDirectory(f, LinkOption.NOFOLLOW_LINKS)) {
-            File[] files = f.toFile().listFiles();
+            File[] files = f.toFile()
+                    .listFiles();
             assert files != null;
             int nFiles = files.length;
             int mod = nFiles / 20;
@@ -472,11 +472,14 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             FileChannel fc = raf.getChannel();
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             data = new ByteBufferInputStream(mem);
-            if (f.toString().endsWith(".gz")) data = new GZIPInputStream(data);
+            if (f.toString()
+                    .endsWith(".gz")) data = new GZIPInputStream(data);
             BufferedReader br = new BufferedReader(new InputStreamReader(data));
             // Read header
             String additionalSplit = ",|\\s+";
-            String[] header = br.readLine().strip().split(additionalSplit);
+            String[] header = br.readLine()
+                    .strip()
+                    .split(additionalSplit);
             int i = 0;
             for (String col : header) {
                 col = col.strip();
@@ -497,7 +500,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 Long sourceId = Parser.parseLong(tokens[0].trim());
                 double[] vals = new double[nCols];
                 for (int j = 1; j <= nCols; j++) {
-                    if (tokens[j] != null && !tokens[j].strip().isBlank()) {
+                    if (tokens[j] != null && !tokens[j].strip()
+                            .isBlank()) {
                         double val = Parser.parseDouble(tokens[j].strip());
                         vals[j - 1] = val;
                     } else {
@@ -534,13 +538,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public void setTransformMatrix(Matrix4d transform) {
+    public void setTransformMatrix(Matrix4D transform) {
         this.transform = transform;
-    }
-
-    @Override
-    public void setVector3dTransformer(Vector3dTransformer tr) {
-        this.transformer = tr;
     }
 
     /**

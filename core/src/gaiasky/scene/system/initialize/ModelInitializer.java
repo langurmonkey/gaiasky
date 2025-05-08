@@ -41,8 +41,8 @@ import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class ModelInitializer extends AbstractInitSystem {
@@ -220,14 +220,14 @@ public class ModelInitializer extends AbstractInitSystem {
         EventManager.instance.subscribe(this.radio, Event.CAMERA_MODE_CMD);
 
         // position attributes
-        engine.force = new Vector3d();
-        engine.accel = new Vector3d();
-        engine.vel = new Vector3d();
+        engine.force = new Vector3D();
+        engine.accel = new Vector3D();
+        engine.vel = new Vector3D();
 
         // position and orientation
         body.pos.set(1e7 * Constants.KM_TO_U, 0, 1e8 * Constants.KM_TO_U);
-        engine.direction = new Vector3d(1, 0, 0);
-        engine.up = new Vector3d(0, 1, 0);
+        engine.direction = new Vector3D(1, 0, 0);
+        engine.up = new Vector3D(0, 1, 0);
         engine.dirup = new Pair<>(engine.direction, engine.up);
 
         engine.posf = new Vector3();
@@ -236,7 +236,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         // engine thrust direction
         // our spacecraft is a rigid solid so thrust is always the camera direction vector
-        engine.thrust = new Vector3d(engine.direction).scl(engine.thrustMagnitude);
+        engine.thrust = new Vector3D(engine.direction).scl(engine.thrustMagnitude);
         engine.currentEnginePower = 0;
 
         // not stabilising
@@ -289,7 +289,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         // Default values
         celestial.innerRad = 0.2f;
-        graph.orientation = new Matrix4d();
+        graph.orientation = new Matrix4D();
 
         scaffolding.billboardSizeFactor = 2.0f;
         scaffolding.locThresholdLabel = 1000.0f;

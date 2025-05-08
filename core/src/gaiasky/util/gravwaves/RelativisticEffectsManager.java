@@ -17,7 +17,7 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -45,11 +45,11 @@ public class RelativisticEffectsManager implements IObserver {
     private final Matrix3 auxm3;
     private final Matrix3 auxm4;
     /** Aux vectors **/
-    private final Vector3d auxd1;
-    private final Vector3d auxd2;
-    private final Vector3d auxd3;
-    private final Vector3d auxd4;
-    private final Vector3d auxd5;
+    private final Vector3D auxd1;
+    private final Vector3D auxd2;
+    private final Vector3D auxd3;
+    private final Vector3D auxd4;
+    private final Vector3D auxd5;
     /** Camera velocity direction vector **/
     public Vector3 velDir;
     /** v/c **/
@@ -84,11 +84,11 @@ public class RelativisticEffectsManager implements IObserver {
         auxm3 = new Matrix3();
         auxm4 = new Matrix3();
 
-        auxd1 = new Vector3d();
-        auxd2 = new Vector3d();
-        auxd3 = new Vector3d();
-        auxd4 = new Vector3d();
-        auxd5 = new Vector3d();
+        auxd1 = new Vector3D();
+        auxd2 = new Vector3D();
+        auxd3 = new Vector3D();
+        auxd4 = new Vector3D();
+        auxd5 = new Vector3D();
 
         screenCoords = new Vector3();
 
@@ -158,7 +158,7 @@ public class RelativisticEffectsManager implements IObserver {
      *
      * @param pos The position for chaining
      */
-    public Vector3d gravitationalWavePos(Vector3d pos) {
+    public Vector3D gravitationalWavePos(Vector3D pos) {
         if (Settings.settings.runtime.gravitationalWaves) {
             float hpluscos = hterms[0];
             float hplussin = hterms[1];
@@ -166,7 +166,7 @@ public class RelativisticEffectsManager implements IObserver {
             float htimessin = hterms[3];
             float t = gwtime;
 
-            Vector3d p = auxd4.set(gw);
+            Vector3D p = auxd4.set(gw);
             Matrix3 P = gwmat3;
             Matrix3 PT = auxm1.set(gwmat3).transpose();
             // PePlusPt = P * ePlus * transpose(P);
@@ -196,14 +196,14 @@ public class RelativisticEffectsManager implements IObserver {
 
             // vec3 huu = pept * pos * pos;
             // huu = transpose(PePt*u)*u;
-            Vector3d huu = auxd1.set(pos).mulRight(pept).mul(pos);
+            Vector3D huu = auxd1.set(pos).mulRight(pept).mul(pos);
             // vec3 hu = 0.5 * pept * pos;
             // hu = 0.5 * PePt * u;
-            Vector3d hu = auxd2.set(pos).mulRight(mul(pept, 0.5f));
+            Vector3D hu = auxd2.set(pos).mulRight(mul(pept, 0.5f));
 
             // vec3 deltau = ((pos + p) / (2 * (1 + pos * p))) * huu - hu;
             // deltau = ((u + p) / (2 * (1 + transpose(u)*p))) * huu - hu;
-            Vector3d deltau = auxd3.set(pos).add(p);
+            Vector3D deltau = auxd3.set(pos).add(p);
             deltau.div(auxd5.set(pos).mul(p).add(1).scl(2));
             deltau.mul(huu).sub(hu);
 

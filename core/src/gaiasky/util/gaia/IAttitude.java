@@ -8,7 +8,7 @@
 package gaiasky.util.gaia;
 
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public interface IAttitude {
     /**
@@ -37,14 +37,14 @@ public interface IAttitude {
      *
      * @return spin vector in [rad/day] relative to SRS
      */
-    Vector3d getSpinVectorInSrs();
+    Vector3D getSpinVectorInSrs();
 
     /**
      * Get the inertial spin vector in the ICRS (or CoMRS).
      *
      * @return spin vector in [rad/day] relative to ICRS
      */
-    Vector3d getSpinVectorInIcrs();
+    Vector3D getSpinVectorInIcrs();
 
     /**
      * Get the PFoV and FFoV directions as an array of unit vectors expressed in
@@ -52,7 +52,7 @@ public interface IAttitude {
      *
      * @return array of two (PFoV, FFoV3) vectors
      */
-    Vector3d[] getFovDirections();
+    Vector3D[] getFovDirections();
 
     /**
      * Get the x, y, z axes of the SRS as an array of three unit vectors
@@ -60,7 +60,7 @@ public interface IAttitude {
      *
      * @return array of three (x, y, z) vectors
      */
-    Vector3d[] getSrsAxes(Vector3d[] xyz);
+    Vector3D[] getSrsAxes(Vector3D[] xyz);
 
     /**
      * Compute the angular speed AL and AC of an inertial direction in the SRS

@@ -23,7 +23,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -31,9 +31,9 @@ import java.util.List;
 public class FocusHit {
 
     private final Vector3 F31 = new Vector3();
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
-    private final Vector3d D33 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
+    private final Vector3D D32 = new Vector3D();
+    private final Vector3D D33 = new Vector3D();
     private final Vector3Q B31 = new Vector3Q();
     private final FilterView filter;
 
@@ -88,7 +88,7 @@ public class FocusHit {
             var entity = view.getEntity();
 
             Vector3 pos = F31;
-            Vector3d posDouble = EntityUtils.getAbsolutePosition(entity, D31).add(camera.getInversePos());
+            Vector3D posDouble = EntityUtils.getAbsolutePosition(entity, D31).add(camera.getInversePos());
             pos.set(posDouble.valuesf());
 
             if (camera.direction.dot(posDouble) > 0) {
@@ -128,8 +128,8 @@ public class FocusHit {
     }
 
     public void addHitRayCelestial(FocusView view,
-                                   Vector3d p0,
-                                   Vector3d p1,
+                                   Vector3D p0,
+                                   Vector3D p1,
                                    NaturalCamera camera,
                                    Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
@@ -174,9 +174,9 @@ public class FocusHit {
                 var graph = Mapper.graph.get(entity);
 
                 Vector3 auxf = F31;
-                Vector3d aux1d = D31;
-                Vector3d aux2d = D32;
-                Vector3d aux3d = D33;
+                Vector3D aux1d = D31;
+                Vector3D aux2d = D32;
+                Vector3D aux3d = D33;
 
                 // aux1d contains the position of the body in the camera ref sys
                 aux1d.set(graph.translation);
@@ -204,8 +204,8 @@ public class FocusHit {
     }
 
     public void addHitRayModel(FocusView view,
-                               Vector3d p0,
-                               Vector3d p1,
+                               Vector3D p0,
+                               Vector3D p1,
                                NaturalCamera camera,
                                Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
@@ -217,7 +217,7 @@ public class FocusHit {
             } else {
                 var graph = Mapper.graph.get(entity);
 
-                Vector3d aux1d = D31;
+                Vector3D aux1d = D31;
 
                 // aux1d contains the position of the body in the camera ref sys
                 aux1d.set(graph.translation);
@@ -271,7 +271,7 @@ public class FocusHit {
                 if (filter.filter(i)) {
                     IParticleRecord pb = pointData.get(i);
                     Vector3 posFloat = F31;
-                    Vector3d pos = set.fetchPositionDouble(pb, camera.getPos(), D31, set.getDeltaYears());
+                    Vector3D pos = set.fetchPositionDouble(pb, camera.getPos(), D31, set.getDeltaYears());
                     posFloat.set(pos.valuesf());
 
                     if (camera.direction.dot(pos) > 0) {
@@ -344,8 +344,8 @@ public class FocusHit {
     }
 
     public void addHitRayParticleSet(FocusView view,
-                                     Vector3d p0,
-                                     Vector3d p1,
+                                     Vector3D p0,
+                                     Vector3D p1,
                                      NaturalCamera camera,
                                      Array<Entity> hits) {
         var set = view.getSet();
@@ -354,13 +354,13 @@ public class FocusHit {
         if (hitCondition(view)) {
             var entity = view.getEntity();
 
-            Vector3d beamDir = new Vector3d();
+            Vector3D beamDir = new Vector3D();
             filter.setEntity(entity);
             Array<Pair<Integer, Double>> temporalHits = new Array<>();
             for (int i = 0; i < n; i++) {
                 if (filter.filter(i)) {
                     IParticleRecord pb = pointData.get(i);
-                    Vector3d posd = set.fetchPositionDouble(pb, set.cPosD, D31, set.getDeltaYears());
+                    Vector3D posd = set.fetchPositionDouble(pb, set.cPosD, D31, set.getDeltaYears());
                     beamDir.set(p1).sub(p0);
                     if (camera.direction.dot(posd) > 0) {
                         // The star is in front of us
@@ -453,8 +453,8 @@ public class FocusHit {
     }
 
     public void addHitRayCluster(FocusView view,
-                                 Vector3d p0,
-                                 Vector3d p1,
+                                 Vector3D p0,
+                                 Vector3D p1,
                                  NaturalCamera camera,
                                  Array<Entity> hits) {
         if (hitCondition(view)) {

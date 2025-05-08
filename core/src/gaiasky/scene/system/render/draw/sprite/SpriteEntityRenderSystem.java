@@ -22,7 +22,7 @@ import gaiasky.util.DecalUtils;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.g2d.Sprite;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class SpriteEntityRenderSystem {
 
     private final LabelView view;
 
-    private final Vector3d D31 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
 
     private Map<String, Sprite> spriteMap;
 
@@ -82,7 +82,7 @@ public class SpriteEntityRenderSystem {
         if (view.isLocation()
                 && view.renderTextLocation()) {
 
-            Vector3d pos = D31;
+            Vector3D pos = D31;
             view.textPosition(camera, pos);
 
             var sprite = getSprite(view.loc.locationMarkerTexture);

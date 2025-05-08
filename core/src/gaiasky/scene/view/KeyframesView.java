@@ -27,7 +27,7 @@ import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -42,8 +42,8 @@ public class KeyframesView extends BaseView {
     private final KeyframeUtils utils;
 
     private final Vector3 F31 = new Vector3();
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
+    private final Vector3D D32 = new Vector3D();
 
     public KeyframesView(Scene scene) {
         this.scene = scene;
@@ -76,12 +76,12 @@ public class KeyframesView extends BaseView {
     public void refreshData() {
         List<Keyframe> keyframes = kf.keyframes;
 
-        Array<Array<Vector3d>> kfPositionsSep = new Array<>();
+        Array<Array<Vector3D>> kfPositionsSep = new Array<>();
         double[] kfPositions = new double[keyframes.size() * 3];
         double[] kfDirections = new double[keyframes.size() * 3];
         double[] kfUps = new double[keyframes.size() * 3];
         boolean[] kfSeams = new boolean[keyframes.size()];
-        Array<Vector3d> current = new Array<>();
+        Array<Vector3D> current = new Array<>();
         int i = 0;
         for (Keyframe kf : keyframes) {
 
@@ -156,7 +156,7 @@ public class KeyframesView extends BaseView {
         }
     }
 
-    public void refreshSingleVector(Entity vo, Vector3d pos, Vector3d vec) {
+    public void refreshSingleVector(Entity vo, Vector3D pos, Vector3D vec) {
         synchronized (verts) {
             verts.setEntity(vo);
             PointCloudData p = verts.getPointCloud();
@@ -170,9 +170,9 @@ public class KeyframesView extends BaseView {
         List<Keyframe> keyframes = kf.keyframes;
 
         if (!keyframes.isEmpty()) {
-            Array<Array<Vector3d>> kfPositionsSep = new Array<>();
+            Array<Array<Vector3D>> kfPositionsSep = new Array<>();
             double[] kfPositions = new double[keyframes.size() * 3];
-            Array<Vector3d> current = new Array<>();
+            Array<Vector3D> current = new Array<>();
             int i = 0;
             for (Keyframe kf : keyframes) {
                 // Fill model table
@@ -258,7 +258,7 @@ public class KeyframesView extends BaseView {
         }
     }
 
-    public void addKnot(Vector3d knot, Vector3d dir, Vector3d up, boolean seam) {
+    public void addKnot(Vector3D knot, Vector3D dir, Vector3D up, boolean seam) {
         if (seam) {
             synchronized (verts) {
                 verts.setEntity(kf.knotsSeam);
@@ -297,9 +297,9 @@ public class KeyframesView extends BaseView {
     public FocusView select(int screenX, int screenY, int minPixDist, NaturalCamera camera) {
 
         Vector3 pos = F31;
-        Vector3d aux = D31;
+        Vector3D aux = D31;
         for (Keyframe keyframe : kf.keyframes) {
-            Vector3d posd = aux.set(keyframe.pos).add(camera.getInversePos());
+            Vector3D posd = aux.set(keyframe.pos).add(camera.getInversePos());
             pos.set(posd.valuesf());
 
             if (camera.direction.dot(posd) > 0) {
@@ -469,7 +469,7 @@ public class KeyframesView extends BaseView {
             double originalDist = D31.set(kf.selected.pos).add(camera.getInversePos()).len();
             Vector3 aux = F31.set(screenX, screenY, 0.5f);
             camera.getCamera().unproject(aux);
-            Vector3d newLocation = D32.set(aux).setLength(originalDist);
+            Vector3D newLocation = D32.set(aux).setLength(originalDist);
             kf.selected.pos.set(newLocation).add(camera.getPos());
 
             synchronized (verts) {
@@ -502,7 +502,7 @@ public class KeyframesView extends BaseView {
 
     public boolean rotateAroundCrs(double dx, double dy, NaturalCamera camera) {
         if (kf.selected != null) {
-            Vector3d crs = D31.set(kf.selected.dir).crs(kf.selected.up);
+            Vector3D crs = D31.set(kf.selected.dir).crs(kf.selected.up);
             kf.selected.dir.rotate(crs, (float) ((dx + dy) * 500d));
             kf.selected.up.rotate(crs, (float) ((dx + dy) * 500d));
             refreshOrientations();

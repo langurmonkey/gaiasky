@@ -33,9 +33,9 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
@@ -51,7 +51,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Cell<Table> contentCell;
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
-    private final Vector3d pos;
+    private final Vector3D pos;
     private final Vector3Q posb;
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
@@ -530,7 +530,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             externalInfoUpdater.setParameters(moreInfo, skin, pad10);
         }
 
-        pos = new Vector3d();
+        pos = new Vector3D();
         posb = new Vector3Q();
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE,
                                         Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED,
@@ -678,7 +678,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 } else {
                     focusNames.add(new OwnLabel("-", skin));
                 }
-                Vector2d posSph = view.getPosSph();
+                Vector2D posSph = view.getPosSph();
                 if (posSph != null && posSph.len() > 0f) {
                     focusRA.setText(nf.format(posSph.x) + deg);
                     focusDEC.setText(nf.format(posSph.y) + deg);

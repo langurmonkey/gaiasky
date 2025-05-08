@@ -17,7 +17,7 @@ import gaiasky.scene.record.MachineDefinition;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.stream.Stream;
@@ -43,16 +43,16 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
     /** Seconds to reach full power **/
     public double fullPowerTime;
     /** Force, acceleration and velocity **/
-    public Vector3d force, accel, vel;
+    public Vector3D force, accel, vel;
     /** Direction and up vectors **/
-    public Vector3d direction, up;
-    public Pair<Vector3d, Vector3d> dirup;
+    public Vector3D direction, up;
+    public Pair<Vector3D, Vector3D> dirup;
     /** Float counterparts **/
     public Vector3 posf, directionf, upf;
     /** Instantaneous engine power, do not set manually **/
     public double currentEnginePower;
     /** Engine thrust vector **/
-    public Vector3d thrust;
+    public Vector3D thrust;
     /** This is the magnitude of the thrust **/
     public double thrustMagnitude;
 
@@ -146,32 +146,32 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
     }
 
     @Override
-    public Vector3d force() {
+    public Vector3D force() {
         return force;
     }
 
     @Override
-    public Vector3d accel() {
+    public Vector3D accel() {
         return accel;
     }
 
     @Override
-    public Vector3d vel() {
+    public Vector3D vel() {
         return vel;
     }
 
     @Override
-    public Vector3d direction() {
+    public Vector3D direction() {
         return direction;
     }
 
     @Override
-    public Vector3d up() {
+    public Vector3D up() {
         return up;
     }
 
     @Override
-    public Vector3d thrust() {
+    public Vector3D thrust() {
         return thrust;
     }
 
@@ -228,18 +228,18 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());
-        copy.force = new Vector3d(this.force);
-        copy.accel = new Vector3d(this.accel);
-        copy.vel = new Vector3d(this.vel);
+        copy.force = new Vector3D(this.force);
+        copy.accel = new Vector3D(this.accel);
+        copy.vel = new Vector3D(this.vel);
 
         copy.fullPowerTime = this.fullPowerTime;
 
         copy.posf = new Vector3(this.posf);
-        copy.direction = new Vector3d(this.direction);
+        copy.direction = new Vector3D(this.direction);
         copy.directionf = new Vector3(this.directionf);
-        copy.up = new Vector3d(this.up);
+        copy.up = new Vector3D(this.up);
         copy.upf = new Vector3(this.upf);
-        copy.thrust = new Vector3d(this.thrust);
+        copy.thrust = new Vector3D(this.thrust);
 
         copy.mass = this.mass;
 

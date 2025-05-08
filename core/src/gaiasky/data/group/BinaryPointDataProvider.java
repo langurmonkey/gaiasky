@@ -23,9 +23,8 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
-import gaiasky.util.math.Vector3dTransformer;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.io.*;
@@ -77,8 +76,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
     /** Whether to use PARTICLE_EXT or PARTICLE. **/
     private final AtomicBoolean extra = new AtomicBoolean();
 
-    private final Vector3d aux3d1 = new Vector3d();
-    private final Vector3d aux3d2 = new Vector3d();
+    private final Vector3D aux3d1 = new Vector3D();
+    private final Vector3D aux3d2 = new Vector3D();
 
 
     public BinaryPointDataProvider() {
@@ -180,12 +179,7 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
     }
 
     @Override
-    public void setTransformMatrix(Matrix4d matrix) {
-        // Not used.
-    }
-
-    @Override
-    public void setVector3dTransformer(Vector3dTransformer tr) {
+    public void setTransformMatrix(Matrix4D matrix) {
         // Not used.
     }
 
@@ -239,9 +233,9 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
         // VELOCITY VECTOR
-        Vector3d velocityVector = Coordinates.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg),
-                                                                      FastMath.toRadians(deltaDeg),
-                                                                      distPc, aux3d2);
+        Vector3D velocityVector = Coordinates.properMotionsToCartesian(muAlpha, muDelta, radVel, FastMath.toRadians(alphaDeg),
+                                                                       FastMath.toRadians(deltaDeg),
+                                                                       distPc, aux3d2);
 
         // MAGNITUDE
         float appMag;
@@ -326,8 +320,8 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
         // POSITION.
-        Vector3d cartPos = sb.pos(aux3d1);
-        Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2);
+        Vector3D cartPos = sb.pos(aux3d1);
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2);
         out.writeDouble(sphPos.x * MathUtilsDouble.radDeg);
         out.writeDouble(sphPos.y * MathUtilsDouble.radDeg);
         out.writeDouble(sb.distance() * Constants.U_TO_PC);

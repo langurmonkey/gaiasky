@@ -17,16 +17,16 @@ import java.util.List;
 public class BoundingBoxDouble implements Serializable {
     @Serial private static final long serialVersionUID = -1286036817192127343L;
 
-    private final static Vector3d tmpVector = new Vector3d();
+    private final static Vector3D tmpVector = new Vector3D();
 
-    public final Vector3d min = new Vector3d();
-    public final Vector3d max = new Vector3d();
+    public final Vector3D min = new Vector3D();
+    public final Vector3D max = new Vector3D();
 
-    private final Vector3d cnt = new Vector3d();
-    private final Vector3d dim = new Vector3d();
+    private final Vector3D cnt = new Vector3D();
+    private final Vector3D dim = new Vector3D();
 
     @Deprecated
-    private Vector3d[] corners;
+    private Vector3D[] corners;
 
     /**
      * Constructs a new bounding box with the minimum and maximum vector set to
@@ -52,7 +52,7 @@ public class BoundingBoxDouble implements Serializable {
      * @param minimum The minimum vector
      * @param maximum The maximum vector
      */
-    public BoundingBoxDouble(Vector3d minimum, Vector3d maximum) {
+    public BoundingBoxDouble(Vector3D minimum, Vector3D maximum) {
         this.set(minimum, maximum);
     }
 
@@ -67,20 +67,20 @@ public class BoundingBoxDouble implements Serializable {
     /**
      * @return the center of the bounding box
      *
-     * @deprecated Use {@link #getCenter(Vector3d)}
+     * @deprecated Use {@link #getCenter(Vector3D)}
      */
     @Deprecated
-    public Vector3d getCenter() {
+    public Vector3D getCenter() {
         return cnt;
     }
 
     /**
-     * @param out The {@link Vector3d} to receive the center of the bounding
+     * @param out The {@link Vector3D} to receive the center of the bounding
      *            box.
      *
      * @return The vector specified with the out argument.
      */
-    public Vector3d getCenter(Vector3d out) {
+    public Vector3D getCenter(Vector3D out) {
         return out.set(cnt);
     }
 
@@ -106,11 +106,11 @@ public class BoundingBoxDouble implements Serializable {
      * @deprecated Use the getCornerXYZ methods instead
      */
     @Deprecated
-    public Vector3d[] getCorners() {
+    public Vector3D[] getCorners() {
         if (corners == null) {
-            corners = new Vector3d[8];
+            corners = new Vector3D[8];
             for (int i = 0; i < 8; i++)
-                corners[i] = new Vector3d();
+                corners[i] = new Vector3D();
         }
         corners[0].set(min.x, min.y, min.z);
         corners[1].set(max.x, min.y, min.z);
@@ -123,55 +123,55 @@ public class BoundingBoxDouble implements Serializable {
         return corners;
     }
 
-    public Vector3d getCorner000(final Vector3d out) {
+    public Vector3D getCorner000(final Vector3D out) {
         return out.set(min.x, min.y, min.z);
     }
 
-    public Vector3d getCorner001(final Vector3d out) {
+    public Vector3D getCorner001(final Vector3D out) {
         return out.set(min.x, min.y, max.z);
     }
 
-    public Vector3d getCorner010(final Vector3d out) {
+    public Vector3D getCorner010(final Vector3D out) {
         return out.set(min.x, max.y, min.z);
     }
 
-    public Vector3d getCorner011(final Vector3d out) {
+    public Vector3D getCorner011(final Vector3D out) {
         return out.set(min.x, max.y, max.z);
     }
 
-    public Vector3d getCorner100(final Vector3d out) {
+    public Vector3D getCorner100(final Vector3D out) {
         return out.set(max.x, min.y, min.z);
     }
 
-    public Vector3d getCorner101(final Vector3d out) {
+    public Vector3D getCorner101(final Vector3D out) {
         return out.set(max.x, min.y, max.z);
     }
 
-    public Vector3d getCorner110(final Vector3d out) {
+    public Vector3D getCorner110(final Vector3D out) {
         return out.set(max.x, max.y, min.z);
     }
 
-    public Vector3d getCorner111(final Vector3d out) {
+    public Vector3D getCorner111(final Vector3D out) {
         return out.set(max.x, max.y, max.z);
     }
 
     /**
      * @return The dimensions of this bounding box on all three axis
      *
-     * @deprecated Use {@link #getDimensions(Vector3d)} instead
+     * @deprecated Use {@link #getDimensions(Vector3D)} instead
      */
     @Deprecated
-    public Vector3d getDimensions() {
+    public Vector3D getDimensions() {
         return dim;
     }
 
     /**
-     * @param out The {@link Vector3d} to receive the dimensions of this
+     * @param out The {@link Vector3D} to receive the dimensions of this
      *            bounding box on all three axis.
      *
      * @return The vector specified with the out argument
      */
-    public Vector3d getDimensions(final Vector3d out) {
+    public Vector3D getDimensions(final Vector3D out) {
         return out.set(dim);
     }
 
@@ -198,38 +198,38 @@ public class BoundingBoxDouble implements Serializable {
     /**
      * @return The minimum vector
      *
-     * @deprecated Use {@link #getMin(Vector3d)} instead.
+     * @deprecated Use {@link #getMin(Vector3D)} instead.
      */
     @Deprecated
-    public Vector3d getMin() {
+    public Vector3D getMin() {
         return min;
     }
 
     /**
-     * @param out The {@link Vector3d} to receive the minimum values.
+     * @param out The {@link Vector3D} to receive the minimum values.
      *
      * @return The vector specified with the out argument
      */
-    public Vector3d getMin(final Vector3d out) {
+    public Vector3D getMin(final Vector3D out) {
         return out.set(min);
     }
 
     /**
      * @return The maximum vector
      *
-     * @deprecated Use {@link #getMax(Vector3d)} instead
+     * @deprecated Use {@link #getMax(Vector3D)} instead
      */
     @Deprecated
-    public Vector3d getMax() {
+    public Vector3D getMax() {
         return max;
     }
 
     /**
-     * @param out The {@link Vector3d} to receive the maximum values.
+     * @param out The {@link Vector3D} to receive the maximum values.
      *
      * @return The vector specified with the out argument
      */
-    public Vector3d getMax(final Vector3d out) {
+    public Vector3D getMax(final Vector3D out) {
         return out.set(max);
     }
 
@@ -256,7 +256,7 @@ public class BoundingBoxDouble implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxDouble set(Vector3d minimum, Vector3d maximum) {
+    public BoundingBoxDouble set(Vector3D minimum, Vector3D maximum) {
         min.set(minimum.x < maximum.x ? minimum.x : maximum.x, minimum.y < maximum.y ? minimum.y : maximum.y, minimum.z < maximum.z ? minimum.z : maximum.z);
         max.set(minimum.x > maximum.x ? minimum.x : maximum.x, minimum.y > maximum.y ? minimum.y : maximum.y, minimum.z > maximum.z ? minimum.z : maximum.z);
         cnt.set(min).add(max).scl(0.5f);
@@ -271,9 +271,9 @@ public class BoundingBoxDouble implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxDouble set(Vector3d[] points) {
+    public BoundingBoxDouble set(Vector3D[] points) {
         this.inf();
-        for (Vector3d l_point : points)
+        for (Vector3D l_point : points)
             this.ext(l_point);
         return this;
     }
@@ -285,9 +285,9 @@ public class BoundingBoxDouble implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxDouble set(List<Vector3d> points) {
+    public BoundingBoxDouble set(List<Vector3D> points) {
         this.inf();
-        for (Vector3d l_point : points)
+        for (Vector3D l_point : points)
             this.ext(l_point);
         return this;
     }
@@ -306,13 +306,13 @@ public class BoundingBoxDouble implements Serializable {
     }
 
     /**
-     * Extends the bounding box to incorporate the given {@link Vector3d}.
+     * Extends the bounding box to incorporate the given {@link Vector3D}.
      *
      * @param point The vector
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxDouble ext(Vector3d point) {
+    public BoundingBoxDouble ext(Vector3D point) {
         return this.set(min.set(min(min.x, point.x), min(min.y, point.y), min(min.z, point.z)), max.set(Math.max(max.x, point.x), FastMath.max(max.y, point.y), FastMath.max(max.z, point.z)));
     }
 
@@ -355,7 +355,7 @@ public class BoundingBoxDouble implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxDouble ext(BoundingBoxDouble bounds, Matrix4d transform) {
+    public BoundingBoxDouble ext(BoundingBoxDouble bounds, Matrix4D transform) {
         ext(tmpVector.set(bounds.min.x, bounds.min.y, bounds.min.z).mul(transform));
         ext(tmpVector.set(bounds.min.x, bounds.min.y, bounds.max.z).mul(transform));
         ext(tmpVector.set(bounds.min.x, bounds.max.y, bounds.min.z).mul(transform));
@@ -376,7 +376,7 @@ public class BoundingBoxDouble implements Serializable {
      *
      * @return This bounding box for chaining.
      */
-    public BoundingBoxDouble mul(Matrix4d transform) {
+    public BoundingBoxDouble mul(Matrix4D transform) {
         final double x0 = min.x, y0 = min.y, z0 = min.z, x1 = max.x, y1 = max.y, z1 = max.z;
         inf();
         ext(tmpVector.set(x0, y0, z0).mul(transform));
@@ -435,7 +435,7 @@ public class BoundingBoxDouble implements Serializable {
      *
      * @return Whether the vector is contained or not.
      */
-    public boolean contains(Vector3d v) {
+    public boolean contains(Vector3D v) {
         return min.x <= v.x && max.x >= v.x && min.y <= v.y && max.y >= v.y && min.z <= v.z && max.z >= v.z;
     }
 

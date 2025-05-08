@@ -31,7 +31,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
@@ -217,7 +217,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             shaderProgram.setUniformf("u_period", trajectory != null && trajectory.oc != null ? (float) trajectory.oc.period : 0f);
             Entity parent = renderable.getParentEntity();
             if (parent != null) {
-                Vector3d urp = Mapper.orientation.has(parent) ? Mapper.orientation.get(parent).getNonRotatedPos() : null;
+                Vector3D urp = Mapper.orientation.has(parent) ? Mapper.orientation.get(parent).getNonRotatedPos() : null;
                 if (urp != null)
                     shaderProgram.setUniformf("u_parentPos", (float) urp.x, (float) urp.y, (float) urp.z);
                 else

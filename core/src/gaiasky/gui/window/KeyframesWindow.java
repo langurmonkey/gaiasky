@@ -43,7 +43,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.InterpolationDouble;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
@@ -321,7 +321,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         normalizeTime.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (manager.keyframes != null && manager.keyframes.size() > 2) {
-                    Vector3d aux = new Vector3d();
+                    Vector3D aux = new Vector3D();
                     int n = manager.keyframes.size();
                     double totalTime = 0;
                     double totalDist = 0;
@@ -591,10 +591,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * @return True if the keyframe was added, false otherwise.
      */
     private boolean addKeyframe(int index,
-                                Vector3d cPos,
-                                Vector3d cDir,
-                                Vector3d cUp,
-                                Vector3d cTarget,
+                                Vector3D cPos,
+                                Vector3D cDir,
+                                Vector3D cUp,
+                                Vector3D cTarget,
                                 Instant cTime) {
 
         try {
@@ -660,10 +660,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private boolean addKeyframe() {
         checkKeyframesTableBeforeAdd();
         // Create new instances for the current keyframe
-        Vector3d cPos = new Vector3d();
-        Vector3d cDir = new Vector3d();
-        Vector3d cUp = new Vector3d();
-        Vector3d cTarget = null;
+        Vector3D cPos = new Vector3D();
+        Vector3D cDir = new Vector3D();
+        Vector3D cUp = new Vector3D();
+        Vector3D cTarget = null;
         ICamera cam = GaiaSky.instance.getICamera();
         Instant cTime;
         // Freeze the camera info
@@ -675,7 +675,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (cam.hasFocus()) {
                 var focusPos = new Vector3Q();
                 cam.getFocus().getAbsolutePosition(focusPos);
-                cTarget = new Vector3d();
+                cTarget = new Vector3D();
                 focusPos.put(cTarget);
             }
 
@@ -1142,7 +1142,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     var focusPos = new Vector3Q();
                     cam.getFocus().getAbsolutePosition(focusPos);
                     if (kf.target == null) {
-                        kf.target = new Vector3d();
+                        kf.target = new Vector3D();
                     }
                     focusPos.put(kf.target);
                 } else {
@@ -1197,7 +1197,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 // Work out keyframe properties
                 Keyframe k0, k1;
-                Vector3d pos, dir, up, target;
+                Vector3D pos, dir, up, target;
                 Instant time;
                 if (index < manager.keyframes.size() - 1) {
                     // We can interpolate.
@@ -1207,14 +1207,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     // Target.
                     if (k0.target != null && k1.target != null) {
                         // Compute mean position.
-                        target = new Vector3d().set(k0.target).interpolate(k1.target, 0.5, InterpolationDouble.linear);
+                        target = new Vector3D().set(k0.target).interpolate(k1.target, 0.5, InterpolationDouble.linear);
                     } else {
                         // No target.
                         target = null;
                     }
 
                     // Interpolate position.
-                    pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 0.5, InterpolationDouble.linear);
+                    pos = new Vector3D().set(k0.pos).interpolate(k1.pos, 0.5, InterpolationDouble.linear);
 
                     // Interpolate direction.
                     QuaternionDouble q0 = new QuaternionDouble();
@@ -1222,8 +1222,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     QuaternionDouble q1 = new QuaternionDouble();
                     q1.setFromCamera(k1.dir, k1.up);
                     q0.slerp(q1, 0.5);
-                    dir = q0.getDirection(new Vector3d());
-                    up = q0.getUp(new Vector3d());
+                    dir = q0.getDirection(new Vector3D());
+                    up = q0.getUp(new Vector3D());
 
                     // Time.
                     time = k0.time.plusMillis((long) ((k1.time.toEpochMilli() - k0.time.toEpochMilli()) / 2d));
@@ -1235,18 +1235,18 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     // Target.
                     if (k0.target != null && k1.target != null) {
                         // Compute mean position.
-                        target = new Vector3d().set(k0.target).interpolate(k1.target, 1.5, InterpolationDouble.linear);
+                        target = new Vector3D().set(k0.target).interpolate(k1.target, 1.5, InterpolationDouble.linear);
                     } else {
                         // No target.
                         target = null;
                     }
 
                     // Interpolate position.
-                    pos = new Vector3d().set(k0.pos).interpolate(k1.pos, 1.5, InterpolationDouble.linear);
+                    pos = new Vector3D().set(k0.pos).interpolate(k1.pos, 1.5, InterpolationDouble.linear);
 
                     // Use direction and up from previous frame.
-                    dir = new Vector3d(k1.dir);
-                    up = new Vector3d(k1.up);
+                    dir = new Vector3D(k1.dir);
+                    up = new Vector3D(k1.up);
 
                     // Time.
                     time = k1.time.plusMillis((long) ((k1.time.toEpochMilli() - k0.time.toEpochMilli()) / 2d));

@@ -9,7 +9,7 @@ package gaiasky.util.coord;
 
 import gaiasky.util.Nature;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class NslSun {
@@ -37,9 +37,9 @@ public class NslSun {
     static final double cosineObliquity = FastMath.cos(Coordinates.OBLIQUITY_RAD_J2000);
     static final double ABERRATION_CONSTANT_J2000 = 20.49122;
     /** Unit vectors **/
-    static final Vector3d X_AXIS = Vector3d.getUnitX();
-    static final Vector3d Y_AXIS = Vector3d.getUnitY();
-    static final Vector3d Z_AXIS = Vector3d.getUnitZ();
+    static final Vector3D X_AXIS = Vector3D.getUnitX();
+    static final Vector3D Y_AXIS = Vector3D.getUnitY();
+    static final Vector3D Z_AXIS = Vector3D.getUnitZ();
     private final double timeOriginDaysFromJ2000 = missionReferenceEpoch - (AstroUtils.JD_J2000 - AstroUtils.JD_J2010);
     private final double timeOriginNsFromJ2000 = missionReferenceEpoch - (AstroUtils.JD_J2000 - AstroUtils.JD_J2010) * Nature.D_TO_NS;
     /**
@@ -128,7 +128,7 @@ public class NslSun {
      *
      * @return The output vector containing the solar direction as a unit 3-vector in BCRS.
      */
-    public Vector3d getSolarDirection(Vector3d out) {
+    public Vector3D getSolarDirection(Vector3D out) {
         return out.set(cosineLon, sineLon * cosineObliquity, sineLon
                 * sineObliquity);
     }

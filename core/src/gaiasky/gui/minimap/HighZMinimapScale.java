@@ -20,7 +20,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class HighZMinimapScale extends AbstractMinimapScale {
 
@@ -39,8 +39,8 @@ public class HighZMinimapScale extends AbstractMinimapScale {
         trans = Coordinates.eqToGal();
     }
 
-    private Vector3d get(double raDeg, double decDeg, double distMpc) {
-        return Coordinates.sphericalToCartesian(MathUtilsDouble.degRad * raDeg, MathUtilsDouble.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
+    private Vector3D get(double raDeg, double decDeg, double distMpc) {
+        return Coordinates.sphericalToCartesian(MathUtilsDouble.degRad * raDeg, MathUtilsDouble.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3D());
     }
 
     @Override

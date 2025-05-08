@@ -8,14 +8,14 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class Ruler implements Component {
     public final double[] pos0 = new double[3];
     public final double[] pos1 = new double[3];
-    public final Vector3d p0 = new Vector3d();
-    public final Vector3d p1 = new Vector3d();
-    public final Vector3d m = new Vector3d();
+    public final Vector3D p0 = new Vector3D();
+    public final Vector3D p1 = new Vector3D();
+    public final Vector3D m = new Vector3D();
     public String name0, name1;
     public boolean rulerOk = false;
     public String dist;

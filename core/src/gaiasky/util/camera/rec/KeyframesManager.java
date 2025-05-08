@@ -57,7 +57,7 @@ public class KeyframesManager implements IObserver {
     /**
      * Reference to current camera orientation.
      */
-    public Vector3d dir, up;
+    public Vector3D dir, up;
     /**
      * Reference to current time.
      */
@@ -123,20 +123,20 @@ public class KeyframesManager implements IObserver {
         return (long) (t * Settings.settings.camrecorder.targetFps);
     }
 
-    private PathDouble<Vector3d> getPath(Vector3d[] data,
+    private PathDouble<Vector3D> getPath(Vector3D[] data,
                                          PathType pathType) {
         if (pathType == PathType.LINEAR) {
             return new LinearDouble<>(data);
         } else if (pathType == PathType.CATMULL_ROM_SPLINE) {
             // Needs extra points at beginning and end.
-            Vector3d[] extData = new Vector3d[data.length + 2];
+            Vector3D[] extData = new Vector3D[data.length + 2];
             System.arraycopy(data, 0, extData, 1, data.length);
             extData[0] = data[0];
             extData[data.length + 1] = data[data.length - 1];
             return new CatmullRomSplineDouble<>(extData, false);
         } else if (pathType == PathType.B_SPLINE) {
             // Needs extra points at beginning and end.
-            Vector3d[] extData = new Vector3d[data.length + 2];
+            Vector3D[] extData = new Vector3D[data.length + 2];
             System.arraycopy(data, 0, extData, 1, data.length);
             extData[0] = data[0];
             extData[data.length + 1] = data[data.length - 1];
@@ -159,9 +159,9 @@ public class KeyframesManager implements IObserver {
                         double secs = Parser.parseDouble(tokens[0]);
                         Instant time = parseTime(tokens[1]);
                         // Orientation.
-                        Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
-                        Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
-                        Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
+                        Vector3D pos = new Vector3D(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
+                        Vector3D dir = new Vector3D(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
+                        Vector3D up = new Vector3D(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
                         boolean seam = Parser.parseInt(tokens[11]) == 1;
                         String name = tokens[12];
                         Keyframe kf = new Keyframe(name, pos, dir, up, time, secs, seam);
@@ -170,10 +170,10 @@ public class KeyframesManager implements IObserver {
                         // Keyframe has target.
                         double secs = Parser.parseDouble(tokens[0]);
                         Instant time = parseTime(tokens[1]);
-                        Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
-                        Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
-                        Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
-                        Vector3d target = new Vector3d(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
+                        Vector3D pos = new Vector3D(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
+                        Vector3D dir = new Vector3D(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
+                        Vector3D up = new Vector3D(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
+                        Vector3D target = new Vector3D(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
                         boolean seam = Parser.parseInt(tokens[14]) == 1;
                         String name = tokens[15];
                         Keyframe kf = new Keyframe(name, pos, dir, up, target, time, secs, seam);
@@ -238,7 +238,7 @@ public class KeyframesManager implements IObserver {
         }
     }
 
-    public double[] samplePaths(Array<Array<Vector3d>> pointsSep,
+    public double[] samplePaths(Array<Array<Vector3D>> pointsSep,
                                 double[] points,
                                 int samplesPerSegment,
                                 PathType pathType) {
@@ -249,12 +249,12 @@ public class KeyframesManager implements IObserver {
             return result;
         } else {
             Array<Double> res = new Array<>();
-            for (Array<Vector3d> vec : pointsSep) {
+            for (Array<Vector3D> vec : pointsSep) {
                 int nSamples = (vec.size - 1) * samplesPerSegment + 1;
                 int nChunks = nSamples - 1;
 
-                Vector3d aux = new Vector3d();
-                PathDouble<Vector3d> sampler = getPath(toArray(vec), pathType);
+                Vector3D aux = new Vector3D();
+                PathDouble<Vector3D> sampler = getPath(toArray(vec), pathType);
                 double step = 1d / nChunks;
                 int i = 0;
                 for (double t = 0d; i < nSamples * 3; t += step) {
@@ -278,8 +278,8 @@ public class KeyframesManager implements IObserver {
         }
     }
 
-    private Vector3d[] toArray(Array<Vector3d> v) {
-        Vector3d[] out = new Vector3d[v.size];
+    private Vector3D[] toArray(Array<Vector3D> v) {
+        Vector3D[] out = new Vector3D[v.size];
         for (int i = 0; i < v.size; i++)
             out[i] = v.get(i);
         return out;
@@ -318,8 +318,8 @@ public class KeyframesManager implements IObserver {
     private PathPart[] positionsToPathParts(List<Keyframe> keyframes,
                                             PathType pathType) {
         double frameRate = Settings.settings.camrecorder.targetFps;
-        Array<Array<Vector3d>> positionsSep = new Array<>();
-        Array<Vector3d> current = new Array<>();
+        Array<Array<Vector3D>> positionsSep = new Array<>();
+        Array<Vector3D> current = new Array<>();
         Array<Double> times = new Array<>();
         int i = 0;
         double secs = 0;
@@ -345,7 +345,7 @@ public class KeyframesManager implements IObserver {
 
         PathPart[] res = new PathPart[positionsSep.size];
         int j = 0;
-        for (Array<Vector3d> part : positionsSep) {
+        for (Array<Vector3D> part : positionsSep) {
             double elapsed = times.get(j);
             PathPart pp = new PathPart(getPath(toArray(part), pathType), part.size, (long) (frameRate * elapsed));
             res[j] = pp;
@@ -548,8 +548,8 @@ public class KeyframesManager implements IObserver {
                 synchronized (this) {
                     t = (ITimeFrameProvider) data[0];
                     pos = (Vector3Q) data[1];
-                    dir = (Vector3d) data[2];
-                    up = (Vector3d) data[3];
+                    dir = (Vector3D) data[2];
+                    up = (Vector3D) data[3];
                 }
                 if (state.get() == RecorderState.PLAYING && currentPath != null) {
                     // In playing mode, we set the frame and then advance to the next.
@@ -597,11 +597,11 @@ public class KeyframesManager implements IObserver {
     }
 
     public static class PathPart {
-        PathDouble<Vector3d> path;
+        PathDouble<Vector3D> path;
         int nPoints, nChunks;
         long nFrames;
 
-        public PathPart(PathDouble<Vector3d> path,
+        public PathPart(PathDouble<Vector3D> path,
                         int nPoints,
                         long nFrames) {
             this.path = path;

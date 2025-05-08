@@ -4,7 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.data.api.OrientationServer;
 import gaiasky.data.util.OrientationServerLoader.OrientationServerParameters;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.time.Instant;
 
@@ -23,7 +23,7 @@ public class AttitudeComponent {
     public String orientationSource;
     public OrientationServer orientationServer;
 
-    public Vector3d nonRotatedPos;
+    public Vector3D nonRotatedPos;
 
     public void setOrientationProvider(String provider) {
         this.provider = provider;
@@ -38,12 +38,12 @@ public class AttitudeComponent {
         copy.provider = provider;
         copy.orientationSource = orientationSource;
         copy.orientationServer = orientationServer;
-        copy.nonRotatedPos = new Vector3d(nonRotatedPos);
+        copy.nonRotatedPos = new Vector3D(nonRotatedPos);
         return copy;
     }
 
     public void initialize(AssetManager manager) {
-        nonRotatedPos = new Vector3d();
+        nonRotatedPos = new Vector3D();
         if (orientationSource != null && !orientationSource.isBlank()) {
             manager.load(orientationSource, OrientationServer.class, new OrientationServerParameters(provider));
         }

@@ -9,15 +9,15 @@ package gaiasky.util.math;
 
 public class ChangeOfBasisTest {
     public static void main(String[] args) {
-        Matrix4d c = Matrix4d.changeOfBasis(new double[] { 0, 0, -1 }, new double[] { 0, 1, 0 }, new double[] { 1, 0, 0 });
+        Matrix4D c = Matrix4D.changeOfBasis(new double[] { 0, 0, -1 }, new double[] { 0, 1, 0 }, new double[] { 1, 0, 0 });
 
-        Vector3d v = new Vector3d(1, 0, 0);
-        System.out.println(v + " -> " + (new Vector3d(v)).mul(c));
+        Vector3D v = new Vector3D(1, 0, 0);
+        System.out.println(v + " -> " + (new Vector3D(v)).mul(c));
 
-        v = new Vector3d(0, 1, 0);
-        System.out.println(v + " -> " + (new Vector3d(v)).mul(c));
+        v = new Vector3D(0, 1, 0);
+        System.out.println(v + " -> " + (new Vector3D(v)).mul(c));
 
-        v = new Vector3d(0, 0, 1);
-        System.out.println(v + " -> " + (new Vector3d(v)).mul(c));
+        v = new Vector3D(0, 0, 1);
+        System.out.println(v + " -> " + (new Vector3D(v)).mul(c));
     }
 }

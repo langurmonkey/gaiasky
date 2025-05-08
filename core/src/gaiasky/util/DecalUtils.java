@@ -19,7 +19,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.g2d.Sprite;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 /**
@@ -273,7 +273,7 @@ public class DecalUtils {
      * @param direction the direction vector
      * @param up        the up vector
      */
-    public static void setBillboardRotation(Quaternion rotation, final Vector3d direction, final Vector3d up) {
+    public static void setBillboardRotation(Quaternion rotation, final Vector3D direction, final Vector3D up) {
         tmp.set((float) up.x, (float) up.y, (float) up.z).crs((float) direction.x, (float) direction.y, (float) direction.z).nor();
         tmp2.set((float) direction.x, (float) direction.y, (float) direction.z).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, (float) direction.x, tmp.y, tmp2.y, (float) direction.y, tmp.z, tmp2.z, (float) direction.z);

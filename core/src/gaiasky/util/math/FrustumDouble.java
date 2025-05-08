@@ -12,14 +12,14 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import gaiasky.util.math.PlaneDouble.PlaneSide;
 
 public class FrustumDouble {
-    protected static final Vector3d[] clipSpacePlanePoints = { new Vector3d(-1, -1, -1), new Vector3d(1, -1, -1), new Vector3d(1, 1, -1), new Vector3d(-1, 1, -1), // near clip
-            new Vector3d(-1, -1, 1), new Vector3d(1, -1, 1), new Vector3d(1, 1, 1), new Vector3d(-1, 1, 1) }; // far clip
+    protected static final Vector3D[] clipSpacePlanePoints = { new Vector3D(-1, -1, -1), new Vector3D(1, -1, -1), new Vector3D(1, 1, -1), new Vector3D(-1, 1, -1), // near clip
+            new Vector3D(-1, -1, 1), new Vector3D(1, -1, 1), new Vector3D(1, 1, 1), new Vector3D(-1, 1, 1) }; // far clip
     protected static final double[] clipSpacePlanePointsArray = new double[8 * 3];
-    private final static Vector3d tmpV = new Vector3d();
+    private final static Vector3D tmpV = new Vector3D();
 
     static {
         int j = 0;
-        for (Vector3d v : clipSpacePlanePoints) {
+        for (Vector3D v : clipSpacePlanePoints) {
             clipSpacePlanePointsArray[j++] = v.x;
             clipSpacePlanePointsArray[j++] = v.y;
             clipSpacePlanePointsArray[j++] = v.z;
@@ -30,12 +30,12 @@ public class FrustumDouble {
     public final PlaneDouble[] planes = new PlaneDouble[6];
 
     /** eight points making up the near and far clipping "rectangles". order is counter clockwise, starting at bottom left **/
-    public final Vector3d[] planePoints = { new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d() };
+    public final Vector3D[] planePoints = { new Vector3D(), new Vector3D(), new Vector3D(), new Vector3D(), new Vector3D(), new Vector3D(), new Vector3D(), new Vector3D() };
     protected final double[] planePointsArray = new double[8 * 3];
 
     public FrustumDouble() {
         for (int i = 0; i < 6; i++) {
-            planes[i] = new PlaneDouble(new Vector3d(), 0);
+            planes[i] = new PlaneDouble(new Vector3D(), 0);
         }
     }
 
@@ -45,11 +45,11 @@ public class FrustumDouble {
      *
      * @param inverseProjectionView the combined projection and view matrices.
      */
-    public void update(Matrix4d inverseProjectionView) {
+    public void update(Matrix4D inverseProjectionView) {
         System.arraycopy(clipSpacePlanePointsArray, 0, planePointsArray, 0, clipSpacePlanePointsArray.length);
-        Matrix4d.prj(inverseProjectionView.val, planePointsArray, 0, 8, 3);
+        Matrix4D.prj(inverseProjectionView.val, planePointsArray, 0, 8, 3);
         for (int i = 0, j = 0; i < 8; i++) {
-            Vector3d v = planePoints[i];
+            Vector3D v = planePoints[i];
             v.x = planePointsArray[j++];
             v.y = planePointsArray[j++];
             v.z = planePointsArray[j++];
@@ -70,7 +70,7 @@ public class FrustumDouble {
      *
      * @return Whether the point is in the frustum.
      */
-    public boolean pointInFrustum(Vector3d point) {
+    public boolean pointInFrustum(Vector3D point) {
         for (int i = 0; i < planes.length; i++) {
             PlaneSide result = planes[i].testPoint(point);
             if (result == PlaneSide.Back)
@@ -105,7 +105,7 @@ public class FrustumDouble {
      *
      * @return Whether the sphere is in the frustum
      */
-    public boolean sphereInFrustum(Vector3d center, float radius) {
+    public boolean sphereInFrustum(Vector3D center, float radius) {
         for (int i = 0; i < 6; i++)
             if ((planes[i].normal.x * center.x + planes[i].normal.y * center.y + planes[i].normal.z * center.z) < (-radius - planes[i].d))
                 return false;
@@ -137,7 +137,7 @@ public class FrustumDouble {
      *
      * @return Whether the sphere is in the frustum
      */
-    public boolean sphereInFrustumWithoutNearFar(Vector3d center, float radius) {
+    public boolean sphereInFrustumWithoutNearFar(Vector3D center, float radius) {
         for (int i = 2; i < 6; i++)
             if ((planes[i].normal.x * center.x + planes[i].normal.y * center.y + planes[i].normal.z * center.z) < (-radius - planes[i].d))
                 return false;
@@ -197,7 +197,7 @@ public class FrustumDouble {
      *
      * @return Whether the bounding box is in the frustum
      */
-    public boolean boundsInFrustum(Vector3d center, Vector3d dimensions) {
+    public boolean boundsInFrustum(Vector3D center, Vector3D dimensions) {
         return boundsInFrustum(center.x, center.y, center.z, dimensions.x / 2, dimensions.y / 2, dimensions.z / 2);
     }
 

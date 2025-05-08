@@ -21,7 +21,7 @@ import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import uk.ac.starlink.table.ColumnInfo;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class EntityUtils {
      * @param out    Auxiliary vector to put the result in.
      * @return The vector with the position.
      */
-    public static Vector3d getAbsolutePosition(final Entity entity, Vector3d out) {
+    public static Vector3D getAbsolutePosition(final Entity entity, Vector3D out) {
         if (entity != null) {
             var body = Mapper.body.get(entity);
             body.pos.put(out);
@@ -103,7 +103,7 @@ public class EntityUtils {
      * @param out    Auxiliary vector to put the result in.
      * @return The vector with the position.
      */
-    public static Vector3d getAbsolutePosition(Entity entity, String name, Vector3d out) {
+    public static Vector3D getAbsolutePosition(Entity entity, String name, Vector3D out) {
         if (Mapper.particleSet.has(entity)) {
             return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
         } else if (Mapper.starSet.has(entity)) {

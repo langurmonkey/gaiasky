@@ -16,8 +16,8 @@ import gaiasky.util.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
 import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
 import gaiasky.util.math.BoundingBoxDouble;
 import gaiasky.util.math.FrustumDouble;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class CascadeShadowMap implements Disposable {
@@ -28,21 +28,21 @@ public class CascadeShadowMap implements Disposable {
     protected final int cascadeCount;
 
     protected final DoubleArray splitRates;
-    private final Vector3d[] splitPoints;
-    private final Matrix4d lightMatrix = new Matrix4d();
+    private final Vector3D[] splitPoints;
+    private final Matrix4D lightMatrix = new Matrix4D();
     private final BoundingBoxDouble box = new BoundingBoxDouble();
-    private final Vector3d center = new Vector3d();
-    private final Vector3d a = new Vector3d();
-    private final Vector3d b = new Vector3d();
-    private final Vector3d dir = new Vector3d();
-    private final Vector3d up = new Vector3d();
-    private final Vector3d tmp = new Vector3d();
-    private final Vector3d tmp2 = new Vector3d();
+    private final Vector3D center = new Vector3D();
+    private final Vector3D a = new Vector3D();
+    private final Vector3D b = new Vector3D();
+    private final Vector3D dir = new Vector3D();
+    private final Vector3D up = new Vector3D();
+    private final Vector3D tmp = new Vector3D();
+    private final Vector3D tmp2 = new Vector3D();
 
     /** Attributes used for the CSM camera, which does not cover the same range as the full camera. **/
-    protected Matrix4d projection, view, combined;
+    protected Matrix4D projection, view, combined;
     /** Inverse projection view matrix. **/
-    private final Matrix4d invProjectionView = new Matrix4d();
+    private final Matrix4D invProjectionView = new Matrix4D();
     protected FrustumDouble frustum;
     /** Camera near value for the cascaded shadow maps. **/
     public double CAM_NEAR_CSM;
@@ -57,15 +57,15 @@ public class CascadeShadowMap implements Disposable {
         attribute = new CascadeShadowMapAttribute(this);
         lights = new Array<>(cascadeCount);
         splitRates = new DoubleArray(cascadeCount + 2);
-        splitPoints = new Vector3d[8];
+        splitPoints = new Vector3D[8];
         for (int i = 0; i < splitPoints.length; i++) {
-            splitPoints[i] = new Vector3d();
+            splitPoints[i] = new Vector3D();
         }
 
         // Camera attributes.
-        projection = new Matrix4d();
-        view = new Matrix4d();
-        combined = new Matrix4d();
+        projection = new Matrix4D();
+        view = new Matrix4D();
+        combined = new Matrix4D();
         frustum = new FrustumDouble();
         CAM_NEAR_CSM = 1000.0 * Constants.M_TO_U;
         CAM_FAR_CSM = Constants.AU_TO_U;
@@ -168,8 +168,8 @@ public class CascadeShadowMap implements Disposable {
 
         lightMatrix.setToLookAt(dir, up);
         box.inf();
-        for (Vector3d splitPoint : splitPoints) {
-            Vector3d v = splitPoint.mul(lightMatrix);
+        for (Vector3D splitPoint : splitPoints) {
+            Vector3D v = splitPoint.mul(lightMatrix);
             box.ext(v);
         }
         double halfFrustumDepth = box.getDepth() / 2;
@@ -218,15 +218,15 @@ public class CascadeShadowMap implements Disposable {
         return new DirectionalShadowLight(width, height);
     }
 
-    public void updateCSM(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
+    public void updateCSM(PerspectiveCamera cam, Vector3D position, Vector3D direction, Vector3D up) {
         double aspect = cam.viewportWidth / cam.viewportHeight;
         projection.setToProjection(CAM_NEAR_CSM, CAM_FAR_CSM, cam.fieldOfView, aspect);
         view.setToLookAt(position, tmp.set(position).add(direction), up);
         combined.set(projection);
-        Matrix4d.mul(combined.val, view.val);
+        Matrix4D.mul(combined.val, view.val);
 
         invProjectionView.set(combined);
-        Matrix4d.inv(invProjectionView.val);
+        Matrix4D.inv(invProjectionView.val);
         frustum.update(invProjectionView);
     }
 }

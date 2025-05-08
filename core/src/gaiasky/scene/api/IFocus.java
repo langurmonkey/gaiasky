@@ -168,7 +168,7 @@ public interface IFocus {
      *
      * @return The position in alpha, delta.
      */
-    Vector2d getPosSph();
+    Vector2D getPosSph();
 
     /**
      * Gets the position of this entity in the next time step in the
@@ -320,7 +320,7 @@ public interface IFocus {
      *
      * @return The orientation matrix. Can be null.
      */
-    Matrix4d getOrientation();
+    Matrix4D getOrientation();
 
     /**
      * Return the rotation component of this focus.
@@ -360,9 +360,9 @@ public interface IFocus {
      * @param camera The camera.
      * @param hits   The list where the focus is to be added.
      */
-    void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
+    void addHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<IFocus> hits);
 
-    void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits);
+    void addEntityHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<Entity> hits);
 
     /**
      * Hook that runs when the candidate is actually made focus.

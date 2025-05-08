@@ -19,7 +19,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
     private PointCloudData data, data0, data1;
     private Trajectory trajectory;
     private final Vector3Q aux1 = new Vector3Q();
-    private final Vector3d aux2 = new Vector3d();
+    private final Vector3D aux2 = new Vector3D();
 
     @Override
     public void initialize(Entity entity, Trajectory trajectory) {

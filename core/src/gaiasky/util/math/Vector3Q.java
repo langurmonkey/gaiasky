@@ -13,14 +13,14 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import net.jafama.FastMath;
 
-import static gaiasky.util.math.Matrix4d.*;
+import static gaiasky.util.math.Matrix4D.*;
 
 /**
  * A vector-3 that uses {@link Quadruple}, 128-bit floating point numbers, as components.
  * This provides 33-36 significant digits of precision.
  */
 public class Vector3Q {
-    private final static Matrix4d tmpMat = new Matrix4d();
+    private final static Matrix4D tmpMat = new Matrix4D();
 
     /** the x-component of this vector **/
     public Quadruple x;
@@ -62,7 +62,7 @@ public class Vector3Q {
         this.z = Quadruple.valueOf(z);
     }
 
-    public Vector3Q(Vector3d vec) {
+    public Vector3Q(Vector3D vec) {
         this(vec.x, vec.y, vec.z);
     }
 
@@ -176,7 +176,7 @@ public class Vector3Q {
         return this;
     }
 
-    public Vector3Q set(final Vector3d vec) {
+    public Vector3Q set(final Vector3D vec) {
         if (vec != null)
             return this.set(vec.x, vec.y, vec.z);
         return this;
@@ -200,15 +200,15 @@ public class Vector3Q {
         return out.set(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
 
-    public Vector3d put(final Vector3d vec) {
+    public Vector3D put(final Vector3D vec) {
         return vec.set(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
     }
 
-    public Vector3d tov3d() {
-        return new Vector3d(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
+    public Vector3D tov3d() {
+        return new Vector3D(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
     }
 
-    public Vector3d tov3d(Vector3d out) {
+    public Vector3D tov3d(Vector3D out) {
         return out.set(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
     }
 
@@ -277,7 +277,7 @@ public class Vector3Q {
         return this;
     }
 
-    public Vector3Q add(final Vector3d vec) {
+    public Vector3Q add(final Vector3D vec) {
         this.x.add(vec.x);
         this.y.add(vec.y);
         this.z.add(vec.z);
@@ -348,7 +348,7 @@ public class Vector3Q {
         return this.sub(a_vec.x, a_vec.y, a_vec.z);
     }
 
-    public Vector3Q sub(final Vector3d a_vec) {
+    public Vector3Q sub(final Vector3D a_vec) {
         return this.sub(a_vec.x, a_vec.y, a_vec.z);
     }
 
@@ -498,7 +498,7 @@ public class Vector3Q {
         return aux.set(this).sub(vec).len();
     }
 
-    public Quadruple dst(final Vector3d vec) {
+    public Quadruple dst(final Vector3D vec) {
         Quadruple a = new Quadruple(vec.x).subtract(this.x);
         Quadruple b = new Quadruple(vec.y).subtract(this.y);
         Quadruple c = new Quadruple(vec.z).subtract(this.z);
@@ -506,14 +506,14 @@ public class Vector3Q {
     }
 
     /**
-     * Faster version of {@link Vector3Q#dst(Vector3d)}, using an auxiliary vector.
+     * Faster version of {@link Vector3Q#dst(Vector3D)}, using an auxiliary vector.
      *
      * @param vec The vector to compute the distance to.
      * @param aux The auxiliary vector.
      *
      * @return The distance between the two points.
      */
-    public Quadruple dst(final Vector3d vec, final Vector3Q aux) {
+    public Quadruple dst(final Vector3D vec, final Vector3Q aux) {
         return aux.set(this).sub(vec).len();
     }
 
@@ -538,7 +538,7 @@ public class Vector3Q {
         return this.dst2(vec).doubleValue();
     }
 
-    public double dst2d(Vector3d vec) {
+    public double dst2d(Vector3D vec) {
         return this.dst2d(vec.x, vec.y, vec.z);
     }
 
@@ -578,7 +578,7 @@ public class Vector3Q {
         return this.div(len2.sqrt());
     }
 
-    public double dot(final Vector3d vec) {
+    public double dot(final Vector3D vec) {
         return this.x.cpy().multiply(vec.x).add(this.y.cpy().multiply(vec.y)).add(this.z.cpy().multiply(vec.z)).doubleValue();
     }
 
@@ -616,7 +616,7 @@ public class Vector3Q {
                         this.x.cpy().multiply(vec.y).subtract(this.y.cpy().multiply(vec.x.cpy())));
     }
 
-    public Vector3Q crs(final Vector3d vec) {
+    public Vector3Q crs(final Vector3D vec) {
         var vx = vec.x;
         var vy = vec.y;
         var vz = vec.z;
@@ -677,7 +677,7 @@ public class Vector3Q {
      *
      * @return This vector for chaining
      */
-    public Vector3Q mul(final Matrix4d matrix) {
+    public Vector3Q mul(final Matrix4D matrix) {
         final double[] mat = matrix.val;
         var m00 = Quadruple.valueOf(mat[M00]);
         var m01 = Quadruple.valueOf(mat[M01]);
@@ -729,7 +729,7 @@ public class Vector3Q {
      *
      * @return This vector for chaining
      */
-    public Vector3Q rotate(final Vector3d axis, double degrees) {
+    public Vector3Q rotate(final Vector3D axis, double degrees) {
         tmpMat.setToRotation(axis, degrees);
         return this.mul(tmpMat);
     }
@@ -752,7 +752,7 @@ public class Vector3Q {
      *
      * @return The matrix aux, for chaining.
      */
-    public Matrix4d setToTranslation(Matrix4d matrix) {
+    public Matrix4D setToTranslation(Matrix4D matrix) {
         return matrix.idt().translate(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
 
@@ -822,7 +822,7 @@ public class Vector3Q {
     }
 
     /** Gets the angle in degrees between the two vectors **/
-    public double angle(Vector3d v) {
+    public double angle(Vector3D v) {
         return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lenDouble() * v.len()), -1d, 1d));
     }
 
@@ -832,7 +832,7 @@ public class Vector3Q {
     }
 
     /** Gets the angle in degrees between the two vectors **/
-    public double anglePrecise(Vector3d v) {
+    public double anglePrecise(Vector3D v) {
         return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lenDouble() * v.len()), -1d, 1d));
     }
 

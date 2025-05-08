@@ -8,7 +8,7 @@
 package gaiasky.util.units;
 
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
@@ -16,7 +16,7 @@ import gaiasky.util.units.Quantity.Length.LengthUnit;
 
 public class Position {
 
-    public final Vector3d realPosition;
+    public final Vector3D realPosition;
 
     /**
      * Works out the cartesian equatorial position in the Gaia Sandbox reference
@@ -30,7 +30,7 @@ public class Position {
             c = 0.04;
             unitC = "mas";
         }
-        realPosition = new Vector3d();
+        realPosition = new Vector3D();
 
         switch (type) {
             case EQ_SPH_DIST -> {

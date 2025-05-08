@@ -29,7 +29,7 @@ import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,9 +60,9 @@ public class VRDeviceInitializer extends AbstractInitSystem {
     private void initializeVRDevice(Entity entity) {
         // VR device.
         var vr = Mapper.vr.get(entity);
-        vr.beamP0 = new Vector3d();
-        vr.beamP1 = new Vector3d();
-        vr.intersection = new Vector3d();
+        vr.beamP0 = new Vector3D();
+        vr.beamP1 = new Vector3D();
+        vr.intersection = new Vector3D();
 
         // Base.
         var base = Mapper.base.get(entity);

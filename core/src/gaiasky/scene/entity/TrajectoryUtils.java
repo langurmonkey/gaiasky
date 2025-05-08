@@ -16,9 +16,9 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.time.Instant;
 import java.util.Date;
@@ -30,14 +30,14 @@ public class TrajectoryUtils {
      **/
     public static OrbitRefresher orbitRefresher;
     private final Vector3Q B31, B32;
-    private final Vector3d D31, D32, D33;
+    private final Vector3D D31, D32, D33;
 
     public TrajectoryUtils() {
         B31 = new Vector3Q();
         B32 = new Vector3Q();
-        D31 = new Vector3d();
-        D32 = new Vector3d();
-        D33 = new Vector3d();
+        D31 = new Vector3D();
+        D32 = new Vector3D();
+        D33 = new Vector3D();
     }
 
     /**
@@ -106,17 +106,17 @@ public class TrajectoryUtils {
 
         // Up
         Vector3Q y = B32.set(barycenter).nor();
-        Vector3d yd = y.put(D31);
+        Vector3D yd = y.put(D31);
         // Towards north - intersect y with plane
-        Vector3d zd = D32;
-        IntersectorDouble.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0, 0, 0), new Vector3d(0, 1, 0), zd);
+        Vector3D zd = D32;
+        IntersectorDouble.lineIntersection(barycenter.put(new Vector3D()), (new Vector3D(yd)), new Vector3D(0, 0, 0), new Vector3D(0, 1, 0), zd);
         zd.sub(barycenter).nor();
         //zd.set(yd).crs(0, 1, 0).nor();
 
         // Orthogonal to ZY, right-hand system
-        Vector3d xd = D33.set(yd).crs(zd);
+        Vector3D xd = D33.set(yd).crs(zd);
 
-        transform.matrix = Matrix4d.changeOfBasis(zd, yd, xd);
+        transform.matrix = Matrix4D.changeOfBasis(zd, yd, xd);
     }
 
     /**

@@ -11,9 +11,9 @@ import java.io.Serializable;
 
 public class RayDouble implements Serializable {
     private static final long serialVersionUID = -620692054835390878L;
-    static Vector3d tmp = new Vector3d();
-    public final Vector3d origin = new Vector3d();
-    public final Vector3d direction = new Vector3d();
+    static Vector3D tmp = new Vector3D();
+    public final Vector3D origin = new Vector3D();
+    public final Vector3D direction = new Vector3D();
 
     /**
      * Constructor, sets the starting position of the Rayd and the direction.
@@ -21,7 +21,7 @@ public class RayDouble implements Serializable {
      * @param origin    The starting position
      * @param direction The direction
      */
-    public RayDouble(Vector3d origin, Vector3d direction) {
+    public RayDouble(Vector3D origin, Vector3D direction) {
         this.origin.set(origin);
         this.direction.set(direction).nor();
     }
@@ -36,12 +36,12 @@ public class RayDouble implements Serializable {
      *
      * @return The end point
      *
-     * @deprecated Use {@link #getEndPoint(Vector3d, float)} instead. Returns the endpoint given the distance. This is calculated as
+     * @deprecated Use {@link #getEndPoint(Vector3D, float)} instead. Returns the endpoint given the distance. This is calculated as
      * startpoint + distance * direction.
      */
     @Deprecated
-    public Vector3d getEndPoint(float distance) {
-        return getEndPoint(new Vector3d(), distance);
+    public Vector3D getEndPoint(float distance) {
+        return getEndPoint(new Vector3D(), distance);
     }
 
     /**
@@ -52,7 +52,7 @@ public class RayDouble implements Serializable {
      *
      * @return The out param
      */
-    public Vector3d getEndPoint(final Vector3d out, final float distance) {
+    public Vector3D getEndPoint(final Vector3D out, final float distance) {
         return out.set(direction).scl(distance).add(origin);
     }
 
@@ -63,7 +63,7 @@ public class RayDouble implements Serializable {
      *
      * @return This Rayd for chaining.
      */
-    public RayDouble mul(Matrix4d matrix) {
+    public RayDouble mul(Matrix4D matrix) {
         tmp.set(origin).add(direction);
         tmp.mul(matrix);
         origin.mul(matrix);
@@ -84,7 +84,7 @@ public class RayDouble implements Serializable {
      *
      * @return this Rayd for chaining
      */
-    public RayDouble set(Vector3d origin, Vector3d direction) {
+    public RayDouble set(Vector3D origin, Vector3D direction) {
         this.origin.set(origin);
         this.direction.set(direction);
         return this;

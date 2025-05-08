@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.scene.record.RotationComponent;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 /**
  * The orientation is either a rigid rotation represented by {@link RotationComponent}, or
@@ -91,7 +91,7 @@ public class Orientation implements Component, ICopy {
         }
     }
 
-    public Vector3d getNonRotatedPos() {
+    public Vector3D getNonRotatedPos() {
         if (attitudeComponent != null) {
             return attitudeComponent.nonRotatedPos;
         }

@@ -23,8 +23,8 @@ import com.badlogic.gdx.utils.Scaling;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3D;
 
 public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
     private Image topProjection;
@@ -55,9 +55,9 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         trans = Coordinates.eqToGal();
     }
 
-    public float[] position(Vector3d pos, float[] out) {
-        Vector3d p = aux3d1.set(pos).mul(trans);
-        Vector2d pos2d = aux2d1;
+    public float[] position(Vector3D pos, float[] out) {
+        Vector3D p = aux3d1.set(pos).mul(trans);
+        Vector2D pos2d = aux2d1;
         pos2d.set(p.z, p.y).scl(from);
         float cx = u2Px(pos2d.x, side2);
         float cy = u2Px(pos2d.y, sideshort2);

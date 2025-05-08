@@ -19,7 +19,7 @@ import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.StdRandom;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.io.*;
@@ -174,7 +174,7 @@ public class GalaxyGenerator {
         }
     }
 
-    private static void addMWParticle(double x, double y, double z, Vector3d aux, List<double[]> particles) {
+    private static void addMWParticle(double x, double y, double z, Vector3D aux, List<double[]> particles) {
         aux.set(x, y, z);
         double size = generateNewSize();
         double[] color = generateNewColor();
@@ -194,7 +194,7 @@ public class GalaxyGenerator {
     }
 
     private static List<double[]> generateUniformBlob(double xExtent, double yExtent, double zExtent) {
-        Vector3d aux = new Vector3d();
+        Vector3D aux = new Vector3D();
         // x, y, z, size
         List<double[]> particles = new ArrayList<>(N);
 
@@ -216,7 +216,7 @@ public class GalaxyGenerator {
      * @return The list of stars
      */
     private static List<double[]> generateMilkyWay() {
-        Vector3d aux = new Vector3d();
+        Vector3D aux = new Vector3D();
         // x, y, z, size
         List<double[]> particles = new ArrayList<>(N);
 
@@ -290,7 +290,7 @@ public class GalaxyGenerator {
         double stepAngle = bar ? 60.0 / FastMath.max(1.0, ((Narms / 2.0) - 1.0)) : 360.0 / Narms;
         double angle = bar ? 10.0 : 0.0;
 
-        Vector3d rotAxis = new Vector3d(0, 1, 0);
+        Vector3D rotAxis = new Vector3D(0, 1, 0);
 
         // Generate bar
         for (long j = 0; j < Nbar; j++) {
@@ -318,7 +318,7 @@ public class GalaxyGenerator {
                 x = StdRandom.gaussian() * armWidth;
                 y = StdRandom.gaussian() * armHeight;
 
-                Vector3d particle = new Vector3d(x, y, z);
+                Vector3D particle = new Vector3D(x, y, z);
                 particle.rotate(rotAxis, angle);
 
                 // Differential rotation

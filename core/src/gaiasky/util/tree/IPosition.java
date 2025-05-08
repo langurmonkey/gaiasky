@@ -8,12 +8,12 @@
 package gaiasky.util.tree;
 
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public interface IPosition {
 
     Vector3Q getPosition();
 
-    Vector3d getVelocity();
+    Vector3D getVelocity();
 
 }

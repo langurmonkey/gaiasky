@@ -8,17 +8,17 @@
 package gaiasky.util.gaia;
 
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class Epsl extends AnalyticalAttitudeDataServer {
     /** The unit vector towards the North Ecliptic Pole, expressed in ICRS **/
-    static final Vector3d NECLP = new Vector3d(-Math.sin(OBLIQUITY_RAD), FastMath.cos(OBLIQUITY_RAD), 0.0);
-    static final Vector3d[] xyz = new Vector3d[] { new Vector3d(), new Vector3d(), new Vector3d() };
+    static final Vector3D NECLP = new Vector3D(-Math.sin(OBLIQUITY_RAD), FastMath.cos(OBLIQUITY_RAD), 0.0);
+    static final Vector3D[] xyz = new Vector3D[] { new Vector3D(), new Vector3D(), new Vector3D() };
     /** The current mode **/
     private final Mode currentMode;
     /** Auxiliary vector **/
-    private Vector3d spinVector;
+    private Vector3D spinVector;
     /**
      * The spin phase becomes a continuous function of time when represented as
      * omega + TWO_PI * omegaRevs:
@@ -119,7 +119,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
             break;
         }
 
-        spinVector = new Vector3d();
+        spinVector = new Vector3D();
         setInitialized(true);
     }
 

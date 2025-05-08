@@ -243,7 +243,7 @@ public class Proximity {
 
     public static class NearbyRecord implements IFocus {
         public double distToCamera, size, radius;
-        public Vector3d pos, pm, absolutePos;
+        public Vector3D pos, pm, absolutePos;
         public float[] col;
         public String name;
         public byte type = TYPE_UNDEFINED;
@@ -251,9 +251,9 @@ public class Proximity {
         public int index;
 
         public NearbyRecord() {
-            pos = new Vector3d();
-            pm = new Vector3d();
-            absolutePos = new Vector3d();
+            pos = new Vector3D();
+            pm = new Vector3D();
+            absolutePos = new Vector3D();
             col = new float[4];
         }
 
@@ -372,7 +372,7 @@ public class Proximity {
         }
 
         @Override
-        public Vector2d getPosSph() {
+        public Vector2D getPosSph() {
             return null;
         }
 
@@ -467,7 +467,7 @@ public class Proximity {
         }
 
         @Override
-        public Matrix4d getOrientation() {
+        public Matrix4D getOrientation() {
             return null;
         }
 
@@ -492,12 +492,12 @@ public class Proximity {
         }
 
         @Override
-        public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+        public void addHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<IFocus> hits) {
 
         }
 
         @Override
-        public void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+        public void addEntityHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<Entity> hits) {
 
         }
 

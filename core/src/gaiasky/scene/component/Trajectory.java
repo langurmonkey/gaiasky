@@ -18,16 +18,16 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);
     public Entity body;
-    public Vector3d curr;
+    public Vector3D curr;
     public double alpha;
-    public Matrix4d localTransformD = new Matrix4d();
+    public Matrix4D localTransformD = new Matrix4D();
     public String provider;
     public Double multiplier = 1.0d;
     public Class<? extends IOrbitDataProvider> providerClass;

@@ -37,12 +37,12 @@ import gaiasky.util.tree.OctreeNode;
 
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
+    private final Vector3D D32 = new Vector3D();
     private final Vector3Q B31 = new Vector3Q();
     private final Vector3Q B33 = new Vector3Q();
     private final Matrix4 matAux = new Matrix4();
-    private final Matrix4d matDAux = new Matrix4d();
+    private final Matrix4D matDAux = new Matrix4D();
     /**
      * Particle component, maybe.
      **/
@@ -421,8 +421,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                                         double latitude,
                                         double distance,
                                         Vector3Q out) {
-        Vector3d aux1 = D31;
-        Vector3d aux2 = D32;
+        Vector3D aux1 = D31;
+        Vector3D aux2 = D32;
 
         // Lon/Lat/Radius
         longitude *= MathUtilsDouble.degRad;
@@ -431,7 +431,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         Coordinates.sphericalToCartesian(longitude, latitude, rad, aux1);
 
         aux2.set(aux1.z, aux1.y, aux1.x).scl(1, -1, -1).scl(-(getRadius() + distance * Constants.KM_TO_U));
-        Matrix4d ori = new Matrix4d(graph.orientation);
+        Matrix4D ori = new Matrix4D(graph.orientation);
         var rotation = getRotationComponent();
         if (rotation != null) {
             ori.rotate(0, 1, 0, rotation.angle);
@@ -451,7 +451,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector2d getPosSph() {
+    public Vector2D getPosSph() {
         var set = getSet();
         if (set != null) {
             return set.getPosSph();
@@ -711,7 +711,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                     matDAux.set(matAux.getValues());
                     cart.mul(matDAux);
 
-                    Vector3d sph = D32;
+                    Vector3D sph = D32;
                     Coordinates.cartesianToSpherical(cart, sph);
 
                     double u = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
@@ -778,7 +778,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Matrix4d getOrientation() {
+    public Matrix4D getOrientation() {
         return graph.orientation;
     }
 
@@ -824,16 +824,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public void addHitRay(Vector3d p0,
-                          Vector3d p1,
+    public void addHitRay(Vector3D p0,
+                          Vector3D p1,
                           NaturalCamera camera,
                           Array<IFocus> hits) {
 
     }
 
     @Override
-    public void addEntityHitRay(Vector3d p0,
-                                Vector3d p1,
+    public void addEntityHitRay(Vector3D p0,
+                                Vector3D p1,
                                 NaturalCamera camera,
                                 Array<Entity> hits) {
         if (focus != null && focus.focusable && focus.hitRayConsumer != null) {

@@ -51,9 +51,9 @@ import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.FixedStage;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
@@ -99,22 +99,22 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
     private XrControllerDevice interactingController;
 
-    private final Vector3d auxDouble = new Vector3d();
+    private final Vector3D auxDouble = new Vector3D();
     private final Vector3 aux = new Vector3();
-    private final Vector3d mouseP0 = new Vector3d();
-    private final Vector3d mouseP1 = new Vector3d();
-    private final Vector3d point = new Vector3d();
-    private final Vector3d normal = new Vector3d();
-    private final Vector3d p0 = new Vector3d();
-    private final Vector3d p1 = new Vector3d();
-    private final Vector3d intersection3D = new Vector3d();
-    private final Vector3d intersection2D = new Vector3d();
-    private final Matrix4d transform = new Matrix4d();
-    private final Matrix4d inverse = new Matrix4d();
-    private final Vector3d camDir = new Vector3d();
-    private final Vector3d camUp = new Vector3d();
-    private final Vector3d up = new Vector3d();
-    private final Vector3d side = new Vector3d();
+    private final Vector3D mouseP0 = new Vector3D();
+    private final Vector3D mouseP1 = new Vector3D();
+    private final Vector3D point = new Vector3D();
+    private final Vector3D normal = new Vector3D();
+    private final Vector3D p0 = new Vector3D();
+    private final Vector3D p1 = new Vector3D();
+    private final Vector3D intersection3D = new Vector3D();
+    private final Vector3D intersection2D = new Vector3D();
+    private final Matrix4D transform = new Matrix4D();
+    private final Matrix4D inverse = new Matrix4D();
+    private final Vector3D camDir = new Vector3D();
+    private final Vector3D camUp = new Vector3D();
+    private final Vector3D up = new Vector3D();
+    private final Vector3D side = new Vector3D();
 
     public MainVRGui(Skin skin) {
         setSkin(skin);
@@ -231,8 +231,8 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
      * @return 1 if the intersection is successful, 0 otherwise.
      */
     private int processDevice(VRDevice device,
-                              Vector3d beamP0,
-                              Vector3d beamP1) {
+                              Vector3D beamP0,
+                              Vector3D beamP1) {
 
         ICamera cam = GaiaSky.instance.getICamera();
 
@@ -565,7 +565,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                         var affine = Mapper.affine.get(entity);
                         affine.transformations.clear();
                         dir.set(camera.getCamera().direction);
-                        var angle = dir.angle(new Vector3d(0, 0, 1));
+                        var angle = dir.angle(new Vector3D(0, 0, 1));
                         if (dir.x < 0) {
                             angle = -angle;
                         }

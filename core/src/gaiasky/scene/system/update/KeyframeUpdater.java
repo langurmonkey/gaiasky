@@ -14,14 +14,14 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.VertsView;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class KeyframeUpdater extends AbstractUpdateSystem {
 
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
-    private final Vector3d D33 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
+    private final Vector3D D32 = new Vector3D();
+    private final Vector3D D33 = new Vector3D();
 
     private final GraphUpdater graphUpdater;
     private final VertsView view;
@@ -52,8 +52,8 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
 
         // Update length of orientations
         for (Entity vo : kf.orientations) {
-            Vector3d p0 = D31;
-            Vector3d p1 = D32;
+            Vector3D p0 = D31;
+            Vector3D p1 = D32;
             view.setEntity(vo);
             PointCloudData p = view.getPointCloud();
             var pt0 = p.samples.get(0);
@@ -61,10 +61,10 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
             var pt1 = p.samples.get(1);
             p1.set(pt1.x(), pt1.y(), pt1.z());
 
-            Vector3d c = D33.set(camera.getPos());
+            Vector3D c = D33.set(camera.getPos());
             double len = FastMath.max(1e-9, FastMath.atan(0.03) * c.dst(p0));
 
-            Vector3d v = c.set(p1).sub(p0).nor().scl(len);
+            Vector3D v = c.set(p1).sub(p0).nor().scl(len);
             p.samples.set(1, new PointCloudData.PointSample(
                     p0.x + v.x,
                     p0.y + v.y,

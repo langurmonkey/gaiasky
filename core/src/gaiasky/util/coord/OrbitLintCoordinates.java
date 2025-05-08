@@ -13,9 +13,9 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.record.OrbitComponent;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.time.Instant;
@@ -24,8 +24,8 @@ import java.util.Map;
 public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     OrbitComponent orbitalParams;
     PointCloudData data;
-    Matrix4d transform;
-    Vector3d aux = new Vector3d();
+    Matrix4D transform;
+    Vector3D aux = new Vector3D();
 
     public OrbitLintCoordinates() {
         super();
@@ -37,7 +37,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
         } else {
             super.doneLoading(params);
-            transform = new Matrix4d();
+            transform = new Matrix4D();
             if (entity != null) {
                 Trajectory trajectory = Mapper.trajectory.get(entity);
                 Verts verts = Mapper.verts.get(entity);
@@ -94,8 +94,8 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         aux.nor().scl(percent * len);
         out.add(aux);
 
-        Matrix4d transformFunction = getTransformFunction();
-        Matrix4d parentOrientation = getParentOrientation();
+        Matrix4D transformFunction = getTransformFunction();
+        Matrix4D parentOrientation = getParentOrientation();
 
         if (transformFunction == null && parentOrientation != null) {
             transform.set(parentOrientation);
@@ -129,14 +129,14 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         return false;
     }
 
-    protected Matrix4d getTransformFunction() {
+    protected Matrix4D getTransformFunction() {
         if (entity != null) {
             return Mapper.transform.get(entity).matrix;
         }
         return null;
     }
 
-    protected Matrix4d getParentOrientation() {
+    protected Matrix4D getParentOrientation() {
         if (entity != null) {
             return Mapper.graph.get(Mapper.graph.get(entity).parent).orientation;
         }

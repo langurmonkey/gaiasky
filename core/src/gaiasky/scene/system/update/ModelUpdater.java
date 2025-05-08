@@ -24,16 +24,16 @@ import gaiasky.scene.entity.LightingUtils;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public class ModelUpdater extends AbstractUpdateSystem {
 
     private final ICamera camera;
-    private final Vector3d D32;
-    private final Matrix4d MD4;
+    private final Vector3D D32;
+    private final Matrix4D MD4;
     private final Quaternion QF;
     private final QuaternionDouble QD;
 
@@ -41,10 +41,10 @@ public class ModelUpdater extends AbstractUpdateSystem {
                         int priority) {
         super(family, priority);
         this.camera = GaiaSky.instance.cameraManager;
-        this.D32 = new Vector3d();
+        this.D32 = new Vector3D();
         this.QD = new QuaternionDouble();
         this.QF = new Quaternion();
-        this.MD4 = new Matrix4d();
+        this.MD4 = new Matrix4D();
     }
 
     @Override
@@ -140,7 +140,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
             // Do actual update.
             if (Mapper.tagBillboard.has(entity)) {
                 // Billboard orientation computation.
-                DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
+                DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3D(0, 1, 0));
                 graph.translation.setToTranslation(localTransform).scl(size).rotate(QF);
             } else if (Mapper.engine.has(entity)) {
                 // Spacecraft.

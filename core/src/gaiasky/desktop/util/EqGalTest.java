@@ -9,7 +9,7 @@ package gaiasky.desktop.util;
 
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.Scanner;
@@ -24,11 +24,11 @@ public class EqGalTest {
         System.out.print("Enter declination [deg]: ");
         double dec = readFloat(sc);
         double dist = 10;
-        Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), FastMath.toRadians(dec), dist, new Vector3d());
+        Vector3D pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), FastMath.toRadians(dec), dist, new Vector3D());
 
-        Vector3d posGal = new Vector3d(pos);
+        Vector3D posGal = new Vector3D(pos);
         posGal.mul(Coordinates.eqToGal());
-        Vector3d posGalSph = Coordinates.cartesianToSpherical(posGal, new Vector3d());
+        Vector3D posGalSph = Coordinates.cartesianToSpherical(posGal, new Vector3D());
         double l = posGalSph.x * MathUtilsDouble.radiansToDegrees;
         double b = posGalSph.y * MathUtilsDouble.radiansToDegrees;
 

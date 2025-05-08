@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
 
 public class Body implements Component, ICopy {
@@ -34,7 +34,7 @@ public class Body implements Component, ICopy {
     /**
      * Position in the equatorial system; ra, dec.
      */
-    public Vector2d posSph = new Vector2d();
+    public Vector2D posSph = new Vector2D();
 
     /**
      * Body size in internal units.

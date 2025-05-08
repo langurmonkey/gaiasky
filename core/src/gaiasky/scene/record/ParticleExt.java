@@ -16,7 +16,7 @@ import gaiasky.util.TLV3D;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
@@ -114,7 +114,7 @@ public record ParticleExt(long id,
     }
 
     @Override
-    public Vector3d pos(Vector3d aux) {
+    public Vector3D pos(Vector3D aux) {
         return aux.set(x(),
                        y(),
                        z());
@@ -230,16 +230,16 @@ public record ParticleExt(long id,
      **/
     @Override
     public double ra() {
-        Vector3d cartPos = pos(aux3d1.get());
-        Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos,
+        Vector3D cartPos = pos(aux3d1.get());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartPos,
                                                            aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.x;
     }
 
     @Override
     public double dec() {
-        Vector3d cartPos = pos(aux3d1.get());
-        Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos,
+        Vector3D cartPos = pos(aux3d1.get());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartPos,
                                                            aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.y;
     }
@@ -251,8 +251,8 @@ public record ParticleExt(long id,
      */
     @Override
     public double lambda() {
-        Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
-        Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
                                                            aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.x;
     }
@@ -264,8 +264,8 @@ public record ParticleExt(long id,
      */
     @Override
     public double beta() {
-        Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
-        Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
                                                            aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.y;
     }
@@ -277,8 +277,8 @@ public record ParticleExt(long id,
      */
     @Override
     public double l() {
-        Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
-        Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
                                                            aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.x;
     }
@@ -290,8 +290,8 @@ public record ParticleExt(long id,
      */
     @Override
     public double b() {
-        Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
-        Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
                                                            aux3d2.get());
         return MathUtilsDouble.radDeg * sphPos.y;
     }

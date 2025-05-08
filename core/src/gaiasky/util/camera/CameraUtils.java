@@ -20,7 +20,7 @@ import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class CameraUtils {
 
@@ -44,7 +44,7 @@ public class CameraUtils {
         return Intersector.intersectRaySphere(ray, vec, (float) f.getRadius(), intersection);
     }
 
-    public static boolean getLonLat(FocusView f, Entity e, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection, Vector3d in, Vector3d out, Matrix4 localTransformInv, double[] lonlat) {
+    public static boolean getLonLat(FocusView f, Entity e, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection, Vector3D in, Vector3D out, Matrix4 localTransformInv, double[] lonlat) {
 
         boolean inter = intersectScreenSphere(f, e, camera, sx, sy, v0, v1, vec, intersection);
 

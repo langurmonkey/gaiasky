@@ -31,9 +31,9 @@ import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
@@ -74,7 +74,7 @@ public class DataInfoWindow extends GenericDialog {
     private boolean updating = false;
 
     private final DecimalFormat nf;
-    private final Vector3d pos;
+    private final Vector3D pos;
     private final Vector3Q posb;
     private final float padBottom = 10f;
 
@@ -87,7 +87,7 @@ public class DataInfoWindow extends GenericDialog {
         this.reader = new JsonReader();
         this.pad = 8f;
         this.nf = new DecimalFormat("##0.##");
-        this.pos = new Vector3d();
+        this.pos = new Vector3D();
         this.posb = new Vector3Q();
 
         setCancelText(I18n.msg("gui.close"));
@@ -434,7 +434,7 @@ public class DataInfoWindow extends GenericDialog {
         final String deg = I18n.msg("gui.unit.deg");
         var focusRA = new OwnLabel("", skin, contentStyle);
         var focusDEC = new OwnLabel("", skin, contentStyle);
-        Vector2d posSph = object.getPosSph();
+        Vector2D posSph = object.getPosSph();
         if (posSph != null && posSph.len() > 0f) {
             focusRA.setText(nf.format(posSph.x) + deg);
             focusDEC.setText(nf.format(posSph.y) + deg);

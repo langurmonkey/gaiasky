@@ -49,7 +49,7 @@ import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
@@ -75,12 +75,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * VR offset.
      **/
-    public final Vector3d vrOffset;
+    public final Vector3D vrOffset;
     /**
      * Acceleration and velocity.
      **/
-    public final Vector3d accel, vel, posBak;
-    public final Vector3d direction, up;
+    public final Vector3D accel, vel, posBak;
+    public final Vector3D direction, up;
     /**
      * Indicates whether the camera is facing the focus or not.
      **/
@@ -123,7 +123,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Auxiliary double vectors.
      **/
-    private final Vector3d aux1, aux2, aux5;
+    private final Vector3D aux1, aux2, aux5;
     private final Vector3Q dx, aux1b, aux2b, aux3b, aux4b, aux5b, nextFocusPosition, nextClosestPosition;
     private final Vector2 aux2f2;
     /**
@@ -133,12 +133,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Acceleration, velocity and position for pitch, yaw and roll.
      **/
-    private Vector3d pitch, yaw, roll;
+    private Vector3D pitch, yaw, roll;
     /**
      * Acceleration, velocity and position for the horizontal and vertical
      * rotation around the focus.
      **/
-    private Vector3d horizontal, vertical;
+    private Vector3D horizontal, vertical;
     /**
      * Time since last forward control issued, in seconds.
      **/
@@ -172,7 +172,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * The direction point to seek.
      */
-    private Vector3d lastVel;
+    private Vector3D lastVel;
     /**
      * FOCUS_MODE position.
      **/
@@ -187,7 +187,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Surface mode Cartesian coordinates of the mouse pointer on the focus object at every frame.
      */
-    private final Vector3d pointerCartesian;
+    private final Vector3D pointerCartesian;
     /**
      * This flag is up when new pointer coordinates are set. It is down when the coordinates have been consumed.
      **/
@@ -220,7 +220,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * VR velocity vectors.
      **/
-    private Vector3d velocityVR0, velocityVR1;
+    private Vector3D velocityVR0, velocityVR1;
     /**
      * Magnitude of velocityVR vector. Sets the velocity in the direction
      * of the VR controller.
@@ -276,24 +276,24 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                          ShaderProgram spriteShader,
                          ShaderProgram shapeShader) {
         super(parent);
-        this.vrOffset = new Vector3d();
-        this.vel = new Vector3d();
-        this.accel = new Vector3d();
+        this.vrOffset = new Vector3D();
+        this.vel = new Vector3D();
+        this.accel = new Vector3D();
         this.force = new Vector3Q();
-        this.posBak = new Vector3d();
+        this.posBak = new Vector3D();
         this.qPrev = new QuaternionDouble();
         this.focus = new FocusView();
         this.focusView = new FocusView();
         this.trackingObject = new FocusView();
         this.vr = vr;
-        this.pointerCartesian = new Vector3d();
+        this.pointerCartesian = new Vector3D();
 
-        this.up = new Vector3d(1, 0, 0);
-        this.direction = new Vector3d(0, 1, 0);
+        this.up = new Vector3D(1, 0, 0);
+        this.direction = new Vector3D(0, 1, 0);
 
-        this.aux1 = new Vector3d();
-        this.aux2 = new Vector3d();
-        this.aux5 = new Vector3d();
+        this.aux1 = new Vector3D();
+        this.aux2 = new Vector3D();
+        this.aux5 = new Vector3D();
         this.auxf1 = new Vector3();
         this.aux2f2 = new Vector2();
 
@@ -330,14 +330,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         focusDirection = new Vector3Q();
         desired = new Vector3Q();
-        pitch = new Vector3d(0.0f, 0.0f, -3.0291599E-6f);
-        yaw = new Vector3d(0.0f, 0.0f, -7.9807205E-6f);
-        roll = new Vector3d(0.0f, 0.0f, -1.4423944E-4f);
-        horizontal = new Vector3d();
-        vertical = new Vector3d();
+        pitch = new Vector3D(0.0f, 0.0f, -3.0291599E-6f);
+        yaw = new Vector3D(0.0f, 0.0f, -7.9807205E-6f);
+        roll = new Vector3D(0.0f, 0.0f, -1.4423944E-4f);
+        horizontal = new Vector3D();
+        vertical = new Vector3D();
 
         friction = new Vector3Q();
-        lastVel = new Vector3d();
+        lastVel = new Vector3D();
         focusPos = new Vector3Q();
         freeTargetPos = new Vector3Q();
         freeTargetOn = false;
@@ -698,8 +698,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param amountX Amount in the perpendicular direction of p0-p1
      * @param amountY Amount in the direction of p0-p1
      */
-    public void setVelocityVR(Vector3d p0,
-                              Vector3d p1,
+    public void setVelocityVR(Vector3D p0,
+                              Vector3D p1,
                               double amountX,
                               double amountY) {
         if (getMode() == CameraMode.FOCUS_MODE) {
@@ -792,7 +792,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
-    public void addAmount(Vector3d vec,
+    public void addAmount(Vector3D vec,
                           double amount,
                           boolean x) {
         if (x)
@@ -1081,7 +1081,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     }
 
-    private void defaultState(Vector3d vec,
+    private void defaultState(Vector3D vec,
                               boolean resetVelocity) {
         // Always reset acceleration
         vec.x = 0;
@@ -1111,7 +1111,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Updates the given accel/vel/pos of the angle using dt.
      */
-    private boolean updatePosition(Vector3d angle,
+    private boolean updatePosition(Vector3D angle,
                                    double dt) {
         if (angle.x != 0 || angle.y != 0) {
             // Calculate velocity from acceleration
@@ -1566,7 +1566,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param angle          the angle, in degrees
      */
     public void rotateAround(final Vector3Q rotationCenter,
-                             Vector3d rotationAxis,
+                             Vector3D rotationAxis,
                              double angle) {
         rotate(rotationAxis, angle);
 
@@ -1577,7 +1577,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         posDistanceCheck();
     }
 
-    public void rotate(Vector3d axis,
+    public void rotate(Vector3D axis,
                        double angle) {
         if (!axis.hasNaN() && Double.isFinite(angle)) {
             direction.rotate(axis, angle);
@@ -1606,7 +1606,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      *
      * @param vec the displacement vector
      */
-    public void translate(Vector3d vec) {
+    public void translate(Vector3D vec) {
         if (vec != null && !vec.hasNaN()) {
             pos.add(vec);
             posDistanceCheck();
@@ -1640,27 +1640,27 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public Vector3d getDirection() {
+    public Vector3D getDirection() {
         return direction;
     }
 
     @Override
-    public void setDirection(Vector3d dir) {
+    public void setDirection(Vector3D dir) {
         this.direction.set(dir);
     }
 
     @Override
-    public Vector3d getUp() {
+    public Vector3D getUp() {
         return up;
     }
 
-    public void setUp(Vector3d up) {
+    public void setUp(Vector3D up) {
         this.up.set(up);
     }
 
     @Override
-    public Vector3d[] getDirections() {
-        return new Vector3d[]{direction};
+    public Vector3D[] getDirections() {
+        return new Vector3D[]{direction};
     }
 
     @Override
@@ -1901,7 +1901,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         } else {
             p = chFocus.getAbsolutePosition(aux1b).add(posInv);
         }
-        Vector3d pos = aux5;
+        Vector3D pos = aux5;
         p.put(pos);
         DecalUtils.drawSprite(sprite, batch, (float) pos.x, (float) pos.y, (float) pos.z, 0.0008d,
                 1f, this, true, 0.04f, 0.04f);
@@ -1972,7 +1972,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             float chw2 = chw / 2;
             float chh2 = chh / (vr ? 1 : 2);
 
-            Vector3d pos = aux5;
+            Vector3D pos = aux5;
             p.put(pos);
             GlobalResources.applyRelativisticAberration(pos, this);
             RelativisticEffectsManager.getInstance().gravitationalWavePos(pos);
@@ -2014,7 +2014,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return False if projected point falls outside the screen bounds, true
      * otherwise.
      */
-    private boolean projectToScreen(Vector3d vec,
+    private boolean projectToScreen(Vector3D vec,
                                     Vector3 out,
                                     int rw,
                                     int rh,
@@ -2090,7 +2090,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public Vector3d getVelocity() {
+    public Vector3D getVelocity() {
         return vel;
     }
 

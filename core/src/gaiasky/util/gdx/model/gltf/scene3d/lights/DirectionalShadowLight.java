@@ -19,7 +19,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class DirectionalShadowLight extends DirectionalLightEx implements ShadowMap, Disposable
@@ -82,7 +82,7 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 		this.center.set(center);
 		return this;
 	}
-	public DirectionalShadowLight setCenter(Vector3d center) {
+	public DirectionalShadowLight setCenter(Vector3D center) {
 		center.put(this.center);
 		return this;
 	}

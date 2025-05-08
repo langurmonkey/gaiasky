@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 
 public class FadeNodeInitializer extends AbstractInitSystem {
 
@@ -29,10 +29,10 @@ public class FadeNodeInitializer extends AbstractInitSystem {
 
         // Initialize default mappings, if no mappings are set
         if (fade.fadeIn != null && fade.fadeInMap == null) {
-            fade.fadeInMap = new Vector2d(0, 1);
+            fade.fadeInMap = new Vector2D(0, 1);
         }
         if (fade.fadeOut != null && fade.fadeOutMap == null) {
-            fade.fadeOutMap = new Vector2d(1, 0);
+            fade.fadeOutMap = new Vector2D(1, 0);
         }
 
     }

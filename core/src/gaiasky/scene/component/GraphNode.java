@@ -16,7 +16,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.util.Consumers.Consumer4;
 import gaiasky.util.Functions.Function3;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3Q;
 
 public class GraphNode implements Component, ICopy {
@@ -63,7 +63,7 @@ public class GraphNode implements Component, ICopy {
      * plane, but not other transformations applied to the object such as the
      * size or the rotation angle at the time.
      */
-    public Matrix4d orientation;
+    public Matrix4D orientation;
 
     /**
      * The total number of descendants under this node.
@@ -178,7 +178,7 @@ public class GraphNode implements Component, ICopy {
         }
         if (orientation != null) {
             if (copy.orientation == null) {
-                copy.orientation = new Matrix4d();
+                copy.orientation = new Matrix4D();
             }
             copy.orientation.set(orientation);
         }

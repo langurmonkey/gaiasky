@@ -38,7 +38,7 @@ import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
 import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
@@ -150,7 +150,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.lastSortCameraPos = new Vector3Q(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         set.proximity = new Proximity(Constants.N_DIR_LIGHTS);
         set.focusPosition = new Vector3Q();
-        set.focusPositionSph = new Vector2d();
+        set.focusPositionSph = new Vector2D();
         set.entity = entity;
 
         // Default epochs, if not set

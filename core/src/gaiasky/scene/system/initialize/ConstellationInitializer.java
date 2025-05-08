@@ -19,7 +19,7 @@ import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 
 public class ConstellationInitializer extends AbstractInitSystem {
@@ -38,7 +38,7 @@ public class ConstellationInitializer extends AbstractInitSystem {
         var line = Mapper.line.get(entity);
         var label = Mapper.label.get(entity);
 
-        constel.posd = new Vector3d();
+        constel.posd = new Vector3D();
         constel.alpha = 0.4f;
 
         if (body.color == null) {

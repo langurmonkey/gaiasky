@@ -10,8 +10,8 @@ package gaiasky.data.orbit;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -45,11 +45,11 @@ public class FileDataLoaderEclipticJulianTime {
                 if (tokens.length >= 4) {
                     // Valid data line
                     Timestamp t = new Timestamp(getTime(tokens[0]));
-                    Matrix4d transform = new Matrix4d();
+                    Matrix4D transform = new Matrix4D();
                     transform.scl(Constants.KM_TO_U);
                     if (!t.equals(last)) {
 
-                        Vector3d pos = new Vector3d(parsed(tokens[1]), parsed(tokens[2]), parsed(tokens[3]));
+                        Vector3D pos = new Vector3D(parsed(tokens[1]), parsed(tokens[2]), parsed(tokens[3]));
                         pos.mul(transform);
                         orbitData.addPoint(pos, t.toInstant());
                         last.setTime(t.getTime());

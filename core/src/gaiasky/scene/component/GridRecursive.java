@@ -10,7 +10,7 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class GridRecursive implements Component {
     public List<Pair<Double, String>> annotations;
 
     // Mid-points of lines in refys mode
-    public Vector3d p01, p02, a, b, c, d;
+    public Vector3D p01, p02, a, b, c, d;
     public double d01, d02;
 
     // Regime: 1 - normal with depth buffer, 2 - rescaling quad

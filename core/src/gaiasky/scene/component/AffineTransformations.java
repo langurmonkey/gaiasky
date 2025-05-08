@@ -11,9 +11,9 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scene.record.*;
 import gaiasky.util.Constants;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.Vector;
 
@@ -104,7 +104,7 @@ public class AffineTransformations implements Component {
     public synchronized void setQuaternion(double[] axis, double angle) {
         initialize();
         QuaternionTransform qt = new QuaternionTransform();
-        qt.setQuaternion(new Vector3d(axis), angle);
+        qt.setQuaternion(new Vector3D(axis), angle);
         this.transformations.add(qt);
     }
 
@@ -146,7 +146,7 @@ public class AffineTransformations implements Component {
         return mat;
     }
 
-    public synchronized Matrix4d apply(Matrix4d mat) {
+    public synchronized Matrix4D apply(Matrix4D mat) {
         if (transformations != null) {
             for (ITransform tr : transformations) {
                 tr.apply(mat);

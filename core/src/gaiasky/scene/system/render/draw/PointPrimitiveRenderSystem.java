@@ -26,7 +26,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import org.lwjgl.opengl.GL30;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     private final PointView pointView;
     private final int glType;
     private int sizeOffset;
-    private final Vector3d D31 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
 
     public PointPrimitiveRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -135,7 +135,7 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
         var pointCloudData = verts.pointCloudData;
         var cc = body.color;
 
-        Vector3d v = D31;
+        Vector3D v = D31;
         for (int i = 0; i < pointCloudData.getNumPoints(); i++) {
             pointCloudData.loadPoint(v, i);
             v.add(graph.translation);

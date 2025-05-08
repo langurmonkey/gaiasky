@@ -39,13 +39,13 @@ public class Coordinates {
     private static final double Q = 27.12825;
     private static final double P = 192.85948;
 
-    private static final Matrix4d equatorialToEcliptic;
-    private static final Matrix4d eclipticToEquatorial;
-    private static final Matrix4d equatorialToGalactic;
-    private static final Matrix4d galacticToEquatorial;
-    private static final Matrix4d eclipticToGalactic;
-    private static final Matrix4d galacticToEcliptic;
-    private static final Matrix4d mat4didt;
+    private static final Matrix4D equatorialToEcliptic;
+    private static final Matrix4D eclipticToEquatorial;
+    private static final Matrix4D equatorialToGalactic;
+    private static final Matrix4D galacticToEquatorial;
+    private static final Matrix4D eclipticToGalactic;
+    private static final Matrix4D galacticToEcliptic;
+    private static final Matrix4D mat4didt;
     private static final Matrix4 equatorialToEclipticF;
     private static final Matrix4 eclipticToEquatorialF;
     private static final Matrix4 equatorialToGalacticF;
@@ -54,7 +54,7 @@ public class Coordinates {
     private static final Matrix4 galacticToEclipticF;
     private static final Matrix4 mat4fidt;
 
-    private static final Map<String, Matrix4d> mapd;
+    private static final Map<String, Matrix4D> mapd;
     private static final Map<String, Matrix4> mapf;
 
     static {
@@ -73,19 +73,19 @@ public class Coordinates {
         galacticToEquatorialF = galacticToEquatorial.putIn(new Matrix4());
 
         // EQ -> GAL
-        equatorialToGalactic = new Matrix4d(galacticToEquatorial).inv();
+        equatorialToGalactic = new Matrix4D(galacticToEquatorial).inv();
         equatorialToGalacticF = equatorialToGalactic.putIn(new Matrix4());
 
         // ECL -> GAL
-        eclipticToGalactic = new Matrix4d(galacticToEquatorial).mul(equatorialToEcliptic);
+        eclipticToGalactic = new Matrix4D(galacticToEquatorial).mul(equatorialToEcliptic);
         eclipticToGalacticF = eclipticToGalactic.putIn(new Matrix4());
 
         // GAL -> ECL
-        galacticToEcliptic = new Matrix4d(eclipticToEquatorial).mul(equatorialToGalactic);
+        galacticToEcliptic = new Matrix4D(eclipticToEquatorial).mul(equatorialToGalactic);
         galacticToEclipticF = galacticToEcliptic.putIn(new Matrix4());
 
         // Identities
-        mat4didt = new Matrix4d();
+        mat4didt = new Matrix4D();
         mat4fidt = new Matrix4();
 
         // Init maps
@@ -124,7 +124,7 @@ public class Coordinates {
 
     }
 
-    public static Map<String, Matrix4d> getMap() {
+    public static Map<String, Matrix4D> getMap() {
         return mapd;
     }
 
@@ -149,8 +149,8 @@ public class Coordinates {
      *
      * @return The rotation matrix.
      */
-    public static Matrix4d getRotationMatrix(double alpha, double beta, double gamma) {
-        return new Matrix4d().rotate(0, 1, 0, gamma)
+    public static Matrix4D getRotationMatrix(double alpha, double beta, double gamma) {
+        return new Matrix4D().rotate(0, 1, 0, gamma)
                 .rotate(0, 0, 1, beta)
                 .rotate(0, 1, 0, alpha);
     }
@@ -167,12 +167,12 @@ public class Coordinates {
      * @return The matrix to transform from equatorial coordinates to ecliptic
      * coordinates.
      */
-    public static Matrix4d eclToEq() {
+    public static Matrix4D eclToEq() {
         //return getRotationMatrix(0, obliquity, 0);
         return eclipticToEquatorial;
     }
 
-    public static Matrix4d eclipticToEquatorial() {
+    public static Matrix4D eclipticToEquatorial() {
         return eclToEq();
     }
 
@@ -192,11 +192,11 @@ public class Coordinates {
      *
      * @return The transformation matrix.
      */
-    public static Matrix4d eclToEq(double julianDate) {
+    public static Matrix4D eclToEq(double julianDate) {
         return getRotationMatrix(0, AstroUtils.obliquity(julianDate), 0);
     }
 
-    public static Matrix4d eclipticToEquatorial(double jd) {
+    public static Matrix4D eclipticToEquatorial(double jd) {
         return eclToEq(jd);
     }
 
@@ -207,12 +207,12 @@ public class Coordinates {
      *
      * @return The transformation matrix.
      */
-    public static Matrix4d eqToEcl() {
+    public static Matrix4D eqToEcl() {
         //return getRotationMatrix(0, -obliquity, 0);
         return equatorialToEcliptic;
     }
 
-    public static Matrix4d equatorialToEcliptic() {
+    public static Matrix4D equatorialToEcliptic() {
         return eqToEcl();
     }
 
@@ -237,11 +237,11 @@ public class Coordinates {
      * @return The matrix to transform from equatorial coordinates to ecliptic
      * coordinates.
      */
-    public static Matrix4d eqToEcl(double julianDate) {
+    public static Matrix4D eqToEcl(double julianDate) {
         return getRotationMatrix(0, -AstroUtils.obliquity(julianDate), 0);
     }
 
-    public static Matrix4d equatorialToEcliptic(double jd) {
+    public static Matrix4D equatorialToEcliptic(double jd) {
         return eqToEcl(jd);
     }
 
@@ -254,11 +254,11 @@ public class Coordinates {
      *
      * @return The transformation matrix.
      */
-    public static Matrix4d galToEq() {
+    public static Matrix4D galToEq() {
         return galacticToEquatorial;
     }
 
-    public static Matrix4d galacticToEquatorial() {
+    public static Matrix4D galacticToEquatorial() {
         return galToEq();
     }
 
@@ -279,11 +279,11 @@ public class Coordinates {
      *
      * @return The transformation matrix.
      */
-    public static Matrix4d eqToGal() {
+    public static Matrix4D eqToGal() {
         return equatorialToGalactic;
     }
 
-    public static Matrix4d equatorialToGalactic() {
+    public static Matrix4D equatorialToGalactic() {
         return eqToGal();
     }
 
@@ -304,9 +304,9 @@ public class Coordinates {
      *
      * @return The out vector with the galactic longitude and latitude, in radians.
      */
-    public static Vector2d equatorialToGalactic(double alpha, double delta, Vector2d out) {
+    public static Vector2D equatorialToGalactic(double alpha, double delta, Vector2D out) {
         // To equatorial cartesian
-        Vector3d aux = new Vector3d(alpha, delta, Constants.PC_TO_U);
+        Vector3D aux = new Vector3D(alpha, delta, Constants.PC_TO_U);
         sphericalToCartesian(aux, aux);
 
         // Rotate to galactic cartesian
@@ -330,9 +330,9 @@ public class Coordinates {
      *
      * @return The out vector with the right ascension and declination, in radians.
      */
-    public static Vector2d galacticToEquatorial(double l, double b, Vector2d out) {
+    public static Vector2D galacticToEquatorial(double l, double b, Vector2D out) {
         // To equatorial cartesian
-        Vector3d aux = new Vector3d(l, b, Constants.PC_TO_U);
+        Vector3D aux = new Vector3D(l, b, Constants.PC_TO_U);
         sphericalToCartesian(aux, aux);
 
         // Rotate to galactic cartesian
@@ -357,7 +357,7 @@ public class Coordinates {
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
      * for chaining.
      */
-    public static Vector2d eclipticToEquatorial(Vector2d vec, Vector2d out) {
+    public static Vector2D eclipticToEquatorial(Vector2D vec, Vector2D out) {
         return eclipticToEquatorial(vec.x, vec.y, out);
     }
 
@@ -371,7 +371,7 @@ public class Coordinates {
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
      * for chaining.
      */
-    public static Vector2d eclipticToEquatorial(double lambda, double beta, Vector2d out) {
+    public static Vector2D eclipticToEquatorial(double lambda, double beta, Vector2D out) {
 
         double alpha = FastMath.atan2(
                 (Math.sin(lambda) * FastMath.cos(OBLIQUITY_RAD_J2000) - FastMath.tan(beta) * FastMath.sin(OBLIQUITY_RAD_J2000)),
@@ -385,7 +385,7 @@ public class Coordinates {
         return out.set(alpha, delta);
     }
 
-    public static Matrix4d eclipticToGalactic() {
+    public static Matrix4D eclipticToGalactic() {
         return eclipticToGalactic;
     }
 
@@ -393,7 +393,7 @@ public class Coordinates {
         return eclipticToGalacticF;
     }
 
-    public static Matrix4d galacticToEcliptic() {
+    public static Matrix4D galacticToEcliptic() {
         return galacticToEcliptic;
     }
 
@@ -419,7 +419,7 @@ public class Coordinates {
      * @return Output vector in Cartesian coordinates where x and z are on the
      * horizontal plane and y is in the up direction.
      */
-    public static Vector3d sphericalToCartesian(Vector3d vec, Vector3d out) {
+    public static Vector3D sphericalToCartesian(Vector3D vec, Vector3D out) {
         return sphericalToCartesian(vec.x, vec.y, vec.z, out);
     }
 
@@ -441,7 +441,7 @@ public class Coordinates {
      * z are on the horizontal plane and y is in the up direction, for
      * chaining.
      */
-    public static Vector3d sphericalToCartesian(double longitude, double latitude, double radius, Vector3d out) {
+    public static Vector3D sphericalToCartesian(double longitude, double latitude, double radius, Vector3D out) {
         out.x = radius * FastMath.cos(latitude) * FastMath.sin(longitude);
         out.y = radius * FastMath.sin(latitude);
         out.z = radius * FastMath.cos(latitude) * FastMath.cos(longitude);
@@ -484,7 +484,7 @@ public class Coordinates {
      * <li>The radius or distance to the point.</li>
      * </ol>
      */
-    public static Vector3d cartesianToSpherical(Vector3d vec, Vector3d out) {
+    public static Vector3D cartesianToSpherical(Vector3D vec, Vector3D out) {
         /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
@@ -535,7 +535,7 @@ public class Coordinates {
      * <li>The radius or distance to the point.</li>
      * </ol>
      */
-    public static Vector3d cartesianToSpherical(Vector3Q vec, Vector3d out) {
+    public static Vector3D cartesianToSpherical(Vector3Q vec, Vector3D out) {
         /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
@@ -642,9 +642,9 @@ public class Coordinates {
      *
      * @return The proper motion vector in internal_units/year.
      */
-    public static Vector3d properMotionsToCartesian(double muAlphaStar, double muDelta, double radVel, double ra, double dec,
+    public static Vector3D properMotionsToCartesian(double muAlphaStar, double muDelta, double radVel, double ra, double dec,
                                                     double distPc,
-                                                    Vector3d out) {
+                                                    Vector3D out) {
         double ma = muAlphaStar * Nature.MILLIARCSEC_TO_ARCSEC;
         double md = muDelta * Nature.MILLIARCSEC_TO_ARCSEC;
 
@@ -688,9 +688,9 @@ public class Coordinates {
      *
      * @return The proper motions (muAlpha, muDelta) in mas/yr, and the radial velocity in km/s.
      */
-    public static Vector3d cartesianToProperMotions(double vx, double vy, double vz,
+    public static Vector3D cartesianToProperMotions(double vx, double vy, double vz,
                                                     double ra, double dec, double distPc,
-                                                    Vector3d out) {
+                                                    Vector3D out) {
         // Precompute constants for conversion
         double kmPerYearToInternal = Constants.U_TO_KM / Nature.Y_TO_S;
         double arcsecPerYearToKm = Nature.ARCSEC_PER_YEAR_TO_KMS * distPc;
@@ -728,7 +728,7 @@ public class Coordinates {
         return out.set(muAlphaStar, muDelta, vr);
     }
 
-    public static Matrix4d getTransformD(String name) {
+    public static Matrix4D getTransformD(String name) {
         if (name == null || name.isEmpty() || !mapf.containsKey(name))
             return mat4didt;
         return mapd.get(name.toLowerCase());
@@ -740,7 +740,7 @@ public class Coordinates {
         return mapf.get(name.toLowerCase());
     }
 
-    public static Matrix4d idt() {
+    public static Matrix4D idt() {
         return mat4didt;
     }
 

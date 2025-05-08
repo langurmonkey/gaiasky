@@ -9,7 +9,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 import net.jafama.FastMath;
 
@@ -18,7 +18,7 @@ public class Constel implements Component {
 
     public float alpha;
     public boolean allLoaded = false;
-    public Vector3d posd;
+    public Vector3D posd;
 
     /** List of pairs of HIP identifiers **/
     public Array<int[]> ids;

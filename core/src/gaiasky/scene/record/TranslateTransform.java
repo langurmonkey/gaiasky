@@ -8,7 +8,7 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public class TranslateTransform implements ITransform {
     /** Translation **/
@@ -18,7 +18,7 @@ public class TranslateTransform implements ITransform {
         mat.translate((float) vector[0], (float) vector[1], (float) vector[2]);
     }
 
-    public void apply(Matrix4d mat) {
+    public void apply(Matrix4D mat) {
         mat.translate(vector[0], vector[1], vector[2]);
     }
 

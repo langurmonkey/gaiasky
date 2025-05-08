@@ -23,11 +23,11 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class SpacecraftView extends BaseView implements ISpacecraft {
     private static final Log logger = Logger.getLogger(SpacecraftView.class);
-    private final Vector3d D31 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
     public MotorEngine engine;
     public Coordinates coord;
 
@@ -69,11 +69,11 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
         return engine.currentMachine;
     }
 
-    public Vector3d force() {
+    public Vector3D force() {
         return engine.force;
     }
 
-    public Vector3d accel() {
+    public Vector3D accel() {
         return engine.accel;
     }
 
@@ -81,19 +81,19 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
         return body.pos;
     }
 
-    public Vector3d vel() {
+    public Vector3D vel() {
         return engine.vel;
     }
 
-    public Vector3d direction() {
+    public Vector3D direction() {
         return engine.direction;
     }
 
-    public Vector3d up() {
+    public Vector3D up() {
         return engine.up;
     }
 
-    public Vector3d thrust() {
+    public Vector3D thrust() {
         return engine.thrust;
     }
 
@@ -250,7 +250,7 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
             EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
     }
 
-    public double computeDirectionUp(double dt, Pair<Vector3d, Vector3d> pair) {
+    public double computeDirectionUp(double dt, Pair<Vector3D, Vector3D> pair) {
         // Yaw, pitch and roll
         engine.yawf = engine.yawp * engine.responsiveness;
         engine.pitchf = engine.pitchp * engine.responsiveness;
@@ -277,14 +277,14 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
         double pitchDiff = (engine.pitchv * dt) % 360d;
         double rollDiff = (engine.rollv * dt) % 360d;
 
-        Vector3d direction = pair.getFirst();
-        Vector3d up = pair.getSecond();
+        Vector3D direction = pair.getFirst();
+        Vector3D up = pair.getSecond();
 
         // apply yaw
         direction.rotate(up, yawDiff);
 
         // apply pitch
-        Vector3d aux1 = D31.set(direction).crs(up);
+        Vector3D aux1 = D31.set(direction).crs(up);
         direction.rotate(aux1, pitchDiff);
         up.rotate(aux1, pitchDiff);
 

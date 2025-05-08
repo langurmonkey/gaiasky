@@ -22,7 +22,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
 
@@ -32,10 +32,10 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Since OctreeNode is not to be parallelized, these can be static.
      **/
-    private static final Vector3d auxD1 = new Vector3d();
-    private static final Vector3d auxD2 = new Vector3d();
-    private static final Vector3d auxD3 = new Vector3d();
-    private static final Vector3d auxD4 = new Vector3d();
+    private static final Vector3D auxD1 = new Vector3D();
+    private static final Vector3D auxD2 = new Vector3D();
+    private static final Vector3D auxD3 = new Vector3D();
+    private static final Vector3D auxD4 = new Vector3D();
     public static int nOctantsObserved = 0;
     public static int nObjectsObserved = 0;
     /**
@@ -45,19 +45,19 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Contains the bottom-left-front position of the octant.
      **/
-    public final Vector3d min;
+    public final Vector3D min;
     /**
      * Contains the top-right-back position of the octant.
      **/
-    public final Vector3d max;
+    public final Vector3D max;
     /**
      * The centre of this octant.
      **/
-    public final Vector3d centre;
+    public final Vector3D centre;
     /**
      * Octant size in x, y and z.
      **/
-    public final Vector3d size;
+    public final Vector3D size;
     /**
      * Contains the depth level.
      **/
@@ -132,10 +132,10 @@ public class OctreeNode implements ILineRenderable {
                        double hsy,
                        double hsz,
                        int depth) {
-        this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
-        this.max = new Vector3d(x + hsx, y + hsy, z + hsz);
-        this.centre = new Vector3d(x, y, z);
-        this.size = new Vector3d(hsx * 2, hsy * 2, hsz * 2);
+        this.min = new Vector3D(x - hsx, y - hsy, z - hsz);
+        this.max = new Vector3D(x + hsx, y + hsy, z + hsz);
+        this.centre = new Vector3D(x, y, z);
+        this.size = new Vector3D(hsx * 2, hsy * 2, hsz * 2);
         this.depth = depth;
         this.observed = false;
         this.status = LoadStatus.NOT_LOADED;
@@ -154,10 +154,10 @@ public class OctreeNode implements ILineRenderable {
                       double hsz,
                       int depth) {
         this.pageId = pageId;
-        this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
-        this.max = new Vector3d(x + hsx, y + hsy, z + hsz);
-        this.centre = new Vector3d(x, y, z);
-        this.size = new Vector3d(hsx * 2, hsy * 2, hsz * 2);
+        this.min = new Vector3D(x - hsx, y - hsy, z - hsz);
+        this.max = new Vector3D(x + hsx, y + hsy, z + hsz);
+        this.centre = new Vector3D(x, y, z);
+        this.size = new Vector3D(hsx * 2, hsy * 2, hsz * 2);
         this.depth = depth;
         this.observed = false;
         this.status = LoadStatus.NOT_LOADED;
@@ -551,7 +551,7 @@ public class OctreeNode implements ILineRenderable {
         return min.x <= x && max.x >= x && min.y <= y && max.y >= y && min.z <= z && max.z >= z;
     }
 
-    public boolean contains(Vector3d v) {
+    public boolean contains(Vector3D v) {
         return min.x <= v.x && max.x >= v.x && min.y <= v.y && max.y >= v.y && min.z <= v.z && max.z >= v.z;
     }
 
@@ -561,7 +561,7 @@ public class OctreeNode implements ILineRenderable {
      * @param position The position.
      * @return The best octant.
      */
-    public OctreeNode getBestOctant(Vector3d position) {
+    public OctreeNode getBestOctant(Vector3D position) {
         if (!this.contains(position)) {
             return null;
         } else {
@@ -754,10 +754,10 @@ public class OctreeNode implements ILineRenderable {
      */
     private boolean computeObservedFast(ICamera cam) {
         // vector from camera to center of box
-        Vector3d camPosBox = auxD1.set(centre).sub(cam.getPos());
+        Vector3D camPosBox = auxD1.set(centre).sub(cam.getPos());
         // auxD2 rotation axis
-        Vector3d axis = auxD2.set(cam.getDirection()).crs(centre);
-        Vector3d edge = auxD3.set(cam.getDirection()).rotate(axis, cam.getCamera().fieldOfView / 2d);
+        Vector3D axis = auxD2.set(cam.getDirection()).crs(centre);
+        Vector3D edge = auxD3.set(cam.getDirection()).rotate(axis, cam.getCamera().fieldOfView / 2d);
         // get angle at edge (when far side is radius)
         double angle1 = FastMath.toDegrees(FastMath.atan(radius / camPosBox.len()));
         // get actual angle
@@ -919,7 +919,7 @@ public class OctreeNode implements ILineRenderable {
 
         if (this.col.a > 0) {
             // Camera correction
-            Vector3d loc = auxD4;
+            Vector3D loc = auxD4;
             loc.set(this.min).add(camera.getInversePos());
 
             /*

@@ -29,7 +29,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -39,26 +39,26 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      * The input inputListener attached to this camera
      **/
     private final SpacecraftMouseKbdListener spacecraftMouseKbdListener;
-    private final Vector3d aux1, aux2;
+    private final Vector3D aux1, aux2;
     private final Vector3Q aux1b;
     private final Vector3Q toDesired;
     private final Vector3Q desired;
-    private final Vector3d scThrust;
+    private final Vector3D scThrust;
 
     /*
      * Controller listener
      **/
     //private SpacecraftControllerListener controllerListener;
-    private final Vector3d scForce;
-    private final Vector3d scAccel;
-    private final Vector3d scVel;
-    private final Vector3d scDir;
-    private final Vector3d scUp;
-    private final Pair<Vector3d, Vector3d> dirUp;
+    private final Vector3D scForce;
+    private final Vector3D scAccel;
+    private final Vector3D scVel;
+    private final Vector3D scDir;
+    private final Vector3D scUp;
+    private final Pair<Vector3D, Vector3D> dirUp;
     /**
      * Direction and up vectors.
      **/
-    public Vector3d direction, up;
+    public Vector3D direction, up;
     public Vector3Q relPos;
     private Entity sc;
     private final SpacecraftView view;
@@ -78,21 +78,21 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         super(parent);
 
         // Vectors
-        direction = new Vector3d(1, 0, 0);
-        up = new Vector3d(0, 1, 0);
+        direction = new Vector3D(1, 0, 0);
+        up = new Vector3D(0, 1, 0);
         relPos = new Vector3Q();
         toDesired = new Vector3Q();
         desired = new Vector3Q();
-        aux1 = new Vector3d();
-        aux2 = new Vector3d();
+        aux1 = new Vector3D();
+        aux2 = new Vector3D();
         aux1b = new Vector3Q();
-        scThrust = new Vector3d();
-        scForce = new Vector3d();
-        scAccel = new Vector3d();
-        scVel = new Vector3d();
+        scThrust = new Vector3D();
+        scForce = new Vector3D();
+        scAccel = new Vector3D();
+        scVel = new Vector3D();
         scpos = new Vector3Q();
-        scDir = new Vector3d();
-        scUp = new Vector3d();
+        scDir = new Vector3D();
+        scUp = new Vector3D();
 
         dirUp = new Pair<>(scDir, scUp);
 
@@ -158,23 +158,23 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public Vector3d getDirection() {
+    public Vector3D getDirection() {
         return direction;
     }
 
     @Override
-    public void setDirection(Vector3d dir) {
+    public void setDirection(Vector3D dir) {
         this.direction.set(dir);
     }
 
     @Override
-    public Vector3d getUp() {
+    public Vector3D getUp() {
         return up;
     }
 
     @Override
-    public Vector3d[] getDirections() {
-        return new Vector3d[] { direction };
+    public Vector3D[] getDirections() {
+        return new Vector3D[] { direction };
     }
 
     @Override
@@ -402,7 +402,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public Vector3d getVelocity() {
+    public Vector3D getVelocity() {
         return scVel;
     }
 

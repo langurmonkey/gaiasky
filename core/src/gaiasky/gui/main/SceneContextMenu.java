@@ -31,7 +31,7 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.ContextMenu;
 import gaiasky.util.scene2d.MenuItem;
 import gaiasky.util.scene2d.OwnCheckBox;
@@ -216,7 +216,7 @@ public class SceneContextMenu extends ContextMenu {
 
                 double[] lonlat = new double[2];
                 FocusView view = candidate;
-                boolean ok = CameraUtils.getLonLat(view, view.getEntity(), GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
+                boolean ok = CameraUtils.getLonLat(view, view.getEntity(), GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3D(), new Vector3D(), new Matrix4(), lonlat);
                 if (ok) {
                     final Double pointerLon = lonlat[0];
                     final Double pointerLat = lonlat[1];

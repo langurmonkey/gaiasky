@@ -15,7 +15,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 
 public class VRDevice implements Component, IObserver {
@@ -24,14 +24,14 @@ public class VRDevice implements Component, IObserver {
 
     // Intersection sphere.
     public IntModelInstance intersectionModel;
-    public Vector3d intersection;
+    public Vector3D intersection;
 
     // Points in the beam.
-    public Vector3d beamP0 = new Vector3d();
-    public Vector3d beamP1 = new Vector3d();
-    public Vector3d beamP2 = new Vector3d();
+    public Vector3D beamP0 = new Vector3D();
+    public Vector3D beamP1 = new Vector3D();
+    public Vector3D beamP2 = new Vector3D();
     // Final point, always very, very far. Not used for rendering.
-    public Vector3d beamPn = new Vector3d();
+    public Vector3D beamPn = new Vector3D();
 
     // Default colors for normal and select mode.
     private static final Color normal = ColorUtils.gRedC;

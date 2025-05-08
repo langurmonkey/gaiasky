@@ -8,7 +8,7 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public class RotateTransform implements ITransform {
     /** Rotation axis. **/
@@ -20,7 +20,7 @@ public class RotateTransform implements ITransform {
         mat.rotate((float) axis[0], (float) axis[1], (float) axis[2], (float) angle);
     }
 
-    public void apply(Matrix4d mat) {
+    public void apply(Matrix4D mat) {
         mat.rotate(axis[0], axis[1], axis[2], angle);
     }
 

@@ -23,28 +23,28 @@ import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class GridRecUpdater extends AbstractUpdateSystem {
 
-    private final Vector3d D33, D34;
+    private final Vector3D D33, D34;
     private final Vector3 F31, F34;
     private final Vector3Q B31;
 
-    private final Matrix4d mat4;
+    private final Matrix4D mat4;
 
     public GridRecUpdater(Family family, int priority) {
         super(family, priority);
 
-        D33 = new Vector3d();
-        D34 = new Vector3d();
+        D33 = new Vector3D();
+        D34 = new Vector3D();
         F31 = new Vector3();
         F34 = new Vector3();
         B31 = new Vector3Q();
-        mat4 = new Matrix4d();
+        mat4 = new Matrix4D();
     }
 
     @Override
@@ -81,8 +81,8 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         // Compute projection lines to reference system.
         if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
             IFocus focus = camera.getFocus();
-            Vector3d cPos = D33;
-            Vector3d fPos = D34;
+            Vector3D cPos = D33;
+            Vector3D fPos = D34;
             getCFPos(cPos, fPos, camera, focus, transform);
 
             // Line in XZ
@@ -166,17 +166,17 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void getCFPos(Vector3d cPos, Vector3d fPos, ICamera camera, IFocus focus, RefSysTransform tr) {
-        Matrix4d inv = tr.matrix;
-        Matrix4d trf = inv != null ? mat4.set(inv).inv() : mat4.idt();
+    private void getCFPos(Vector3D cPos, Vector3D fPos, ICamera camera, IFocus focus, RefSysTransform tr) {
+        Matrix4D inv = tr.matrix;
+        Matrix4D trf = inv != null ? mat4.set(inv).inv() : mat4.idt();
         camera.getPos().put(cPos).mul(trf);
         Vector3Q v3b = new Vector3Q(fPos);
         focus.getPredictedPosition(v3b, GaiaSky.instance.time, camera, false).mul(trf);
         v3b.put(fPos).sub(cPos);
     }
 
-    private void getZXLine(Vector3d a, Vector3d b, Vector3d cPos, Vector3d fPos, RefSysTransform tr) {
-        Matrix4d inv = tr.matrix;
+    private void getZXLine(Vector3D a, Vector3D b, Vector3D cPos, Vector3D fPos, RefSysTransform tr) {
+        Matrix4D inv = tr.matrix;
         a.set(-cPos.x, -cPos.y, -cPos.z);
         b.set(fPos.x, -cPos.y, fPos.z);
         if (inv != null) {
@@ -186,8 +186,8 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         }
     }
 
-    private void getYLine(Vector3d a, Vector3d b, Vector3d cPos, Vector3d fPos, RefSysTransform tr) {
-        Matrix4d inv = tr.matrix;
+    private void getYLine(Vector3D a, Vector3D b, Vector3D cPos, Vector3D fPos, RefSysTransform tr) {
+        Matrix4D inv = tr.matrix;
         a.set(fPos.x, -cPos.y, fPos.z);
         b.set(fPos.x, fPos.y, fPos.z);
         if (inv != null) {

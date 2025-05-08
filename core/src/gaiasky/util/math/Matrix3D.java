@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import java.io.Serial;
 import java.io.Serializable;
 
-public class Matrix3d implements Serializable {
+public class Matrix3D implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 7907569533774959788L;
 	public static final int M00 = 0;
@@ -31,11 +31,11 @@ public class Matrix3d implements Serializable {
 		tmp[M22] = 1;
 	}
 
-	public Matrix3d() {
+	public Matrix3D() {
 		idt();
 	}
 
-	public Matrix3d(Matrix3d matrix) {
+	public Matrix3D(Matrix3D matrix) {
 		set(matrix);
 	}
 
@@ -43,13 +43,13 @@ public class Matrix3d implements Serializable {
 	 * @param values The double array to copy. Remember that this matrix is in
 	 *           <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> order. (The double array
 	 *           is not modified.) */
-	public Matrix3d(double[] values) {
+	public Matrix3D(double[] values) {
 		this.set(values);
 	}
 
 	/** Sets this matrix to the identity matrix
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d idt () {
+	public Matrix3D idt () {
 		double[] val = this.val;
 		val[M00] = 1;
 		val[M10] = 0;
@@ -71,7 +71,7 @@ public class Matrix3d implements Serializable {
 	 * 
 	 * @param m Matrix to multiply by.
 	 * @return This matrix for the purpose of chaining operations together. */
-	public Matrix3d mul (Matrix3d m) {
+	public Matrix3D mul (Matrix3D m) {
 		double[] val = this.val;
 
 		double v00 = val[M00] * m.val[M00] + val[M01] * m.val[M10] + val[M02] * m.val[M20];
@@ -107,7 +107,7 @@ public class Matrix3d implements Serializable {
 	 * 
 	 * @param m The other Matrix to multiply by
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d mulLeft (Matrix3d m) {
+	public Matrix3D mulLeft (Matrix3D m) {
 		double[] val = this.val;
 
 		double v00 = m.val[M00] * val[M00] + m.val[M01] * val[M10] + m.val[M02] * val[M20];
@@ -138,14 +138,14 @@ public class Matrix3d implements Serializable {
 	/** Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
 	 * @param degrees the angle in degrees.
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToRotation (double degrees) {
+	public Matrix3D setToRotation (double degrees) {
 		return setToRotationRad(MathUtils.degreesToRadians * degrees);
 	}
 
 	/** Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
 	 * @param radians the angle in radians.
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToRotationRad (double radians) {
+	public Matrix3D setToRotationRad (double radians) {
 		double cos = (double)Math.cos(radians);
 		double sin = (double)Math.sin(radians);
 		double[] val = this.val;
@@ -165,11 +165,11 @@ public class Matrix3d implements Serializable {
 		return this;
 	}
 
-	public Matrix3d setToRotation (Vector3d axis, double degrees) {
+	public Matrix3D setToRotation (Vector3D axis, double degrees) {
 		return setToRotation(axis, MathUtilsDouble.cosDeg(degrees), MathUtilsDouble.sinDeg(degrees));
 	}
 
-	public Matrix3d setToRotation (Vector3d axis, double cos, double sin) {
+	public Matrix3D setToRotation (Vector3D axis, double cos, double sin) {
 		double[] val = this.val;
 		double oc = 1.0f - cos;
 		val[M00] = oc * axis.x * axis.x + cos;
@@ -188,7 +188,7 @@ public class Matrix3d implements Serializable {
 	 * @param x the translation in x
 	 * @param y the translation in y
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToTranslation (double x, double y) {
+	public Matrix3D setToTranslation (double x, double y) {
 		double[] val = this.val;
 
 		val[M00] = 1;
@@ -209,7 +209,7 @@ public class Matrix3d implements Serializable {
 	/** Sets this matrix to a translation matrix.
 	 * @param translation The translation vector.
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToTranslation (Vector2 translation) {
+	public Matrix3D setToTranslation (Vector2 translation) {
 		double[] val = this.val;
 
 		val[M00] = 1;
@@ -232,7 +232,7 @@ public class Matrix3d implements Serializable {
 	 * @param scaleX the scale in x
 	 * @param scaleY the scale in y
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToScaling (double scaleX, double scaleY) {
+	public Matrix3D setToScaling (double scaleX, double scaleY) {
 		double[] val = this.val;
 		val[M00] = scaleX;
 		val[M10] = 0;
@@ -249,7 +249,7 @@ public class Matrix3d implements Serializable {
 	/** Sets this matrix to a scaling matrix.
 	 * @param scale The scale vector.
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToScaling (Vector2 scale) {
+	public Matrix3D setToScaling (Vector2 scale) {
 		double[] val = this.val;
 		val[M00] = scale.x;
 		val[M10] = 0;
@@ -280,7 +280,7 @@ public class Matrix3d implements Serializable {
 	/** Inverts this matrix given that the determinant is != 0.
 	 * @return This matrix for the purpose of chaining operations.
 	 * @throws GdxRuntimeException if the matrix is singular (not invertible) */
-	public Matrix3d inv () {
+	public Matrix3D inv () {
 		double det = det();
 		if (det == 0) throw new GdxRuntimeException("Can't invert a singular matrix");
 
@@ -313,7 +313,7 @@ public class Matrix3d implements Serializable {
 	/** Copies the values from the provided matrix to this matrix.
 	 * @param mat The matrix to copy.
 	 * @return This matrix for the purposes of chaining. */
-	public Matrix3d set (Matrix3d mat) {
+	public Matrix3D set (Matrix3D mat) {
 		System.arraycopy(mat.val, 0, val, 0, val.length);
 		return this;
 	}
@@ -321,7 +321,7 @@ public class Matrix3d implements Serializable {
 	/** Copies the values from the provided affine matrix to this matrix. The last row is set to (0, 0, 1).
 	 * @param affine The affine matrix to copy.
 	 * @return This matrix for the purposes of chaining. */
-	public Matrix3d set (Affine2 affine) {
+	public Matrix3D set (Affine2 affine) {
 		double[] val = this.val;
 
 		val[M00] = affine.m00;
@@ -340,7 +340,7 @@ public class Matrix3d implements Serializable {
 	/** Sets this 3x3 matrix to the top left 3x3 corner of the provided 4x4 matrix.
 	 * @param mat The matrix whose top left corner will be copied. This matrix will not be modified.
 	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d set (Matrix4 mat) {
+	public Matrix3D set (Matrix4 mat) {
 		double[] val = this.val;
 		val[M00] = mat.val[Matrix4.M00];
 		val[M10] = mat.val[Matrix4.M10];
@@ -360,7 +360,7 @@ public class Matrix3d implements Serializable {
 	 * @param values The matrix, in double form, that is to be copied. Remember that this matrix is in
 	 *           <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> order.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix3d set (double[] values) {
+	public Matrix3D set (double[] values) {
 		System.arraycopy(values, 0, val, 0, val.length);
 		return this;
 	}
@@ -368,7 +368,7 @@ public class Matrix3d implements Serializable {
 	/** Adds a translational component to the matrix in the 3rd column. The other columns are untouched.
 	 * @param vector The translation vector.
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d trn (Vector2 vector) {
+	public Matrix3D trn (Vector2 vector) {
 		val[M02] += vector.x;
 		val[M12] += vector.y;
 		return this;
@@ -378,7 +378,7 @@ public class Matrix3d implements Serializable {
 	 * @param x The x-component of the translation vector.
 	 * @param y The y-component of the translation vector.
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d trn (double x, double y) {
+	public Matrix3D trn (double x, double y) {
 		val[M02] += x;
 		val[M12] += y;
 		return this;
@@ -387,7 +387,7 @@ public class Matrix3d implements Serializable {
 	/** Adds a translational component to the matrix in the 3rd column. The other columns are untouched.
 	 * @param vector The translation vector. (The z-component of the vector is ignored because this is a 3x3 matrix)
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d trn (Vector3 vector) {
+	public Matrix3D trn (Vector3 vector) {
 		val[M02] += vector.x;
 		val[M12] += vector.y;
 		return this;
@@ -398,7 +398,7 @@ public class Matrix3d implements Serializable {
 	 * @param x The x-component of the translation vector.
 	 * @param y The y-component of the translation vector.
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d translate (double x, double y) {
+	public Matrix3D translate (double x, double y) {
 		double[] tmp = this.tmp;
 		tmp[M00] = 1;
 		tmp[M10] = 0;
@@ -419,7 +419,7 @@ public class Matrix3d implements Serializable {
 	 * glTranslate/glRotate/glScale.
 	 * @param translation The translation vector.
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d translate (Vector2 translation) {
+	public Matrix3D translate (Vector2 translation) {
 		double[] tmp = this.tmp;
 		tmp[M00] = 1;
 		tmp[M10] = 0;
@@ -440,7 +440,7 @@ public class Matrix3d implements Serializable {
 	 * glTranslate/glRotate/glScale.
 	 * @param degrees The angle in degrees
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d rotate (double degrees) {
+	public Matrix3D rotate (double degrees) {
 		return rotateRad(MathUtils.degreesToRadians * degrees);
 	}
 
@@ -448,7 +448,7 @@ public class Matrix3d implements Serializable {
 	 * glTranslate/glRotate/glScale.
 	 * @param radians The angle in radians
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d rotateRad (double radians) {
+	public Matrix3D rotateRad (double radians) {
 		if (radians == 0) return this;
 		double cos = (double)Math.cos(radians);
 		double sin = (double)Math.sin(radians);
@@ -475,7 +475,7 @@ public class Matrix3d implements Serializable {
 	 * @param scaleX The scale in the x-axis.
 	 * @param scaleY The scale in the y-axis.
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d scale (double scaleX, double scaleY) {
+	public Matrix3D scale (double scaleX, double scaleY) {
 		double[] tmp = this.tmp;
 		tmp[M00] = scaleX;
 		tmp[M10] = 0;
@@ -497,7 +497,7 @@ public class Matrix3d implements Serializable {
 	 * glTranslate/glRotate/glScale.
 	 * @param scale The vector to scale the matrix by.
 	 * @return This matrix for the purpose of chaining. */
-	public Matrix3d scale (Vector2 scale) {
+	public Matrix3D scale (Vector2 scale) {
 		double[] tmp = this.tmp;
 		tmp[M00] = scale.x;
 		tmp[M10] = 0;
@@ -521,7 +521,7 @@ public class Matrix3d implements Serializable {
 		return val;
 	}
 
-	public Vector2d getTranslation (Vector2d position) {
+	public Vector2D getTranslation (Vector2D position) {
 		position.x = val[M02];
 		position.y = val[M12];
 		return position;
@@ -529,7 +529,7 @@ public class Matrix3d implements Serializable {
 
 	/** @param scale The vector which will receive the (non-negative) scale components on each axis.
 	 * @return The provided vector for chaining. */
-	public Vector2d getScale (Vector2d scale) {
+	public Vector2D getScale (Vector2D scale) {
 		double[] val = this.val;
 		scale.x = (double)Math.sqrt(val[M00] * val[M00] + val[M01] * val[M01]);
 		scale.y = (double)Math.sqrt(val[M10] * val[M10] + val[M11] * val[M11]);
@@ -547,7 +547,7 @@ public class Matrix3d implements Serializable {
 	/** Scale the matrix in the both the x and y components by the scalar value.
 	 * @param scale The single value that will be used to scale both the x and y components.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix3d scl (double scale) {
+	public Matrix3D scl (double scale) {
 		val[M00] *= scale;
 		val[M11] *= scale;
 		return this;
@@ -556,7 +556,7 @@ public class Matrix3d implements Serializable {
 	/** Scale this matrix using the x and y components of the vector but leave the rest of the matrix alone.
 	 * @param scale The {@link Vector3} to use to scale this matrix.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix3d scl (Vector2 scale) {
+	public Matrix3D scl (Vector2 scale) {
 		val[M00] *= scale.x;
 		val[M11] *= scale.y;
 		return this;
@@ -565,7 +565,7 @@ public class Matrix3d implements Serializable {
 	/** Scale this matrix using the x and y components of the vector but leave the rest of the matrix alone.
 	 * @param scale The {@link Vector3} to use to scale this matrix. The z component will be ignored.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix3d scl (Vector3 scale) {
+	public Matrix3D scl (Vector3 scale) {
 		val[M00] *= scale.x;
 		val[M11] *= scale.y;
 		return this;
@@ -573,7 +573,7 @@ public class Matrix3d implements Serializable {
 
 	/** Transposes the current matrix.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix3d transpose () {
+	public Matrix3D transpose () {
 		// Where MXY you do not have to change MXX
 		double[] val = this.val;
 		double v01 = val[M10];

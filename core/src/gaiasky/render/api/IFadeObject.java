@@ -7,7 +7,7 @@
 
 package gaiasky.render.api;
 
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 
 public interface IFadeObject {
     /**
@@ -15,7 +15,7 @@ public interface IFadeObject {
      *
      * @return The fade in distances in internal units.
      */
-    public Vector2d getFadeIn();
+    public Vector2D getFadeIn();
 
     /**
      * Sets the near and far fade in distances.
@@ -30,7 +30,7 @@ public interface IFadeObject {
      *
      * @return The fade out distances in internal units.
      */
-    public Vector2d getFadeOut();
+    public Vector2D getFadeOut();
 
     /**
      * Sets the near and far fade out distances.

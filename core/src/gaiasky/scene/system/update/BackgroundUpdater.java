@@ -18,7 +18,7 @@ import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public class BackgroundUpdater extends AbstractUpdateSystem {
 
@@ -55,7 +55,7 @@ public class BackgroundUpdater extends AbstractUpdateSystem {
             Class<Coordinates> c = Coordinates.class;
             try {
                 Method m = ClassReflection.getMethod(c, transformName);
-                Matrix4d trf = (Matrix4d) m.invoke(null);
+                Matrix4D trf = (Matrix4D) m.invoke(null);
                 Matrix4 aux = trf.putIn(new Matrix4());
                 localTransform.mul(aux);
             } catch (ReflectionException e) {

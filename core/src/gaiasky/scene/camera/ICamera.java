@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public interface ICamera {
@@ -57,41 +57,41 @@ public interface ICamera {
 
     Vector3Q getPos();
 
-    void setPos(Vector3d pos);
+    void setPos(Vector3D pos);
 
     void setPos(Vector3Q pos);
 
     Vector3Q getPreviousPos();
 
-    void setPreviousPos(Vector3d pos);
+    void setPreviousPos(Vector3D pos);
 
     void setPreviousPos(Vector3Q pos);
 
     Vector3Q getDPos();
 
-    void setDPos(Vector3d dPos);
+    void setDPos(Vector3D dPos);
 
     void setDPos(Vector3Q dPos);
 
     Vector3Q getInversePos();
 
-    Vector3d getDirection();
+    Vector3D getDirection();
 
-    void setDirection(Vector3d dir);
+    void setDirection(Vector3D dir);
 
-    Vector3d getVelocity();
+    Vector3D getVelocity();
 
-    Vector3d getUp();
+    Vector3D getUp();
 
-    Vector3d[] getDirections();
+    Vector3D[] getDirections();
 
     int getNCameras();
 
     double speedScaling();
 
-    Vector3d getShift();
+    Vector3D getShift();
 
-    void setShift(Vector3d shift);
+    void setShift(Vector3D shift);
 
     Matrix4 getProjView();
 
@@ -187,7 +187,7 @@ public interface ICamera {
 
     boolean isVisible(Entity cb);
 
-    boolean isVisible(double viewAngle, Vector3d pos, double distToCamera);
+    boolean isVisible(double viewAngle, Vector3D pos, double distToCamera);
 
     void resize(int width, int height);
 

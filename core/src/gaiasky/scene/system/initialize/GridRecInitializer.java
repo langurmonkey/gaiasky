@@ -28,9 +28,9 @@ import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,14 +70,14 @@ public class GridRecInitializer extends AbstractInitSystem {
         body.color = Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? gr.ccGal : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? gr.ccEcl : gr.ccEq);
         body.labelColor = body.color;
 
-        gr.p01 = new Vector3d();
-        gr.p02 = new Vector3d();
+        gr.p01 = new Vector3D();
+        gr.p02 = new Vector3D();
         gr.d01 = -1;
         gr.d02 = -1;
-        gr.a = new Vector3d();
-        gr.b = new Vector3d();
-        gr.c = new Vector3d();
-        gr.d = new Vector3d();
+        gr.a = new Vector3D();
+        gr.b = new Vector3D();
+        gr.c = new Vector3D();
+        gr.d = new Vector3D();
 
         // Init billboard model
         model.renderConsumer = ModelEntityRenderSystem::renderRecursiveGridModel;
@@ -195,7 +195,7 @@ public class GridRecInitializer extends AbstractInitSystem {
         if (Settings.settings.runtime.openXr) {
             var fade = Mapper.fade.get(entity);
             fade.setFadeOut(new double[] { 5e6, 50e6 });
-            fade.fadeOutMap = new Vector2d(1, 0);
+            fade.fadeOutMap = new Vector2D(1, 0);
         }
 
     }

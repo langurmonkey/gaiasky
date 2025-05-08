@@ -15,16 +15,16 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 
 public class ConstellationUpdater extends AbstractUpdateSystem {
-    private final Vector3d D31;
+    private final Vector3D D31;
 
     public ConstellationUpdater(Family family, int priority) {
         super(family, priority);
 
-        D31 = new Vector3d();
+        D31 = new Vector3D();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ConstellationUpdater extends AbstractUpdateSystem {
         var label = Mapper.label.get(entity);
 
         constel.posd.setZero();
-        Vector3d p = D31;
+        Vector3D p = D31;
         int nStars = 0;
         for (IPosition[] line : constel.lines) {
             if (line != null) {
