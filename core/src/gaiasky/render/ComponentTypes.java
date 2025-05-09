@@ -7,17 +7,16 @@
 
 package gaiasky.render;
 
+import gaiasky.util.Bits;
 import gaiasky.util.i18n.I18n;
 
 import java.io.Serial;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 
-public class ComponentTypes extends BitSet {
+public class ComponentTypes extends Bits {
     public static final int CT_SIZE = 32;
-    @Serial private static final long serialVersionUID = 1L;
 
     public ComponentTypes() {
         super(CT_SIZE);
@@ -45,16 +44,15 @@ public class ComponentTypes extends BitSet {
     }
 
     /**
-     * Checks if all the t bits in this bit set are also set in the other.
+     * Checks if all the bits in this bit set are also set in the other.
      *
-     * @param other The bit set to check against
+     * @param other The bit set to check against.
      *
      * @return True if all the bits set to true in this bit set are also true in
-     * the other. Returns false otherwise
+     * the other. Returns false otherwise.
      */
     public boolean allSetLike(ComponentTypes other) {
-        long thisVal = this.toLongArray()[0];
-        return (thisVal & other.toLongArray()[0]) == thisVal;
+        return other.containsAll(this);
     }
 
     /**

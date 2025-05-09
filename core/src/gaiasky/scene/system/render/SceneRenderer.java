@@ -560,11 +560,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
-     * Checks if the component types are all on
+     * Checks if the component types are all on.
      *
-     * @param comp The components
+     * @param comp The components.
      *
-     * @return Whether the components are all on
+     * @return Whether the components are all on.
      */
     public boolean allOn(ComponentTypes comp) {
         boolean allOn = comp.isEmpty() || comp.allSetLike(visible);
