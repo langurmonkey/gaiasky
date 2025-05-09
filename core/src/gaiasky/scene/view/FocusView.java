@@ -286,7 +286,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public boolean isVisible(String name) {
         var set = getSet();
         if (set != null && set.index.containsKey(name)) {
-            return set.isVisible(set.index.get(name, -1));
+            return set.isVisible(set.index.get(name));
         } else {
             return isVisible();
         }
