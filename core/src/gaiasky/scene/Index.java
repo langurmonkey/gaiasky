@@ -21,10 +21,8 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -42,7 +40,7 @@ public class Index {
      **/
     protected final IntMap<IPosition> hipMap;
 
-    /** The archetypes container. **/
+    /** The archetypes' container. **/
     protected Archetypes archetypes;
 
     /**
