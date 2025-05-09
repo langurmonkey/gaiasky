@@ -1310,11 +1310,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The speed scaling.
      */
     public double speedScaling(double min) {
-        var proximityNull = proximity.effective[0] == null;
+        var focusDistance = getMode().isFocus() ? focus.getDistToCamera() : Double.MAX_VALUE;
         var closestBodyDistance = getClosestBodyDistance();
         var closestStarDistance = getClosestStarDistance();
 
-        final double dist = FastMath.min(closestBodyDistance, closestStarDistance);
+        final double dist = FastMath.min(focusDistance, FastMath.min(closestBodyDistance, closestStarDistance));
 
         final double distanceMap;
         if (dist < DIST_A) {
@@ -1839,7 +1839,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         // Mark closest object in BLUE
         if (Settings.settings.scene.crosshair.closest && closest != null) {
-            drawCrossHair(spriteBatch, closest, decal, false, spriteClosest, crosshairArrow, chScale, rw, rh, 0.3f, 0.5f, 1f, 1f);
+            drawCrossHair(spriteBatch, closest, decal, false, spriteClosest, crosshairArrow, chScale, rw, rh, 0.3f, 0.5f, 1f, 0.6f);
         }
 
         // Mark the focus in GREEN

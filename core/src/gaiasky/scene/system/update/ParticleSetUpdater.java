@@ -129,9 +129,9 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
         if (set.indices != null && set.indices.length > 0 && set.pointData != null) {
             updateParticleSet(camera, set);
 
-            // Update close stars
+            // Update close stars in camera proximity.
             int j = 0;
-            for (int i = 0; i < FastMath.min(set.proximity.updating.length, set.pointData.size()); i++) {
+            for (int i = 0; i < FastMath.min(set.proximity.updating.length, set.indices.length); i++) {
                 if (set.indices[i] >= 0
                         && utils.filter(set.indices[i], set, datasetDesc)
                         && set.isVisible(set.indices[i])) {

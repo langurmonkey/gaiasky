@@ -186,6 +186,8 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 for (int i = n; i < totalCount; i++) {
                     buffer.add(i, metadata[i]);
                 }
+                // Sort it.
+                buffer.sort();
 
                 // Now move top indices to array.
                 int[] topIndices = this.buffer.indexArray();
