@@ -540,7 +540,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         }
                         focus = focusBak;
 
-                        double dist = aux4b.dstDouble(pos);
+                        double dist = aux4b.dstD(pos);
                         if (dist < focus.getRadius()) {
                             // aux2 <- focus-cam with a length of radius
                             aux2b.set(pos).sub(aux4b).nor().scl(focus.getRadius());
@@ -658,8 +658,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public void updatePerspectiveCamera() {
         camera.position.set(0f, 0f, 0f);
-        camera.direction.set(direction.valuesf());
-        camera.up.set(up.valuesf());
+        camera.direction.set(direction.valuesF());
+        camera.up.set(up.valuesF());
         camera.update();
 
         posInv.set(pos).scl(-1);
@@ -1700,7 +1700,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (focus.isValid() && !Mapper.hip.has(focus.getEntity()) && focus.getSet() == null) {
             // Move camera if too close to focus.
             this.focus.getAbsolutePosition(aux1b);
-            if (pos.dstDouble(aux1b, aux2b) < this.focus.getRadius()) {
+            if (pos.dstD(aux1b, aux2b) < this.focus.getRadius()) {
                 // Position camera near focus.
                 stopTotalMovement();
 

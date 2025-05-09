@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.TextureArray;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import gaiasky.GaiaSky;
@@ -227,12 +228,12 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Particles for which forceLabel is enabled.
      **/
-    public Set<Integer> forceLabel;
+    public IntSet forceLabel;
 
     /**
      * Particles with special label colors.
      **/
-    public Map<Integer, float[]> labelColors;
+    public IntMap<float[]> labelColors;
 
     /**
      * Stores the time when the last sort operation finished, in seconds.

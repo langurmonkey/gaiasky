@@ -300,7 +300,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                 .sub(camPos);
                     }
                     em.post(Event.CAMERA_DIR_CMD, this, (Object) dir.nor()
-                            .valuesd());
+                            .valuesD());
                 });
                 // Make sure the last action is flushed
                 sleepFrames(2);
@@ -1953,10 +1953,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     .add(c);
 
 
-            cameraTransition(pos.valuesd(),
+            cameraTransition(pos.valuesD(),
                              "internal",
-                             dir.valuesd(),
-                             up.valuesd(),
+                             dir.valuesD(),
+                             up.valuesD(),
                              positionDurationSeconds,
                              "logisticsigmoid",
                              60.0,

@@ -350,7 +350,9 @@ public class LabelEntityRenderSystem {
                     renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
                 }
             }
-            for (Integer i : set.forceLabel) {
+            var it = set.forceLabel.iterator();
+            while(it.hasNext) {
+                var i = it.next();
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     renderStarLabel(view, set, i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
                 }
@@ -438,7 +440,7 @@ public class LabelEntityRenderSystem {
         // Horizon line.
         for (float angle = 0; angle < 360; angle += stepAngle) {
             F31.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0f, distToCamera, D31)
-                            .valuesf())
+                            .valuesF())
                     .mul(grid.annotTransform);
             effectsPos(F31, camera);
             if (F31.dot(camera.getCamera().direction.nor()) > 0) {
@@ -453,7 +455,7 @@ public class LabelEntityRenderSystem {
         for (float angle = -90; angle <= 90; angle += stepAngle) {
             if (angle != 0) {
                 F31.set(Coordinates.sphericalToCartesian(0, FastMath.toRadians(angle), distToCamera, D31)
-                                .valuesf())
+                                .valuesF())
                         .mul(grid.annotTransform);
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {
@@ -463,7 +465,7 @@ public class LabelEntityRenderSystem {
                                   view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
                 }
                 F31.set(Coordinates.sphericalToCartesian(0, FastMath.toRadians(-angle), -distToCamera, D31)
-                                .valuesf())
+                                .valuesF())
                         .mul(grid.annotTransform);
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {

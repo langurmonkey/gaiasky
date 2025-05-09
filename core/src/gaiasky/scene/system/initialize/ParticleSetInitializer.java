@@ -12,6 +12,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
@@ -159,8 +160,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         }
 
         // Maps.
-        set.forceLabel = new HashSet<>();
-        set.labelColors = new HashMap<>();
+        set.forceLabel = new IntSet();
+        set.labelColors = new IntMap<>();
 
         // Labels.
         label.label = true;

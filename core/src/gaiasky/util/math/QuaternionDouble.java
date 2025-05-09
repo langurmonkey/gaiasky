@@ -223,9 +223,9 @@ public class QuaternionDouble implements Serializable {
     /**
      * Sets the quaternion to the given euler angles in radians.
      *
-     * @param yaw   the rotation around the y axis in radians
-     * @param pitch the rotation around the x axis in radians
-     * @param roll  the rotation around the z axis in radians
+     * @param yaw   the rotation around the Y axis in radians
+     * @param pitch the rotation around the X axis in radians
+     * @param roll  the rotation around the Z axis in radians
      *
      * @return this quaternion
      */
@@ -685,7 +685,7 @@ public class QuaternionDouble implements Serializable {
      * </p>
      *
      * <p>
-     * Taken from Bones framework for JPCT, see http://www.aptalkarga.com/bones/ which in turn took it from Graphics Gem
+     * Taken from Bones framework for JPCT, see <a href="http://www.aptalkarga.com/bones/">this site</a>, which in turn took it from Graphics Gem.
      * code at
      * ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z.
      * </p>
@@ -823,9 +823,8 @@ public class QuaternionDouble implements Serializable {
      * </p>
      *
      * <p>
-     * Taken from Bones framework for JPCT, see http://www.aptalkarga.com/bones/ which in turn took it from Graphics Gem
-     * code at
-     * ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z.
+     * Taken from Bones framework for JPCT, see <a href="http://www.aptalkarga.com/bones/">this site</a>, which in turn took it from Graphics Gem.
+     * Code at ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z.
      * </p>
      *
      * @param normalizeAxes whether to normalize the axes (necessary when they contain scaling)
@@ -1077,10 +1076,9 @@ public class QuaternionDouble implements Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof QuaternionDouble)) {
+        if (!(obj instanceof QuaternionDouble other)) {
             return false;
         }
-        QuaternionDouble other = (QuaternionDouble) obj;
         return (NumberUtils.floatToRawIntBits((float) w) == NumberUtils.floatToRawIntBits((float) other.w)) && (NumberUtils.floatToRawIntBits((float) x)
                 == NumberUtils.floatToRawIntBits((float) other.x)) && (NumberUtils.floatToRawIntBits((float) y) == NumberUtils.floatToRawIntBits((float) other.y)) && (
                 NumberUtils.floatToRawIntBits((float) z) == NumberUtils.floatToRawIntBits((float) other.z));

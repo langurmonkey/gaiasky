@@ -7,16 +7,16 @@
 
 package gaiasky.util.coord;
 
+
+import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Constants;
-import gaiasky.util.LruCache;
+import gaiasky.util.LruCacheLong;
 import gaiasky.util.Nature;
 import gaiasky.util.Pair;
 import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.time.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Astronomical utilities. Contains functions to convert Julian dates, reference systems, and more.
@@ -59,9 +59,10 @@ public class AstroUtils {
     public static final long J2000_MS;
 
     /**
-     * Julian date cache, since most dates are used more than once.
+     * Julian date cache, since most dates are used more than once. We use an LRU so that the least recently
+     * used Julian date is moved out of the cache on insertion.
      **/
-    private static final LruCache<Long, Double> julianDateCache = new LruCache<>(50);
+    private static final LruCacheLong<Double> julianDateCache = new LruCacheLong<>(10);
     /**
      * Initialize nsl Sun
      **/
@@ -480,9 +481,9 @@ public class AstroUtils {
     public static String getSpectralType(final float tEff) {
         initSpectralTypeTable();
 
-        int n = spTypeTable.size();
+        int n = spectralTypes.size;
         for (int i = n - 1; i >= 0; i--) {
-            var p = spTypeTable.get(i);
+            var p = spectralTypes.get(i);
             if (tEff <= p.getFirst()) {
                 return p.getSecond();
             }
@@ -490,15 +491,15 @@ public class AstroUtils {
         return null;
     }
 
-    private static List<Pair<Float, String>> spTypeTable;
+    private static Array<Pair<Float, String>> spectralTypes;
 
     /**
      * Initializes the spectral type table for main sequence stars.
      * More info: <a href="https://sites.uni.edu/morgans/astro/course/Notes/section2/spectraltemps.html">see here</a>.
      */
     private static void initSpectralTypeTable() {
-        if (spTypeTable == null) {
-            spTypeTable = new ArrayList<>();
+        if (spectralTypes == null) {
+            spectralTypes = new Array<>();
             addToSpTable(54000f, "O5");
             addToSpTable(45000f, "O6");
             addToSpTable(43300f, "O7");
@@ -559,8 +560,8 @@ public class AstroUtils {
     }
 
     private static void addToSpTable(float tEff, String spType) {
-        if (spTypeTable != null) {
-            spTypeTable.add(new Pair<>(tEff, spType));
+        if (spectralTypes != null) {
+            spectralTypes.add(new Pair<>(tEff, spType));
         }
     }
 

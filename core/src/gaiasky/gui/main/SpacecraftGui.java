@@ -539,7 +539,7 @@ public class SpacecraftGui extends AbstractGui {
         // VELOCITY INDICATORS IN NAVBALL
         if (!vel.isZero()) {
             // velocity
-            aux3f1.set(vel.valuesf()).nor().scl(0.864f);
+            aux3f1.set(vel.valuesF()).nor().scl(0.864f);
             aux3f1.mul(qf);
             aux3f1.add(0, 0, 6.3f);
             aiVelDec.setPosition(aux3f1);
@@ -547,7 +547,7 @@ public class SpacecraftGui extends AbstractGui {
             aiVelDec.lookAt(aiCam.position, aiCam.up);
 
             // anti-velocity
-            aux3f2.set(vel.valuesf()).nor().scl(-0.864f);
+            aux3f2.set(vel.valuesF()).nor().scl(-0.864f);
             aux3f2.mul(qf);
             aux3f2.add(0, 0, 6.3f);
             aiAntivelDec.setPosition(aux3f2);

@@ -89,7 +89,7 @@ public class FocusHit {
 
             Vector3 pos = F31;
             Vector3D posDouble = EntityUtils.getAbsolutePosition(entity, D31).add(camera.getInversePos());
-            pos.set(posDouble.valuesf());
+            pos.set(posDouble.valuesF());
 
             if (camera.direction.dot(posDouble) > 0) {
                 // The object is in front of us, roughly.
@@ -180,7 +180,7 @@ public class FocusHit {
 
                 // aux1d contains the position of the body in the camera ref sys
                 aux1d.set(graph.translation);
-                auxf.set(aux1d.valuesf());
+                auxf.set(aux1d.valuesF());
 
                 if (camera.direction.dot(aux1d) > 0) {
                     // The object is in front of us
@@ -272,7 +272,7 @@ public class FocusHit {
                     IParticleRecord pb = pointData.get(i);
                     Vector3 posFloat = F31;
                     Vector3D pos = set.fetchPositionDouble(pb, camera.getPos(), D31, set.getDeltaYears());
-                    posFloat.set(pos.valuesf());
+                    posFloat.set(pos.valuesF());
 
                     if (camera.direction.dot(pos) > 0) {
                         // The particle is in front of us
@@ -412,7 +412,7 @@ public class FocusHit {
 
             Vector3 pos = F31;
             Vector3Q posb = EntityUtils.getAbsolutePosition(entity, B31).add(camera.posInv);
-            pos.set(posb.valuesf());
+            pos.set(posb.valuesF());
 
             if (camera.direction.dot(posb) > 0) {
                 // The star is in front of us

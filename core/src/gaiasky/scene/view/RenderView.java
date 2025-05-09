@@ -70,7 +70,7 @@ public class RenderView extends BaseView implements IRenderable {
     /** Text color for the star with the given name in a star set. **/
     public float[] textColour(String name) {
         assert starSet != null : "Called the wrong method!";
-        name = name.toLowerCase(Locale.ROOT).trim();
+        name = name.toLowerCase().trim();
         if (starSet.index.containsKey(name)) {
             int idx = starSet.index.get(name, -1);
             if (starSet.labelColors.containsKey(idx)) {

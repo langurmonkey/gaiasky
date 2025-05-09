@@ -80,37 +80,11 @@ public class Vector3D implements VectorDouble<Vector3D> {
         return FastMath.sqrt(x * x + y * y + z * z);
     }
 
-    /** @return The squared euclidean length */
-    public static double len2(final double x,
-                              final double y,
-                              final double z) {
+    /** @return The squared Euclidean length */
+    private static double len2(final double x,
+                               final double y,
+                               final double z) {
         return x * x + y * y + z * z;
-    }
-
-    /** @return The euclidean distance between the two specified vectors */
-    public static double dst(final double x1,
-                             final double y1,
-                             final double z1,
-                             final double x2,
-                             final double y2,
-                             final double z2) {
-        final double a = x2 - x1;
-        final double b = y2 - y1;
-        final double c = z2 - z1;
-        return FastMath.sqrt(a * a + b * b + c * c);
-    }
-
-    /** @return the squared distance between the given points */
-    public static double dst2(final double x1,
-                              final double y1,
-                              final double z1,
-                              final double x2,
-                              final double y2,
-                              final double z2) {
-        final double a = x2 - x1;
-        final double b = y2 - y1;
-        final double c = z2 - z1;
-        return a * a + b * b + c * c;
     }
 
     /** @return The dot product between the two vectors */
@@ -125,7 +99,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
 
     /**
      * Calculates the outer product of two given vectors <code>v</code> and
-     * <code>w</code> and returns the result as a new <code>GVector3d</code>.
+     * <code>w</code> and returns the result as a new {@link Vector3D}GVector3d</code>.
      *
      * @param v left operand
      * @param w right operand
@@ -607,24 +581,34 @@ public class Vector3D implements VectorDouble<Vector3D> {
                 x * l_mat[Matrix4D.M01] + y * l_mat[Matrix4D.M11] + z * l_mat[Matrix4D.M21] + l_mat[Matrix4D.M31],
                 x * l_mat[Matrix4D.M02] + y * l_mat[Matrix4D.M12] + z * l_mat[Matrix4D.M22] + l_mat[Matrix4D.M32]);
     }
-    /** Left-multiplies the vector by the given matrix.
+
+    /**
+     * Left-multiplies the vector by the given matrix.
+     *
      * @param matrix The matrix
-     * @return This vector for chaining */
-    public Vector3D mul (Matrix3D matrix) {
+     *               public Vector3D mul (Matrix3D matrix) {
+     *
+     * @return This vector for chaining
+     */
+    public Vector3D mul(Matrix3D matrix) {
         final double[] l_mat = matrix.val;
         return set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M01] + z * l_mat[Matrix3.M02],
-                x * l_mat[Matrix3.M10] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M12],
-                x * l_mat[Matrix3.M20] + y * l_mat[Matrix3.M21] + z * l_mat[Matrix3.M22]);
+                   x * l_mat[Matrix3.M10] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M12],
+                   x * l_mat[Matrix3.M20] + y * l_mat[Matrix3.M21] + z * l_mat[Matrix3.M22]);
     }
 
-    /** Multiplies the vector by the transpose of the given matrix.
+    /**
+     * Multiplies the vector by the transpose of the given matrix.
+     *
      * @param matrix The matrix
-     * @return This vector for chaining */
-    public Vector3D traMul (Matrix3D matrix) {
+     *
+     * @return This vector for chaining
+     */
+    public Vector3D traMul(Matrix3D matrix) {
         final double[] l_mat = matrix.val;
         return set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M10] + z * l_mat[Matrix3.M20],
-                x * l_mat[Matrix3.M01] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M21],
-                x * l_mat[Matrix3.M02] + y * l_mat[Matrix3.M12] + z * l_mat[Matrix3.M22]);
+                   x * l_mat[Matrix3.M01] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M21],
+                   x * l_mat[Matrix3.M02] + y * l_mat[Matrix3.M12] + z * l_mat[Matrix3.M22]);
     }
 
     /**
@@ -950,14 +934,14 @@ public class Vector3D implements VectorDouble<Vector3D> {
     }
 
     public double[] values() {
-        return new double[] { x, y, z };
+        return new double[]{x, y, z};
     }
 
-    public float[] valuesf() {
-        return new float[] { (float) x, (float) y, (float) z };
+    public float[] valuesF() {
+        return new float[]{(float) x, (float) y, (float) z};
     }
 
-    public float[] valuesf(float[] vec) {
+    public float[] valuesF(float[] vec) {
         vec[0] = (float) x;
         vec[1] = (float) y;
         vec[2] = (float) z;
@@ -1053,7 +1037,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Vector3 other = (Vector3) obj;
+        Vector3D other = (Vector3D) obj;
         if (NumberUtils.doubleToLongBits(x) != NumberUtils.doubleToLongBits(other.x))
             return false;
         if (NumberUtils.doubleToLongBits(y) != NumberUtils.doubleToLongBits(other.y))
@@ -1149,7 +1133,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      * Converts the current direction cosines to spherical coordinates.
      *
      * @return Longitude [0, 2*Pi] and latitude [-Pi/2, Pi/2] corresponding to
-     *         the current direction cosine as a {@link Vector2D}
+     * the current direction cosine as a {@link Vector2D}
      */
     public Vector2D toSphericalCoordinates() {
         final double xy = FastMath.sqrt((this.x * this.x) + (this.y * this.y));

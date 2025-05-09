@@ -300,7 +300,7 @@ public class KeyframesView extends BaseView {
         Vector3D aux = D31;
         for (Keyframe keyframe : kf.keyframes) {
             Vector3D posd = aux.set(keyframe.pos).add(camera.getInversePos());
-            pos.set(posd.valuesf());
+            pos.set(posd.valuesF());
 
             if (camera.direction.dot(posd) > 0) {
                 // The object is in front of us

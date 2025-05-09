@@ -89,7 +89,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             goToLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.CAMERA_MODE_CMD, goToLoc, CameraManager.CameraMode.FREE_MODE);
-                    EventManager.publish(Event.CAMERA_POS_CMD, goToLoc, lr.position.valuesd());
+                    EventManager.publish(Event.CAMERA_POS_CMD, goToLoc, lr.position.valuesD());
                     EventManager.publish(Event.CAMERA_DIR_CMD, goToLoc, lr.direction.values());
                     EventManager.publish(Event.CAMERA_UP_CMD, goToLoc, lr.up.values());
                     EventManager.publish(Event.TIME_CHANGE_CMD, goToLoc, lr.simulationTime);
