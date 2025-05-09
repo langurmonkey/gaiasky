@@ -377,7 +377,7 @@ public class LabelEntityRenderSystem {
         var visibleCamera = camera.isVisible(solidAngle, starPosition.put(D32), distToCamera);
         if (visibleCamera && (forceLabel || solidAngle > thresholdLabel)) {
             Vector3d labelPosition = D32.set(starPosition);
-            textPosition(camera, labelPosition, distToCamera, solidAngle, radius);
+            textPosition(camera, labelPosition, distToCamera, solidAngle / 100f, radius);
 
             shader.setUniformf("u_viewAngle", solidAngle);
             shader.setUniformf("u_viewAnglePow", 1f);
