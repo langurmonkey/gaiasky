@@ -11,9 +11,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import net.jafama.FastMath;
 
-import gaiasky.util.math.Quadruple;
-import java.math.MathContext;
-
 /**
  * Random constants holder.
  */
