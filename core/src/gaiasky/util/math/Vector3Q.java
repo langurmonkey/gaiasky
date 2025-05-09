@@ -57,9 +57,9 @@ public class Vector3Q {
      * @param z The z-component
      */
     public Vector3Q(double x, double y, double z) {
-        this.x = Quadruple.valueOf(x);
-        this.y = Quadruple.valueOf(y);
-        this.z = Quadruple.valueOf(z);
+        this.x = new Quadruple(x);
+        this.y = new Quadruple(y);
+        this.z = new Quadruple(z);
     }
 
     public Vector3Q(Vector3D vec) {
@@ -90,14 +90,9 @@ public class Vector3Q {
         return FastMath.sqrt(x * x + y * y + z * z);
     }
 
-    /** @return The squared Euclidean length */
-    public static double len2(final double x, final double y, final double z) {
-        return x * x + y * y + z * z;
-    }
-
     /**
      * Calculates the outer product of two given vectors <code>v</code> and
-     * <code>w</code> and returns the result as a new <code>GVector3d</code>.
+     * <code>w</code> and returns the result as a new {@link Vector3Q}.
      *
      * @param v left operand
      * @param w right operand
@@ -106,8 +101,7 @@ public class Vector3Q {
      */
     static public Vector3Q crs(final Vector3Q v, final Vector3Q w) {
         final Vector3Q res = new Vector3Q(v);
-
-        return res.cpy().crs(w);
+        return res.crs(w);
     }
 
     public double x() {
@@ -278,16 +272,18 @@ public class Vector3Q {
     }
 
     public Vector3Q add(final Vector3D vec) {
-        this.x.add(vec.x);
-        this.y.add(vec.y);
-        this.z.add(vec.z);
+        var aux = new Quadruple();
+        this.x.add(aux.assign(vec.x));
+        this.y.add(aux.assign(vec.y));
+        this.z.add(aux.assign(vec.z));
         return this;
     }
 
     public Vector3Q add(final Vector3 vec) {
-        this.x.add(vec.x);
-        this.y.add(vec.y);
-        this.z.add(vec.z);
+        var aux = new Quadruple();
+        this.x.add(aux.assign(vec.x));
+        this.y.add(aux.assign(vec.y));
+        this.z.add(aux.assign(vec.z));
         return this;
     }
 
@@ -301,9 +297,10 @@ public class Vector3Q {
      * @return This vector for chaining.
      */
     public Vector3Q add(double x, double y, double z) {
-        this.x.add(x);
-        this.y.add(y);
-        this.z.add(z);
+        var aux = new Quadruple();
+        this.x.add(aux.assign(x));
+        this.y.add(aux.assign(y));
+        this.z.add(aux.assign(z));
         return this;
     }
 
@@ -316,9 +313,10 @@ public class Vector3Q {
      */
     public Vector3Q add(double... vals) {
         assert vals.length == 3 : "vals must contain 3 values";
-        this.x.add(vals[0]);
-        this.y.add(vals[1]);
-        this.z.add(vals[2]);
+        var aux = new Quadruple();
+        this.x.add(aux.assign(vals[0]));
+        this.y.add(aux.assign(vals[1]));
+        this.z.add(aux.assign(vals[2]));
         return this;
     }
 
@@ -445,21 +443,22 @@ public class Vector3Q {
         return len(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
 
-    public float lenFloat() {
-        return this.len().floatValue();
+    public float lenF() {
+        return len().floatValue();
     }
 
     public Quadruple len() {
-        Quadruple sumSq = x.cpy().multiply(x).add(y.cpy().multiply(y)).add(z.cpy().multiply(z));
-        return sumSq.sqrt();
+        return len2().sqrt();
     }
 
-    public double len2d() {
+    public double len2D() {
         return this.len2().doubleValue();
     }
 
     public Quadruple len2() {
-        return x.cpy().multiply(x).add(y.cpy().multiply(y)).add(z.cpy().multiply(z));
+        var res = new Quadruple(x);
+        var aux = new Quadruple();
+        return res.multiply(x).add(aux.assign(y).multiply(y)).add(aux.assign(z).multiply(z));
     }
 
     /**
@@ -471,19 +470,16 @@ public class Vector3Q {
         return x.equals(vec.x) && y.equals(vec.y) && z.equals(vec.z);
     }
 
-    public double dstDouble(final Vector3Q vec) {
+    public double dstD(final Vector3Q vec) {
         return dst(vec).doubleValue();
     }
 
-    public double dstDouble(final Vector3Q vec, final Vector3Q aux) {
+    public double dstD(final Vector3Q vec, final Vector3Q aux) {
         return dst(vec, aux).doubleValue();
     }
 
     public Quadruple dst(final Vector3Q vec) {
-        Quadruple a = vec.x.cpy().subtract(this.x);
-        Quadruple b = vec.y.cpy().subtract(this.y);
-        Quadruple c = vec.z.cpy().subtract(this.z);
-        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c)).sqrt();
+        return dst2(vec).sqrt();
     }
 
     /**
@@ -499,10 +495,7 @@ public class Vector3Q {
     }
 
     public Quadruple dst(final Vector3D vec) {
-        Quadruple a = new Quadruple(vec.x).subtract(this.x);
-        Quadruple b = new Quadruple(vec.y).subtract(this.y);
-        Quadruple c = new Quadruple(vec.z).subtract(this.z);
-        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c)).sqrt();
+        return dst2(vec).sqrt();
     }
 
     /**
@@ -517,16 +510,13 @@ public class Vector3Q {
         return aux.set(this).sub(vec).len();
     }
 
-    public double dstDouble(double x, double y, double z) {
+    public double dstD(double x, double y, double z) {
         return dst(x, y, z).doubleValue();
     }
 
     /** @return the distance between this point and the given point */
     public Quadruple dst(double x, double y, double z) {
-        Quadruple a = new Quadruple(x).subtract(this.x);
-        Quadruple b = new Quadruple(y).subtract(this.y);
-        Quadruple c = new Quadruple(z).subtract(this.z);
-        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c)).sqrt();
+        return dst2(x, y, z).sqrt();
     }
 
     /** @return the distance between this point and the given point */
@@ -534,23 +524,26 @@ public class Vector3Q {
         return aux.set(this).sub(x, y, z).len();
     }
 
-    public double dst2d(Vector3Q vec) {
+    public double dst2D(Vector3Q vec) {
         return this.dst2(vec).doubleValue();
     }
 
-    public double dst2d(Vector3D vec) {
-        return this.dst2d(vec.x, vec.y, vec.z);
+    public double dst2D(Vector3D vec) {
+        return this.dst2D(vec.x, vec.y, vec.z);
     }
 
     public Quadruple dst2(Vector3Q vec) {
-        Quadruple a = vec.x.cpy().subtract(this.x);
-        Quadruple b = vec.y.cpy().subtract(this.y);
-        Quadruple c = vec.z.cpy().subtract(this.z);
-        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c));
+        var res = new Quadruple(vec.x).subtract(this.x);
+        var aux = new Quadruple();
+        return res.multiply(res).add(aux.assign(vec.y).subtract(this.y).multiply(aux)).add(aux.assign(vec.z).subtract(this.z).multiply(aux));
     }
 
-    public double dst2d(double x, double y, double z) {
+    public double dst2D(double x, double y, double z) {
         return dst2(x, y, z).doubleValue();
+    }
+
+    public Quadruple dst2(Vector3D vec) {
+        return dst2(vec.x, vec.y, vec.z);
     }
 
     /**
@@ -563,15 +556,14 @@ public class Vector3Q {
      * @return The squared distance
      */
     public Quadruple dst2(double x, double y, double z) {
-        Quadruple a = new Quadruple(x).subtract(this.x);
-        Quadruple b = new Quadruple(y).subtract(this.y);
-        Quadruple c = new Quadruple(z).subtract(this.z);
-        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c));
+        var res = new Quadruple(x).subtract(this.x);
+        var aux = new Quadruple();
+        return res.multiply(res).add(aux.assign(y).subtract(this.y).multiply(aux)).add(aux.assign(z).subtract(this.z).multiply(aux));
     }
 
     public Vector3Q nor() {
-        final Quadruple len2 = this.len2();
-        final double len2d = len2.doubleValue();
+        final var len2 = this.len2();
+        final var len2d = len2.doubleValue();
         if (len2d == 0f || len2d == 1f)
 
             return this;
@@ -579,15 +571,19 @@ public class Vector3Q {
     }
 
     public double dot(final Vector3D vec) {
-        return this.x.cpy().multiply(vec.x).add(this.y.cpy().multiply(vec.y)).add(this.z.cpy().multiply(vec.z)).doubleValue();
+        var res = new Quadruple();
+        var aux = new Quadruple();
+        return res.assign(this.x).multiply(vec.x).add(aux.assign(this.y).multiply(vec.y)).add(aux.assign(this.z).multiply(vec.z)).doubleValue();
     }
 
-    public double dotd(final Vector3Q vec) {
+    public double dotD(final Vector3Q vec) {
         return this.dot(vec).doubleValue();
     }
 
     public Quadruple dot(final Vector3Q vec) {
-        return this.x.cpy().multiply(vec.x).add(this.y.cpy().multiply(vec.y)).add(this.z.cpy().multiply(vec.z));
+        var res = new Quadruple();
+        var aux = new Quadruple();
+        return res.assign(this.x).multiply(vec.x).add(aux.assign(this.y).multiply(vec.y)).add(aux.assign(this.z).multiply(vec.z));
     }
 
     /**
@@ -600,7 +596,9 @@ public class Vector3Q {
      * @return The dot product
      */
     public Quadruple dot(Quadruple x, Quadruple y, Quadruple z) {
-        return this.x.cpy().multiply(x).add(this.y.cpy().multiply(y)).add(this.z.cpy().multiply(z));
+        var res = new Quadruple();
+        var aux = new Quadruple();
+        return res.assign(this.x).multiply(x).add(aux.assign(this.y).multiply(y)).add(aux.assign(this.z).multiply(z));
     }
 
     /**
@@ -611,18 +609,16 @@ public class Vector3Q {
      * @return This vector for chaining
      */
     public Vector3Q crs(final Vector3Q vec) {
-        return this.set(this.y.cpy().multiply(vec.z).subtract(this.z.cpy().multiply(vec.y.cpy())),
-                        this.z.cpy().multiply(vec.x).subtract(this.x.cpy().multiply(vec.z.cpy())),
-                        this.x.cpy().multiply(vec.y).subtract(this.y.cpy().multiply(vec.x.cpy())));
+        var res = new Vector3Q();
+        var aux = new Quadruple();
+        res.x.assign(this.y).multiply(vec.z).subtract(aux.assign(this.z).multiply(vec.y));
+        res.y.assign(this.z).multiply(vec.x).subtract(aux.assign(this.x).multiply(vec.z));
+        res.z.assign(this.x).multiply(vec.y).subtract(aux.assign(this.y).multiply(vec.x));
+        return this.set(res);
     }
 
     public Vector3Q crs(final Vector3D vec) {
-        var vx = vec.x;
-        var vy = vec.y;
-        var vz = vec.z;
-        return this.set(this.y.multiply(vz).subtract(this.z.multiply(vy)),
-                        this.z.multiply(vx).subtract(this.x.multiply(vz)),
-                        this.x.multiply(vy).subtract(this.y.multiply(vx)));
+        return this.crs(vec.x, vec.y, vec.z);
     }
 
     /**
@@ -634,10 +630,13 @@ public class Vector3Q {
      *
      * @return This vector for chaining
      */
-    public Vector3Q crs(double x, double y, double z) {
-        return this.set(this.y.cpy().multiply(z).subtract(this.z.cpy().multiply(y)),
-                        this.z.cpy().multiply(x).subtract(this.x.cpy().multiply(z)),
-                        this.x.cpy().multiply(y).subtract(this.y.cpy().multiply(x)));
+    public Vector3Q crs(final double x, final double y, final double z) {
+        var res = new Vector3Q();
+        var aux = new Quadruple();
+        res.x.assign(this.y).multiply(z).subtract(aux.assign(this.z).multiply(y));
+        res.y.assign(this.z).multiply(x).subtract(aux.assign(this.x).multiply(z));
+        res.z.assign(this.x).multiply(y).subtract(aux.assign(this.y).multiply(x));
+        return this.set(res);
     }
 
     /**
@@ -662,11 +661,13 @@ public class Vector3Q {
         var m9 = Quadruple.valueOf(matrix[9]);
         var m10 = Quadruple.valueOf(matrix[10]);
         var m11 = Quadruple.valueOf(matrix[11]);
-        return set(
-                x.cpy().multiply(m0).add(y.cpy().multiply(m3)).add(z.cpy().multiply(m6)).add(m9),
-                x.cpy().multiply(m1).add(y.cpy().multiply(m4)).add(z.cpy().multiply(m7)).add(m10),
-                x.cpy().multiply(m2).add(y.cpy().multiply(m5)).add(z.cpy().multiply(m8)).add(m11)
-        );
+        var aux = new Vector3Q(this);
+        var rx = new Quadruple(aux.x).multiply(m0).add(aux.y.multiply(m3)).add(aux.z.multiply(m6)).add(m9);
+        aux.set(this);
+        var ry = new Quadruple(aux.x).multiply(m1).add(aux.y.multiply(m4)).add(aux.z.multiply(m7)).add(m10);
+        aux.set(this);
+        var rz = new Quadruple(aux.x).multiply(m2).add(aux.y.multiply(m5)).add(aux.z.multiply(m8)).add(m11);
+        return set(rx, ry, rz);
     }
 
     /**
@@ -691,11 +692,13 @@ public class Vector3Q {
         var m21 = Quadruple.valueOf(mat[M21]);
         var m22 = Quadruple.valueOf(mat[M22]);
         var m23 = Quadruple.valueOf(mat[M23]);
-        return set(
-        x.cpy().multiply(m00).add(y.cpy().multiply(m01)).add(z.cpy().multiply(m02)).add(m03),
-        x.cpy().multiply(m10).add(y.cpy().multiply(m11)).add(z.cpy().multiply(m12)).add(m13),
-        x.cpy().multiply(m20).add(y.cpy().multiply(m21)).add(z.cpy().multiply(m22)).add(m23)
-        );
+        var aux = new Vector3Q(this);
+        var rx = new Quadruple(aux.x).multiply(m00).add(aux.y.multiply(m01)).add(aux.z.multiply(m02)).add(m03);
+        aux.set(this);
+        var ry = new Quadruple(aux.x).multiply(m10).add(aux.y.multiply(m11)).add(aux.z.multiply(m12)).add(m13);
+        aux.set(this);
+        var rz = new Quadruple(aux.x).multiply(m20).add(aux.y.multiply(m21)).add(aux.z.multiply(m22)).add(m23);
+        return set(rx, ry, rz);
     }
 
     /**
@@ -761,7 +764,7 @@ public class Vector3Q {
     }
 
     public boolean isUnit(final double margin) {
-        return FastMath.abs(len2d() - 1f) < margin;
+        return FastMath.abs(len2D() - 1f) < margin;
     }
 
     public boolean isZero() {
@@ -769,7 +772,7 @@ public class Vector3Q {
     }
 
     public boolean isZero(final double margin) {
-        return len2d() < margin;
+        return len2D() < margin;
     }
 
     public String toString() {
@@ -781,12 +784,12 @@ public class Vector3Q {
     }
 
     public Vector3Q setLength2(double len2) {
-        double oldLen2 = len2d();
+        double oldLen2 = len2D();
         return (oldLen2 == 0 || oldLen2 == len2) ? this : scl(Math.sqrt(len2 / oldLen2));
     }
 
     public Vector3Q clamp(double min, double max) {
-        final double l2 = len2d();
+        final double l2 = len2D();
         if (l2 == 0f)
             return this;
         if (l2 > max * max)
@@ -800,15 +803,15 @@ public class Vector3Q {
         return new Quadruple[]{x, y, z};
     }
 
-    public double[] valuesd() {
+    public double[] valuesD() {
         return new double[]{x.doubleValue(), y.doubleValue(), z.doubleValue()};
     }
 
-    public float[] valuesf() {
+    public float[] valuesF() {
         return new float[]{x.floatValue(), y.floatValue(), z.floatValue()};
     }
 
-    public float[] valuesf(float[] vec) {
+    public float[] valuesF(float[] vec) {
         vec[0] = x.floatValue();
         vec[1] = y.floatValue();
         vec[2] = z.floatValue();
@@ -818,7 +821,7 @@ public class Vector3Q {
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3Q v) {
-        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotD(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
@@ -828,7 +831,7 @@ public class Vector3Q {
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3Q v) {
-        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotD(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
@@ -839,11 +842,11 @@ public class Vector3Q {
     @Override
     public int hashCode() {
         final long prime = 31;
-        long result = 1;
-        result = prime * result + x.hashCode();
-        result = prime * result + y.hashCode();
-        result = prime * result + z.hashCode();
-        return (int) result;
+        long res = 1;
+        res = prime * res + x.hashCode();
+        res = prime * res + y.hashCode();
+        res = prime * res + z.hashCode();
+        return (int) res;
     }
 
     @Override

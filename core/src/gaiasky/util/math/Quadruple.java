@@ -1391,7 +1391,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return 1 if this instance is greater in magnitude than the {@code other} instance,
      * 0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
      */
-    public int compareMagnitudeTo(Quadruple other) {
+    public int compareMagnitudeTo(final Quadruple other) {
         // 20.10.24 18:44:39 Regarding NaNs, behave like doubles
         if (isNaN())
             return other.isNaN() ? 0 : 1;
@@ -1504,7 +1504,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return the reference to this object, which holds a new value that equals
      * the sum of its previous value and the value of the summand
      */
-    public Quadruple add(Quadruple summand) {
+    public Quadruple add(final Quadruple summand) {
         if (isNaN() || summand.isNaN()) return assignNaN(); // NaN + whatever = NaN;
 
         if (isInfinite()) {
@@ -4245,7 +4245,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addUnsigned(Quadruple summand) {
+    private Quadruple addUnsigned(final Quadruple summand) {
         if (exponent != 0 && summand.exponent != 0) {   // Both are normal numbers
             if (exponent == summand.exponent)             // Same exponent
                 return addWithSameExps(summand);
@@ -4269,7 +4269,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addWithSameExps(Quadruple summand) {
+    private Quadruple addWithSameExps(final Quadruple summand) {
         final long carryUp = addMant(summand.mantHi, summand.mantLo);
         final long shiftedOutBit = mantLo & 1;           // the bit that will be shifted out
         shiftMantissaRight(1);
@@ -4291,7 +4291,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addWitDifferentExps(Quadruple summand) {
+    private Quadruple addWitDifferentExps(final Quadruple summand) {
         long greaterHi, greaterLo, exp2;
 
         // Put the mantissa of the lesser summand, that is to be shifted, to the fields of this instance
@@ -4333,7 +4333,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addNormalAndSubnormal(Quadruple summand) {
+    private Quadruple addNormalAndSubnormal(final Quadruple summand) {
         long greaterHi;
         long greaterLo;
         long shiftedOutBit;
@@ -4534,7 +4534,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance, with the new value that equals the difference
      */
-    private Quadruple subtractUnsigned(Quadruple subtrahend) {
+    private Quadruple subtractUnsigned(final Quadruple subtrahend) {
         long minuendLo, minuendHi;
         int lesserExp;
 
