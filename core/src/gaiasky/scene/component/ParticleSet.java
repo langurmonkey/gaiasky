@@ -12,6 +12,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -36,7 +37,6 @@ import uk.ac.starlink.table.ColumnInfo;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ParticleSet implements Component, IDisposable {
 
@@ -293,7 +293,7 @@ public class ParticleSet implements Component, IDisposable {
     // Has been disposed.
     public boolean disposed = false;
     // Name index.
-    public Map<String, Integer> index;
+    public ObjectIntMap<String> index;
     private final Object indexSync = new Object();
     // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
@@ -391,8 +391,8 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return An map{string,int} mapping names to indices
      */
-    public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
-        Map<String, Integer> index = new ConcurrentHashMap<>((int) (pointData.size() * 1.25));
+    public ObjectIntMap<String> generateIndex(List<IParticleRecord> pointData) {
+        ObjectIntMap<String> index = new ObjectIntMap<>((int) (pointData.size() * 1.25));
         synchronized (indexSync) {
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
@@ -672,7 +672,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setFocusIndex(String name) {
         synchronized (indexSync) {
-            candidateFocusIndex = index.getOrDefault(name.toLowerCase()
+            candidateFocusIndex = index.get(name.toLowerCase()
                                                              .trim(), -1);
         }
     }
@@ -753,7 +753,7 @@ public class ParticleSet implements Component, IDisposable {
                            Render render) {
         synchronized (indexSync) {
             if (index.containsKey(name)) {
-                this.setVisible(index.get(name), visible, render);
+                this.setVisible(index.get(name, -1), visible, render);
             }
         }
     }
@@ -800,7 +800,7 @@ public class ParticleSet implements Component, IDisposable {
                 .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
-                int idx = index.get(name);
+                int idx = index.get(name, -1);
                 if (idx >= 0 && idx < pointData.size()) {
                     IParticleRecord pb = pointData.get(idx);
                     return getAbsolutePosition(pb, date, out);
@@ -868,7 +868,7 @@ public class ParticleSet implements Component, IDisposable {
                 .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
-                int idx = index.get(name);
+                int idx = index.get(name, -1);
                 IParticleRecord pb = pointData.get(idx);
                 fetchPosition(pb, null, out, currDeltaYears);
                 return out;
@@ -1144,7 +1144,7 @@ public class ParticleSet implements Component, IDisposable {
                 .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
-                int idx = index.get(name);
+                int idx = index.get(name, -1);
                 if (this.forceLabel.contains(idx)) {
                     if (!forceLabel) {
                         // Remove from forceLabelStars
@@ -1163,7 +1163,7 @@ public class ParticleSet implements Component, IDisposable {
                 .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
-                int idx = index.get(name);
+                int idx = index.get(name, -1);
                 return forceLabel.contains(idx);
             }
         }
@@ -1176,7 +1176,7 @@ public class ParticleSet implements Component, IDisposable {
                 .trim();
         synchronized (indexSync) {
             if (index.containsKey(name)) {
-                int idx = index.get(name);
+                int idx = index.get(name, -1);
                 labelColors.put(idx, color);
             }
         }

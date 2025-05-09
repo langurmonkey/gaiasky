@@ -9,6 +9,8 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.Position;
@@ -31,7 +33,7 @@ public class Index {
     private static final Logger.Log logger = Logger.getLogger(Index.class);
 
     /** Quick lookup map. Name to node. **/
-    protected final Map<String, Entity> index;
+    protected final ObjectMap<String, Entity> index;
 
     /**
      * Map from integer to position with all Hipparcos stars, for the
@@ -53,7 +55,7 @@ public class Index {
 
         // String-to-node map. The number of objects is a first approximation, as
         // some nodes actually contain multiple objects.
-        index = new ConcurrentHashMap<>((int) (numberEntities * 1.25), 0.9f, 1);
+        index = new ObjectMap<>((int) (numberEntities * 1.25), 0.9f);
 
         // HIP map with 121k * 1.25
         hipMap = new IntMap<>(151250, 0.9f);
@@ -157,7 +159,7 @@ public class Index {
     private void addParticleSet(Entity entity, ParticleSet particleSet) {
         if (particleSet != null) {
             if (particleSet.index != null) {
-                Set<String> keys = particleSet.index.keySet();
+                ObjectIntMap.Keys<String> keys = particleSet.index.keys();
                 for (String key : keys) {
                     index.put(key, entity);
                 }
@@ -260,7 +262,7 @@ public class Index {
     /** Removes the entities in the given particle set from this index. **/
     public void removeFromIndex(ParticleSet set) {
         if (set.index != null) {
-            Set<String> keys = set.index.keySet();
+            ObjectIntMap.Keys<String> keys = set.index.keys();
             for (String key : keys) {
                 index.remove(key);
             }
@@ -278,7 +280,7 @@ public class Index {
      * @param abort      To enable abortion mid-computation.
      */
     public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
-        Set<String> keys = index.keySet();
+        ObjectMap.Keys<String> keys = index.keys();
         name = name.toLowerCase().trim();
 
         int i = 0;

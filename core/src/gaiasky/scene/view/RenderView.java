@@ -72,7 +72,7 @@ public class RenderView extends BaseView implements IRenderable {
         assert starSet != null : "Called the wrong method!";
         name = name.toLowerCase(Locale.ROOT).trim();
         if (starSet.index.containsKey(name)) {
-            int idx = starSet.index.get(name);
+            int idx = starSet.index.get(name, -1);
             if (starSet.labelColors.containsKey(idx)) {
                 return starSet.labelColors.get(idx);
             }
