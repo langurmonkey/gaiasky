@@ -914,10 +914,8 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
         if (subtrahend.isZero()) {
             var negative = this.negative;
             if (isZero()) {
-                if (isNegative() && !subtrahend.isNegative())
-                // -0.0 - 0.0 = -0.0
-                {
-                } else negative = false;
+                if (!isNegative() || subtrahend.isNegative())
+                    negative = false;
             }
             return new Float128(negative, exponent, mantHi, mantLo);                                      // X - 0 = X
         }

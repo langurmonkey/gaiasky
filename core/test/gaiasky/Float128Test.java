@@ -1,12 +1,9 @@
 package gaiasky;
 
 import gaiasky.util.math.Float128;
-import gaiasky.util.math.Quadruple;
-import gaiasky.util.math.QuadrupleMath;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link Float128}.
@@ -22,6 +19,11 @@ public class Float128Test {
         var f128b = Float128.from(b);
         assertEquals(a + b, f128a.add(f128b)
                 .doubleValue(), delta);
+
+        f128a = Float128.from(-a);
+        f128b = Float128.from(b);
+        assertEquals(-a + b, f128a.add(f128b)
+                .doubleValue(), delta);
     }
 
     @Test
@@ -31,6 +33,11 @@ public class Float128Test {
         var f128a = Float128.from(a);
         var f128b = Float128.from(b);
         assertEquals(a - b, f128a.subtract(f128b)
+                .doubleValue(), delta);
+
+        f128a = Float128.from(-a);
+        f128b = Float128.from(b);
+        assertEquals(-a - b, f128a.subtract(f128b)
                 .doubleValue(), delta);
     }
 
@@ -42,6 +49,11 @@ public class Float128Test {
         var f128b = Float128.from(b);
         assertEquals(a * b, f128a.multiply(f128b)
                 .doubleValue(), delta);
+
+        f128a = Float128.from(-a);
+        f128b = Float128.from(b);
+        assertEquals(-a * b, f128a.multiply(f128b)
+                .doubleValue(), delta);
     }
 
     @Test
@@ -51,6 +63,11 @@ public class Float128Test {
         var f128a = Float128.from(a);
         var f128b = Float128.from(b);
         assertEquals(a / b, f128a.divide(f128b)
+                .doubleValue(), delta);
+
+        f128a = Float128.from(-a);
+        f128b = Float128.from(b);
+        assertEquals(-a / b, f128a.divide(f128b)
                 .doubleValue(), delta);
     }
 }
