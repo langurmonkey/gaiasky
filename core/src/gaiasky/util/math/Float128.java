@@ -1,10 +1,6 @@
 package gaiasky.util.math;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Immutable version of {@link Float128} implemented as a Java record.
@@ -30,6 +26,7 @@ import java.util.regex.Pattern;
  * @param mantLo   The least significant 64 bits of fractional part of the mantissa.
  */
 public record Float128(boolean negative, int exponent, long mantHi, long mantLo) {
+
 
     private static final int HASH_CODE_OF_NAN = -441827835;  // All the NaNs have to have the same hashcode.
     // This is the best one I could imagine.
@@ -66,8 +63,12 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      */
     public static final int EXPONENT_OF_INFINITY = 0xFFFF_FFFF;
 
+    /** Value of one. **/
+    public static final Float128 ONE = Float128.from(1d);
     /** Value of zero. **/
     public static final Float128 ZERO = new Float128(false, 0, 0, 0);
+    /** Value of negative zero. **/
+    public static final Float128 NEGATIVE_ZERO = new Float128(true, 0, 0, 0);
     /** Value of {@code +Infinity}. **/
     public static final Float128 POSITIVE_INFINITY = new Float128(false, EXPONENT_OF_INFINITY, 0, 0);
     /** Value of {@code -Infinity}. **/
@@ -82,6 +83,14 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     private static final Float128 MAX_VALUE = new Float128((int) EXPONENT_OF_MAX_VALUE, -1, -1);
     /** Minimum possible positive normal value, 2.270646210401492537526567265179587581247e-646456993 */
     private static final Float128 MIN_NORMAL = new Float128(1, 0, 0);
+
+    public static Float128 infinity(boolean negative) {
+        return negative ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
+    }
+
+    public static Float128 zero(boolean negative) {
+        return negative ? NEGATIVE_ZERO : ZERO;
+    }
 
     private static final char[] ZEROS = "0000000000000000000000000000000000000000".toCharArray(); // 40 zeros
 
@@ -575,7 +584,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * First creates an empty (zero) instance, then copies the fields of the parameter.
      * to the fields of the new instance
      *
-     * @param value the {@code Float128} value to be assigned to the new instance.
+     * @param value the {@link Float128} value to be assigned to the new instance.
      */
     public Float128(Float128 value) {
         this(value.negative, value.exponent, value.mantHi, value.mantLo);
@@ -652,18 +661,9 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Creates a new {@link Float128} instance with the given {@link String} value.
-     *
-     * @param value the {@link String} value to be assigned.
-     */
-    public static Float128 from(String value) {
-        return NumberParser.parse(value);
-    }
-
-    /**
      * Builds a Float128 value from the given low-level parts.<br>
      * Treats the {@code exponent} parameter as the unbiased exponent value,
-     * whose {@code 0} value corresponds to the {@code Float128} value of 1.0.
+     * whose {@code 0} value corresponds to the {@link Float128} value of 1.0.
      *
      * @param negative the sign of the value ({@code true} for negative)
      * @param exponent Binary exponent (unbiased, 0 means 2^0)
@@ -676,6 +676,2470 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
         return new Float128(negative, exponent + EXPONENT_BIAS, mantHi, mantLo);
     }
 
+    private F128 toF128() {
+        return new F128(negative, exponent, mantHi, mantLo);
+    }
+
+    /**
+     * Adds the value of the given {@link Float128} summand to the value of this Float128.
+     * The instance acquires a new value that equals the sum of the previous value and the value of the summand.
+     *
+     * @param summand the value to add
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the sum of its previous value and the value of the summand
+     */
+    public Float128 add(final Float128 summand) {
+        if (isNaN() || summand.isNaN()) return NAN; // NaN + whatever = NaN;
+
+        if (isInfinite()) {
+            if (summand.isInfinite() && (negative != summand.negative))
+                return NAN;
+            else return this;
+        }
+
+        if (summand.isInfinite()) return new Float128(summand);
+
+        if (summand.isZero()) {
+            if (isZero())
+                if (summand.isNegative() && isNegative())
+                    return new Float128(true, exponent, mantHi, mantLo);
+                else
+                    return new Float128(false, exponent, mantHi, mantLo);
+        }
+
+        if (isZero()) return new Float128(summand);
+
+        // Both are regular numbers
+        var f = new F128(this);
+        if (negative == summand.negative)                   // same signs
+            return f.addUnsigned(summand.toF128())
+                    .toFloat128();                      // Does not affect sign
+        else {                                              // signs differ
+            f.subtractUnsigned(
+                    summand.toF128());                        // Subtracts ignoring sings, returns negative if the summand is greater in magnitude
+            f.negative ^= negative;                          // If signs differ and summand is greater in magnitude, the sign gets inverted
+        }
+        return f.toFloat128();
+    }
+
+    /**
+     * Adds the value of the given {@code long} summand to the value of this Float128.
+     * The value of the {@code long} operand is preliminarily converted to a {@link Float128} value.
+     * The instance acquires the new value that equals the sum of the previous value and the value of the summand.
+     *
+     * @param summand the value to add
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the sum of its previous value and the value of the summand
+     */
+    public Float128 add(long summand) {
+        return add(Float128.from(summand));
+    }
+
+    /**
+     * Adds the value of the given {@code double} summand to the value of this Float128.
+     * The value of the {@code double} operand is preliminarily converted to a {@link Float128} value.
+     * The instance acquires the new value that equals the sum of the previous value and the value of the summand.
+     *
+     * @param summand the value to add
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the sum of its previous value and the value of the summand
+     */
+    public Float128 add(double summand) {
+        return add(Float128.from(summand));
+    }
+
+    /**
+     * Adds the value of the given {@link Float128 op2} to the value of {@link Float128 op1}
+     * and creates a new instance of Float128 containing the sum.
+     * The operands remain unchanged.
+     *
+     * @param op1 the first operand to add
+     * @param op2 the second operand to add
+     *
+     * @return a new instance of Float128 containing the sum of the operands
+     */
+    public static Float128 add(Float128 op1, Float128 op2) {
+        op1 = new Float128(op1);
+        return op1.add(op2);
+    }
+
+    /**
+     * Adds the value of the given {@code long op2} to the value of {@link Float128 op1}
+     * and creates a new instance of Float128 containing the sum.
+     * The value of the {@code long} operand is preliminarily converted to a {@link Float128} value.
+     * The Float128 operand remains unchanged.
+     *
+     * @param op1 the first operand to add
+     * @param op2 the second operand to add
+     *
+     * @return a new instance of Float128 containing the sum of the operands
+     */
+    public static Float128 add(Float128 op1, long op2) {
+        op1 = new Float128(op1);
+        return op1.add(op2);
+    }
+
+    /**
+     * Adds the value of the given {@code double op2} to the value of {@link Float128 op1}
+     * and creates a new instance of Float128 containing the sum.
+     * The value of the {@code double} operand is preliminarily converted to a {@link Float128} value.
+     * The Float128 operand remains unchanged.
+     *
+     * @param op1 the first operand to add
+     * @param op2 the second operand to add
+     *
+     * @return a new instance of Float128 containing the sum of the operands
+     */
+    public static Float128 add(Float128 op1, double op2) {
+        op1 = new Float128(op1);
+        return op1.add(op2);
+    }
+
+    /**
+     * Subtracts the value of the given {@link Float128} subtrahend from the value of this Float128.
+     * The instance acquires a new value that equals the difference between the previous value and the value of the subtrahend.
+     *
+     * @param subtrahend the value to be subtracted from the current value of this Float128
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the difference between its previous value and the value of the subtrahend
+     */
+    public Float128 subtract(Float128 subtrahend) {
+        if (isNaN() || subtrahend.isNaN()) return NAN; // NaN - whatever = NaN;
+
+        if (isInfinite()) {
+            if (subtrahend.isInfinite() && (negative == subtrahend.negative))
+                return NAN;                             // Infinity - Infinity = NaN
+            else return this;                                 // Infinity - X = Infinity
+        }
+
+        if (subtrahend.isInfinite())
+            return new Float128(!subtrahend.negative, subtrahend.exponent, subtrahend.mantHi, subtrahend.mantLo);
+
+        if (subtrahend.isZero()) {
+            var negative = this.negative;
+            if (isZero()) {
+                if (isNegative() && !subtrahend.isNegative())
+                // -0.0 - 0.0 = -0.0
+                {
+                }
+                else negative = false;
+            }
+            return new Float128(negative, exponent, mantHi, mantLo);                                      // X - 0 = X
+        }
+
+        if (isZero())
+            return new Float128(!subtrahend.negative, subtrahend.exponent, subtrahend.mantHi, subtrahend.mantLo);
+
+        // Both are regular numbers
+        F128 f = this.toF128();
+        if (negative != subtrahend.negative)                // Different signs
+            return f.addUnsigned(subtrahend.toF128())
+                    .toFloat128();                   // Does not affect sign, -X - Y = -(X + Y), X - (-Y) = X + Y
+        else {
+            // same sign
+            f.subtractUnsigned(
+                    subtrahend.toF128());                     // Subtracts irrespective of sings, the result is negative if the subtrahend is greater in magnitude
+            f.negative ^= negative;                          // Minuend was negative and greater in magnitude or positive and less in magnitude than the subtrahend
+        }
+        return f.toFloat128();
+    }
+
+    /**
+     * Subtracts the value of the given {@code long} subtrahend from the value of this Float128.
+     * The value of the {@code long} subtrahend is preliminarily converted to a {@link Float128} value.
+     * The instance acquires a new value that equals the difference between the previous value and the value of the subtrahend.
+     *
+     * @param subtrahend the value to be subtracted from the current value of this Float128
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the difference between its previous value and the value of the subtrahend
+     */
+    public Float128 subtract(long subtrahend) {
+        return subtract(Float128.from(subtrahend));
+    }
+
+    /**
+     * Subtracts the value of the given {@code double} subtrahend from the value of this Float128.
+     * The value of the {@code double} subtrahend is preliminarily converted to a {@link Float128} value.
+     * The instance acquires a new value that equals the difference between the previous value and the value of the subtrahend.
+     *
+     * @param subtrahend the value to be subtracted from the current value of this Float128
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the difference between its previous value and the value of the subtrahend
+     */
+    public Float128 subtract(double subtrahend) {
+        return subtract(Float128.from(subtrahend));
+    }
+
+    /**
+     * Subtracts the value of the {@link Float128} {@code subtrahend} from the value of the {@code minuend},
+     * creates and returns a new  instance of Float128 that contains the difference.
+     * The operands remain unchanged.
+     *
+     * @param minuend    the value from which the subtrahend is to be subtracted
+     * @param subtrahend the value to be subtracted from the minuend
+     *
+     * @return a new instance of Float128 containing the difference
+     */
+    public static Float128 subtract(Float128 minuend, Float128 subtrahend) {
+        minuend = new Float128(minuend);
+        return minuend.subtract(subtrahend);
+    }
+
+    /**
+     * Subtracts the value of the {@code long} {@code subtrahend} from the value of the {@code minuend},
+     * creates and returns a new  instance of Float128 that contains the difference.
+     * The value of the {@code long} subtrahend is preliminarily converted to a {@link Float128} value.
+     * The Float128 minuend remains unchanged.
+     *
+     * @param minuend    the value from which the subtrahend is to be subtracted
+     * @param subtrahend the value to be subtracted from the minuend
+     *
+     * @return a new instance of Float128 containing the difference
+     */
+    public static Float128 subtract(Float128 minuend, long subtrahend) {
+        minuend = new Float128(minuend);
+        final Float128 qSubtr = Float128.from(subtrahend);
+        return minuend.subtract(qSubtr);
+    }
+
+    /**
+     * Subtracts the value of the {@code double} {@code subtrahend} from the value of the {@code minuend},
+     * creates and returns a new  instance of Float128 that contains the difference.
+     * The value of the {@code double} subtrahend is preliminarily converted to a {@link Float128} value.
+     * The Float128 minuend remains unchanged.
+     *
+     * @param minuend    the value from which the subtrahend is to be subtracted
+     * @param subtrahend the value to be subtracted from the minuend
+     *
+     * @return a new instance of Float128 containing the difference
+     */
+    public static Float128 subtract(Float128 minuend, double subtrahend) {
+        minuend = new Float128(minuend);
+        final Float128 qSubtr = Float128.from(subtrahend);
+        return minuend.subtract(qSubtr);
+    }
+
+    /**
+     * Multiplies the value of this Float128 by the value of the given {@link Float128} factor.
+     * The instance acquires a new value that equals the product of the previous value and the value of the factor.
+     *
+     * @param factor the value to multiply the current value of this Float128 by.
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the product of its previous value and the value of the factor
+     */
+    public Float128 multiply(Float128 factor) {
+        if (isNaN() || factor.isNaN()) return NAN;  // NaN * whatever = NaN;
+
+        if (isInfinite()) {
+            if (factor.isZero()) return NAN;          // Inf * 0 = NaN
+            return infinity(factor.negative);           // Change sign if factor is negative:
+        }                                                   // Inf * x = Inf, Inf * -x = -Inf...
+
+        if (isZero()) {
+            if (factor.isInfinite()) return NAN;      // 0 * Inf = NaN
+            return zero(factor.negative);               // Change sign if factor is negative:
+        }                                                   // 0 * x = (x < 0)? -0 : 0; -0 * x = (x < 0)? 0 : -0
+
+        // This is a normal number, non-zero, non-infinity, and factor != NaN
+        if (factor.isInfinite()) return infinity(factor.negative);
+        if (factor.isZero()) return zero(factor.negative);
+
+        // Both are regular numbers
+        var f = new F128(this);
+        f.multUnsigned(factor);
+        f.negative ^= factor.negative;                        // Change sign if factor is negative
+        return f.toFloat128();
+    }
+
+    /**
+     * Multiplies the value of this Float128 by the value of the given {@code long} factor.
+     * The value of the {@code long} factor is preliminarily converted to a {@link Float128} value.
+     * The instance acquires a new value that equals the product of the previous value and the value of the factor.
+     *
+     * @param factor the value to multiply the current value of this Float128 by.
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the product of its previous value and the value of the factor
+     */
+    public Float128 multiply(long factor) {
+        return multiply(Float128.from(factor));
+    }
+
+    /**
+     * Multiplies the value of this Float128 by the value of the given {@code double} factor.
+     * The value of the {@code double} factor is preliminarily converted to a {@link Float128} value.
+     * The instance acquires a new value that equals the product of the previous value and the value of the factor.
+     *
+     * @param factor the value to multiply the current value of this Float128 by.
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the product of its previous value and the value of the factor
+     */
+    public Float128 multiply(double factor) {
+        return multiply(Float128.from(factor));
+    }
+
+    /**
+     * Multiplies the value of the given {@link Float128 factor1} by the {@link Float128 factor2},
+     * creates and returns a new instance of Float128 containing the product.
+     * The operands remain unchanged.
+     *
+     * @param factor1 the 1st factor to be multiplied by the second one
+     * @param factor2 the 2nd factor to be multiplied by the first one
+     *
+     * @return a new instance of Float128 containing the value of the product
+     */
+    public static Float128 multiply(Float128 factor1, Float128 factor2) {
+        factor1 = new Float128(factor1);
+        return factor1.multiply(factor2);
+    }
+
+    /**
+     * Multiplies the value of the given {@link Float128 factor1} by the {@code long factor2},
+     * creates and returns a new instance of Float128 containing the product.
+     * The value of the {@code long} factor is preliminarily converted to a {@link Float128} value.
+     * The operands remain unchanged.
+     *
+     * @param factor1 the 1st factor to be multiplied by the second one
+     * @param factor2 the 2nd factor to be multiplied by the first one
+     *
+     * @return a new instance of Float128 containing the value of the product
+     */
+    public static Float128 multiply(Float128 factor1, long factor2) {
+        factor1 = new Float128(factor1);
+        return factor1.multiply(factor2);
+    }
+
+    /**
+     * Multiplies the value of the given {@link Float128 factor1} by the {@code double factor2},
+     * creates and returns a new instance of Float128 containing the product.
+     * The value of the {@code double} factor is preliminarily converted to a {@link Float128} value.
+     * The operands remain unchanged.
+     *
+     * @param factor1 the 1st factor to be multiplied by the second one
+     * @param factor2 the 2nd factor to be multiplied by the first one
+     *
+     * @return a new instance of Float128 containing the value of the product
+     */
+    public static Float128 multiply(Float128 factor1, double factor2) {
+        factor1 = new Float128(factor1);
+        return factor1.multiply(factor2);
+    }
+
+    /**
+     * Divides the value of this Float128 by the value of the given {@link Float128} divisor.
+     * The instance acquires a new value that equals the quotient.
+     *
+     * @param divisor the divisor to divide the current value of this Float128 by
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the quotient of the previous value of this Float128 divided by the given divisor
+     */
+    public Float128 divide(Float128 divisor) {
+        if (isNaN() || divisor.isNaN()) return NAN; // NaN / whatever = NaN;
+
+        if (isInfinite()) {
+            if (divisor.isInfinite()) return NAN;     // Inf / Inf = NaN
+            return infinity(divisor.negative);          // Inf / x = Inf, Inf / -x = -Inf...
+        }
+
+        if (isZero()) {
+            if (divisor.isZero()) return NAN;         // 0 / 0 = NaN
+            return zero(divisor.negative);              // 0 / x = 0, 0 / -x = -0, etc.
+        }
+
+        // This is a normal number, not a zero, not an infinity, and divisor != NaN
+        if (divisor.isInfinite())
+            return zero(divisor.negative);              // x / Inf = 0, x / -Inf = -0
+
+        if (divisor.isZero())
+            return infinity(divisor.negative);          // x / 0 = Inf, x / -0 = -Inf
+
+        // Both are regular numbers, do divide
+        var f = new F128(this);
+        f.divideUnsigned(divisor.toF128());                            // ignores signs
+
+        f.negative ^= divisor.negative;                       // x  / -y = -(x / y)
+        return f.toFloat128();
+    }
+
+    /**
+     * Divides the value of this Float128 by the value of the given {@code long} divisor.
+     * The instance acquires a new value that equals the quotient.
+     * The value of the {@code long} divisor is preliminarily converted to a {@link Float128} value.
+     *
+     * @param divisor the divisor to divide the current value of this Float128 by
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the quotient of the previous value of this Float128 divided by the given divisor
+     */
+    public Float128 divide(long divisor) {
+        return divide(Float128.from(divisor));
+    }
+
+    /**
+     * Divides the value of this Float128 by the value of the given {@code double} divisor.
+     * The instance acquires a new value that equals the quotient.
+     * The value of the {@code double} divisor is preliminarily converted to a {@link Float128} value.
+     *
+     * @param divisor the divisor to divide the current value of this Float128 by
+     *
+     * @return the reference to this object, which holds a new value that equals
+     * the quotient of the previous value of this Float128 divided by the given divisor
+     */
+    public Float128 divide(double divisor) {
+        return divide(Float128.from(divisor));
+    }
+
+    /**
+     * Divides the value of the given dividend by the value of the given {@link Float128} divisor,
+     * creates and returns a new instance of Float128 containing the quotient.
+     * The operands remain unchanged.
+     *
+     * @param dividend the value to be divided by the divisor
+     * @param divisor  the divisor to divide the dividend by
+     *
+     * @return a new instance of Float128, which holds the value of the quotient
+     */
+    public static Float128 divide(Float128 dividend, Float128 divisor) {
+        dividend = new Float128(dividend);
+        return dividend.divide(divisor);
+    }
+
+    /**
+     * Divides the value of the given dividend by the value of the given {@code long} divisor,
+     * creates and returns a new instance of Float128 containing the quotient.
+     * The value of the {@code long} divisor is preliminarily converted to a {@link Float128} value.
+     * The operands remain unchanged.
+     *
+     * @param dividend the value to be divided by the divisor
+     * @param divisor  the divisor to divide the dividend by
+     *
+     * @return a new instance of Float128, which holds the value of the quotient
+     */
+    public static Float128 divide(Float128 dividend, long divisor) {
+        dividend = new Float128(dividend);
+        return dividend.divide(divisor);
+    }
+
+    /**
+     * Divides the value of the given dividend by the value of the given {@code double} divisor,
+     * creates and returns a new instance of Float128 containing the quotient.
+     * The value of the {@code double} divisor is preliminarily converted to a {@link Float128} value.
+     * The operands remain unchanged.
+     *
+     * @param dividend the value to be divided by the divisor
+     * @param divisor  the divisor to divide the dividend by
+     *
+     * @return a new instance of Float128, which holds the value of the quotient
+     */
+    public static Float128 divide(Float128 dividend, double divisor) {
+        dividend = new Float128(dividend);
+        return dividend.divide(divisor);
+    }
+
+    /* ***********************************************************************************
+     ****** Square root ******************************************************************
+     *********************************************************************************** */
+
+    /**
+     * Computes a square root of the value of this {@link Float128}
+     * and replaces the old value of this instance with the newly-computed value.
+     *
+     * @return the reference to this instance, which holds a new value that equals
+     * to the square root of its previous value
+     */
+    public Float128 sqrt() {
+        if (negative) return NAN;
+        if (isNaN() || isInfinite()) return this;
+
+        var f = new F128(this);
+        long absExp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // unbiased exponent
+        if (f.exponent == 0)                                  // subnormal
+            absExp -= f.normalizeMantissa();                   // It returns 0 for MIN_NORMAL / 2, 1 for MIN_NORMAL / 4... no additional correction is needed
+        f.exponent = (int) (absExp / 2 + EXPONENT_BIAS);       // the exponent of the root
+
+        long thirdWord = f.sqrtMant();                        // puts 128 bit of the root into mantHi, mantLo
+        // and returns additional 64 bits of the root
+
+        if (absExp % 2 != 0) {                              // Exponent is odd,
+            final long[] multed = multBySqrt2(f.mantHi, f.mantLo,
+                                              thirdWord); // multiply this value by sqrt(2), fill mantissa with the new value
+            f.mantHi = multed[0];
+            f.mantLo = multed[1];
+            thirdWord = multed[2];
+            if (absExp < 0)
+                f.exponent--;                       // for negative odd powers of two, exp = floor(exp / 2), e.g sqrt(0.64) = 0.8, sqrt(0.36) = 0.6
+        }
+
+        if ((thirdWord & HIGH_BIT) != 0)                    // The rest of the root >= a half of the lowest bit, round up
+            if (++f.mantLo == 0)
+                if (++f.mantHi == 0)
+                    f.exponent++;        // 21.01.08 18:04:02: Actually, this branch can never be executed,
+        // since derivative of sqrt(x) at point x = 4 equals 1/4
+        // and is less than 1/4 if x < 4, so
+        // sqrt(-1, -1, EXP_0Q + 1) is a little more than (-1, -1, EXP_0Q),
+        // but less than (-1, -1, EXP_0Q) + 0.5 LSB, so gets rounded down to (-1, -1, EXP_0Q)
+        // (0xFFFF_FFFF_FFFF_FFFFL, 0xFFFF_FFFF_FFFF_FFFFL, and no carry to the position of the implicit unity).
+        // Nevertheless let it remain as a safety net
+
+
+        return f.toFloat128();
+    }
+
+    /**
+     * Computes a square root of the value of the given {@link Float128},
+     * creates and returns a new instance of Float128 containing the value of the square root.
+     * The parameter remains unchanged.
+     *
+     * @param square the value to find the square root of
+     *
+     * @return a new instance of Float128 containing the value of the square root of the given argument
+     */
+    public static Float128 sqrt(Float128 square) {
+        return new Float128(square).sqrt();
+    }
+
+    /**
+     * Bean used to transport a mutable state in some operations.
+     */
+    private static class F128 {
+        boolean negative;
+        int exponent;
+        long mantHi, mantLo;
+
+        private static final F128 ONE = new F128(Float128.ONE);
+
+        public F128(boolean negative, int exponent, long mantHi, long mantLo) {
+            this.negative = negative;
+            this.exponent = exponent;
+            this.mantHi = mantHi;
+            this.mantLo = mantLo;
+        }
+
+        public F128(Float128 f) {
+            this(f.negative, f.exponent, f.mantHi, f.mantLo);
+        }
+
+        public Float128 toFloat128() {
+            return new Float128(negative, exponent, mantHi, mantLo);
+        }
+
+        /**
+         * Checks if the value is negative.
+         *
+         * @return {@code true}, if the value is negative, {@code false} otherwise
+         */
+        public boolean isNegative() {
+            return negative;
+        }
+
+        /**
+         * Checks if the value is infinite (i.e {@code NEGATIVE_INFINITY} or {@code POSITIVE_INFINITY}).
+         *
+         * @return {@code true}, if the value is infinity (either positive or negative), {@code false} otherwise
+         */
+        public boolean isInfinite() {
+            return (exponent == EXPONENT_OF_INFINITY) && ((mantHi | mantLo) == 0);
+        }
+
+        /**
+         * Checks if the value is not a number (i.e. has the value of {@code NaN}).
+         *
+         * @return {@code true}, if the value is not a number (NaN), {@code false} otherwise
+         */
+        public boolean isNaN() {
+            return (exponent == EXPONENT_OF_INFINITY) && ((mantHi | mantLo) != 0);
+        }
+
+        /**
+         * Assigns the value of +0 to this instance.
+         */
+        private void assignZero() {
+            negative = false;
+            mantHi = mantLo = exponent = 0;
+        }
+
+        /**
+         * Assigns the value of -0 to this instance.
+         *
+         * @return this instance with the new value (-0)
+         */
+        @SuppressWarnings("unused") // May occur helpful?
+        private F128 assignMinusZero() {
+            negative = true;
+            mantHi = mantLo = exponent = 0;
+            return this;
+        }
+
+        /**
+         * Assigns the value of +1 or -1 to this instance,
+         * depending on the sign of the previous value of the instance and the {@code changeSign} parameter.
+         */
+        private void assignOne() {
+            exponent = EXPONENT_OF_ONE;
+            mantHi = 0;
+            mantLo = 0;
+        }
+
+        /**
+         * Assigns the value of Infinity or -Infinity,
+         * depending on the sign of the previous value of the instance and the {@code changeSign} parameter.
+         */
+        private void assignInfinity() {
+            exponent = EXPONENT_OF_INFINITY;
+            mantHi = 0;
+            mantLo = 0;
+        }
+
+
+        /**
+         * For a Float128 with a normal mantissa (with implied unity)
+         * and non-positive biased exponent, returns a copy of the conventional subnormal form, with the exponent = 0
+         * and the mantissa shifted rightwards with explicit 1 in the appropriate position.<br>
+         * Shifts mantissa rightwards by |exp2| + 1 bits, sets explicit 1, and rounds it up, taking into account the bits having been shifted-out
+         *
+         * @param exp2 the exponent of the newly-found subnormal value (always negative)
+         *
+         * @return This Float128 in subnormal form.
+         */
+        private long makeSubnormal(long exp2) {
+            exp2 = -exp2;                               // just for convenience
+            if (exp2 > 127) {                           // Effectively 0 or MIN_VALUE
+                mantLo = mantHi = 0;
+                if (exp2 == 128) mantLo++;                // MIN_VALUE
+                return 0;                                 // exp2 >= 129 means 0
+            }
+
+            final long shiftedOutBit = shiftMantissa(exp2);
+
+            exp2 = 0;                                   // it's subnormal
+            if (shiftedOutBit != 0)
+                if (++mantLo == 0 && ++mantHi == 0)       // Round up. carry beyond the higher word?
+                    exp2++;                                 // it becomes MIN_NORMAL
+
+            return exp2;
+        }
+
+        /**
+         * Shifts the mantissa by exp2 + 1 bits rightwards, to make a conventional subnormal value
+         *
+         * @param exp2 unbiased exponent of the value (negated)
+         *
+         * @return the highest bit that has been shifted out beyond the two longs of mantissa (1L if it was 1, 0 otherwise)
+         */
+        private long shiftMantissa(long exp2) {
+            long shiftedOut = mantLo & 1;                // The highest of shifted out bits to evaluate carry
+            mantLo = (mantLo >>> 1) | (mantHi << 63);
+            mantHi = (mantHi >>> 1) | HIGH_BIT;          // move 1 bit right and set unity that was implied
+
+            if (exp2 >= 64) {                            // the higher word move into the lower
+                if (exp2 == 64)
+                    shiftedOut = mantLo >>> 63;              // former lowest bit of mantHi now is the highest bit of mantLo
+                else
+                    shiftedOut = (mantHi >>> (exp2 - 65)) & 1; // one of the bits of the high word
+                mantLo = mantHi >>> exp2 - 64;
+                mantHi = 0;
+            } else if (exp2 > 0) {                      // Shift both words
+                shiftedOut = (mantLo >>> exp2 - 1) & 1;
+                mantLo = (mantLo >>> exp2) | (mantHi << 64 - exp2);
+                mantHi = mantHi >>> exp2;
+            }
+            return shiftedOut;
+        }
+
+        /**
+         * Adds a regular number (not NaN, not Infinity) to this instance, that also contains a regular number.
+         * The signs are ignored and don't change (both summands are expected to have the same sign).
+         *
+         * @param summand a Float128 to add to this instance
+         *
+         * @return this instance with the new value (the sum of the two summands)
+         */
+        private F128 addUnsigned(final F128 summand) {
+            if (exponent != 0 && summand.exponent != 0) {   // Both are normal numbers
+                if (exponent == summand.exponent)             // Same exponent
+                    return addWithSameExps(summand);
+                return addWitDifferentExps(summand);          // Different exponents
+            }
+            // At least one of the summands is subnormal
+            if ((exponent | summand.exponent) != 0)         // And one is normal
+                return addNormalAndSubnormal(summand);
+
+            // Both are subnormals. It's the simplest case
+            exponent = (int) addMant(summand.mantHi, summand.mantLo);  // if there was carry (to the implicit unity),
+            return this;
+        }
+
+        /**
+         * Adds a summand to this instance in case when both summands are normal
+         * and have the same exponent
+         *
+         * @param summand a Float128 to add to this instance
+         *
+         * @return this instance with the new value (the sum of the two summands)
+         */
+        private F128 addWithSameExps(final F128 summand) {
+            final long carryUp = addMant(summand.mantHi, summand.mantLo);
+            final long shiftedOutBit = mantLo & 1;           // the bit that will be shifted out
+            shiftMantissaRight(1);
+
+            if (shiftedOutBit != 0 && ++mantLo == 0)    // Carry to the higher word
+                mantHi++;
+
+            if (carryUp != 0) mantHi |= BIT_63;        // Set the highest bit (where the carry should get)
+            if (++exponent == EXPONENT_OF_INFINITY)                  // Infinity
+                mantHi = mantLo = 0;
+            return this;
+        }
+
+        /**
+         * Adds a summand to this instance
+         * in case when both summands and this are normal and have different exponents
+         *
+         * @param summand a Float128 to add to this instance
+         *
+         * @return this instance with the new value (the sum of the two summands)
+         */
+        private F128 addWitDifferentExps(final F128 summand) {
+            long greaterHi, greaterLo, exp2;
+
+            // Put the mantissa of the lesser summand, that is to be shifted, to the fields of this instance
+            if (Integer.compareUnsigned(exponent, summand.exponent) < 0) { // Value of this is less than the value of the other
+                greaterHi = summand.mantHi;
+                greaterLo = summand.mantLo;    // mantissa of the greatest to be added
+                exp2 = exponent;                                  // the exponent of the lesser
+                exponent = summand.exponent;                      // Copy the exponent of the greater value to this
+            } else {
+                greaterHi = mantHi;
+                greaterLo = mantLo;           // mantissa of the greatest to be added
+                mantHi = summand.mantHi;
+                mantLo = summand.mantLo; // mantissa of the lesser to be shifted
+                exp2 = summand.exponent;                          // the exponent of the lesser
+            }
+
+            final int shift = exponent - (int) exp2;
+            if (Integer.compareUnsigned(shift,
+                                        129) > 0) {      // Implied higher unity of the lesser will be two positions farther than bit 0
+                mantHi = greaterHi;
+                mantLo = greaterLo;           // The lesser summand is too small to affect the result
+                return this;
+            }
+
+            if (shift == 129)                                   // The implied unity of the lesser is added to the greater
+                return greaterPlusLowerBit(greaterHi, greaterLo);
+
+            final long shiftedOutBit = shiftAndSetUnity(shift);        // shifts right and adds the implicit unity of the lesser
+            final long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
+            if (carryUp != 0)                                   // Overflow, shift 1 bit right
+                shiftAndCorrectExponent(shiftedOutBit);           // shiftedOutBit flags that it was rounded up already
+
+            return this;
+        }
+
+        /**
+         * Adds a summand to this instance in case when exactly one of the summands is subnormal
+         *
+         * @param summand a Float128 to add to this instance
+         *
+         * @return this instance with the new value (the sum of the two summands)
+         */
+        private F128 addNormalAndSubnormal(final F128 summand) {
+            long greaterHi;
+            long greaterLo;
+            long shiftedOutBit;
+            // Put the subnormal mantissa, that will be shifted, into the instance fields,
+            // the mantissa of the greater (normal) value into local variables,
+            // And the exponent of the normal value in the exponent field of this
+            if (exponent == 0) {                                // This is subnormal
+                greaterHi = summand.mantHi;
+                greaterLo = summand.mantLo;   // Normal value to be added to this
+                exponent = summand.exponent;                      // Copy the exponent of the larger value to this
+            } else {                                            // The other is subnormal
+                greaterHi = mantHi;
+                greaterLo = mantLo;           // Normal mantissa to be added
+                mantHi = summand.mantHi;
+                mantLo = summand.mantLo; // Subnormal mantissa to be shifted
+            }
+
+            final int shift = exponent - 1;                     // How far should we shift subnormal mantissa
+            int lz = Long.numberOfLeadingZeros(mantHi);         // Leading zeros in the subnormal value
+            if (lz == 64) lz = 64 + Long.numberOfLeadingZeros(mantLo);
+            if (shift + lz > 128) {                            // Subnormal is too small to affect the result
+                mantHi = greaterHi;
+                mantLo = greaterLo;
+                return this;
+            }
+
+            shiftedOutBit = highestShiftedOutBit(shift);        // Shift the lesser summand rightwards
+            shiftMantissaRight(shift);                          // Here we don't need to add the implicit 1
+            final long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
+
+            if (carryUp != 0)                                   // Overflow, shift 1 bit right
+                shiftAndCorrectExponent(shiftedOutBit);
+
+            return this;
+        }
+
+        /**
+         * Adds the given 128-bit value to the mantissa of this instance
+         *
+         * @param mantHi2 the higher 64 bits of the 128-bit summand to be added
+         * @param mantLo2 the lower 64 bits of the 128-bit summand to be added
+         *
+         * @return the carry (1 if the addition has resulted in overflow, 0 otherwise)
+         */
+        private long addMant(long mantHi2, long mantLo2) {
+            mantLo += mantLo2;
+            long carry = Long.compareUnsigned(mantLo, mantLo2) < 0 ? 1 : 0;
+            if (carry != 0 && (mantHi += carry) == 0) {
+                mantHi = mantHi2;
+            } else {
+                mantHi += mantHi2;
+                carry = Long.compareUnsigned(mantHi, mantHi2) < 0 ? 1 : 0;
+            }
+            return carry;
+        }
+
+        /**
+         * Shifts the mantissa of this instance by {@code shift} bits to the right,
+         * without setting the implicit unity,
+         * and returns the bits of the former mantissa that dont't fit in 128 bits after the shift (shifted-out bits).
+         * (e.g. if the value of {@code shift} was 3, the lowest 3 bits of {@code mantLo} will be returned in bits 63-61 of the result, the other bits will be 0)
+         *
+         * @param shift the distance to shift the mantissa
+         *
+         * @return the bits of mantissa that was shifted out
+         */
+        private long shiftMantissaRight(int shift) {
+            long shiftedOutBits;
+            if (shift == 0) return 0L;
+
+            if (shift == 128) {
+                shiftedOutBits = mantHi;
+                mantHi = mantLo = 0;
+                return shiftedOutBits;
+            }
+
+            shiftedOutBits = (shift <= 64) ?
+                    (mantLo << 64 - shift) :
+                    (mantHi << 128 - shift | mantLo >>> shift - 64);
+
+            if (shift >= 64) {
+                mantLo = mantHi >>> shift - 64;
+                mantHi = 0;
+            } else {
+                mantLo = mantLo >>> shift | mantHi << (64 - shift);
+                mantHi = mantHi >>> shift;
+            }
+            return shiftedOutBits;
+        }
+
+        /**
+         * Increments the value passed in the parameters and assigns it to the mantissa.
+         * If the mantissa becomes 0 (that indicates its overflow), increments the exponent.
+         *
+         * @param greaterHi the upper 64 bits of the given value
+         * @param greaterLo the lower 64 bits of the given value
+         *
+         * @return this instance with the new value
+         */
+        private F128 greaterPlusLowerBit(long greaterHi, long greaterLo) {
+            if ((mantLo = ++greaterLo) == 0) {
+                if ((mantHi = ++greaterHi) == 0)
+                    exponent++;                    // If it becomes infinity, the mantissa is already 0
+            } else
+                mantHi = greaterHi;
+            return this;
+        }
+
+        /**
+         * Shifts the mantissa of this instance by {@code shift} bits right
+         * and sets the implicit unity in the correspondent position
+         *
+         * @param shift the distance to shift the mantissa
+         *
+         * @return the value of the highest bit that was shifted out
+         */
+        private long shiftAndSetUnity(int shift) {
+            final long shiftedOutBit = (shift == 0) ? 0 :               // Keep in mind the highest bit that will be shifted out
+                    (shift <= 64) ? 1 & (mantLo >>> shift - 1) :
+                            1 & (mantHi >>> shift - 65);
+            shiftMantissaRight(shift);                          // Shift the mantissa
+
+            if (shift > 64) mantLo |= 1L << (128 - shift);    // Set implicit unity (bit 129) of the lesser
+            else mantHi |= 1L << (64 - shift);    // as if it was shifted from beyond the mantHi
+
+            return shiftedOutBit;                               // Return the highest shifted-out bit
+        }
+
+        /**
+         * Adds the given 128-bit value to the mantissa, taking into account the carry from
+         * the lower part of the summand (that may have been shifted out beforehand)
+         *
+         * @param summandHi the higher part of the 128-bit summand
+         * @param summandLo the lower part of the 128-bit summand
+         * @param carry     the carry from the lower bits (may be 0 or 1)
+         *
+         * @return the carry (1 if the addition has led to overflow, 0 otherwise)
+         */
+        private long addAndRoundUp(long summandHi, long summandLo, long carry) {
+            if (carry != 0 && (mantLo += carry) == 0) {
+                mantLo = summandLo;
+                carry = 1;
+            } else {
+                mantLo += summandLo;
+                carry = Long.compareUnsigned(mantLo, summandLo) < 0 ? 1 : 0;
+            }
+            if (carry != 0 && (mantHi += carry) == 0) {
+                mantHi = summandHi;
+            } else {
+                mantHi += summandHi;
+                carry = Long.compareUnsigned(mantHi, summandHi) < 0 ? 1 : 0;
+            }
+            return carry;
+        }
+
+        /**
+         * Shifts the mantissa one bit right and rounds it up (unless rounding is forbidden by non-null value
+         * of the {@code dontRoundUpAnyMore} parameter) and increments the exponent.
+         * If the exponent becomes equal to {@code EXPONENT_OF_INFINITY}, clears the mantissa to force Infinity.
+         *
+         * @param dontRoundUpAnyMore non-zero value
+         */
+        private void shiftAndCorrectExponent(long dontRoundUpAnyMore) {
+            final long shiftedOutBit = dontRoundUpAnyMore != 0 ? 0 : (mantLo & 1);    // the lowest bit to be shifted out (if was not rounded yet)
+            shiftMantissaRight(1);                              // after that, the highest bit is always 0
+            if (shiftedOutBit != 0)                             // Don't round up if already
+                addMant(0, 1);                                    // so carry after this addition is impossible
+            if (++exponent == EXPONENT_OF_INFINITY)                          // Infinity
+                mantHi = mantLo = 0;
+        }
+
+        /**
+         * Returns the highest bit of the mantissa that will be shifter out
+         * during shift right by {@code shift} bits
+         *
+         * @param shift the distance the value will be shifted
+         *
+         * @return 1, if the highest shifted-out bit is 1, 0 otherwise
+         */
+        private long highestShiftedOutBit(int shift) {
+            if (shift == 0) return 0;
+            if (shift <= 64) return 1 & (mantLo >>> shift - 1);
+            return 1 & (mantHi >>> shift - 65);
+        } // private long highestShiftedOutBit(int shift) {
+
+        /* **********************************************************************************
+         * Used by subtraction **************************************************************
+         ********************************************************************************** */
+
+        /**
+         * Subtracts a regular number (Non-NaN, non-infinity) from this instance, ignoring sings.
+         * returns a negative value of the difference if the subtrahend is greater in magnitude than the minuend (this),
+         * and a positive one otherwise.
+         *
+         * @param subtrahend the value to be subtracted
+         */
+        private void subtractUnsigned(final F128 subtrahend) {
+            long minuendLo, minuendHi;
+            int lesserExp;
+
+            final int thisIsGreater = compareMagnitudeTo(subtrahend); // ignores signs
+            if (thisIsGreater == 0)                             // operands are equal in magnitude
+            {
+                assignZero();
+                return;
+            }
+
+            // Swap minuend and subtrahend, if minuend is less in magnitude than subtrahend
+            // so that this.mantHi, this.mantLo and lesserExp contain respectively mantissa and exponent
+            // of the subtrahend (the lesser of the operands),
+            // and minuendHi, minuendLo and this.exponent contain ones of the minuend (the greater one)
+            if (thisIsGreater > 0) {
+                minuendLo = mantLo;
+                minuendHi = mantHi;           // mantissa of the greater
+                mantHi = subtrahend.mantHi;
+                mantLo = subtrahend.mantLo; // mantissa of the lesser to be shifted rightwards
+                lesserExp = subtrahend.exponent;
+                negative = false;                                 // minuend is greater than subtrahend
+            } else {                                            // Subtrahend is greater in magnitude
+                minuendLo = subtrahend.mantLo;
+                minuendHi = subtrahend.mantHi; // mantissa of the greater
+                lesserExp = exponent;
+                exponent = subtrahend.exponent;                   // may remain unchanged
+                negative = true;                                  // minuend is less than subtrahend
+            }
+
+            if (exponent != 0 && lesserExp != 0)                // Both are normal
+            {
+                subtractNormals(minuendLo, minuendHi, lesserExp);
+                return;
+            }
+
+            if ((exponent | lesserExp) == 0)                    // both are subnormal
+            {
+                subtractSubnormals(minuendLo, minuendHi);
+                return;
+            }
+
+            subtractSubnormalFromNormal(minuendLo, minuendHi);
+        } // private Float128 subtractUnsigned(Float128 subtrahend) {
+
+        /**
+         * Compares the magnitude (absolute value) of this instance
+         * with the magnitude of the other instance.
+         *
+         * @param other the Quadruple to compare with
+         *
+         * @return 1 if this instance is greater in magnitude than the {@code other} instance,
+         * 0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
+         */
+        public int compareMagnitudeTo(final F128 other) {
+            // 20.10.24 18:44:39 Regarding NaNs, behave like doubles
+            if (isNaN())
+                return other.isNaN() ? 0 : 1;
+            if (other.isNaN())
+                return -1;
+
+            if (isInfinite())
+                return other.isInfinite() ? 0 : 1;
+            if (other.isInfinite())
+                return -1;
+
+            int result;
+            if ((result = Integer.compareUnsigned(exponent, other.exponent)) != 0)
+                return result;
+            if ((result = Long.compareUnsigned(mantHi, other.mantHi)) != 0) // If exponents are equal, compare mantissas
+                return result;
+            return Long.compareUnsigned(mantLo, other.mantLo);
+        } // public int compareMagnitudeTo(Quadruple other) {
+
+        /**
+         * Compares the magnitudes (absolute values) of the two Quadruples.
+         *
+         * @param q1 the instance to compare with the other one
+         * @param q2 the instance to compare with
+         *
+         * @return a negative integer, zero, or a positive integer as the magnitude of the first
+         * instance is less than, equal to, or greater than the magnitude of the second instance.
+         */
+        public static int compareMagnitudes(F128 q1, F128 q2) {
+            return q1.compareMagnitudeTo(q2);
+        } // public static int compareMagnitudes(Quadruple q1, Quadruple q2) {
+
+        /**
+         * Subtracts a normal value, whose mantissa is contained by this
+         * instance and exponent is passed in as the {@code lesserExp} parameter, from another
+         * normal value, whose mantissa is contained in {@code minuendLo} and {@code minuendLo}
+         * parameters and exponent is in the {@code exponent} field of this instance.
+         *
+         * @param minuendLo the lower 64 bits of the minuend
+         * @param minuendHi the higher 64 bits of the minuend
+         * @param lesserExp the exponent of the subtrahend
+         */
+        private void subtractNormals(long minuendLo, long minuendHi, int lesserExp) {
+            final int shift = exponent - lesserExp;             // The distance to shift the mantissa of the subtrahend
+            if (shift > 130) {                                 // The subtrahend is too small to affect the result
+                mantHi = minuendHi;
+                mantLo = minuendLo;
+                return;
+            }
+
+            if (shift == 130)  // the result differs from the minuend in the only case when minuend is 2^n (1.00..00 * 2^n)
+            {
+                subtract_1e_130(minuendLo, minuendHi);
+                return;     // and subtrahend is greater than 2^(n-130).
+            }
+
+            if (shift == 129) {
+                subtract_1e_129(minuendLo, minuendHi);
+                return;     // subtracts LSB if subtrahend > LSB
+            }
+
+            if (shift != 0) // 0 < shift < 129, different exponents
+            {
+                subtractDifferentExp(minuendLo, minuendHi, shift);
+                return;
+            }
+
+            // same exponent
+            subtractSameExp(minuendLo, minuendHi);
+        } // private Float128 subtractNormals(long minuendLo, long minuendHi, int lesserExp) {
+
+        /**
+         * Subtracts a value whose exponent is lower than the exponent of the minuend by 130.
+         * The only case when the subtrahend affects the result is
+         * when the minuend is 2^n and the subtrahend is greater than 2^(n-130).
+         * The result is 1.FF..FF * 2^(n-1) in this case, otherwise it equals the minuend.
+         * The result is assigned to this instance.
+         *
+         * @param minuendLo the lower 64 bits of the minuend
+         * @param minuendHi the higher 64 bits of the minuend
+         */
+        private void subtract_1e_130(long minuendLo, long minuendHi) {
+            if ((mantHi | mantLo) != 0 && (minuendLo | minuendHi) == 0) {// 0b1_00...00.0000 - 0.01xx, where one of the x's != 0, == 0_11..11.10
+                mantHi = mantLo = -1;
+                exponent--;
+            } else {
+                mantHi = minuendHi;
+                mantLo = minuendLo;
+            }
+        } // private Float128 subtract_1e_130(long minuendLo, long minuendHi) {
+
+        /**
+         * Subtracts unity from the LSB of the mantissa of the minuend passed in,
+         * if the subtrahend is greater than 1/2 LSB of the minuend.
+         * if the minuend == 2^n (1.00..00*2^n), the result is 1.FF..FF * 2^(n-1) in case if the subtrahend <= 3/4 LSB,
+         * and 1.FF..FE * 2^(n-1) in case if the subtrahend > 3/4 LSB.
+         * Assigns the result to the {@code mantHi, mantLo} fields of this instance
+         *
+         * @param minuendLo the lower 64 bits of the minuend
+         * @param minuendHi the higher 64 bits of the minuend
+         */
+        private void subtract_1e_129(long minuendLo, long minuendHi) {
+            final long subtrahendHi = mantHi, subtrahendLo = mantLo;
+
+            if ((minuendHi | minuendLo) == 0) {                 // Borrow from the implicit unity is inevitable (1.000 - 0.001 = 0.FFF
+                mantHi = mantLo = -1;                           // Subtrahend is not less then 1/2 LSB, 0b1.00..00 - 0b0.00..00,1 = 0b0.11..11,1 << 1 = 0b1.1111e-1
+                if (((subtrahendHi & HIGH_BIT) != 0)        // The MSB is 1 and at least one of other bits is 1, e.g. 1.10001... > 1.5e-129
+                        && (((subtrahendHi & ~HIGH_BIT) | subtrahendLo) != 0))  // i.e. subtrahend is greater than 3/4 LSB,
+                    mantLo--;                                     // in this case mantissa = 1.FF...FE
+                exponent--;                                     // The difference can't become subnormal
+            } else {
+                mantLo = minuendLo;
+                mantHi = minuendHi;
+                if ((subtrahendHi | subtrahendLo) != 0)         // Subtrahend is greater than 1/2 LSB (at least one bit except the implicit unity is 1)
+                    if (--mantLo == -1) mantHi--;                 // Can't underflow since it's not 0 here
+            }
+        } // private Float128 subtract_1e_129(long minuendLo, long minuendHi) {
+
+        /**
+         * Subtracts a normal value, whose mantissa is contained by this instance
+         * and exponent is less than exponent of {@code this} by the amount
+         * passed in the {@code shift} parameter, from another normal value,
+         * whose mantissa is contained in {@code minuendLo} and {@code minuendLo} parameters
+         * and exponent is contained in the {@code exponent} field of this instance
+         *
+         * @param minuendLo the lower 64 bits of the mantissa of the minuend
+         * @param minuendHi the higher 64 bits of the mantissa of the minuend
+         * @param shift     the difference between the exponents
+         */
+        private void subtractDifferentExp(long minuendLo, long minuendHi, int shift) {
+            final long shiftedOutBits = shiftMantissaRight(
+                    shift);  // Shift the subtrahend's mantissa rightwards to align by bits' values
+            setUnity(shift);                                    // The implicit highest unity of the subtrahend
+            long borrow =
+                    Long.compareUnsigned(shiftedOutBits, HIGH_BIT) > 0 ? 1 : 0; // more than 1/2 of LSB
+            borrow = subtrMant(minuendHi, minuendLo, borrow);   // has borrow propagated to the implicit unity?
+
+            if (borrow != 0) {                                  // yes, needs normalization
+                if (shift == 1)
+                    normalizeShiftedByOneBit(shiftedOutBits);       // shiftedOutBits may be MIN_VALUE or 0
+                else
+                    normalizeShiftedByAFewBits(
+                            shiftedOutBits);     // shift > 1, highest bit of mantHi is always 1. shift can't be o here
+            } else if ((mantHi | mantLo) == 0 && shiftedOutBits == HIGH_BIT) { // 1.0 - 2^129 = 1.FFFF_... * 2^-1
+                exponent--;
+                mantHi = mantLo = 0xFFFF_FFFF_FFFF_FFFFL;
+            }
+        } // private Float128 subtractDifferentExp(long minuendLo, long minuendHi, int shift) {
+
+        /**
+         * Normalizes the mantissa after subtraction, in case when subtrahend was shifted right by one bit.
+         * There may be zeros in higher bits of the result, so we shift the mantissa left by (leadingZeros + 1) bits
+         * and take into account borrow that possibly has to be propagated from the shifted-out bit of the subtrahend.
+         *
+         * @param shiftedOutBits the bits that were shifted out (in the leftmost position of the parameter)
+         *                       <br>Covered
+         */
+        private void normalizeShiftedByOneBit(long shiftedOutBits) {
+            int lz = numberOfLeadingZeros();
+            if (lz == 0) {
+                shiftMantLeft(1);
+                exponent--;                     // The implicit unity was zeroed by borrow, exponent was >= 2, now >= 1
+                if (shiftedOutBits != 0)                          // Is borrow to be propagated from the shifted-out bit?
+                    if (--mantLo == -1 && --mantHi == -1) {         // Borrow from the implicit unity
+                        if (--exponent != 0)                          // has it become subnormal?
+                            shiftMantLeft(1);                           // no, shift out the implicit unity
+                    }
+            } else {                                            // lz != 0, a few high bits are zeros
+                if ((shiftedOutBits != 0)) {                      // Need to take borrow into account
+                    shiftMantLeft(1);
+                    exponent--;
+                    if (--mantLo == -1)
+                        mantHi--;                   // Borrow. mantHi can't become -1, since it's shifted and thus >= 2
+                    lz = numberOfLeadingZeros();                    // it has changed, so find the new value
+                }
+                normalize(lz + 1);
+            }
+        } // private void normalizeShiftedByOneBit(long shiftedOutBits) {
+
+        /**
+         * Normalizes the mantissa after subtraction, in case when subtrahend was shifted right
+         * by more than one bit. The highest bit of mantHi is always 1 (mantHi & HIGH_BIT != 0),
+         * for rounding the result, take into account more shifted-out bits, than just the highest of them.
+         *
+         * @param shiftedOutBits the bits that were shifted out (in the leftmost position of the parameter)
+         *                       <br>Covered
+         */
+        private void normalizeShiftedByAFewBits(long shiftedOutBits) {
+            shiftMantLeft(1);
+            exponent--;
+            if (shiftedOutBits == HIGH_BIT || shiftedOutBits > 0x4000_0000_0000_0000L) {
+                if (--mantLo == -1)                               // round down (shifted-out part of subtrahend was .1000.. or > .0100.. )
+                    mantHi--;                                       // mantHi and mantLo can't be 0 at the same, so it won't get underflowed
+            } else if (shiftedOutBits <= 0xC000_0000_0000_0000L)     // shifted-out part of subtrahend was > .1000, so it's rounded down,
+                // but it was <= .1100.., so it shouldn't have been rounded down
+                mantLo |= 1;                                    // then undo rounding down
+
+        } // private void normalizeShiftedByAFewBits(long shiftedOutBits) {
+
+        /**
+         * Normalizes the result of subtraction,
+         * shifting the mantissa leftwards by {@code shift} bits i case when the result remains normal,
+         * or by {@code exponent - 1}, when the result becomes subnormal, and correcting the exponent appropriately.
+         *
+         * @param shift the distance to shift the mantissa and the amount to decrease the exponent by
+         *              <br>Covered
+         */
+        private void normalize(int shift) {
+            if (Integer.compareUnsigned(exponent, shift) > 0) { // Remains normal
+                shiftMantLeft(shift);
+                exponent -= shift;
+            } else {                                            // becomes subnormal
+                if (exponent > 1)
+                    shiftMantLeft(exponent - 1);
+                exponent = 0;
+            }
+        } // private void normalize(int shift) {
+
+        /**
+         * Calculates the number of leading zeros in the mantissa
+         *
+         * @return the number of leading zeros in the mantissa
+         * <br>Covered
+         */
+        private int numberOfLeadingZeros() {
+            int lz = Long.numberOfLeadingZeros(mantHi);         // Leading zeros in high 64 bits
+            if (lz == 64) lz += Long.numberOfLeadingZeros(mantLo);  // if all zeros, add zeros of lower 64 bits
+            return lz;
+        } // private int numberOfLeadingZeros() {
+
+        /**
+         * Subtracts subtrahend, whose mantissa in the {@code mantHi, mantLo} fields,
+         * from the minuend passed in the parameters, when the exponents of the subtrahend and the minuend are equal.
+         */
+        private void subtractSameExp(long minuendLo, long minuendHi) {
+            mantLo = minuendLo - mantLo;
+            if (Long.compareUnsigned(minuendLo, mantLo) < 0)    // borrow
+                minuendHi--;
+            mantHi = minuendHi - mantHi;                        // Borrow impossible since minuend > subtrahend
+
+            // The implicit unity is always 0 after this subtraction (1.xxx - 1.yyy = 0.zzz), so normalization is always needed
+            normalize(numberOfLeadingZeros() + 1);
+        } // private Float128 subtractSameExp(long minuendLo, long minuendHi) {
+
+        /**
+         * Subtracts a subnormal value, whose mantissa is contained by this instance,
+         * from a normal value, whose mantissa is contained in {@code minuendLo} and {@code minuendLo} parameters
+         * and exponent is contained in the {@code exponent} field of this instance
+         *
+         * @param minuendLo the lower 64 bits of the mantissa of the minuend
+         * @param minuendHi the higher 64 bits of the mantissa of the minuend
+         */
+        private void subtractSubnormalFromNormal(long minuendLo, long minuendHi) {
+            final int shift = exponent - 1;                     // How far should we shift subnormal mantissa
+            final int lz = numberOfLeadingZeros();
+
+            if (((shift & 0xFFFF_FF00) != 0) || (shift + lz > 129)) {  // Normal is too great or Subnormal is too small to affect the result
+                mantHi = minuendHi;
+                mantLo = minuendLo;
+                return;
+            }
+
+            final long shiftedOutBits = shiftMantissaRight(
+                    shift);  // Shift the subtrahend's mantissa rightwards to align by bits' values
+            long borrow = Long.compareUnsigned(shiftedOutBits, HIGH_BIT) > 0 ? 1 : 0; // greater than 1/2 of LSB
+
+            borrow = subtrMant(minuendHi, minuendLo, borrow);   // has borrow propagated to the implicit unity?
+            if (borrow != 0) {                                  // yes, needs normalization
+                if (shift == 1)
+                    normalizeShiftedByOneBit(shiftedOutBits);       // shiftedOutBits may be MIN_VALUE or 0
+                else if (shift != 0)
+                    normalizeShiftedByAFewBits(shiftedOutBits);     // shift > 1, highest bit of mantHi is always 1
+                else exponent = 0;                                // exponent was 1, borrow from implicit unity, becomes subnormal
+            } else if ((mantHi | mantLo) == 0
+                    && (shiftedOutBits == HIGH_BIT || shiftedOutBits > 0x4000_0000_0000_0000L)) { // 1.0 - 2^129 = 1.FFFF_... * 2^-1
+                exponent--;
+                mantHi = mantLo = 0xFFFF_FFFF_FFFF_FFFFL;
+            }
+        } // private Float128 subtractSubnormalFromNormal(long minuendLo, long minuendHi) {
+
+        /**
+         * Subtracts a subnormal value, whose mantissa is contained by this instance,
+         * from another subnormal value, whose mantissa is contained in {@code minuendLo} and {@code minuendLo} parameters.
+         * FYI, exponents of subnormal values are always 0
+         *
+         * @param minuendLo the lower 64 bits of the mantissa of the minuend
+         * @param minuendHi the higher 64 bits of the mantissa of the minuend
+         */
+        private void subtractSubnormals(long minuendLo, long minuendHi) {
+            mantLo = minuendLo - mantLo;
+            if (Long.compareUnsigned(mantLo, minuendLo) > 0)    // borrow
+                minuendHi--;
+            mantHi = minuendHi - mantHi;
+        }
+
+        /**
+         * Sets a bit of the mantissa into 1. The position of the bit to be set is defined by the {@code shift} parameter.
+         * The bits are implied to be numbered starting from the highest, from 1 to 128,
+         * so that {@code setUnity(1)} sets the MSB of the {@code mantHi} field, and {@code setUnity(128)} sets the LSB of {@code mantLo}
+         *
+         * @param shift the number of the bit to set, starting from 1, that means the most significant bit of the mantissa
+         */
+        private void setUnity(int shift) {
+            if (shift > 64)
+                mantLo |= 1L << 128 - shift;
+            else
+                mantHi |= 1L << 64 - shift;
+        }
+
+        /**
+         * Shifts the mantissa leftwards by {@code shift} bits
+         *
+         * @param shift the distance to shift the mantissa by
+         */
+        private void shiftMantLeft(int shift) {
+            assert (shift >= 0 && shift < 129) : "Can't shift by more than 128 or less than 1 bits";
+            if (shift == 0) return;
+            if (shift >= 128) {
+                mantHi = mantLo = 0;
+                return;
+            }
+            if (shift >= 64) {
+                mantHi = mantLo << (shift - 64);
+                mantLo = 0;
+            } else {
+                mantHi = mantHi << shift | mantLo >>> (64 - shift);
+                mantLo = mantLo << shift;
+            }
+        }
+
+        /**
+         * Subtracts {@code mantHi} and {@code mantLo} from {@code minuendHi} and {@code minuendLo},
+         * taking into account the {@code borrow}.
+         * The result is returned in {@code mantHi} and {@code mantLo}
+         *
+         * @param minuendHi the higher 64 bits of the minuend
+         * @param minuendLo the lower 64 bits of the minuend
+         * @param borrow    the borrow from the lower (shifted out) bits (additionally subtracts 1 if borrow != 0)
+         *
+         * @return the borrow from the higher bit (implicit unity). May be 0 or 1
+         */
+        private long subtrMant(long minuendHi, long minuendLo, long borrow) {
+            if (borrow != 0 && --minuendLo == -1) {
+                mantLo = -1 - mantLo;   // -1 - mantLo == minuendLo - mantLo here
+                borrow = 1;
+            } else {
+                mantLo = minuendLo - mantLo;
+                borrow = Long.compareUnsigned(mantLo, minuendLo) > 0 ? 1 : 0;
+            }
+            if (borrow != 0 && --minuendHi == -1) {
+                mantHi = -1 - mantHi;
+            } else {
+                mantHi = minuendHi - mantHi;
+                borrow = Long.compareUnsigned(mantHi, minuendHi) > 0 ? 1 : 0;
+            }
+            return borrow;
+        }
+
+        /* **********************************************************************************
+         * Used by multiplication  **********************************************************
+         ********************************************************************************** */
+
+        /**
+         * Multiples this instance of {@link Float128} by the given {@link Float128} factor, ignoring the signs
+         * <br>Uses static arrays
+         * <b><i>BUFFER_5x32_A, BUFFER_5x32_B, BUFFER_10x32_A</i></b>
+         *
+         * @param factor the factor to multiply this instance by
+         */
+        private void multUnsigned(Float128 factor) {
+            // will use these buffers to hold unpacked mantissas of the factors (5 longs each, 4 x 32 bits + higher (implicit) unity)
+            final long[] factor1 = BUFFER_5x32_A, factor2 = BUFFER_5x32_B, product = BUFFER_10x32_A;
+
+            long productExponent = Integer.toUnsignedLong(
+                    exponent)  // Preliminarily evaluate the exponent of the product (may get adjusted)
+                    + Integer.toUnsignedLong(factor.exponent) - EXPONENT_OF_ONE;
+
+            if (exponentWouldExceedBounds(productExponent, 1,
+                                          0))         // exp < 129 || exp > EXPONENT_OF_MAX_VALUE, assigns respectively 0 or Infinity
+                return;
+
+            // put the mantissas into the buffers that will be used by the proper multiplication
+            productExponent = normalizeAndUnpack(factor, productExponent, factor1, factor2); // May decrease productExponent
+            if (productExponent < -129)                               // Product will be less than 1/2 MIN_VALUE
+            {
+                assignZero();
+                return;
+            }
+
+            multiplyBuffers(factor1, factor2, product);               // Leaves the higher half-words empty
+            final boolean isRoundedUp = roundBuffer(product);
+
+            productExponent = normalizeProduct(product, productExponent, isRoundedUp);
+            if (productExponent > EXPONENT_OF_MAX_VALUE)                            // Overflow, return infinity
+            {
+                assignInfinity();
+                return;
+            }
+
+            packBufferToMantissa(product);
+
+            if (productExponent <= 0)                                 // Result is subnormal
+                productExponent = normalizeSubnormal(productExponent, isRoundedUp);
+
+            exponent = (int) productExponent;
+        }
+
+        /**
+         * Prepares the mantissas for being multiplied:<br>
+         * if one of the factors is subnormal, normalizes it and appropriately corrects the exponent of the product,
+         * then unpack both mantissas to buffers {@code buffer1}, {@code buffer2}.
+         *
+         * @param factor          the factor to multiply this by
+         * @param productExponent preliminary evaluated value of the exponent of the product
+         * @param buffer1         a buffer to hold unpacked mantissa of one of the factors (5 longs, each holds 32 bits )
+         * @param buffer2         a buffer to hold unpacked mantissa of the other factor
+         *
+         * @return the exponent of the product, corrected in case if one of the factors is subnormal
+         * <br>Covered
+         */
+        private long normalizeAndUnpack(Float128 factor, long productExponent, long[] buffer1, long[] buffer2) {
+
+            // If one of the numbers is subnormal, put its mantissa in mantHi, mantLo
+            long factorMantHi = factor.mantHi, factorMantLo = factor.mantLo;
+            boolean oneIsSubnormal = false;
+            if (exponent == 0) {                 // this is subnormal
+                oneIsSubnormal = true;
+            } else if (factor.exponent == 0) {   // factor is subnormal, copy it's mantissa to this and this to mantHi, mantLo
+                factorMantHi = this.mantHi;
+                factorMantLo = this.mantLo;
+                this.mantHi = factor.mantHi;
+                this.mantLo = factor.mantLo;
+                oneIsSubnormal = true;
+            }
+
+            if (oneIsSubnormal) {       // Subnotmal's mantissa is here now. Normalize it and adjust exponent
+                final int lz = numberOfLeadingZeros();
+                productExponent -= lz;
+                if (productExponent < -129)  // Product would be less than (MIN_VALUE / 2)
+                    return productExponent;
+                shiftMantLeft(lz + 1); // Normalize mantissa
+            }
+
+            unpack_To5x32(mantHi, mantLo, buffer1);
+            unpack_To5x32(factorMantHi, factorMantLo, buffer2);
+            return productExponent;
+        } // private long normalizeAndUnpack(Float128 factor, long productExponent, long[] buffer1, long[] buffer2) {
+
+        /**
+         * Multiplies the value stored in {@code factor1} as unpacked 128-bit}<br>
+         * {@code (4 x 32 bit + highest (implicit) unity)}
+         * <br>
+         * by the value stored in factor2 of the same format and saves the result
+         * in the {@code product} as unpacked 256-bit value}<br>
+         * {@code (8 x 32 bit + 1 or 2 highest bits of the product + 0)  }
+         *
+         * @param factor1 contains the unpacked value of factor1
+         * @param factor2 contains the unpacked value of factor2
+         * @param product gets filled with the unpacked value of the product
+         */
+        private static void multiplyBuffers(long[] factor1, long[] factor2, long[] product) {
+            assert (factor1.length == factor2.length && product.length == factor1.length * 2) :
+                    "Factors' lengths must be equal to each other and twice less than the product's length";
+
+            Arrays.fill(product, 0);
+            final int maxIdxFact = factor1.length - 1;
+            long sum = 0;
+
+            for (int i = maxIdxFact; i >= 0; i--) { // compute partial 32-bit products
+                for (int j = maxIdxFact; j >= 0; j--) {
+                    sum = factor1[i] * factor2[j];
+                    product[i + j + 1] += sum & LOWER_32_BITS;
+                    product[i + j] += (sum >>> 32) + (product[i + j + 1] >>> 32);
+                    product[i + j + 1] &= LOWER_32_BITS;
+                }
+            }
+        }
+
+        /**
+         * Rounds the content of the given unpacked buffer
+         * so that it contains 128 bits of the fractional part of the product.
+         * The integer part of the product of two mantissas is contained in the lowest bits of it buffer[1],
+         * the fractional part is contained in the lower half-words of buffer[2]..buffer[6].
+         * If bit 129 (counting rightwards starting from the point position),
+         * i.e. bit 31 of buffer[6], is 1, the content of buffer[1] -- buffer[5] gets incremented.
+         *
+         * @return a flag signifying that the number is actually rounded up,
+         * used to prevent unnecessary rounding in the future
+         */
+        private boolean roundBuffer(long[] buffer) {
+            buffer[6] += 0x8000_0000L;               // it's 1/2 of the LSB. Round half-up
+            if ((buffer[6] & 0x1_0000_0000L) == 0)   // no carry at all
+                return false;
+
+            for (int i = 5; ; i--) {             // it will inevitably break, at most at the last iteration
+                buffer[i + 1] = 0;                // If there's carry here, the lower word = 0
+                buffer[i]++;                      // propagate the carry. The higher half-word is always 0
+                if ((buffer[i] & 0x1_0000_0000L) == 0) // Still 0. No carry to the next higher word
+                    break;
+            }
+            return true;
+        }
+
+        /**
+         * Normalizes a product of multiplication.<br>
+         * The product may be => 2 (e.g. 1.9 * 1.9 = 3.61), in this case it should be
+         * divided by two, and the exponent should be incremented.
+         *
+         * @param product         a buffer containing the product
+         * @param productExponent preliminary evaluated exponent of the product (may get adjusted)
+         * @param isRoundedUp     a flag signifying that rounding should not be applied
+         *
+         * @return the exponent of the product, perhaps adjusted
+         */
+        private long normalizeProduct(long[] product, long productExponent, boolean isRoundedUp) {
+            if (product[1] > 1) {                   // Carry to the highest (implied) bit --
+                productExponent++;
+                if (productExponent <= EXPONENT_OF_MAX_VALUE)
+                    shiftBufferRight(product, isRoundedUp);
+            }
+            return productExponent;
+        }
+
+        /**
+         * Packs unpacked mantissa held in the given buffer
+         * (0, 1 (integer part, i.e. implicit unity), + 4 longs containing 32 bits each)
+         * into the {@code mantLo}, {@code mantHi} fields of this instance
+         *
+         * @param buffer of 6 (at least) longs, containing the fractional part of the mantissa in the lower halves of words 2..5
+         *               <br> Covered (no special data required)
+         */
+        private void packBufferToMantissa(long[] buffer) {
+            mantLo = buffer[5] & LOWER_32_BITS | (buffer[4] << 32);
+            mantHi = buffer[3] & LOWER_32_BITS | (buffer[2] << 32);
+        }
+
+        /**
+         * Normalizes a subnormal value (with negative exponent),
+         * shifting the bits of its mantissa rightwards according to the exponent's value and clearing
+         *
+         * @param productExponent the exponent of the product (always negative for subnormal results)
+         * @param isRoundedUp     a flag to prevent taking into account the shifted-out LSB when rounding the value
+         *                        (in case if the value was already rounded-up)
+         *
+         * @return the exponent value of a subnormal Float128, that is 0
+         */
+        private long normalizeSubnormal(long productExponent, boolean isRoundedUp) {
+            if (isRoundedUp) mantLo &= -2L;     // Clear LSB to avoid excessive rounding up
+            productExponent = makeSubnormal(productExponent);
+            return productExponent;
+        }
+
+        /**
+         * Shifts the contents of a buffer, containing the unpacked mantissa
+         * of a Float128 as the lower halves of {@code buffer[2] -- buffer[5]}, rightwards one bit.
+         * Rounds it up unless the {@code isRoundedUp} parameter is {@code true}.
+         *
+         * @param buffer      the buffer of (at least) 6 longs, containing the mantissa of a Float128 value
+         * @param isRoundedUp a flag to prevent extra rounding in case if the value is already rounded up
+         */
+        private void shiftBufferRight(long[] buffer, boolean isRoundedUp) {
+            if (isRoundedUp)
+                shiftBuffRightWithoutRounding(buffer);
+            else
+                shiftBuffRightWithRounding(buffer); // There can't be carry to the highest (implied) bit, no need to check it
+        }
+
+        /**
+         * Shifts the contents of a buffer, containing the unpacked mantissa
+         * of a Float128 as the lower halves of {@code buffer[2] -- buffer[5]}, rightwards one bit, and rounds it up.
+         *
+         * @param buffer the buffer of (at least) 6 longs, containing the mantissa of a Float128 value
+         */
+        private void shiftBuffRightWithRounding(long[] buffer) {
+            final long carry = buffer[5] & 1;
+            shiftBuffRightWithoutRounding(buffer);
+            buffer[5] += carry;                   // former LSB, currently shifted out
+            for (int i = 5; i >= 2; i--) {        // Propagate carry.
+                if ((buffer[i] & HIGHER_32_BITS) != 0) { // OVerflow of the lower 32 bits
+                    buffer[i] &= LOWER_32_BITS;
+                    buffer[i - 1]++;                  // Add carry to the next higher word
+                }
+            }
+        }
+
+        /**
+         * Shifts the contents of a buffer, containing the unpacked mantissa
+         * of a Float128 as the lower halves of {@code buffer[2] -- buffer[5]}, rightwards one bit, without rounding it up
+         * (the shifted-out LSB is just truncated).
+         *
+         * @param buffer the buffer of (at least) 6 longs, containing the mantissa of a Float128 value
+         */
+        private void shiftBuffRightWithoutRounding(long[] buffer) {
+            for (int i = 5; i >= 2; i--)
+                buffer[i] = (buffer[i] >>> 1) | (buffer[i - 1] & 1) << 31;
+        }
+
+        /**
+         * Unpacks the value of the two longs, containing 128 bits of a fractional
+         * part of the mantissa, to an "unpacked" buffer, that consists of 5 longs,
+         * the first of which contains the integer part of the mantissa, aka implicit
+         * unity (that is always 1), and the others (the items
+         * {@code buffer[1] -- buffer[4]}) contain 128 bits of the fractional part in
+         * their lower halves (bits 31 - 0), the highest 32 bits in
+         * {@code buffer[1]). @param factHi the higher 64 bits of the fractional part
+         * of the mantissa
+         * <p>
+         * @param mantLo the lower 64 bits of the fractional part of the mantissa
+         * @param buffer the buffer to hold the unpacked mantissa, should be array of at
+         *               least 5 longs
+         * <p>
+         * @return the buffer holding the unpacked value (the same reference as passed
+         * in as the {@code buffer} parameter
+         */
+        private static void unpack_To5x32(long mantHi, long mantLo, long[] buffer) {
+            buffer[0] = 1;
+            buffer[1] = mantHi >>> 32;
+            buffer[2] = mantHi & LOWER_32_BITS;
+            buffer[3] = mantLo >>> 32;
+            buffer[4] = mantLo & LOWER_32_BITS;
+        } // private static long[] unpack_To5x32(long factHi, long factLo, long[] buffer) {
+
+        /**
+         * Unpacks the value of the two longs, containing 128 bits of a fractional part of the mantissa,
+         * to an "unpacked" buffer, that consists of 5 ints,
+         * the first of which contains the integer part of the mantissa, aka implicit unity (that is always 1),
+         * and the others (the items {@code buffer[1] -- buffer[4]}) contain 128 bits
+         * of the fractional part (bits 31 - 0),
+         * the highest 32 bits in {@code buffer[1]).
+         * <p>
+         * @param factHi the higher 64 bits of the fractional part of the mantissa
+         * @param mantLo the lower 64 bits of the fractional part of the mantissa
+         * @param buffer the buffer to hold the unpacked mantissa, should be array of at least 5 longs
+         * <p>
+         * @return the buffer holding the unpacked value (the same reference as passed in as the {@code buffer} parameter
+         */
+        private static void unpack_To5x32(long mantHi, long mantLo, int[] buffer) {
+            buffer[0] = 1;
+            buffer[1] = (int) (mantHi >>> 32);
+            buffer[2] = (int) (mantHi);
+            buffer[3] = (int) (mantLo >>> 32);
+            buffer[4] = (int) (mantLo);
+        } // private static int[] unpack_To5x32(long factHi, long factLo, int[] buffer) {
+
+        protected void ____Used_By_division____() {
+        }
+
+        /* **********************************************************************************
+         * Used by division *****************************************************************
+         ********************************************************************************** */
+
+        /**
+         * Divides this instance of {@link Float128} by the given {@link Float128} divisor, ignoring their signs
+         * <br>Uses static arrays
+         * <b><i>BUFFER_5x32_A_INT, BUFFER_5x32_B, BUFFER_10x32_A_INT, BUFFER_10x32_B</i></b>
+         * 20.10.17 10:26:36 A new version with probable doubling of the dividend and
+         * simplified estimation of the quotient digit and simplified estimation of the necessity of rounding up the result
+         *
+         * @param divisor the divisor to divide this instance by
+         *                <br>Covered
+         */
+        private void divideUnsigned(F128 divisor) {
+            if (divisor.compareMagnitudeTo(ONE) == 0)       // x / 1 = x;
+                return;
+            if (compareMagnitudeTo(divisor) == 0)           // x / x = 1;
+            {
+                assignOne();
+                return;
+            }
+
+            long quotientExponent = Integer.toUnsignedLong(
+                    exponent) // Preliminarily evaluate the exponent of the quotient (may get adjusted)
+                    - Integer.toUnsignedLong(divisor.exponent) + EXPONENT_OF_ONE;
+
+            if (exponentWouldExceedBounds(quotientExponent,
+                                          0,
+                                          1)) // exp < -128 || exp > EXPONENT_OF_MAX_VALUE + 1, Assigns respective values if exp exceeds bounds
+                return;
+
+            boolean needToDivide = true;
+            final int[] divisorBuff = BUFFER_5x32_A_INT;
+            if (exponent != 0 & divisor.exponent != 0) {    // both are normal
+                if (mantHi == divisor.mantHi && mantLo == divisor.mantLo) { // Mantissas are equal, result. mantissa = 1
+                    mantHi = mantLo = 0;                        // will return 2 ^ (exp1 - exp2)
+                    needToDivide = false;                       // Mark that actual division not needed
+                } else {                                      // Mantissas differ, division may be needed
+                    if (divisor.mantHi == 0 && divisor.mantLo == 0) // Divisor == 2^n, mantissa remains unchanged
+                        needToDivide = false;                     // Mark that actual division not needed
+                    else                                        // divisor != 2^n
+                        unpack_To5x32(divisor.mantHi, divisor.mantLo,
+                                      divisorBuff);  // divisor as an array of long containing the unpacked mantissa
+                }
+            } else {                                        // At least one is subnormal
+                quotientExponent = normalizeAndUnpackSubnormals(quotientExponent, divisor, divisorBuff);
+            }
+
+            if (needToDivide)
+                quotientExponent = doDivide(quotientExponent, divisorBuff); // *** Proper division
+
+            if (exponentWouldExceedBounds(quotientExponent,
+                                          0,
+                                          0)) // exp < -128 || exp > EXPONENT_OF_MAX_VALUE, Assigns respective values if exp exceeds bounds
+                return;
+
+            if (quotientExponent <= 0)
+                quotientExponent = makeSubnormal(quotientExponent);
+
+            exponent = (int) quotientExponent;
+        }
+
+        /**
+         * Checks if the exponent of the result exceeds acceptable bounds and sets the
+         * corresponding value in this case.<br>
+         * If it is below {@code  -(128 + lowerBoundTolerance) }, assigns zero to this instance and returns {@code true}.
+         * If it is above {@code EXPONENT_OF_MAX_VALUE + upperBoundTolerance}, assigns Infinity to this instance and returns {@code true}.
+         * returns {@code false} without changing the value, if the exponent is within the bounds.
+         *
+         * @param exponent the exponent of the result to be examined
+         *                 <br>Covered
+         */
+        private boolean exponentWouldExceedBounds(long exponent, long lowerBoundTolerance, long upperBoundTolerance) {
+            if (exponent > EXPONENT_OF_MAX_VALUE + upperBoundTolerance) {// Overflow, return infinity
+                assignInfinity();
+                return true;
+            }
+            if (exponent < -(128 + lowerBoundTolerance)) {                            // The result may be subnormal, so expSum may be negative
+                assignZero();
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Normalizes the operands and unpacks the divisor:<br>
+         * normalizes the mantissa of this instance as needed, if it's subnormal;
+         * unpacks the mantissa of the divisor into divisorBuff and normalizes the unpacked value if the divisor is subnormal
+         * (the divisor itself remains unchanged);
+         * adjusts appropriately the quotientExponent.
+         *
+         * @param quotientExponent preliminary evaluated exponent of the divisor, gets corrected and returned
+         * @param divisor          the divisor to unpack and normalize as needed
+         * @param divisorBuff      the buffer to unpack the divisor into
+         *
+         * @return the exponent of the quotient, adjusted accordingly to the normalization results
+         * <br>Covered
+         */
+        private long normalizeAndUnpackSubnormals(long quotientExponent, F128 divisor, int[] divisorBuff) {
+            if (exponent == 0)                           // Dividend is subnormal
+                quotientExponent -= normalizeMantissa();
+
+            if (divisor.exponent == 0) {                // Divisor is subnormal
+                quotientExponent += normalizeAndUnpackDivisor(divisor, divisorBuff);  // normalize and unpack
+            } else                                       // Divisor is normal
+                unpack_To5x32(divisor.mantHi, divisor.mantLo, divisorBuff); // just unpack
+            return quotientExponent;
+        }
+
+        /**
+         * Shifts the mantissa (of a subnormal value) leftwards so that it has
+         * the conventional format (with implied higher unity to the left of the highest bit of mantHi
+         * and higher 64 bits of the fractional part in mantHi)
+         *
+         * @return the number of bits the mantissa is shifted by, minus one (e.g. 0 for MIN_NORMAL / 2)
+         * to use as an exponent correction
+         * <br>Covered
+         */
+        private long normalizeMantissa() {
+            int shift = Long.numberOfLeadingZeros(mantHi);
+            if (shift == 64)
+                shift += Long.numberOfLeadingZeros(mantLo);
+            shiftMantLeft(shift + 1); // shift by at least one position (for MIN_NORMAL / 2)
+            return shift;             // exponent correction = shift value - 1, it's 0 for MIN_NORMAL / 2
+        }
+
+        /**
+         * Unpacks the mantissa of the given divisor into the given buffer and normalizes it,
+         * so that the buffer contains the MSB in the LSB of buffer[0]
+         * and up to 127 bits in the lower halves of buffer[1] -- buffer[4]
+         *
+         * @param divisor a subnormal Float128 whose mantissa is to be unpacked and normalizes
+         * @param buffer  a buffer of at least 5 longs to unpack the mantissa to
+         *
+         * @return the number of bits the mantissa is shifted by, minus one (e.g. 0 for MIN_NORMAL / 2)
+         * to use as an exponent correction
+         * <br>Covered
+         */
+        private static long normalizeAndUnpackDivisor(F128 divisor, int[] buffer) {
+            long mantHi = divisor.mantHi, mantLo = divisor.mantLo;
+            int shift = Long.numberOfLeadingZeros(mantHi); // the highest 1 will be the implied unity -- shift-out it
+            if (shift == 64)
+                shift += Long.numberOfLeadingZeros(mantLo);
+            final long result = shift;
+            shift++;
+
+            if (shift <= 64) {
+                mantHi = (mantHi << shift) + (mantLo >>> 64 - shift);
+                mantLo <<= shift;
+            } else {
+                mantHi = mantLo << shift - 64;
+                mantLo = 0;
+            }
+
+            unpack_To5x32(mantHi, mantLo, buffer);
+            return result; // exp correction = shift value - 1, it's 0 for MIN_NORMAL / 2
+        }
+
+        /**
+         * Divides preliminarily normalized mantissa of this instance by the mantissa of the divisor
+         * given as an unpacked value in {@code divisor}.
+         *
+         * @param quotientExponent a preliminarily evaluated exponent of the quotient, may get adjusted
+         * @param divisor          unpacked divisor (integer part (implicit unity) in divisor[0],
+         *                         128 bits of the fractional part in the lower halves of divisor[1] -- divisor[4])
+         *
+         * @return (possibly adjusted) exponent of the quotient
+         */
+        private long doDivide(long quotientExponent, final int[] divisor) {
+            final int[] dividend = BUFFER_10x32_A_INT; // Will hold dividend with integer part in buff[1] and mantissa in buff[2] -- buff[5]
+            quotientExponent = unpackMantissaTo(quotientExponent, divisor, dividend);
+            divideBuffers(dividend, divisor, quotientExponent); // proper division
+            return quotientExponent;
+        }
+
+        /**
+         * Unpacks the mantissa of this instance into {@code dividend}.
+         * If the mantissa of this instance is less than the divisor, multiplies it by 2 and decrements the {@code quotientExponent}
+         *
+         * @param quotientExponent a preliminary evaluated exponent of the quotient being computed
+         * @param divisor          a buffer (5 longs) containing unpacked divisor,
+         *                         integer 1 in divisor[0], 4 x 32 bits of the mantissa in in divisor[1..4]
+         * @param dividend         a buffer (10 longs) to unpack the mantissa to,
+         *                         integer 1 (or up to 3 in case of doubling) in dividend[1], 4 x 32 bits of the mantissa in in dividend[2..5]
+         *
+         * @return (possibly decremented) exponent of the quotient
+         */
+        private long unpackMantissaTo(long quotientExponent, final int[] divisor, final int[] dividend) {
+            // The mantissa of this is normalized, the normalized mantissa of the divisor is in divisorBuff
+            if (compareMantissaWith(divisor) < 0) {
+                unpackDoubledMantissaToBuff_10x32(dividend);
+                quotientExponent--;
+            } else
+                unpackMantissaToBuff_10x32(dividend);
+            return quotientExponent;
+        }
+
+        /**
+         * Compares the mantissa of this instance with the unpacked mantissa of another Float128 value.
+         * Returns
+         * <li>a positive value if the mantissa of this instance is greater,
+         * <li>zero if the mantissas are equal,
+         * <li>a negative value if the mantissa of this instance is less than the mantissa of the other Float128.
+         * <br><br>
+         *
+         * @param divisor a buffer (5 longs) containing an unpacked value of the mantissa of the other operand,
+         *                integer 1 in divisor[1], 4 x 32 bits of the mantissa in in divisor[1..4]
+         *
+         * @return a positive value if the mantissa of this instance is greater, zero if the mantissas are equal,
+         * or a negative value if the mantissa of this instance is less than the mantissa of the other Float128.
+         */
+        private int compareMantissaWith(int[] divisor) {
+            final int cmp = Long.compareUnsigned(mantHi, ((long) divisor[1] << 32) | (divisor[2] & LOWER_32_BITS));
+            return cmp == 0 ? Long.compareUnsigned(mantLo, ((long) divisor[3] << 32) | (divisor[4] & LOWER_32_BITS)) : cmp;
+        }
+
+        /**
+         * Unpacks the mantissa of this instance into the given buffer and multiplies it by 2 (shifts left),
+         * integer part (may be up to 3) in buffer[1], fractional part in buffer[2] -- buffer[5]
+         *
+         * @param buffer a buffer to unpack the mantissa, at least 6 longs
+         *               <br>Covered
+         */
+        private void unpackDoubledMantissaToBuff_10x32(int[] buffer) { //
+            //    Arrays.fill(buffer, 0); // Manual filling a little faster
+            buffer[0] = 0;
+            buffer[1] = (int) (2 + (mantHi >>> 63));
+            buffer[2] = (int) (mantHi >>> 31 & LOWER_32_BITS);
+            buffer[3] = (int) (((mantHi << 1) + (mantLo >>> 63)) & LOWER_32_BITS);
+            buffer[4] = (int) (mantLo >>> 31 & LOWER_32_BITS);
+            buffer[5] = (int) (mantLo << 1 & LOWER_32_BITS);
+            for (int i = 6; i < 10; i++)
+                buffer[i] = 0;
+        }
+
+        /**
+         * Unpacks the mantissa of this instance into the given buffer,
+         * integer part (implicit unity) in buffer[1], fractional part in lower halves of buffer[2] -- buffer[5]
+         *
+         * @param buffer a buffer to unpack the mantissa, at least 6 longs
+         *               <br>Covered
+         */
+        private void unpackMantissaToBuff_10x32(int[] buffer) {
+            //    Arrays.fill(buffer, 0); // Manual filling a little faster
+            buffer[0] = 0;
+            buffer[1] = 1;
+            buffer[2] = (int) (mantHi >>> 32);
+            buffer[3] = (int) (mantHi & LOWER_32_BITS);
+            buffer[4] = (int) (mantLo >>> 32);
+            buffer[5] = (int) (mantLo & LOWER_32_BITS);
+            for (int i = 6; i < 10; i++)
+                buffer[i] = 0;
+        }
+
+        /**
+         * Divides the dividend given as an unpacked buffer {@code dividendBuff} by the divisor
+         * held in the unpacked form in the {@code divisorBuff} and packs the result
+         * into the fields {@code mantHi, mantLo} of this instance. Rounds the result as needed.
+         * <br>Uses static arrays
+         * <b><i>BUFFER_5x32_B_INT</i></b>
+         *
+         * @param dividend         a buffer of 10 longs containing unpacked mantissa of the dividend (integer 1 (or up to 3 in case of doubling) in dividend[1],
+         *                         the fractional part of the mantissa in the lower halves of dividend[2] -- dividend[5])
+         * @param divisor          a buffer of 5 longs containing unpacked mantissa of the divisor (integer part (implicit unity) in divisor[0],
+         *                         the fractional part of the mantissa in the lower halves of divisor[1] -- divisor[4])
+         * @param quotientExponent preliminary evaluated exponent of the quotient, may get adjusted
+         *
+         */
+        private void divideBuffers(int[] dividend, int[] divisor, long quotientExponent) {
+            final int[] quotientBuff = BUFFER_5x32_B_INT;  // Will be used to hold unpacked quotient
+
+            final long nextBit = divideArrays(dividend, divisor, quotientBuff);
+
+            packMantissaFromWords_1to4(quotientBuff);   // Pack unpacked quotient into the mantissa fields of this instance
+
+            if (quotientExponent > 0           // Not rounding for subnormals, since the rounding will be done by makeSubnormal()
+                    && nextBit != 0               // if remainder >= (LSB_of_the_quotient * 0.5)
+                    && ++mantLo == 0)              // and mantLo was FFFF_FFFF_FFFF_FFFF, now became 0
+                ++mantHi;                        // carry to the higher word
+        }
+
+        /**
+         * Divides an unpacked value held in the 10 ints of the {@code dividend}
+         * by the value held in the 5 ints of the {@code divisor}
+         * and fills 5 ints of the {@code quotient} with the quotient value.
+         * All values are unpacked 129-bit values, containing integer parts
+         * (implicit unities, always 1) in LSB of buff[0] (buff[1] for dividend)
+         * and 128 bits of the fractional part in lower halves of buff[1] -- buff[4] (buff[2] -- buff[5] for dividend).
+         * It uses the principle of the standard long division algorithm, with the difference
+         * that instead of one decimal digit of the quotient at each step, the next 32 bits are calculated.
+         *
+         * @param dividend an unpacked value of the mantissa of the dividend (10 x 32 bits: 0, 1, dd1, dd2, dd3, dd4, 0, 0, 0, 0)
+         * @param divisor  an unpacked value of the mantissa of the divisor (5 x 32 bits: 1, dr1, dr2, dr3, dr4)
+         * @param quotient a buffer that gets filled with the mantissa of the quotient
+         *
+         * @return the next bit of the quotient (half the LSB), to be used for rounding the result
+         * <br>Covered
+         */
+        private static long divideArrays(int[] dividend, int[] divisor, int[] quotient) {
+            // will contain remainder after each iteration
+            //    Arrays.fill(quotient, 0);
+
+            final long divisorHigh = ((long) divisor[0] << 32) | (divisor[1] & LOWER_32_BITS);   // The most significant word of the divisor
+            int offset = 0;                               // the index of the quotient word being computed
+            quotient[offset++] = 1;                       // the integer part aka the implicit unity of the quotient is always 1
+            subtractDivisor(divisor, dividend);          // Subtract divisor multiplied by 1 from the remainder
+
+            // Compute the quotient by portions by 32 bits per iterations
+            //    if (!isEmpty(remainder)) {
+            do {
+                final long remainderHigh = ((long) dividend[offset + 1] << 32) | (dividend[offset + 2] & LOWER_32_BITS); // The most significant 64 bits of the remainder
+
+                long quotientWord = (dividend[offset] == 0) ?
+                        // Wow! They use dynamically allocated BigIntegers for this, with their dynamically allocated MutableBigIntegers and int[] !!!
+                        // Long.divideUnsigned(remainderHigh, divisorHigh):
+                        divideUnsignedLongs(remainderHigh, divisorHigh) :
+                        divide65bits(dividend[offset], remainderHigh, divisorHigh);
+
+                if (quotientWord == 0x1_0000_0000L)
+                    quotientWord--;
+
+                if (quotientWord != 0) {    // Multiply divisor by quotientWord and subtract the product from the remainder, adjust quotientWord
+                    //          final int diff = multipyAndSubtract(divisor, quotientWord, offset, remainder);
+                    //          if (remainder[offset + 1] < 0) {           // The quotiendWord occurred to be too great
+                    if (multipyAndSubtract(divisor, quotientWord, offset, dividend) < 0) {
+                        quotientWord--;                               // decrease it
+                        addDivisorBack(divisor, dividend, offset);   // Add divisor * 1 back
+                    }
+                }
+
+                quotient[offset++] = (int) quotientWord;          // The next word of the quotient
+            } while (offset <= 4 /* && !isEmpty(remainder) */);    // TODO here - не ходить по всему, а проверять только ту часть, которая м.б. != 0
+            //    } // (!isEmpty(remainder)) {
+
+            if (greaterThanHalfOfDivisor_3(dividend, divisor, offset))
+                return 1;
+
+            return 0;
+
+        }
+
+        /**
+         * Subtracts the divisor from the dividend to obtain the remainder for the first iteration
+         *
+         * @param divisor   unpacked mantissa of the divisor, 1 + 4 x 32 bits, implicit integer 1 in divisor[0]
+         * @param remainder unpacked mantissa of the dividend, 2 + 8 x 32 bits, implicit integer 1 in divisor[1]
+         */
+        private static void subtractDivisor(int[] divisor, int[] remainder) {
+            long carry = 0;
+            for (int i = 5; i >= 1; i--) {
+                final long difference = (remainder[i] & LOWER_32_BITS) - (divisor[i - 1] & LOWER_32_BITS) + carry;
+                ;
+                remainder[i] = (int) difference;
+                carry = difference >> 32;
+            }
+        }
+
+        private static long divideUnsignedLongs(long dividend, long divisor) {
+            final long dividendHi = dividend >>> 16;
+            final long remainder = (dividendHi % divisor << 16) | (dividend & 0xFFFFL);
+            return (dividendHi / divisor << 16) | (remainder / divisor);
+        }
+
+        /**
+         * Divides a dividend, consisting of more than 64 bits (and less than 81 bits),
+         * by the given divisor, that may contain up to 33 bits.
+         *
+         * @param dividendHi the most significant 64 bits of the dividend
+         * @param dividendLo the least significant 64 bits of the dividend
+         * @param divisor    the divisor
+         *
+         * @return the quotient
+         */
+        private static long divide65bits(long dividendHi, long dividendLo, long divisor) {
+            dividendHi = dividendHi << 48 | dividendLo >>> 16;  // 16 bits of dividendHi and 48 bits of dividendLo
+            final long quotientHi = dividendHi / divisor;                  // The most significant 32 bits of the quotient
+            final long remainder = ((dividendHi % divisor) << 16) | (dividendLo & 0xFFFF);
+            final long quotientLo = remainder / divisor;                        // The least significant 16 bits of the quotient
+
+            return quotientHi << 16 | quotientLo;
+        }
+
+
+        /**
+         * Multiplies the divisor by a newly found word of quotient,
+         * taking into account the position of the word in the quotient ({@code offset} is the index
+         * of the given word in the array that contains the quotient being calculated),
+         * and subtracts the product from the remainder, to prepare the remainder for the next iteration
+         * <br>Uses static arrays
+         * <b><i>BUFFER_10x32_B</i></b>
+         *
+         * @param divisor      unpacked mantissa of the divisor, 1 + 4 x 32 bits, implicit integer 1 in divisor[0]
+         * @param quotientWord a newly found word (32 bits) of the quotient being computed
+         * @param offset       the position (index) of the given {@code quotientWord} in the future quotient,
+         *                     defines the position of the product, that is subtracted from the remainder, relative to the latter
+         * @param remainder    the remainder to subtract the product from
+         */
+        private static int multipyAndSubtract(int[] divisor, long quotientWord, int offset, int[] remainder) {
+            offset += 5;
+            long carry = 0;
+
+            long difference = 0;
+            for (int i = 4; i >= 0; i--) {
+                final long product = quotientWord * (divisor[i] & LOWER_32_BITS) + carry;
+                difference = remainder[offset] - product;
+                remainder[offset--] = (int) difference;
+                carry = product >>> 32;
+                if ((difference & LOWER_32_BITS) > (~(int) product & LOWER_32_BITS))
+                    carry++;
+            }
+            return (int) difference;
+        }
+
+        /**
+         * Adds the divisor, shifted by offset words, back to remainder, to correct the remainder in case when
+         * preliminarily estimated word of quotient occurred to be too great
+         *
+         * @param divisor   unpacked mantissa of the divisor, 1 + 4 x 32 bits, implicit integer 1 in divisor[0]
+         * @param remainder unpacked mantissa of the dividend, 2 + 8 x 32 bits, implicit integer 1 in divisor[1]
+         */
+        private static void addDivisorBack(int[] divisor, int[] remainder, int offset) {
+            offset += 5;                          // Index in reminder remainder
+            long carry = 0;
+
+            for (int idx = 4; idx >= 0; idx--) {  // Index in the divisor
+                final long sum = (remainder[offset] & LOWER_32_BITS) + (divisor[idx] & LOWER_32_BITS) + carry;
+                remainder[offset--] = (int) sum;
+                carry = sum >>> 32;
+            }
+        }
+
+
+        private static boolean greaterThanHalfOfDivisor_3(int[] remainder, int[] divisor, int offset) {
+            for (int idx = 0; idx < 4; idx++) {
+                //      final int cmp = Integer.compareUnsigned(
+                //            (remainder[offset] << 1) + (remainder[++offset] >>> 31),      // Doubled remainder
+                //            divisor[idx]                                                              // Greater than divisor
+                //          );
+                final int cmp = Integer.compare( // 21.06.14 18:10:02 Экономим на спичках
+                                                 (remainder[offset] << 1) + (remainder[++offset] >>> 31) + Integer.MIN_VALUE,
+                                                 // Doubled remainder
+                                                 divisor[idx] + Integer.MIN_VALUE
+                                                 // Greater than divisor
+                );
+                if (cmp > 0)
+                    return true;
+                if (cmp < 0)
+                    return false;
+            }
+            final int cmp = Integer.compareUnsigned(
+                    (remainder[offset] << 1),      // Doubled remainder
+                    divisor[4]                                                              // Greater than divisor
+            );
+            return (cmp >= 0);
+        }
+
+        /**
+         * Packs the unpacked value from words 1..4 of the given buffer into the mantissa of this instance
+         *
+         * @param buffer the buffer of at least 5 longs, containing an unpacked value of the mantissa
+         *               (the integer part (implicit unity) in buffer[0], the 128 bits of fractional part in the lower halves of buffer[1] -- buffer[4]
+         *               <br>Covered
+         */
+        private void packMantissaFromWords_1to4(int[] buffer) {
+            mantLo = (buffer[4] & LOWER_32_BITS) | ((long) buffer[3] << 32);
+            mantHi = (buffer[2] & LOWER_32_BITS) | ((long) buffer[1] << 32);
+        }
+
+        /**
+         * Calculates the higher 136 bits of the square root of the mantissa
+         * and stores the high 128 bits of result in mantHi, mantLo,
+         * returns the 2 least significant bits, aligned to the left,
+         * as the result for purposes of possible rounding
+         * <br>Uses static arrays
+         * <b><i>BUFFER_3x64_A, BUFFER_3x64_B, BUFFER_3x64_C, BUFFER_3x64_D</i></b>
+         *
+         * @return bits 128 -- 135 of the root in the high byte of the long result
+         */
+        private long sqrtMant() {
+            final long[] remainder = BUFFER_3x64_A;       // aliases for static buffers
+            final long[] rootX2 = BUFFER_3x64_B;
+            Arrays.fill(rootX2, 0);  // Doubled root with explicit higher unity
+            final long[] root = BUFFER_3x64_C;
+            Arrays.fill(root, 0);
+
+            final long digit = findFirstDigit();                      // Find the first byte of the root
+
+            remainder[0] = mantHi - ((0x200 + digit) * digit << 48);  // Most significant
+            remainder[1] = mantLo;
+            remainder[2] = 0;
+            shift_6_bitsLeft(remainder);
+
+            root[0] = digit << WORD_LENGTH - DIGIT_LENGTH;     // the first digit to the high bits
+            // The doubled root contains explicit unity, and the digits shifted right by 9 bits,
+            // so that the first (most significant) digit's position is as follows: 0b0000_0000_1###_####_#000_...
+            // Such scale is convenient for finding the next digit
+            rootX2[0] = 0x0080_0000_0000_0000L + (digit << (WORD_LENGTH - (DIGIT_LENGTH * 2) - 1));
+
+            int bitNumber = DIGIT_LENGTH;                        // The position of the nest digit
+
+            if (isEmpty(remainder))
+                while (bitNumber < MAX_BITS_FOR_SQRT) {
+                    bitNumber = computeNextDigit(remainder, rootX2, root, bitNumber);
+                }
+
+            mantHi = root[0];
+            mantLo = root[1];
+            return root[2];
+        }
+
+        /**
+         * Finds the first byte of the root, using a table that maps
+         * the most significant 16 bits of the mantissa of this instance
+         * to corresponding 8 bits of the sought root
+         */
+        private long findFirstDigit() {
+            final int sqrtDigit = (int) (mantHi >>> 48);               // first 16 bits of the argument
+            int idx = Arrays.binarySearch(SQUARE_BYTES, sqrtDigit);
+            if (idx < 0) idx = -idx - 2;
+            // first 8 bits of the root
+            return ROOT_BYTES[idx];
+        }
+
+    }
+
+
+    /********************************************************************************************
+     *** Methods used by sqrt() *****************************************************************
+     ********************************************************************************************/
+
+    private static final int WORD_LENGTH = 64;
+    private static final int DIGIT_LENGTH = 8;
+    private static final int MAX_BITS_FOR_SQRT = 20 * DIGIT_LENGTH; // To provide precision sufficient for additional multiplying by sqrt(2)
+
+
+    /**
+     * Finds the first byte of the root, using a table that maps
+     * the most significant 16 bits of the mantissa of this instance
+     * to corresponding 8 bits of the sought root
+     */
+    private long findFirstDigit() {
+        final int sqrtDigit = (int) (mantHi >>> 48);               // first 16 bits of the argument
+        int idx = Arrays.binarySearch(SQUARE_BYTES, sqrtDigit);
+        if (idx < 0) idx = -idx - 2;
+        // first 8 bits of the root
+        return ROOT_BYTES[idx];
+    } // private long findFirstDigit() {
+
+    /**
+     * Shifts the contents of the buffer left by 6 bits
+     *
+     * @param buffer the buffer to shift
+     */
+    private static void shift_6_bitsLeft(long[] buffer) {
+        for (int i = 0; i < buffer.length - 1; i++)
+            buffer[i] = (buffer[i] << 6 | buffer[i + 1] >>> 58);
+        buffer[buffer.length - 1] <<= 6;
+    } // private static void shift_6_bitsLeft(long[] buffer) {
+
+    /**
+     * Calculates the next digit of the root, appends it to the root at a suitable position
+     * and changes the involved values, remainder and rootX2, accordingly
+     * (extracted from sqrtMant() 20.09.02 10:19:34)
+     * <br>Uses static arrays
+     * <b><i>BUFFER_3x64_D</i></b>
+     *
+     * @param remainder the remainder
+     * @param rootX2    doubled root
+     * @param root      square root found so far
+     * @param bitNumber the position of the digit to be found
+     *
+     * @return the position of the next to be found
+     */
+    private static int computeNextDigit(final long[] remainder, final long[] rootX2, final long[] root, int bitNumber) {
+        final long[] aux = BUFFER_3x64_D;           // Auxiliary variable to be subtracted from the remainder at each step, == (2r + d) * d
+        final long digit = findNextDigit(rootX2, remainder, aux,
+                                         bitNumber); // digit = findDigit(); aux = 2 * r + d^2 * scale) * digit
+        addDigit(root, digit, bitNumber);                 // root += digit >>> (128 - bitNumber);
+
+        final boolean remainderIsEmpty = subtractBuff(aux,
+                                                      remainder);   // remainder -= aux; // aux can't be greater than remainder!
+        if (remainderIsEmpty || bitNumber >= MAX_BITS_FOR_SQRT - 8)
+            return Integer.MAX_VALUE;
+
+        shift_8_bitsLeft(remainder);                      // remainder <<= 8;
+
+        addDigitToBuff(rootX2, digit, bitNumber + 9);     // rootX2 += digit * 2; (shifted properly, by 9 bits right)
+        bitNumber += DIGIT_LENGTH;                        // next digit position
+        return bitNumber;
+    } // private static int computeNextDigit(final long[] remainder, final long[] rootX2, final long[] root, int bitNumber) {
+
+    /**
+     * Finds the next digit in the root and the corresponding {@code aux} value,
+     * that will be subtracted from the remainder.
+     *
+     * @param rootX2        doubled root found so far
+     * @param remainder     the remainder
+     * @param aux           auxiliary value to be subtracted from the remainder
+     * @param rootBitNumber the position of the digit in the root
+     *
+     * @return the digit found
+     */
+    private static long findNextDigit(long[] rootX2, long[] remainder, long[] aux, int rootBitNumber) {
+        long digit = Long.divideUnsigned(remainder[0], rootX2[0]);
+        digit = Math.min(digit, 0xFF);
+
+        computeAux(digit, rootBitNumber, rootX2, aux);  // (root * 2 + digit * scale) * digit == 2rd + d^2 * scale
+        while (compareBuffs64(aux,
+                              remainder) > 0) {    // aux > remainder, the digit is too large. Decrease the digit and recompute aux
+            // A very rare case: probability is less than 0.85%
+            digit--;
+            computeAux(digit, rootBitNumber, rootX2, aux);
+        }
+        return digit;
+    } // private static long findNextDigit(long[] rootX2, long[] remainder, long[] aux, int rootBitNumber) {
+
+    /**
+     * Appends the found digit to the calculated root at the position specified by rootBitNumber.
+     * for cases where the digit cannot fall on a word boundary
+     *
+     * @param root          a buffer containing the bits of the root found so far
+     * @param digit         a value of the digit to append
+     * @param rootBitNumber the position to place the most significant bit of the digit at, counting from MSB
+     */
+    private static void addDigit(long[] root, long digit, int rootBitNumber) {
+        final int buffIdx = rootBitNumber / 64;
+        final int bitIdx = rootBitNumber % 64;
+        root[buffIdx] += digit << 56 - bitIdx;
+    } // private static void addDigit(long[] root, long digit, int rootBitNumber) {
+
+    /**
+     * Subtracts a number, represented as a big-endian array of longs, from another number of the same form
+     *
+     * @param subtrahend subtrahend
+     * @param minuend    minuend that is replaced with the difference
+     *
+     * @return {@code true} if the result is 0 (i.e. the operands are equal)
+     */
+    private static boolean subtractBuff(long[] subtrahend, long[] minuend) {
+        boolean diffIsEmpty = true;
+        long diff, minnd;
+
+        for (int i = subtrahend.length - 1; i >= 0; i--) {
+            minnd = minuend[i];
+            diff = minnd - subtrahend[i];
+
+            if (Long.compareUnsigned(diff, minnd) > 0) { // Underflow.
+                // It can't be the most significant word (i == 0), since aux can't be greater than remainder -- guaranteed by findNextDigit()
+                if (minuend[i - 1] == 0) subtrahend[i - 1]++;
+                else minuend[i - 1]--;
+            }
+            minuend[i] = diff;
+            diffIsEmpty &= diff == 0;
+        }
+        return diffIsEmpty;
+    } // private static boolean subtractBuff(long[] buff_1, long[] buff_2) {
+
+    /**
+     * Shifts the contents of the buffer left by 8 bits
+     *
+     * @param buffer the buffer to shift
+     */
+    private static void shift_8_bitsLeft(long[] buffer) {
+        for (int i = 0; i < buffer.length - 1; i++)
+            buffer[i] = (buffer[i] << 8 | buffer[i + 1] >>> 56);
+        buffer[buffer.length - 1] <<= 8;
+    } // private static void shift_8_bitsLeft(long[] buffer) {
+
+    /**
+     * Appends the found digit to the calculated root at the position specified by rootBitNumber.
+     * for cases where the digit can fall on a word boundary
+     *
+     * @param buff      a buffer containing the bits of the root found so far
+     * @param digit     a value of the digit to append
+     * @param bitNumber the position to place the most significant bit of the digit at, counting from MSB
+     */
+    private static void addDigitToBuff(long[] buff, long digit, int bitNumber) { //
+        final int buffIdx = bitNumber / 64;
+        final int bitIdx = bitNumber % 64;
+
+        if (bitIdx <= 64 - 8) {                // The whole digit into one word
+            buff[buffIdx] += digit << 64 - 8 - bitIdx;
+        } else {                            // Parts of the digit in different words
+            buff[buffIdx] += digit >>> bitIdx + 8 - 64;  // 8 is digit length
+            buff[buffIdx + 1] += digit << 128 - 8 - bitIdx;
+        }
+    } // private static void addDigitToBuff(long[] buff, long digit, int bitNumber) { //
+
+    /**
+     * Computes the auxiliary value to be subtracted from the remainder: aux = 2rd + d^2 * scale.
+     * Instead of the 'scale' the bit position {@code rootBitNumber} is used
+     *
+     * @param digit         the found next digit of the root
+     * @param rootBitNumber the position of the digit in the root
+     * @param rootX2        doubled root found so far
+     * @param aux           the buffer to be filled with the found value of aux
+     */
+    private static void computeAux(long digit, int rootBitNumber, long[] rootX2, long[] aux) {
+        copyBuff(rootX2, aux);
+        addDigitToBuff(aux, digit, rootBitNumber + 10);    // aux = rootX2 + digit * scale;
+        multBufByDigit(aux, digit);                        // aux *= digit,
+    } // private static void computeAux(long digit, int rootBitNumber, long[] rootX2, long[] aux) {
+
+    /**
+     * Copies an array of longs from src to dst
+     *
+     * @param src source
+     * @param dst destination
+     */
+    private static void copyBuff(long[] src, long[] dst) {
+        System.arraycopy(src, 0, dst, 0, src.length);
+    } // private static void copyBuff(long[] src, long[] dst) {
+
+    /**
+     * Compares two numbers
+     * represented as arrays of {@code long} (big-endian, most significant bits in buff[0])
+     *
+     * @param buff1 contains the first number to compare
+     * @param buff2 contains the second number to compare
+     *
+     * @return The result of comparison, according to general Java comparison convention
+     */
+    private static int compareBuffs64(long[] buff1, long[] buff2) {
+        for (int i = 0; i < buff1.length; i++)
+            if (buff1[i] != buff2[i])
+                return Long.compareUnsigned(buff1[i], buff2[i]);
+        return 0;
+    } // private static int compareBuffs64(long[] buff1, long[] buff2) {
+
+    /**
+     * Multiplies a number represented as {@code long[]} by a digit
+     * (that's expected to be less than 32 bits long)
+     */
+    private static void multBufByDigit(long[] buff, long digit) {
+        long carry = 0;
+        for (int i = buff.length - 1; i >= 0; i--) {
+            final long prodLo = (buff[i] & LOWER_32_BITS) * digit + carry;
+            final long prodHi = (buff[i] >>> 32) * digit;
+            carry = prodHi >>> 32;                    // will get beyond the boundary of the word
+            final long product = prodLo + (prodHi << 32);
+            if (Long.compareUnsigned(product, (prodHi << 32)) < 0)
+                carry++;
+            buff[i] = product;
+        }
+    } // private static void multBufByDigit(long[] buff, long digit) {
+
+    /**
+     * Multiplies 192 bits of the mantissa given in the arguments
+     * {@code mantHi, mantLo, and thirdWord}, without implicit unity (only fractional part)
+     * by 192 bits of the constant value of sqrt(2)
+     * <br> uses static arrays
+     * <b><i>BUFFER_4x64_A, BUFFER_6x32_A, BUFFER_6x32_B, BUFFER_12x32</i></b>
+     *
+     * @param mantHi    64 most significant bits of the fractional part of the mantissa
+     * @param mantLo    bits 64..127 of the fractional part of the mantissa
+     * @param thirdWord 64 least significant bits of the fractional part of the mantissa
+     *
+     * @return 192 bits of the fractional part of the product
+     */
+    private long[] multBySqrt2(long mantHi, long mantLo, long thirdWord) {
+
+        BUFFER_4x64_A[0] = 0;
+        BUFFER_4x64_A[1] = mantHi >>> 1 | HIGH_BIT;                     // to take implied unities into account:
+        BUFFER_4x64_A[2] = mantLo >>> 1 | mantHi << 63;
+        BUFFER_4x64_A[3] = thirdWord >>> 1 | mantLo << 63;
+
+        final long[] product = multPacked3x64(
+        ); // SQRT_2_AS_LONGS contains implied unity in the MSB
+
+        product[0] = product[1] << 2 | product[2] >>> 62;   // x * y = ((x >>> 1) * (y >>> 1)) << 2
+        product[1] = product[2] << 2 | product[3] >>> 62;
+        product[2] = product[3] << 2;
+        return product;
+    } // private long[] multBySqrt2(long mantHi, long mantLo, long thirdWord) {
+
+    /**
+     * Multiplies mantissas of quasidecimal numbers given as contents of arrays factor1 and factor2
+     * (with exponent in buff[0] and 192 bits of mantissa in buff[1]..buff[3]),
+     * replaces the mantissa of factor1 with the product. Does not affect factor1[0].<br>
+     * uses static arrays <b><i>BUFFER_6x32_A, BUFFER_6x32_B, BUFFER_12x32</b></i>
+     *
+     * @return factor1, whose mantissa is replaced with the product
+     */
+    private static long[] multPacked3x64() {
+        multPacked3x64_simply(Float128.BUFFER_4x64_A, Float128.SQRT_2_AS_LONGS);
+        return pack_12x32_to_3x64(Float128.BUFFER_4x64_A);
+    } // private static long[] multPacked3x64(long[] factor1, long[] factor2) {
+
+
     /**
      * Returns a copy of this Float128.
      *
@@ -686,9 +3150,9 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Returns a new instance of {@code Float128} with the value of the absolute value of this instance
+     * Returns a new instance of {@link Float128} with the value of the absolute value of this instance
      *
-     * @return a new instance of {@code Float128} with the value of the absolute value of this instance
+     * @return a new instance of {@link Float128} with the value of the absolute value of this instance
      */
     public Float128 abs() {
         return new Float128(false, exponent, mantHi, mantLo);
@@ -868,7 +3332,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      */
     private long[] multMantBy192bits(long[] factor_6x32, final long decimalExpOfPow2,
                                      long[] product_4x64, long[] buffer_10x32) {
-        unpackQuadToBuff(this, BUFFER_4x32_A);
+        unpackQuadToBuff(this);
 
         // multiply 6 x 32 bits by 4 x 32 bits
         for (int i = 5; i >= 0; i--) // compute partial 32-bit products
@@ -948,14 +3412,13 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * so that each word of the buffer contains the corresponding 32 bits of the mantissa
      * in its least significant 32 bits
      *
-     * @param quad   a quadruple to unpack
-     * @param buffer a buffer to hold the unpacked mantissa
+     * @param quad a quadruple to unpack
      */
-    private static void unpackQuadToBuff(Float128 quad, long[] buffer) {
-        buffer[0] = quad.mantHi >>> 32;                // big-endian, highest word
-        buffer[1] = quad.mantHi & LOWER_32_BITS;
-        buffer[2] = quad.mantLo >>> 32;
-        buffer[3] = quad.mantLo & LOWER_32_BITS;
+    private static void unpackQuadToBuff(Float128 quad) {
+        Float128.BUFFER_4x32_A[0] = quad.mantHi >>> 32;                // big-endian, highest word
+        Float128.BUFFER_4x32_A[1] = quad.mantHi & LOWER_32_BITS;
+        Float128.BUFFER_4x32_A[2] = quad.mantLo >>> 32;
+        Float128.BUFFER_4x32_A[3] = quad.mantLo & LOWER_32_BITS;
     } // private static void unpackQuadToBuff(Float128 quad, long[] buffer) {
 
     /**
@@ -1037,7 +3500,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      *
      * @param exp the power to raise 2 to
      *
-     * @return the value of {@code2^exp}
+     * @return the value of {@code 2^exp}
      */
     private static long[] powerOfTwo(long exp) {
         if (exp == 0)
@@ -1088,7 +3551,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
         multPacked3x64_simply(factor1, factor2);
         final int expCorr = correctPossibleUnderflow(BUFFER_12x32);
         long[] result = BUFFER_4x64_B;
-        result = pack_12x32_to_3x64(BUFFER_12x32, result);
+        pack_12x32_to_3x64(result);
 
         result[0] = factor1[0] + factor2[0] + expCorr; // product.exp = f1.exp + f2.exp
         return result;
@@ -1102,10 +3565,8 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      *
      * @param factor1 an array of longs containing factor 1 as packed quasidecimal
      * @param factor2 an array of longs containing factor 2 as packed quasidecimal
-     *
-     * @return BUFF_12x32 filled with the product of mantissas
      */
-    private static long[] multPacked3x64_simply(long[] factor1, long[] factor2) {
+    private static void multPacked3x64_simply(long[] factor1, long[] factor2) {
         Arrays.fill(BUFFER_12x32, 0);
         // TODO2 19.01.16 21:23:06 for the next version -- rebuild the table of powers to make the numbers unpacked, to avoid packing/unpacking
         unpack_3x64_to_6x32(factor1, BUFFER_6x32_A);
@@ -1122,70 +3583,23 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             BUFFER_12x32[i - 1] += BUFFER_12x32[i] >>> 32;
             BUFFER_12x32[i] &= LOWER_32_BITS;
         }
-        return BUFFER_12x32;
     } // private static long[] multPacked3x64_simply(long[] factor1, long[] factor2) {
 
     /**
      * converts 192 most significant bits of the mantissa of a number from an unpacked quasidecimal form (where 32 least significant bits only used)
      * to a packed quasidecimal form (where buff[0] contains the exponent and buff[1]..buff[3] contain 3 x 64 = 192 bits of mantissa)
      *
-     * @param unpackedMant a buffer of at least 6 longs containing an unpacked value
-     * @param result       a buffer of at least 4 long to hold the packed value
+     * @param result a buffer of at least 4 long to hold the packed value
      *
      * @return packedQD192 with words 1..3 filled with the packed mantissa. packedQD192[0] is not affected.
      */
-    private static long[] pack_12x32_to_3x64(long[] unpackedMant, long[] result) {
-        result[1] = (unpackedMant[0] << 32) + unpackedMant[1];
-        result[2] = (unpackedMant[2] << 32) + unpackedMant[3];
-        result[3] = (unpackedMant[4] << 32) + unpackedMant[5];
+    private static long[] pack_12x32_to_3x64(long[] result) {
+        result[1] = (Float128.BUFFER_12x32[0] << 32) + Float128.BUFFER_12x32[1];
+        result[2] = (Float128.BUFFER_12x32[2] << 32) + Float128.BUFFER_12x32[3];
+        result[3] = (Float128.BUFFER_12x32[4] << 32) + Float128.BUFFER_12x32[5];
         return result;
     } // private static long[] pack_12x32_to_3x64(long[] unpackedMant, long[] result) {
 
-    /**
-     * For a Float128 with a normal mantissa (with implied unity)
-     * and non-positive biased exponent, returns a copy of the conventional subnormal form, with the exponent = 0
-     * and the mantissa shifted rightwards with explicit 1 in the appropriate position.<br>
-     * Shifts mantissa rightwards by |exp2| + 1 bits, sets explicit 1, and rounds it up, taking into account the bits having been shifted-out
-     *
-     * @param exp2 the exponent of the newly-found subnormal value (always negative)
-     *
-     * @return This Float128 in subnormal form.
-     */
-    private Float128 makeSubnormal(long exp2) {
-        boolean negative = this.negative;
-        long mantHi =this.mantHi, mantLo=this.mantLo;
-
-        exp2 = -exp2;                               // just for convenience
-        if (exp2 > 127) {                           // Effectively 0 or MIN_VALUE
-            mantLo = mantHi = 0;
-            if (exp2 == 128) mantLo++;                // MIN_VALUE
-            return new Float128(negative, 0, mantHi, mantLo);                                 // exp2 >= 129 means 0
-        }
-
-        long shiftedOutBit = mantLo & 1;                // The highest of shifted out bits to evaluate carry
-        mantLo = (mantLo >>> 1) | (mantHi << 63);
-        mantHi = (mantHi >>> 1) | HIGH_BIT;          // move 1 bit right and set unity that was implied
-
-        if (exp2 >= 64) {                            // the higher word move into the lower
-            if (exp2 == 64)
-                shiftedOutBit = mantLo >>> 63;              // former lowest bit of mantHi now is the highest bit of mantLo
-            else
-                shiftedOutBit = (mantHi >>> (exp2 - 65)) & 1; // one of the bits of the high word
-            mantLo = mantHi >>> exp2 - 64;
-            mantHi = 0;
-        } else if (exp2 > 0) {                      // Shift both words
-            shiftedOutBit = (mantLo >>> exp2 - 1) & 1;
-            mantLo = (mantLo >>> exp2) | (mantHi << 64 - exp2);
-            mantHi = mantHi >>> exp2;
-        }
-
-        exp2 = 0;                                   // it's subnormal
-        if (shiftedOutBit != 0)
-            if (++mantLo == 0 && ++mantHi == 0)       // Round up. carry beyond the higher word?
-                exp2++;                                 // it becomes MIN_NORMAL
-
-        return new Float128(negative, (int) exp2, mantHi, mantLo);
-    }
 
     /**
      * Converts the decimal mantissa of a number given in a binary form into
@@ -1237,7 +3651,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             multBuffBy10(multBuffer);                              // next digit in turn gets into bits 35..32 of multBuffer
             sb.append(Character.forDigit((int) (multBuffer[0] >>> 32), 10)); // Here it is
             charCount++;
-        } while (charCount < maxLen && !isEmpty(multBuffer));
+        } while (charCount < maxLen && isEmpty(multBuffer));
         return sb;
     } // private static StringBuilder convertMantToString(long[] qdNumber, long[] multBuffer, int maxLen) {
 
@@ -1272,541 +3686,9 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return {@code true} if the buffer is empty, {@code false} otherwise
      */
     private static boolean isEmpty(long[] buffer) {
-        for (int i = 0; i < buffer.length; i++)
-            if (buffer[i] != 0)
-                return false;
-        return true;
+        for (long l : buffer)
+            if (l != 0)
+                return true;
+        return false;
     }
-
-    /**
-     * A class that parses a string containing a numeric value and sets the fields of its {@code Float128} owner accordingly.
-     * Contains involved static methods, constants, and interim variables
-     */
-    private static class NumberParser {
-
-        /** A pattern used to strip leading zeroes from integer numbers */
-        private static final Pattern LEADING_ZEROES_PTRN = Pattern.compile("(^0+)(\\d*)");
-
-        /** The maximum number of digits in the mantissa that are taken into account */
-        private static final int MAX_MANTISSA_LENGTH = 59;  // 2^192 = 6.277e57, so the 58-th digit after point may affect the result
-
-
-        /**
-         * A mapping of string designations of special values,
-         * used by {@link Float128.NumberParser.NumberParts#parse(String)}
-         */
-        @SuppressWarnings("serial")
-        private static final Map<String, Float128> QUADRUPLE_CONSTS = new HashMap<>() {{
-            put("quadruple.min_value", MIN_VALUE);
-            put("min_value", MIN_VALUE);
-            put("quadruple.max_value", MAX_VALUE);
-            put("max_value", MAX_VALUE);
-            put("quadruple.min_normal", MIN_NORMAL);
-            put("min_normal", MIN_NORMAL);
-            put("quadruple.nan", NAN);
-            put("nan", NAN);
-            put("quadruple.negative_infinity", NEGATIVE_INFINITY);
-            put("negative_infinity", NEGATIVE_INFINITY);
-            put("-infinity", NEGATIVE_INFINITY);
-            put("quadruple.positive_infinity", POSITIVE_INFINITY);
-            put("positive_infinity", POSITIVE_INFINITY);
-            put("infinity", POSITIVE_INFINITY);
-            put("+infinity", POSITIVE_INFINITY);
-        }};
-
-        /**
-         * A decomposer and container to extract and store the parts of the string representing a number.
-         * Its fields are set by the {@link #decompose(String)} method and used to build a Float128 value
-         *
-         * @author misa
-         */
-        private static class NumberParts {
-
-            /** Decimal exponent of the number */
-            private long exp10;
-            /** Sign flag ({@code true} for negatives) */
-            private boolean negative;
-            /** Mantissa without the dot and leading/trailing zeros */
-            private String mantStr;
-            /** exponent correction, derived from mantissa */
-            private int expCorrection;
-
-            /***
-             * A regex to parse floating-point number with a minimal framing
-             * of methods to extract separate parts of the number
-             * @author misa
-             *
-             */
-            private static class FPStringRegex {
-                private static final Pattern FP_STRING_PTRN = Pattern.compile(
-                        "^(\\+|-)?((\\d*\\.)?(\\d*))(e(\\+|-)?0*(\\d+))?$",
-                        // 19.11.29 17:37:04 Enable any number of zeroes before exponent
-                        Pattern.CASE_INSENSITIVE);
-
-                private static Matcher m;
-
-                private static void match(String source) {
-                    m = FP_STRING_PTRN.matcher(source);         //   "^(\\+|-)?((\\d*\\.)?(\\d+))(e(\\+|-)?(\\d+))?$"
-                    if (!m.find())
-                        throw new NumberFormatException("Invalid number: '" + source + "'");
-                }
-
-                private static boolean negative() {
-                    return ("-".equals(m.group(1)));
-                }
-
-                private static String expString() {
-                    return m.group(5);
-                }
-
-                private static String intPartString() {
-                    return m.group(3);
-                }
-
-                private static String fractPartString() {
-                    return m.group(4);
-                }
-
-            }
-
-            private String sourceStr;
-
-            /**
-             * Decomposes an input string containing a floating-point number
-             * into parts (sign, mantissa, exponent, and necessary exponent correction depending on the mantissa)
-             * and sets appropriately the inner fields to be used by subsequent processing
-             *
-             * @param source the source String
-             *
-             * @return the reference of this instance
-             */
-            private NumberParser.NumberParts decompose(String source) {
-                this.sourceStr = source;
-                NumberParser.NumberParts.FPStringRegex.match(source); // It throws an exception if doesn't match
-
-                negative = NumberParser.NumberParts.FPStringRegex.negative();
-                exp10 = extractExp10(NumberParser.NumberParts.FPStringRegex.expString());
-                expCorrection = buildMantString(NumberParser.NumberParts.FPStringRegex.intPartString(),
-                                                NumberParser.NumberParts.FPStringRegex.fractPartString());
-
-                return this;
-            }
-
-            /**
-             * Builds a String containing the mantissa of the floating-point number being parsed
-             * as a string of digits without trailing or leading zeros.
-             * Finds the exponent correction depending on the point position and the number of leading zeroes.
-             *
-             * @param intPartString   the integer part of the mantissa, (m.b. including the dot)
-             * @param fractPartString the integer part of the mantissa
-             */
-            private int buildMantString(String intPartString, String fractPartString) {
-                int expCorrection = uniteMantString(intPartString, fractPartString);
-
-                final Matcher m2 = LEADING_ZEROES_PTRN.matcher(mantStr);     // Strip leading zeroes
-                if (m2.find()) {
-                    mantStr = m2.group(2);
-                    expCorrection -= m2.group(1)
-                            .length();                     // - number of leading zeroes stripped
-                }
-                mantStr = mantStr.replaceFirst("0*$", "");            // Strip trailing zeroes
-                return expCorrection;
-            } // NumberParts.findMantString(String intPartString, String fractPartString) {
-
-            /**
-             * Unites the integer part of the mantissa with the fractional part and computes
-             * necessary exponent correction that depends on the position of the decimal point
-             *
-             * @param intPartString   the integer part of the mantissa, may be null for empty mantissa (e.g. "e123"), or consist of only "."
-             * @param fractPartString the fractional part of the mantissa, may be empty for e.g. "33.e5"
-             *
-             * @return the exponent correction to be added to the explicitely expressed number's exponent
-             */
-            private int uniteMantString(String intPartString, String fractPartString) {
-                if (intPartString == null) {
-                    intPartString = fractPartString;
-                    fractPartString = "";
-                }
-
-                intPartString = intPartString.replaceFirst("\\.$", "");
-                if (intPartString.isEmpty() && fractPartString.isEmpty())
-                    throw new NumberFormatException("Invalid number: " + sourceStr);
-
-                mantStr = intPartString + fractPartString;      // mantissa as a string
-                return intPartString.length() - 1;              // 10.0 = 1e1, 1.0 = 1e0, 0.1 = 1e-1 etc;
-            } // private int NumberParts.uniteMantString( String intPartString, String fractPartString) {
-
-            private static final Pattern EXP_STR_PTRN = Pattern.compile("e(\\+|-)?(\\d+)");
-
-            /**
-             * Extracts a long value of the exponent from a substring
-             * containing the exponent of the floating-point number being parsed,
-             * e.g. "e+646456993"
-             *
-             * @param expString substring containing the exponent, may be null if the number is in decimal format (without exponent)
-             *
-             * @return numeric exponent value
-             */
-            private static long extractExp10(String expString) {
-                long exp10 = 0;
-                if (expString != null) {
-                    final Matcher m = EXP_STR_PTRN.matcher(expString); // It will surely find, otherwise it couldn't get here
-                    if (m.find()) {
-                        exp10 = parseLong(m.group(2));
-                        if ("-".equals(m.group(1))) exp10 = -exp10;
-                    }
-                }
-                return exp10;
-            } // private static long NumberParts.extractExp10(String expString) {
-
-            /**
-             * Parses a String containing an unsigned long number.
-             * For values greater than   999_999_999_999_999_999 (1e18-1) returns Long.MAX_VALUE.
-             *
-             * @param longString string representation of a number
-             *
-             * @return a long value represented by the longString
-             */
-            private static long parseLong(String longString) {
-                if (longString.length() > 18) return Long.MAX_VALUE;
-                return Long.parseLong(longString);
-            }
-
-        } // private static class NumberParts {
-
-        static final NumberParser.NumberParts PARTS = new NumberParser.NumberParts();
-
-        /**
-         * Parses a string containing a floating-point number and sets the fields
-         * of the owner (a {@code Float128} instance)
-         * <br>uses static arrays
-         * <b><i>BUFFER_4x64_B, BUFFER_6x32_A, BUFFER_6x32_B, BUFFER_6x32_C, BUFFER_12x32</i></b>
-         *
-         * @param source input string to parse
-         *
-         * @return the <b>owner</b> with the values of the fields modified to correspond to the value presented by the <b>source</b>
-         */
-        private static Float128 parse(String source) {
-            source = source.trim()
-                    .toLowerCase();
-
-            final Float128 qConst = QUADRUPLE_CONSTS.get(source);
-            if (qConst != null)
-                return qConst;
-
-            source = source.replaceAll("\\_", "");
-            return buildFloat128(PARTS.decompose(source));
-        }
-
-        /**
-         * Builds a quadruple value based on the parts of the decimal floating-point number.
-         * Puts the value into the owner's fields
-         * <br>uses static arrays
-         * <b><i>BUFFER_4x64_B, BUFFER_6x32_A, BUFFER_6x32_B, BUFFER_6x32_C, BUFFER_12x32</i></b>,
-         *
-         * @param parts contains parts of the parsed number -- integer and fractional parts of the decimal mantissa, exponent, and sign.
-         */
-        private static Float128 buildFloat128(NumberParser.NumberParts parts) {
-            var negative = parts.negative;
-            long exp10 = parts.exp10;
-            final int exp10Corr = parseMantissa(parts, BUFFER_6x32_C);
-            // and puts it into buff_6x32_C. Returns necessary exponent correction
-            if (exp10Corr == 0 && isEmpty(BUFFER_6x32_C)) {
-                return ZERO;
-            }
-
-            exp10 += exp10Corr; // takes account of the point position in the mant string
-            // and possible carry as a result of round-up (like 9.99e1 -> 1.0e2)
-
-            Float128 f;
-            if ((f = exceedsAcceptableExponentRange(exp10)) != null)
-                return f;
-
-            final long exp2 = findBinaryExponent(exp10, BUFFER_6x32_C);
-            return findBinaryMantissa((int) exp10,
-                                      exp2,
-                                      BUFFER_6x32_C);   // Finds binary mantissa and possible exponent correction. Fills the owner's fields.
-        }
-
-        /**
-         * Finds the numeric value of the normalized decimal mantissa
-         * in "quasidecimal" format ( M * 2^192 / 10, so that 1.0 becomes 0x19..99, and 9.99..99 becomes 0xFF..FF)
-         * and puts it into the given buffer.
-         * Finds and returns the exponent correction to be added to the number's exponent
-         * (depending on the position of the decimal point in the original mantissa and possible rounding up), so that
-         * 0.123 corresponds to expCorr == -1,  1.23 to expCorr == 0, and 123000.0 to expCorr = 5.
-         *
-         * @param parts  a {@code NumberParts} instance containing the parts of the number
-         * @param buffer a buffer to put the numeric value to
-         *
-         * @return exponent correction to be added to the parsed number's exponent
-         * /
-         **/
-        private static int parseMantissa(NumberParser.NumberParts parts, long[] buffer) {
-            if (parts.mantStr.isEmpty()) { // There's nothing but zeroes
-                Arrays.fill(buffer, 0);
-                return 0;
-            } else { // find numeric value of the mantissa
-                // Rounding may result in additional exponent correction
-                return parseMantString(parts.mantStr, buffer) + parts.expCorrection;
-            }
-        }
-
-        /**
-         * Parses the given String, containing a long decimal number,
-         * and sets its numeric 192-bit value in the given buffer.
-         * May require to increment exponent if (10^n) - 1 ( == 99..99) gets rounded up to 10^n ( == 100..00),
-         * returns 1 in such case, otherwise returns 1.
-         *
-         * @param mantStr a String containing the decimal number to be parsed
-         * @param buffer  a buffer to put the found value to
-         *
-         * @return exponent correction to be added to the explicit exponent of the number
-         */
-        private static int parseMantString(String mantStr, long[] buffer) { //
-            int expCorr = 0;
-            final StringBuilder sb = new StringBuilder(mantStr);
-            // Limit the string length to avoid unnecessary fuss
-            if (sb.length() > MAX_MANTISSA_LENGTH) { // Strip extra digits that can't affect the result
-                final boolean carry = sb.charAt(MAX_MANTISSA_LENGTH) >= '5'; // The highest digit to be truncated
-                sb.delete(MAX_MANTISSA_LENGTH, sb.length());
-                if (carry)                           // Round-up: add carry
-                    expCorr += addCarry(sb);           // May add an extra digit in front of it (99..99 -> 100)
-            }
-            findNumericMantValue(sb, buffer);
-            return expCorr;
-        }
-
-        /**
-         * Converts a string of digits to a 192-bit "quasidecimal" numeric value
-         *
-         * @param sb     a StringBuilder containing the digits of the mantissa
-         * @param buffer a buffer to put the found value to
-         */
-        private static void findNumericMantValue(StringBuilder sb, long[] buffer) {
-            assert buffer.length == 6 : "findMantValue(): buffer length must be 6";
-            Arrays.fill(buffer, 0);
-            for (int i = sb.length() - 1; i >= 0; i--) { // digits, starting from the last
-                buffer[0] |= (long) Character.digit(sb.charAt(i), 10) << 32;
-                divBuffBy10(buffer);
-            }
-        }
-
-        /**
-         * Checks that the decimal exponent value doesn't exceed the possible range.<br>
-         * if exponent < MIN_EXP10, assigns 0 to the owner and returns {@code true}.
-         * if exponent > MAX_EXP10, assigns Infinity to the owner and returns {@code true}.
-         * Otherwise returns {@code false}.
-         */
-        private static Float128 exceedsAcceptableExponentRange(long exp10) {
-            if (exp10 < MIN_EXP10) {              // exp < MIN_EXP10. Can be nothing but 0
-                return ZERO;
-            } else if (exp10 > MAX_EXP10) {        // exp > MIN_EXP10. Can be nothing but Infinity
-                return POSITIVE_INFINITY;
-            }
-            return null;
-        }
-
-        /** (2^63) / 10 =~ 9.223372e17 */
-        private static final double TWO_POW_63_DIV_10 = 922337203685477580d; // 2^63 / 10
-
-        /**
-         * Finds binary exponent, using decimal exponent and mantissa.<br>
-         * exp2 = exp10 * log<sub>2</sub>(10) + log<sub>2</sub>(mant)<br>
-         *
-         * @param exp10    decimal exponent
-         * @param mantissa array of longs containing decimal mantissa (divided by 10)
-         *
-         * @return found value of binary exponent
-         */
-        private static long findBinaryExponent(long exp10, long[] mantissa) {
-            final long mant10 = mantissa[0] << 31 | mantissa[1] >>> 1;  // Higher 63 bits of the mantissa, in range
-            // 0x0CC..CCC -- 0x7FF..FFF (2^63/10 -- 2^63-1)
-            final double mant10d = mant10 / TWO_POW_63_DIV_10;           // decimal value of the mantissa in range 1.0..9.9999...
-            return (long) Math.floor((exp10) * LOG2_10 + log2(mant10d)); // Binary exponent
-        }
-
-        /**
-         * Finds binary mantissa based on the given decimal mantissa and binary exponent,
-         * <pre>mant<sub>2</sub> = mant<sub>10</sub> * 10^exp<sub>10</sub> / 2^exp<sub>2</sub></pre>
-         * Assigns the found mantissa value to the owner's fields mantHi, mantLo and sets its binary exponent.
-         * <br>uses static arrays
-         * <b><i>BUFFER_4x64_B, BUFFER_6x32_A, BUFFER_6x32_B, BUFFER_12x32</i></b>,
-         *
-         * @param exp10    decimal exponent from the source string
-         * @param exp2     binary mantissa found from decimal mantissa
-         * @param mantissa a buffer containing unpacked quasidecimal mantissa (6 x 32 bits)
-         */
-        private static Float128 findBinaryMantissa(int exp10, long exp2, long[] mantissa) {
-            final long[] powerOf2 = powerOfTwo(
-                    -exp2);  // pow(2, -exp2): division by 2^exp2 is multiplication by 2^(-exp2) actually
-            long[] product = BUFFER_12x32;          // use it for the product (M * 10^E / 2^e)
-            product = multUnpacked6x32bydPacked(mantissa, powerOf2, product); // product in buff_12x32
-            multBuffBy10(product);                  // "Quasidecimals" are numbers divided by 10
-
-            if (powerOf2[0] != -exp10)
-                multBuffBy10(
-                        product);                // For some combinations of exp2 and exp10, additional multiplication needed (see mant2_from_M_E_e.xls)
-
-            exp2 += normalizeMant(product);         // compensate possible inaccuracy of logarithms used to compute exp2
-            exp2 += EXPONENT_BIAS;                     // add bias
-
-            // For subnormal values, exp2 <= 0
-            if (exp2 <= 0) {                        // subnormal
-                // Don't round subnormals up, makeSubnormal will round them,
-                // unless bits 129..191 of the product >= 0xFFFF_FFFF_FFFF_FFE0L
-                // (i.e. unless the fractional part of the mantissa >= (0.5 - 1.7e-18))
-
-                if (product[4] == 0xFFFF_FFFFL        // 20.11.24 17:34:48 Max. deviation for subnormals seems to be 1e-18
-                        && (product[5] & 0xFFFF_FFE0L) == 0xFFFF_FFE0L) // && (product[5] & 0xFFFF_FF00L) == 0xFFFF_FF00L)
-                    exp2 += roundUp(product);            // round up, may require exponent correction
-
-                fillOwnerMantissaFrom(product);       // 128 bits mantHi, mantLo from unpacked buffer
-                if (exp2 <= 0)
-                    exp2 = makeSubnormal(
-                            exp2);   // Shift to the right by exp2 bits, may correct exp2 in case of rounding up
-            } else {
-                exp2 += roundUp(product);              // round up, may require exponent correction
-                fillOwnerMantissaFrom(product);
-            }
-
-            owner.exponent = (int) exp2;
-            if (owner.exponent == EXPONENT_OF_INFINITY) // Infinity
-                owner.mantHi = owner.mantLo = 0;
-        }
-
-        /**
-         * 20.10.02 13:16:54 Was used for debugging
-         */
-        @SuppressWarnings("unused")
-        private static void logExpAndMant(boolean indent, long exp2, long[] product) {
-            //      final String prefix = indent? "\t\t\t\t\t\t" : "";
-            //      log_(prefix + "exp2:\t" + hexStr((int)exp2));
-            //      log("\tmant:\t" + hexStr((int)product[5]) + "\t = \t" + (int)product[5]);
-            //      say_("exp2:\t" + hexStr((int)exp2));
-            //      say("\tmant:\t" + hexStr((int)product[5]) + "\t = \t" + (int)product[5]);
-        }
-
-        /**
-         * Multiplies unpacked 192-bit value by a packed 192-bit factor
-         * <br>uses static arrays
-         * <b><i>BUFFER_6x32_B</i></b>
-         *
-         * @param factor1 a buffer containing unpacked quasidecimal mantissa (6 x 32 bits)
-         * @param factor2 an array of 4 longs containing packed quasidecimal power of two
-         * @param product a buffer of at least 12 longs to hold the product
-         *
-         * @return an unpacked (with 32 bits used only) value of 384 bits of the product put in the {@code product}
-         */
-        private static long[] multUnpacked6x32bydPacked(long[] factor1, long[] factor2, long[] product) {
-            Arrays.fill(product, 0);
-            unpack_3x64_to_6x32(factor2, BUFFER_6x32_B); // It's the powerOf2, with exponent in 0'th word
-            factor2 = BUFFER_6x32_B;
-
-            final int maxFactIdx = factor1.length - 1;
-
-            for (int i = maxFactIdx; i >= 0; i--) // compute partial 32-bit products
-                for (int j = maxFactIdx; j >= 0; j--) {
-                    final long part = factor1[i] * factor2[j];
-                    product[j + i + 1] += part & LOWER_32_BITS;
-                    product[j + i] += part >>> 32;
-                }
-
-            for (int i = 11; i > 0; i--) { // Carry higher bits of the product to the lower bits of the next word
-                product[i - 1] += product[i] >>> 32;
-                product[i] &= LOWER_32_BITS;
-            }
-
-            return product;
-        } // private static long[] multUnpacked6x32bydPacked(long[] factor1, long[] factor2, long[] product) {
-
-
-        /**
-         * Fills the mantissa of the owner with the higher 128 bits of the buffer
-         *
-         * @param mantissa a buffer containing unpacked mantissa (n longs, where only lower 32 bits of each word are used)
-         */
-        private static void fillOwnerMantissaFrom(long[] mantissa) {
-            owner.mantHi = (mantissa[0] << 32) + mantissa[1];
-            owner.mantLo = (mantissa[2] << 32) + mantissa[3];
-        } // private static void fillOwnerMantissaFrom(long[] mantissa) {
-
-        /***
-         * Makes sure that the (unpacked) mantissa is normalized,
-         * i.e. buff[0] contains 1 in bit 32 (the implied integer part) and higher 32 of mantissa in bits 31..0,
-         * and buff[1]..buff[4] contain other 96 bits of mantissa in their lower halves:
-         * <pre>0x0000_0001_XXXX_XXXXL, 0x0000_0000_XXXX_XXXXL...</pre>
-         * If necessary, divides the mantissa by appropriate power of 2 to make it normal.
-         * @param mantissa a buffer containing unpacked mantissa
-         * @return if the mantissa was not normal initially, a correction that should be added to the result's exponent, or 0 otherwise
-         */
-        private static int normalizeMant(long[] mantissa) {
-            final int expCorr = 31 - Long.numberOfLeadingZeros(mantissa[0]);
-            if (expCorr != 0)
-                divBuffByPower2(mantissa, expCorr);
-            return expCorr;
-        } // private static int normalizeMant(long[] mantissa) {
-
-        /**
-         * Rounds up the contents of the unpacked buffer to 128 bits
-         * by adding unity one bit lower than the lowest of these 128 bits.
-         * If carry propagates up to bit 33 of buff[0], shifts the buffer rightwards
-         * to keep it normalized.
-         *
-         * @param mantissa the buffer to get rounded
-         *
-         * @return 1 if the buffer was shifted, 0 otherwise
-         */
-        private static int roundUp(long[] mantissa) {
-            // due to the limited precision of the power of 2, a number with exactly half LSB in its mantissa
-            // (i.e that would have 0x8000_0000_0000_0000L in bits 128..191 if it were computed precisely),
-            // after multiplication by this power of 2, may get erroneous bits 185..191 (counting from the MSB),
-            // taking a value from
-            // 0xXXXX_XXXX_XXXX_XXXXL 0xXXXX_XXXX_XXXX_XXXXL 0x7FFF_FFFF_FFFF_FFD8L.
-            // to
-            // 0xXXXX_XXXX_XXXX_XXXXL 0xXXXX_XXXX_XXXX_XXXXL 0x8000_0000_0000_0014L, or something alike.
-            // To round it up, we first add
-            // 0x0000_0000_0000_0000L 0x0000_0000_0000_0000L 0x0000_0000_0000_0028L, to turn it into
-            // 0xXXXX_XXXX_XXXX_XXXXL 0xXXXX_XXXX_XXXX_XXXXL 0x8000_0000_0000_00XXL,
-            // and then add
-            // 0x0000_0000_0000_0000L 0x0000_0000_0000_0000L 0x8000_0000_0000_0000L, to provide carry to higher bits.
-
-            addToBuff(mantissa, 5, 100);               // to compensate possible inaccuracy
-            addToBuff(mantissa, 4, 0x8000_0000L);               // round-up, if bits 128..159 >= 0x8000_0000L
-            if ((mantissa[0] & (HIGHER_32_BITS << 1)) != 0) {   // carry's got propagated beyond the highest bit
-                divBuffByPower2(mantissa, 1);
-                return 1;
-            }
-            return 0;
-        } // private static int roundUp(long[] mantissa) {
-
-        /**
-         * Divides the contents of the buffer by 2^exp2<br>
-         * (shifts the buffer rightwards by exp2 if the exp2 is positive, and leftwards if it's negative),
-         * keeping it unpacked (only lower 32 bits of each element are used, except the buff[0]
-         * whose higher half is intended to contain integer part)
-         *
-         * @param buffer the buffer to divide
-         * @param exp2   the exponent of the power of two to divide by, expected to be
-         */
-        private static void divBuffByPower2(long[] buffer, int exp2) {
-            final int maxIdx = buffer.length - 1;
-            final int backShift = 32 - Math.abs(exp2);
-
-            if (exp2 > 0) { // Shift to the right
-                for (int i = maxIdx; i > 0; i--)
-                    buffer[i] = (buffer[i] >>> exp2)
-                            | ((buffer[i - 1] << backShift) & LOWER_32_BITS);
-                buffer[0] = (buffer[0] >>> exp2);    // Preserve the high half of buff[0]
-            } else if (exp2 < 0) { // Shift to the left
-                exp2 = -exp2;
-                buffer[0] = (buffer[0] << exp2) | (buffer[1] >> backShift); // Preserve the high half of buff[0]
-                for (int i = 1; i < maxIdx; i++)
-                    buffer[i] = ((buffer[i] << exp2) & LOWER_32_BITS)
-                            | (buffer[i + 1] >> backShift);
-                buffer[maxIdx] = (buffer[maxIdx] << exp2) & LOWER_32_BITS;
-            }
-        } // private static void divBuffByPower2(long[] buffer, int exp2) {
-
-    } // private static class NumberParser
 }
