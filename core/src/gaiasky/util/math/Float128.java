@@ -25,7 +25,7 @@ import java.util.Arrays;
  * @param mantHi   The most significant 64 bits of fractional part of the mantissa.
  * @param mantLo   The least significant 64 bits of fractional part of the mantissa.
  */
-public record Float128(boolean negative, int exponent, long mantHi, long mantLo) {
+public record Float128(boolean negative, int exponent, long mantHi, long mantLo) implements Comparable<Float128> {
 
 
     private static final int HASH_CODE_OF_NAN = -441827835;  // All the NaNs have to have the same hashcode.
@@ -682,10 +682,10 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
 
 
     /**
-     * Converts the value of this {@code Quadruple} to an {@code int} value in a way
+     * Converts the value of this {@link Float128} to an {@code int} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code int}).
      *
-     * @return the value of this {@code Quadruple} instance converted to an {@code int}.
+     * @return the value of this {@link Float128} instance converted to an {@code int}.
      */
     public int intValue() {
         final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // Unbiased exponent
@@ -698,10 +698,10 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Converts the value of this {@code Quadruple} to a {@code long} value in a way
+     * Converts the value of this {@link Float128} to a {@code long} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code long}).
      *
-     * @return the value of this {@code Quadruple} instance converted to a {@code long}.
+     * @return the value of this {@link Float128} instance converted to a {@code long}.
      */
     public long longValue() {
         final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // Unbiased exponent
@@ -714,24 +714,24 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Converts the value of this {@code Quadruple} to a {@code float} value in a way
+     * Converts the value of this {@link Float128} to a {@code float} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code float}).
      *
-     * @return the value of this {@code Quadruple} instance converted to a {@code float}.
+     * @return the value of this {@link Float128} instance converted to a {@code float}.
      */
     public float floatValue() {
         return (float) doubleValue();
     }
 
     /**
-     * Converts the value of this {@code Quadruple} to a {@code double} value in a way
+     * Converts the value of this {@link Float128} to a {@code double} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code float}).
      * Uses 'half-even' approach to the rounding, like {@code BigDecimal.doubleValue()}
      *
-     * @return the value of this {@code Quadruple} instance converted to a {@code double}.
+     * @return the value of this {@link Float128} instance converted to a {@code double}.
      */
     public double doubleValue() {
-        if (exponent == 0)                  // All subnormal Quadruples are also converted into 0d
+        if (exponent == 0)                  // All subnormal Float128s are also converted into 0d
             return negative ? -0.0d : 0.0d;
 
         if (exponent == EXPONENT_OF_INFINITY)
@@ -1780,13 +1780,13 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             }
 
             subtractSubnormalFromNormal(minuendLo, minuendHi);
-        } // private Float128 subtractUnsigned(Float128 subtrahend) {
+        }
 
         /**
          * Compares the magnitude (absolute value) of this instance
          * with the magnitude of the other instance.
          *
-         * @param other the Quadruple to compare with
+         * @param other the Float128 to compare with
          *
          * @return 1 if this instance is greater in magnitude than the {@code other} instance,
          * 0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
@@ -1809,10 +1809,10 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             if ((result = Long.compareUnsigned(mantHi, other.mantHi)) != 0) // If exponents are equal, compare mantissas
                 return result;
             return Long.compareUnsigned(mantLo, other.mantLo);
-        } // public int compareMagnitudeTo(Quadruple other) {
+        } // public int compareMagnitudeTo(Float128 other) {
 
         /**
-         * Compares the magnitudes (absolute values) of the two Quadruples.
+         * Compares the magnitudes (absolute values) of the two Float128s.
          *
          * @param q1 the instance to compare with the other one
          * @param q2 the instance to compare with
@@ -1822,7 +1822,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          */
         public static int compareMagnitudes(F128 q1, F128 q2) {
             return q1.compareMagnitudeTo(q2);
-        } // public static int compareMagnitudes(Quadruple q1, Quadruple q2) {
+        }
 
         /**
          * Subtracts a normal value, whose mantissa is contained by this
@@ -3782,5 +3782,56 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             if (l != 0)
                 return true;
         return false;
+    }
+
+    /**
+     * Compares the value of this instance with the value of the specified instance.
+     *
+     * @param other the {@link Float128} to compare with
+     *
+     * @return a negative integer, zero, or a positive integer as the value of this instance is less than,
+     * equal to, or greater than the value of the specified instance.
+     */
+    @Override
+    public int compareTo(Float128 other) {
+
+        if (isNaN())
+            return other.isNaN() ? 0 : 1;                      // NaN is considered to be greater than any other value
+        if (other.isNaN())
+            return -1;
+
+        // For Doubles, -0 < 0. Do it the same way
+        if (negative != other.negative)                     // If signs differ
+            return negative ? -1 : 1;
+
+        // Signs are equal -- compare exponents (unsigned)
+        int result = Integer.compareUnsigned(exponent, other.exponent);
+
+        if (result == 0)                                    // If exponents are equal, compare mantissas
+            result = Long.compareUnsigned(mantHi, other.mantHi);
+        if (result == 0)
+            result = Long.compareUnsigned(mantLo, other.mantLo);
+
+        if (negative) result = -result;                     // both are negative, invert result
+        return result;
+    }
+
+    /**
+     * Computes a hashcode for this {@link Float128},
+     * based on the values of its fields.
+     *
+     * @see Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        if (isNaN())                                        // Since NaNs are considered equal, they must return the same hashCode
+            return HASH_CODE_OF_NAN;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + exponent;
+        result = prime * result + (int) (mantHi ^ (mantHi >>> 32));
+        result = prime * result + (int) (mantLo ^ (mantLo >>> 32));
+        result = prime * result + (negative ? 1231 : 1237);
+        return result;
     }
 }
