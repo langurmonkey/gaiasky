@@ -680,6 +680,98 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
         return new F128(negative, exponent, mantHi, mantLo);
     }
 
+
+    /**
+     * Converts the value of this {@code Quadruple} to an {@code int} value in a way
+     * similar to standard narrowing conversions (e.g., from {@code double} to {@code int}).
+     *
+     * @return the value of this {@code Quadruple} instance converted to an {@code int}.
+     */
+    public int intValue() {
+        final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // Unbiased exponent
+        if (exp < 0 || isNaN()) return 0;
+        if (exp >= 31)                                              // value <= Integer.MIN_VALUE || value > Integer.MAX_VALUE
+            return negative ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        final int intValue = exp == 0 ? 1 : (1 << exp) | (int) (mantHi >>> 64 - exp);  // implicit unity | fractional part of the mantissa, shifted rightwards
+        return negative ? -intValue : intValue;
+    }
+
+    /**
+     * Converts the value of this {@code Quadruple} to a {@code long} value in a way
+     * similar to standard narrowing conversions (e.g., from {@code double} to {@code long}).
+     *
+     * @return the value of this {@code Quadruple} instance converted to a {@code long}.
+     */
+    public long longValue() {
+        final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // Unbiased exponent
+        if (exp < 0 || isNaN()) return 0;                           // NaN.longValue == 0
+        if (exp >= 63)                                              // value <= Long.MIN_VALUE || value > Long.MAX_VALUE
+            return negative ? Long.MIN_VALUE : Long.MAX_VALUE;
+
+        final long longValue = exp == 0 ? 1 : (1L << exp) | (mantHi >>> 64 - exp);  // implicit unity | fractional part of the mantissa, shifted rightwards
+        return negative ? -longValue : longValue;
+    }
+
+    /**
+     * Converts the value of this {@code Quadruple} to a {@code float} value in a way
+     * similar to standard narrowing conversions (e.g., from {@code double} to {@code float}).
+     *
+     * @return the value of this {@code Quadruple} instance converted to a {@code float}.
+     */
+    public float floatValue() {
+        return (float) doubleValue();
+    }
+
+    /**
+     * Converts the value of this {@code Quadruple} to a {@code double} value in a way
+     * similar to standard narrowing conversions (e.g., from {@code double} to {@code float}).
+     * Uses 'half-even' approach to the rounding, like {@code BigDecimal.doubleValue()}
+     *
+     * @return the value of this {@code Quadruple} instance converted to a {@code double}.
+     */
+    public double doubleValue() {
+        if (exponent == 0)                  // All subnormal Quadruples are also converted into 0d
+            return negative ? -0.0d : 0.0d;
+
+        if (exponent == EXPONENT_OF_INFINITY)
+            return (mantHi != 0 || mantLo != 0) ? Double.NaN :
+                    negative ?
+                            Double.NEGATIVE_INFINITY :
+                            Double.POSITIVE_INFINITY;
+
+        int expD = exponent - EXPONENT_BIAS;                   // Unbiased, to range -0x8000_0000 ... 0x7FFF_FFFF
+        if (expD > EXP_0D)                                  // Out of range
+            return negative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+
+        if (expD < -(EXP_0D + 52))                          // below Double.MIN_VALUE -- return 0
+            return negative ? -0.0d : 0.0d;
+
+        if (expD < -(EXP_0D - 1)) {                         // subnormal
+            long lValue = (mantHi >>> 12) | 0x0010_0000_0000_0000L; // implied higher bit;
+            lValue = lValue + (1L << -EXP_0D - expD) >>> -EXP_0D - expD + 1;
+            if (negative) lValue |= DOUBLE_SIGN_MASK;
+            return Double.longBitsToDouble(lValue);
+        }
+
+        // normal case
+        long dMant = mantHi >>> 12;
+        if ((mantHi & HALF_DOUBLES_LSB) != 0)               // The highest bit, of those was shifted out, is 1 -- round it up
+            if ((((mantHi & (HALF_DOUBLES_LSB - 1)) | mantLo) != 0)  // greater than just n + LSB * 0.5
+                    || (dMant & 1) != 0) {                     // 20.12.22 14:09:22 + Half-even approach, like in BigDecimal.doubleValue()
+                dMant++;
+                if ((dMant & DOUBLE_EXP_MASK) != 0) {         // Overflow of the mantissa, shift it right and increase the exponent
+                    dMant = (dMant & ~DOUBLE_IMPLIED_MSB) >>> 1;
+                    expD++;
+                }
+            }
+
+        if (expD > EXP_0D)
+            return negative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+        final long lValue = ((long) (expD + EXP_0D) << 52) | dMant | (negative ? DOUBLE_SIGN_MASK : 0);
+        return Double.longBitsToDouble(lValue);
+    }
+
     /**
      * Adds the value of the given {@link Float128} summand to the value of this Float128.
      * The instance acquires a new value that equals the sum of the previous value and the value of the summand.
@@ -825,8 +917,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
                 if (isNegative() && !subtrahend.isNegative())
                 // -0.0 - 0.0 = -0.0
                 {
-                }
-                else negative = false;
+                } else negative = false;
             }
             return new Float128(negative, exponent, mantHi, mantLo);                                      // X - 0 = X
         }
@@ -2310,10 +2401,12 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * {@code buffer[1]). @param factHi the higher 64 bits of the fractional part
          * of the mantissa
          * <p>
+         *
          * @param mantLo the lower 64 bits of the fractional part of the mantissa
          * @param buffer the buffer to hold the unpacked mantissa, should be array of at
          *               least 5 longs
-         * <p>
+         *               <p>
+         *
          * @return the buffer holding the unpacked value (the same reference as passed
          * in as the {@code buffer} parameter
          */
@@ -2333,10 +2426,12 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * of the fractional part (bits 31 - 0),
          * the highest 32 bits in {@code buffer[1]).
          * <p>
+         *
          * @param factHi the higher 64 bits of the fractional part of the mantissa
          * @param mantLo the lower 64 bits of the fractional part of the mantissa
          * @param buffer the buffer to hold the unpacked mantissa, should be array of at least 5 longs
-         * <p>
+         *               <p>
+         *
          * @return the buffer holding the unpacked value (the same reference as passed in as the {@code buffer} parameter
          */
         private static void unpack_To5x32(long mantHi, long mantLo, int[] buffer) {
@@ -2617,7 +2712,6 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * @param divisor          a buffer of 5 longs containing unpacked mantissa of the divisor (integer part (implicit unity) in divisor[0],
          *                         the fractional part of the mantissa in the lower halves of divisor[1] -- divisor[4])
          * @param quotientExponent preliminary evaluated exponent of the quotient, may get adjusted
-         *
          */
         private void divideBuffers(int[] dividend, int[] divisor, long quotientExponent) {
             final int[] quotientBuff = BUFFER_5x32_B_INT;  // Will be used to hold unpacked quotient
