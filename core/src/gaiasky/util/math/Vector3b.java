@@ -44,9 +44,9 @@ public class Vector3b {
      * @param z The z-component
      */
     public Vector3b(QuadrupleImmutable x, QuadrupleImmutable y, QuadrupleImmutable z) {
-        this.x = new QuadrupleImmutable(x);
-        this.y = new QuadrupleImmutable(y);
-        this.z = new QuadrupleImmutable(z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     /**
@@ -158,9 +158,9 @@ public class Vector3b {
      * @return this vector for chaining
      */
     public Vector3b set(QuadrupleImmutable x, QuadrupleImmutable y, QuadrupleImmutable z) {
-        this.x = new QuadrupleImmutable(x);
-        this.y = new QuadrupleImmutable(y);
-        this.z = new QuadrupleImmutable(z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
         return this;
     }
 
@@ -265,9 +265,9 @@ public class Vector3b {
     }
 
     public Vector3b add(final Vector3b vec) {
-        this.x.add(vec.x);
-        this.y.add(vec.y);
-        this.z.add(vec.z);
+        this.x = this.x.add(vec.x);
+        this.y = this.y.add(vec.y);
+        this.z = this.z.add(vec.z);
         return this;
     }
 
@@ -324,16 +324,16 @@ public class Vector3b {
      * @return This vector for chaining
      */
     public Vector3b add(double value) {
-        this.x = this.x.add(value);
-        this.y = this.y.add(value);
-        this.z = this.z.add(value);
+        x = x.add(value);
+        y = y.add(value);
+        z = z.add(value);
         return this;
     }
 
     public Vector3b sub(final Vector3b vec) {
-        this.x = x.subtract(vec.x);
-        this.y = y.subtract(vec.y);
-        this.z = z.subtract(vec.z);
+        x = x.subtract(vec.x);
+        y = y.subtract(vec.y);
+        z = z.subtract(vec.z);
         return this;
     }
 
@@ -376,30 +376,30 @@ public class Vector3b {
     }
 
     public Vector3b div(QuadrupleImmutable num) {
-        this.x = x.divide(num);
-        this.y = y.divide(num);
-        this.z = z.divide(num);
+        x = x.divide(num);
+        y = y.divide(num);
+        z = z.divide(num);
         return this;
     }
 
     public Vector3b scl(QuadrupleImmutable scl) {
-        this.x = x.multiply(scl);
-        this.y = y.multiply(scl);
-        this.z = z.multiply(scl);
+        x = x.multiply(scl);
+        y = y.multiply(scl);
+        z = z.multiply(scl);
         return this;
     }
 
     public Vector3b scl(double scalar) {
-        this.x = x.multiply(scalar);
-        this.y = y.multiply(scalar);
-        this.z = z.multiply(scalar);
+        x = x.multiply(scalar);
+        y = y.multiply(scalar);
+        z = z.multiply(scalar);
         return this;
     }
 
     public Vector3b scl(final Vector3b vec) {
-        this.x = x.multiply(vec.x);
-        this.y = y.multiply(vec.y);
-        this.z = z.multiply(vec.z);
+        x = x.multiply(vec.x);
+        y = y.multiply(vec.y);
+        z = z.multiply(vec.z);
         return this;
     }
 
@@ -420,16 +420,16 @@ public class Vector3b {
     }
 
     public Vector3b mul(Vector3b vec) {
-        this.x = x.multiply(vec.x);
-        this.y = y.multiply(vec.y);
-        this.z = z.multiply(vec.z);
+        x = x.multiply(vec.x);
+        y = y.multiply(vec.y);
+        z = z.multiply(vec.z);
         return this;
     }
 
     public Vector3b div(Vector3b vec) {
-        this.x = x.divide(vec.x);
-        this.y = y.divide(vec.y);
-        this.z = z.divide(vec.z);
+        x = x.divide(vec.x);
+        y = y.divide(vec.y);
+        z = z.divide(vec.z);
         return this;
     }
 
@@ -474,9 +474,9 @@ public class Vector3b {
     }
 
     public QuadrupleImmutable dst(final Vector3b vec) {
-        QuadrupleImmutable a = vec.x.subtract(this.x);
-        QuadrupleImmutable b = vec.y.subtract(this.y);
-        QuadrupleImmutable c = vec.z.subtract(this.z);
+        var a = vec.x.subtract(this.x);
+        var b = vec.y.subtract(this.y);
+        var c = vec.z.subtract(this.z);
         return a.multiply(a)
                 .add(b.multiply(b))
                 .add(c.multiply(c))
@@ -567,22 +567,16 @@ public class Vector3b {
      * @return The squared distance
      */
     public QuadrupleImmutable dst2(double x, double y, double z) {
-        QuadrupleImmutable a = QuadrupleImmutable.from(x)
-                .subtract(this.x);
-        QuadrupleImmutable b = QuadrupleImmutable.from(y)
-                .subtract(this.y);
-        QuadrupleImmutable c = QuadrupleImmutable.from(z)
-                .subtract(this.z);
-        return a.multiply(a)
-                .add(b.multiply(b))
-                .add(c.multiply(c));
+        var a = QuadrupleImmutable.from(x).subtract(this.x);
+        var b = QuadrupleImmutable.from(y).subtract(this.y);
+        var c = QuadrupleImmutable.from(z).subtract(this.z);
+        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c));
     }
 
     public Vector3b nor() {
         final var len2 = this.len2();
         final var len2d = len2.doubleValue();
         if (len2d == 0f || len2d == 1f)
-
             return this;
         return this.div(len2.sqrt());
     }
@@ -623,7 +617,9 @@ public class Vector3b {
      * @return The dot product
      */
     public QuadrupleImmutable dot(QuadrupleImmutable x, QuadrupleImmutable y, QuadrupleImmutable z) {
-        return this.x.multiply(x).add(this.y.multiply(y)).add(this.z.multiply(z));
+        return this.x.multiply(x)
+                .add(this.y.multiply(y))
+                .add(this.z.multiply(z));
     }
 
     /**
@@ -634,7 +630,10 @@ public class Vector3b {
      * @return This vector for chaining
      */
     public Vector3b crs(final Vector3b vec) {
-        return this.set(this.y.multiply(vec.z).subtract(this.z.multiply(vec.y)), this.z.multiply(vec.x).subtract(this.x.multiply(vec.z)), this.x.multiply(vec.y).subtract(this.y.multiply(vec.x)));
+        return this.set(this.y.multiply(vec.z)
+                                .subtract(this.z.multiply(vec.y)), this.z.multiply(vec.x)
+                                .subtract(this.x.multiply(vec.z)), this.x.multiply(vec.y)
+                                .subtract(this.y.multiply(vec.x)));
     }
 
     public Vector3b crs(final Vector3D vec) {
@@ -654,7 +653,10 @@ public class Vector3b {
         var vx = QuadrupleImmutable.from(x);
         var vy = QuadrupleImmutable.from(y);
         var vz = QuadrupleImmutable.from(z);
-        return this.set(this.y.multiply(vz).subtract(this.z.multiply(vy)), this.z.multiply(vx).subtract(this.x.multiply(vz)), this.x.multiply(vy).subtract(this.y.multiply(vx)));
+        return this.set(this.y.multiply(vz)
+                                .subtract(this.z.multiply(vy)), this.z.multiply(vx)
+                                .subtract(this.x.multiply(vz)), this.x.multiply(vy)
+                                .subtract(this.y.multiply(vx)));
     }
 
     /**
@@ -679,7 +681,16 @@ public class Vector3b {
         var m9 = QuadrupleImmutable.from(matrix[9]);
         var m10 = QuadrupleImmutable.from(matrix[10]);
         var m11 = QuadrupleImmutable.from(matrix[11]);
-        return set(x.multiply(m0).add(y.multiply(m3)).add(z.multiply(m6)).add(m9), x.multiply(m1).add(y.multiply(m4)).add(z.multiply(m7)).add(m10), x.multiply(m2).add(y.multiply(m5)).add(z.multiply(m8)).add(m11));
+        return set(x.multiply(m0)
+                           .add(y.multiply(m3))
+                           .add(z.multiply(m6))
+                           .add(m9), x.multiply(m1)
+                           .add(y.multiply(m4))
+                           .add(z.multiply(m7))
+                           .add(m10), x.multiply(m2)
+                           .add(y.multiply(m5))
+                           .add(z.multiply(m8))
+                           .add(m11));
     }
 
     /**
@@ -704,7 +715,16 @@ public class Vector3b {
         var m21 = QuadrupleImmutable.from(mat[M21]);
         var m22 = QuadrupleImmutable.from(mat[M22]);
         var m23 = QuadrupleImmutable.from(mat[M23]);
-        return this.set(x.multiply(m00).add(y.multiply(m01)).add(z.multiply(m02)).add(m03), x.multiply(m10).add(y.multiply(m11)).add(z.multiply(m12)).add(m13), x.multiply(m20).add(y.multiply(m21)).add(z.multiply(m22)).add(m23));
+        return this.set(x.multiply(m00)
+                                .add(y.multiply(m01))
+                                .add(z.multiply(m02))
+                                .add(m03), x.multiply(m10)
+                                .add(y.multiply(m11))
+                                .add(z.multiply(m12))
+                                .add(m13), x.multiply(m20)
+                                .add(y.multiply(m21))
+                                .add(z.multiply(m22))
+                                .add(m23));
     }
 
     /**
