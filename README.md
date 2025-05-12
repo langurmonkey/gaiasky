@@ -78,6 +78,12 @@ On Windows, open PowerShell, make sure your `$JAVA_HOME` environment variable po
 
 Et voilà! The bleeding edge Gaia Sky is running in your machine.
 
+You can run the tests with:
+
+```console
+gradlew core:test
+```
+
 
 ### 3.1 CLI arguments
 
