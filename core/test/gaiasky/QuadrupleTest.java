@@ -14,6 +14,12 @@ public class QuadrupleTest {
     private static final double delta = 1.0e-9;
 
     @Test
+    public void testToString() {
+        var q = new Quadruple(123.42534534564564564e4);
+        assertEquals("1.234253453456456540152430534362792968750e+06", q.toString());
+    }
+
+    @Test
     public void testPiConstant() {
         Quadruple pi = QuadrupleMath.pi();
         // Compare pi to known double value of Math.PI

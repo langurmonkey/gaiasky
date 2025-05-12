@@ -12,6 +12,12 @@ public class Float128Test {
     private static final double delta = 1.0e-10;
 
     @Test
+    public void testToString() {
+        var f128 = Float128.from(123.42534534564564564e4);
+        assertEquals("1.234253453456456540152430534362792968750e+06", f128.toString());
+    }
+
+    @Test
     public void testAdd() {
         var a = 124543.334;
         var b = 343499904.3434534523;
@@ -24,6 +30,7 @@ public class Float128Test {
         f128b = Float128.from(b);
         assertEquals(-a + b, f128a.add(f128b)
                 .doubleValue(), delta);
+
     }
 
     @Test

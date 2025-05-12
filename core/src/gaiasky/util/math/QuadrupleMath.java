@@ -8,7 +8,7 @@
 package gaiasky.util.math;
 
 /**
- * Approximates some trigonometric functions using double-precision arithmetics.
+ * Approximates some trigonometric functions using double-precision arithmetics. It also contains the implementation of {@link Object#toString()}.
  */
 public final class QuadrupleMath {
 
@@ -51,5 +51,6 @@ public final class QuadrupleMath {
         double ad = Math.atan2(dy, dx);
         return Quadruple.valueOf(Double.toString(ad));
     }
+
 }
 
