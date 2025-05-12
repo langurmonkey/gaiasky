@@ -17,7 +17,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Consumers.Consumer7;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -48,7 +48,7 @@ public class Label implements Component {
     /**
      * Position of label.
      */
-    public Vector3Q labelPosition;
+    public Vector3b labelPosition;
 
     /**
      * Is it a label or another kind of text?
@@ -81,13 +81,13 @@ public class Label implements Component {
      */
     public void setLabelPositionPc(double[] labelPositionPc) {
         if (labelPositionPc != null) {
-            this.labelPosition = new Vector3Q(labelPositionPc[0] * Constants.PC_TO_U, labelPositionPc[1] * Constants.PC_TO_U, labelPositionPc[2] * Constants.PC_TO_U);
+            this.labelPosition = new Vector3b(labelPositionPc[0] * Constants.PC_TO_U, labelPositionPc[1] * Constants.PC_TO_U, labelPositionPc[2] * Constants.PC_TO_U);
         }
     }
 
     public void setLabelPositionKm(double[] labelPositionKm) {
         if (labelPosition != null) {
-            this.labelPosition = new Vector3Q(labelPositionKm[0] * Constants.KM_TO_U, labelPositionKm[1] * Constants.KM_TO_U, labelPositionKm[2] * Constants.KM_TO_U);
+            this.labelPosition = new Vector3b(labelPositionKm[0] * Constants.KM_TO_U, labelPositionKm[1] * Constants.KM_TO_U, labelPositionKm[2] * Constants.KM_TO_U);
         }
     }
 

@@ -12,7 +12,7 @@ import com.badlogic.ashley.core.Engine;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 
 public class Body implements Component, ICopy {
     /**
@@ -23,13 +23,13 @@ public class Body implements Component, ICopy {
      * kept in {@link Body#posEpoch}.
      * The absolute position is held at {@link GraphNode#translation}.
      */
-    public Vector3Q pos = new Vector3Q();
+    public Vector3b pos = new Vector3b();
     /**
      * A copy of the original position, if any.
      * If the entity has a {@link ProperMotion} component, this is the
      * position at epoch {@link ProperMotion#epochJd}.
      */
-    public Vector3Q posEpoch = new Vector3Q();
+    public Vector3b posEpoch = new Vector3b();
 
     /**
      * Position in the equatorial system; ra, dec.
@@ -83,7 +83,7 @@ public class Body implements Component, ICopy {
      */
     public boolean positionSetInScript = false;
 
-    public void setPos(Vector3Q pos) {
+    public void setPos(Vector3b pos) {
         this.pos.set(pos);
         updatePosEpoch();
     }

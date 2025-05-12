@@ -34,7 +34,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.*;
 
@@ -52,7 +52,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
     private final Vector3D pos;
-    private final Vector3Q posb;
+    private final Vector3b posb;
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
     protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralGeneration;
@@ -531,7 +531,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         }
 
         pos = new Vector3D();
-        posb = new Vector3Q();
+        posb = new Vector3b();
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE,
                                         Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED,
                                         Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR,
@@ -821,7 +821,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 focusDEC.setText(nf.format((double) data[3] % 360) + deg);
             }
             case CAMERA_MOTION_UPDATE -> {
-                final Vector3Q campos = (Vector3Q) data[0];
+                final Vector3b campos = (Vector3b) data[0];
                 double velInternalPerSecond = (double) data[1] * Constants.KM_TO_U * Nature.S_TO_H;
                 Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond,
                                                                                      Settings.settings.program.ui.distanceUnits);

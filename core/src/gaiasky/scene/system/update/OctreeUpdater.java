@@ -17,7 +17,7 @@ import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Octree;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
@@ -73,7 +73,7 @@ public class OctreeUpdater extends AbstractUpdateSystem {
                         OctreeNode parent = octree.parenthood.get(star);
                         if (parent != null && !parent.isObserved()) {
                             var starGraph = Mapper.graph.get(star);
-                            Vector3Q starParentTranslation = starGraph.translation;
+                            Vector3b starParentTranslation = starGraph.translation;
 
                             scene.updateEntityGraph(star, GaiaSky.instance.time, starParentTranslation, 1);
                             scene.updateEntity(star, (float) GaiaSky.instance.time.getDt());

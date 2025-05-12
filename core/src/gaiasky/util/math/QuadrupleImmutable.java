@@ -882,7 +882,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi, lo
      * @return a new instance of Float128 containing the value of the square root of the given argument
      */
     public static QuadrupleImmutable sqrt(QuadrupleImmutable square) {
-        return new QuadrupleImmutable(square).sqrt();
+        return square.sqrt();
     }
 
     /**

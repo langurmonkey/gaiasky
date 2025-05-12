@@ -73,7 +73,6 @@ import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
-import gaiasky.util.math.Quadruple;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
@@ -110,7 +109,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     private final CatalogManager catalogManager;
     // Auxiliary vectors
     private final Vector3D aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
-    private final Vector3Q aux3b1, aux3b2, aux3b3, aux3b4, aux3b5;
+    private final Vector3b aux3b1, aux3b2, aux3b3, aux3b4, aux3b5;
     private final Vector2D aux2d1;
     private final Set<AtomicBoolean> stops;
     private final FocusView focusView;
@@ -142,11 +141,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         aux3d4 = new Vector3D();
         aux3d5 = new Vector3D();
         aux3d6 = new Vector3D();
-        aux3b1 = new Vector3Q();
-        aux3b2 = new Vector3Q();
-        aux3b3 = new Vector3Q();
-        aux3b4 = new Vector3Q();
-        aux3b5 = new Vector3Q();
+        aux3b1 = new Vector3b();
+        aux3b2 = new Vector3b();
+        aux3b3 = new Vector3b();
+        aux3b4 = new Vector3b();
+        aux3b5 = new Vector3b();
         aux2d1 = new Vector2D();
 
         em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE, Event.SCENE_LOADED);
@@ -292,8 +291,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
                 postRunnable(() -> {
                     // Instantly set the camera direction to look towards the focus
-                    Vector3Q camPos = GaiaSky.instance.cameraManager.getPos();
-                    Vector3Q dir = new Vector3Q();
+                    Vector3b camPos = GaiaSky.instance.cameraManager.getPos();
+                    Vector3b dir = new Vector3b();
                     synchronized (focusView) {
                         focusView.setEntity(entity);
                         focusView.getAbsolutePosition(dir)
@@ -660,15 +659,15 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 // Up to ecliptic north pole
                 Vector3D up = new Vector3D(0, 1, 0).mul(Coordinates.eclToEq());
 
-                Vector3Q focusPos = aux3b1;
+                Vector3b focusPos = aux3b1;
                 focusView.getAbsolutePosition(focusPos);
 
                 focusView.setEntity(other);
-                Vector3Q otherPos = aux3b2;
+                Vector3b otherPos = aux3b2;
                 focusView.getAbsolutePosition(otherPos);
                 focusView.clearEntity();
 
-                Vector3Q otherToFocus = aux3b3;
+                Vector3b otherToFocus = aux3b3;
                 otherToFocus.set(focusPos)
                         .sub(otherPos)
                         .nor();
@@ -934,7 +933,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             var camera = GaiaSky.instance.cameraManager;
             Vector3 posFloat = new Vector3();
             Vector3D posDouble = new Vector3D();
-            Vector3Q posPrec = new Vector3Q();
+            Vector3b posPrec = new Vector3b();
             synchronized (focusView) {
                 focusView.setEntity(entity);
                 focusView.getAbsolutePosition(name, posPrec);
@@ -1946,7 +1945,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             }
             var targetDistance = radius / FastMath.tan(targetAngle * 0.5);
             var len = camObj.len()
-                    .subtract(new Quadruple(targetDistance));
+                    .subtract(QuadrupleImmutable.from(targetDistance));
             // Final position.
             var pos = camObj.nor()
                     .scl(len)
@@ -2021,7 +2020,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     /* target distance */
                     double target = 100 * Constants.M_TO_U;
 
-                    Vector3Q camObj = aux3b1;
+                    Vector3b camObj = aux3b1;
                     focusView.getAbsolutePosition(camObj)
                             .add(cam.posInv)
                             .nor();
@@ -2187,7 +2186,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     base.setName(nameStub);
                     base.setCt("Others");
                     var graph = Mapper.graph.get(invisible);
-                    graph.translation = new Vector3Q();
+                    graph.translation = new Vector3b();
                     graph.setParent(Scene.ROOT_NAME);
                     scene.initializeEntity(invisible);
                     scene.setUpEntity(invisible);
@@ -2237,11 +2236,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     Settings.settings.scene.crosshair.focus = false;
 
                     // Get target position
-                    Vector3Q target = aux3b1;
+                    Vector3b target = aux3b1;
                     focusView.getPositionAboveSurface(longitude, latitude, 50, target);
 
                     // Get object position
-                    Vector3Q objectPosition = focusView.getAbsolutePosition(aux3b2);
+                    Vector3b objectPosition = focusView.getAbsolutePosition(aux3b2);
 
                     // Check intersection with object
                     boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1),
@@ -2296,7 +2295,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                              double target,
                              long sleep,
                              NaturalCamera cam,
-                             Vector3Q camobj,
+                             Vector3b camobj,
                              AtomicBoolean stop) {
         // Apply roll and wait
         double ang = cam.up.angle(camobj);
@@ -3472,7 +3471,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public double[] internalCartesianToEquatorial(double x,
                                                   double y,
                                                   double z) {
-        Vector3Q in = aux3b1.set(x, y, z);
+        Vector3b in = aux3b1.set(x, y, z);
         Vector3D out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
         return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble()};
@@ -5113,7 +5112,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 if (trackObject) {
                     shape.track = new FocusView(trackingObject);
                 } else {
-                    body.setPos(EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3Q()));
+                    body.setPos(EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3b()));
                 }
                 shape.trackName = objectName;
 

@@ -42,7 +42,7 @@ import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import net.jafama.FastMath;
 
 import java.nio.file.Files;
@@ -83,7 +83,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private Scene scene;
     private String starLensTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    final Vector3Q v3b1 = new Vector3Q(), v3b2 = new Vector3Q();
+    final Vector3b v3b1 = new Vector3b(), v3b2 = new Vector3b();
     final Vector3 v3f1 = new Vector3();
     final Matrix4 prevViewProj = new Matrix4();
     final Matrix4 projection = new Matrix4(), combined = new Matrix4(), view = new Matrix4();
@@ -813,7 +813,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
             case CAMERA_MOTION_UPDATE -> {
                 var camera = (PerspectiveCamera) data[3];
-                var campos = (Vector3Q) data[0];
+                var campos = (Vector3b) data[0];
                 var rmTime = getRaymarchingTime();
                 float cameraOffset = (camera.direction.x + camera.direction.y + camera.direction.z);
                 for (int i = 0; i < RenderType.values().length; i++) {

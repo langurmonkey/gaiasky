@@ -36,7 +36,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
@@ -46,14 +46,14 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
     private final FocusView view;
 
-    private final Vector3Q B31;
+    private final Vector3b B31;
     private final Vector3D D31;
 
     public ParticleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
 
         this.utils = new ParticleUtils();
-        this.B31 = new Vector3Q();
+        this.B31 = new Vector3b();
         this.D31 = new Vector3D();
         this.view = new FocusView();
 

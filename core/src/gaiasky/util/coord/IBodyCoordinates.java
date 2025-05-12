@@ -8,7 +8,7 @@
 package gaiasky.util.coord;
 
 import com.badlogic.ashley.core.Entity;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 
 import java.time.Instant;
 import java.util.Map;
@@ -32,7 +32,7 @@ public interface IBodyCoordinates {
      *
      * @return The out vector for chaining.
      */
-    Vector3Q getEclipticSphericalCoordinates(Instant instant, Vector3Q out);
+    Vector3b getEclipticSphericalCoordinates(Instant instant, Vector3b out);
 
     /**
      * Gets ecliptic cartesian coordinates for the given date.
@@ -44,7 +44,7 @@ public interface IBodyCoordinates {
      * @return The out vector for chaining, or null if the date is out of range,
      * in case of non-elliptical orbits such as Gaia.
      */
-    Vector3Q getEclipticCartesianCoordinates(Instant instant, Vector3Q out);
+    Vector3b getEclipticCartesianCoordinates(Instant instant, Vector3b out);
 
     /**
      * Gets equatorial cartesian coordinates for the given date.
@@ -56,7 +56,7 @@ public interface IBodyCoordinates {
      * @return The out vector for chaining, or null if the date is out of range,
      * in case of non-elliptical orbits such as Gaia.
      */
-    Vector3Q getEquatorialCartesianCoordinates(Instant instant, Vector3Q out);
+    Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out);
 
     /**
      * Update the references in this coordinates object with the given index.

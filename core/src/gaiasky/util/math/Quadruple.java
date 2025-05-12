@@ -3034,34 +3034,33 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * <br>Covered
      */
     private static long divideArrays(int[] dividend, int[] divisor, int[] quotient) {
-        final int[] remainder = dividend;
 
         final long divisorHigh = ((long) divisor[0] << 32) | (divisor[1] & LOWER_32_BITS);
         int offset = 0;
         quotient[offset++] = 1;
-        subtractDivisor(divisor, remainder);
+        subtractDivisor(divisor, dividend);
 
         do {
-            final long remainderHigh = ((long) remainder[offset + 1] << 32) | (remainder[offset + 2] & LOWER_32_BITS);
+            final long remainderHigh = ((long) dividend[offset + 1] << 32) | (dividend[offset + 2] & LOWER_32_BITS);
 
-            long quotientWord = (remainder[offset] == 0) ?
+            long quotientWord = (dividend[offset] == 0) ?
                     divideUnsignedLongs(remainderHigh, divisorHigh) :
-                    divide65bits(remainder[offset], remainderHigh, divisorHigh);
+                    divide65bits(dividend[offset], remainderHigh, divisorHigh);
 
             if (quotientWord == 0x1_0000_0000L)
                 quotientWord--;
 
             if (quotientWord != 0) {
-                if (multiplyAndSubtract(divisor, quotientWord, offset, remainder) < 0) {
+                if (multiplyAndSubtract(divisor, quotientWord, offset, dividend) < 0) {
                     quotientWord--;
-                    addDivisorBack(divisor, remainder, offset);
+                    addDivisorBack(divisor, dividend, offset);
                 }
             }
 
             quotient[offset++] = (int) quotientWord;
         } while (offset <= 4);
 
-        if (greaterThanHalfOfDivisor_3(remainder, divisor, offset))
+        if (greaterThanHalfOfDivisor_3(dividend, divisor, offset))
             return 1;
 
         return 0;
@@ -3248,8 +3247,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         final int sqrtDigit = (int) (mantHi >>> 48);               // first 16 bits of the argument
         int idx = Arrays.binarySearch(SQUARE_BYTES, sqrtDigit);
         if (idx < 0) idx = -idx - 2;
-        final long digit = ROOT_BYTES[idx];                        // first 8 bits of the root
-        return digit;
+        // first 8 bits of the root
+        return ROOT_BYTES[idx];
     }
 
     /**

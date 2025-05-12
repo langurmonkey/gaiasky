@@ -13,7 +13,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 
@@ -426,7 +426,7 @@ public class BookmarksManager implements IObserver {
                     }
                 } else {
                     // Location bookmark.
-                    Vector3Q pos = data[0] != null ? (Vector3Q) d0 : null;
+                    Vector3b pos = data[0] != null ? (Vector3b) d0 : null;
                     Vector3D dir = data[1] != null ? (Vector3D) data[1] : null;
                     Vector3D up = data[2] != null ? (Vector3D) data[2] : null;
                     Instant t = data[3] != null ? (Instant) data[3] : null;
@@ -528,7 +528,7 @@ public class BookmarksManager implements IObserver {
         }
     }
 
-    private String str(Vector3Q v) {
+    private String str(Vector3b v) {
         return v != null ? "[" + v.x.toString() + "," + v.y.toString() + "," + v.z.toString() + "]" : "null";
     }
 

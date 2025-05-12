@@ -20,7 +20,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import uk.ac.starlink.table.ColumnInfo;
 
@@ -35,7 +35,7 @@ public class EntityUtils {
      * @param out    Auxiliary vector to put the result in.
      * @return The vector with the position.
      */
-    public static Vector3Q getAbsolutePosition(final Entity entity, Vector3Q out) {
+    public static Vector3b getAbsolutePosition(final Entity entity, Vector3b out) {
         if (entity != null) {
             var body = Mapper.body.get(entity);
             out.set(body.pos);
@@ -52,7 +52,7 @@ public class EntityUtils {
     }
 
     /**
-     * This is a faster version of {@link EntityUtils#getAbsolutePosition(Entity, Vector3Q)} that uses double-precision
+     * This is a faster version of {@link EntityUtils#getAbsolutePosition(Entity, Vector3b)} that uses double-precision
      * vectors instead of arbitrary precision.
      *
      * @param entity The entity.
@@ -84,7 +84,7 @@ public class EntityUtils {
      * @param out    Auxiliary vector to put the result in.
      * @return The vector with the position.
      */
-    public static Vector3Q getAbsolutePosition(Entity entity, String name, Vector3Q out) {
+    public static Vector3b getAbsolutePosition(Entity entity, String name, Vector3b out) {
         if (Mapper.particleSet.has(entity)) {
             return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
         } else if (Mapper.starSet.has(entity)) {
@@ -95,7 +95,7 @@ public class EntityUtils {
     }
 
     /**
-     * This is a faster version of {@link EntityUtils#getAbsolutePosition(Entity, String, Vector3Q)} that uses double-precision
+     * This is a faster version of {@link EntityUtils#getAbsolutePosition(Entity, String, Vector3b)} that uses double-precision
      * vectors instead of arbitrary precision.
      *
      * @param entity The entity.

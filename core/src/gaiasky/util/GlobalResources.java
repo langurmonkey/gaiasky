@@ -31,7 +31,7 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
@@ -234,7 +234,7 @@ public class GlobalResources {
      *
      * @return True if the body is visible
      */
-    public static boolean isInView(Vector3Q point, double len, float coneAngle, Vector3D dir) {
+    public static boolean isInView(Vector3b point, double len, float coneAngle, Vector3D dir) {
         return FastMath.acos(point.tov3d().dot(dir) / len) < coneAngle;
     }
 

@@ -377,7 +377,7 @@ public class QuaternionDouble implements Serializable {
         return v;
     }
 
-    public Vector3Q transform(Vector3Q v) {
+    public Vector3b transform(Vector3b v) {
         tmp2.set(this);
         tmp2.conjugate();
         tmp2.mulLeft(tmp1.set(v.x.doubleValue(), v.y.doubleValue(), v.z.doubleValue(), 0.0)).mulLeft(this);

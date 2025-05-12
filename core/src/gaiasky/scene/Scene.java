@@ -28,7 +28,7 @@ import gaiasky.scene.system.update.*;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
@@ -75,7 +75,7 @@ public class Scene {
 
     /** Number of actual objects in the scene. **/
     private int numberObjects = -1;
-    private final Vector3Q aux3b = new Vector3Q();
+    private final Vector3b aux3b = new Vector3b();
 
     public Scene() {
     }
@@ -471,7 +471,7 @@ public class Scene {
      */
     public void updateEntityGraph(Entity entity,
                                   ITimeFrameProvider time,
-                                  Vector3Q parentTranslation,
+                                  Vector3b parentTranslation,
                                   float opacity) {
         var updater = findUpdater(GraphUpdater.class);
         if (updater != null) {

@@ -215,7 +215,7 @@ public class Proximity {
 
     public NearbyRecord convert(IFocus focus, NearbyRecord c, ICamera camera) {
         c.pm.set(0, 0, 0);
-        Vector3Q absPos = new Vector3Q();
+        Vector3b absPos = new Vector3b();
         absPos = focus.getAbsolutePosition(absPos);
         c.absolutePos.set(absPos);
         c.pos.set(c.absolutePos).sub(camera.getPos());
@@ -339,7 +339,7 @@ public class Proximity {
         }
 
         @Override
-        public Vector3Q getPos() {
+        public Vector3b getPos() {
             return null;
         }
 
@@ -354,12 +354,12 @@ public class Proximity {
         }
 
         @Override
-        public Vector3Q getAbsolutePosition(Vector3Q out) {
+        public Vector3b getAbsolutePosition(Vector3b out) {
             return out.set(absolutePos);
         }
 
         @Override
-        public Vector3Q getAbsolutePosition(String name, Vector3Q out) {
+        public Vector3b getAbsolutePosition(String name, Vector3b out) {
             if (name.equalsIgnoreCase(this.name))
                 return out.set(absolutePos);
             else
@@ -367,7 +367,7 @@ public class Proximity {
         }
 
         @Override
-        public Vector3Q getClosestAbsolutePos(Vector3Q out) {
+        public Vector3b getClosestAbsolutePos(Vector3b out) {
             return out.set(absolutePos);
         }
 
@@ -377,12 +377,12 @@ public class Proximity {
         }
 
         @Override
-        public Vector3Q getPredictedPosition(Vector3Q aux, ITimeFrameProvider time, ICamera camera, boolean force) {
+        public Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force) {
             return null;
         }
 
         @Override
-        public Vector3Q getPredictedPosition(Vector3Q aux, double deltaTime) {
+        public Vector3b getPredictedPosition(Vector3b aux, double deltaTime) {
             return null;
         }
 
@@ -437,17 +437,17 @@ public class Proximity {
         }
 
         @Override
-        public double getElevationAt(Vector3Q camPos) {
+        public double getElevationAt(Vector3b camPos) {
             return 0;
         }
 
         @Override
-        public double getElevationAt(Vector3Q camPos, boolean useFuturePosition) {
+        public double getElevationAt(Vector3b camPos, boolean useFuturePosition) {
             return 0;
         }
 
         @Override
-        public double getElevationAt(Vector3Q camPos, Vector3Q nextPos) {
+        public double getElevationAt(Vector3b camPos, Vector3b nextPos) {
             return 0;
         }
 

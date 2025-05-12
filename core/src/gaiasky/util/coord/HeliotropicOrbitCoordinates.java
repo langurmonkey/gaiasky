@@ -8,7 +8,7 @@
 package gaiasky.util.coord;
 
 import com.badlogic.ashley.core.Entity;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 
 import java.time.Instant;
 import java.util.Map;
@@ -20,17 +20,17 @@ public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3Q getEclipticCartesianCoordinates(Instant date, Vector3Q out) {
+    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
         return null;
     }
 
     @Override
-    public Vector3Q getEclipticSphericalCoordinates(Instant date, Vector3Q out) {
+    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         return null;
     }
 
     @Override
-    public Vector3Q getEquatorialCartesianCoordinates(Instant date, Vector3Q out) {
+    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
         boolean inRange = getData().loadPoint(out, date);
         if (!inRange) {
             return null;

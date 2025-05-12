@@ -26,7 +26,7 @@ import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -38,7 +38,7 @@ public class CameraManager implements ICamera, IObserver {
      **/
     private final Vector3D out;
     private final Vector3D in;
-    private final Vector3Q inb;
+    private final Vector3b inb;
     private final Vector3 vec;
     private final Vector3 v0;
     private final Vector3 v1;
@@ -73,7 +73,7 @@ public class CameraManager implements ICamera, IObserver {
 
         this.mode = mode;
         this.in = new Vector3D();
-        this.inb = new Vector3Q();
+        this.inb = new Vector3b();
         this.out = new Vector3D();
         this.vec = new Vector3();
         this.v0 = new Vector3();
@@ -196,7 +196,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3Q getPos() {
+    public Vector3b getPos() {
         return current.getPos();
     }
 
@@ -206,12 +206,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void setPos(Vector3Q pos) {
+    public void setPos(Vector3b pos) {
         current.setPos(pos);
     }
 
     @Override
-    public Vector3Q getPreviousPos() {
+    public Vector3b getPreviousPos() {
         return current.getPreviousPos();
     }
 
@@ -221,12 +221,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void setPreviousPos(Vector3Q prevPos) {
+    public void setPreviousPos(Vector3b prevPos) {
         current.setPreviousPos(prevPos);
     }
 
     @Override
-    public Vector3Q getDPos() {
+    public Vector3b getDPos() {
         return current.getDPos();
     }
 
@@ -236,12 +236,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void setDPos(Vector3Q dPos) {
+    public void setDPos(Vector3b dPos) {
         current.setDPos(dPos);
     }
 
     @Override
-    public Vector3Q getInversePos() {
+    public Vector3b getInversePos() {
         return current.getInversePos();
     }
 

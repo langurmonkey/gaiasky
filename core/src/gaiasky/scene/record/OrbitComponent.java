@@ -224,11 +224,8 @@ public class OrbitComponent {
         // Mean anomaly at epoch
         double M0 = FastMath.toRadians(meanAnomaly);
 
-        // Time since epoch in days
-        double deltaT = (M - M0) / n;
-
         // Return time in Julian days since epoch
-        return deltaT;
+        return (M - M0) / n;
     }
 
     /**

@@ -13,7 +13,7 @@ import gaiasky.data.api.OrientationServer;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 
 import java.time.Instant;
@@ -29,7 +29,7 @@ public class LVLHOrientationServer implements OrientationServer {
     protected Entity object;
     protected Entity parent;
     protected FocusView view;
-    protected final Vector3Q a, b, c, lastPos;
+    protected final Vector3b a, b, c, lastPos;
     protected final Vector3D up, dir, side, lastDir;
     protected boolean initialized = false;
 
@@ -38,10 +38,10 @@ public class LVLHOrientationServer implements OrientationServer {
         lastOrientation = new QuaternionDouble();
         this.objectName = objectName.substring(objectName.lastIndexOf("/") + 1);
         this.view = new FocusView();
-        a = new Vector3Q();
-        b = new Vector3Q();
-        c = new Vector3Q();
-        lastPos = new Vector3Q();
+        a = new Vector3b();
+        b = new Vector3b();
+        c = new Vector3b();
+        lastPos = new Vector3b();
         up = new Vector3D();
         dir = new Vector3D();
         side = new Vector3D();

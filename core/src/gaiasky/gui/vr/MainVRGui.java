@@ -52,7 +52,7 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.FixedStage;
 import gaiasky.vr.openxr.input.XrControllerDevice;
@@ -81,7 +81,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     FrameBuffer buffer;
     Entity entity;
     // VR UI position with respect to the user.
-    Vector3Q relativePosition = new Vector3Q();
+    Vector3b relativePosition = new Vector3b();
     // 5 pointers
     Vector2 pointer = new Vector2(Float.NaN, Float.NaN);
     boolean triggerPressed = false;

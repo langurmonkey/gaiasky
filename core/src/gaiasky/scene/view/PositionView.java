@@ -10,7 +10,7 @@ package gaiasky.scene.view;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Body;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 
@@ -46,7 +46,7 @@ public non-sealed class PositionView extends AbstractView implements IPosition {
     }
 
     @Override
-    public Vector3Q getPosition() {
+    public Vector3b getPosition() {
         return body.pos;
     }
 

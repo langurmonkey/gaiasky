@@ -28,7 +28,7 @@ import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.SpacecraftCoordinates;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -40,9 +40,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      **/
     private final SpacecraftMouseKbdListener spacecraftMouseKbdListener;
     private final Vector3D aux1, aux2;
-    private final Vector3Q aux1b;
-    private final Vector3Q toDesired;
-    private final Vector3Q desired;
+    private final Vector3b aux1b;
+    private final Vector3b toDesired;
+    private final Vector3b desired;
     private final Vector3D scThrust;
 
     /*
@@ -59,7 +59,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      * Direction and up vectors.
      **/
     public Vector3D direction, up;
-    public Vector3Q relPos;
+    public Vector3b relPos;
     private Entity sc;
     private final SpacecraftView view;
     /**
@@ -71,7 +71,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      **/
     private final FocusView secondClosest;
     private final FocusView auxView;
-    private Vector3Q scpos;
+    private Vector3b scpos;
     private double targetDistance;
 
     public SpacecraftCamera(CameraManager parent) {
@@ -80,17 +80,17 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // Vectors
         direction = new Vector3D(1, 0, 0);
         up = new Vector3D(0, 1, 0);
-        relPos = new Vector3Q();
-        toDesired = new Vector3Q();
-        desired = new Vector3Q();
+        relPos = new Vector3b();
+        toDesired = new Vector3b();
+        desired = new Vector3b();
         aux1 = new Vector3D();
         aux2 = new Vector3D();
-        aux1b = new Vector3Q();
+        aux1b = new Vector3b();
         scThrust = new Vector3D();
         scForce = new Vector3D();
         scAccel = new Vector3D();
         scVel = new Vector3D();
-        scpos = new Vector3Q();
+        scpos = new Vector3b();
         scDir = new Vector3D();
         scUp = new Vector3D();
 

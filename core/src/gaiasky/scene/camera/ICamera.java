@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -55,25 +55,25 @@ public interface ICamera {
 
     float getFovFactor();
 
-    Vector3Q getPos();
+    Vector3b getPos();
 
     void setPos(Vector3D pos);
 
-    void setPos(Vector3Q pos);
+    void setPos(Vector3b pos);
 
-    Vector3Q getPreviousPos();
+    Vector3b getPreviousPos();
 
     void setPreviousPos(Vector3D pos);
 
-    void setPreviousPos(Vector3Q pos);
+    void setPreviousPos(Vector3b pos);
 
-    Vector3Q getDPos();
+    Vector3b getDPos();
 
     void setDPos(Vector3D dPos);
 
-    void setDPos(Vector3Q dPos);
+    void setDPos(Vector3b dPos);
 
-    Vector3Q getInversePos();
+    Vector3b getInversePos();
 
     Vector3D getDirection();
 

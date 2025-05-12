@@ -42,7 +42,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.InterpolationDouble;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
@@ -673,7 +673,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             cDir.set(manager.dir);
             cUp.set(manager.up);
             if (cam.hasFocus()) {
-                var focusPos = new Vector3Q();
+                var focusPos = new Vector3b();
                 cam.getFocus().getAbsolutePosition(focusPos);
                 cTarget = new Vector3D();
                 focusPos.put(cTarget);
@@ -1139,7 +1139,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 kf.up.set(manager.up);
                 var cam = GaiaSky.instance.getICamera();
                 if (cam.hasFocus()) {
-                    var focusPos = new Vector3Q();
+                    var focusPos = new Vector3b();
                     cam.getFocus().getAbsolutePosition(focusPos);
                     if (kf.target == null) {
                         kf.target = new Vector3D();

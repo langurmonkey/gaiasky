@@ -7,11 +7,11 @@
 
 package gaiasky.util.tree;
 
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3b;
 
 public interface IOctreeObject {
 
-    Vector3Q getPosition();
+    Vector3b getPosition();
 
     int getStarCount();
 
