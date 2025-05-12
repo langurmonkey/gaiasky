@@ -608,19 +608,19 @@ public class Coordinates {
          * math.sqrt(xsq + ysq))
          */
 
-        QuadrupleImmutable xsq = vec.x.multiply(vec.x);
-        QuadrupleImmutable ysq = vec.y.multiply(vec.y);
-        QuadrupleImmutable zsq = vec.z.multiply(vec.z);
-        QuadrupleImmutable distance = xsq.add(ysq).add(zsq).sqrt();
+        var xsq = vec.x.multiply(vec.x);
+        var ysq = vec.y.multiply(vec.y);
+        var zsq = vec.z.multiply(vec.z);
+        var distance = xsq.add(ysq).add(zsq).sqrt();
 
-        QuadrupleImmutable alpha = QuadrupleImmutableMath.atan2(vec.x, vec.z);
+        var alpha = QuadrupleImmutableMath.atan2(vec.x, vec.z);
         if (alpha.doubleValue() < 0) {
-            alpha.add(QuadrupleImmutableMath.pi2());
+            alpha.add(QuadrupleImmutableMath.PI_2);
         }
 
         QuadrupleImmutable delta;
         if (zsq.add(xsq).doubleValue() == 0) {
-            QuadrupleImmutable piOverTwo = QuadrupleImmutableMath.PI_OVER_2;
+            var piOverTwo = QuadrupleImmutableMath.PI_OVER_2;
             delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(QuadrupleImmutable.from(-1.0)));
         } else {
             delta = QuadrupleImmutableMath.atan(vec.y.divide(zsq.add(xsq).sqrt()));

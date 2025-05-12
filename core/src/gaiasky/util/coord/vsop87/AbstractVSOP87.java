@@ -34,7 +34,7 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
                     VSOP87Binary.class,
                     new VSOP87Loader.VSOP87LoaderParameters(Settings.settings.data.highAccuracy ? 0 : 0.6));
         }
-        versionA = true;
+        versionA = dataFile.contains("vsop87a");
     }
 
     @Override

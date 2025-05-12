@@ -25,7 +25,8 @@ import java.util.Arrays;
  * @param mantHi   The most significant 64 bits of fractional part of the mantissa.
  * @param mantLo   The least significant 64 bits of fractional part of the mantissa.
  */
-public record QuadrupleImmutable(boolean negative, int exponent, long mantHi, long mantLo) implements Comparable<QuadrupleImmutable> {
+public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
+                                 long mantLo) implements Comparable<QuadrupleImmutable> {
 
     private static final int HASH_CODE_OF_NAN = -441827835;
 
@@ -68,7 +69,8 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi, lo
     /** Value of {@code NaN}. **/
     public static final QuadrupleImmutable NAN = new QuadrupleImmutable(false, EXPONENT_OF_INFINITY, 0x8000_0000_0000_0000L, 0);
     /** Value of {@code PI}. **/
-    public static final QuadrupleImmutable PI = new QuadrupleImmutable(0x8000_0000, 0x921f_b544_42d1_8469L, 0x898c_c517_01b8_39a2L);
+    public static final QuadrupleImmutable PI = new QuadrupleImmutable(0x8000_0000, 0x921f_b544_42d1_8469L,
+                                                                       0x898c_c517_01b8_39a2L);
 
     public static QuadrupleImmutable infinity(boolean negative) {
         return negative ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
@@ -727,11 +729,13 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi, lo
         if (factor.isInfinite()) return infinity(factor.negative);
         if (factor.isZero()) return zero(factor.negative);
 
-        // Both are regular numbers
-        var f = new MutableBag(this);
-        f.multUnsigned(factor);
-        f.negative ^= factor.negative;
-        return f.toFloat128();
+        synchronized (QuadrupleImmutable.class) {
+            // Both are regular numbers
+            var f = new MutableBag(this);
+            f.multUnsigned(factor);
+            f.negative ^= factor.negative;
+            return f.toFloat128();
+        }
     }
 
     /**
@@ -791,12 +795,14 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi, lo
         if (divisor.isZero())
             return infinity(divisor.negative);
 
-        // Both are regular numbers, do divide
-        var f = new MutableBag(this);
-        f.divideUnsigned(divisor.toF128());
+        synchronized (QuadrupleImmutable.class) {
+            // Both are regular numbers, do divide
+            var f = new MutableBag(this);
+            f.divideUnsigned(divisor.toF128());
 
-        f.negative ^= divisor.negative;
-        return f.toFloat128();
+            f.negative ^= divisor.negative;
+            return f.toFloat128();
+        }
     }
 
     /**

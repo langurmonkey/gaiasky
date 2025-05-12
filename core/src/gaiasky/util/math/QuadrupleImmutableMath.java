@@ -13,17 +13,7 @@ package gaiasky.util.math;
 public final class QuadrupleImmutableMath {
 
     public static final QuadrupleImmutable PI = QuadrupleImmutable.PI;
-
-    private QuadrupleImmutableMath() { /* no instances */ }
-
-    public static QuadrupleImmutable pi() {
-        return QuadrupleImmutable.PI;
-    }
-
-    public static QuadrupleImmutable pi2() {
-        return pi().multiply(2.0);
-    }
-
+    public static QuadrupleImmutable PI_2 = PI.multiply(2.0);
     public static final QuadrupleImmutable PI_OVER_2 = QuadrupleImmutable.PI.divide(2.0);
 
     /**
@@ -33,9 +23,7 @@ public final class QuadrupleImmutableMath {
      */
     public static QuadrupleImmutable atan(QuadrupleImmutable x) {
         // Fast fallback via double: accurate to double-precision (tests use doubleValue())
-        double dv = x.doubleValue();
-        double ad = Math.atan(dv);
-        return QuadrupleImmutable.from(ad);
+        return QuadrupleImmutable.from(Math.atan(x.doubleValue()));
     }
 
     /**
@@ -44,10 +32,7 @@ public final class QuadrupleImmutableMath {
      */
     public static QuadrupleImmutable atan2(QuadrupleImmutable y, QuadrupleImmutable x) {
         // Fast fallback via double: accurate to double-precision (tests use doubleValue())
-        double dy = y.doubleValue();
-        double dx = x.doubleValue();
-        double ad = Math.atan2(dy, dx);
-        return QuadrupleImmutable.from(ad);
+        return QuadrupleImmutable.from(Math.atan2(y.doubleValue(), x.doubleValue()));
     }
 
 }
