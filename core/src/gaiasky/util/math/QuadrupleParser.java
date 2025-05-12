@@ -37,7 +37,7 @@ public class QuadrupleParser {
         return toString(q.isNegative(), q.exponent(), q.mantHi(), q.mantLo());
     }
 
-    public static String toString(Float128 f) {
+    public static String toString(QuadrupleImmutable f) {
         return toString(f.negative(), f.exponent(), f.mantHi(), f.mantLo());
     }
 

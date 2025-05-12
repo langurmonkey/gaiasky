@@ -2424,7 +2424,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
     private void shiftMantLeft(int shift) {
         assert (shift >= 0 && shift < 129) : "Can't shift by more than 128 or less than 1 bits";
         if (shift == 0) return;
-        if (shift >= 128) {
+        if (shift == 128) {
             mantHi = mantLo = 0;
             return;
         }

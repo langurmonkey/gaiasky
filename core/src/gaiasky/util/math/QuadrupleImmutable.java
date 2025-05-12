@@ -3,7 +3,7 @@ package gaiasky.util.math;
 import java.util.Arrays;
 
 /**
- * Immutable version of {@link Float128} implemented as a Java record.
+ * Immutable version of {@link QuadrupleImmutable} implemented as a Java record.
  * <p>
  * A floating-point number with a 128-bit fractional part of the mantissa and 32-bit
  * exponent. Normal values range from approximately {@code 2.271e-646456993}
@@ -25,7 +25,7 @@ import java.util.Arrays;
  * @param mantHi   The most significant 64 bits of fractional part of the mantissa.
  * @param mantLo   The least significant 64 bits of fractional part of the mantissa.
  */
-public record Float128(boolean negative, int exponent, long mantHi, long mantLo) implements Comparable<Float128> {
+public record QuadrupleImmutable(boolean negative, int exponent, long mantHi, long mantLo) implements Comparable<QuadrupleImmutable> {
 
     private static final int HASH_CODE_OF_NAN = -441827835;
 
@@ -56,25 +56,25 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     public static final int EXPONENT_OF_INFINITY = 0xFFFF_FFFF;
 
     /** Value of one. **/
-    public static final Float128 ONE = Float128.from(1d);
+    public static final QuadrupleImmutable ONE = QuadrupleImmutable.from(1d);
     /** Value of zero. **/
-    public static final Float128 ZERO = new Float128(false, 0, 0, 0);
+    public static final QuadrupleImmutable ZERO = new QuadrupleImmutable(false, 0, 0, 0);
     /** Value of negative zero. **/
-    public static final Float128 NEGATIVE_ZERO = new Float128(true, 0, 0, 0);
+    public static final QuadrupleImmutable NEGATIVE_ZERO = new QuadrupleImmutable(true, 0, 0, 0);
     /** Value of {@code +Infinity}. **/
-    public static final Float128 POSITIVE_INFINITY = new Float128(false, EXPONENT_OF_INFINITY, 0, 0);
+    public static final QuadrupleImmutable POSITIVE_INFINITY = new QuadrupleImmutable(false, EXPONENT_OF_INFINITY, 0, 0);
     /** Value of {@code -Infinity}. **/
-    public static final Float128 NEGATIVE_INFINITY = new Float128(true, EXPONENT_OF_INFINITY, 0, 0);
+    public static final QuadrupleImmutable NEGATIVE_INFINITY = new QuadrupleImmutable(true, EXPONENT_OF_INFINITY, 0, 0);
     /** Value of {@code NaN}. **/
-    public static final Float128 NAN = new Float128(false, EXPONENT_OF_INFINITY, 0x8000_0000_0000_0000L, 0);
+    public static final QuadrupleImmutable NAN = new QuadrupleImmutable(false, EXPONENT_OF_INFINITY, 0x8000_0000_0000_0000L, 0);
     /** Value of {@code PI}. **/
-    public static final Float128 PI = new Float128(0x8000_0000, 0x921f_b544_42d1_8469L, 0x898c_c517_01b8_39a2L);
+    public static final QuadrupleImmutable PI = new QuadrupleImmutable(0x8000_0000, 0x921f_b544_42d1_8469L, 0x898c_c517_01b8_39a2L);
 
-    public static Float128 infinity(boolean negative) {
+    public static QuadrupleImmutable infinity(boolean negative) {
         return negative ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
     }
 
-    public static Float128 zero(boolean negative) {
+    public static QuadrupleImmutable zero(boolean negative) {
         return negative ? NEGATIVE_ZERO : ZERO;
     }
 
@@ -352,33 +352,33 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     };
 
     /**
-     * Creates a new {@link Float128} with a positive value built from the given parts.
+     * Creates a new {@link QuadrupleImmutable} with a positive value built from the given parts.
      *
      * @param exponent The binary exponent (unbiased).
      * @param mantHi   The most significant 64 bits of fractional part of the mantissa.
      * @param mantLo   The least significant 64 bits of fractional part of the mantissa.
      */
-    public Float128(int exponent, long mantHi, long mantLo) {
+    public QuadrupleImmutable(int exponent, long mantHi, long mantLo) {
         this(false, exponent, mantHi, mantLo);
     }
 
     /**
-     * Creates a new {@link Float128} instance with the value of the given {@link Float128} instance.<br>
+     * Creates a new {@link QuadrupleImmutable} instance with the value of the given {@link QuadrupleImmutable} instance.<br>
      * First creates an empty (zero) instance, then copies the fields of the parameter.
      * to the fields of the new instance
      *
-     * @param value the {@link Float128} value to be assigned to the new instance.
+     * @param value the {@link QuadrupleImmutable} value to be assigned to the new instance.
      */
-    public Float128(Float128 value) {
+    public QuadrupleImmutable(QuadrupleImmutable value) {
         this(value.negative, value.exponent, value.mantHi, value.mantLo);
     }
 
     /**
-     * Creates a new {@link Float128} instance with the given {@link double} value.
+     * Creates a new {@link QuadrupleImmutable} instance with the given {@link double} value.
      *
      * @param value the {@link double} value to be assigned.
      */
-    public static Float128 from(double value) {
+    public static QuadrupleImmutable from(double value) {
         boolean negative;
         int exponent;
         long mantLo, mantHi;
@@ -399,7 +399,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             if (numOfZeros < 63)
                 // when numOfZeros == 63, since d << 64 does nothing
                 mantHi = doubleAsLong << numOfZeros + 1;
-            return new Float128(negative, exponent, mantHi, mantLo);
+            return new QuadrupleImmutable(negative, exponent, mantHi, mantLo);
         }
 
         if ((doubleAsLong & DOUBLE_EXP_MASK) == DOUBLE_EXP_MASK) {
@@ -408,21 +408,21 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
                 mantHi = 0;
             else
                 mantHi = DOUBLE_SIGN_MASK;
-            return new Float128(negative, exponent, mantHi, mantLo);
+            return new QuadrupleImmutable(negative, exponent, mantHi, mantLo);
         }
 
         // Normal case
         exponent = (int) ((doubleAsLong & DOUBLE_EXP_MASK) >>> 52) - EXP_0D + EXPONENT_BIAS;
         mantHi = (doubleAsLong & DOUBLE_MANT_MASK) << 12;
-        return new Float128(negative, exponent, mantHi, mantLo);
+        return new QuadrupleImmutable(negative, exponent, mantHi, mantLo);
     }
 
     /**
-     * Creates a new {@link Float128} instance with the given {@link long} value.
+     * Creates a new {@link QuadrupleImmutable} instance with the given {@link long} value.
      *
      * @param value the {@link long} value to be assigned.
      */
-    public static Float128 from(long value) {
+    public static QuadrupleImmutable from(long value) {
         if (value == 0)
             return ZERO;
 
@@ -446,7 +446,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     /**
      * Builds a Float128 value from the given low-level parts.<br>
      * Treats the {@code exponent} parameter as the unbiased exponent value,
-     * whose {@code 0} value corresponds to the {@link Float128} value of 1.0.
+     * whose {@code 0} value corresponds to the {@link QuadrupleImmutable} value of 1.0.
      *
      * @param negative the sign of the value ({@code true} for negative)
      * @param exponent Binary exponent (unbiased, 0 means 2^0)
@@ -455,20 +455,20 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      *
      * @return A Float128 containing the value built of the given parts
      */
-    public static Float128 fromUnbiasedExponent(boolean negative, int exponent, long mantHi, long mantLo) {
-        return new Float128(negative, exponent + EXPONENT_BIAS, mantHi, mantLo);
+    public static QuadrupleImmutable fromUnbiasedExponent(boolean negative, int exponent, long mantHi, long mantLo) {
+        return new QuadrupleImmutable(negative, exponent + EXPONENT_BIAS, mantHi, mantLo);
     }
 
-    private F128 toF128() {
-        return new F128(negative, exponent, mantHi, mantLo);
+    private MutableBag toF128() {
+        return new MutableBag(negative, exponent, mantHi, mantLo);
     }
 
 
     /**
-     * Converts the value of this {@link Float128} to an {@code int} value in a way
+     * Converts the value of this {@link QuadrupleImmutable} to an {@code int} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code int}).
      *
-     * @return the value of this {@link Float128} instance converted to an {@code int}.
+     * @return the value of this {@link QuadrupleImmutable} instance converted to an {@code int}.
      */
     public int intValue() {
         final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // Unbiased exponent
@@ -481,10 +481,10 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Converts the value of this {@link Float128} to a {@code long} value in a way
+     * Converts the value of this {@link QuadrupleImmutable} to a {@code long} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code long}).
      *
-     * @return the value of this {@link Float128} instance converted to a {@code long}.
+     * @return the value of this {@link QuadrupleImmutable} instance converted to a {@code long}.
      */
     public long longValue() {
         final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
@@ -497,21 +497,21 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Converts the value of this {@link Float128} to a {@code float} value in a way
+     * Converts the value of this {@link QuadrupleImmutable} to a {@code float} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code float}).
      *
-     * @return the value of this {@link Float128} instance converted to a {@code float}.
+     * @return the value of this {@link QuadrupleImmutable} instance converted to a {@code float}.
      */
     public float floatValue() {
         return (float) doubleValue();
     }
 
     /**
-     * Converts the value of this {@link Float128} to a {@code double} value in a way
+     * Converts the value of this {@link QuadrupleImmutable} to a {@code double} value in a way
      * similar to standard narrowing conversions (e.g., from {@code double} to {@code float}).
      * Uses 'half-even' approach to the rounding, like {@code BigDecimal.doubleValue()}
      *
-     * @return the value of this {@link Float128} instance converted to a {@code double}.
+     * @return the value of this {@link QuadrupleImmutable} instance converted to a {@code double}.
      */
     public double doubleValue() {
         if (exponent == 0)
@@ -556,7 +556,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Adds the value of the given {@link Float128} summand to the value of this Float128.
+     * Adds the value of the given {@link QuadrupleImmutable} summand to the value of this Float128.
      * The instance acquires a new value that equals the sum of the previous value and the value of the summand.
      *
      * @param summand the value to add
@@ -564,7 +564,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the sum of its previous value and the value of the summand
      */
-    public Float128 add(final Float128 summand) {
+    public QuadrupleImmutable add(final QuadrupleImmutable summand) {
         if (isNaN() || summand.isNaN()) return NAN;
 
         if (isInfinite()) {
@@ -573,20 +573,20 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             else return this;
         }
 
-        if (summand.isInfinite()) return new Float128(summand);
+        if (summand.isInfinite()) return new QuadrupleImmutable(summand);
 
         if (summand.isZero()) {
             if (isZero())
                 if (summand.isNegative() && isNegative())
-                    return new Float128(true, exponent, mantHi, mantLo);
+                    return new QuadrupleImmutable(true, exponent, mantHi, mantLo);
                 else
-                    return new Float128(false, exponent, mantHi, mantLo);
+                    return new QuadrupleImmutable(false, exponent, mantHi, mantLo);
         }
 
-        if (isZero()) return new Float128(summand);
+        if (isZero()) return new QuadrupleImmutable(summand);
 
         // Both are regular numbers
-        var f = new F128(this);
+        var f = new MutableBag(this);
         if (negative == summand.negative)
             return f.addUnsigned(summand.toF128())
                     .toFloat128();
@@ -600,7 +600,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
 
     /**
      * Adds the value of the given {@code long} summand to the value of this Float128.
-     * The value of the {@code long} operand is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code long} operand is preliminarily converted to a {@link QuadrupleImmutable} value.
      * The instance acquires the new value that equals the sum of the previous value and the value of the summand.
      *
      * @param summand the value to add
@@ -608,13 +608,13 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the sum of its previous value and the value of the summand
      */
-    public Float128 add(long summand) {
-        return add(Float128.from(summand));
+    public QuadrupleImmutable add(long summand) {
+        return add(QuadrupleImmutable.from(summand));
     }
 
     /**
      * Adds the value of the given {@code double} summand to the value of this Float128.
-     * The value of the {@code double} operand is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code double} operand is preliminarily converted to a {@link QuadrupleImmutable} value.
      * The instance acquires the new value that equals the sum of the previous value and the value of the summand.
      *
      * @param summand the value to add
@@ -622,12 +622,12 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the sum of its previous value and the value of the summand
      */
-    public Float128 add(double summand) {
-        return add(Float128.from(summand));
+    public QuadrupleImmutable add(double summand) {
+        return add(QuadrupleImmutable.from(summand));
     }
 
     /**
-     * Subtracts the value of the given {@link Float128} subtrahend from the value of this Float128.
+     * Subtracts the value of the given {@link QuadrupleImmutable} subtrahend from the value of this Float128.
      * The instance acquires a new value that equals the difference between the previous value and the value of the subtrahend.
      *
      * @param subtrahend the value to be subtracted from the current value of this Float128
@@ -635,7 +635,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the difference between its previous value and the value of the subtrahend
      */
-    public Float128 subtract(Float128 subtrahend) {
+    public QuadrupleImmutable subtract(QuadrupleImmutable subtrahend) {
         if (isNaN() || subtrahend.isNaN()) return NAN;
 
         if (isInfinite()) {
@@ -645,7 +645,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
         }
 
         if (subtrahend.isInfinite())
-            return new Float128(!subtrahend.negative, subtrahend.exponent, subtrahend.mantHi, subtrahend.mantLo);
+            return new QuadrupleImmutable(!subtrahend.negative, subtrahend.exponent, subtrahend.mantHi, subtrahend.mantLo);
 
         if (subtrahend.isZero()) {
             var negative = this.negative;
@@ -653,14 +653,14 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
                 if (!isNegative() || subtrahend.isNegative())
                     negative = false;
             }
-            return new Float128(negative, exponent, mantHi, mantLo);                                      // X - 0 = X
+            return new QuadrupleImmutable(negative, exponent, mantHi, mantLo);                                      // X - 0 = X
         }
 
         if (isZero())
-            return new Float128(!subtrahend.negative, subtrahend.exponent, subtrahend.mantHi, subtrahend.mantLo);
+            return new QuadrupleImmutable(!subtrahend.negative, subtrahend.exponent, subtrahend.mantHi, subtrahend.mantLo);
 
         // Both are regular numbers
-        F128 f = this.toF128();
+        MutableBag f = this.toF128();
         if (negative != subtrahend.negative)
             return f.addUnsigned(subtrahend.toF128())
                     .toFloat128();
@@ -675,7 +675,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
 
     /**
      * Subtracts the value of the given {@code long} subtrahend from the value of this Float128.
-     * The value of the {@code long} subtrahend is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code long} subtrahend is preliminarily converted to a {@link QuadrupleImmutable} value.
      * The instance acquires a new value that equals the difference between the previous value and the value of the subtrahend.
      *
      * @param subtrahend the value to be subtracted from the current value of this Float128
@@ -683,13 +683,13 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the difference between its previous value and the value of the subtrahend
      */
-    public Float128 subtract(long subtrahend) {
-        return subtract(Float128.from(subtrahend));
+    public QuadrupleImmutable subtract(long subtrahend) {
+        return subtract(QuadrupleImmutable.from(subtrahend));
     }
 
     /**
      * Subtracts the value of the given {@code double} subtrahend from the value of this Float128.
-     * The value of the {@code double} subtrahend is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code double} subtrahend is preliminarily converted to a {@link QuadrupleImmutable} value.
      * The instance acquires a new value that equals the difference between the previous value and the value of the subtrahend.
      *
      * @param subtrahend the value to be subtracted from the current value of this Float128
@@ -697,12 +697,12 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the difference between its previous value and the value of the subtrahend
      */
-    public Float128 subtract(double subtrahend) {
-        return subtract(Float128.from(subtrahend));
+    public QuadrupleImmutable subtract(double subtrahend) {
+        return subtract(QuadrupleImmutable.from(subtrahend));
     }
 
     /**
-     * Multiplies the value of this Float128 by the value of the given {@link Float128} factor.
+     * Multiplies the value of this Float128 by the value of the given {@link QuadrupleImmutable} factor.
      * The instance acquires a new value that equals the product of the previous value and the value of the factor.
      *
      * @param factor the value to multiply the current value of this Float128 by.
@@ -710,7 +710,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the product of its previous value and the value of the factor
      */
-    public Float128 multiply(Float128 factor) {
+    public QuadrupleImmutable multiply(QuadrupleImmutable factor) {
         if (isNaN() || factor.isNaN()) return NAN;
 
         if (isInfinite()) {
@@ -728,7 +728,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
         if (factor.isZero()) return zero(factor.negative);
 
         // Both are regular numbers
-        var f = new F128(this);
+        var f = new MutableBag(this);
         f.multUnsigned(factor);
         f.negative ^= factor.negative;
         return f.toFloat128();
@@ -736,7 +736,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
 
     /**
      * Multiplies the value of this Float128 by the value of the given {@code long} factor.
-     * The value of the {@code long} factor is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code long} factor is preliminarily converted to a {@link QuadrupleImmutable} value.
      * The instance acquires a new value that equals the product of the previous value and the value of the factor.
      *
      * @param factor the value to multiply the current value of this Float128 by.
@@ -744,13 +744,13 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the product of its previous value and the value of the factor
      */
-    public Float128 multiply(long factor) {
-        return multiply(Float128.from(factor));
+    public QuadrupleImmutable multiply(long factor) {
+        return multiply(QuadrupleImmutable.from(factor));
     }
 
     /**
      * Multiplies the value of this Float128 by the value of the given {@code double} factor.
-     * The value of the {@code double} factor is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code double} factor is preliminarily converted to a {@link QuadrupleImmutable} value.
      * The instance acquires a new value that equals the product of the previous value and the value of the factor.
      *
      * @param factor the value to multiply the current value of this Float128 by.
@@ -758,12 +758,12 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the product of its previous value and the value of the factor
      */
-    public Float128 multiply(double factor) {
-        return multiply(Float128.from(factor));
+    public QuadrupleImmutable multiply(double factor) {
+        return multiply(QuadrupleImmutable.from(factor));
     }
 
     /**
-     * Divides the value of this Float128 by the value of the given {@link Float128} divisor.
+     * Divides the value of this Float128 by the value of the given {@link QuadrupleImmutable} divisor.
      * The instance acquires a new value that equals the quotient.
      *
      * @param divisor the divisor to divide the current value of this Float128 by
@@ -771,7 +771,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return the reference to this object, which holds a new value that equals
      * the quotient of the previous value of this Float128 divided by the given divisor
      */
-    public Float128 divide(Float128 divisor) {
+    public QuadrupleImmutable divide(QuadrupleImmutable divisor) {
         if (isNaN() || divisor.isNaN()) return NAN;
 
         if (isInfinite()) {
@@ -792,7 +792,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
             return infinity(divisor.negative);
 
         // Both are regular numbers, do divide
-        var f = new F128(this);
+        var f = new MutableBag(this);
         f.divideUnsigned(divisor.toF128());
 
         f.negative ^= divisor.negative;
@@ -802,43 +802,43 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     /**
      * Divides the value of this Float128 by the value of the given {@code long} divisor.
      * The instance acquires a new value that equals the quotient.
-     * The value of the {@code long} divisor is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code long} divisor is preliminarily converted to a {@link QuadrupleImmutable} value.
      *
      * @param divisor the divisor to divide the current value of this Float128 by
      *
      * @return the reference to this object, which holds a new value that equals
      * the quotient of the previous value of this Float128 divided by the given divisor
      */
-    public Float128 divide(long divisor) {
-        return divide(Float128.from(divisor));
+    public QuadrupleImmutable divide(long divisor) {
+        return divide(QuadrupleImmutable.from(divisor));
     }
 
     /**
      * Divides the value of this Float128 by the value of the given {@code double} divisor.
      * The instance acquires a new value that equals the quotient.
-     * The value of the {@code double} divisor is preliminarily converted to a {@link Float128} value.
+     * The value of the {@code double} divisor is preliminarily converted to a {@link QuadrupleImmutable} value.
      *
      * @param divisor the divisor to divide the current value of this Float128 by
      *
      * @return the reference to this object, which holds a new value that equals
      * the quotient of the previous value of this Float128 divided by the given divisor
      */
-    public Float128 divide(double divisor) {
-        return divide(Float128.from(divisor));
+    public QuadrupleImmutable divide(double divisor) {
+        return divide(QuadrupleImmutable.from(divisor));
     }
 
     /**
-     * Computes a square root of the value of this {@link Float128}
+     * Computes a square root of the value of this {@link QuadrupleImmutable}
      * and replaces the old value of this instance with the newly-computed value.
      *
      * @return the reference to this instance, which holds a new value that equals
      * to the square root of its previous value
      */
-    public Float128 sqrt() {
+    public QuadrupleImmutable sqrt() {
         if (negative) return NAN;
         if (isNaN() || isInfinite()) return this;
 
-        var f = new F128(this);
+        var f = new MutableBag(this);
         long absExp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
         if (f.exponent == 0)
             absExp -= f.normalizeMantissa();
@@ -873,7 +873,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Computes a square root of the value of the given {@link Float128},
+     * Computes a square root of the value of the given {@link QuadrupleImmutable},
      * creates and returns a new instance of Float128 containing the value of the square root.
      * The parameter remains unchanged.
      *
@@ -881,33 +881,33 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      *
      * @return a new instance of Float128 containing the value of the square root of the given argument
      */
-    public static Float128 sqrt(Float128 square) {
-        return new Float128(square).sqrt();
+    public static QuadrupleImmutable sqrt(QuadrupleImmutable square) {
+        return new QuadrupleImmutable(square).sqrt();
     }
 
     /**
      * Bean used to transport a mutable state in some operations.
      */
-    private static class F128 {
+    private static class MutableBag {
         boolean negative;
         int exponent;
         long mantHi, mantLo;
 
-        private static final F128 ONE = new F128(Float128.ONE);
+        private static final MutableBag ONE = new MutableBag(QuadrupleImmutable.ONE);
 
-        public F128(boolean negative, int exponent, long mantHi, long mantLo) {
+        public MutableBag(boolean negative, int exponent, long mantHi, long mantLo) {
             this.negative = negative;
             this.exponent = exponent;
             this.mantHi = mantHi;
             this.mantLo = mantLo;
         }
 
-        public F128(Float128 f) {
+        public MutableBag(QuadrupleImmutable f) {
             this(f.negative, f.exponent, f.mantHi, f.mantLo);
         }
 
-        public Float128 toFloat128() {
-            return new Float128(negative, exponent, mantHi, mantLo);
+        public QuadrupleImmutable toFloat128() {
+            return new QuadrupleImmutable(negative, exponent, mantHi, mantLo);
         }
 
         /**
@@ -950,7 +950,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          *
          * @return this instance with the new value (-0)
          */
-        private F128 assignMinusZero() {
+        private MutableBag assignMinusZero() {
             negative = true;
             mantHi = mantLo = exponent = 0;
             return this;
@@ -1040,7 +1040,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private F128 addUnsigned(final F128 summand) {
+        private MutableBag addUnsigned(final MutableBag summand) {
             if (exponent != 0 && summand.exponent != 0) {
                 if (exponent == summand.exponent)
                     return addWithSameExps(summand);
@@ -1063,7 +1063,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private F128 addWithSameExps(final F128 summand) {
+        private MutableBag addWithSameExps(final MutableBag summand) {
             final long carryUp = addMant(summand.mantHi, summand.mantLo);
             final long shiftedOutBit = mantLo & 1;
             shiftMantissaRight(1);
@@ -1085,7 +1085,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private F128 addWitDifferentExps(final F128 summand) {
+        private MutableBag addWitDifferentExps(final MutableBag summand) {
             long greaterHi, greaterLo, exp2;
 
             if (Integer.compareUnsigned(exponent, summand.exponent) < 0) {
@@ -1127,7 +1127,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private F128 addNormalAndSubnormal(final F128 summand) {
+        private MutableBag addNormalAndSubnormal(final MutableBag summand) {
             long greaterHi;
             long greaterLo;
             long shiftedOutBit;
@@ -1227,7 +1227,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          *
          * @return this instance with the new value
          */
-        private F128 greaterPlusLowerBit(long greaterHi, long greaterLo) {
+        private MutableBag greaterPlusLowerBit(long greaterHi, long greaterLo) {
             if ((mantLo = ++greaterLo) == 0) {
                 if ((mantHi = ++greaterHi) == 0)
                     exponent++;                    // If it becomes infinity, the mantissa is already 0
@@ -1320,7 +1320,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          *
          * @param subtrahend the value to be subtracted
          */
-        private void subtractUnsigned(final F128 subtrahend) {
+        private void subtractUnsigned(final MutableBag subtrahend) {
             long minuendLo, minuendHi;
             int lesserExp;
 
@@ -1372,7 +1372,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * @return 1 if this instance is greater in magnitude than the {@code other} instance,
          * 0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
          */
-        public int compareMagnitudeTo(final F128 other) {
+        public int compareMagnitudeTo(final MutableBag other) {
             // 20.10.24 18:44:39 Regarding NaNs, behave like doubles
             if (isNaN())
                 return other.isNaN() ? 0 : 1;
@@ -1715,13 +1715,13 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
         }
 
         /**
-         * Multiples this instance of {@link Float128} by the given {@link Float128} factor, ignoring the signs
+         * Multiples this instance of {@link QuadrupleImmutable} by the given {@link QuadrupleImmutable} factor, ignoring the signs
          * <br>Uses static arrays
          * <b><i>BUFFER_5x32_A, BUFFER_5x32_B, BUFFER_10x32_A</i></b>
          *
          * @param factor the factor to multiply this instance by
          */
-        private void multUnsigned(Float128 factor) {
+        private void multUnsigned(QuadrupleImmutable factor) {
             // will use these buffers to hold unpacked mantissas of the factors (5 longs each, 4 x 32 bits + higher (implicit) unity)
             final long[] factor1 = BUFFER_5x32_A, factor2 = BUFFER_5x32_B, product = BUFFER_10x32_A;
 
@@ -1770,7 +1770,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * @return the exponent of the product, corrected in case if one of the factors is subnormal
          * <br>Covered
          */
-        private long normalizeAndUnpack(Float128 factor, long productExponent, long[] buffer1, long[] buffer2) {
+        private long normalizeAndUnpack(QuadrupleImmutable factor, long productExponent, long[] buffer1, long[] buffer2) {
 
             // If one of the numbers is subnormal, put its mantissa in mantHi, mantLo
             long factorMantHi = factor.mantHi, factorMantLo = factor.mantLo;
@@ -2000,7 +2000,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
 
 
         /**
-         * Divides this instance of {@link Float128} by the given {@link Float128} divisor, ignoring their signs
+         * Divides this instance of {@link QuadrupleImmutable} by the given {@link QuadrupleImmutable} divisor, ignoring their signs
          * <br>Uses static arrays
          * <b><i>BUFFER_5x32_A_INT, BUFFER_5x32_B, BUFFER_10x32_A_INT, BUFFER_10x32_B</i></b>
          * 20.10.17 10:26:36 A new version with probable doubling of the dividend and
@@ -2009,7 +2009,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * @param divisor the divisor to divide this instance by
          *                <br>Covered
          */
-        private void divideUnsigned(F128 divisor) {
+        private void divideUnsigned(MutableBag divisor) {
             if (divisor.compareMagnitudeTo(ONE) == 0)
                 return;
             if (compareMagnitudeTo(divisor) == 0) {
@@ -2093,7 +2093,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * @return the exponent of the quotient, adjusted accordingly to the normalization results
          * <br>Covered
          */
-        private long normalizeAndUnpackSubnormals(long quotientExponent, F128 divisor, int[] divisorBuff) {
+        private long normalizeAndUnpackSubnormals(long quotientExponent, MutableBag divisor, int[] divisorBuff) {
             if (exponent == 0)
                 quotientExponent -= normalizeMantissa();
 
@@ -2133,7 +2133,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
          * to use as an exponent correction
          * <br>Covered
          */
-        private static long normalizeAndUnpackDivisor(F128 divisor, int[] buffer) {
+        private static long normalizeAndUnpackDivisor(MutableBag divisor, int[] buffer) {
             long mantHi = divisor.mantHi, mantLo = divisor.mantLo;
             int shift = Long.numberOfLeadingZeros(mantHi);
             if (shift == 64)
@@ -2753,17 +2753,17 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      *
      * @return A new instance of Float128 with the same value as this
      */
-    public Float128 cpy() {
-        return new Float128(this);
+    public QuadrupleImmutable cpy() {
+        return new QuadrupleImmutable(this);
     }
 
     /**
-     * Returns a new instance of {@link Float128} with the value of the absolute value of this instance
+     * Returns a new instance of {@link QuadrupleImmutable} with the value of the absolute value of this instance
      *
-     * @return a new instance of {@link Float128} with the value of the absolute value of this instance
+     * @return a new instance of {@link QuadrupleImmutable} with the value of the absolute value of this instance
      */
-    public Float128 abs() {
-        return new Float128(false, exponent, mantHi, mantLo);
+    public QuadrupleImmutable abs() {
+        return new QuadrupleImmutable(false, exponent, mantHi, mantLo);
     }
 
     /**
@@ -2880,16 +2880,16 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return {@code true}, if the value is less than one
      */
     private static boolean isLessThanOne() {
-        if (Float128.BUFFER_12x32[0] < 0x1999_9999L) return true;
-        if (Float128.BUFFER_12x32[0] > 0x1999_9999L) return false;
+        if (QuadrupleImmutable.BUFFER_12x32[0] < 0x1999_9999L) return true;
+        if (QuadrupleImmutable.BUFFER_12x32[0] > 0x1999_9999L) return false;
 
         // A note regarding the coverage:
         // Multiplying a 128-bit number by another 192-bit number,
         // as well as multiplying of two 192-bit numbers,
         // can never produce 320 (or 384 bits, respectively) of 0x1999_9999L, 0x9999_9999L,
-        for (int i = 1; i < Float128.BUFFER_12x32.length; i++) { // so this loop can't be covered entirely
-            if (Float128.BUFFER_12x32[i] < 0x9999_9999L) return true;
-            if (Float128.BUFFER_12x32[i] > 0x9999_9999L) return false;
+        for (int i = 1; i < QuadrupleImmutable.BUFFER_12x32.length; i++) { // so this loop can't be covered entirely
+            if (QuadrupleImmutable.BUFFER_12x32[i] < 0x9999_9999L) return true;
+            if (QuadrupleImmutable.BUFFER_12x32[i] > 0x9999_9999L) return false;
         }
         // and it can never reach this point in real life.
         return false;
@@ -2899,12 +2899,12 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * Multiplies the unpacked value stored in the given buffer by 10
      */
     private static void multBuffBy10() {
-        final int maxIdx = Float128.BUFFER_12x32.length - 1;
-        Float128.BUFFER_12x32[0] &= LOWER_32_BITS;
-        Float128.BUFFER_12x32[maxIdx] *= 10;
+        final int maxIdx = QuadrupleImmutable.BUFFER_12x32.length - 1;
+        QuadrupleImmutable.BUFFER_12x32[0] &= LOWER_32_BITS;
+        QuadrupleImmutable.BUFFER_12x32[maxIdx] *= 10;
         for (int i = maxIdx - 1; i >= 0; i--) {
-            Float128.BUFFER_12x32[i] = Float128.BUFFER_12x32[i] * 10 + (Float128.BUFFER_12x32[i + 1] >>> 32);
-            Float128.BUFFER_12x32[i + 1] &= LOWER_32_BITS;
+            QuadrupleImmutable.BUFFER_12x32[i] = QuadrupleImmutable.BUFFER_12x32[i] * 10 + (QuadrupleImmutable.BUFFER_12x32[i + 1] >>> 32);
+            QuadrupleImmutable.BUFFER_12x32[i + 1] &= LOWER_32_BITS;
         }
     }
 
@@ -2916,8 +2916,8 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      */
     private static void multPacked3x64_simply() {
         Arrays.fill(BUFFER_12x32, 0);
-        unpack_3x64_to_6x32(Float128.BUFFER_4x64_A, BUFFER_6x32_A);
-        unpack_3x64_to_6x32(Float128.SQRT_2_AS_LONGS, BUFFER_6x32_B);
+        unpack_3x64_to_6x32(QuadrupleImmutable.BUFFER_4x64_A, BUFFER_6x32_A);
+        unpack_3x64_to_6x32(QuadrupleImmutable.SQRT_2_AS_LONGS, BUFFER_6x32_B);
 
         for (int i = 5; i >= 0; i--) // compute partial 32-bit products
             for (int j = 5; j >= 0; j--) {
@@ -2939,10 +2939,10 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
      * @return packedQD192 with words 1..3 filled with the packed mantissa. packedQD192[0] is not affected.
      */
     private static long[] pack_12x32_to_3x64() {
-        Float128.BUFFER_4x64_A[1] = (Float128.BUFFER_12x32[0] << 32) + Float128.BUFFER_12x32[1];
-        Float128.BUFFER_4x64_A[2] = (Float128.BUFFER_12x32[2] << 32) + Float128.BUFFER_12x32[3];
-        Float128.BUFFER_4x64_A[3] = (Float128.BUFFER_12x32[4] << 32) + Float128.BUFFER_12x32[5];
-        return Float128.BUFFER_4x64_A;
+        QuadrupleImmutable.BUFFER_4x64_A[1] = (QuadrupleImmutable.BUFFER_12x32[0] << 32) + QuadrupleImmutable.BUFFER_12x32[1];
+        QuadrupleImmutable.BUFFER_4x64_A[2] = (QuadrupleImmutable.BUFFER_12x32[2] << 32) + QuadrupleImmutable.BUFFER_12x32[3];
+        QuadrupleImmutable.BUFFER_4x64_A[3] = (QuadrupleImmutable.BUFFER_12x32[4] << 32) + QuadrupleImmutable.BUFFER_12x32[5];
+        return QuadrupleImmutable.BUFFER_4x64_A;
     }
 
     /**
@@ -2962,13 +2962,13 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     /**
      * Compares the value of this instance with the value of the specified instance.
      *
-     * @param other the {@link Float128} to compare with
+     * @param other the {@link QuadrupleImmutable} to compare with
      *
      * @return a negative integer, zero, or a positive integer as the value of this instance is less than,
      * equal to, or greater than the value of the specified instance.
      */
     @Override
-    public int compareTo(Float128 other) {
+    public int compareTo(QuadrupleImmutable other) {
 
         if (isNaN())
             return other.isNaN() ? 0 : 1;
@@ -2992,7 +2992,7 @@ public record Float128(boolean negative, int exponent, long mantHi, long mantLo)
     }
 
     /**
-     * Computes a hashcode for this {@link Float128},
+     * Computes a hashcode for this {@link QuadrupleImmutable},
      * based on the values of its fields.
      *
      * @see Object#hashCode()
