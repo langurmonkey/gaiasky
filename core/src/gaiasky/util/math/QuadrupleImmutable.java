@@ -850,32 +850,34 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
             absExp -= f.normalizeMantissa();
         f.exponent = (int) (absExp / 2 + EXPONENT_BIAS);
 
-        long thirdWord = f.sqrtMant();                        // puts 128 bit of the root into mantHi, mantLo
-        // and returns additional 64 bits of the root
+        synchronized(QuadrupleImmutable.class) {
+            long thirdWord = f.sqrtMant();                        // puts 128 bit of the root into mantHi, mantLo
+            // and returns additional 64 bits of the root
 
-        if (absExp % 2 != 0) {                              // Exponent is odd,
-            final long[] multed = multBySqrt2(f.mantHi, f.mantLo,
-                                              thirdWord); // multiply this value by sqrt(2), fill mantissa with the new value
-            f.mantHi = multed[0];
-            f.mantLo = multed[1];
-            thirdWord = multed[2];
-            if (absExp < 0)
-                f.exponent--;                       // for negative odd powers of two, exp = floor(exp / 2), e.g sqrt(0.64) = 0.8, sqrt(0.36) = 0.6
+            if (absExp % 2 != 0) {                              // Exponent is odd,
+                final long[] multed = multBySqrt2(f.mantHi, f.mantLo,
+                                                  thirdWord); // multiply this value by sqrt(2), fill mantissa with the new value
+                f.mantHi = multed[0];
+                f.mantLo = multed[1];
+                thirdWord = multed[2];
+                if (absExp < 0)
+                    f.exponent--;                       // for negative odd powers of two, exp = floor(exp / 2), e.g sqrt(0.64) = 0.8, sqrt(0.36) = 0.6
+            }
+
+            if ((thirdWord & HIGH_BIT) != 0)                    // The rest of the root >= a half of the lowest bit, round up
+                if (++f.mantLo == 0)
+                    if (++f.mantHi == 0)
+                        f.exponent++;        // 21.01.08 18:04:02: Actually, this branch can never be executed,
+            // since derivative of sqrt(x) at point x = 4 equals 1/4
+            // and is less than 1/4 if x < 4, so
+            // sqrt(-1, -1, EXP_0Q + 1) is a little more than (-1, -1, EXP_0Q),
+            // but less than (-1, -1, EXP_0Q) + 0.5 LSB, so gets rounded down to (-1, -1, EXP_0Q)
+            // (0xFFFF_FFFF_FFFF_FFFFL, 0xFFFF_FFFF_FFFF_FFFFL, and no carry to the position of the implicit unity).
+            // Nevertheless let it remain as a safety net
+
+
+            return f.toFloat128();
         }
-
-        if ((thirdWord & HIGH_BIT) != 0)                    // The rest of the root >= a half of the lowest bit, round up
-            if (++f.mantLo == 0)
-                if (++f.mantHi == 0)
-                    f.exponent++;        // 21.01.08 18:04:02: Actually, this branch can never be executed,
-        // since derivative of sqrt(x) at point x = 4 equals 1/4
-        // and is less than 1/4 if x < 4, so
-        // sqrt(-1, -1, EXP_0Q + 1) is a little more than (-1, -1, EXP_0Q),
-        // but less than (-1, -1, EXP_0Q) + 0.5 LSB, so gets rounded down to (-1, -1, EXP_0Q)
-        // (0xFFFF_FFFF_FFFF_FFFFL, 0xFFFF_FFFF_FFFF_FFFFL, and no carry to the position of the implicit unity).
-        // Nevertheless let it remain as a safety net
-
-
-        return f.toFloat128();
     }
 
     /**
