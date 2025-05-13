@@ -23,7 +23,8 @@ import java.util.Arrays;
  * Quadruple-precision floating-point implementation. I have removed unnecessary methods (most of BigDecimal stuff)
  * and cleaned up the code (remove unneeded comments, fixed typos, delete unnecessary return statements
  * and parameters, etc.). The string parsing utilities, as well as the string conversions, are taken
- * out to {@link QuadrupleParser} class.
+ * out to {@link QuadrupleParser} class. I have also made the class thread-safe by wrapping the working
+ * buffers within a {@link ThreadLocal}.
  * <p>
  * Original code by M. Vokhmentsev, see this <a href='https://github.com/m-vokhm/Quadruple'>repository</a>.
  * <p>
@@ -53,9 +54,6 @@ import java.util.Arrays;
  * <p style="margin-left:20px;">{@code a = a.add(2).multiply(5).divide(3);} <p>
  * to compute
  * <p style="margin-left:20px;">{@code a = (a + 2) * 5 / 3}.<br>
- * <p>
- * <b><i>The class is not thread safe.</i></b> Different threads should not simultaneously
- * perform operations even with different instances of the class.
  * <p>
  * An instance internally contains boolean flag for the value's sign,
  * 32-bit (an {@code int}) of binary exponent, and 128 bits (2 {@code longs}) of fractional part of the mantissa.
@@ -1186,7 +1184,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
     /**
      * Sets the negative flag.
      */
-    public Quadruple setNegative( boolean value) {
+    public Quadruple setNegative(boolean value) {
         negative = value;
         return this;
     }
@@ -1281,35 +1279,39 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
     /** Quadruple with value of 1.0 */
     private static final Quadruple ONE = new Quadruple().assign(1);
 
-    private static final long[] BUFFER_4x64_A = new long[4];
-
-    private static final long[] BUFFER_3x64_A = new long[3];
-    private static final long[] BUFFER_3x64_B = new long[3];
-    private static final long[] BUFFER_3x64_C = new long[3];
-    private static final long[] BUFFER_3x64_D = new long[3];
-
-    private static final long[] BUFFER_5x32_A = new long[5];
-    private static final int[] BUFFER_5x32_A_INT = new int[5];
-    private static final long[] BUFFER_5x32_B = new long[5];
-    private static final int[] BUFFER_5x32_B_INT = new int[5];
-
-    private static final long[] BUFFER_6x32_A = new long[6];
-    private static final long[] BUFFER_6x32_B = new long[6];
-
-    private static final long[] BUFFER_10x32_A = new long[10];
-    private static final int[] BUFFER_10x32_A_INT = new int[10];
-
-    private static final long[] BUFFER_12x32 = new long[12];
+    // Buffers used internally
+    private static class Buffers {
+        final long[] BUFFER_4x64_A = new long[4];
+        final long[] BUFFER_3x64_A = new long[3];
+        final long[] BUFFER_3x64_B = new long[3];
+        final long[] BUFFER_3x64_C = new long[3];
+        final long[] BUFFER_3x64_D = new long[3];
+        final long[] BUFFER_5x32_A = new long[5];
+        final int[] BUFFER_5x32_A_INT = new int[5];
+        final long[] BUFFER_5x32_B = new long[5];
+        final int[] BUFFER_5x32_B_INT = new int[5];
+        final long[] BUFFER_6x32_A = new long[6];
+        final long[] BUFFER_6x32_B = new long[6];
+        final long[] BUFFER_10x32_A = new long[10];
+        final int[] BUFFER_10x32_A_INT = new int[10];
+        final long[] BUFFER_12x32 = new long[12];
+        /**
+         * The mantissa of the Sqrt(2) in a format convenient for multiplying,
+         * SQRT_2_AS_LONGS[1] .. SQRT_2_AS_LONGS[3] contains the mantissa including the implied unity
+         * that is in the high bit of SQRT_2_AS_LONGS[1]. The other bits contain the fractional part of the mantissa.
+         * Used by multBySqrt2()
+         */
+        final long[] SQRT_2_AS_LONGS = new long[]{
+                0, 0xb504_f333_f9de_6484L, 0x597d_89b3_754a_be9fL, 0x1d6f_60ba_893b_a84dL,
+        };
+    }
 
     /**
-     * The mantissa of the Sqrt(2) in a format convenient for multiplying,
-     * SQRT_2_AS_LONGS[1] .. SQRT_2_AS_LONGS[3] contains the mantissa including the implied unity
-     * that is in the high bit of SQRT_2_AS_LONGS[1]. The other bits contain the fractional part of the mantissa.
-     * Used by multBySqrt2()
+     * Static thread-local buffers instance. These are working buffers which need to be instantiated
+     * locally in every thread.
      */
-    private static final long[] SQRT_2_AS_LONGS = new long[]{
-            0, 0xb504_f333_f9de_6484L, 0x597d_89b3_754a_be9fL, 0x1d6f_60ba_893b_a84dL,
-    };
+    private static final ThreadLocal<Buffers> buffers = ThreadLocal.withInitial(Buffers::new);
+
 
     private static final int[] SQUARE_BYTES = {
             //   0:
@@ -1552,6 +1554,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             0x0069,
             0x006a,
     };
+
     /**
      * Unpacks the mantissa of a 192-bit quasi-decimal (4 longs: exp10, mantHi, mantMid, mantLo)
      * to a buffer of 6 longs, where the least significant 32 bits of each long contains
@@ -1577,20 +1580,23 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * uses static arrays <b><i>BUFFER_6x32_A, BUFFER_6x32_B, BUFFER_12x32</b></i>
      */
     private static void multPacked3x64_simply() {
-        Arrays.fill(BUFFER_12x32, 0);
-        unpack_3x64_to_6x32(Quadruple.BUFFER_4x64_A, BUFFER_6x32_A);
-        unpack_3x64_to_6x32(Quadruple.SQRT_2_AS_LONGS, BUFFER_6x32_B);
+        var buff1232 = buffers.get().BUFFER_12x32;
+        var buff632a = buffers.get().BUFFER_6x32_A;
+        var buff632b = buffers.get().BUFFER_6x32_B;
+        Arrays.fill(buff1232, 0);
+        unpack_3x64_to_6x32(buffers.get().BUFFER_4x64_A, buff632a);
+        unpack_3x64_to_6x32(buffers.get().SQRT_2_AS_LONGS, buff632b);
 
-        for (int i = 5; i >= 0; i--)
+        for (int i = 5; i >= 0; i--) // compute partial 32-bit products
             for (int j = 5; j >= 0; j--) {
-                final long part = BUFFER_6x32_A[i] * BUFFER_6x32_B[j];
-                BUFFER_12x32[j + i + 1] += part & LOWER_32_BITS;
-                BUFFER_12x32[j + i] += part >>> 32;
+                final long part = buff632a[i] * buff632b[j];
+                buff1232[j + i + 1] += part & LOWER_32_BITS;
+                buff1232[j + i] += part >>> 32;
             }
 
         for (int i = 11; i > 0; i--) {
-            BUFFER_12x32[i - 1] += BUFFER_12x32[i] >>> 32;
-            BUFFER_12x32[i] &= LOWER_32_BITS;
+            buff1232[i - 1] += buff1232[i] >>> 32;
+            buff1232[i] &= LOWER_32_BITS;
         }
     }
 
@@ -1601,10 +1607,12 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return packedQD192 with words 1..3 filled with the packed mantissa. packedQD192[0] is not affected.
      */
     private static long[] pack_12x32_to_3x64() {
-        Quadruple.BUFFER_4x64_A[1] = (Quadruple.BUFFER_12x32[0] << 32) + Quadruple.BUFFER_12x32[1];
-        Quadruple.BUFFER_4x64_A[2] = (Quadruple.BUFFER_12x32[2] << 32) + Quadruple.BUFFER_12x32[3];
-        Quadruple.BUFFER_4x64_A[3] = (Quadruple.BUFFER_12x32[4] << 32) + Quadruple.BUFFER_12x32[5];
-        return Quadruple.BUFFER_4x64_A;
+        var buff1232 = buffers.get().BUFFER_12x32;
+        var buff464 = buffers.get().BUFFER_4x64_A;
+        buff464[1] = (buff1232[0] << 32) + buff1232[1];
+        buff464[2] = (buff1232[2] << 32) + buff1232[3];
+        buff464[3] = (buff1232[4] << 32) + buff1232[5];
+        return buff464;
     }
 
     /**
@@ -2473,17 +2481,21 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param factor the factor to multiply this instance by
      */
     private void multUnsigned(Quadruple factor) {
-        final long[] factor1 = BUFFER_5x32_A, factor2 = BUFFER_5x32_B, product = BUFFER_10x32_A;
+        // will use these buffers to hold unpacked mantissas of the factors (5 longs each, 4 x 32 bits + higher (implicit) unity)
+        final long[] factor1 = buffers.get().BUFFER_5x32_A, factor2 = buffers.get().BUFFER_5x32_B, product = buffers.get().BUFFER_10x32_A;
 
-        long productExponent = Integer.toUnsignedLong(exponent)
+        long productExponent = Integer.toUnsignedLong(
+                exponent)
                 + Integer.toUnsignedLong(factor.exponent) - EXPONENT_OF_ONE;
 
-        if (exponentWouldExceedBounds(productExponent, 1, 0))
+        if (exponentWouldExceedBounds(productExponent, 1,
+                                      0))
             return;
 
+        // put the mantissas into the buffers that will be used by the proper multiplication
         productExponent = normalizeAndUnpack(factor, productExponent, factor1, factor2);
         if (productExponent < -129) {
-            assignZero(false);
+            assignZero();
             return;
         }
 
@@ -2771,7 +2783,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             return;
 
         boolean needToDivide = true;
-        final int[] divisorBuff = BUFFER_5x32_A_INT;
+        final int[] divisorBuff = buffers.get().BUFFER_5x32_A_INT;
         if (exponent != 0 & divisor.exponent != 0) {
             if (mantHi == divisor.mantHi && mantLo == divisor.mantLo) {
                 mantHi = mantLo = 0;
@@ -2907,7 +2919,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return (possibly adjusted) exponent of the quotient
      */
     private long doDivide(long quotientExponent, final int[] divisor) {
-        final int[] dividend = BUFFER_10x32_A_INT;
+        final int[] dividend = buffers.get().BUFFER_10x32_A_INT;
         quotientExponent = unpackMantissaTo(quotientExponent, divisor, dividend);
         divideBuffers(dividend, divisor, quotientExponent);
         return quotientExponent;
@@ -3004,7 +3016,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param quotientExponent preliminary evaluated exponent of the quotient, may get adjusted
      */
     private void divideBuffers(int[] dividend, int[] divisor, long quotientExponent) {
-        final int[] quotientBuff = BUFFER_5x32_B_INT;
+        final int[] quotientBuff = buffers.get().BUFFER_5x32_B_INT;
 
         final long nextBit = divideArrays(dividend, divisor, quotientBuff);
 
@@ -3206,11 +3218,10 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return bits 128 -- 135 of the root in the high byte of the long result
      */
     private long sqrtMant() {
-
-        final long[] remainder = BUFFER_3x64_A;
-        final long[] rootX2 = BUFFER_3x64_B;
+        final long[] remainder = buffers.get().BUFFER_3x64_A;
+        final long[] rootX2 = buffers.get().BUFFER_3x64_B;
         Arrays.fill(rootX2, 0);
-        final long[] root = BUFFER_3x64_C;
+        final long[] root = buffers.get().BUFFER_3x64_C;
         Arrays.fill(root, 0);
 
         final long digit = findFirstDigit();
@@ -3277,7 +3288,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return the position of the next to be found
      */
     private static int computeNextDigit(final long[] remainder, final long[] rootX2, final long[] root, int bitNumber) {
-        final long[] aux = BUFFER_3x64_D;
+        final long[] aux = buffers.get().BUFFER_3x64_D;
         final long digit = findNextDigit(rootX2, remainder, aux, bitNumber);
         addDigit(root, digit, bitNumber);
 
@@ -3459,10 +3470,11 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      */
     private long[] multBySqrt2(long mantHi, long mantLo, long thirdWord) {
 
-        BUFFER_4x64_A[0] = 0;
-        BUFFER_4x64_A[1] = mantHi >>> 1 | HIGH_BIT;
-        BUFFER_4x64_A[2] = mantLo >>> 1 | mantHi << 63;
-        BUFFER_4x64_A[3] = thirdWord >>> 1 | mantLo << 63;
+        var buff464 = buffers.get().BUFFER_4x64_A;
+        buff464[0] = 0;
+        buff464[1] = mantHi >>> 1 | HIGH_BIT;
+        buff464[2] = mantLo >>> 1 | mantHi << 63;
+        buff464[3] = thirdWord >>> 1 | mantLo << 63;
 
         final long[] product = multPacked3x64();
 

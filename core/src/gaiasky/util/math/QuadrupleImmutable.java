@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 /**
  * Immutable version of {@link QuadrupleImmutable} implemented as a Java record.
+ * This class is thread-safe.
  * <p>
  * A floating-point number with a 128-bit fractional part of the mantissa and 32-bit
  * exponent. Normal values range from approximately {@code 2.271e-646456993}
@@ -17,6 +18,68 @@ import java.util.Arrays;
  * <p>
  * Implements conversions from/to other numeric types, conversions from/to strings,
  * formatting, arithmetic operations and square root.
+ * <p>
+ * The biased exponent values stored in the {@code exponent} field are as following:
+ *
+ * <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="">
+ * <tr>
+ * <th class="colLast" scope="col">biased value</th>
+ * <th class="colLast" scope="col">const name</th>
+ * <th class="colLast" scope="col">means</th>
+ * <th class="colLast" scope="col">unbiased exponent (power of 2)</th>
+ * </tr>
+ * <tr class="altColor">
+ * <td>{@code 0x0000_0000}</td>
+ * <td>{@code EXPONENT_OF_SUBNORMAL}</td>
+ * <td>subnormal values</td>
+ * <td>{@code 0x8000_0001 = -2147483647 =  Integer.MIN_VALUE + 1}</td>
+ * </tr>
+ * <tr class="rowColor">
+ * <td>{@code 0x0000_0001}</td>
+ * <td>{@code EXPONENT_OF_MIN_NORMAL}</td>
+ * <td>{@code MIN_NORMAL}</td>
+ * <td>{@code 0x8000_0002 = -2147483646 =  Integer.MIN_VALUE + 2}</td>
+ * </tr>
+ * <tr class="altColor">
+ * <td>{@code 0x7FFF_FFFE}</td>
+ * <td>&nbsp;</td>
+ * <td>{@code -1}</td>
+ * <td>{@code 0xFFFF_FFFF}</td>
+ * </tr>
+ * <tr class="rowColor">
+ * <td>{@code 0x7FFF_FFFF}</td>
+ * <td>{@code EXPONENT_OF_ONE}</td>
+ * <td>{@code 0}</td>
+ * <td>{@code 0x0000_0000}</td>
+ * </tr>
+ * <tr class="altColor">
+ * <td>{@code 0x8000_0000}</td>
+ * <td>&nbsp;</td>
+ * <td>{@code 1}</td>
+ * <td>{@code 0x0000_0001}</td>
+ * </tr>
+ * <tr class="rowColor">
+ * <td>{@code 0xFFFF_FFFE}</td>
+ * <td>{@code EXPONENT_OF_MAX_VALUE}</td>
+ * <td>{@code MAX_VALUE}</td>
+ * <td>{@code 0x7fff_ffff =  2147483647 =  Integer.MAX_VALUE}</td>
+ * </tr>
+ * <tr class="altColor">
+ * <td>{@code 0xFFFF_FFFF}</td>
+ * <td>{@code EXPONENT_OF_INFINITY}</td>
+ * <td>{@code Infinity}</td>
+ * <td>{@code 0x8000_0000 =  2147483648 =  Integer.MIN_VALUE}</td>
+ * </tr>
+ * </table>
+ * <br>The boundaries of the range are:
+ * <pre>{@code
+ * MAX_VALUE:  2^2147483647 * (2 - 2^-128) =
+ *             = 1.76161305168396335320749314979184028566452310e+646456993
+ * MIN_NORMAL: 2^-2147483646 =
+ *             = 2.27064621040149253752656726517958758124747730e-646456993
+ * MIN_VALUE:  2^-2147483774 =
+ *             = 6.67282948260747430814835377499134611597699952e-646457032
+ * }</pre>
  * <p>
  * Original code by M. Vokhmentsev, see this <a href='https://github.com/m-vokhm/Quadruple'>repository</a>.
  *
@@ -57,7 +120,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
     public static final int EXPONENT_OF_INFINITY = 0xFFFF_FFFF;
 
     /** Value of one. **/
-    public static final QuadrupleImmutable ONE = QuadrupleImmutable.from(1d);
+    public static final QuadrupleImmutable ONE = from(1d);
     /** Value of zero. **/
     public static final QuadrupleImmutable ZERO = new QuadrupleImmutable(false, 0, 0, 0);
     /** Value of negative zero. **/
@@ -81,35 +144,38 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
     }
 
     // Buffers used internally
-    private static final long[] BUFFER_4x64_A = new long[4];
-
-    private static final long[] BUFFER_3x64_A = new long[3];
-    private static final long[] BUFFER_3x64_B = new long[3];
-    private static final long[] BUFFER_3x64_C = new long[3];
-    private static final long[] BUFFER_3x64_D = new long[3];
-
-    private static final long[] BUFFER_5x32_A = new long[5];
-    private static final int[] BUFFER_5x32_A_INT = new int[5];
-    private static final long[] BUFFER_5x32_B = new long[5];
-    private static final int[] BUFFER_5x32_B_INT = new int[5];
-
-    private static final long[] BUFFER_6x32_A = new long[6];
-    private static final long[] BUFFER_6x32_B = new long[6];
-
-    private static final long[] BUFFER_10x32_A = new long[10];
-    private static final int[] BUFFER_10x32_A_INT = new int[10];
-
-    private static final long[] BUFFER_12x32 = new long[12];
+    private static class Buffers {
+        final long[] BUFFER_4x64_A = new long[4];
+        final long[] BUFFER_3x64_A = new long[3];
+        final long[] BUFFER_3x64_B = new long[3];
+        final long[] BUFFER_3x64_C = new long[3];
+        final long[] BUFFER_3x64_D = new long[3];
+        final long[] BUFFER_5x32_A = new long[5];
+        final int[] BUFFER_5x32_A_INT = new int[5];
+        final long[] BUFFER_5x32_B = new long[5];
+        final int[] BUFFER_5x32_B_INT = new int[5];
+        final long[] BUFFER_6x32_A = new long[6];
+        final long[] BUFFER_6x32_B = new long[6];
+        final long[] BUFFER_10x32_A = new long[10];
+        final int[] BUFFER_10x32_A_INT = new int[10];
+        final long[] BUFFER_12x32 = new long[12];
+        /**
+         * The mantissa of the Sqrt(2) in a format convenient for multiplying,
+         * SQRT_2_AS_LONGS[1] .. SQRT_2_AS_LONGS[3] contains the mantissa including the implied unity
+         * that is in the high bit of SQRT_2_AS_LONGS[1]. The other bits contain the fractional part of the mantissa.
+         * Used by multBySqrt2()
+         */
+        final long[] SQRT_2_AS_LONGS = new long[]{
+                0, 0xb504_f333_f9de_6484L, 0x597d_89b3_754a_be9fL, 0x1d6f_60ba_893b_a84dL,
+        };
+    }
 
     /**
-     * The mantissa of the Sqrt(2) in a format convenient for multiplying,
-     * SQRT_2_AS_LONGS[1] .. SQRT_2_AS_LONGS[3] contains the mantissa including the implied unity
-     * that is in the high bit of SQRT_2_AS_LONGS[1]. The other bits contain the fractional part of the mantissa.
-     * Used by multBySqrt2()
+     * Static thread-local buffers instance. These are working buffers which need to be instantiated
+     * locally in every thread.
      */
-    private static final long[] SQRT_2_AS_LONGS = new long[]{
-            0, 0xb504_f333_f9de_6484L, 0x597d_89b3_754a_be9fL, 0x1d6f_60ba_893b_a84dL,
-    };
+    private static final ThreadLocal<Buffers> buffers = ThreadLocal.withInitial(Buffers::new);
+
 
     private static final int[] SQUARE_BYTES = {
             //   0:
@@ -611,7 +677,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the sum of its previous value and the value of the summand
      */
     public QuadrupleImmutable add(long summand) {
-        return add(QuadrupleImmutable.from(summand));
+        return add(from(summand));
     }
 
     /**
@@ -625,7 +691,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the sum of its previous value and the value of the summand
      */
     public QuadrupleImmutable add(double summand) {
-        return add(QuadrupleImmutable.from(summand));
+        return add(from(summand));
     }
 
     /**
@@ -686,7 +752,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the difference between its previous value and the value of the subtrahend
      */
     public QuadrupleImmutable subtract(long subtrahend) {
-        return subtract(QuadrupleImmutable.from(subtrahend));
+        return subtract(from(subtrahend));
     }
 
     /**
@@ -700,7 +766,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the difference between its previous value and the value of the subtrahend
      */
     public QuadrupleImmutable subtract(double subtrahend) {
-        return subtract(QuadrupleImmutable.from(subtrahend));
+        return subtract(from(subtrahend));
     }
 
     /**
@@ -729,13 +795,11 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
         if (factor.isInfinite()) return infinity(factor.negative);
         if (factor.isZero()) return zero(factor.negative);
 
-        synchronized (QuadrupleImmutable.class) {
-            // Both are regular numbers
-            var f = new MutableBag(this);
-            f.multUnsigned(factor);
-            f.negative ^= factor.negative;
-            return f.toFloat128();
-        }
+        // Both are regular numbers
+        var f = new MutableBag(this);
+        f.multUnsigned(factor);
+        f.negative ^= factor.negative;
+        return f.toFloat128();
     }
 
     /**
@@ -749,7 +813,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the product of its previous value and the value of the factor
      */
     public QuadrupleImmutable multiply(long factor) {
-        return multiply(QuadrupleImmutable.from(factor));
+        return multiply(from(factor));
     }
 
     /**
@@ -763,7 +827,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the product of its previous value and the value of the factor
      */
     public QuadrupleImmutable multiply(double factor) {
-        return multiply(QuadrupleImmutable.from(factor));
+        return multiply(from(factor));
     }
 
     /**
@@ -795,14 +859,12 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
         if (divisor.isZero())
             return infinity(divisor.negative);
 
-        synchronized (QuadrupleImmutable.class) {
-            // Both are regular numbers, do divide
-            var f = new MutableBag(this);
-            f.divideUnsigned(divisor.toF128());
+        // Both are regular numbers, do divide
+        var f = new MutableBag(this);
+        f.divideUnsigned(divisor.toF128());
 
-            f.negative ^= divisor.negative;
-            return f.toFloat128();
-        }
+        f.negative ^= divisor.negative;
+        return f.toFloat128();
     }
 
     /**
@@ -816,7 +878,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the quotient of the previous value of this Float128 divided by the given divisor
      */
     public QuadrupleImmutable divide(long divisor) {
-        return divide(QuadrupleImmutable.from(divisor));
+        return divide(from(divisor));
     }
 
     /**
@@ -830,7 +892,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * the quotient of the previous value of this Float128 divided by the given divisor
      */
     public QuadrupleImmutable divide(double divisor) {
-        return divide(QuadrupleImmutable.from(divisor));
+        return divide(from(divisor));
     }
 
     /**
@@ -850,34 +912,32 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
             absExp -= f.normalizeMantissa();
         f.exponent = (int) (absExp / 2 + EXPONENT_BIAS);
 
-        synchronized(QuadrupleImmutable.class) {
-            long thirdWord = f.sqrtMant();                        // puts 128 bit of the root into mantHi, mantLo
-            // and returns additional 64 bits of the root
+        long thirdWord = f.sqrtMant();                        // puts 128 bit of the root into mantHi, mantLo
+        // and returns additional 64 bits of the root
 
-            if (absExp % 2 != 0) {                              // Exponent is odd,
-                final long[] multed = multBySqrt2(f.mantHi, f.mantLo,
-                                                  thirdWord); // multiply this value by sqrt(2), fill mantissa with the new value
-                f.mantHi = multed[0];
-                f.mantLo = multed[1];
-                thirdWord = multed[2];
-                if (absExp < 0)
-                    f.exponent--;                       // for negative odd powers of two, exp = floor(exp / 2), e.g sqrt(0.64) = 0.8, sqrt(0.36) = 0.6
-            }
-
-            if ((thirdWord & HIGH_BIT) != 0)                    // The rest of the root >= a half of the lowest bit, round up
-                if (++f.mantLo == 0)
-                    if (++f.mantHi == 0)
-                        f.exponent++;        // 21.01.08 18:04:02: Actually, this branch can never be executed,
-            // since derivative of sqrt(x) at point x = 4 equals 1/4
-            // and is less than 1/4 if x < 4, so
-            // sqrt(-1, -1, EXP_0Q + 1) is a little more than (-1, -1, EXP_0Q),
-            // but less than (-1, -1, EXP_0Q) + 0.5 LSB, so gets rounded down to (-1, -1, EXP_0Q)
-            // (0xFFFF_FFFF_FFFF_FFFFL, 0xFFFF_FFFF_FFFF_FFFFL, and no carry to the position of the implicit unity).
-            // Nevertheless let it remain as a safety net
-
-
-            return f.toFloat128();
+        if (absExp % 2 != 0) {                              // Exponent is odd,
+            final long[] multed = multBySqrt2(f.mantHi, f.mantLo,
+                                              thirdWord); // multiply this value by sqrt(2), fill mantissa with the new value
+            f.mantHi = multed[0];
+            f.mantLo = multed[1];
+            thirdWord = multed[2];
+            if (absExp < 0)
+                f.exponent--;                       // for negative odd powers of two, exp = floor(exp / 2), e.g sqrt(0.64) = 0.8, sqrt(0.36) = 0.6
         }
+
+        if ((thirdWord & HIGH_BIT) != 0)                    // The rest of the root >= a half of the lowest bit, round up
+            if (++f.mantLo == 0)
+                if (++f.mantHi == 0)
+                    f.exponent++;        // 21.01.08 18:04:02: Actually, this branch can never be executed,
+        // since derivative of sqrt(x) at point x = 4 equals 1/4
+        // and is less than 1/4 if x < 4, so
+        // sqrt(-1, -1, EXP_0Q + 1) is a little more than (-1, -1, EXP_0Q),
+        // but less than (-1, -1, EXP_0Q) + 0.5 LSB, so gets rounded down to (-1, -1, EXP_0Q)
+        // (0xFFFF_FFFF_FFFF_FFFFL, 0xFFFF_FFFF_FFFF_FFFFL, and no carry to the position of the implicit unity).
+        // Nevertheless let it remain as a safety net
+
+
+        return f.toFloat128();
     }
 
     /**
@@ -1731,7 +1791,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          */
         private void multUnsigned(QuadrupleImmutable factor) {
             // will use these buffers to hold unpacked mantissas of the factors (5 longs each, 4 x 32 bits + higher (implicit) unity)
-            final long[] factor1 = BUFFER_5x32_A, factor2 = BUFFER_5x32_B, product = BUFFER_10x32_A;
+            final long[] factor1 = buffers.get().BUFFER_5x32_A, factor2 = buffers.get().BUFFER_5x32_B, product = buffers.get().BUFFER_10x32_A;
 
             long productExponent = Integer.toUnsignedLong(
                     exponent)
@@ -2035,7 +2095,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                 return;
 
             boolean needToDivide = true;
-            final int[] divisorBuff = BUFFER_5x32_A_INT;
+            final int[] divisorBuff = buffers.get().BUFFER_5x32_A_INT;
             if (exponent != 0 & divisor.exponent != 0) {
                 if (mantHi == divisor.mantHi && mantLo == divisor.mantLo) {
                     mantHi = mantLo = 0;
@@ -2172,7 +2232,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @return (possibly adjusted) exponent of the quotient
          */
         private long doDivide(long quotientExponent, final int[] divisor) {
-            final int[] dividend = BUFFER_10x32_A_INT;
+            final int[] dividend = buffers.get().BUFFER_10x32_A_INT;
             quotientExponent = unpackMantissaTo(quotientExponent, divisor, dividend);
             divideBuffers(dividend, divisor, quotientExponent);
             return quotientExponent;
@@ -2270,7 +2330,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param quotientExponent preliminary evaluated exponent of the quotient, may get adjusted
          */
         private void divideBuffers(int[] dividend, int[] divisor, long quotientExponent) {
-            final int[] quotientBuff = BUFFER_5x32_B_INT;
+            final int[] quotientBuff = buffers.get().BUFFER_5x32_B_INT;
 
             final long nextBit = divideArrays(dividend, divisor, quotientBuff);
 
@@ -2466,10 +2526,10 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @return bits 128 -- 135 of the root in the high byte of the long result
          */
         private long sqrtMant() {
-            final long[] remainder = BUFFER_3x64_A;
-            final long[] rootX2 = BUFFER_3x64_B;
+            final long[] remainder = buffers.get().BUFFER_3x64_A;
+            final long[] rootX2 = buffers.get().BUFFER_3x64_B;
             Arrays.fill(rootX2, 0);
-            final long[] root = BUFFER_3x64_C;
+            final long[] root = buffers.get().BUFFER_3x64_C;
             Arrays.fill(root, 0);
 
             final long digit = findFirstDigit();
@@ -2541,7 +2601,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @return the position of the next to be found
      */
     private static int computeNextDigit(final long[] remainder, final long[] rootX2, final long[] root, int bitNumber) {
-        final long[] aux = BUFFER_3x64_D;
+        final long[] aux = buffers.get().BUFFER_3x64_D;
         final long digit = findNextDigit(rootX2, remainder, aux,
                                          bitNumber);
         addDigit(root, digit, bitNumber);
@@ -2728,10 +2788,11 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      */
     private long[] multBySqrt2(long mantHi, long mantLo, long thirdWord) {
 
-        BUFFER_4x64_A[0] = 0;
-        BUFFER_4x64_A[1] = mantHi >>> 1 | HIGH_BIT;
-        BUFFER_4x64_A[2] = mantLo >>> 1 | mantHi << 63;
-        BUFFER_4x64_A[3] = thirdWord >>> 1 | mantLo << 63;
+        var buff464 = buffers.get().BUFFER_4x64_A;
+        buff464[0] = 0;
+        buff464[1] = mantHi >>> 1 | HIGH_BIT;
+        buff464[2] = mantLo >>> 1 | mantHi << 63;
+        buff464[3] = thirdWord >>> 1 | mantLo << 63;
 
         final long[] product = multPacked3x64(
         );
@@ -2888,16 +2949,17 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @return {@code true}, if the value is less than one
      */
     private static boolean isLessThanOne() {
-        if (QuadrupleImmutable.BUFFER_12x32[0] < 0x1999_9999L) return true;
-        if (QuadrupleImmutable.BUFFER_12x32[0] > 0x1999_9999L) return false;
+        var buff1232 = buffers.get().BUFFER_12x32;
+        if (buff1232[0] < 0x1999_9999L) return true;
+        if (buff1232[0] > 0x1999_9999L) return false;
 
         // A note regarding the coverage:
         // Multiplying a 128-bit number by another 192-bit number,
         // as well as multiplying of two 192-bit numbers,
         // can never produce 320 (or 384 bits, respectively) of 0x1999_9999L, 0x9999_9999L,
-        for (int i = 1; i < QuadrupleImmutable.BUFFER_12x32.length; i++) { // so this loop can't be covered entirely
-            if (QuadrupleImmutable.BUFFER_12x32[i] < 0x9999_9999L) return true;
-            if (QuadrupleImmutable.BUFFER_12x32[i] > 0x9999_9999L) return false;
+        for (int i = 1; i < buff1232.length; i++) { // so this loop can't be covered entirely
+            if (buff1232[i] < 0x9999_9999L) return true;
+            if (buff1232[i] > 0x9999_9999L) return false;
         }
         // and it can never reach this point in real life.
         return false;
@@ -2907,12 +2969,13 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * Multiplies the unpacked value stored in the given buffer by 10
      */
     private static void multBuffBy10() {
-        final int maxIdx = QuadrupleImmutable.BUFFER_12x32.length - 1;
-        QuadrupleImmutable.BUFFER_12x32[0] &= LOWER_32_BITS;
-        QuadrupleImmutable.BUFFER_12x32[maxIdx] *= 10;
+        var buff1232 = buffers.get().BUFFER_12x32;
+        final int maxIdx = buff1232.length - 1;
+        buff1232[0] &= LOWER_32_BITS;
+        buff1232[maxIdx] *= 10;
         for (int i = maxIdx - 1; i >= 0; i--) {
-            QuadrupleImmutable.BUFFER_12x32[i] = QuadrupleImmutable.BUFFER_12x32[i] * 10 + (QuadrupleImmutable.BUFFER_12x32[i + 1] >>> 32);
-            QuadrupleImmutable.BUFFER_12x32[i + 1] &= LOWER_32_BITS;
+            buff1232[i] = buff1232[i] * 10 + (buff1232[i + 1] >>> 32);
+            buff1232[i + 1] &= LOWER_32_BITS;
         }
     }
 
@@ -2923,20 +2986,23 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * uses static arrays <b><i>BUFFER_6x32_A, BUFFER_6x32_B, BUFFER_12x32</b></i>
      */
     private static void multPacked3x64_simply() {
-        Arrays.fill(BUFFER_12x32, 0);
-        unpack_3x64_to_6x32(QuadrupleImmutable.BUFFER_4x64_A, BUFFER_6x32_A);
-        unpack_3x64_to_6x32(QuadrupleImmutable.SQRT_2_AS_LONGS, BUFFER_6x32_B);
+        var buff1232 = buffers.get().BUFFER_12x32;
+        var buff632a = buffers.get().BUFFER_6x32_A;
+        var buff632b = buffers.get().BUFFER_6x32_B;
+        Arrays.fill(buff1232, 0);
+        unpack_3x64_to_6x32(buffers.get().BUFFER_4x64_A, buff632a);
+        unpack_3x64_to_6x32(buffers.get().SQRT_2_AS_LONGS, buff632b);
 
         for (int i = 5; i >= 0; i--) // compute partial 32-bit products
             for (int j = 5; j >= 0; j--) {
-                final long part = BUFFER_6x32_A[i] * BUFFER_6x32_B[j];
-                BUFFER_12x32[j + i + 1] += part & LOWER_32_BITS;
-                BUFFER_12x32[j + i] += part >>> 32;
+                final long part = buff632a[i] * buff632b[j];
+                buff1232[j + i + 1] += part & LOWER_32_BITS;
+                buff1232[j + i] += part >>> 32;
             }
 
         for (int i = 11; i > 0; i--) {
-            BUFFER_12x32[i - 1] += BUFFER_12x32[i] >>> 32;
-            BUFFER_12x32[i] &= LOWER_32_BITS;
+            buff1232[i - 1] += buff1232[i] >>> 32;
+            buff1232[i] &= LOWER_32_BITS;
         }
     }
 
@@ -2947,10 +3013,12 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @return packedQD192 with words 1..3 filled with the packed mantissa. packedQD192[0] is not affected.
      */
     private static long[] pack_12x32_to_3x64() {
-        QuadrupleImmutable.BUFFER_4x64_A[1] = (QuadrupleImmutable.BUFFER_12x32[0] << 32) + QuadrupleImmutable.BUFFER_12x32[1];
-        QuadrupleImmutable.BUFFER_4x64_A[2] = (QuadrupleImmutable.BUFFER_12x32[2] << 32) + QuadrupleImmutable.BUFFER_12x32[3];
-        QuadrupleImmutable.BUFFER_4x64_A[3] = (QuadrupleImmutable.BUFFER_12x32[4] << 32) + QuadrupleImmutable.BUFFER_12x32[5];
-        return QuadrupleImmutable.BUFFER_4x64_A;
+        var buff1232 = buffers.get().BUFFER_12x32;
+        var buff464 = buffers.get().BUFFER_4x64_A;
+        buff464[1] = (buff1232[0] << 32) + buff1232[1];
+        buff464[2] = (buff1232[2] << 32) + buff1232[3];
+        buff464[3] = (buff1232[4] << 32) + buff1232[5];
+        return buff464;
     }
 
     /**
