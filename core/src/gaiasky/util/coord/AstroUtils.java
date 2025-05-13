@@ -13,7 +13,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.LruCacheLong;
 import gaiasky.util.Nature;
 import gaiasky.util.Pair;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.time.*;
@@ -571,7 +571,7 @@ public class AstroUtils {
      * @param date The date.
      * @param out  The out vector with [lambda, beta, r] in radians and kilometres.
      */
-    public static void plutoEclipticCoordinates(Instant date, Vector3b out) {
+    public static void plutoEclipticCoordinates(Instant date, Vector3Q out) {
         if (Constants.notWithinVSOPTime(date.toEpochMilli()))
             return;
         plutoEclipticCoordinates(getDaysSinceJ2000(date), out);
@@ -584,7 +584,7 @@ public class AstroUtils {
      * @param d   Julian date.
      * @param out The out vector with [lambda, beta, r] in radians and kilometres.
      */
-    private static void plutoEclipticCoordinates(double d, Vector3b out) {
+    private static void plutoEclipticCoordinates(double d, Vector3Q out) {
         double S = FastMath.toRadians(50.03 + 0.033459652 * d);
         double P = FastMath.toRadians(238.95 + 0.003968789 * d);
 

@@ -19,7 +19,10 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.*;
+import gaiasky.util.math.Quadruple;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCDParser;
 import gaiasky.util.units.Quantity.Angle;
@@ -216,7 +219,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
     }
 
     private void addCluster(String[] names, double ra, double raRad, double dec, double decRad, double dist, double distPc, double muAlphaStar, double muDelta, double radVel, double radiusDeg, int nStars, Array<Entity> list) {
-        Vector3b pos = Coordinates.sphericalToCartesian(raRad, decRad, QuadrupleImmutable.from(dist), new Vector3b());
+        Vector3Q pos = Coordinates.sphericalToCartesian(raRad, decRad, Quadruple.from(dist), new Vector3Q());
 
         Vector3D pmv = Coordinates.properMotionsToCartesian(muAlphaStar, muDelta, radVel, FastMath.toRadians(ra), FastMath.toRadians(dec), distPc, new Vector3D());
 

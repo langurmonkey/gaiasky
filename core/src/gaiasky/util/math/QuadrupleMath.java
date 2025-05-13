@@ -37,7 +37,7 @@ public final class QuadrupleMath {
         // Fast fallback via double: accurate to double-precision (tests use doubleValue())
         double dv = x.doubleValue();
         double ad = Math.atan(dv);
-        return Quadruple.valueOf(Double.toString(ad));
+        return Quadruple.from(Double.toString(ad));
     }
 
     /**
@@ -49,7 +49,7 @@ public final class QuadrupleMath {
         double dy = y.doubleValue();
         double dx = x.doubleValue();
         double ad = Math.atan2(dy, dx);
-        return Quadruple.valueOf(Double.toString(ad));
+        return Quadruple.from(Double.toString(ad));
     }
 
 }

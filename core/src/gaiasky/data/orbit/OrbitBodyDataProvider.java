@@ -18,7 +18,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
@@ -36,7 +36,7 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
     private int i = 1;
     private PointCloudData data, data0, data1;
     private Trajectory trajectory;
-    private final Vector3b aux1 = new Vector3b();
+    private final Vector3Q aux1 = new Vector3Q();
     private final Vector3D aux2 = new Vector3D();
 
     @Override

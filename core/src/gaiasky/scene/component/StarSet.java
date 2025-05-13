@@ -13,7 +13,7 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 
 public class StarSet extends ParticleSet {
@@ -115,7 +115,7 @@ public class StarSet extends ParticleSet {
         return out.set(this.proximity.updating[0].pos);
     }
 
-    public Vector3b getClosestAbsolutePos(Vector3b out) {
+    public Vector3Q getClosestAbsolutePos(Vector3Q out) {
         return out.set(this.proximity.updating[0].absolutePos);
     }
 

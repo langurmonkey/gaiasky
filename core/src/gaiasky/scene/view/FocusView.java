@@ -39,8 +39,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     private final Vector3D D31 = new Vector3D();
     private final Vector3D D32 = new Vector3D();
-    private final Vector3b B31 = new Vector3b();
-    private final Vector3b B33 = new Vector3b();
+    private final Vector3Q B31 = new Vector3Q();
+    private final Vector3Q B33 = new Vector3Q();
     private final Matrix4 matAux = new Matrix4();
     private final Matrix4D matDAux = new Matrix4D();
     /**
@@ -344,7 +344,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getPos() {
+    public Vector3Q getPos() {
         return body.pos;
     }
 
@@ -390,7 +390,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getAbsolutePosition(Vector3b out) {
+    public Vector3Q getAbsolutePosition(Vector3Q out) {
         if (getSet() != null) {
             return getSet().getAbsolutePosition(out);
         } else {
@@ -399,8 +399,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getAbsolutePosition(String name,
-                                        Vector3b out) {
+    public Vector3Q getAbsolutePosition(String name,
+                                        Vector3Q out) {
         if (getSet() != null) {
             return getSet().getAbsolutePosition(name, out);
         } else {
@@ -420,7 +420,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public void getPositionAboveSurface(double longitude,
                                         double latitude,
                                         double distance,
-                                        Vector3b out) {
+                                        Vector3Q out) {
         Vector3D aux1 = D31;
         Vector3D aux2 = D32;
 
@@ -442,7 +442,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getClosestAbsolutePos(Vector3b out) {
+    public Vector3Q getClosestAbsolutePos(Vector3Q out) {
         if (starSet != null) {
             return out.set(starSet.proximity.updating[0].absolutePos);
         } else {
@@ -472,14 +472,14 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getPredictedPosition(Vector3b out,
+    public Vector3Q getPredictedPosition(Vector3Q out,
                                          ITimeFrameProvider time,
                                          ICamera unused,
                                          boolean force) {
         return getPredictedPosition(out, null, time, force);
     }
 
-    public Vector3b getPredictedPosition(Vector3b out,
+    public Vector3Q getPredictedPosition(Vector3Q out,
                                          String name,
                                          ITimeFrameProvider time,
                                          boolean force) {
@@ -502,7 +502,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public Vector3b getPredictedPosition(Vector3b out, double deltaTime) {
+    public Vector3Q getPredictedPosition(Vector3Q out, double deltaTime) {
         // Get a line copy of focus and update it.
         var copy = scene.getLineCopy(entity);
 
@@ -653,7 +653,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public double getElevationAt(Vector3b camPos) {
+    public double getElevationAt(Vector3Q camPos) {
         if (!isValid()) {
             return 0;
         }
@@ -665,13 +665,13 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public double getElevationAt(Vector3b camPos,
+    public double getElevationAt(Vector3Q camPos,
                                  boolean useFuturePosition) {
         if (isBillboard()) {
             return 0;
         } else if (isModel()) {
             if (useFuturePosition) {
-                Vector3b nextPos = getPredictedPosition(B33, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+                Vector3Q nextPos = getPredictedPosition(B33, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
                 return getElevationAt(camPos, nextPos);
             } else {
                 return getElevationAt(camPos, null);
@@ -682,8 +682,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public double getElevationAt(Vector3b camPos,
-                                 Vector3b nextPos) {
+    public double getElevationAt(Vector3Q camPos,
+                                 Vector3Q nextPos) {
         if (isBillboard()) {
             return 0;
         } else if (isModel()) {
@@ -693,7 +693,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             double height = 0;
             if (mc != null && mc.mtc != null && mc.mtc.heightData != null) {
                 double dCam;
-                Vector3b cart = B31;
+                Vector3Q cart = B31;
                 if (nextPos != null) {
                     cart.set(nextPos);
                     dCam = D32.set(camPos).sub(cart).len();

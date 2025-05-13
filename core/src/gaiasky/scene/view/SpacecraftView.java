@@ -22,7 +22,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.IBodyCoordinates;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 
 public class SpacecraftView extends BaseView implements ISpacecraft {
@@ -77,7 +77,7 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
         return engine.accel;
     }
 
-    public Vector3b pos() {
+    public Vector3Q pos() {
         return body.pos;
     }
 

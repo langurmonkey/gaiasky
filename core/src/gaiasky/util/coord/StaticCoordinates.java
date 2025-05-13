@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class StaticCoordinates implements IBodyCoordinates {
 
-    private Vector3b position;
+    private Vector3Q position;
     private String transformName;
     private Matrix4D trf;
 
@@ -34,17 +34,17 @@ public class StaticCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant date, Vector3Q out) {
         return out.set(position);
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant date, Vector3Q out) {
         return out.set(position);
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEquatorialCartesianCoordinates(Instant date, Vector3Q out) {
         return out.set(position);
     }
 
@@ -76,12 +76,12 @@ public class StaticCoordinates implements IBodyCoordinates {
         trf = new Matrix4D(transformMatrix);
     }
 
-    public Vector3b getPosition() {
+    public Vector3Q getPosition() {
         return position;
     }
 
-    public void setPosition(Vector3b pos) {
-        this.position = new Vector3b(pos);
+    public void setPosition(Vector3Q pos) {
+        this.position = new Vector3Q(pos);
     }
 
     public void setPosition(double[] position) {
@@ -89,7 +89,7 @@ public class StaticCoordinates implements IBodyCoordinates {
     }
 
     public void setPositionKm(double[] position) {
-        this.position = new Vector3b(position[0] * Constants.KM_TO_U, position[1] * Constants.KM_TO_U, position[2] * Constants.KM_TO_U);
+        this.position = new Vector3Q(position[0] * Constants.KM_TO_U, position[1] * Constants.KM_TO_U, position[2] * Constants.KM_TO_U);
     }
 
     public void setPositionkm(double[] position) {
@@ -97,24 +97,24 @@ public class StaticCoordinates implements IBodyCoordinates {
     }
 
     public void setPositionEquatorial(double[] position) {
-        this.position = new Vector3b();
+        this.position = new Vector3Q();
         this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD, position[1] * Nature.TO_RAD, position[2] * Constants.PC_TO_U, new Vector3D()));
     }
 
     public void setPositionGalactic(double[] position) {
-        this.position = new Vector3b();
+        this.position = new Vector3Q();
         this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD, position[1] * Nature.TO_RAD, position[2] * Constants.PC_TO_U, new Vector3D()));
         this.position.mul(Coordinates.galacticToEquatorial());
     }
 
     public void setPositionEcliptic(double[] position) {
-        this.position = new Vector3b();
+        this.position = new Vector3Q();
         this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD, position[1] * Nature.TO_RAD, position[2] * Constants.PC_TO_U, new Vector3D()));
         this.position.mul(Coordinates.eclipticToEquatorial());
     }
 
     public void setPositionPc(double[] position) {
-        this.position = new Vector3b(position[0] * Constants.PC_TO_U, position[1] * Constants.PC_TO_U, position[2] * Constants.PC_TO_U);
+        this.position = new Vector3Q(position[0] * Constants.PC_TO_U, position[1] * Constants.PC_TO_U, position[2] * Constants.PC_TO_U);
     }
 
     public void setPositionpc(double[] position) {
@@ -130,8 +130,8 @@ public class StaticCoordinates implements IBodyCoordinates {
         double ra = MathUtilsDouble.degRad * equatorial[0];
         double dec = MathUtilsDouble.degRad * equatorial[1];
         double dist = Constants.PC_TO_U * equatorial[2];
-        this.position = new Vector3b();
-        Coordinates.sphericalToCartesian(ra, dec, QuadrupleImmutable.from(dist), this.position);
+        this.position = new Vector3Q();
+        Coordinates.sphericalToCartesian(ra, dec, Quadruple.from(dist), this.position);
     }
 
     @Override

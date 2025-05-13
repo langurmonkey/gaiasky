@@ -18,7 +18,7 @@ import gaiasky.scene.entity.ConstellationRadio;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 
@@ -50,7 +50,7 @@ public class ConstellationInitializer extends AbstractInitSystem {
         label.label = true;
         label.renderConsumer = LabelEntityRenderSystem::renderConstellation;
         label.renderFunction = LabelView::renderTextBase;
-        label.labelPosition = new Vector3b();
+        label.labelPosition = new Vector3Q();
 
         // Lines.
         line.lineWidth = 1.5f;

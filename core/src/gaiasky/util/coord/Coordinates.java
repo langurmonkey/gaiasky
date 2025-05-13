@@ -423,7 +423,7 @@ public class Coordinates {
         return sphericalToCartesian(vec.x, vec.y, vec.z, out);
     }
 
-    public static Vector3b sphericalToCartesian(Vector3b vec, Vector3b out) {
+    public static Vector3Q sphericalToCartesian(Vector3Q vec, Vector3Q out) {
         return sphericalToCartesian(vec.x.doubleValue(), vec.y.doubleValue(), vec.z, out);
     }
 
@@ -462,10 +462,10 @@ public class Coordinates {
      * z are on the horizontal plane and y is in the up direction, for
      * chaining.
      */
-    public static Vector3b sphericalToCartesian(double longitude, double latitude, QuadrupleImmutable radius, Vector3b out) {
-        out.x = radius.multiply(QuadrupleImmutable.from(Math.cos(latitude) * FastMath.sin(longitude)));
-        out.y = radius.multiply(QuadrupleImmutable.from(Math.sin(latitude)));
-        out.z = radius.multiply(QuadrupleImmutable.from(Math.cos(latitude) * FastMath.cos(longitude)));
+    public static Vector3Q sphericalToCartesian(double longitude, double latitude, Quadruple radius, Vector3Q out) {
+        out.x.assign(radius).multiply(new Quadruple(Math.cos(latitude) * FastMath.sin(longitude)));
+        out.y.assign(radius).multiply(new Quadruple(Math.sin(latitude)));
+        out.z.assign(radius).multiply(new Quadruple(Math.cos(latitude) * FastMath.cos(longitude)));
         return out;
     }
 
@@ -535,7 +535,7 @@ public class Coordinates {
      * <li>The radius or distance to the point.</li>
      * </ol>
      */
-    public static Vector3D cartesianToSpherical(Vector3b vec, Vector3D out) {
+    public static Vector3D cartesianToSpherical(Vector3Q vec, Vector3D out) {
         /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
@@ -594,7 +594,7 @@ public class Coordinates {
      * <li>The radius or distance to the point.</li>
      * </ol>
      */
-    public static Vector3b cartesianToSpherical(Vector3b vec, Vector3b out) {
+    public static Vector3Q cartesianToSpherical(Vector3Q vec, Vector3Q out) {
         /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
@@ -608,22 +608,22 @@ public class Coordinates {
          * math.sqrt(xsq + ysq))
          */
 
-        var xsq = vec.x.multiply(vec.x);
-        var ysq = vec.y.multiply(vec.y);
-        var zsq = vec.z.multiply(vec.z);
-        var distance = xsq.add(ysq).add(zsq).sqrt();
+        Quadruple xsq = vec.x.multiply(vec.x);
+        Quadruple ysq = vec.y.multiply(vec.y);
+        Quadruple zsq = vec.z.multiply(vec.z);
+        Quadruple distance = xsq.add(ysq).add(zsq).sqrt();
 
-        var alpha = QuadrupleImmutableMath.atan2(vec.x, vec.z);
+        Quadruple alpha = QuadrupleMath.atan2(vec.x, vec.z);
         if (alpha.doubleValue() < 0) {
-            alpha.add(QuadrupleImmutableMath.PI_2);
+            alpha.add(QuadrupleMath.pi2());
         }
 
-        QuadrupleImmutable delta;
+        Quadruple delta;
         if (zsq.add(xsq).doubleValue() == 0) {
-            var piOverTwo = QuadrupleImmutableMath.PI_OVER_2;
-            delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(QuadrupleImmutable.from(-1.0)));
+            Quadruple piOverTwo = QuadrupleMath.piOver2();
+            delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(Quadruple.from(-1.0)));
         } else {
-            delta = QuadrupleImmutableMath.atan(vec.y.divide(zsq.add(xsq).sqrt()));
+            delta = QuadrupleMath.atan(vec.y.divide(zsq.add(xsq).sqrt()));
         }
 
         return out.set(alpha, delta, distance);

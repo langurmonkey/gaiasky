@@ -29,7 +29,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class GridRecInitializer extends AbstractInitSystem {
         label.labelFactor = 2e-3f;
         label.labelMax = 1f;
         label.label = true;
-        label.labelPosition = new Vector3b();
+        label.labelPosition = new Vector3Q();
         label.renderConsumer = LabelEntityRenderSystem::renderRecursiveGrid;
         label.renderFunction = LabelView::renderTextGridRec;
 

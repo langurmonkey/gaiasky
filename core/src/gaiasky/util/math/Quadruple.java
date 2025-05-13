@@ -22,8 +22,8 @@ import java.util.Arrays;
 /**
  * Quadruple-precision floating-point implementation. I have removed unnecessary methods (most of BigDecimal stuff)
  * and cleaned up the code (remove unneeded comments, fixed typos, delete unnecessary return statements
- * and parameters, etc.). The string parsing utilities, as well as the string conversions, are taken
- * out to {@link QuadrupleParser} class. I have also made the class thread-safe by wrapping the working
+ * and parameters, etc.). The string parsing utilities, as well as the string conversions, have been moved
+ * to {@link QuadrupleParser}. I have also made the class thread-safe by wrapping the working
  * buffers around with a {@link ThreadLocal}.
  * <p>
  * Original code by M. Vokhmentsev, see this <a href='https://github.com/m-vokhm/Quadruple'>repository</a>.
@@ -241,7 +241,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @see #assign(String)
      */
-    public static Quadruple valueOf(String strValue) {
+    public static Quadruple from(String strValue) {
         return new Quadruple(strValue);
     }
 
@@ -252,7 +252,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @param lValue the {@code long} value to be assigned
      */
-    public static Quadruple valueOf(long lValue) {
+    public static Quadruple from(long lValue) {
         return new Quadruple(lValue);
     }
 
@@ -263,7 +263,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @param dValue the {@code double} value to be assigned
      */
-    public static Quadruple valueOf(double dValue) {
+    public static Quadruple from(double dValue) {
         return new Quadruple(dValue);
     }
 

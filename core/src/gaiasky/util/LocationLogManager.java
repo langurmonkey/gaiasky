@@ -15,7 +15,7 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -101,7 +101,7 @@ public class LocationLogManager implements IObserver {
                 record.name = name;
                 record.entryTime = entryTime;
                 record.simulationTime = simulationTime;
-                record.position = new Vector3b().set(camera.getPos());
+                record.position = new Vector3Q().set(camera.getPos());
                 record.direction = new Vector3D().set(camera.getDirection());
                 record.up = new Vector3D().set(camera.getUp());
 
@@ -129,7 +129,7 @@ public class LocationLogManager implements IObserver {
      */
     public static class LocationRecord {
         public String name;
-        public Vector3b position;
+        public Vector3Q position;
         public Vector3D direction;
         public Vector3D up;
         public Instant simulationTime;

@@ -17,7 +17,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -70,7 +70,7 @@ public class Camcorder implements IObserver {
     }
 
     public void update(ITimeFrameProvider time,
-                       Vector3b position,
+                       Vector3Q position,
                        Vector3D direction,
                        Vector3D up) {
         switch (mode.get()) {
@@ -300,7 +300,7 @@ public class Camcorder implements IObserver {
             case UPDATE_CAM_RECORDER -> {
                 // Update with current position
                 ITimeFrameProvider dt = (ITimeFrameProvider) data[0];
-                Vector3b pos = (Vector3b) data[1];
+                Vector3Q pos = (Vector3Q) data[1];
                 Vector3D dir = (Vector3D) data[2];
                 Vector3D up = (Vector3D) data[3];
                 update(dt, pos, dir, up);

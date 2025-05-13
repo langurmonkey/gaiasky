@@ -24,7 +24,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
@@ -32,7 +32,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
 
     private final Vector3D D33, D34;
     private final Vector3 F31, F34;
-    private final Vector3b B31;
+    private final Vector3Q B31;
 
     private final Matrix4D mat4;
 
@@ -43,7 +43,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         D34 = new Vector3D();
         F31 = new Vector3();
         F34 = new Vector3();
-        B31 = new Vector3b();
+        B31 = new Vector3Q();
         mat4 = new Matrix4D();
     }
 
@@ -170,7 +170,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         Matrix4D inv = tr.matrix;
         Matrix4D trf = inv != null ? mat4.set(inv).inv() : mat4.idt();
         camera.getPos().put(cPos).mul(trf);
-        Vector3b v3b = new Vector3b(fPos);
+        Vector3Q v3b = new Vector3Q(fPos);
         focus.getPredictedPosition(v3b, GaiaSky.instance.time, camera, false).mul(trf);
         v3b.put(fPos).sub(cPos);
     }

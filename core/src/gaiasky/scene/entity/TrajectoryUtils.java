@@ -17,7 +17,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 
 import java.time.Instant;
@@ -29,12 +29,12 @@ public class TrajectoryUtils {
      * The trajectory refresher daemon.
      **/
     public static OrbitRefresher orbitRefresher;
-    private final Vector3b B31, B32;
+    private final Vector3Q B31, B32;
     private final Vector3D D31, D32, D33;
 
     public TrajectoryUtils() {
-        B31 = new Vector3b();
-        B32 = new Vector3b();
+        B31 = new Vector3Q();
+        B32 = new Vector3Q();
         D31 = new Vector3D();
         D32 = new Vector3D();
         D33 = new Vector3D();
@@ -97,7 +97,7 @@ public class TrajectoryUtils {
             return;
         Coordinates coord = Mapper.coordinates.get(parent);
         // Compute new transform function from the orbit's parent position
-        Vector3b barycenter = B31;
+        Vector3Q barycenter = B31;
         if (coord != null && coord.coordinates != null) {
             coord.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), barycenter);
         } else {
@@ -105,7 +105,7 @@ public class TrajectoryUtils {
         }
 
         // Up
-        Vector3b y = B32.set(barycenter).nor();
+        Vector3Q y = B32.set(barycenter).nor();
         Vector3D yd = y.put(D31);
         // Towards north - intersect y with plane
         Vector3D zd = D32;

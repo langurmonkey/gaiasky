@@ -27,7 +27,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
@@ -41,7 +41,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
     private final Random rand;
     private final Vector3 aux1f;
     private final Vector3D aux1, aux2, aux5;
-    private final Vector3b aux1b;
+    private final Vector3Q aux1b;
     private final ComponentTypes ct;
     private final Vector3[] positions;
     private final Vector3[] additional;
@@ -55,7 +55,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
         aux1 = new Vector3D();
         aux2 = new Vector3D();
         aux5 = new Vector3D();
-        aux1b = new Vector3b();
+        aux1b = new Vector3Q();
         rand = new Random(123);
         baseTime = System.currentTimeMillis();
         ct = new ComponentTypes(ComponentType.valueOf("Effects"));

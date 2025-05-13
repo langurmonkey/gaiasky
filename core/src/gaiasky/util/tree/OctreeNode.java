@@ -21,7 +21,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
@@ -613,7 +613,7 @@ public class OctreeNode implements ILineRenderable {
      *                        star
      *                        group according to the current view angle.
      */
-    public void update(Vector3b parentTransform,
+    public void update(Vector3Q parentTransform,
                        ICamera cam,
                        List<IOctreeObject> roulette,
                        float opacity,

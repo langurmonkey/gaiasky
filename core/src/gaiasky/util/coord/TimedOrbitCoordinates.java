@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Pool;
 import gaiasky.scene.Scene;
 import gaiasky.util.Logger;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
 import java.util.Map;
@@ -71,17 +71,17 @@ public class TimedOrbitCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant instant, Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant instant, Vector3Q out) {
         return coordinates.getEclipticSphericalCoordinates(instant, out);
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant instant, Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant instant, Vector3Q out) {
         return coordinates.getEclipticCartesianCoordinates(instant, out);
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out) {
+    public Vector3Q getEquatorialCartesianCoordinates(Instant instant, Vector3Q out) {
         return coordinates.getEquatorialCartesianCoordinates(instant, out);
     }
 
