@@ -3,8 +3,7 @@ package gaiasky.util.math;
 import java.util.Arrays;
 
 /**
- * Immutable version of {@link QuadrupleImmutable} implemented as a Java record.
- * This class is thread-safe.
+ * Immutable, thread-safe version of {@link Quadruple} implemented as a Java record.
  * <p>
  * A floating-point number with a 128-bit fractional part of the mantissa and 32-bit
  * exponent. Normal values range from approximately {@code 2.271e-646456993}

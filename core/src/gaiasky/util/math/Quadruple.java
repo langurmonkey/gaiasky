@@ -24,7 +24,7 @@ import java.util.Arrays;
  * and cleaned up the code (remove unneeded comments, fixed typos, delete unnecessary return statements
  * and parameters, etc.). The string parsing utilities, as well as the string conversions, are taken
  * out to {@link QuadrupleParser} class. I have also made the class thread-safe by wrapping the working
- * buffers within a {@link ThreadLocal}.
+ * buffers around with a {@link ThreadLocal}.
  * <p>
  * Original code by M. Vokhmentsev, see this <a href='https://github.com/m-vokhm/Quadruple'>repository</a>.
  * <p>
