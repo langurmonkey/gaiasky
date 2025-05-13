@@ -2310,9 +2310,6 @@ public class Settings extends SettingsObject {
             if (locale == null || locale.isEmpty()) {
                 locale = Locale.getDefault().toLanguageTag();
             }
-            if (locale == null) {
-                locale = getDefaultLocale();
-            }
             return locale;
         }
 
