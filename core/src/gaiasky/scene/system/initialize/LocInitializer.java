@@ -15,7 +15,7 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 public class LocInitializer extends AbstractInitSystem {
 
@@ -41,7 +41,7 @@ public class LocInitializer extends AbstractInitSystem {
         label.renderConsumer = LabelEntityRenderSystem::renderLocation;
         label.depthBufferConsumer = LabelView::noTextDepthBuffer;
         label.renderFunction = LabelView::renderTextLocation;
-        label.labelPosition = new Vector3b();
+        label.labelPosition = new Vector3Q();
 
         if (body.color == null) {
             // Default maker color.

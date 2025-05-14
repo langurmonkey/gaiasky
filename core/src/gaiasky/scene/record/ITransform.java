@@ -8,12 +8,12 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public interface ITransform {
     void apply(Matrix4 mat);
 
-    void apply(Matrix4d mat);
+    void apply(Matrix4D mat);
 
     ITransform copy();
 }

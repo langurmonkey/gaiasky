@@ -22,8 +22,8 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.camera.Proximity.NearbyRecord;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public abstract class AbstractCamera implements ICamera {
@@ -35,8 +35,8 @@ public abstract class AbstractCamera implements ICamera {
     /** Camera far value. **/
     public double CAM_FAR;
 
-    public Vector3b pos, posInv, prevPos, dPos;
-    public Vector3d tmp, shift;
+    public Vector3Q pos, posInv, prevPos, dPos;
+    public Vector3D tmp, shift;
     /**
      * The main camera.
      **/
@@ -91,12 +91,12 @@ public abstract class AbstractCamera implements ICamera {
         initNearFar();
 
         this.parent = parent;
-        pos = new Vector3b();
-        prevPos = new Vector3b();
-        dPos = new Vector3b();
-        posInv = new Vector3b();
-        shift = new Vector3d();
-        tmp = new Vector3d();
+        pos = new Vector3Q();
+        prevPos = new Vector3Q();
+        dPos = new Vector3Q();
+        posInv = new Vector3Q();
+        shift = new Vector3D();
+        tmp = new Vector3D();
         prevCombined = new Matrix4();
 
         camLeft = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
@@ -136,52 +136,52 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3b getPos() {
+    public Vector3Q getPos() {
         return pos;
     }
 
     @Override
-    public void setPos(Vector3d pos) {
+    public void setPos(Vector3D pos) {
         this.pos.set(pos);
     }
 
     @Override
-    public void setPos(Vector3b pos) {
+    public void setPos(Vector3Q pos) {
         this.pos.set(pos);
     }
 
     @Override
-    public Vector3b getPreviousPos() {
+    public Vector3Q getPreviousPos() {
         return prevPos;
     }
 
     @Override
-    public void setPreviousPos(Vector3b pos) {
+    public void setPreviousPos(Vector3Q pos) {
         this.prevPos.set(pos);
     }
 
     @Override
-    public void setPreviousPos(Vector3d prevpos) {
+    public void setPreviousPos(Vector3D prevpos) {
         this.prevPos.set(prevpos);
     }
 
     @Override
-    public void setDPos(Vector3b dPos) {
+    public void setDPos(Vector3Q dPos) {
         this.dPos.set(dPos);
     }
 
     @Override
-    public void setDPos(Vector3d dPos) {
+    public void setDPos(Vector3D dPos) {
         this.dPos.set(dPos);
     }
 
     @Override
-    public Vector3b getDPos() {
+    public Vector3Q getDPos() {
         return dPos;
     }
 
     @Override
-    public Vector3b getInversePos() {
+    public Vector3Q getInversePos() {
         return posInv;
     }
 
@@ -213,11 +213,11 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public boolean isVisible(double viewAngle, Vector3d pos, double distToCamera) {
+    public boolean isVisible(double viewAngle, Vector3D pos, double distToCamera) {
         return (viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
     }
 
-    public boolean isVisible(double viewAngle, Vector3b pos, double distToCamera) {
+    public boolean isVisible(double viewAngle, Vector3Q pos, double distToCamera) {
         return (viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
     }
 
@@ -266,12 +266,12 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3d getShift() {
+    public Vector3D getShift() {
         return this.shift;
     }
 
     @Override
-    public void setShift(Vector3d shift) {
+    public void setShift(Vector3D shift) {
         this.shift.set(shift);
     }
 
@@ -363,7 +363,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3d getVelocity() {
+    public Vector3D getVelocity() {
         return null;
     }
 

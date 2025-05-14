@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.TextureArray;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -20,10 +21,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.FilterView;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
-import gaiasky.util.Nature;
+import gaiasky.util.*;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -35,8 +33,10 @@ import uk.ac.starlink.table.ColumnInfo;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class ParticleSet implements Component, IDisposable {
 
@@ -47,10 +47,10 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     // Auxiliary vectors.
-    protected final Vector3b B31 = new Vector3b();
-    protected final Vector3b B32 = new Vector3b();
-    protected final Vector3d D31 = new Vector3d();
-    protected final Vector3d D32 = new Vector3d();
+    protected final Vector3Q B31 = new Vector3Q();
+    protected final Vector3Q B32 = new Vector3Q();
+    protected final Vector3D D31 = new Vector3D();
+    protected final Vector3D D32 = new Vector3D();
 
     /**
      * List that contains the point data. It contains only [x y z].
@@ -212,7 +212,7 @@ public class ParticleSet implements Component, IDisposable {
      * Temporary storage for the mean position of this particle set, if it is given externally.
      * If this is set, the mean position is not computed from the positions of all the particles automatically.
      **/
-    public Vector3d meanPosition;
+    public Vector3D meanPosition;
 
     /**
      * Factor to apply to the data points, usually to normalise distances.
@@ -227,12 +227,12 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Particles for which forceLabel is enabled.
      **/
-    public Set<Integer> forceLabel;
+    public IntSet forceLabel;
 
     /**
      * Particles with special label colors.
      **/
-    public Map<Integer, float[]> labelColors;
+    public IntMap<float[]> labelColors;
 
     /**
      * Stores the time when the last sort operation finished, in seconds.
@@ -274,12 +274,12 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Position of the current focus.
      */
-    public Vector3b focusPosition;
+    public Vector3Q focusPosition;
 
     /**
      * Position in equatorial coordinates of the current focus in radians.
      */
-    public Vector2d focusPositionSph;
+    public Vector2D focusPositionSph;
 
     /**
      * FOCUS_MODE attributes.
@@ -293,7 +293,7 @@ public class ParticleSet implements Component, IDisposable {
     // Has been disposed.
     public boolean disposed = false;
     // Name index.
-    public Map<String, Integer> index;
+    public FastObjectIntMap<String> index;
     private final Object indexSync = new Object();
     // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
@@ -310,9 +310,9 @@ public class ParticleSet implements Component, IDisposable {
     public ParticleSetUpdaterTask updaterTask;
 
     // Last sort position.
-    public Vector3b lastSortCameraPos, cPosD;
+    public Vector3Q lastSortCameraPos, cPosD;
     // Auxiliary matrix.
-    protected final Matrix4d mat = new Matrix4d();
+    protected final Matrix4D mat = new Matrix4D();
 
     public float[] getColorMin() {
         return ccMin;
@@ -391,8 +391,8 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return An map{string,int} mapping names to indices
      */
-    public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
-        Map<String, Integer> index = new ConcurrentHashMap<>((int) (pointData.size() * 1.25));
+    public FastObjectIntMap<String> generateIndex(List<IParticleRecord> pointData) {
+        FastObjectIntMap<String> index = new FastObjectIntMap<>((int) (pointData.size() * 1.25f), String.class);
         synchronized (indexSync) {
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
@@ -408,7 +408,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setMeanPosition(double[] pos) {
-        this.meanPosition = new Vector3d(pos[0], pos[1], pos[2]);
+        this.meanPosition = new Vector3D(pos[0], pos[1], pos[2]);
     }
 
     public void setPosition(double[] pos) {
@@ -420,7 +420,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setMeanPositionKm(double[] pos) {
-        this.meanPosition = new Vector3d(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
+        this.meanPosition = new Vector3D(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
     }
 
     public void setPositionKm(double[] pos) {
@@ -432,7 +432,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setMeanPositionPc(double[] pos) {
-        this.meanPosition = new Vector3d(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
+        this.meanPosition = new Vector3D(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
     }
 
     public void setPositionPc(double[] pos) {
@@ -672,8 +672,8 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setFocusIndex(String name) {
         synchronized (indexSync) {
-            candidateFocusIndex = index.getOrDefault(name.toLowerCase()
-                                                             .trim(), -1);
+            candidateFocusIndex = index.get(name.toLowerCase()
+                                                             .trim());
         }
     }
 
@@ -705,7 +705,7 @@ public class ParticleSet implements Component, IDisposable {
      */
     public void updateFocus(ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
-        Vector3b aux = this.fetchPosition(focus, cPosD, B31, currDeltaYears);
+        Vector3Q aux = this.fetchPosition(focus, cPosD, B31, currDeltaYears);
         this.focusPosition.set(aux)
                 .add(camera.getPos());
         this.focusDistToCamera = aux.lenDouble();
@@ -720,7 +720,7 @@ public class ParticleSet implements Component, IDisposable {
         } else {
             focus = pointData.get(focusIndex);
             updateFocus(GaiaSky.instance.getICamera());
-            Vector3d posSph = Coordinates.cartesianToSpherical(focusPosition, D31);
+            Vector3D posSph = Coordinates.cartesianToSpherical(focusPosition, D31);
             focusPositionSph.set((float) (MathUtilsDouble.radDeg * posSph.x), (float) (MathUtilsDouble.radDeg * posSph.y));
         }
     }
@@ -793,9 +793,9 @@ public class ParticleSet implements Component, IDisposable {
      * @param date The date at which to get the position. If null, the position is given at the current simulation date.
      * @param out  The out vector.
      **/
-    public Vector3b getAbsolutePosition(String name,
+    public Vector3Q getAbsolutePosition(String name,
                                         Instant date,
-                                        Vector3b out) {
+                                        Vector3Q out) {
         name = name.toLowerCase()
                 .trim();
         synchronized (indexSync) {
@@ -818,12 +818,12 @@ public class ParticleSet implements Component, IDisposable {
      *               date.
      * @param out    The out vector.
      **/
-    public Vector3b getAbsolutePosition(IParticleRecord object,
+    public Vector3Q getAbsolutePosition(IParticleRecord object,
                                         Instant date,
-                                        Vector3b out) {
+                                        Vector3Q out) {
         if (object.hasProperMotion()) {
             double deltaYears = AstroUtils.getMsSince(date == null ? GaiaSky.instance.time.getTime() : date, epochJd) * Nature.MS_TO_Y;
-            Vector3b aux = this.fetchPosition(object, null, B31, deltaYears);
+            Vector3Q aux = this.fetchPosition(object, null, B31, deltaYears);
             return out.set(aux);
         } else {
             return getAbsolutePosition(out);
@@ -836,8 +836,8 @@ public class ParticleSet implements Component, IDisposable {
      * @param date The date at which to get the position. If null, the position is given at the current simulation date.
      * @param out  The out vector.
      **/
-    public Vector3b getAbsolutePosition(Instant date,
-                                        Vector3b out) {
+    public Vector3Q getAbsolutePosition(Instant date,
+                                        Vector3Q out) {
         IParticleRecord focus = pointData.get(focusIndex);
         return getAbsolutePosition(focus, date, out);
     }
@@ -845,7 +845,7 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Returns the current focus position, if any, in the out vector.
      **/
-    public Vector3b getAbsolutePosition(Vector3b out) {
+    public Vector3Q getAbsolutePosition(Vector3Q out) {
         if (entity != null && Mapper.affine.has(entity) && focusIndex >= 0 && focusIndex < pointData.size()) {
             IParticleRecord focus = pointData.get(focusIndex);
             return fetchPosition(focus, null, out, currDeltaYears);
@@ -862,8 +862,8 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return The absolute position in the out vector.
      */
-    public Vector3b getAbsolutePosition(String name,
-                                        Vector3b out) {
+    public Vector3Q getAbsolutePosition(String name,
+                                        Vector3Q out) {
         name = name.toLowerCase()
                 .trim();
         synchronized (indexSync) {
@@ -886,8 +886,8 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return The absolute position in the out vector.
      */
-    public Vector3d getAbsolutePosition(String name,
-                                        Vector3d out) {
+    public Vector3D getAbsolutePosition(String name,
+                                        Vector3D out) {
         var result = getAbsolutePosition(name, B32);
         if (result != null) {
             out.set(result);
@@ -911,18 +911,18 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return The vector for chaining
      */
-    public Vector3d fetchPositionDouble(IParticleRecord pb,
-                                        Vector3b camPos,
-                                        Vector3d out,
+    public Vector3D fetchPositionDouble(IParticleRecord pb,
+                                        Vector3Q camPos,
+                                        Vector3D out,
                                         double deltaYears) {
-        Vector3d pm = D32.set(0, 0, 0);
+        Vector3D pm = D32.set(0, 0, 0);
         if (pb.hasProperMotion()) {
             pm.set(pb.vx(),
                    pb.vy(),
                    pb.vz())
                     .scl(deltaYears);
         }
-        Vector3d destination = out.set(pb.x(), pb.y(), pb.z());
+        Vector3D destination = out.set(pb.x(), pb.y(), pb.z());
         // Apply affine transformations, if any.
         if (entity != null) {
             var affine = Mapper.affine.get(entity);
@@ -955,11 +955,11 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @return The vector for chaining.
      */
-    public Vector3b fetchPosition(IParticleRecord pb,
-                                  Vector3b camPos,
-                                  Vector3b out,
+    public Vector3Q fetchPosition(IParticleRecord pb,
+                                  Vector3Q camPos,
+                                  Vector3Q out,
                                   double deltaYears) {
-        Vector3d pm = D32;
+        Vector3D pm = D32;
         if (pb.hasProperMotion()) {
             pm.set(pb.vx(),
                    pb.vy(),
@@ -1087,7 +1087,7 @@ public class ParticleSet implements Component, IDisposable {
     public double getSolidAngleApparent(int idx) {
         if (idx >= 0 && idx < pointData.size()) {
             IParticleRecord candidate = pointData.get(idx);
-            Vector3d aux = candidate.pos(D31);
+            Vector3D aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
             float size = candidate.hasSize() ? candidate.size() : 0.5e2f;
             return (float) ((size / aux.sub(camera.getPos())
@@ -1105,7 +1105,7 @@ public class ParticleSet implements Component, IDisposable {
         return candidateFocusIndex < 0 || candidateFocusIndex >= pointData.size() || view.filter(candidateFocusIndex);
     }
 
-    public Vector2d getPosSph() {
+    public Vector2D getPosSph() {
         return focusPositionSph;
     }
 

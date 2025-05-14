@@ -19,7 +19,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.g2d.Sprite;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 /**
@@ -29,6 +29,7 @@ public class DecalUtils {
 
     static Vector3 tmp, tmp2, tmp3;
     static Matrix4 idt, aux1, aux2;
+    static Quaternion qAux;
 
     static {
         tmp = new Vector3();
@@ -37,6 +38,7 @@ public class DecalUtils {
         idt = new Matrix4();
         aux1 = new Matrix4();
         aux2 = new Matrix4();
+        qAux = new Quaternion();
     }
 
     /**
@@ -58,7 +60,17 @@ public class DecalUtils {
      * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
      * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
      */
-    public static void drawSprite(Sprite sprite, SpriteBatch batch, float x, float y, float z, double size, float rotationCenter, ICamera cam, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
+    public static void drawSprite(Sprite sprite,
+                                  SpriteBatch batch,
+                                  float x,
+                                  float y,
+                                  float z,
+                                  double size,
+                                  float rotationCenter,
+                                  ICamera cam,
+                                  boolean faceCamera,
+                                  float minSizeDegrees,
+                                  float maxSizeDegrees) {
         sprite.setPosition(0, 0);
         sprite.setCenter(0, 0);
         // Store batch matrices
@@ -66,17 +78,23 @@ public class DecalUtils {
         aux2.set(batch.getProjectionMatrix());
 
         Camera camera = cam.getCamera();
-        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
 
         if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
             double dist = camera.position.dst(tmp3.set(x, y, z));
-            double minsize = minSizeDegrees > 0 ? FastMath.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
-            double maxsize = maxSizeDegrees > 0 ? FastMath.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
-            size = MathUtils.clamp(size, (float) minsize, (float) maxsize);
+            double minSize = minSizeDegrees > 0 ? FastMath.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
+            double maxSize = maxSizeDegrees > 0 ? FastMath.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
+            size = MathUtils.clamp(size, (float) minSize, (float) maxSize);
         }
 
+        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up, qAux);
         float sizeF = (float) size;
-        batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(sizeF, sizeF, sizeF);
+        batch.getTransformMatrix()
+                .set(camera.combined)
+                .translate(x, y, z)
+                .rotate(rotation)
+                .rotate(0, 1, 0, 180)
+                .rotate(0, 0, 1, rotationCenter)
+                .scale(sizeF, sizeF, sizeF);
         // Force matrices to be set to shader
         batch.setProjectionMatrix(idt);
 
@@ -104,7 +122,16 @@ public class DecalUtils {
         drawFont3D(font, batch, text, position, 1f, camera, faceCamera);
     }
 
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float size, float rotationCenter, ICamera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font,
+                                  ExtSpriteBatch batch,
+                                  String text,
+                                  float x,
+                                  float y,
+                                  float z,
+                                  float size,
+                                  float rotationCenter,
+                                  ICamera camera,
+                                  boolean faceCamera) {
         drawFont3D(font, batch, text, x, y, z, size, rotationCenter, camera, faceCamera, -1, -1);
     }
 
@@ -128,13 +155,23 @@ public class DecalUtils {
      * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
      * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
      */
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, double size, float rotationCenter, ICamera cam, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
+    public static void drawFont3D(BitmapFont font,
+                                  ExtSpriteBatch batch,
+                                  String text,
+                                  float x,
+                                  float y,
+                                  float z,
+                                  double size,
+                                  float rotationCenter,
+                                  ICamera cam,
+                                  boolean faceCamera,
+                                  float minSizeDegrees,
+                                  float maxSizeDegrees) {
         // Store batch matrices
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
 
         Camera camera = cam.getCamera();
-        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
 
         if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
             double dist = camera.position.dst(tmp3.set(x, y, z));
@@ -143,6 +180,7 @@ public class DecalUtils {
             size = MathUtils.clamp(size, (float) minSize, (float) maxSize);
         }
 
+        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up, qAux);
         float sizeF = (float) size;
         batch.getTransformMatrix()
                 .set(camera.combined)
@@ -175,7 +213,13 @@ public class DecalUtils {
      * @param camera   The camera.
      * @param scale    The scale of the font.
      */
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, float scale, ICamera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font,
+                                  ExtSpriteBatch batch,
+                                  String text,
+                                  Vector3 position,
+                                  float scale,
+                                  ICamera camera,
+                                  boolean faceCamera) {
         drawFont3D(font, batch, text, position.x, position.y, position.z, scale, 0, camera, faceCamera);
     }
 
@@ -187,7 +231,14 @@ public class DecalUtils {
         font.draw(batch, text, x, y);
     }
 
-    public static void drawFont2D(BitmapFont font, ExtSpriteBatch batch, RenderingContext rc, String text, float x, float y, float scale, float width) {
+    public static void drawFont2D(BitmapFont font,
+                                  ExtSpriteBatch batch,
+                                  RenderingContext rc,
+                                  String text,
+                                  float x,
+                                  float y,
+                                  float scale,
+                                  float width) {
         drawFont2D(font, batch, rc, text, x, y, scale, -1);
     }
 
@@ -229,27 +280,18 @@ public class DecalUtils {
     }
 
     /**
-     * Gets the billboard rotation using the parameters of the given camera
-     *
-     * @param camera The camera
-     * @return The quaternion with the rotation
-     */
-    public static Quaternion getBillboardRotation(Camera camera) {
-        return getBillboardRotation(camera.direction, camera.up);
-    }
-
-    /**
      * Returns a Quaternion representing the billboard rotation to be applied to
      * a decal that is always to face the given direction and up vector
      *
      * @param direction The direction vector
      * @param up        The up vector
+     * @param out       The quaternion to put the result;
+     *
      * @return The quaternion with the rotation
      */
-    public static Quaternion getBillboardRotation(Vector3 direction, Vector3 up) {
-        Quaternion rotation = new Quaternion();
-        setBillboardRotation(rotation, direction, up);
-        return rotation;
+    public static Quaternion getBillboardRotation(Vector3 direction, Vector3 up, Quaternion out) {
+        setBillboardRotation(out, direction, up);
+        return out;
     }
 
     /**
@@ -273,7 +315,7 @@ public class DecalUtils {
      * @param direction the direction vector
      * @param up        the up vector
      */
-    public static void setBillboardRotation(Quaternion rotation, final Vector3d direction, final Vector3d up) {
+    public static void setBillboardRotation(Quaternion rotation, final Vector3D direction, final Vector3D up) {
         tmp.set((float) up.x, (float) up.y, (float) up.z).crs((float) direction.x, (float) direction.y, (float) direction.z).nor();
         tmp2.set((float) direction.x, (float) direction.y, (float) direction.z).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, (float) direction.x, tmp.y, tmp2.y, (float) direction.y, tmp.z, tmp2.z, (float) direction.z);

@@ -33,8 +33,8 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.math.BoundingBoxDouble;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.*;
@@ -66,8 +66,8 @@ public class ShadowMapRenderPass extends RenderPass {
     private static final IntSet DEBUG_UI_VIEW_LOCAL_SET = new IntSet();
 
     private Vector3 aux1;
-    private Vector3d aux1d, aux2d, aux3d;
-    private Vector3b aux1b, aux2b;
+    private Vector3D aux1d, aux2d, aux3d;
+    private Vector3Q aux1b, aux2b;
 
     public ShadowMapRenderPass(final SceneRenderer sceneRenderer) {
         super(sceneRenderer);
@@ -82,11 +82,11 @@ public class ShadowMapRenderPass extends RenderPass {
 
         // Aux vectors
         aux1 = new Vector3();
-        aux1d = new Vector3d();
-        aux2d = new Vector3d();
-        aux3d = new Vector3d();
-        aux1b = new Vector3b();
-        aux2b = new Vector3b();
+        aux1d = new Vector3D();
+        aux2d = new Vector3D();
+        aux3d = new Vector3D();
+        aux1b = new Vector3Q();
+        aux2b = new Vector3Q();
 
         // Build frame buffers and arrays
         buildShadowMapData();
@@ -155,7 +155,7 @@ public class ShadowMapRenderPass extends RenderPass {
             }
 
             // Position, factor of radius
-            Vector3d boxCenterAbsPos = box.getCenter(aux1d);
+            Vector3D boxCenterAbsPos = box.getCenter(aux1d);
             // Light direction depends on light.
             Vector3 lightDir = aux1;
             if (model.model.hasDirLight(0)) {
@@ -248,7 +248,7 @@ public class ShadowMapRenderPass extends RenderPass {
             double entitySpan = EntityUtils.getModelSpan(candidate);
             var distCamCenter = (entitySpan * 2.0 / FastMath.tan(FastMath.toRadians(cameraLightIndividual.fieldOfView)));
             // Position, factor of radius
-            Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
+            Vector3Q objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
             for (int j = 0; j < NUM_SHADOW_CASTING_LIGHTS; j++) {
                 // Light direction depends on light.
                 Vector3 lightDir = aux1;
@@ -370,15 +370,15 @@ public class ShadowMapRenderPass extends RenderPass {
                 double entitySpan = EntityUtils.getModelSpan(candidate);
                 var distCamCenter = (entitySpan * 2.0 / FastMath.tan(FastMath.toRadians(cameraLightIndividual.fieldOfView)));
                 // Position, factor of radius
-                Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
-                Vector3b camPos = camera.getPos();
-                Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
+                Vector3Q objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
+                Vector3Q camPos = camera.getPos();
+                Vector3D camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
                 boolean intersect = IntersectorDouble.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos.put(aux1d), radius);
                 if (intersect) {
                     // Use height
                     camDir.nor().scl(body.distToCamera - radius);
                 }
-                Vector3d objCam = aux2d.set(camPos).sub(objPos).nor().scl(-(body.distToCamera - radius)).add(camDir);
+                Vector3D objCam = aux2d.set(camPos).sub(objPos).nor().scl(-(body.distToCamera - radius)).add(camDir);
 
                 objCam.add(shadowCamDir.nor().scl((float) -distCamCenter));
                 objCam.put(cameraLightIndividual.position);

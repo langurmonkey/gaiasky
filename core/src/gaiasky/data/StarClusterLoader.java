@@ -17,12 +17,12 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Quadruple;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCDParser;
 import gaiasky.util.units.Quantity.Angle;
@@ -30,7 +30,6 @@ import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
 import net.jafama.FastMath;
-import org.apfloat.Apfloat;
 import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;
@@ -220,11 +219,11 @@ public class StarClusterLoader extends AbstractSceneLoader {
     }
 
     private void addCluster(String[] names, double ra, double raRad, double dec, double decRad, double dist, double distPc, double muAlphaStar, double muDelta, double radVel, double radiusDeg, int nStars, Array<Entity> list) {
-        Vector3b pos = Coordinates.sphericalToCartesian(raRad, decRad, new Apfloat(dist, Constants.PREC), new Vector3b());
+        Vector3Q pos = Coordinates.sphericalToCartesian(raRad, decRad, Quadruple.from(dist), new Vector3Q());
 
-        Vector3d pmv = Coordinates.properMotionsToCartesian(muAlphaStar, muDelta, radVel, FastMath.toRadians(ra), FastMath.toRadians(dec), distPc, new Vector3d());
+        Vector3D pmv = Coordinates.properMotionsToCartesian(muAlphaStar, muDelta, radVel, FastMath.toRadians(ra), FastMath.toRadians(dec), distPc, new Vector3D());
 
-        Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
+        Vector3D posSph = new Vector3D((float) ra, (float) dec, (float) dist);
         Vector3 pmSph = new Vector3((float) (muAlphaStar), (float) (muDelta), (float) radVel);
 
         // Create cluster archetype
@@ -238,7 +237,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
 
         var body = Mapper.body.get(entity);
         body.setPos(pos);
-        body.posSph = new Vector2d(posSph.x, posSph.y);
+        body.posSph = new Vector2D(posSph.x, posSph.y);
         body.setColor(Arrays.copyOf(clusterColor, clusterColor.length));
         body.setLabelColor(Arrays.copyOf(clusterColor, clusterColor.length));
 

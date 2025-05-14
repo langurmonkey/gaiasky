@@ -14,7 +14,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagNoProcess;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 public class KeyframeUtils {
 
@@ -37,7 +37,7 @@ public class KeyframeUtils {
         verts.glPrimitive = rg.isPoint() ? GL20.GL_POINTS : GL20.GL_LINE_STRIP;
 
         var graph = Mapper.graph.get(entity);
-        graph.translation = new Vector3b();
+        graph.translation = new Vector3Q();
 
         // First, initialize it.
         scene.initializeEntity(entity);

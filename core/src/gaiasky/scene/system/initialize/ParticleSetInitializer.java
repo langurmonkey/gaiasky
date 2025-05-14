@@ -12,6 +12,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
@@ -38,8 +39,8 @@ import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
 import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
 
@@ -146,11 +147,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (set.factor == null)
             set.factor = 1d;
         set.lastSortTime = -1;
-        set.cPosD = new Vector3b();
-        set.lastSortCameraPos = new Vector3b(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        set.cPosD = new Vector3Q();
+        set.lastSortCameraPos = new Vector3Q(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         set.proximity = new Proximity(Constants.N_DIR_LIGHTS);
-        set.focusPosition = new Vector3b();
-        set.focusPositionSph = new Vector2d();
+        set.focusPosition = new Vector3Q();
+        set.focusPositionSph = new Vector2D();
         set.entity = entity;
 
         // Default epochs, if not set
@@ -159,8 +160,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         }
 
         // Maps.
-        set.forceLabel = new HashSet<>();
-        set.labelColors = new HashMap<>();
+        set.forceLabel = new IntSet();
+        set.labelColors = new IntMap<>();
 
         // Labels.
         label.label = true;
@@ -379,7 +380,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             Label label = Mapper.label.get(entity);
             Body body = Mapper.body.get(entity);
             if (label.labelPosition == null) {
-                label.labelPosition = new Vector3b(body.pos);
+                label.labelPosition = new Vector3Q(body.pos);
             }
         } else {
             Base base = entity.getComponent(Base.class);

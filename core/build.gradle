@@ -12,19 +12,6 @@ java {
 }
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src']
-        }
-    }
-    test {
-        java {
-            srcDirs = ["test"]
-        }
-    }
-}
-
 project.ext.mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
 project.ext.workDir = new File("../")
 project.ext.assetsDir = new File(project.ext.workDir, "assets")
@@ -52,6 +39,23 @@ tasks.register('versionFile') {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        main {
+            output.resourcesDir = project.assetsDir.absolutePath
+        }
+    }
+    test {
+        java {
+            srcDirs = ["test"]
+        }
+    }
+}
+
+
 jar {
     dependsOn versionFile
     exclude('**/*.hiero')
@@ -61,14 +65,6 @@ jar {
 
 install4j {
     installDir = file("${System.properties['user.home']}/Programs/install4j11")
-}
-
-sourceSets {
-    main {
-        main {
-            output.resourcesDir = project.assetsDir.absolutePath
-        }
-    }
 }
 
 javadoc {
@@ -660,8 +656,14 @@ tasks.register('pack') {
     }
 }
 
-test {
-    useJUnit() // explicitly use the JUnit 4 test framework
+tasks.named('test', Test) {
+    useJUnit()
+
+    maxHeapSize = '1G'
+
+    testLogging {
+        events "passed"
+    }
 }
 
 eclipse {

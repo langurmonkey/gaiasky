@@ -11,7 +11,7 @@ package gaiasky;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class OrbitComponentTest {
         oc.meanAnomaly = 358.617;  // at epoch
         oc.mu =1.32712440018e11;
 
-        Vector3d out = new Vector3d();
+        Vector3D out = new Vector3D();
         Instant i = AstroUtils.julianDateToInstant(oc.epoch + 100.0);
         oc.loadDataPoint(out, i);
         out.scl(Constants.U_TO_KM);

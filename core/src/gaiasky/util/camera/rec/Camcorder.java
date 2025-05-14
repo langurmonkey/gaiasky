@@ -17,8 +17,8 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -37,7 +37,7 @@ public class Camcorder implements IObserver {
      **/
     public static Camcorder instance;
     private final DateFormat df;
-    Vector3d dir, upp, aux1, aux2;
+    Vector3D dir, upp, aux1, aux2;
     float time;
     private final AtomicReference<RecorderState> mode;
     private final AtomicReference<CameraPath> recordingPath, playingPath;
@@ -54,10 +54,10 @@ public class Camcorder implements IObserver {
 
         df = new SimpleDateFormat("yyyyMMdd_HH-mm-ss-SSS");
 
-        dir = new Vector3d();
-        upp = new Vector3d();
-        aux1 = new Vector3d();
-        aux2 = new Vector3d();
+        dir = new Vector3D();
+        upp = new Vector3D();
+        aux1 = new Vector3D();
+        aux2 = new Vector3D();
 
         EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.PLAY_CAMERA_CMD, Event.UPDATE_CAM_RECORDER);
     }
@@ -70,9 +70,9 @@ public class Camcorder implements IObserver {
     }
 
     public void update(ITimeFrameProvider time,
-                       Vector3b position,
-                       Vector3d direction,
-                       Vector3d up) {
+                       Vector3Q position,
+                       Vector3D direction,
+                       Vector3D up) {
         switch (mode.get()) {
             case RECORDING:
                 if (recordingPath.get() != null) {
@@ -300,9 +300,9 @@ public class Camcorder implements IObserver {
             case UPDATE_CAM_RECORDER -> {
                 // Update with current position
                 ITimeFrameProvider dt = (ITimeFrameProvider) data[0];
-                Vector3b pos = (Vector3b) data[1];
-                Vector3d dir = (Vector3d) data[2];
-                Vector3d up = (Vector3d) data[3];
+                Vector3Q pos = (Vector3Q) data[1];
+                Vector3D dir = (Vector3D) data[2];
+                Vector3D up = (Vector3D) data[3];
                 update(dt, pos, dir, up);
             }
             default -> {

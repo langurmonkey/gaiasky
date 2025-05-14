@@ -41,7 +41,7 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.IntAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.XrRenderer;
 import gaiasky.vr.openxr.XrViewManager;
@@ -169,13 +169,13 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
 
     private void setSurfacePosition(XrCompositionLayerProjectionView view) {
         viewManager.updateCamera(view, camera);
-        Vector3d dir = new Vector3d();
+        Vector3D dir = new Vector3D();
         dir.set(camera.direction);
-        float angle = (float) dir.angle(Vector3d.getUnitX());
+        float angle = (float) dir.angle(Vector3D.getUnitX());
         if (dir.z > 0) {
             angle = -angle;
         }
-        Vector3d pos = new Vector3d();
+        Vector3D pos = new Vector3D();
         pos.set(camera.position);
         dir.y = 0;
         pos.add(dir.nor().scl(1.5f));

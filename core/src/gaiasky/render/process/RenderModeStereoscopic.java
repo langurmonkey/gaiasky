@@ -32,7 +32,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.HashMap;
@@ -59,11 +59,11 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     private final Vector3 aux1;
     private final Vector3 aux2;
     private final Vector3 aux3;
-    private final Vector3d aux1d;
-    private final Vector3d aux2d;
-    private final Vector3d aux3d;
-    private final Vector3d aux4d;
-    private final Vector3d aux5d;
+    private final Vector3D aux1d;
+    private final Vector3D aux2d;
+    private final Vector3D aux3d;
+    private final Vector3D aux4d;
+    private final Vector3D aux5d;
     /**
      * Frame buffers for 3D mode (screen, screenshot, frame output)
      **/
@@ -91,11 +91,11 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         aux1 = new Vector3();
         aux2 = new Vector3();
         aux3 = new Vector3();
-        aux1d = new Vector3d();
-        aux2d = new Vector3d();
-        aux3d = new Vector3d();
-        aux4d = new Vector3d();
-        aux5d = new Vector3d();
+        aux1d = new Vector3D();
+        aux2d = new Vector3D();
+        aux3d = new Vector3D();
+        aux4d = new Vector3D();
+        aux5d = new Vector3D();
 
         EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE);
     }
@@ -137,12 +137,12 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         // Aux5d contains the direction to the side of the camera, normalized.
         aux5d.set(camera.getDirection()).crs(camera.getUp()).nor();
 
-        Vector3d side = aux4d.set(aux5d).nor().scl(separation);
-        Vector3d sideRemainder = aux2d.set(aux5d).scl(separation - separationCapped);
-        Vector3d sideCapped = aux3d.set(aux5d).nor().scl(separationCapped);
+        Vector3D side = aux4d.set(aux5d).nor().scl(separation);
+        Vector3D sideRemainder = aux2d.set(aux5d).scl(separation - separationCapped);
+        Vector3D sideCapped = aux3d.set(aux5d).nor().scl(separationCapped);
         Vector3 backupPos = aux2.set(perspectiveCam.position);
         Vector3 backupDir = aux3.set(perspectiveCam.direction);
-        Vector3d backupPosd = aux1d.set(camera.getPos());
+        Vector3D backupPosd = aux1d.set(camera.getPos());
 
         if (Settings.settings.program.modeStereo.profile.isAnaglyph()) {
             // Update viewport.
@@ -323,13 +323,13 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
     }
 
-    private void restoreCameras(ICamera camera, PerspectiveCamera cam, Vector3d backupPosd, Vector3 backupPos, Vector3 backupDir) {
+    private void restoreCameras(ICamera camera, PerspectiveCamera cam, Vector3D backupPosd, Vector3 backupPos, Vector3 backupDir) {
         camera.setPos(backupPosd);
         cam.position.set(backupPos);
         cam.direction.set(backupDir);
     }
 
-    private void moveCamera(ICamera camera, Vector3d sideRemainder, Vector3d side, Vector3d sideCapped, double angle, boolean switchSides) {
+    private void moveCamera(ICamera camera, Vector3D sideRemainder, Vector3D side, Vector3D sideCapped, double angle, boolean switchSides) {
         PerspectiveCamera cam = camera.getCamera();
         Vector3 sideFloat = sideCapped.put(aux1);
 

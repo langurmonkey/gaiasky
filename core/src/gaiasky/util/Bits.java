@@ -286,7 +286,7 @@ public class Bits {
     }
 
     /**
-     * Clears all of the bits in this bit set whose corresponding bit is set in the specified bit set.
+     * Clears all the bits in this bit set whose corresponding bit is set in the specified bit set.
      *
      * @param other a bit set
      */

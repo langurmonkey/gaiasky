@@ -7,7 +7,7 @@
 
 package gaiasky.util.gaia.utils;
 
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class ComplexArea implements Area {
      */
     @Override
     public Place getMidPoint() {
-        Vector3d sum = new Vector3d();
+        Vector3D sum = new Vector3D();
         for (Area a : listOfAreas) {
             sum.scaleAdd(a.getWeight(), a.getMidPoint().getDirection());
         }

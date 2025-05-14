@@ -17,10 +17,10 @@ import gaiasky.GaiaSky;
 import gaiasky.gui.api.IMinimapScale;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 
 public abstract class AbstractMinimapScale implements IMinimapScale {
     protected OrthographicCamera ortho;
@@ -34,11 +34,11 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     /** Conversions to and from internal units **/
     protected double to, from;
 
-    protected Vector3d aux3d1, aux3d2;
-    protected Vector3b aux3b1, aux3b2;
-    protected Vector2d aux2d1, aux2d2;
+    protected Vector3D aux3d1, aux3d2;
+    protected Vector3Q aux3b1, aux3b2;
+    protected Vector2D aux2d1, aux2d2;
 
-    protected Matrix4d trans;
+    protected Matrix4D trans;
 
     protected Color sunc, camc, textbc, textrc, textgc, textyc, textcc, textmc;
     protected float[] camp, camd;
@@ -48,12 +48,12 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     protected ICamera cam;
 
     protected AbstractMinimapScale() {
-        aux3d1 = new Vector3d();
-        aux3d2 = new Vector3d();
-        aux3b1 = new Vector3b();
-        aux3b2 = new Vector3b();
-        aux2d1 = new Vector2d();
-        aux2d2 = new Vector2d();
+        aux3d1 = new Vector3D();
+        aux3d2 = new Vector3D();
+        aux3b1 = new Vector3Q();
+        aux3b2 = new Vector3Q();
+        aux2d1 = new Vector2D();
+        aux2d2 = new Vector2D();
     }
 
     protected void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort, double to, double from, double extentUp, double extentDown) {
@@ -101,9 +101,9 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
 
     protected abstract void updateLocal();
 
-    public float[] position(Vector3d pos, float[] out) {
-        Vector3d p = aux3d1.set(pos).mul(trans);
-        Vector2d pos2d = aux2d1;
+    public float[] position(Vector3D pos, float[] out) {
+        Vector3D p = aux3d1.set(pos).mul(trans);
+        Vector2D pos2d = aux2d1;
 
         // Side
         pos2d.set(p.z, p.y).scl(from);
@@ -122,7 +122,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
         return out;
     }
 
-    public float[] direction(Vector3d dir, float[] out) {
+    public float[] direction(Vector3D dir, float[] out) {
         aux3d2.set(dir).mul(trans);
 
         // Side
@@ -139,7 +139,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     }
 
     @Override
-    public boolean isActive(Vector3d campos, double distSun) {
+    public boolean isActive(Vector3D campos, double distSun) {
         return distSun <= extentUp * to && distSun > extentDown * to;
     }
 
@@ -174,7 +174,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
 
         // Viewport
         sr.setColor(1, 1, 1, viewportAlpha);
-        Vector2d endx = aux2d1.set(dx, dy).scl(40f);
+        Vector2D endx = aux2d1.set(dx, dy).scl(40f);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
         float c1x = (float) endx.x + cx;
         float c1y = (float) endx.y + cy;
@@ -213,7 +213,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
 
         // Viewport
         sr.setColor(1, 1, 1, viewportAlpha);
-        Vector2d endx = aux2d1.set(dx, dy).scl(40f);
+        Vector2D endx = aux2d1.set(dx, dy).scl(40f);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
         float c1x = (float) endx.x + cx;
         float c1y = (float) endx.y + cy;

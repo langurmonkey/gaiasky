@@ -8,7 +8,7 @@
 package gaiasky.util.coord.moon;
 
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 /**
@@ -46,7 +46,7 @@ public class MoonMeeusCoordinates {
      *                   of the Earth and the Moon [km].
      * @return The out vector with geocentric [lambda, beta, r] in radians and kilometres.
      */
-    public static Vector3d moonEclipticCoordinates(double julianDate, Vector3d out) {
+    public static Vector3D moonEclipticCoordinates(double julianDate, Vector3D out) {
 
         // Time T measured in Julian centuries from the Epoch J2000.0.
         double T = AstroUtils.T(julianDate);

@@ -9,7 +9,6 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.math.RandomXS128;
 import net.jafama.FastMath;
-import org.apfloat.Apfloat;
 
 import java.util.Random;
 
@@ -34,15 +33,15 @@ public final class MathUtilsDouble {
     static private final double radFull = PI * 2;
     static private final double radToIndex = SIN_COUNT / radFull;
     static public Random random = new RandomXS128();
-    static Vector3d aux0, aux1, aux2, aux3, aux4, aux5;
+    static Vector3D aux0, aux1, aux2, aux3, aux4, aux5;
 
     static {
-        aux0 = new Vector3d();
-        aux1 = new Vector3d();
-        aux2 = new Vector3d();
-        aux3 = new Vector3d();
-        aux4 = new Vector3d();
-        aux5 = new Vector3d();
+        aux0 = new Vector3D();
+        aux1 = new Vector3D();
+        aux2 = new Vector3D();
+        aux3 = new Vector3D();
+        aux4 = new Vector3D();
+        aux5 = new Vector3D();
     }
 
     /** Returns the sine in radians from a lookup table. */
@@ -382,9 +381,9 @@ public final class MathUtilsDouble {
                                               double x0,
                                               double y0,
                                               double z0) {
-        Vector3d v = aux0.set(x1, y1, z1);
-        Vector3d w = aux1.set(x2, y2, z2);
-        Vector3d p = aux2.set(x0, y0, z0);
+        Vector3D v = aux0.set(x1, y1, z1);
+        Vector3D w = aux1.set(x2, y2, z2);
+        Vector3D p = aux2.set(x0, y0, z0);
         aux3.set(p).sub(v);
         aux4.set(w).sub(v);
 
@@ -400,11 +399,11 @@ public final class MathUtilsDouble {
             return p.dst(v); // Beyond the 'v' end of the segment
         else if (t > 1.0)
             return p.dst(w); // Beyond the 'w' end of the segment
-        Vector3d projection = v.add(aux4.scl(t)); // Projection falls on the segment
+        Vector3D projection = v.add(aux4.scl(t)); // Projection falls on the segment
         return p.dst(projection);
     }
 
-    public static Vector3d getClosestPoint2(double x1,
+    public static Vector3D getClosestPoint2(double x1,
                                             double y1,
                                             double z1,
                                             double x2,
@@ -413,18 +412,18 @@ public final class MathUtilsDouble {
                                             double x0,
                                             double y0,
                                             double z0,
-                                            Vector3d result) {
+                                            Vector3D result) {
         //           (P2-P1)dot(v)
         //Pr = P1 +  ------------- * v.
         //           (v)dot(v)
 
-        Vector3d p1 = aux0.set(x1, y1, z1);
-        Vector3d p2 = aux1.set(x0, y0, z0);
-        Vector3d v = aux2.set(x2 - x1, y2 - y1, z2 - z1);
+        Vector3D p1 = aux0.set(x1, y1, z1);
+        Vector3D p2 = aux1.set(x0, y0, z0);
+        Vector3D v = aux2.set(x2 - x1, y2 - y1, z2 - z1);
 
         double nomin = aux3.set(p2).sub(p1).dot(v);
         double denom = v.dot(v);
-        Vector3d frac = aux4.set(v).scl(nomin / denom);
+        Vector3D frac = aux4.set(v).scl(nomin / denom);
 
         result.set(p1).add(frac);
         return result;
@@ -494,7 +493,7 @@ public final class MathUtilsDouble {
         final double absB = FastMath.abs(b);
         final double diff = FastMath.abs(a - b);
 
-        if (a == b) {
+        if (a.equals(b)) {
             // shortcut, handles infinities
             return true;
         } else if (a == 0 || b == 0 || absA + absB < Double.MIN_NORMAL) {
@@ -508,33 +507,6 @@ public final class MathUtilsDouble {
         }
     }
 
-    /**
-     * Checks whether a is divisible by b, using the default precision.
-     *
-     * @param a First decimal number, represented by a string.
-     * @param b Second decimal number, represented by a string.
-     * @return Whether a % b == 0 at the default precision.
-     */
-    public static boolean divisible(String a,
-                                    String b) {
-        return divisible(a, b, Apfloat.DEFAULT);
-    }
-
-    /**
-     * Checks whether a is divisible by b, using the given floating-point precision.
-     *
-     * @param a         First decimal number, represented by a string.
-     * @param b         Second decimal number, represented by a string.
-     * @param precision The precision.
-     * @return Whether a % b == 0 at the given precision.
-     */
-    public static boolean divisible(String a,
-                                    String b,
-                                    long precision) {
-        Apfloat af = new Apfloat(a, precision);
-        Apfloat bf = new Apfloat(b, precision);
-        return af.mod(bf).doubleValue() == 0;
-    }
 
     /**
      * Implements a low-pass filter to smooth the input values.

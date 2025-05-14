@@ -23,7 +23,7 @@ import gaiasky.gui.main.KeyBindings;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.TextureWidget;
 
@@ -32,7 +32,7 @@ public class MinimapWidget implements Disposable {
     private final FrameBuffer sfb;
     private final TextureWidget topProjection;
     private final TextureWidget sideProjection;
-    private final Vector3d aux3d;
+    private final Vector3D aux3d;
     private final Array<IMinimapScale> scales;
     int side, side2;
     int sideShort, sideShort2;
@@ -96,7 +96,7 @@ public class MinimapWidget implements Disposable {
         String[] minimapHotkey = KeyBindings.instance.getStringKeys("action.toggle/gui.minimap.title", true);
         topProjection.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.minimap.title") + " - " + I18n.msg("gui.minimap.top"), minimapHotkey, skin));
         sideProjection.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.minimap.title") + " - " + I18n.msg("gui.minimap.side"), minimapHotkey, skin));
-        aux3d = new Vector3d();
+        aux3d = new Vector3D();
     }
 
     public void update() {

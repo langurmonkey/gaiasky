@@ -17,8 +17,8 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import org.lwjgl.opengl.GL20;
 
 public class TrajectoryInitializer extends AbstractInitSystem {
@@ -63,8 +63,8 @@ public class TrajectoryInitializer extends AbstractInitSystem {
                         var affine = Mapper.affine.get(entity);
                         if (affine != null && !affine.isEmpty()) {
                             var data = verts.pointCloudData;
-                            var v = new Vector3d();
-                            var mat = new Matrix4d();
+                            var v = new Vector3D();
+                            var mat = new Matrix4D();
                             affine.apply(mat);
                             for (int i = 0; i < data.getNumPoints(); i++) {
                                 // Get.

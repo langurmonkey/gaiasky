@@ -12,8 +12,8 @@ import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProject
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 
 import static gaiasky.util.Settings.*;
 
@@ -108,9 +108,9 @@ public enum Event {
      * </ol>
      * <p>Location bookmarks:</p>
      * <ol start='0'>
-     *     <li>camera position ({@link Vector3b}, may be null)</li>
-     *     <li>camera direction ({@link Vector3d}, may be null)</li>
-     *     <li>camera up ({@link Vector3d}, may be null)</li>
+     *     <li>camera position ({@link Vector3Q}, may be null)</li>
+     *     <li>camera direction ({@link Vector3D}, may be null)</li>
+     *     <li>camera up ({@link Vector3D}, may be null)</li>
      *     <li>time ({@link java.time.Instant}, may be null)</li>
      *     <li>focus ({@link String}, may be null)</li>
      *     <li>settings ({@link gaiasky.util.Settings}, may be null)</li>

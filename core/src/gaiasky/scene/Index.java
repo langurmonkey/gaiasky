@@ -9,19 +9,20 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.Position;
 import gaiasky.scene.view.PositionView;
+import gaiasky.util.FastStringObjectMap;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -31,7 +32,7 @@ public class Index {
     private static final Logger.Log logger = Logger.getLogger(Index.class);
 
     /** Quick lookup map. Name to node. **/
-    protected final Map<String, Entity> index;
+    protected final FastStringObjectMap<Entity> index;
 
     /**
      * Map from integer to position with all Hipparcos stars, for the
@@ -39,7 +40,7 @@ public class Index {
      **/
     protected final IntMap<IPosition> hipMap;
 
-    /** The archetypes container. **/
+    /** The archetypes' container. **/
     protected Archetypes archetypes;
 
     /**
@@ -53,7 +54,7 @@ public class Index {
 
         // String-to-node map. The number of objects is a first approximation, as
         // some nodes actually contain multiple objects.
-        index = new ConcurrentHashMap<>((int) (numberEntities * 1.25), 0.9f, 1);
+        index = new FastStringObjectMap<>((int) (numberEntities * 1.25), Entity.class);
 
         // HIP map with 121k * 1.25
         hipMap = new IntMap<>(151250, 0.9f);
@@ -68,7 +69,8 @@ public class Index {
      * @return The entity, or null if it does not exist.
      */
     public Entity getEntity(String name) {
-        name = name.toLowerCase().strip();
+        name = name.toLowerCase()
+                .strip();
         return index.get(name);
     }
 
@@ -80,7 +82,8 @@ public class Index {
      * @return True if the index contains an entity with the given name. False otherwise.
      */
     public boolean containsEntity(String name) {
-        return index.containsKey(name.toLowerCase().trim());
+        return index.containsKey(name.toLowerCase()
+                                         .trim());
     }
 
     /**
@@ -98,7 +101,8 @@ public class Index {
             if (base.names != null) {
                 if (mustAddToIndex(entity)) {
                     for (String name : base.names) {
-                        String nameLowerCase = name.toLowerCase().trim();
+                        String nameLowerCase = name.toLowerCase()
+                                .trim();
                         if (!index.containsKey(nameLowerCase)) {
                             index.put(nameLowerCase, entity);
                         } else if (!nameLowerCase.isEmpty()) {
@@ -106,7 +110,9 @@ public class Index {
                             var conflictBase = Mapper.base.get(conflict);
                             var entityArchetype = conflictBase.archetype;
                             var conflictArchetype = Mapper.base.get(conflict).archetype;
-                            logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName().toLowerCase() + ")", conflictBase.getName() + " (" + conflictArchetype.getName().toLowerCase() + ")"));
+                            logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName()
+                                    .toLowerCase() + ")", conflictBase.getName() + " (" + conflictArchetype.getName()
+                                    .toLowerCase() + ")"));
                             String[] names1 = base.names;
                             String[] names2 = conflictBase.names;
                             boolean same = names1.length == names2.length;
@@ -149,7 +155,8 @@ public class Index {
             }
         }
         if (!ok) {
-            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity).getName() + ")"));
+            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity)
+                    .getName() + ")"));
         }
         return ok;
     }
@@ -157,9 +164,10 @@ public class Index {
     private void addParticleSet(Entity entity, ParticleSet particleSet) {
         if (particleSet != null) {
             if (particleSet.index != null) {
-                Set<String> keys = particleSet.index.keySet();
+                String[] keys = particleSet.index.keys();
                 for (String key : keys) {
-                    index.put(key, entity);
+                    if (key != null)
+                        index.put(key, entity);
                 }
             }
         }
@@ -192,9 +200,9 @@ public class Index {
                 for (IParticleRecord pb : stars) {
                     if (pb.hip() > 0) {
                         hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
-                                pb.vx(),
-                                pb.vy(),
-                                pb.vz()));
+                                                          pb.vx(),
+                                                          pb.vy(),
+                                                          pb.vz()));
                     }
                 }
             }
@@ -230,7 +238,8 @@ public class Index {
         var base = Mapper.base.get(entity);
         if (base.names != null) {
             for (String name : base.names) {
-                index.remove(name.toLowerCase().trim());
+                index.remove(name.toLowerCase()
+                                     .trim());
             }
 
             // Id
@@ -260,9 +269,10 @@ public class Index {
     /** Removes the entities in the given particle set from this index. **/
     public void removeFromIndex(ParticleSet set) {
         if (set.index != null) {
-            Set<String> keys = set.index.keySet();
+            String[] keys = set.index.keys();
             for (String key : keys) {
-                index.remove(key);
+                if (key != null)
+                    index.remove(key);
             }
         }
     }
@@ -278,35 +288,40 @@ public class Index {
      * @param abort      To enable abortion mid-computation.
      */
     public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
-        Set<String> keys = index.keySet();
-        name = name.toLowerCase().trim();
+        String[] keys = index.keys();
+        name = name.toLowerCase()
+                .trim();
 
         int i = 0;
         // Starts with
         for (String key : keys) {
-            if (abort != null && abort.get())
-                return;
-            var entity = index.get(key);
-            var focus = Mapper.focus.get(entity);
-            if (focus != null && focus.focusable && key.startsWith(name)) {
-                results.add(key);
-                i++;
+            if (key != null) {
+                if (abort != null && abort.get())
+                    return;
+                var entity = index.get(key);
+                var focus = Mapper.focus.get(entity);
+                if (focus != null && focus.focusable && key.startsWith(name)) {
+                    results.add(key);
+                    i++;
+                }
+                if (i >= maxResults)
+                    return;
             }
-            if (i >= maxResults)
-                return;
         }
         // Contains
         for (String key : keys) {
-            if (abort != null && abort.get())
-                return;
-            var entity = index.get(key);
-            var focus = Mapper.focus.get(entity);
-            if (focus != null && focus.focusable && key.contains(name)) {
-                results.add(key);
-                i++;
+            if (key != null) {
+                if (abort != null && abort.get())
+                    return;
+                var entity = index.get(key);
+                var focus = Mapper.focus.get(entity);
+                if (focus != null && focus.focusable && key.contains(name)) {
+                    results.add(key);
+                    i++;
+                }
+                if (i >= maxResults)
+                    return;
             }
-            if (i >= maxResults)
-                return;
         }
     }
 }

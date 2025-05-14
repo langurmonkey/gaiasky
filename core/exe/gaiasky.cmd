@@ -13,8 +13,8 @@ cd %GSDIR%
 
 :: Memory
 SET OPTS=-Xms2g -Xmx6g
-:: Shenandoah GC (only in LTS)
-::SET OPTS=%OPTS% -XX:+UseShenandoahGC
+:: ZGC
+SET OPTS=%OPTS% -XX:+UseZGC -XX:+ZGenerational
 :: Assets location
 SET OPTS=%OPTS% -Dassets.location=.
 :: SimpleLogger defaults

@@ -9,7 +9,7 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 
 public record ParticleVector(double[] data) implements IParticleRecord {
@@ -130,7 +130,7 @@ public record ParticleVector(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public Vector3d pos(Vector3d aux) {
+    public Vector3D pos(Vector3D aux) {
         aux.x = data[0];
         aux.y = data[1];
         aux.z = data[2];

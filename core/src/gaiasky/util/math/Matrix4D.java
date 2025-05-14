@@ -16,7 +16,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @SuppressWarnings("unused")
-public class Matrix4d implements Serializable {
+public class Matrix4D implements Serializable {
     /**
      * XX: Typically the unrotated X component for scaling, also the cosine of
      * the angle when rotated on the Y and/or Z axis. On Vector3d multiplication
@@ -110,25 +110,25 @@ public class Matrix4d implements Serializable {
      */
     public static final int M33 = 15;
     public final static double[] stmp = new double[16];
-    static final Vector3d l_vez = new Vector3d();
-    static final Vector3d l_vex = new Vector3d();
-    static final Vector3d l_vey = new Vector3d();
-    static final Vector3b l_vezb = new Vector3b();
-    static final Vector3b l_vexb = new Vector3b();
-    static final Vector3b l_veyb = new Vector3b();
-    static final Vector3d tmpVec = new Vector3d();
-    static final Vector3b tmpVecb = new Vector3b();
-    static final Matrix4d tmpMat = new Matrix4d();
-    static final Vector3d right = new Vector3d();
-    static final Vector3d tmpForward = new Vector3d();
-    static final Vector3d tmpUp = new Vector3d();
+    static final Vector3D l_vez = new Vector3D();
+    static final Vector3D l_vex = new Vector3D();
+    static final Vector3D l_vey = new Vector3D();
+    static final Vector3Q l_vezb = new Vector3Q();
+    static final Vector3Q l_vexb = new Vector3Q();
+    static final Vector3Q l_veyb = new Vector3Q();
+    static final Vector3D tmpVec = new Vector3D();
+    static final Vector3Q tmpVecb = new Vector3Q();
+    static final Matrix4D tmpMat = new Matrix4D();
+    static final Vector3D right = new Vector3D();
+    static final Vector3D tmpForward = new Vector3D();
+    static final Vector3D tmpUp = new Vector3D();
     @Serial private static final long serialVersionUID = -2717655254359579617L;
     static QuaternionDouble quat = new QuaternionDouble();
     public final double[] tmp = new double[16];
     public final double[] val = new double[16];
 
     /** Constructs an identity matrix */
-    public Matrix4d() {
+    public Matrix4D() {
         val[M00] = 1f;
         val[M11] = 1f;
         val[M22] = 1f;
@@ -140,7 +140,7 @@ public class Matrix4d implements Serializable {
      *
      * @param matrix The matrix to copy. (This matrix is not modified)
      */
-    public Matrix4d(Matrix4d matrix) {
+    public Matrix4D(Matrix4D matrix) {
         this.set(matrix);
     }
 
@@ -153,11 +153,11 @@ public class Matrix4d implements Serializable {
      *               "http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column
      *               major</a> order. (The double array is not modified.)
      */
-    public Matrix4d(double[] values) {
+    public Matrix4D(double[] values) {
         this.set(values);
     }
 
-    public Matrix4d(float[] values) {
+    public Matrix4D(float[] values) {
         this.set(values);
     }
 
@@ -166,7 +166,7 @@ public class Matrix4d implements Serializable {
      *
      * @param quaternion The quaternion to be copied. (The quaternion is not modified)
      */
-    public Matrix4d(QuaternionDouble quaternion) {
+    public Matrix4D(QuaternionDouble quaternion) {
         this.set(quaternion);
     }
 
@@ -177,7 +177,7 @@ public class Matrix4d implements Serializable {
      * @param rotation The rotation, must be normalized
      * @param scale    The scale
      */
-    public Matrix4d(Vector3d position, QuaternionDouble rotation, Vector3d scale) {
+    public Matrix4D(Vector3D position, QuaternionDouble rotation, Vector3D scale) {
         set(position, rotation, scale);
     }
 
@@ -197,10 +197,10 @@ public class Matrix4d implements Serializable {
     /**
      * Multiplies the vector with the given matrix, performing a division by w.
      * The matrix array is assumed to hold a 4x4 column major matrix as you can
-     * get from {@link Matrix4d#val}. The vector array is assumed to hold a
+     * get from {@link Matrix4D#val}. The vector array is assumed to hold a
      * 3-component vector, with x being the first element, y being the second
      * and z being the last component. The result is stored in the vector array.
-     * This is the same as {@link Vector3d#prj(Matrix4d)}.
+     * This is the same as {@link Vector3D#prj(Matrix4D)}.
      *
      * @param mat the matrix
      * @param vec the vector.
@@ -332,8 +332,8 @@ public class Matrix4d implements Serializable {
     /**
      * Multiplies the matrix mata with matrix matb, storing the result in mata.
      * The arrays are assumed to hold 4x4 column major matrices as you can get
-     * from {@link Matrix4d#val}. This is the same as
-     * {@link Matrix4d#mul(Matrix4d)}.
+     * from {@link Matrix4D#val}. This is the same as
+     * {@link Matrix4D#mul(Matrix4D)}.
      *
      * @param mata the first matrix.
      * @param matb the second matrix.
@@ -352,14 +352,14 @@ public class Matrix4d implements Serializable {
      *
      * @return The change of basis matrix.
      */
-    public static Matrix4d changeOfBasis(Vector3d x, Vector3d y, Vector3d z) {
+    public static Matrix4D changeOfBasis(Vector3D x, Vector3D y, Vector3D z) {
         double[] vals = new double[] {
                 x.x, y.x, z.x, 0,
                 x.y, y.y, z.y, 0,
                 x.z, y.z, z.z, 0,
                 0, 0, 0, 1
         };
-        Matrix4d c = new Matrix4d(vals);
+        Matrix4D c = new Matrix4D(vals);
         return c.tra();
     }
 
@@ -373,14 +373,14 @@ public class Matrix4d implements Serializable {
      *
      * @return The change of basis matrix.
      */
-    public static Matrix4d changeOfBasis(double[] x, double[] y, double[] z) {
+    public static Matrix4D changeOfBasis(double[] x, double[] y, double[] z) {
         double[] vals = new double[] {
                 x[0], y[0], z[0], 0,
                 x[1], y[1], z[1], 0,
                 x[2], y[2], z[2], 0,
                 0, 0, 0, 1
         };
-        Matrix4d c = new Matrix4d(vals);
+        Matrix4D c = new Matrix4D(vals);
         return c.tra();
     }
 
@@ -392,11 +392,11 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d set(Matrix4d matrix) {
+    public Matrix4D set(Matrix4D matrix) {
         return this.set(matrix.val);
     }
 
-    public Matrix4d set(Matrix4 matrix) {
+    public Matrix4D set(Matrix4 matrix) {
         return this.set(matrix.val);
     }
 
@@ -411,12 +411,12 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d set(double[] values) {
+    public Matrix4D set(double[] values) {
         System.arraycopy(values, 0, val, 0, val.length);
         return this;
     }
 
-    public Matrix4d set(float[] values) {
+    public Matrix4D set(float[] values) {
         for (int i = 0; i < val.length; i++) {
             val[i] = values[i];
         }
@@ -430,7 +430,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d set(QuaternionDouble quaternion) {
+    public Matrix4D set(QuaternionDouble quaternion) {
         return set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
     }
 
@@ -448,7 +448,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d set(double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
+    public Matrix4D set(double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
         return set(0f, 0f, 0f, quaternionX, quaternionY, quaternionZ, quaternionW);
     }
 
@@ -460,7 +460,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for chaining
      */
-    public Matrix4d set(Vector3d position, QuaternionDouble orientation) {
+    public Matrix4D set(Vector3D position, QuaternionDouble orientation) {
         return set(position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w);
     }
 
@@ -485,7 +485,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
+    public Matrix4D set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
         final double xs = quaternionX * 2f, ys = quaternionY * 2f, zs = quaternionZ * 2f;
         final double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
         final double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
@@ -522,7 +522,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for chaining
      */
-    public Matrix4d set(Vector3d position, QuaternionDouble orientation, Vector3d scale) {
+    public Matrix4D set(Vector3D position, QuaternionDouble orientation, Vector3D scale) {
         return set(position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w, scale.x, scale.y, scale.z);
     }
 
@@ -553,7 +553,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW, double scaleX, double scaleY, double scaleZ) {
+    public Matrix4D set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW, double scaleX, double scaleY, double scaleZ) {
         final double xs = quaternionX * 2f, ys = quaternionY * 2f, zs = quaternionZ * 2f;
         final double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
         final double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
@@ -592,7 +592,7 @@ public class Matrix4d implements Serializable {
      * @param zAxis The z-axis.
      * @param pos   The translation vector.
      */
-    public Matrix4d set(Vector3d xAxis, Vector3d yAxis, Vector3d zAxis, Vector3d pos) {
+    public Matrix4D set(Vector3D xAxis, Vector3D yAxis, Vector3D zAxis, Vector3D pos) {
         val[M00] = xAxis.x;
         val[M01] = xAxis.y;
         val[M02] = xAxis.z;
@@ -613,8 +613,8 @@ public class Matrix4d implements Serializable {
     }
 
     /** @return a copy of this matrix */
-    public Matrix4d cpy() {
-        return new Matrix4d(this);
+    public Matrix4D cpy() {
+        return new Matrix4D(this);
     }
 
     /**
@@ -626,7 +626,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d trn(Vector3d vector) {
+    public Matrix4D trn(Vector3D vector) {
         val[M03] += vector.x;
         val[M13] += vector.y;
         val[M23] += vector.z;
@@ -643,7 +643,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d trn(double x, double y, double z) {
+    public Matrix4D trn(double x, double y, double z) {
         val[M03] += x;
         val[M13] += y;
         val[M23] += z;
@@ -674,7 +674,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining operations together.
      */
-    public Matrix4d mul(Matrix4d matrix) {
+    public Matrix4D mul(Matrix4D matrix) {
         matrix4_mul(val, matrix.val);
         return this;
     }
@@ -691,7 +691,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining operations together.
      */
-    public Matrix4d mulLeft(Matrix4d matrix) {
+    public Matrix4D mulLeft(Matrix4D matrix) {
         tmpMat.set(matrix);
         // mul(tmpMat.val, this.val);
         tmpMat.mul(this);
@@ -703,7 +703,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d tra() {
+    public Matrix4D tra() {
         tmp[M00] = val[M00];
         tmp[M01] = val[M10];
         tmp[M02] = val[M20];
@@ -728,7 +728,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d idt() {
+    public Matrix4D idt() {
         val[M00] = 1;
         val[M01] = 0;
         val[M02] = 0;
@@ -748,7 +748,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d inv() {
+    public Matrix4D inv() {
         matrix4_inv(val);
         return this;
     }
@@ -776,7 +776,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToProjection(double near, double far, double fov, double aspectRatio) {
+    public Matrix4D setToProjection(double near, double far, double fov, double aspectRatio) {
         idt();
         double l_fd = 1.0 / FastMath.tan((fov * (Math.PI / 180)) / 2.0);
         double l_a1 = (far + near) / (near - far);
@@ -813,7 +813,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToOrtho2D(double x, double y, double width, double height) {
+    public Matrix4D setToOrtho2D(double x, double y, double width, double height) {
         setToOrtho(x, x + width, y, y + height, 0, 1);
         return this;
     }
@@ -831,7 +831,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToOrtho2D(double x, double y, double width, double height, double near, double far) {
+    public Matrix4D setToOrtho2D(double x, double y, double width, double height, double near, double far) {
         setToOrtho(x, x + width, y, y + height, near, far);
         return this;
     }
@@ -850,7 +850,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToOrtho(double left, double right, double bottom, double top, double near, double far) {
+    public Matrix4D setToOrtho(double left, double right, double bottom, double top, double near, double far) {
 
         this.idt();
         double x_orth = 2 / (right - left);
@@ -890,7 +890,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setTranslation(double x, double y, double z) {
+    public Matrix4D setTranslation(double x, double y, double z) {
         val[M03] = x;
         val[M13] = y;
         val[M23] = z;
@@ -906,7 +906,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToTranslation(Vector3d vector) {
+    public Matrix4D setToTranslation(Vector3D vector) {
         idt();
         val[M03] = vector.x;
         val[M13] = vector.y;
@@ -914,7 +914,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setToTranslation(Vector3 vector) {
+    public Matrix4D setToTranslation(Vector3 vector) {
         idt();
         val[M03] = vector.x;
         val[M13] = vector.y;
@@ -933,7 +933,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToTranslation(double x, double y, double z) {
+    public Matrix4D setToTranslation(double x, double y, double z) {
         idt();
         val[M03] = x;
         val[M13] = y;
@@ -951,7 +951,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToTranslationAndScaling(Vector3d translation, Vector3d scaling) {
+    public Matrix4D setToTranslationAndScaling(Vector3D translation, Vector3D scaling) {
         idt();
         val[M03] = translation.x;
         val[M13] = translation.y;
@@ -976,7 +976,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToTranslationAndScaling(double translationX, double translationY, double translationZ, double scalingX, double scalingY, double scalingZ) {
+    public Matrix4D setToTranslationAndScaling(double translationX, double translationY, double translationZ, double scalingX, double scalingY, double scalingZ) {
         idt();
         val[M03] = translationX;
         val[M13] = translationY;
@@ -995,7 +995,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToRotation(Vector3d axis, double degrees) {
+    public Matrix4D setToRotation(Vector3D axis, double degrees) {
         if (degrees == 0) {
             idt();
             return this;
@@ -1011,7 +1011,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToRotationRad(Vector3d axis, double radians) {
+    public Matrix4D setToRotationRad(Vector3D axis, double radians) {
         if (radians == 0) {
             idt();
             return this;
@@ -1029,7 +1029,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToRotation(double axisX, double axisY, double axisZ, double degrees) {
+    public Matrix4D setToRotation(double axisX, double axisY, double axisZ, double degrees) {
         if (degrees == 0) {
             idt();
             return this;
@@ -1047,7 +1047,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToRotationRad(double axisX, double axisY, double axisZ, double radians) {
+    public Matrix4D setToRotationRad(double axisX, double axisY, double axisZ, double radians) {
         if (radians == 0) {
             idt();
             return this;
@@ -1063,7 +1063,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together
      */
-    public Matrix4d setToRotation(final Vector3d v1, final Vector3d v2) {
+    public Matrix4D setToRotation(final Vector3D v1, final Vector3D v2) {
         return set(quat.setFromCross(v1, v2));
     }
 
@@ -1079,7 +1079,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together
      */
-    public Matrix4d setToRotation(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
+    public Matrix4D setToRotation(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
         return set(quat.setFromCross(x1, y1, z1, x2, y2, z2));
     }
 
@@ -1092,7 +1092,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix
      */
-    public Matrix4d setFromEulerAngles(double yaw, double pitch, double roll) {
+    public Matrix4D setFromEulerAngles(double yaw, double pitch, double roll) {
         quat.setEulerAngles(yaw, pitch, roll);
         return set(quat);
     }
@@ -1104,7 +1104,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for chaining.
      */
-    public Matrix4d setToScaling(Vector3d vector) {
+    public Matrix4D setToScaling(Vector3D vector) {
         idt();
         val[M00] = vector.x;
         val[M11] = vector.y;
@@ -1121,7 +1121,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for chaining.
      */
-    public Matrix4d setToScaling(double x, double y, double z) {
+    public Matrix4D setToScaling(double x, double y, double z) {
         idt();
         val[M00] = x;
         val[M11] = y;
@@ -1138,7 +1138,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setToLookAt(Vector3d direction, Vector3d up) {
+    public Matrix4D setToLookAt(Vector3D direction, Vector3D up) {
         l_vez.set(direction).nor();
         l_vex.set(direction).nor();
         l_vex.crs(up).nor();
@@ -1157,7 +1157,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setToLookAt(Vector3b direction, Vector3b up) {
+    public Matrix4D setToLookAt(Vector3Q direction, Vector3Q up) {
         l_vezb.set(direction).nor();
         l_vexb.set(direction).nor();
         l_vexb.crs(up).nor();
@@ -1186,7 +1186,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix
      */
-    public Matrix4d setToLookAt(Vector3d position, Vector3d target, Vector3d up) {
+    public Matrix4D setToLookAt(Vector3D position, Vector3D target, Vector3D up) {
         tmpVec.set(target).sub(position);
         setToLookAt(tmpVec, up);
         this.mul(tmpMat.setToTranslation(-position.x, -position.y, -position.z));
@@ -1194,7 +1194,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setToLookAt(Vector3b position, Vector3b target, Vector3b up) {
+    public Matrix4D setToLookAt(Vector3Q position, Vector3Q target, Vector3Q up) {
         tmpVecb.set(target).sub(position);
         setToLookAt(tmpVecb, up);
         this.mul(tmpMat.setToTranslation(-position.x.doubleValue(), -position.y.doubleValue(), -position.z.doubleValue()));
@@ -1202,7 +1202,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setToWorld(Vector3d position, Vector3d forward, Vector3d up) {
+    public Matrix4D setToWorld(Vector3D position, Vector3D forward, Vector3D up) {
         tmpForward.set(forward).nor();
         right.set(tmpForward).crs(up).nor();
         tmpUp.set(right).crs(tmpForward).nor();
@@ -1224,7 +1224,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d lerp(Matrix4d matrix, double alpha) {
+    public Matrix4D lerp(Matrix4D matrix, double alpha) {
         for (int i = 0; i < 16; i++)
             this.val[i] = this.val[i] * (1 - alpha) + matrix.val[i] * alpha;
         return this;
@@ -1236,7 +1236,7 @@ public class Matrix4d implements Serializable {
      *
      * @param mat the matrix
      */
-    public Matrix4d set(Matrix3 mat) {
+    public Matrix4D set(Matrix3 mat) {
         val[0] = mat.val[0];
         val[1] = mat.val[1];
         val[2] = mat.val[2];
@@ -1256,28 +1256,28 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d scl(Vector3d scale) {
+    public Matrix4D scl(Vector3D scale) {
         val[M00] *= scale.x;
         val[M11] *= scale.y;
         val[M22] *= scale.z;
         return this;
     }
 
-    public Matrix4d scl(double x, double y, double z) {
+    public Matrix4D scl(double x, double y, double z) {
         val[M00] *= x;
         val[M11] *= y;
         val[M22] *= z;
         return this;
     }
 
-    public Matrix4d scl(double scale) {
+    public Matrix4D scl(double scale) {
         val[M00] *= scale;
         val[M11] *= scale;
         val[M22] *= scale;
         return this;
     }
 
-    public Vector3d getTranslation(Vector3d position) {
+    public Vector3D getTranslation(Vector3D position) {
         position.x = val[M03];
         position.y = val[M13];
         position.z = val[M23];
@@ -1302,7 +1302,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d setTranslation(Vector3d vector) {
+    public Matrix4D setTranslation(Vector3D vector) {
         val[M03] = vector.x;
         val[M13] = vector.y;
         val[M23] = vector.z;
@@ -1319,7 +1319,7 @@ public class Matrix4d implements Serializable {
         vec[2] = (float) val[M23];
     }
 
-    public Vector3d addTranslationTo(Vector3d position) {
+    public Vector3D addTranslationTo(Vector3D position) {
         position.x += val[M03];
         position.y += val[M13];
         position.z += val[M23];
@@ -1351,44 +1351,44 @@ public class Matrix4d implements Serializable {
 
     /** @return the squared scale factor on the X axis */
     public double getScaleXSquared() {
-        return val[Matrix4d.M00] * val[Matrix4d.M00] + val[Matrix4d.M01] * val[Matrix4d.M01] + val[Matrix4d.M02] * val[Matrix4d.M02];
+        return val[Matrix4D.M00] * val[Matrix4D.M00] + val[Matrix4D.M01] * val[Matrix4D.M01] + val[Matrix4D.M02] * val[Matrix4D.M02];
     }
 
     /** @return the squared scale factor on the Y axis */
     public double getScaleYSquared() {
-        return val[Matrix4d.M10] * val[Matrix4d.M10] + val[Matrix4d.M11] * val[Matrix4d.M11] + val[Matrix4d.M12] * val[Matrix4d.M12];
+        return val[Matrix4D.M10] * val[Matrix4D.M10] + val[Matrix4D.M11] * val[Matrix4D.M11] + val[Matrix4D.M12] * val[Matrix4D.M12];
     }
 
     /** @return the squared scale factor on the Z axis */
     public double getScaleZSquared() {
-        return val[Matrix4d.M20] * val[Matrix4d.M20] + val[Matrix4d.M21] * val[Matrix4d.M21] + val[Matrix4d.M22] * val[Matrix4d.M22];
+        return val[Matrix4D.M20] * val[Matrix4D.M20] + val[Matrix4D.M21] * val[Matrix4D.M21] + val[Matrix4D.M22] * val[Matrix4D.M22];
     }
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleX() {
-        return (MathUtilsDouble.isZero(val[Matrix4d.M01]) && MathUtilsDouble.isZero(val[Matrix4d.M02])) ? val[Matrix4d.M00] : FastMath.sqrt(getScaleXSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4D.M01]) && MathUtilsDouble.isZero(val[Matrix4D.M02])) ? val[Matrix4D.M00] : FastMath.sqrt(getScaleXSquared());
     }
 
     /** @return the scale factor on the Y axis (non-negative) */
     public double getScaleY() {
-        return (MathUtilsDouble.isZero(val[Matrix4d.M10]) && MathUtilsDouble.isZero(val[Matrix4d.M12])) ? val[Matrix4d.M11] : FastMath.sqrt(getScaleYSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4D.M10]) && MathUtilsDouble.isZero(val[Matrix4D.M12])) ? val[Matrix4D.M11] : FastMath.sqrt(getScaleYSquared());
     }
 
     // @on
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleZ() {
-        return (MathUtilsDouble.isZero(val[Matrix4d.M20]) && MathUtilsDouble.isZero(val[Matrix4d.M21])) ? val[Matrix4d.M22] : FastMath.sqrt(getScaleZSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4D.M20]) && MathUtilsDouble.isZero(val[Matrix4D.M21])) ? val[Matrix4D.M22] : FastMath.sqrt(getScaleZSquared());
     }
 
     // @on
 
-    public Vector3d getScale(Vector3d scale) {
+    public Vector3D getScale(Vector3D scale) {
         return scale.set(getScaleX(), getScaleY(), getScaleZ());
     }
 
     /** removes the translational part and transposes the matrix. */
-    public Matrix4d toNormalMatrix() {
+    public Matrix4D toNormalMatrix() {
         val[M03] = 0;
         val[M13] = 0;
         val[M23] = 0;
@@ -1403,7 +1403,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d translate(Vector3d translation) {
+    public Matrix4D translate(Vector3D translation) {
         return translate(translation.x, translation.y, translation.z);
     }
 
@@ -1415,7 +1415,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d translate(double[] translation) {
+    public Matrix4D translate(double[] translation) {
         return translate(translation[0], translation[1], translation[2]);
     }
 
@@ -1429,7 +1429,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d translate(double x, double y, double z) {
+    public Matrix4D translate(double x, double y, double z) {
         tmp[M00] = 1;
         tmp[M01] = 0;
         tmp[M02] = 0;
@@ -1461,7 +1461,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d rotate(Vector3d axis, double degrees) {
+    public Matrix4D rotate(Vector3D axis, double degrees) {
         if (degrees == 0)
             return this;
         quat.set(axis, degrees);
@@ -1478,7 +1478,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d rotateRad(Vector3d axis, double radians) {
+    public Matrix4D rotateRad(Vector3D axis, double radians) {
         if (radians == 0)
             return this;
         quat.setFromAxisRad(axis, radians);
@@ -1497,7 +1497,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d rotate(double axisX, double axisY, double axisZ, double degrees) {
+    public Matrix4D rotate(double axisX, double axisY, double axisZ, double degrees) {
         if (degrees == 0)
             return this;
         quat.setFromAxis(axisX, axisY, axisZ, degrees);
@@ -1516,7 +1516,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d rotateRad(double axisX, double axisY, double axisZ, double radians) {
+    public Matrix4D rotateRad(double axisX, double axisY, double axisZ, double radians) {
         if (radians == 0)
             return this;
         quat.setFromAxisRad(axisX, axisY, axisZ, radians);
@@ -1532,7 +1532,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d rotate(QuaternionDouble rotation) {
+    public Matrix4D rotate(QuaternionDouble rotation) {
         rotation.toMatrix(tmp);
         matrix4_mul(val, tmp);
         return this;
@@ -1546,7 +1546,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together
      */
-    public Matrix4d rotate(final Vector3d v1, final Vector3d v2) {
+    public Matrix4D rotate(final Vector3D v1, final Vector3D v2) {
         return rotate(quat.setFromCross(v1, v2));
     }
 
@@ -1560,7 +1560,7 @@ public class Matrix4d implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together.
      */
-    public Matrix4d scale(double scaleX, double scaleY, double scaleZ) {
+    public Matrix4D scale(double scaleX, double scaleY, double scaleZ) {
         tmp[M00] = scaleX;
         tmp[M01] = 0;
         tmp[M02] = 0;

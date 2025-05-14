@@ -215,7 +215,7 @@ public class Proximity {
 
     public NearbyRecord convert(IFocus focus, NearbyRecord c, ICamera camera) {
         c.pm.set(0, 0, 0);
-        Vector3b absPos = new Vector3b();
+        Vector3Q absPos = new Vector3Q();
         absPos = focus.getAbsolutePosition(absPos);
         c.absolutePos.set(absPos);
         c.pos.set(c.absolutePos).sub(camera.getPos());
@@ -243,7 +243,7 @@ public class Proximity {
 
     public static class NearbyRecord implements IFocus {
         public double distToCamera, size, radius;
-        public Vector3d pos, pm, absolutePos;
+        public Vector3D pos, pm, absolutePos;
         public float[] col;
         public String name;
         public byte type = TYPE_UNDEFINED;
@@ -251,9 +251,9 @@ public class Proximity {
         public int index;
 
         public NearbyRecord() {
-            pos = new Vector3d();
-            pm = new Vector3d();
-            absolutePos = new Vector3d();
+            pos = new Vector3D();
+            pm = new Vector3D();
+            absolutePos = new Vector3D();
             col = new float[4];
         }
 
@@ -339,7 +339,7 @@ public class Proximity {
         }
 
         @Override
-        public Vector3b getPos() {
+        public Vector3Q getPos() {
             return null;
         }
 
@@ -354,12 +354,12 @@ public class Proximity {
         }
 
         @Override
-        public Vector3b getAbsolutePosition(Vector3b out) {
+        public Vector3Q getAbsolutePosition(Vector3Q out) {
             return out.set(absolutePos);
         }
 
         @Override
-        public Vector3b getAbsolutePosition(String name, Vector3b out) {
+        public Vector3Q getAbsolutePosition(String name, Vector3Q out) {
             if (name.equalsIgnoreCase(this.name))
                 return out.set(absolutePos);
             else
@@ -367,22 +367,22 @@ public class Proximity {
         }
 
         @Override
-        public Vector3b getClosestAbsolutePos(Vector3b out) {
+        public Vector3Q getClosestAbsolutePos(Vector3Q out) {
             return out.set(absolutePos);
         }
 
         @Override
-        public Vector2d getPosSph() {
+        public Vector2D getPosSph() {
             return null;
         }
 
         @Override
-        public Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force) {
+        public Vector3Q getPredictedPosition(Vector3Q aux, ITimeFrameProvider time, ICamera camera, boolean force) {
             return null;
         }
 
         @Override
-        public Vector3b getPredictedPosition(Vector3b aux, double deltaTime) {
+        public Vector3Q getPredictedPosition(Vector3Q aux, double deltaTime) {
             return null;
         }
 
@@ -437,17 +437,17 @@ public class Proximity {
         }
 
         @Override
-        public double getElevationAt(Vector3b camPos) {
+        public double getElevationAt(Vector3Q camPos) {
             return 0;
         }
 
         @Override
-        public double getElevationAt(Vector3b camPos, boolean useFuturePosition) {
+        public double getElevationAt(Vector3Q camPos, boolean useFuturePosition) {
             return 0;
         }
 
         @Override
-        public double getElevationAt(Vector3b camPos, Vector3b nextPos) {
+        public double getElevationAt(Vector3Q camPos, Vector3Q nextPos) {
             return 0;
         }
 
@@ -467,7 +467,7 @@ public class Proximity {
         }
 
         @Override
-        public Matrix4d getOrientation() {
+        public Matrix4D getOrientation() {
             return null;
         }
 
@@ -492,12 +492,12 @@ public class Proximity {
         }
 
         @Override
-        public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+        public void addHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<IFocus> hits) {
 
         }
 
         @Override
-        public void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+        public void addEntityHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<Entity> hits) {
 
         }
 

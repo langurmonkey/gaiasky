@@ -8,7 +8,7 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public class ScaleTransform implements ITransform {
     /** Scale **/
@@ -18,7 +18,7 @@ public class ScaleTransform implements ITransform {
         mat.scale((float) scale[0], (float) scale[1], (float) scale[2]);
     }
 
-    public void apply(Matrix4d mat) {
+    public void apply(Matrix4D mat) {
         mat.scale(scale[0], scale[1], scale[2]);
     }
 

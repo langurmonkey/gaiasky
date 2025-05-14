@@ -34,6 +34,7 @@ import org.astrogrid.samp.client.*;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -143,7 +144,6 @@ public class SAMPClient implements IObserver {
         // Select multiple rows
         conn.addMessageHandler(new AbstractMessageHandler("table.select.rowList") {
             public Map<Object, Object> processCall(HubConnection c, String senderId, Message msg) {
-                // do stuff
                 ArrayList<String> rows = (ArrayList<String>) msg.getParam("row-list");
                 String id = (String) msg.getParam("table-id");
 
@@ -225,7 +225,7 @@ public class SAMPClient implements IObserver {
         logger.info("Loading VOTable: " + name + " from " + url);
         // Load selected file
         try {
-            DataSource dataSource = new URLDataSource(new URL(url));
+            DataSource dataSource = new URLDataSource(new URI(url).toURL());
             Stage ui = GaiaSky.instance.mainGui.getGuiStage();
             String fileName = dataSource.getName();
             final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);

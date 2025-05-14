@@ -21,7 +21,7 @@ import gaiasky.scene.component.Render;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +30,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
 
     private final Object lock;
     private final Vector3 auxV;
-    private final Vector3d auxD;
+    private final Vector3D auxD;
     private int nLights;
     private float[] positions;
     private float[] solidAngles;
@@ -43,7 +43,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
         reinitialize(Settings.settings.graphics.quality.getGlowNLights());
 
         this.auxV = new Vector3();
-        this.auxD = new Vector3d();
+        this.auxD = new Vector3D();
     }
 
     public void reinitialize(int nLights) {
@@ -102,7 +102,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
                             var graph = Mapper.graph.get(entity);
                             double angle = GaiaSky.instance.cameraManager.getDirection().angle(graph.translation);
                             if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openXr || angle < angleEdgeDeg)) {
-                                Vector3d pos3d = graph.translation.put(auxD);
+                                Vector3D pos3d = graph.translation.put(auxD);
 
                                 // Apply relativistic effects.
                                 GlobalResources.applyRelativisticAberration(pos3d, camera);
@@ -134,7 +134,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
                             for (var record : proximityArray) {
                                 if (record != null) {
 
-                                    Vector3d pos3d = auxD.set(record.absolutePos).sub(camera.getPos());
+                                    Vector3D pos3d = auxD.set(record.absolutePos).sub(camera.getPos());
                                     double angle = GaiaSky.instance.cameraManager.getDirection().angle(pos3d);
                                     if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openXr || angle < angleEdgeDeg)) {
 

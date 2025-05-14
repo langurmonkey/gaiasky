@@ -7,11 +7,11 @@
 
 package gaiasky.util.coord.vsop87;
 
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
 
 public interface iVSOP87 {
-    Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out);
-    Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out);
+    Vector3Q getEclipticSphericalCoordinates(Instant date, Vector3Q out);
+    Vector3Q getEclipticCartesianCoordinates(Instant date, Vector3Q out);
 }

@@ -2,7 +2,7 @@ package gaiasky;
 
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,8 +50,8 @@ public class AstroUtilsTest {
     }
 
     private void testProperMotionConversion(double muAlphaStar, double muDelta, double rv, double ra, double dec, double parallax) {
-        Vector3d aux1 = new Vector3d();
-        Vector3d aux2 = new Vector3d();
+        Vector3D aux1 = new Vector3D();
+        Vector3D aux2 = new Vector3D();
 
         double distPc = 1000d / parallax;
         Coordinates.properMotionsToCartesian(muAlphaStar, muDelta, rv, ra, dec, distPc, aux1);

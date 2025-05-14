@@ -14,12 +14,12 @@ import com.badlogic.gdx.utils.reflect.Method;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public class RefSysTransform implements Component {
     private static final Log logger = Logger.getLogger(RefSysTransform.class);
     public String transformName;
-    public Matrix4d matrix;
+    public Matrix4D matrix;
     public Matrix4 matrixf;
     public boolean floatVersion = false;
 
@@ -38,11 +38,11 @@ public class RefSysTransform implements Component {
                 Method m = ClassReflection.getMethod(Coordinates.class, transformName);
                 Object obj = m.invoke(null);
 
-                Matrix4d trf = null;
+                Matrix4D trf = null;
                 if (obj instanceof Matrix4) {
-                    trf = new Matrix4d(((Matrix4) obj).val);
-                } else if (obj instanceof Matrix4d) {
-                    trf = new Matrix4d((Matrix4d) obj);
+                    trf = new Matrix4D(((Matrix4) obj).val);
+                } else if (obj instanceof Matrix4D) {
+                    trf = new Matrix4D((Matrix4D) obj);
                 }
                 this.matrix = trf;
 
@@ -63,18 +63,18 @@ public class RefSysTransform implements Component {
     }
 
     public void setTransformMatrix(double[] matrixValues) {
-        this.matrix = new Matrix4d(matrixValues);
+        this.matrix = new Matrix4D(matrixValues);
         this.matrixf = this.matrix.putIn(new Matrix4());
     }
 
-    public void setTransformMatrix(Matrix4d m) {
-        this.matrix = new Matrix4d(m);
+    public void setTransformMatrix(Matrix4D m) {
+        this.matrix = new Matrix4D(m);
         this.matrixf = m.putIn(new Matrix4());
     }
 
     public void setTransformMatrix(Matrix4 m) {
         this.matrixf = new Matrix4(m);
-        this.matrix = new Matrix4d(m.val);
+        this.matrix = new Matrix4D(m.val);
     }
 
     /**

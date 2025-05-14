@@ -8,18 +8,18 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class Axis implements Component {
 
-    public Vector3d o;
-    public Vector3d x;
-    public Vector3d y;
-    public Vector3d z;
+    public Vector3D o;
+    public Vector3D x;
+    public Vector3D y;
+    public Vector3D z;
     // Base vectors
-    public Vector3d b0;
-    public Vector3d b1;
-    public Vector3d b2;
+    public Vector3D b0;
+    public Vector3D b1;
+    public Vector3D b2;
 
     // RGBA colors for each of the bases XYZ -> [3][3]
     public float[][] axesColors;

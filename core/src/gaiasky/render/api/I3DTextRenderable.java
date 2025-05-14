@@ -12,7 +12,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public interface I3DTextRenderable extends IRenderable {
 
@@ -60,7 +60,7 @@ public interface I3DTextRenderable extends IRenderable {
      *
      * @param out The out parameter with the result
      */
-    void textPosition(ICamera cam, Vector3d out);
+    void textPosition(ICamera cam, Vector3D out);
 
     /**
      * Returns the text

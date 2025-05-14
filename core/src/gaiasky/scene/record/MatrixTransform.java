@@ -8,7 +8,7 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 /**
  * A generic 4x4 matrix transformation.
@@ -16,7 +16,7 @@ import gaiasky.util.math.Matrix4d;
 public class MatrixTransform implements ITransform {
 
     private Matrix4 matFloat;
-    private Matrix4d matDouble;
+    private Matrix4D matDouble;
 
     public MatrixTransform() {
     }
@@ -39,32 +39,32 @@ public class MatrixTransform implements ITransform {
         setMatrix(mat);
     }
 
-    public MatrixTransform(Matrix4d mat) {
+    public MatrixTransform(Matrix4D mat) {
         setMatrix(mat);
     }
 
     public MatrixTransform(Matrix4 mat) {
         this.matFloat = new Matrix4(mat);
-        this.matDouble = new Matrix4d(this.matFloat.val);
+        this.matDouble = new Matrix4D(this.matFloat.val);
     }
 
     public void setMatrix(float[] mat) {
-        this.matDouble = new Matrix4d(mat);
+        this.matDouble = new Matrix4D(mat);
         this.matFloat = this.matDouble.putIn(new Matrix4());
     }
 
     public void setMatrix(Matrix4 mat) {
         this.matFloat = new Matrix4(mat);
-        this.matDouble = new Matrix4d(this.matFloat.val);
+        this.matDouble = new Matrix4D(this.matFloat.val);
     }
 
     public void setMatrix(double[] mat) {
-        this.matDouble = new Matrix4d(mat);
+        this.matDouble = new Matrix4D(mat);
         this.matFloat = this.matDouble.putIn(new Matrix4());
     }
 
-    public void setMatrix(Matrix4d mat) {
-        this.matDouble = new Matrix4d(mat);
+    public void setMatrix(Matrix4D mat) {
+        this.matDouble = new Matrix4D(mat);
         this.matFloat = this.matDouble.putIn(new Matrix4());
     }
 
@@ -75,7 +75,7 @@ public class MatrixTransform implements ITransform {
     }
 
     @Override
-    public void apply(Matrix4d mat) {
+    public void apply(Matrix4D mat) {
         mat.mul(matDouble);
     }
 
@@ -83,7 +83,7 @@ public class MatrixTransform implements ITransform {
         return this.matFloat == null || this.matDouble == null;
     }
 
-    public Matrix4d getMatDouble() {
+    public Matrix4D getMatDouble() {
         return matDouble;
     }
 

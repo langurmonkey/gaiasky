@@ -16,7 +16,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.io.*;
 
@@ -64,7 +64,7 @@ public class OortGenerator {
 
         Array<double[]> particles = new Array<>(false, N);
 
-        Vector3d particle = new Vector3d();
+        Vector3D particle = new Vector3D();
         int n = 0;
         // Generate only in z, we'll randomly rotate later
         while (n < N) {

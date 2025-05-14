@@ -13,14 +13,13 @@ import gaiasky.util.Settings;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
 
 /**
  * VSOP87 coordinates using an implementation based on binary data files.
  */
-@Deprecated
 public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements iVSOP87 {
 
     private static final String dataFile = "$data/default-data/vsop87/vsop87a.bin";
@@ -35,7 +34,7 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
                     VSOP87Binary.class,
                     new VSOP87Loader.VSOP87LoaderParameters(Settings.settings.data.highAccuracy ? 0 : 0.6));
         }
-        versionA = dataFile.contains("vsop87a.bin");
+        versionA = dataFile.contains("vsop87a");
     }
 
     @Override
@@ -49,18 +48,18 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
     public abstract double[] getData(double tau);
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant date, Vector3Q out) {
         return versionA ? getEclipticSphericalCoordinatesA(date, out) : getEclipticSphericalCoordinatesB(date, out);
     }
-    public Vector3b getEclipticSphericalCoordinatesA(Instant date, Vector3b out) {
-        Vector3b v = getEclipticCartesianCoordinates(date, out);
+    public Vector3Q getEclipticSphericalCoordinatesA(Instant date, Vector3Q out) {
+        Vector3Q v = getEclipticCartesianCoordinates(date, out);
         if (v == null)
             return null;
         Coordinates.cartesianToSpherical(out, out);
         return out;
     }
 
-    public Vector3b getEclipticSphericalCoordinatesB(Instant date, Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinatesB(Instant date, Vector3Q out) {
         if (Constants.notWithinVSOPTime(date.toEpochMilli()))
             return null;
 
@@ -80,11 +79,11 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant date, Vector3Q out) {
         return versionA ? getEclipticCartesianCoordinatesA(date, out) : getEclipticSphericalCoordinatesB(date, out);
     }
 
-    public Vector3b getEclipticCartesianCoordinatesA(Instant date, Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinatesA(Instant date, Vector3Q out) {
         if (Constants.notWithinVSOPTime(date.toEpochMilli()))
             return null;
 
@@ -103,8 +102,8 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
         }
     }
 
-    public Vector3b getEclipticCartesianCoordinatesB(Instant date, Vector3b out) {
-        Vector3b v = getEclipticSphericalCoordinates(date, out);
+    public Vector3Q getEclipticCartesianCoordinatesB(Instant date, Vector3Q out) {
+        Vector3Q v = getEclipticSphericalCoordinates(date, out);
         if (v == null)
             return null;
         Coordinates.sphericalToCartesian(out, out);
@@ -112,8 +111,8 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
-        Vector3b v = getEclipticCartesianCoordinates(date, out);
+    public Vector3Q getEquatorialCartesianCoordinates(Instant date, Vector3Q out) {
+        Vector3Q v = getEclipticCartesianCoordinates(date, out);
         if (v == null)
             return null;
         out.mul(Coordinates.eclToEq());

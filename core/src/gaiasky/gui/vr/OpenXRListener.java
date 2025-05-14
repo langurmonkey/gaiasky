@@ -21,7 +21,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.comp.ViewAngleComparator;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
@@ -44,8 +44,8 @@ public class OpenXRListener implements XrInputListener, IObserver {
     /** Focus comparator **/
     private final Comparator<Entity> comp;
     /** Aux vectors **/
-    private final Vector3d p0;
-    private final Vector3d p1;
+    private final Vector3D p0;
+    private final Vector3D p1;
     private final FocusView focusView;
     /** Map from VR device to model object **/
     private Map<XrControllerDevice, Entity> xrControllerToModel;
@@ -57,8 +57,8 @@ public class OpenXRListener implements XrInputListener, IObserver {
     public OpenXRListener(NaturalCamera cam) {
         this.cam = cam;
         this.comp = new ViewAngleComparator<>();
-        this.p0 = new Vector3d();
-        this.p1 = new Vector3d();
+        this.p0 = new Vector3D();
+        this.p1 = new Vector3D();
         this.focusView = new FocusView();
 
         EventManager.instance.subscribe(this, Event.VR_DRIVER_LOADED);
@@ -148,7 +148,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
         }
     }
 
-    private Array<Entity> getHits(Vector3d p0, Vector3d p1) {
+    private Array<Entity> getHits(Vector3D p0, Vector3D p1) {
         Array<Entity> l = cam.getScene().findFocusableEntities();
         Array<Entity> hits = new Array<>();
 
@@ -161,7 +161,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
         return hits;
     }
 
-    private Entity getBestHit(Vector3d p0, Vector3d p1) {
+    private Entity getBestHit(Vector3D p0, Vector3D p1) {
         Array<Entity> hits = getHits(p0, p1);
         if (hits.size != 0) {
             // Sort using distance

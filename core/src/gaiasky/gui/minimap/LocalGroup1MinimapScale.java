@@ -22,11 +22,11 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class LocalGroup1MinimapScale extends AbstractMinimapScale {
     private int ngals;
-    private Vector3d[] positions;
+    private Vector3D[] positions;
     private float[][] galp;
     private String[] names;
 
@@ -52,7 +52,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
 
         ngals = 8;
         galp = new float[ngals][];
-        positions = new Vector3d[ngals];
+        positions = new Vector3D[ngals];
         names = new String[ngals];
 
         int i = 0;
@@ -76,8 +76,8 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
 
     }
 
-    private Vector3d get(double raDeg, double decDeg, double distMpc) {
-        return Coordinates.sphericalToCartesian(MathUtilsDouble.degRad * raDeg, MathUtilsDouble.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
+    private Vector3D get(double raDeg, double decDeg, double distMpc) {
+        return Coordinates.sphericalToCartesian(MathUtilsDouble.degRad * raDeg, MathUtilsDouble.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3D());
     }
 
     @Override

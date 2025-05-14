@@ -14,12 +14,12 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Settings;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public class RelativisticCamera extends AbstractCamera {
 
-    public Vector3d direction, up;
+    public Vector3D direction, up;
 
     public RelativisticCamera(CameraManager parent) {
         super(parent);
@@ -38,8 +38,8 @@ public class RelativisticCamera extends AbstractCamera {
 
         fovFactor = camera.fieldOfView / 40f;
 
-        up = new Vector3d(1, 0, 0);
-        direction = new Vector3d(0, 1, 0);
+        up = new Vector3D(1, 0, 0);
+        direction = new Vector3D(0, 1, 0);
     }
 
     @Override
@@ -61,21 +61,21 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public Vector3d getDirection() {
+    public Vector3D getDirection() {
         return null;
     }
 
     @Override
-    public void setDirection(Vector3d dir) {
+    public void setDirection(Vector3D dir) {
     }
 
     @Override
-    public Vector3d getUp() {
+    public Vector3D getUp() {
         return null;
     }
 
     @Override
-    public Vector3d[] getDirections() {
+    public Vector3D[] getDirections() {
         return null;
     }
 

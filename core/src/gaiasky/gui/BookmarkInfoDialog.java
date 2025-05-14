@@ -6,7 +6,7 @@ import gaiasky.gui.bookmarks.BookmarksManager.BookmarkNode;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
@@ -118,7 +118,7 @@ public class BookmarkInfoDialog extends GenericDialog {
 
     }
 
-    private String vectorToString(Vector3d v) {
+    private String vectorToString(Vector3D v) {
         if (v != null) {
             return v.toString();
         } else {

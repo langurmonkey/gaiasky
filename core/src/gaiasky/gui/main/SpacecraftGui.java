@@ -50,7 +50,7 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;
 
@@ -90,7 +90,7 @@ public class SpacecraftGui extends AbstractGui {
     // Reference to spacecraft camera rotation quaternion
     private Quaternion qf;
     // Reference to spacecraft camera velocity vector
-    private Vector3d vel;
+    private Vector3D vel;
     private float indicatorw, indicatorh, indicatorx, indicatory;
     private boolean thrustEvents = true;
 
@@ -539,7 +539,7 @@ public class SpacecraftGui extends AbstractGui {
         // VELOCITY INDICATORS IN NAVBALL
         if (!vel.isZero()) {
             // velocity
-            aux3f1.set(vel.valuesf()).nor().scl(0.864f);
+            aux3f1.set(vel.valuesF()).nor().scl(0.864f);
             aux3f1.mul(qf);
             aux3f1.add(0, 0, 6.3f);
             aiVelDec.setPosition(aux3f1);
@@ -547,7 +547,7 @@ public class SpacecraftGui extends AbstractGui {
             aiVelDec.lookAt(aiCam.position, aiCam.up);
 
             // anti-velocity
-            aux3f2.set(vel.valuesf()).nor().scl(-0.864f);
+            aux3f2.set(vel.valuesF()).nor().scl(-0.864f);
             aux3f2.mul(qf);
             aux3f2.add(0, 0, 6.3f);
             aiAntivelDec.setPosition(aux3f2);

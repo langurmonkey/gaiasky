@@ -7,14 +7,14 @@
 
 package gaiasky.util;
 
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 /**
- * Thread local variable holding {@link Vector3d}.
+ * Thread local variable holding {@link Vector3D}.
  */
-public class TLV3D extends ThreadLocal<Vector3d> {
+public class TLV3D extends ThreadLocal<Vector3D> {
     @Override
-    protected Vector3d initialValue() {
-        return new Vector3d();
+    protected Vector3D initialValue() {
+        return new Vector3D();
     }
 }

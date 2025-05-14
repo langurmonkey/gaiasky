@@ -23,7 +23,7 @@ import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector2D;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
@@ -175,7 +175,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
 
         // Fade in
         fadeIn = new OwnCheckBox(I18n.msg("gui.dsload.fade.in"), skin, pad10);
-        Vector2d fi = ci.entity != null ? Mapper.fade.get(ci.entity).fadeIn : null;
+        Vector2D fi = ci.entity != null ? Mapper.fade.get(ci.entity).fadeIn : null;
         container.add(fadeIn).left().padRight(pad18).padBottom(pad10);
 
         HorizontalGroup fadeInGroup = new HorizontalGroup();
@@ -212,7 +212,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
 
         // Fade out
         fadeOut = new OwnCheckBox(I18n.msg("gui.dsload.fade.out"), skin, pad10);
-        Vector2d fo = ci.entity != null ? Mapper.fade.get(ci.entity).fadeOut : null;
+        Vector2D fo = ci.entity != null ? Mapper.fade.get(ci.entity).fadeOut : null;
         container.add(fadeOut).left().padRight(pad18).padBottom(pad10);
 
         HorizontalGroup fadeOutGroup = new HorizontalGroup();

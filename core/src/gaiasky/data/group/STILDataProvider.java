@@ -26,8 +26,8 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.LinearInterpolator;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCD;
 import gaiasky.util.ucd.UCDParser;
@@ -337,16 +337,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (transform != null) {
                                 p.realPosition.mul(transform);
                             }
-                            if (transformer != null) {
-                                transformer.transform(p.realPosition);
-                            }
 
                             // Find out RA/DEC/Dist
-                            Vector3d sph = new Vector3d();
+                            Vector3D sph = new Vector3D();
                             Coordinates.cartesianToSpherical(p.realPosition, sph);
 
                             // PROPER MOTION
-                            Vector3d pm;
+                            Vector3D pm;
                             double muAlphaStar = 0, muDelta = 0, radVel = 0;
                             // Only supported if position is equatorial spherical coordinates (ra/dec)
                             if (pt == PositionType.EQ_SPH_DIST || pt == PositionType.EQ_SPH_PLX) {
@@ -362,9 +359,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                                 double raRad = new Angle(a.getSecond(), a.getFirst().unit).get(AngleUnit.RAD);
                                 double decRad = new Angle(b.getSecond(), b.getFirst().unit).get(AngleUnit.RAD);
-                                pm = Coordinates.properMotionsToCartesian(muAlphaStar, muDelta, radVelValue, raRad, decRad, distPc, new Vector3d());
+                                pm = Coordinates.properMotionsToCartesian(muAlphaStar, muDelta, radVelValue, raRad, decRad, distPc, new Vector3D());
                             } else {
-                                pm = new Vector3d(Vector3d.Zero);
+                                pm = new Vector3D(Vector3D.Zero);
                             }
 
                             // MAGNITUDE
@@ -492,15 +489,15 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 nVari = variMagsDouble.length;
 
                                 // FOLD
-                                List<Vector2d> list = new ArrayList<>(nVari);
+                                List<Vector2D> list = new ArrayList<>(nVari);
                                 for (int k = 0; k < nVari; k++) {
                                     double phase = ((variTimes[k] - variTimes[0]) % pf);
-                                    list.add(new Vector2d(phase, variMagsDouble[k]));
+                                    list.add(new Vector2D(phase, variMagsDouble[k]));
                                 }
                                 list.sort(Comparator.comparingDouble(o -> o.x));
 
                                 for (int k = 0; k < nVari; k++) {
-                                    Vector2d point = list.get(k);
+                                    Vector2D point = list.get(k);
                                     variTimes[k] = point.x + variTimes[0];
                                     variMagsDouble[k] = point.y;
                                 }

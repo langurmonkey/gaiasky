@@ -14,9 +14,9 @@ import net.jafama.FastMath;
 
 public class IntersectorDouble {
 
-    private static final Vector3d auxd1 = new Vector3d();
-    private static final Vector3d auxd2 = new Vector3d();
-    private static final Vector3d auxd3 = new Vector3d();
+    private static final Vector3D auxd1 = new Vector3D();
+    private static final Vector3D auxd2 = new Vector3D();
+    private static final Vector3D auxd3 = new Vector3D();
 
     /**
      * Quick check whether the given {@link Ray} and {@link BoundingBoxDouble}
@@ -29,8 +29,8 @@ public class IntersectorDouble {
      * @return Whether the ray and the bounding box intersect.
      */
     public static boolean intersectRayBoundsFast(RayDouble ray,
-                                                 Vector3d center,
-                                                 Vector3d dimensions) {
+                                                 Vector3D center,
+                                                 Vector3D dimensions) {
         final double divX = 1f / ray.direction.x;
         final double divY = 1f / ray.direction.y;
         final double divZ = 1f / ray.direction.z;
@@ -65,9 +65,9 @@ public class IntersectorDouble {
         return max >= 0 && max >= min;
     }
 
-    public static boolean checkIntersectRaySpehre(Vector3d linePoint0,
-                                                  Vector3d linePoint1,
-                                                  Vector3d sphereCenter,
+    public static boolean checkIntersectRaySpehre(Vector3D linePoint0,
+                                                  Vector3D linePoint1,
+                                                  Vector3D sphereCenter,
                                                   double sphereRadius) {
         return checkIntersectRaySpehre(linePoint0.x, linePoint0.y, linePoint0.z, linePoint1.x, linePoint1.y, linePoint1.z, sphereCenter.x, sphereCenter.y, sphereCenter.z,
                                        sphereRadius);
@@ -75,7 +75,7 @@ public class IntersectorDouble {
 
     public static boolean checkIntersectRaySpehre(Vector3 linePoint0,
                                                   Vector3 linePoint1,
-                                                  Vector3d sphereCenter,
+                                                  Vector3D sphereCenter,
                                                   double sphereRadius) {
         return checkIntersectRaySpehre(linePoint0.x, linePoint0.y, linePoint0.z, linePoint1.x, linePoint1.y, linePoint1.z, sphereCenter.x, sphereCenter.y, sphereCenter.z,
                                        sphereRadius);
@@ -101,9 +101,9 @@ public class IntersectorDouble {
         return D >= 0;
     }
 
-    public synchronized static Array<Vector3d> intersectRaySphere(Vector3d linePoint0,
-                                                                  Vector3d linePoint1,
-                                                                  Vector3d sphereCenter,
+    public synchronized static Array<Vector3D> intersectRaySphere(Vector3D linePoint0,
+                                                                  Vector3D linePoint1,
+                                                                  Vector3D sphereCenter,
                                                                   double sphereRadius) {
         // http://www.codeproject.com/Articles/19799/Simple-Ray-Tracing-in-C-Part-II-Triangles-Intersec
 
@@ -126,7 +126,7 @@ public class IntersectorDouble {
         // discriminant
         double D = B * B - 4 * A * C;
 
-        Array<Vector3d> result = new Array<>(false, 2);
+        Array<Vector3D> result = new Array<>(false, 2);
 
         if (D < 0) {
             return result;
@@ -134,7 +134,7 @@ public class IntersectorDouble {
 
         double t1 = (-B - FastMath.sqrt(D)) / (2.0 * A);
 
-        Vector3d solution1 = auxd1.set(linePoint0.x * (1 - t1) + t1 * linePoint1.x, linePoint0.y * (1 - t1) + t1 * linePoint1.y,
+        Vector3D solution1 = auxd1.set(linePoint0.x * (1 - t1) + t1 * linePoint1.x, linePoint0.y * (1 - t1) + t1 * linePoint1.y,
                                        linePoint0.z * (1 - t1) + t1 * linePoint1.z);
         if (D == 0) {
             result.add(solution1);
@@ -142,7 +142,7 @@ public class IntersectorDouble {
         }
 
         double t2 = (-B + FastMath.sqrt(D)) / (2.0 * A);
-        Vector3d solution2 = auxd2.set(linePoint0.x * (1 - t2) + t2 * linePoint1.x, linePoint0.y * (1 - t2) + t2 * linePoint1.y,
+        Vector3D solution2 = auxd2.set(linePoint0.x * (1 - t2) + t2 * linePoint1.x, linePoint0.y * (1 - t2) + t2 * linePoint1.y,
                                        linePoint0.z * (1 - t2) + t2 * linePoint1.z);
 
         // prefer a solution that's on the line segment itself
@@ -158,11 +158,11 @@ public class IntersectorDouble {
         return result;
     }
 
-    public static boolean checkIntersectSegmentSphere(Vector3d linePoint0,
-                                                      Vector3d linePoint1,
-                                                      Vector3d sphereCenter,
+    public static boolean checkIntersectSegmentSphere(Vector3D linePoint0,
+                                                      Vector3D linePoint1,
+                                                      Vector3D sphereCenter,
                                                       double sphereRadius) {
-        Array<Vector3d> solutions = intersectRaySphere(linePoint0, linePoint1, sphereCenter, sphereRadius);
+        Array<Vector3D> solutions = intersectRaySphere(linePoint0, linePoint1, sphereCenter, sphereRadius);
         // Test each point
         int n = solutions.size;
         for (int i = 0; i < n; i++) {
@@ -180,9 +180,9 @@ public class IntersectorDouble {
      * @param b Point B
      * @param c Point to check
      */
-    private static boolean isBetween(Vector3d a,
-                                     Vector3d b,
-                                     Vector3d c) {
+    private static boolean isBetween(Vector3D a,
+                                     Vector3D b,
+                                     Vector3D c) {
         // -epsilon < (distance(a, c) + distance(c, b) - distance(a, b)) < epsilon
         double ab = a.dst(b);
         double ac = a.dst(c);
@@ -208,10 +208,10 @@ public class IntersectorDouble {
      *
      * @return The minimum distance between the line and the point
      */
-    public synchronized static double distanceLinePoint(Vector3d x1,
-                                                        Vector3d x2,
-                                                        Vector3d x0) {
-        Vector3d aux1 = auxd2.set(x0).sub(x2);
+    public synchronized static double distanceLinePoint(Vector3D x1,
+                                                        Vector3D x2,
+                                                        Vector3D x0) {
+        Vector3D aux1 = auxd2.set(x0).sub(x2);
         double nominator = auxd1.set(x0).sub(x1).crs(aux1).len();
         double denominator = aux1.set(x2).sub(x1).len();
         return nominator / denominator;
@@ -226,18 +226,18 @@ public class IntersectorDouble {
      *
      * @return distance from v to line segment [a,b]
      */
-    public synchronized static double distanceSegmentPoint(final Vector3d a,
-                                                           final Vector3d b,
-                                                           final Vector3d v) {
-        final Vector3d ab = auxd1.set(b).sub(a);
+    public synchronized static double distanceSegmentPoint(final Vector3D a,
+                                                           final Vector3D b,
+                                                           final Vector3D v) {
+        final Vector3D ab = auxd1.set(b).sub(a);
         double ablen = ab.len();
-        final Vector3d av = auxd2.set(v).sub(a);
+        final Vector3D av = auxd2.set(v).sub(a);
         double avlen = av.len();
 
         if (av.dot(ab) <= 0.0) // Point is lagging behind start of the segment, so perpendicular distance is not viable.
             return avlen; // Use distance to start of segment instead.
 
-        final Vector3d bv = auxd3.set(v).sub(b);
+        final Vector3D bv = auxd3.set(v).sub(b);
         double bvlen = bv.len();
 
         if (bv.dot(ab) >= 0.0) // Point is advanced past the end of the segment, so perpendicular distance is not viable.
@@ -254,11 +254,11 @@ public class IntersectorDouble {
      * @param linePoint     A point on the line.
      * @param lineDirection The direction vector of the line.
      */
-    public static void lineIntersection(Vector3d planePoint,
-                                        Vector3d planeNormal,
-                                        Vector3d linePoint,
-                                        Vector3d lineDirection,
-                                        Vector3d out) {
+    public static void lineIntersection(Vector3D planePoint,
+                                        Vector3D planeNormal,
+                                        Vector3D linePoint,
+                                        Vector3D lineDirection,
+                                        Vector3D out) {
         if (planeNormal.dot(lineDirection.nor()) == 0) {
             return;
         }
@@ -276,9 +276,9 @@ public class IntersectorDouble {
      *
      * @return the distance between the point and the plane.
      */
-    public static double distancePointPlane(Vector3d point,
-                                            Vector3d planeNormal,
-                                            Vector3d planePoint) {
+    public static double distancePointPlane(Vector3D point,
+                                            Vector3D planeNormal,
+                                            Vector3D planePoint) {
         double a = planeNormal.x;
         double b = planeNormal.y;
         double c = planeNormal.z;
@@ -324,11 +324,11 @@ public class IntersectorDouble {
      *
      * @return <code>true</code> if the given line segment intersects the plane; <code>false</code> otherwise
      */
-    public static boolean intersectLineSegmentPlane(Vector3d p0,
-                                                    Vector3d p1,
-                                                    Vector3d planeNormal,
-                                                    Vector3d planePoint,
-                                                    Vector3d intersectionPoint) {
+    public static boolean intersectLineSegmentPlane(Vector3D p0,
+                                                    Vector3D p1,
+                                                    Vector3D planeNormal,
+                                                    Vector3D planePoint,
+                                                    Vector3D intersectionPoint) {
         double a = planeNormal.x;
         double b = planeNormal.y;
         double c = planeNormal.z;
@@ -365,7 +365,7 @@ public class IntersectorDouble {
                                                     double b,
                                                     double c,
                                                     double d,
-                                                    Vector3d intersectionPoint) {
+                                                    Vector3D intersectionPoint) {
         double dirX = p1X - p0X;
         double dirY = p1Y - p0Y;
         double dirZ = p1Z - p0Z;

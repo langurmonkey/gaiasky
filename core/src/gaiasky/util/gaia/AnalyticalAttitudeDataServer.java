@@ -11,7 +11,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServer<IAttitude> {
@@ -26,9 +26,9 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
     protected static final double ARCSEC_PER_S_TO_DEG_PER_DAY = 86400.D * (1d / 3600d);
 
     /** Unit vectors **/
-    protected static final Vector3d X_AXIS = Vector3d.getUnitX();
-    protected static final Vector3d Y_AXIS = Vector3d.getUnitY();
-    protected static final Vector3d Z_AXIS = Vector3d.getUnitZ();
+    protected static final Vector3D X_AXIS = Vector3D.getUnitX();
+    protected static final Vector3D Y_AXIS = Vector3D.getUnitY();
+    protected static final Vector3D Z_AXIS = Vector3D.getUnitZ();
 
     /** The obliquity of the ecliptic **/
     protected static final double OBLIQUITY_RAD = Coordinates.OBLIQUITY_RAD_J2000;

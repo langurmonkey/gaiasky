@@ -25,7 +25,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.TopNBuffer;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.ds.GaiaSkyExecutorService;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -60,9 +60,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     private final DatasetDescription datasetDescription;
     private final ParticleUtils utils;
     private final TopNBuffer buffer;
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
-    private final Vector3d D34 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
+    private final Vector3D D32 = new Vector3D();
+    private final Vector3D D34 = new Vector3D();
 
     private final GaiaSkyExecutorService executor;
 
@@ -134,7 +134,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 case METADATA -> {
                     if (base.opacity > 0
                             && (t > UPDATE_INTERVAL_S_2
-                            || (particleSet.lastSortCameraPos.dst2d(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
+                            || (particleSet.lastSortCameraPos.dst2D(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
                             || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_S))) {
                         executor.execute(this);
                     }
@@ -186,6 +186,8 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 for (int i = n; i < totalCount; i++) {
                     buffer.add(i, metadata[i]);
                 }
+                // Sort it.
+                buffer.sort();
 
                 // Now move top indices to array.
                 int[] topIndices = this.buffer.indexArray();
@@ -212,12 +214,12 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     private void updateMetadataParticles(ITimeFrameProvider time,
                                          ICamera camera) {
         // Particles, only distance.
-        Vector3d camPos = camera.getPos()
+        Vector3D camPos = camera.getPos()
                 .tov3d(D34);
         int n = particleSet.pointData.size();
         for (int i = 0; i < n; i++) {
             IParticleRecord d = particleSet.pointData.get(i);
-            Vector3d x = D31.set(d.x(), d.y(), d.z());
+            Vector3D x = D31.set(d.x(), d.y(), d.z());
             particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? camPos.dst2(x) : Double.MAX_VALUE;
         }
     }
@@ -247,7 +249,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     private void updateMetadataParticlesExt(ITimeFrameProvider time,
                                             ICamera camera) {
         // Extended particles and stars, propagate proper motion, weigh with pseudo-size.
-        Vector3d camPos = camera.getPos()
+        Vector3D camPos = camera.getPos()
                 .tov3d(D34);
         double deltaYears = AstroUtils.getMsSince(time.getTime(), particleSet.epochJd) * Nature.MS_TO_Y;
         if (particleSet.pointData != null) {
@@ -256,10 +258,10 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 IParticleRecord d = particleSet.pointData.get(i);
 
                 // Pm
-                Vector3d dx = D32.set(d.vx(), d.vy(), d.vz())
+                Vector3D dx = D32.set(d.vx(), d.vy(), d.vz())
                         .scl(deltaYears);
                 // Pos
-                Vector3d pos = D31.set(d.x(), d.y(), d.z())
+                Vector3D pos = D31.set(d.x(), d.y(), d.z())
                         .add(dx);
 
                 // Use magnitude.

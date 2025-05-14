@@ -34,6 +34,9 @@ import net.jafama.FastMath;
 import java.util.Comparator;
 import java.util.Objects;
 
+/**
+ * Implements the mouse and keyboard listener in default mode.
+ */
 public class MainMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
 
     /**

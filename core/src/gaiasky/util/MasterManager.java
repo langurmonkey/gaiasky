@@ -14,8 +14,8 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.net.URI;
@@ -133,7 +133,7 @@ public class MasterManager implements IObserver {
      * @param up   Camera up.
      * @param time Current time.
      */
-    public void boardcastCameraAndTime(Vector3b pos, Vector3d dir, Vector3d up, ITimeFrameProvider time) {
+    public void boardcastCameraAndTime(Vector3Q pos, Vector3D dir, Vector3D up, ITimeFrameProvider time) {
         String spos = TextUtils.surround(pos.toString(), "[", "]");
         String sdir = TextUtils.surround(dir.toString(), "[", "]");
         String sup = TextUtils.surround(up.toString(), "[", "]");
@@ -179,7 +179,7 @@ public class MasterManager implements IObserver {
      * @param dir Camera direction
      * @param up  Camera up
      */
-    public void boardcastCamera(Vector3d pos, Vector3d dir, Vector3d up) {
+    public void boardcastCamera(Vector3D pos, Vector3D dir, Vector3D up) {
         String spos = TextUtils.surround(pos.toString(), "[", "]");
         String sdir = TextUtils.surround(dir.toString(), "[", "]");
         String sup = TextUtils.surround(up.toString(), "[", "]");

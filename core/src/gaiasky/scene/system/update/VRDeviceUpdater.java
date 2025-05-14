@@ -10,8 +10,8 @@ package gaiasky.scene.system.update;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 
 public class VRDeviceUpdater extends AbstractUpdateSystem {
 
@@ -26,8 +26,8 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
         updateEntity(entity, deltaTime);
     }
 
-    private final Vector3d aux = new Vector3d();
-    private final Matrix4d deviceTransform = new Matrix4d();
+    private final Vector3D aux = new Vector3D();
+    private final Matrix4D deviceTransform = new Matrix4D();
 
     @Override
     public void updateEntity(Entity entity,

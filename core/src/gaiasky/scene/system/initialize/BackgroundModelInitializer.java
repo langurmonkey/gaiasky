@@ -27,7 +27,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 
 public class BackgroundModelInitializer extends AbstractInitSystem {
 
@@ -96,7 +96,7 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
             Class<Coordinates> c = Coordinates.class;
             try {
                 Method m = ClassReflection.getMethod(c, transform.transformName);
-                Matrix4d trf = (Matrix4d) m.invoke(null);
+                Matrix4D trf = (Matrix4D) m.invoke(null);
                 Matrix4 aux = trf.putIn(new Matrix4());
                 graph.localTransform.mul(aux);
             } catch (ReflectionException e) {
@@ -121,7 +121,7 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
             Class<Coordinates> c = Coordinates.class;
             try {
                 Method m = ClassReflection.getMethod(c, transform.transformName);
-                Matrix4d trf = (Matrix4d) m.invoke(null);
+                Matrix4D trf = (Matrix4D) m.invoke(null);
                 Matrix4 aux = new Matrix4();
                 trf.putIn(aux);
                 grid.annotTransform.mul(aux);

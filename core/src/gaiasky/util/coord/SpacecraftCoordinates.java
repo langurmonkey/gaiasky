@@ -21,8 +21,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 
 import java.time.Instant;
 import java.util.Map;
@@ -31,23 +31,23 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
     private static final Log logger = Logger.getLogger(SpacecraftCoordinates.class);
 
     private ISpacecraft spacecraft;
-    private final Vector3d D31;
-    private final Vector3d D32;
-    private final Vector3d D33;
-    private final Vector3b B31;
-    private final Vector3b B32;
-    private final Vector3b B33;
-    private final Vector3b B34;
+    private final Vector3D D31;
+    private final Vector3D D32;
+    private final Vector3D D33;
+    private final Vector3Q B31;
+    private final Vector3Q B32;
+    private final Vector3Q B33;
+    private final Vector3Q B34;
 
     public SpacecraftCoordinates() {
-        this.D31 = new Vector3d();
-        this.D32 = new Vector3d();
-        this.D33 = new Vector3d();
+        this.D31 = new Vector3D();
+        this.D32 = new Vector3D();
+        this.D33 = new Vector3D();
 
-        this.B31 = new Vector3b();
-        this.B32 = new Vector3b();
-        this.B33 = new Vector3b();
-        this.B34 = new Vector3b();
+        this.B31 = new Vector3Q();
+        this.B32 = new Vector3Q();
+        this.B33 = new Vector3Q();
+        this.B34 = new Vector3Q();
     }
 
     public void setSpacecraft(ISpacecraft sc) {
@@ -60,7 +60,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticSphericalCoordinates(Instant date, Vector3Q out) {
         getEclipticCartesianCoordinates(date, out);
 
         // To spherical
@@ -69,7 +69,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
+    public Vector3Q getEclipticCartesianCoordinates(Instant date, Vector3Q out) {
         getEquatorialCartesianCoordinates(date, out);
         out.mul(Coordinates.eqToEcl());
 
@@ -77,7 +77,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out) {
+    public Vector3Q getEquatorialCartesianCoordinates(Instant instant, Vector3Q out) {
         return computePosition(GaiaSky.instance.time.getDt(),
                 GaiaSky.instance.getICamera().getSecondClosestBody(),
                 spacecraft.currentEnginePower(),
@@ -89,7 +89,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
                 out);
     }
 
-    public Vector3b computePosition(double dt, IFocus closest, double currentEnginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3b posb) {
+    public Vector3Q computePosition(double dt, IFocus closest, double currentEnginePower, Vector3D thrust, Vector3D direction, Vector3D force, Vector3D accel, Vector3D vel, Vector3Q posb) {
         double mass = spacecraft.mass();
 
         spacecraft.currentEnginePower(Math.signum(currentEnginePower));
@@ -117,7 +117,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
                 force.set(thrust);
             }
 
-            Vector3d nextVel = D33.set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
+            Vector3D nextVel = D33.set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
 
             if (vel.angle(nextVel) > 90) {
                 spacecraft.currentEnginePower(0);
@@ -132,7 +132,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
 
         // Integrate other quantities
         // convert metres to internal units so we have the velocity in u/s
-        Vector3d acc = D31.set(accel).scl(Constants.M_TO_U);
+        Vector3D acc = D31.set(accel).scl(Constants.M_TO_U);
 
         if (Settings.settings.spacecraft.velocityDirection) {
             double velocityLength = vel.len();
@@ -140,9 +140,9 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         }
         vel.add(acc.scl(dt));
 
-        Vector3b velocity = B32.set(vel);
-        Vector3b newPosition = B33.set(posb).add(velocity.scl(dt));
-        Vector3b pos = posb.put(B34);
+        Vector3Q velocity = B32.set(vel);
+        Vector3Q newPosition = B33.set(posb).add(velocity.scl(dt));
+        Vector3Q pos = posb.put(B34);
         // Check collision!
         IFocus me = GaiaSky.instance.getICamera().getClosestBody();
         if (closest != null && !closest.isEmpty()
@@ -154,7 +154,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
             if (!vel.isZero() && IntersectorDouble.distanceSegmentPoint(pos.put(D31), newPosition.put(D32), closest.getPos().put(D33)) < twoRadii) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = IntersectorDouble.intersectRaySphere(pos.put(D31), newPosition.put(D32), closest.getPos().put(D31), twoRadii);
+                Array<Vector3D> intersections = IntersectorDouble.intersectRaySphere(pos.put(D31), newPosition.put(D32), closest.getPos().put(D31), twoRadii);
 
                 // Teleport outside
                 if (intersections.size >= 1) {
@@ -162,7 +162,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
                 }
 
                 spacecraft.stopAllMovement();
-            } else if (posb.dstDouble(closest.getPos()) < twoRadii) {
+            } else if (posb.dstD(closest.getPos()) < twoRadii) {
                 posb.set(B31.set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos(), B32)));
             } else {
                 posb.set(newPosition);

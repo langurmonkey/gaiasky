@@ -17,7 +17,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.io.*;
 import java.time.Instant;
@@ -109,10 +109,10 @@ public class HeliotropicOrbitDataLoader {
                      * From Data coordinates to OpenGL world coordinates Z -> -X
                      * X -> Y Y -> Z
                      */
-                    Vector3d pos = new Vector3d(parsed(tokens[2]), parsed(tokens[3]), -parsed(tokens[1]));
+                    Vector3D pos = new Vector3D(parsed(tokens[2]), parsed(tokens[3]), -parsed(tokens[1]));
 
                     // Transform to heliotropic using the Sun's ecliptic longitude
-                    Vector3d posHel = correctSunLongitude(pos, time, 0);
+                    Vector3D posHel = correctSunLongitude(pos, time, 0);
 
                     // To ecliptic again
                     pos.mul(Coordinates.eqToEcl());
@@ -158,7 +158,7 @@ public class HeliotropicOrbitDataLoader {
      *
      * @return Vector3 with the position in the heliotropic reference frame
      */
-    protected Vector3d correctSunLongitude(final Vector3d pos, Instant t) {
+    protected Vector3D correctSunLongitude(final Vector3D pos, Instant t) {
         return correctSunLongitude(pos, t, 0);
     }
 
@@ -171,8 +171,8 @@ public class HeliotropicOrbitDataLoader {
      *
      * @return Vector3 with the position in the heliotropic reference frame
      */
-    protected Vector3d correctSunLongitude(final Vector3d pos, Instant t, float origin) {
-        Vector3d upDirection = new Vector3d(0, 1, 0);
+    protected Vector3D correctSunLongitude(final Vector3D pos, Instant t, float origin) {
+        Vector3D upDirection = new Vector3D(0, 1, 0);
         // We get the Up direction of the ecliptic in equatorial coordinates
         upDirection.mul(Coordinates.eclToEq());
         return pos.cpy()
@@ -221,7 +221,7 @@ public class HeliotropicOrbitDataLoader {
         int n = data.samples.size();
         for (int i = 0; i < n; i++) {
             var p = data.samples.get(i);
-            Vector3d pos = new Vector3d(p.x(), p.y(), p.z());
+            Vector3D pos = new Vector3D(p.x(), p.y(), p.z());
             long t = p.toEpochMilli();
 
             long time = iniTime < 0 ? 0 : t - iniTime;

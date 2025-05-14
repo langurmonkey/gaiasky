@@ -13,8 +13,8 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 
 public class StarSet extends ParticleSet {
     /**
@@ -40,7 +40,7 @@ public class StarSet extends ParticleSet {
      */
     public void updateFocus(ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
-        Vector3d aux = this.fetchPositionDouble(focus, cPosD, D31, currDeltaYears);
+        Vector3D aux = this.fetchPositionDouble(focus, cPosD, D31, currDeltaYears);
         this.focusPosition.set(aux).add(cPosD);
         this.focusDistToCamera = aux.len();
         this.focusSize = getFocusSize();
@@ -93,7 +93,7 @@ public class StarSet extends ParticleSet {
     public double getSolidAngleApparent(int index) {
         if (index >= 0) {
             IParticleRecord candidate = pointData.get(index);
-            Vector3d aux = candidate.pos(D31);
+            Vector3D aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
             double va = (float) ((candidate.radius() / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
             return va * Settings.settings.scene.star.brightness;
@@ -111,11 +111,11 @@ public class StarSet extends ParticleSet {
         return this.proximity.updating[0].size;
     }
 
-    public Vector3d getClosestPos(Vector3d out) {
+    public Vector3D getClosestPos(Vector3D out) {
         return out.set(this.proximity.updating[0].pos);
     }
 
-    public Vector3b getClosestAbsolutePos(Vector3b out) {
+    public Vector3Q getClosestAbsolutePos(Vector3Q out) {
         return out.set(this.proximity.updating[0].absolutePos);
     }
 

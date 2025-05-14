@@ -8,14 +8,14 @@
 package gaiasky.util.gaia.utils;
 
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.Random;
 
 public class Place {
 
-    protected Vector3d dirICRS = null;
+    protected Vector3D dirICRS = null;
     protected boolean haveAngles = false;
     protected double alpha;
     protected double delta;
@@ -24,7 +24,7 @@ public class Place {
      * Default constructor. Puts the Place at (alpha, delta ) = (0, 0)
      */
     public Place() {
-        dirICRS = new Vector3d(1.0, 0.0, 0.0);
+        dirICRS = new Vector3D(1.0, 0.0, 0.0);
         haveAngles = false;
     }
 
@@ -34,7 +34,7 @@ public class Place {
      *
      * @param r vector
      */
-    public Place(Vector3d r) {
+    public Place(Vector3D r) {
         dirICRS = r.cpy().nor();
         haveAngles = false;
     }
@@ -43,7 +43,7 @@ public class Place {
      * Creates a new place at the given (alpha, delta)
      */
     public Place(double rightAscension, double declination) {
-        dirICRS = new Vector3d();
+        dirICRS = new Vector3D();
         Coordinates.sphericalToCartesian(rightAscension, declination, 1, dirICRS);
         alpha = rightAscension;
         delta = declination;
@@ -56,7 +56,7 @@ public class Place {
      * @param rnd Random number generator
      */
     public Place(Random rnd) {
-        dirICRS = new Vector3d(rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()).nor();
+        dirICRS = new Vector3D(rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()).nor();
         haveAngles = false;
     }
 
@@ -73,7 +73,7 @@ public class Place {
      *
      * @return vector
      */
-    public Vector3d getDirection() {
+    public Vector3D getDirection() {
         return dirICRS.cpy();
     }
 
@@ -83,7 +83,7 @@ public class Place {
      *
      * @param r vector
      */
-    public Place setDirection(Vector3d r) {
+    public Place setDirection(Vector3D r) {
         dirICRS = r.cpy().nor();
         haveAngles = false;
         return this;
@@ -134,10 +134,10 @@ public class Place {
      * @return angle between them [rad]
      */
     public double getAngleTo(Place p) {
-        Vector3d v1 = this.getDirection();
-        Vector3d v2 = p.getDirection();
-        Vector3d sum = v1.cpy().add(v2);
-        Vector3d dif = v1.sub(v2);
+        Vector3D v1 = this.getDirection();
+        Vector3D v2 = p.getDirection();
+        Vector3D sum = v1.cpy().add(v2);
+        Vector3D dif = v1.sub(v2);
 
         return 2. * FastMath.atan2(dif.len(), sum.len());
     }
@@ -157,7 +157,7 @@ public class Place {
         double x = rnd.nextGaussian();
         double y = rnd.nextGaussian();
         double z = rnd.nextGaussian();
-        dirICRS = new Vector3d(x, y, z).nor();
+        dirICRS = new Vector3D(x, y, z).nor();
         haveAngles = false;
         return this;
     }
@@ -169,9 +169,9 @@ public class Place {
     public Place moveToRandom(Random rnd, Place centre, double radius) {
 
         // construct two unit vectors p and q normal to c:
-        Vector3d pole = new Vector3d(0., 0., 1.);
-        Vector3d c = centre.getDirection();
-        Vector3d p = pole.cpy().crs(c);
+        Vector3D pole = new Vector3D(0., 0., 1.);
+        Vector3D c = centre.getDirection();
+        Vector3D p = pole.cpy().crs(c);
         double pNorm = p.len();
         if (pNorm < 0.1) {
             // this pole was close to c; choose another pole:
@@ -180,7 +180,7 @@ public class Place {
             pNorm = p.len();
         }
         p.scl(1.0 / pNorm);
-        Vector3d q = c.cpy().crs(p);
+        Vector3D q = c.cpy().crs(p);
 
         double tMax = getWeight(radius);
         double t = tMax * rnd.nextDouble();
@@ -212,7 +212,7 @@ public class Place {
      * Internal conversion from direction to (alpha, delta)
      */
     protected void calcAngles() {
-        Vector3d aux = new Vector3d();
+        Vector3D aux = new Vector3D();
         Coordinates.cartesianToSpherical(dirICRS, aux);
         alpha = aux.x;
         delta = aux.y;

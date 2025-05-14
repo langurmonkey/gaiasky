@@ -10,19 +10,19 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.util.Constants;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3Q;
 
 public class Fade implements Component {
     /**
      * Fade in low and high limits
      */
-    public Vector2d fadeIn, fadeInMap;
+    public Vector2D fadeIn, fadeInMap;
 
     /**
      * Fade out low and high limits
      */
-    public Vector2d fadeOut, fadeOutMap;
+    public Vector2D fadeOut, fadeOutMap;
 
     /**
      * The current distance at each cycle, in internal units
@@ -43,7 +43,7 @@ public class Fade implements Component {
     /**
      * The position to use in order to compute the fading distance.
      */
-    public Vector3b fadePosition;
+    public Vector3Q fadePosition;
 
     public void setFadein(double[] fadeIn) {
         setFadeIn(fadeIn);
@@ -51,7 +51,7 @@ public class Fade implements Component {
 
     public void setFadeIn(double[] fadeIn) {
         if (fadeIn != null)
-            this.fadeIn = new Vector2d(fadeIn[0] * Constants.PC_TO_U, fadeIn[1] * Constants.PC_TO_U);
+            this.fadeIn = new Vector2D(fadeIn[0] * Constants.PC_TO_U, fadeIn[1] * Constants.PC_TO_U);
         else
             this.fadeIn = null;
     }
@@ -64,7 +64,7 @@ public class Fade implements Component {
      */
     public void setFadeInMap(double[] fadeInMap) {
         if (fadeInMap != null)
-            this.fadeInMap = new Vector2d(fadeInMap[0], fadeInMap[1]);
+            this.fadeInMap = new Vector2D(fadeInMap[0], fadeInMap[1]);
         else
             this.fadeInMap = null;
     }
@@ -75,7 +75,7 @@ public class Fade implements Component {
 
     public void setFadeOut(double[] fadeOut) {
         if (fadeOut != null)
-            this.fadeOut = new Vector2d(fadeOut[0] * Constants.PC_TO_U, fadeOut[1] * Constants.PC_TO_U);
+            this.fadeOut = new Vector2D(fadeOut[0] * Constants.PC_TO_U, fadeOut[1] * Constants.PC_TO_U);
         else
             this.fadeOut = null;
     }
@@ -88,7 +88,7 @@ public class Fade implements Component {
      */
     public void setFadeOutMap(double[] fadeOutMap) {
         if (fadeOutMap != null)
-            this.fadeOutMap = new Vector2d(fadeOutMap[0], fadeOutMap[1]);
+            this.fadeOutMap = new Vector2D(fadeOutMap[0], fadeOutMap[1]);
         else
             this.fadeOutMap = null;
     }
@@ -103,7 +103,7 @@ public class Fade implements Component {
 
     public void setFadePc(double[] fade) {
         if (fadeIn == null) {
-            fadeIn = new Vector2d();
+            fadeIn = new Vector2D();
         }
         fadeIn.set(fade).scl(Constants.PC_TO_U);
     }
@@ -117,10 +117,10 @@ public class Fade implements Component {
     }
 
     public void setFadePosition(Double fadePosition) {
-        this.fadePosition = new Vector3b(fadePosition, fadePosition, fadePosition);
+        this.fadePosition = new Vector3Q(fadePosition, fadePosition, fadePosition);
     }
 
     public void setFadePosition(double[] fadePosition) {
-        this.fadePosition = new Vector3b(fadePosition[0], fadePosition[1], fadePosition[2]);
+        this.fadePosition = new Vector3Q(fadePosition[0], fadePosition[1], fadePosition[2]);
     }
 }

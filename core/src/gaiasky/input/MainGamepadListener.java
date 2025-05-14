@@ -18,6 +18,9 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
+/**
+ * Implements the gamepad/game controller listener in default mode.
+ */
 public class MainGamepadListener extends AbstractGamepadListener {
     private static final Log logger = Logger.getLogger(MainGamepadListener.class);
 

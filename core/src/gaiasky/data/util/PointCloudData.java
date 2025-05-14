@@ -8,16 +8,16 @@
 package gaiasky.data.util;
 
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.time.Instant;
 import java.util.ArrayList;
 
 public class PointCloudData implements Cloneable {
-    private final Vector3d v0;
-    private final Vector3d v1;
+    private final Vector3D v0;
+    private final Vector3D v1;
 
     /**
      * A sample in the point cloud.
@@ -34,7 +34,7 @@ public class PointCloudData implements Cloneable {
             this(x, y, z, Long.MIN_VALUE, 0);
         }
 
-        public PointSample(Vector3d v) {
+        public PointSample(Vector3D v) {
             this(v.x, v.y, v.z, Long.MIN_VALUE, 0);
         }
 
@@ -42,7 +42,7 @@ public class PointCloudData implements Cloneable {
             this(x, y, z, t.getEpochSecond(), t.getNano());
         }
 
-        public PointSample(Vector3d v, Instant t) {
+        public PointSample(Vector3D v, Instant t) {
             this(v.x, v.y, v.z, t.getEpochSecond(), t.getNano());
         }
 
@@ -50,11 +50,11 @@ public class PointCloudData implements Cloneable {
             v.set((float) x, (float) y, (float) z);
         }
 
-        public void put(Vector3d v) {
+        public void put(Vector3D v) {
             v.set(x, y, z);
         }
 
-        public void put(Vector3b v) {
+        public void put(Vector3Q v) {
             v.set(x, y, z);
         }
 
@@ -88,8 +88,8 @@ public class PointCloudData implements Cloneable {
     public PointCloudData(int capacity) {
         samples = new ArrayList<>(capacity);
 
-        v0 = new Vector3d();
-        v1 = new Vector3d();
+        v0 = new Vector3D();
+        v1 = new Vector3D();
     }
 
     /**
@@ -126,11 +126,11 @@ public class PointCloudData implements Cloneable {
         }
     }
 
-    public void addPoint(Vector3d point, Instant t) {
+    public void addPoint(Vector3D point, Instant t) {
         samples.add(new PointSample(point, t));
     }
 
-    public void addPoint(Vector3d point) {
+    public void addPoint(Vector3D point) {
         samples.add(new PointSample(point));
     }
 
@@ -153,12 +153,12 @@ public class PointCloudData implements Cloneable {
      * @param v     The vector to load the data into.
      * @param index The data index.
      */
-    public void loadPoint(Vector3d v, int index) {
+    public void loadPoint(Vector3D v, int index) {
         samples.get(index)
                 .put(v);
     }
 
-    public void loadPoint(Vector3b v, int index) {
+    public void loadPoint(Vector3Q v, int index) {
         samples.get(index)
                 .put(v);
     }
@@ -179,7 +179,7 @@ public class PointCloudData implements Cloneable {
         return samples.get(index).z;
     }
 
-    public void setPoint(Vector3d v, int index) {
+    public void setPoint(Vector3D v, int index) {
         samples.set(index, new PointSample(v));
     }
 
@@ -233,11 +233,11 @@ public class PointCloudData implements Cloneable {
      *
      * @return Whether the operation completes successfully
      */
-    public boolean loadPoint(Vector3d v, Instant instant) {
+    public boolean loadPoint(Vector3D v, Instant instant) {
         return loadPoint(v, instant.toEpochMilli());
     }
 
-    public boolean loadPoint(Vector3b v, Instant instant) {
+    public boolean loadPoint(Vector3Q v, Instant instant) {
         return loadPoint(v, instant.toEpochMilli());
     }
 
@@ -250,7 +250,7 @@ public class PointCloudData implements Cloneable {
      *
      * @return Whether the operation completes successfully
      */
-    public boolean loadPoint(Vector3d v, long timeMs) {
+    public boolean loadPoint(Vector3D v, long timeMs) {
         // Data is sorted
         int idx = binarySearch(samples, timeMs);
 
@@ -281,7 +281,7 @@ public class PointCloudData implements Cloneable {
         return true;
     }
 
-    public boolean loadPoint(Vector3b v, long timeMs) {
+    public boolean loadPoint(Vector3Q v, long timeMs) {
         // Data is sorted
         int idx = binarySearch(samples, timeMs);
 

@@ -33,9 +33,9 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
@@ -51,10 +51,11 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Cell<Table> contentCell;
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
-    private final Vector3d pos;
-    private final Vector3b posb;
+    private final Vector3D pos;
+    private final Vector3Q posQ;
     protected Skin skin;
-    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
+    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol,
+            focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
     protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralGeneration;
     protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
@@ -530,8 +531,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             externalInfoUpdater.setParameters(moreInfo, skin, pad10);
         }
 
-        pos = new Vector3d();
-        posb = new Vector3b();
+        pos = new Vector3D();
+        posQ = new Vector3Q();
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE,
                                         Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED,
                                         Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR,
@@ -561,7 +562,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 final int focusFieldMaxLength = 14;
 
                 // ID
-                boolean cappedId = false;
                 String id = "";
                 if (view.getExtra() != null || view.getStarSet() != null) {
                     if (view.getId() > 0) {
@@ -678,12 +678,12 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 } else {
                     focusNames.add(new OwnLabel("-", skin));
                 }
-                Vector2d posSph = view.getPosSph();
+                Vector2D posSph = view.getPosSph();
                 if (posSph != null && posSph.len() > 0f) {
                     focusRA.setText(nf.format(posSph.x) + deg);
                     focusDEC.setText(nf.format(posSph.y) + deg);
                 } else {
-                    Coordinates.cartesianToSpherical(view.getAbsolutePosition(posb), pos);
+                    Coordinates.cartesianToSpherical(view.getAbsolutePosition(posQ), pos);
 
                     focusRA.setText(nf.format(MathUtilsDouble.radDeg * pos.x % 360) + deg);
                     focusDEC.setText(nf.format(MathUtilsDouble.radDeg * pos.y % 360) + deg);
@@ -821,7 +821,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 focusDEC.setText(nf.format((double) data[3] % 360) + deg);
             }
             case CAMERA_MOTION_UPDATE -> {
-                final Vector3b campos = (Vector3b) data[0];
+                final Vector3Q campos = (Vector3Q) data[0];
                 double velInternalPerSecond = (double) data[1] * Constants.KM_TO_U * Nature.S_TO_H;
                 Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond,
                                                                                      Settings.settings.program.ui.distanceUnits);

@@ -9,7 +9,7 @@ package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class RenderingContext {
     // Reference screen size to compare to
@@ -24,7 +24,7 @@ public class RenderingContext {
      **/
     public FrameBuffer fb;
     /** VR position offset **/
-    public Vector3d vrOffset;
+    public Vector3D vrOffset;
     /**
      * Scale factor, the ratio between the diagonal of HD resolution (1280x720)
      * and the current resolution

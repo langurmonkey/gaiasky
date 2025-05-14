@@ -35,9 +35,9 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class ParticleInitializer extends AbstractInitSystem implements IObserver {
@@ -46,15 +46,15 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
     private final FocusView view;
 
-    private final Vector3b B31;
-    private final Vector3d D31;
+    private final Vector3Q B31;
+    private final Vector3D D31;
 
     public ParticleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
 
         this.utils = new ParticleUtils();
-        this.B31 = new Vector3b();
-        this.D31 = new Vector3d();
+        this.B31 = new Vector3Q();
+        this.D31 = new Vector3D();
         this.view = new FocusView();
 
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD);
@@ -120,12 +120,12 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
                 // Init cartesian from spherical.
                 gaiasky.util.coord.Coordinates.cartesianToSpherical(view.body.pos, D31);
                 if (view.body.posSph == null) {
-                    view.body.posSph = new Vector2d();
+                    view.body.posSph = new Vector2D();
                 }
                 view.body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
                 var distPc = view.getPos().lenDouble() * Constants.U_TO_PC;
 
-                Vector3d pmv = gaiasky.util.coord.Coordinates.properMotionsToCartesian(pm.pmSph.x, pm.pmSph.y, pm.pmSph.z, FastMath.toRadians(view.getAlpha()), FastMath.toRadians(view.getDelta()), distPc, new Vector3d());
+                Vector3D pmv = gaiasky.util.coord.Coordinates.properMotionsToCartesian(pm.pmSph.x, pm.pmSph.y, pm.pmSph.z, FastMath.toRadians(view.getAlpha()), FastMath.toRadians(view.getDelta()), distPc, new Vector3D());
                 pmv.put(pm.pm);
             }
             pm.hasPm = pm.pm.len2() != 0;

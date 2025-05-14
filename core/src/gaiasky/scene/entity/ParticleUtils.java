@@ -30,14 +30,14 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 public class ParticleUtils {
 
-    private final Vector3d D31 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
     /** Auxiliary color. **/
     protected final Color c = new Color();
     /** Auxiliary HSV array. **/
@@ -137,7 +137,7 @@ public class ParticleUtils {
         } else {
             particleSet.focus = particleSet.pointData.get(particleSet.focusIndex);
             particleSet.focusPosition.set(particleSet.focus.x(), particleSet.focus.y(), particleSet.focus.z());
-            Vector3d posSph = Coordinates.cartesianToSpherical(particleSet.focusPosition, D31);
+            Vector3D posSph = Coordinates.cartesianToSpherical(particleSet.focusPosition, D31);
             particleSet.focusPositionSph.set((float) (MathUtilsDouble.radDeg * posSph.x), (float) (MathUtilsDouble.radDeg * posSph.y));
             particleSet.updateFocus(GaiaSky.instance.getICamera());
         }

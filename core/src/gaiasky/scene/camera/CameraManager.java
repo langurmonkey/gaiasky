@@ -26,8 +26,8 @@ import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -36,9 +36,9 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Last position, for working out velocity
      **/
-    private final Vector3d out;
-    private final Vector3d in;
-    private final Vector3b inb;
+    private final Vector3D out;
+    private final Vector3D in;
+    private final Vector3Q inb;
     private final Vector3 vec;
     private final Vector3 v0;
     private final Vector3 v1;
@@ -58,7 +58,7 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Velocity vector
      **/
-    protected Vector3d velocity, velocityNormalized;
+    protected Vector3D velocity, velocityNormalized;
     private BackupProjectionCamera backupCamera;
 
     public CameraManager(AssetManager manager, CameraMode mode, boolean vr, GlobalResources globalResources) {
@@ -72,15 +72,15 @@ public class CameraManager implements ICamera, IObserver {
         this.focusView = new FocusView();
 
         this.mode = mode;
-        this.in = new Vector3d();
-        this.inb = new Vector3b();
-        this.out = new Vector3d();
+        this.in = new Vector3D();
+        this.inb = new Vector3Q();
+        this.out = new Vector3D();
         this.vec = new Vector3();
         this.v0 = new Vector3();
         this.v1 = new Vector3();
         this.intersection = new Vector3();
-        this.velocity = new Vector3d();
-        this.velocityNormalized = new Vector3d();
+        this.velocity = new Vector3D();
+        this.velocityNormalized = new Vector3D();
         this.localTransformInv = new Matrix4();
 
         updateCurrentCamera();
@@ -196,72 +196,72 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3b getPos() {
+    public Vector3Q getPos() {
         return current.getPos();
     }
 
     @Override
-    public void setPos(Vector3d pos) {
+    public void setPos(Vector3D pos) {
         current.setPos(pos);
     }
 
     @Override
-    public void setPos(Vector3b pos) {
+    public void setPos(Vector3Q pos) {
         current.setPos(pos);
     }
 
     @Override
-    public Vector3b getPreviousPos() {
+    public Vector3Q getPreviousPos() {
         return current.getPreviousPos();
     }
 
     @Override
-    public void setPreviousPos(Vector3d prevPos) {
+    public void setPreviousPos(Vector3D prevPos) {
         current.setPreviousPos(prevPos);
     }
 
     @Override
-    public void setPreviousPos(Vector3b prevPos) {
+    public void setPreviousPos(Vector3Q prevPos) {
         current.setPreviousPos(prevPos);
     }
 
     @Override
-    public Vector3b getDPos() {
+    public Vector3Q getDPos() {
         return current.getDPos();
     }
 
     @Override
-    public void setDPos(Vector3d dPos) {
+    public void setDPos(Vector3D dPos) {
         current.setDPos(dPos);
     }
 
     @Override
-    public void setDPos(Vector3b dPos) {
+    public void setDPos(Vector3Q dPos) {
         current.setDPos(dPos);
     }
 
     @Override
-    public Vector3b getInversePos() {
+    public Vector3Q getInversePos() {
         return current.getInversePos();
     }
 
     @Override
-    public Vector3d getVelocity() {
+    public Vector3D getVelocity() {
         return current.getVelocity();
     }
 
     @Override
-    public Vector3d getDirection() {
+    public Vector3D getDirection() {
         return current.getDirection();
     }
 
     @Override
-    public void setDirection(Vector3d dir) {
+    public void setDirection(Vector3D dir) {
         current.setDirection(dir);
     }
 
     @Override
-    public Vector3d getUp() {
+    public Vector3D getUp() {
         return current.getUp();
     }
 
@@ -464,7 +464,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d[] getDirections() {
+    public Vector3D[] getDirections() {
         return current.getDirections();
     }
 
@@ -545,7 +545,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public boolean isVisible(double viewAngle, Vector3d pos, double distToCamera) {
+    public boolean isVisible(double viewAngle, Vector3D pos, double distToCamera) {
         return current.isVisible(viewAngle, pos, distToCamera);
     }
 
@@ -596,12 +596,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getShift() {
+    public Vector3D getShift() {
         return current.getShift();
     }
 
     @Override
-    public void setShift(Vector3d shift) {
+    public void setShift(Vector3D shift) {
         current.setShift(shift);
     }
 

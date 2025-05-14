@@ -13,8 +13,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 
 import java.io.IOException;
@@ -426,9 +426,9 @@ public class BookmarksManager implements IObserver {
                     }
                 } else {
                     // Location bookmark.
-                    Vector3b pos = data[0] != null ? (Vector3b) d0 : null;
-                    Vector3d dir = data[1] != null ? (Vector3d) data[1] : null;
-                    Vector3d up = data[2] != null ? (Vector3d) data[2] : null;
+                    Vector3Q pos = data[0] != null ? (Vector3Q) d0 : null;
+                    Vector3D dir = data[1] != null ? (Vector3D) data[1] : null;
+                    Vector3D up = data[2] != null ? (Vector3D) data[2] : null;
                     Instant t = data[3] != null ? (Instant) data[3] : null;
                     String focus = data[4] != null ? (String) data[4] : null;
                     Settings s = data[5] != null ? (Settings) data[5] : null;
@@ -528,11 +528,11 @@ public class BookmarksManager implements IObserver {
         }
     }
 
-    private String str(Vector3b v) {
+    private String str(Vector3Q v) {
         return v != null ? "[" + v.x.toString() + "," + v.y.toString() + "," + v.z.toString() + "]" : "null";
     }
 
-    private String str(Vector3d v) {
+    private String str(Vector3D v) {
         return v != null ? "[" + v.x + "," + v.y + "," + v.z + "]" : "null";
     }
 
@@ -584,17 +584,17 @@ public class BookmarksManager implements IObserver {
          * Camera position, for positional bookmarks.
          */
         @Null
-        public Vector3d position;
+        public Vector3D position;
         /**
          * Camera direction, for positional bookmarks.
          */
         @Null
-        public Vector3d direction;
+        public Vector3D direction;
         /**
          * Camera up vector, for positional bookmarks.
          */
         @Null
-        public Vector3d up;
+        public Vector3D up;
         /**
          * Time, for location bookmarks.
          */
@@ -700,12 +700,12 @@ public class BookmarksManager implements IObserver {
             return null;
         }
 
-        private Vector3d vectorFromString(String vectorString) {
+        private Vector3D vectorFromString(String vectorString) {
             if (vectorString.equals(NULL_TOKEN)) {
                 return null;
             }
             var tokens = vectorString.substring(1, vectorString.length() - 1).split(",");
-            return new Vector3d(Parser.parseDouble(tokens[0]), Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]));
+            return new Vector3D(Parser.parseDouble(tokens[0]), Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]));
         }
 
         private Instant instantFromString(String t) {

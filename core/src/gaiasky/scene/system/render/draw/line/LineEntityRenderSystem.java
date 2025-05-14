@@ -29,8 +29,8 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 import net.jafama.FastMath;
 
@@ -43,17 +43,17 @@ public class LineEntityRenderSystem {
      * Auxiliary color array.
      **/
     private final float[] rgba = new float[4];
-    protected Vector3d prev = new Vector3d(), curr = new Vector3d();
+    protected Vector3D prev = new Vector3D(), curr = new Vector3D();
     /**
      * The line view object, used to send into the
      * {@link LinePrimitiveRenderer}.
      **/
     private final LineView lineView;
-    private final Vector3b B31 = new Vector3b();
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
-    private final Vector3d D33 = new Vector3d();
-    private final Vector3d D34 = new Vector3d();
+    private final Vector3Q B31 = new Vector3Q();
+    private final Vector3D D31 = new Vector3D();
+    private final Vector3D D32 = new Vector3D();
+    private final Vector3D D33 = new Vector3D();
+    private final Vector3D D34 = new Vector3D();
 
     public LineEntityRenderSystem() {
         this.lineView = new LineView();
@@ -82,7 +82,7 @@ public class LineEntityRenderSystem {
         if (verts.pointCloudData != null && verts.pointCloudData.getNumPoints() > 1) {
             var graph = Mapper.graph.get(entity);
 
-            Vector3d prev = D31;
+            Vector3D prev = D31;
 
             for (int i = 0; i < verts.pointCloudData.getNumPoints(); i++) {
                 verts.pointCloudData.loadPoint(prev, i);
@@ -96,15 +96,15 @@ public class LineEntityRenderSystem {
             var arrow = Mapper.arrow.get(entity);
             if (arrow != null && arrow.arrowCap) {
                 // Get two last points of line
-                Vector3d p1 = D32.set(verts.pointCloudData.getX(0), verts.pointCloudData.getY(0), verts.pointCloudData.getZ(0));
-                Vector3d p2 = D33.set(verts.pointCloudData.getX(1), verts.pointCloudData.getY(1), verts.pointCloudData.getZ(1));
-                Vector3d ppm = D34.set(p1).sub(p2);
+                Vector3D p1 = D32.set(verts.pointCloudData.getX(0), verts.pointCloudData.getY(0), verts.pointCloudData.getZ(0));
+                Vector3D p2 = D33.set(verts.pointCloudData.getX(1), verts.pointCloudData.getY(1), verts.pointCloudData.getZ(1));
+                Vector3D ppm = D34.set(p1).sub(p2);
                 double p1p2len = ppm.len();
                 p1.sub(camera.getPos());
                 p2.sub(camera.getPos());
 
                 // Add arrow head.
-                Vector3d p3 = ppm.nor().scl(p1p2len * 0.7).add(p2);
+                Vector3D p3 = ppm.nor().scl(p1p2len * 0.7).add(p2);
                 p3.rotate(p1, 30);
                 renderer.addPoint(lineView, p1.x, p1.y, p1.z, cc[0], cc[1], cc[2], alpha);
                 renderer.addPoint(lineView, p3.x, p3.y, p3.z, cc[0], cc[1], cc[2], alpha);
@@ -136,10 +136,10 @@ public class LineEntityRenderSystem {
         if (alpha > 0) {
             var axis = Mapper.axis.get(entity);
 
-            Vector3d o = axis.o;
-            Vector3d x = axis.x;
-            Vector3d y = axis.y;
-            Vector3d z = axis.z;
+            Vector3D o = axis.o;
+            Vector3D x = axis.x;
+            Vector3D y = axis.y;
+            Vector3D z = axis.z;
             float[][] axesColors = axis.axesColors;
             // X
             renderer.addLine(lineView, o.x, o.y, o.z, x.x, x.y, x.z, axesColors[0][0], axesColors[0][1], axesColors[0][2], alpha);
@@ -167,17 +167,17 @@ public class LineEntityRenderSystem {
         addCap(body, ruler.p1, ruler.p0, va, renderer, alpha);
     }
 
-    private void addCap(Body body, Vector3d p0, Vector3d p1, double va, LinePrimitiveRenderer renderer, float alpha) {
+    private void addCap(Body body, Vector3D p0, Vector3D p1, double va, LinePrimitiveRenderer renderer, float alpha) {
         // cpos-p0
-        Vector3d cp = D32.set(p0);
+        Vector3D cp = D32.set(p0);
         // cross(cpos-p0, p0-p1)
-        Vector3d crs = D31.set(p1).sub(p0).crs(cp);
+        Vector3D crs = D31.set(p1).sub(p0).crs(cp);
 
         double d = p0.len();
         double lengthCap = FastMath.tan(va) * d;
         crs.setLength(lengthCap);
-        Vector3d aux0 = D32.set(p0).add(crs);
-        Vector3d aux1 = D33.set(p0).sub(crs);
+        Vector3D aux0 = D32.set(p0).add(crs);
+        Vector3D aux1 = D33.set(p0).sub(crs);
         renderer.addLine(lineView, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, body.color[0], body.color[1], body.color[2], alpha);
     }
 
@@ -206,16 +206,16 @@ public class LineEntityRenderSystem {
         lineView.setEntity(entity);
 
         // This is so that the shape renderer does not mess up the z-buffer.
-        for (List<Vector3d> points : bound.boundaries) {
-            Vector3d previous = null;
-            for (Vector3d point : points) {
+        for (List<Vector3D> points : bound.boundaries) {
+            Vector3D previous = null;
+            for (Vector3D point : points) {
                 if (previous != null) {
                     renderer.addLine(lineView, (float) previous.x, (float) previous.y, (float) previous.z, (float) point.x, (float) point.y, (float) point.z, body.color[0], body.color[1], body.color[2], alpha * base.opacity);
                 }
                 previous = point;
             }
             // Join last to first.
-            Vector3d first = points.get(0);
+            Vector3D first = points.get(0);
             renderer.addLine(lineView, (float) first.x, (float) first.y, (float) first.z, (float) previous.x, (float) previous.y, (float) previous.z, body.color[0], body.color[1], body.color[2], alpha * base.opacity);
         }
     }
@@ -227,9 +227,9 @@ public class LineEntityRenderSystem {
 
         alpha *= constel.alpha * base.opacity;
 
-        Vector3d p1 = D31;
-        Vector3d p2 = D32;
-        Vector3b campos = camera.getPos();
+        Vector3D p1 = D31;
+        Vector3D p2 = D32;
+        Vector3Q campos = camera.getPos();
 
         lineView.setEntity(entity);
 
@@ -243,8 +243,8 @@ public class LineEntityRenderSystem {
         }
     }
 
-    private void getPosition(IPosition posBean, Vector3b camPos, Vector3d out, Constel constel) {
-        Vector3d vel = D33.setZero();
+    private void getPosition(IPosition posBean, Vector3Q camPos, Vector3D out, Constel constel) {
+        Vector3D vel = D33.setZero();
         if (posBean.getVelocity() != null && !posBean.getVelocity().hasNaN()) {
             vel.set(posBean.getVelocity()).scl(constel.deltaYears);
         }
@@ -275,7 +275,7 @@ public class LineEntityRenderSystem {
 
             float baseOpacity = (float) (alpha * trajectory.alpha * base.opacity);
 
-            Vector3d parentPos;
+            Vector3D parentPos;
             parentPos = Mapper.orientation.has(graph.parent) ? Mapper.orientation.get(graph.parent).getNonRotatedPos() : null;
             int last = parentPos != null ? 2 : 1;
 
@@ -286,7 +286,7 @@ public class LineEntityRenderSystem {
 
             boolean hasTime = verts.pointCloudData.hasTime();
 
-            Vector3d bodyPos = D31.setZero();
+            Vector3D bodyPos = D31.setZero();
             if (orbitTrail && hasTime) {
                 // For large periods, fade orbit to 0 a bit before.
                 float bottomAlpha = trajectory.params != null && (trajectory.params.orbitalPeriod > 40000 || base.ct.isEnabled(ComponentType.Moons)) ? -0.2f : -0.1f;
@@ -432,17 +432,17 @@ public class LineEntityRenderSystem {
             IParticleRecord star = set.pointData.get(set.indices[i]);
             float radius = (float) (set.getSize(set.indices[i]) * Constants.STAR_SIZE_FACTOR);
             // Position
-            Vector3b lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
+            Vector3Q lPos = set.fetchPosition(star, set.cPosD, B31, set.currDeltaYears);
             // Proper motion
-            Vector3d pm = D32.set(star.vx(), star.vy(), star.vz()).scl(set.currDeltaYears);
+            Vector3D pm = D32.set(star.vx(), star.vy(), star.vz()).scl(set.currDeltaYears);
             // Rest of attributes
             float distToCamera = (float) lPos.lenDouble();
             float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
             if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.vx() != 0 || star.vy() != 0 || star.vz() != 0)) {
-                Vector3d p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
-                Vector3d ppm = D32.set(star.vx(), star.vy(), star.vz()).scl(Settings.settings.scene.properMotion.length);
+                Vector3D p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
+                Vector3D ppm = D32.set(star.vx(), star.vy(), star.vz()).scl(Settings.settings.scene.properMotion.length);
                 double p1p2len = ppm.len();
-                Vector3d p2 = D33.set(ppm).add(p1);
+                Vector3D p2 = D33.set(ppm).add(p1);
 
                 // Maximum speed in km/s, to normalize
                 float maxSpeedKms = 100;
@@ -492,7 +492,7 @@ public class LineEntityRenderSystem {
                             ppm.set(star.vx(), star.vy(), star.vz());
                             // Units/year to Km/s
                             ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                            Vector3d camStar = D34.set(p1);
+                            Vector3D camStar = D34.set(p1);
                             double pr = ppm.dot(camStar.nor());
                             double projection = ((MathUtilsDouble.clamp(pr, -(double) maxSpeedKms, maxSpeedKms) / (double) maxSpeedKms) + 1) / 2;
                             ColorUtils.colormap_blue_white_red((float) projection, rgba);
@@ -527,7 +527,7 @@ public class LineEntityRenderSystem {
                 renderer.addLine(lineView, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
                 if (Settings.settings.scene.properMotion.arrowHeads) {
                     // Add the arrow cap.
-                    Vector3d p3 = D32.set(ppm).nor().scl(p1p2len * .86).add(p1);
+                    Vector3D p3 = D32.set(ppm).nor().scl(p1p2len * .86).add(p1);
                     p3.rotate(p2, 30);
                     renderer.addLine(lineView, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
                     p3.rotate(p2, -60);

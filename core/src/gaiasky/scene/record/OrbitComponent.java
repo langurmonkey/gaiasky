@@ -12,8 +12,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix3d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Matrix3D;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.time.Instant;
@@ -48,9 +48,9 @@ public class OrbitComponent {
     private boolean externalMu = false;
 
     /** Auxiliary rotation matrix. **/
-    private final Matrix3d Rx = new Matrix3d();
+    private final Matrix3D Rx = new Matrix3D();
     /** Auxiliary vector. **/
-    private final Vector3d vAux = new Vector3d();
+    private final Vector3D vAux = new Vector3D();
 
     public OrbitComponent() {
 
@@ -136,7 +136,7 @@ public class OrbitComponent {
      * @param out The vector to store the result.
      * @param t   The time as a {@link Instant}.
      */
-    public void loadDataPoint(Vector3d out, Instant t) {
+    public void loadDataPoint(Vector3D out, Instant t) {
         double tjd = AstroUtils.getJulianDate(t);
         keplerianToCartesianTime(out, tjd - epoch);
     }
@@ -147,7 +147,7 @@ public class OrbitComponent {
      * @param out    The vector to store the result.
      * @param dtDays The time as Julian days from epoch.
      */
-    public void loadDataPoint(Vector3d out, double dtDays) {
+    public void loadDataPoint(Vector3D out, double dtDays) {
         keplerianToCartesianTime(out, dtDays);
     }
 
@@ -224,11 +224,8 @@ public class OrbitComponent {
         // Mean anomaly at epoch
         double M0 = FastMath.toRadians(meanAnomaly);
 
-        // Time since epoch in days
-        double deltaT = (M - M0) / n;
-
         // Return time in Julian days since epoch
-        return deltaT;
+        return (M - M0) / n;
     }
 
     /**
@@ -251,7 +248,7 @@ public class OrbitComponent {
      * @param out    The vector to store the result.
      * @param dtDays The Julian days from epoch.
      */
-    public void keplerianToCartesianTime(Vector3d out, double dtDays) {
+    public void keplerianToCartesianTime(Vector3D out, double dtDays) {
         computeMu(true);
 
         double inc = FastMath.toRadians(i);
@@ -286,17 +283,17 @@ public class OrbitComponent {
         double cosW = FastMath.cos(argP);
         double sinW = FastMath.sin(argP);
 
-        Rx.val[Matrix3d.M00] = cosO * cosW - sinO * sinW * cosI;
-        Rx.val[Matrix3d.M01] = -cosO * sinW - sinO * cosW * cosI;
-        Rx.val[Matrix3d.M02] = sinO * sinI;
+        Rx.val[Matrix3D.M00] = cosO * cosW - sinO * sinW * cosI;
+        Rx.val[Matrix3D.M01] = -cosO * sinW - sinO * cosW * cosI;
+        Rx.val[Matrix3D.M02] = sinO * sinI;
 
-        Rx.val[Matrix3d.M10] = sinO * cosW + cosO * sinW * cosI;
-        Rx.val[Matrix3d.M11] = -sinO * sinW + cosO * cosW * cosI;
-        Rx.val[Matrix3d.M12] = -cosO * sinI;
+        Rx.val[Matrix3D.M10] = sinO * cosW + cosO * sinW * cosI;
+        Rx.val[Matrix3D.M11] = -sinO * sinW + cosO * cosW * cosI;
+        Rx.val[Matrix3D.M12] = -cosO * sinI;
 
-        Rx.val[Matrix3d.M20] = sinW * sinI;
-        Rx.val[Matrix3d.M21] = cosW * sinI;
-        Rx.val[Matrix3d.M22] = cosI;
+        Rx.val[Matrix3D.M20] = sinW * sinI;
+        Rx.val[Matrix3D.M21] = cosW * sinI;
+        Rx.val[Matrix3D.M22] = cosI;
 
         // Position
         vAux.set(xPf, yPf, zPf);
@@ -315,7 +312,7 @@ public class OrbitComponent {
      * @param out The vector to store the result.
      * @param nu  The true anomaly.
      */
-    public void keplerianToCartesianNu(Vector3d out, double nu) {
+    public void keplerianToCartesianNu(Vector3D out, double nu) {
         computeMu(true);
 
         double inc = FastMath.toRadians(i);
@@ -343,17 +340,17 @@ public class OrbitComponent {
         double cosW = FastMath.cos(argP);
         double sinW = FastMath.sin(argP);
 
-        Rx.val[Matrix3d.M00] = cosO * cosW - sinO * sinW * cosI;
-        Rx.val[Matrix3d.M01] = -cosO * sinW - sinO * cosW * cosI;
-        Rx.val[Matrix3d.M02] = sinO * sinI;
+        Rx.val[Matrix3D.M00] = cosO * cosW - sinO * sinW * cosI;
+        Rx.val[Matrix3D.M01] = -cosO * sinW - sinO * cosW * cosI;
+        Rx.val[Matrix3D.M02] = sinO * sinI;
 
-        Rx.val[Matrix3d.M10] = sinO * cosW + cosO * sinW * cosI;
-        Rx.val[Matrix3d.M11] = -sinO * sinW + cosO * cosW * cosI;
-        Rx.val[Matrix3d.M12] = -cosO * sinI;
+        Rx.val[Matrix3D.M10] = sinO * cosW + cosO * sinW * cosI;
+        Rx.val[Matrix3D.M11] = -sinO * sinW + cosO * cosW * cosI;
+        Rx.val[Matrix3D.M12] = -cosO * sinI;
 
-        Rx.val[Matrix3d.M20] = sinW * sinI;
-        Rx.val[Matrix3d.M21] = cosW * sinI;
-        Rx.val[Matrix3d.M22] = cosI;
+        Rx.val[Matrix3D.M20] = sinW * sinI;
+        Rx.val[Matrix3D.M21] = cosW * sinI;
+        Rx.val[Matrix3D.M22] = cosI;
 
         // Position
         vAux.set(xPf, yPf, zPf);
@@ -366,13 +363,13 @@ public class OrbitComponent {
         out.set(vAux.y, vAux.z, vAux.x).scl(Constants.KM_TO_U);
     }
 
-    public void loadDataPointNu(Vector3d out, double nu) {
+    public void loadDataPointNu(Vector3D out, double nu) {
         keplerianToCartesianNu(out, nu);
     }
 
     // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
     @Deprecated
-    public void loadDataPointReneSchwarz(Vector3d out, double dtDays) {
+    public void loadDataPointReneSchwarz(Vector3D out, double dtDays) {
         computeMu(false);
         double a = semiMajorAxis * Nature.KM_TO_M; // km to m
         double M0 = meanAnomaly * MathUtilsDouble.degRad;

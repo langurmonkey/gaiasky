@@ -32,7 +32,7 @@ import gaiasky.util.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.util.Objects;
@@ -42,7 +42,7 @@ public class ModelEntityRenderSystem {
     private final ParticleUtils utils;
     private final SceneRenderer sceneRenderer;
     private final FocusView focusView;
-    private final Vector3b v3b1 = new Vector3b(), v3b2 = new Vector3b();
+    private final Vector3Q v3b1 = new Vector3Q(), v3b2 = new Vector3Q();
     private final Vector3 v3f1 = new Vector3();
 
     public ModelEntityRenderSystem(SceneRenderer sr) {

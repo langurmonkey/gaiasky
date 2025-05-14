@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 public class PlaneDouble implements Serializable {
     private static final long serialVersionUID = -1240652082930747866L;
-    public final Vector3d normal = new Vector3d();
+    public final Vector3D normal = new Vector3D();
     public double d = 0;
     /**
      * Constructs a new plane with all values set to 0
@@ -27,7 +27,7 @@ public class PlaneDouble implements Serializable {
      * @param normal The plane normal
      * @param d      The distance to the origin
      */
-    public PlaneDouble(Vector3d normal, double d) {
+    public PlaneDouble(Vector3D normal, double d) {
         this.normal.set(normal).nor();
         this.d = d;
     }
@@ -38,7 +38,7 @@ public class PlaneDouble implements Serializable {
      * @param normal The normal
      * @param point  The point on the plane
      */
-    public PlaneDouble(Vector3d normal, Vector3d point) {
+    public PlaneDouble(Vector3D normal, Vector3D point) {
         this.normal.set(normal).nor();
         this.d = -this.normal.dot(point);
     }
@@ -51,7 +51,7 @@ public class PlaneDouble implements Serializable {
      * @param point2 The second point
      * @param point3 The third point
      */
-    public PlaneDouble(Vector3d point1, Vector3d point2, Vector3d point3) {
+    public PlaneDouble(Vector3D point1, Vector3D point2, Vector3D point3) {
         set(point1, point2, point3);
     }
 
@@ -63,7 +63,7 @@ public class PlaneDouble implements Serializable {
      * @param point2 The second point
      * @param point3 The third point
      */
-    public void set(Vector3d point1, Vector3d point2, Vector3d point3) {
+    public void set(Vector3D point1, Vector3D point2, Vector3D point3) {
         normal.set(point1).sub(point2).crs(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).nor();
         d = -point1.dot(normal);
     }
@@ -88,7 +88,7 @@ public class PlaneDouble implements Serializable {
      *
      * @return the shortest signed distance between the plane and the point
      */
-    public double distance(Vector3d point) {
+    public double distance(Vector3D point) {
         return normal.dot(point) + d;
     }
 
@@ -100,7 +100,7 @@ public class PlaneDouble implements Serializable {
      *
      * @return The side the point lies relative to the plane
      */
-    public PlaneSide testPoint(Vector3d point) {
+    public PlaneSide testPoint(Vector3D point) {
         double dist = normal.dot(point) + d;
 
         if (dist == 0)
@@ -140,13 +140,13 @@ public class PlaneDouble implements Serializable {
      *
      * @return whether the plane is front facing
      */
-    public boolean isFrontFacing(Vector3d direction) {
+    public boolean isFrontFacing(Vector3D direction) {
         double dot = normal.dot(direction);
         return dot <= 0;
     }
 
     /** @return The normal */
-    public Vector3d getNormal() {
+    public Vector3D getNormal() {
         return normal;
     }
 
@@ -161,7 +161,7 @@ public class PlaneDouble implements Serializable {
      * @param point  the point on the plane
      * @param normal the normal of the plane
      */
-    public void set(Vector3d point, Vector3d normal) {
+    public void set(Vector3D point, Vector3D normal) {
         this.normal.set(normal);
         d = -point.dot(normal);
     }

@@ -36,7 +36,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -198,7 +198,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 shaderProgram.setUniformf("u_t", curRt1, curRt2);
 
                 // Reference system transform
-                Matrix4d refSysTransform = null;
+                Matrix4D refSysTransform = null;
                 if (graph.children != null && graph.children.size > 0) {
                     if (Mapper.transform.has(graph.children.get(0))) {
                         refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;

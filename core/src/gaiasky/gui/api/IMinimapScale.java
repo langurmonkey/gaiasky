@@ -12,10 +12,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public interface IMinimapScale {
-    boolean isActive(Vector3d campos, double distanceFromSun);
+    boolean isActive(Vector3D campos, double distanceFromSun);
 
     void update();
 

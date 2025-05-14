@@ -10,7 +10,7 @@ package gaiasky.util.gaia;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class AttitudeConverter {
@@ -19,13 +19,13 @@ public class AttitudeConverter {
     static final double PI_HALF = 0.5 * PI;
 
     /** Unit vectors **/
-    static final Vector3d X_AXIS = Vector3d.getUnitX();
-    static final Vector3d Y_AXIS = Vector3d.getUnitY();
-    static final Vector3d Z_AXIS = Vector3d.getUnitZ();
+    static final Vector3D X_AXIS = Vector3D.getUnitX();
+    static final Vector3D Y_AXIS = Vector3D.getUnitY();
+    static final Vector3D Z_AXIS = Vector3D.getUnitZ();
 
-    static final Vector3d aux1 = new Vector3d();
-    static final Vector3d aux2 = new Vector3d();
-    static final Vector3d aux3 = new Vector3d();
+    static final Vector3D aux1 = new Vector3D();
+    static final Vector3D aux2 = new Vector3D();
+    static final Vector3D aux3 = new Vector3D();
 
     /** The obliquity of the ecliptic in radians **/
     static final double OBLIQUITY = Coordinates.OBLIQUITY_RAD_J2000;
@@ -33,7 +33,7 @@ public class AttitudeConverter {
     static final double sinObliquity = FastMath.sin(OBLIQUITY);
     static final double cosObliquity = FastMath.cos(OBLIQUITY);
 
-    static final Vector3d[] xyz = new Vector3d[] { new Vector3d(), new Vector3d(), new Vector3d() };
+    static final Vector3D[] xyz = new Vector3D[] { new Vector3D(), new Vector3D(), new Vector3D() };
 
     /**
      * Converts heliotropic angles and rates to an attitude quaternion and its
@@ -75,7 +75,7 @@ public class AttitudeConverter {
          */
         double sinLSun = FastMath.sin(lSun);
         double cosLSun = FastMath.cos(lSun);
-        Vector3d zInSrs = aux1;
+        Vector3D zInSrs = aux1;
         zInSrs.set(Y_AXIS).rotateVectorByQuaternion(q);
         double rateX = nuDot * cosLSun + omegaDot * zInSrs.x;
         double rateY = -lSunDot * sinObliquity + nuDot * sinLSun * cosObliquity
@@ -125,11 +125,11 @@ public class AttitudeConverter {
          * Calculate the inertial rate in SRS by adding the rotations around
          * k (ecliptic pole), s (solar direction), and z:
          */
-        Vector3d k = new Vector3d(0, -sinObliquity, cosObliquity);
+        Vector3D k = new Vector3D(0, -sinObliquity, cosObliquity);
         k.mul(q);
         double sinLSun = FastMath.sin(lSun);
         double cosLSun = FastMath.cos(lSun);
-        Vector3d sun = new Vector3d(cosLSun, cosObliquity * sinLSun, sinObliquity * sinLSun);
+        Vector3D sun = new Vector3D(cosLSun, cosObliquity * sinLSun, sinObliquity * sinLSun);
         sun.mul(q);
         double rateX = k.x * lSunDot + sun.x * nuDot;
         double rateY = k.y * lSunDot + sun.y * nuDot;
@@ -176,9 +176,9 @@ public class AttitudeConverter {
          */
         double sinLSun = FastMath.sin(lSun);
         double cosLSun = FastMath.cos(lSun);
-        Vector3d zInSrs = aux1;
+        Vector3D zInSrs = aux1;
         zInSrs.set(Y_AXIS).mul(q);
-        Vector3d sz = aux2;
+        Vector3D sz = aux2;
         sz.set(sun.getSolarDirection(aux3)).crs(zInSrs).nor();
         double rateX = h.getNuDot() * cosLSun + h.getOmegaDot() * zInSrs.x
                 + h.getXiDot() * sz.x;
@@ -206,14 +206,14 @@ public class AttitudeConverter {
         HeliotropicAnglesRates anglesAndRates = new HeliotropicAnglesRates();
 
         // k is a unit vector (in ICRS) towards the north ecliptic pole:
-        Vector3d k = new Vector3d(0.0, -sinObliquity, cosObliquity);
+        Vector3D k = new Vector3D(0.0, -sinObliquity, cosObliquity);
 
         // s is a unit vector (in ICRS) towards the nominal sun:
         NslSun sun = new NslSun();
         sun.setTime(gt);
         double cosLSun = FastMath.cos(sun.getSolarLongitude());
         double sinLSun = FastMath.sin(sun.getSolarLongitude());
-        Vector3d s = new Vector3d(cosLSun, sinLSun * cosObliquity, sinLSun
+        Vector3D s = new Vector3D(cosLSun, sinLSun * cosObliquity, sinLSun
                 * sinObliquity);
 
         // xyz[0], xyz[1], xyz[2] are unit vectors (in ICRS) along the SRS axes:
@@ -221,7 +221,7 @@ public class AttitudeConverter {
 
         // m = s x z is a non-unit vector (of length sinXi) normal to the plane
         // containing s and z:
-        Vector3d m = new Vector3d(s);
+        Vector3D m = new Vector3D(s);
         m.crs(xyz[2]);
 
         // compute solar aspect angle xi in range [0, pi]:
@@ -242,10 +242,10 @@ public class AttitudeConverter {
         anglesAndRates.setThirdAngle(Math.atan2(sinXiSinOmega, sinXiCosOmega));
 
         // inertial spin rate in ICRS:
-        Vector3d spin = att.getSpinVectorInIcrs();
+        Vector3D spin = att.getSpinVectorInIcrs();
 
         // subtract motion of the nominal sun to get heliotropic spin rate:
-        Vector3d spinHel = new Vector3d(spin);
+        Vector3D spinHel = new Vector3D(spin);
         spinHel.add(k.scl(-sun.getSolarLongitudeDot()));
 
         // scalar products with s, z, and m are used to determine the angular

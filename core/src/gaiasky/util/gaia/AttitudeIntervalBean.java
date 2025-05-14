@@ -7,11 +7,10 @@
 
 package gaiasky.util.gaia;
 
-import gaiasky.util.LruCache;
+import gaiasky.util.LruCacheLong;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.Map;
 
 public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
     public String name;
@@ -19,7 +18,7 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
     public String file;
     public BaseAttitudeDataServer<IAttitude> attitude;
 
-    public Map<Long, IAttitude> cache;
+    public LruCacheLong<IAttitude> cache;
     public long hits = 0, misses = 0;
 
     public AttitudeIntervalBean(String name,
@@ -31,7 +30,7 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
         this.activationTime = activationTime;
         this.attitude = attitude;
 
-        cache = new LruCache<>(10);
+        cache = new LruCacheLong<>(10);
     }
 
     public synchronized IAttitude get(Date date) {
@@ -39,7 +38,7 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
     }
 
     public synchronized IAttitude get(Instant instant) {
-        Long time = instant.toEpochMilli();
+        long time = instant.toEpochMilli();
         if (!cache.containsKey(time)) {
             IAttitude att = attitude.getAttitude(instant);
             cache.put(time, att);

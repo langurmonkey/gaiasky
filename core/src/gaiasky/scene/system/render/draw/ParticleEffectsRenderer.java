@@ -27,8 +27,8 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
@@ -40,28 +40,28 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
 
     private final Random rand;
     private final Vector3 aux1f;
-    private final Vector3d aux1, aux2, aux5;
-    private final Vector3b aux1b;
+    private final Vector3D aux1, aux2, aux5;
+    private final Vector3Q aux1b;
     private final ComponentTypes ct;
     private final Vector3[] positions;
     private final Vector3[] additional;
-    private final Vector3d[] camPositions;
+    private final Vector3D[] camPositions;
     private final long baseTime;
 
 
     public ParticleEffectsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super(sceneRenderer, rg, alphas, programs);
         aux1f = new Vector3();
-        aux1 = new Vector3d();
-        aux2 = new Vector3d();
-        aux5 = new Vector3d();
-        aux1b = new Vector3b();
+        aux1 = new Vector3D();
+        aux2 = new Vector3D();
+        aux5 = new Vector3D();
+        aux1b = new Vector3Q();
         rand = new Random(123);
         baseTime = System.currentTimeMillis();
         ct = new ComponentTypes(ComponentType.valueOf("Effects"));
         positions = new Vector3[N_PARTICLES * 2];
         additional = new Vector3[N_PARTICLES * 2];
-        camPositions = new Vector3d[N_PARTICLES];
+        camPositions = new Vector3D[N_PARTICLES];
         float colFade = Color.toFloatBits(0.f, 0.f, 0.f, 0.f);
         float ctm = System.currentTimeMillis() / 1000f;
         for (int i = 0; i < N_PARTICLES * 2; i++) {
@@ -69,7 +69,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
                 // First in the pair
                 positions[i] = new Vector3((float) (rand.nextFloat() * Constants.PC_TO_U), 0f, (float) (rand.nextFloat() * Constants.PC_TO_U));
                 additional[i] = new Vector3(Color.toFloatBits(1f, 1f, 1f, 1f), 3 + rand.nextInt() % 8, ctm);
-                camPositions[i / 2] = new Vector3d();
+                camPositions[i / 2] = new Vector3D();
             } else {
                 // Companion, start with same positions
                 positions[i] = new Vector3(positions[i - 1]);
@@ -130,9 +130,9 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
                 return;
             }
         }
-        Vector3d campos = aux1.set(cam.getPos());
+        Vector3D campos = aux1.set(cam.getPos());
         for (int i = 0; i < N_PARTICLES * 2; i++) {
-            Vector3d pos = aux5.set(positions[i]);
+            Vector3D pos = aux5.set(positions[i]);
             if (i % 2 == 0) {
                 if (pos.dst2(campos) > distLimit) {
                     // New particle
@@ -143,8 +143,8 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
                 }
             } else {
                 // Companion, use previous camera position
-                Vector3d prev_campos = camPositions[(i - 1) / 2];
-                Vector3d camdiff = aux2.set(campos).sub(prev_campos);
+                Vector3D prev_campos = camPositions[(i - 1) / 2];
+                Vector3D camdiff = aux2.set(campos).sub(prev_campos);
                 pos.set(positions[i - 1]).add(camdiff);
                 pos.put(positions[i]);
             }

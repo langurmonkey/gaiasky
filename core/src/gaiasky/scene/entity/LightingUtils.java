@@ -17,7 +17,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.TLV3;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 /**
@@ -38,10 +38,9 @@ public class LightingUtils {
             for (int i = 0; i < Constants.N_POINT_LIGHTS; i++) {
                 IFocus lightSource = camera.getCloseLightSource(i);
                 if (lightSource != null) {
-                    if (lightSource instanceof Proximity.NearbyRecord) {
+                    if (lightSource instanceof Proximity.NearbyRecord nr) {
                         var pointLight = model.model.pointLight(i);
                         if (pointLight != null) {
-                            Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
                             if (nr.isStar() || nr.isStarGroup()) {
                                 // Only stars illuminate.
                                 float[] col = nr.getColor();
@@ -52,7 +51,7 @@ public class LightingUtils {
                                 pointLight.color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
                                 pointLight.intensity = 1;
                             } else {
-                                Vector3b campos = camera.getPos();
+                                Vector3Q campos = camera.getPos();
                                 pointLight.position.set(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
                                 pointLight.color.set(0f, 0f, 0f, 0f);
                                 pointLight.intensity = 0;

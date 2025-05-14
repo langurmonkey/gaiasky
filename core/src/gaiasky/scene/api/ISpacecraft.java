@@ -7,21 +7,21 @@
 
 package gaiasky.scene.api;
 
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public interface ISpacecraft {
 
-    Vector3d force();
+    Vector3D force();
 
-    Vector3d accel();
+    Vector3D accel();
 
-    Vector3d vel();
+    Vector3D vel();
 
-    Vector3d direction();
+    Vector3D direction();
 
-    Vector3d up();
+    Vector3D up();
 
-    Vector3d thrust();
+    Vector3D thrust();
 
     double currentEnginePower();
 

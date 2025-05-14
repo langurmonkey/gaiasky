@@ -12,9 +12,9 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.gaia.time.Secs;
 import gaiasky.util.gaia.utils.*;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class ModifiedScanningLaw {
     // here since the shift of the origin (equinox) by 0.05542 arcsec
     // is not consistent with the ScanningLaw transformation from
     // ecliptic to equatorial coordinates.
-    protected static Vector3d eclPole = new Vector3d(0.0, 0.0, 1.0).rotate(obliquity * Nature.TO_DEG, 0, 0, 1);
+    protected static Vector3D eclPole = new Vector3D(0.0, 0.0, 1.0).rotate(obliquity * Nature.TO_DEG, 0, 0, 1);
     /**
      * The sun object is used to calculate the longitude and longitude rate of
      * the nominal sun. Mathematically, it should give exactly the same
@@ -148,8 +148,8 @@ public class ModifiedScanningLaw {
     protected double sFactor, zMax, zMin, s1min;
     protected double sRed, kappa;
     protected boolean reduced;
-    protected Vector3d spinAxis = new Vector3d();
-    protected Vector3d[] refDir;
+    protected Vector3D spinAxis = new Vector3D();
+    protected Vector3D[] refDir;
     protected long unit, dt;
     protected ComplexArea[] highDensityAreas;
     protected ScanState status;
@@ -192,7 +192,7 @@ public class ModifiedScanningLaw {
 
         // default complex areas (none)
         highDensityAreas = new ComplexArea[]{};
-        refDir = new Vector3d[0];
+        refDir = new Vector3D[0];
 
         // THE REMAINING INITIALIZATIONS SHOULD NOT BE CHANGED!!!
 
@@ -354,16 +354,16 @@ public class ModifiedScanningLaw {
         ca.setName("BW + Sgr I");
 
         // circle 1:
-        Vector3d dir1 = new Vector3d();
+        Vector3D dir1 = new Vector3D();
         double radius1 = 0.50 * DEG;
         Coordinates.sphericalToCartesian(1.04 * DEG, -3.88 * DEG, radius1, dir1);
 
         // circle 2:
-        Vector3d dir2 = new Vector3d();
+        Vector3D dir2 = new Vector3D();
         double radius2 = 0.50 * DEG;
         Coordinates.sphericalToCartesian(1.44 * DEG, -2.64 * DEG, radius2, dir2);
 
-        Matrix4d galEq = Coordinates.eqToGal();
+        Matrix4D galEq = Coordinates.eqToGal();
         dir1.mul(galEq);
         dir2.mul(galEq);
 
@@ -390,7 +390,7 @@ public class ModifiedScanningLaw {
         if (areas != null) {
             int nAreas = areas.length;
             highDensityAreas = new ComplexArea[nAreas];
-            refDir = new Vector3d[nAreas];
+            refDir = new Vector3D[nAreas];
             for (int i = 0; i < nAreas; i++) {
                 highDensityAreas[i] = areas[i];
                 refDir[i] = areas[i].getMidPoint().getDirection();
@@ -830,7 +830,7 @@ public class ModifiedScanningLaw {
 
             double[] dydt = new double[y.length];
             sun.setTime(t);
-            Vector3d sunDir = new Vector3d();
+            Vector3D sunDir = new Vector3D();
             sun.getSolarDirection(sunDir);
             double sLonDot = sun.getSolarLongitudeDot();
             double cosNu = FastMath.cos(y[0]);
@@ -862,8 +862,8 @@ public class ModifiedScanningLaw {
             if (altMin < zMax) {
                 reduced = true;
                 double kappaR = kappaN;
-                double s0 = Vector3d.crs(eclPole, spinAxis).dot(refDir[indexAltMin]);
-                double s1 = Vector3d.crs(sunDir, spinAxis).dot(refDir[indexAltMin]);
+                double s0 = Vector3D.crs(eclPole, spinAxis).dot(refDir[indexAltMin]);
+                double s1 = Vector3D.crs(sunDir, spinAxis).dot(refDir[indexAltMin]);
                 if (s1 > 0) {
                     kappaR = FastMath.min(kappaN, (sRed - s0) / s1);
                 } else if (s1 < 0) {

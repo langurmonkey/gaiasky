@@ -20,7 +20,7 @@ import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 
 public class VertsView extends BaseView implements IGPUVertsRenderable {
 
@@ -193,7 +193,7 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
      *
      * @param point The point to add
      */
-    public void addPoint(Vector3d point) {
+    public void addPoint(Vector3D point) {
         if (verts.pointCloudData == null) {
             setPoints(point.values());
         } else {

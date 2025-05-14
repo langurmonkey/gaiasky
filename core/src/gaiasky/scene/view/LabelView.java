@@ -30,13 +30,13 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class LabelView extends RenderView implements I3DTextRenderable {
 
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
+    private final Vector3D D31 = new Vector3D();
+    private final Vector3D D32 = new Vector3D();
     private final Vector3 F31 = new Vector3();
     private final Vector3 F32 = new Vector3();
 
@@ -107,7 +107,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
                             && (body.solidAngle <= LocationMark.UPPER_LIMIT || loc.ignoreSolidAngleLimit))
                         || label.forceLabel)
                 ){
-            Vector3d aux = D31;
+            Vector3D aux = D31;
             graph.translation.put(aux).sub(body.pos).scl(-1);
             // Make sure we don't render locations if the normal at the point points away from the camera.
             return aux.add(loc.location3d).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor()) < -0.3;
@@ -198,7 +198,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
      * @param out The out parameter with the result.
      */
     @Override
-    public void textPosition(ICamera cam, Vector3d out) {
+    public void textPosition(ICamera cam, Vector3D out) {
         if (label != null && label.labelPosition != null) {
             out.set(label.labelPosition).add(cam.getInversePos());
         } else {
@@ -211,7 +211,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             out.clamp(0, distToCamera - getRadius()).scl(0.9f);
 
             // Offset label a bit to the bottom-right of the position.
-            Vector3d offset = D32;
+            Vector3D offset = D32;
             offset.set(cam.getUp());
             offset.crs(out).nor();
 
@@ -269,7 +269,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         return base.opacity;
     }
 
-    protected void render2DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, RenderingContext rc, BitmapFont font, ICamera camera, String label, Vector3d pos3d) {
+    protected void render2DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, RenderingContext rc, BitmapFont font, ICamera camera, String label, Vector3D pos3d) {
         Vector3 p = F31;
         pos3d.setVector3(p);
 
@@ -294,11 +294,11 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         render2DLabel(batch, shader, rc, font, camera, label, x, y, scale, -1);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, double radius, boolean forceLabel) {
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3D pos, double distToCamera, float scale, double size, double radius, boolean forceLabel) {
         render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, radius, -1, -1, forceLabel);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, double radius, float minSizeDegrees, float maxSizeDegrees, boolean forceLabel) {
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3D pos, double distToCamera, float scale, double size, double radius, float minSizeDegrees, float maxSizeDegrees, boolean forceLabel) {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", Settings.settings.scene.label.size * scale / camera.getFovFactor());
 

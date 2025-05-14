@@ -18,18 +18,18 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 
 import java.util.List;
 
 public class BillboardSetInitializer extends AbstractInitSystem {
 
-    private final Vector3d D31;
+    private final Vector3D D31;
 
     public BillboardSetInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
-        D31 = new Vector3d();
+        D31 = new Vector3D();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
             var provider = new PointDataProvider();
             boolean reload = false;
             for (BillboardDataset dataset : billboard.datasets) {
-                boolean reloadNeeded = dataset.initialize(provider, null, reload);
+                boolean reloadNeeded = dataset.initialize(provider, reload);
                 reload = reload || reloadNeeded;
             }
         } catch (Exception e) {
@@ -78,8 +78,8 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         coord.coordinates.getEquatorialCartesianCoordinates(null, body.pos);
 
         // Model
-        Vector3d aux = D31;
-        Vector3b pos3b = body.pos;
+        Vector3D aux = D31;
+        Vector3Q pos3b = body.pos;
 
         // Transform all
         for (BillboardDataset bd : set.datasets) {

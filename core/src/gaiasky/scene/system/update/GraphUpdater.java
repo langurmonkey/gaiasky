@@ -25,8 +25,8 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -38,8 +38,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
     private final ITimeFrameProvider time;
     int processed = 0, lastProcessed;
     private ICamera camera;
-    private final Vector3d D31;
-    private final Vector3b B31;
+    private final Vector3D D31;
+    private final Vector3Q B31;
     private final SpacecraftView view;
 
     /**
@@ -52,8 +52,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
                         ITimeFrameProvider time) {
         super(family, priority);
         this.time = time;
-        this.D31 = new Vector3d();
-        this.B31 = new Vector3b();
+        this.D31 = new Vector3D();
+        this.B31 = new Vector3Q();
         this.view = new SpacecraftView();
     }
 
@@ -110,7 +110,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
     public void update(Entity entity,
                        ITimeFrameProvider time,
-                       final Vector3b parentTranslation,
+                       final Vector3Q parentTranslation,
                        float opacity) {
         processed++;
         var graph = Mapper.graph.get(entity);
@@ -329,7 +329,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
             // Apply proper motion if needed.
             if (pm != null && pm.hasPm) {
-                Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
+                Vector3D pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
                 body.pos.add(pmv);
             }
         }
@@ -424,7 +424,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             engine.yaw = FastMath.toDegrees(engine.yaw);
         }
         // Update float vectors
-        Vector3b camPos = B31.set(view.body.pos).add(camera.getInversePos());
+        Vector3Q camPos = B31.set(view.body.pos).add(camera.getInversePos());
         camPos.put(engine.posf);
         engine.direction.put(engine.directionf);
         engine.up.put(engine.upf);

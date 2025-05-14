@@ -31,7 +31,7 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.DoubleValidator;
 
@@ -447,7 +447,7 @@ public class DatasetTransformsWindow extends GenericDialog {
 
     }
 
-    private int findRefSysTransformIndex(Matrix4d matrix) {
+    private int findRefSysTransformIndex(Matrix4D matrix) {
         var map = Coordinates.getMap();
         for (var key : map.keySet()) {
             if (key.length() < 10) {

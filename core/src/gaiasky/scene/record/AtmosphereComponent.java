@@ -29,8 +29,8 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
-import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
@@ -60,15 +60,15 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public Map<String, Object> params;
 
     Vector3 aux;
-    Vector3d aux3, aux1;
+    Vector3D aux3, aux1;
 
     public AtmosphereComponent() {
         localTransform = new Matrix4();
         mc = new ModelComponent(false);
         mc.initialize(null);
         aux = new Vector3();
-        aux3 = new Vector3d();
-        aux1 = new Vector3d();
+        aux3 = new Vector3D();
+        aux1 = new Vector3D();
         fogColor = new Vector3();
     }
 
@@ -93,7 +93,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         }
     }
 
-    public void update(Vector3b transform) {
+    public void update(Vector3Q transform) {
         transform.setToTranslation(localTransform).scl(size);
     }
 
@@ -172,8 +172,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
                                                   GraphNode graph,
                                                   RotationComponent rigidRotation,
                                                   ModelScaffolding scaffolding,
-                                                  Vector3d vrOffset) {
-        Vector3b parentTranslation = null;
+                                                  Vector3D vrOffset) {
+        Vector3Q parentTranslation = null;
         Entity parent = graph.parent;
         if (parent != null) {
             parentTranslation = Mapper.graph.get(parent).translation;
@@ -202,11 +202,11 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public void updateAtmosphericScatteringParams(Material mat,
                                                   float alpha,
                                                   boolean ground,
-                                                  Vector3b translation,
+                                                  Vector3Q translation,
                                                   RotationComponent rc,
                                                   String inverseRefPlaneTransform,
-                                                  Vector3b parentTranslation,
-                                                  Vector3d vrOffset) {
+                                                  Vector3Q parentTranslation,
+                                                  Vector3D vrOffset) {
 
         translation.put(aux3);
         if (vrOffset != null) {
