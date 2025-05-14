@@ -438,12 +438,13 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         }
     }
 
-    private String getRunTimeString(Double seconds) {
-        double hours = seconds / 3600d;
-        double minutes = (seconds % 3600d) / 60d;
-        double secs = seconds % 60d;
+    private String getRunTimeString(Double totalSeconds) {
+        double hours = Math.floor(totalSeconds / 3600.0);
+        double remainingSeconds = totalSeconds % 3600.0;
+        double minutes = Math.floor(remainingSeconds / 60.0);
+        double seconds = Math.floor(remainingSeconds % 60.0);
 
-        return timeFormatter.format(hours) + ":" + timeFormatter.format(minutes) + ":" + timeFormatter.format(secs);
+        return timeFormatter.format(hours) + ":" + timeFormatter.format(minutes) + ":" + timeFormatter.format(seconds);
     }
 
     @Override

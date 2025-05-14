@@ -52,9 +52,10 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
     private final Vector3D pos;
-    private final Vector3Q posb;
+    private final Vector3Q posQ;
     protected Skin skin;
-    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
+    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol,
+            focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
     protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralGeneration;
     protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
@@ -531,7 +532,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         }
 
         pos = new Vector3D();
-        posb = new Vector3Q();
+        posQ = new Vector3Q();
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE,
                                         Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED,
                                         Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR,
@@ -561,7 +562,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 final int focusFieldMaxLength = 14;
 
                 // ID
-                boolean cappedId = false;
                 String id = "";
                 if (view.getExtra() != null || view.getStarSet() != null) {
                     if (view.getId() > 0) {
@@ -683,7 +683,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     focusRA.setText(nf.format(posSph.x) + deg);
                     focusDEC.setText(nf.format(posSph.y) + deg);
                 } else {
-                    Coordinates.cartesianToSpherical(view.getAbsolutePosition(posb), pos);
+                    Coordinates.cartesianToSpherical(view.getAbsolutePosition(posQ), pos);
 
                     focusRA.setText(nf.format(MathUtilsDouble.radDeg * pos.x % 360) + deg);
                     focusDEC.setText(nf.format(MathUtilsDouble.radDeg * pos.y % 360) + deg);
