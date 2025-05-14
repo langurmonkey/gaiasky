@@ -68,7 +68,7 @@ public class I18nStatus {
             PathMatcher languageMatcher = FileSystems.getDefault().getPathMatcher("glob:" + cliArgs.bundleFile + "*_*.properties");
 
             Path i18nDir = Path.of(ASSETS_LOC, "i18n");
-            List<Path> candidatePaths = Files.list(i18nDir).collect(Collectors.toList());
+            List<Path> candidatePaths = Files.list(i18nDir).toList();
             List<Path> languagePaths = new ArrayList<>();
             Path main = null;
             for (Path p : candidatePaths) {
