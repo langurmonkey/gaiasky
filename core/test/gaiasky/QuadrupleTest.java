@@ -23,7 +23,7 @@ public class QuadrupleTest {
     public void testPiConstant() {
         Quadruple pi = QuadrupleMath.pi();
         // Compare pi to known double value of Math.PI
-        Quadruple expected = Quadruple.valueOf(Double.toString(Math.PI));
+        Quadruple expected = Quadruple.from(Double.toString(Math.PI));
         Quadruple diff = pi.subtract(expected)
                 .abs();
         assertTrue("PI constant should match Math.PI within tolerance; diff=" + diff,
@@ -35,13 +35,13 @@ public class QuadrupleTest {
         // pi2() should equal pi * 2
         Quadruple twoPi = QuadrupleMath.pi2();
         Quadruple expectedTwoPi = QuadrupleMath.pi()
-                .multiply(Quadruple.valueOf(2));
+                .multiply(Quadruple.from(2));
         assertEquals(expectedTwoPi, twoPi);
 
         // piOver2() should equal pi / 2
         Quadruple halfPi = QuadrupleMath.piOver2();
         Quadruple expectedHalfPi = QuadrupleMath.pi()
-                .divide(Quadruple.valueOf(2));
+                .divide(Quadruple.from(2));
         assertEquals(expectedHalfPi, halfPi);
     }
 
@@ -63,7 +63,7 @@ public class QuadrupleTest {
     @Test
     public void testAtanLargeValue() {
         // For large x, atan(x) ~ pi/2
-        Quadruple large = Quadruple.valueOf("1e10");
+        Quadruple large = Quadruple.from("1e10");
         Quadruple result = QuadrupleMath.atan(large);
         Quadruple expected = QuadrupleMath.piOver2();
         assertEquals(expected.doubleValue(), result.doubleValue(), delta);
@@ -78,7 +78,7 @@ public class QuadrupleTest {
         // Quadrant I: y=1, x=1 => pi/4
         Quadruple q1 = QuadrupleMath.atan2(one, one);
         Quadruple expectedQ1 = QuadrupleMath.piOver2()
-                .divide(Quadruple.valueOf(2));
+                .divide(Quadruple.from(2));
         assertEquals(expectedQ1.doubleValue(), q1.doubleValue(), delta);
 
         // Quadrant II: y=1, x=-1 => 3*pi/4
