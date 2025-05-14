@@ -64,7 +64,7 @@ JAVA=$(printf %q "$JAVA")
 #
 
 # Memory
-OPTS="$OPTS -Xms2g -Xmx6g"
+OPTS="$OPTS -Xms2g -Xmx5g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
@@ -73,10 +73,12 @@ OPTS="$OPTS -Xms2g -Xmx6g"
 # Shenandoah GC (only in LTS)
 #OPTS="$OPTS -XX:+UseShenandoahGC"
 # ZGC
-#OPTS="$OPTS -XX:+UseZGC"
+OPTS="$OPTS -XX:+UseZGC -XX:+ZGenerational"
 
 # GC debug only
 #OPTS="$OPTS -verbose:gc -XX:+PrintGCDetails"
+# Log GC to file
+#OPTS="$OPTS -Xlog:gc*:file=gaiasky-gc.log:tags,uptime,time,level"
 # JIT compiler debug only
 #OPTS="$OPTS -XX:+PrintCompilation"
 # Even more JIT compiler debugging - This produces a huge XML log file (for JITWatch)
