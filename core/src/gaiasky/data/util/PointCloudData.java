@@ -15,9 +15,23 @@ import net.jafama.FastMath;
 import java.time.Instant;
 import java.util.ArrayList;
 
+/**
+ * Holds data for point clouds.
+ */
 public class PointCloudData implements Cloneable {
-    private final Vector3D v0;
-    private final Vector3D v1;
+    /** Auxiliary vector 0. **/
+    private static final ThreadLocal<Vector3D> vec0 = ThreadLocal.withInitial(Vector3D::new);
+    /** Auxiliary vector 1. **/
+    private static final ThreadLocal<Vector3D> vec1 = ThreadLocal.withInitial(Vector3D::new);
+
+    /** The samples of this point cloud. **/
+    public ArrayList<PointSample> samples;
+    /** Period, in days. Negative for no period. **/
+    public double period = -1;
+    /** Time of the first data point. **/
+    private Instant start;
+    /** Time of the last data point. **/
+    private Instant end;
 
     /**
      * A sample in the point cloud.
@@ -74,12 +88,6 @@ public class PointCloudData implements Cloneable {
         }
     }
 
-    /** The samples of this point cloud. **/
-    public ArrayList<PointSample> samples;
-    /** Period in days. **/
-    public double period = -1;
-    private Instant start, end;
-
 
     public PointCloudData() {
         this(16);
@@ -87,9 +95,6 @@ public class PointCloudData implements Cloneable {
 
     public PointCloudData(int capacity) {
         samples = new ArrayList<>(capacity);
-
-        v0 = new Vector3D();
-        v1 = new Vector3D();
     }
 
     /**
@@ -97,8 +102,6 @@ public class PointCloudData implements Cloneable {
      **/
     public void clear() {
         samples.clear();
-        v0.setZero();
-        v1.setZero();
     }
 
     public boolean isEmpty() {
@@ -266,6 +269,8 @@ public class PointCloudData implements Cloneable {
                     .put(v);
         } else {
             // Interpolate
+            var v0 = vec0.get();
+            var v1 = vec1.get();
             loadPoint(v0, idx);
             loadPoint(v1, idx + 1);
             long t0 = samples.get(idx)
@@ -296,6 +301,8 @@ public class PointCloudData implements Cloneable {
                     .put(v);
         } else {
             // Interpolate
+            var v0 = vec0.get();
+            var v1 = vec1.get();
             loadPoint(v0, idx);
             loadPoint(v1, idx + 1);
             long t0 = samples.get(idx)
