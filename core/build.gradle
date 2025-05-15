@@ -104,9 +104,11 @@ abstract class GaiaSkyRun extends JavaExec {
         //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
         // Default GC
         //jvmArgs "-XX:+UseShenandoahGC"
+        // ZGC
+        jvmArgs = [ '-XX:+UseZGC', '-XX:+ZGenerational']
         if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
             // Required to run lwjgl3 java apps on macOS
-            jvmArgs("-XstartOnFirstThread")
+            jvmArgs += "-XstartOnFirstThread"
         }
         // Verbose GC
         // jvmArgs = ['-verbose:gc']
