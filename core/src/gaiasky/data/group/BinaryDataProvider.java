@@ -96,33 +96,30 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     public List<IParticleRecord> readData(InputStream in, double factor) {
         List<IParticleRecord> data = null;
-        DataInputStream data_in = new DataInputStream(in);
 
-        try {
-            int version = 1;
-            data_in.mark(0);
-            int versionToken = data_in.readInt();
-            if (versionToken < 0) {
-                version = data_in.readInt();
-            } else {
-                // Rewind.
-                data_in.reset();
-            }
-            // Read size of stars.
-            int size = data_in.readInt();
-            data = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
-                data.add(binaryVersions[version].readParticleRecord(data_in, factor));
-            }
-
-        } catch (IOException e) {
-            logger.error(e);
-        } finally {
+        try (DataInputStream data_in = new DataInputStream(in)) {
             try {
-                data_in.close();
+                int version = 1;
+                data_in.mark(0);
+                int versionToken = data_in.readInt();
+                if (versionToken < 0) {
+                    version = data_in.readInt();
+                } else {
+                    // Rewind.
+                    data_in.reset();
+                }
+                // Read size of stars.
+                int size = data_in.readInt();
+                data = new ArrayList<>(size);
+                for (int i = 0; i < size; i++) {
+                    data.add(binaryVersions[version].readParticleRecord(data_in, factor));
+                }
+
             } catch (IOException e) {
                 logger.error(e);
             }
+        } catch (IOException e) {
+            logger.error(e);
         }
 
         return data;

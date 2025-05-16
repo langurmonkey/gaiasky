@@ -143,8 +143,9 @@ public class IntModel implements Disposable {
             nodes.add(loadNode(node));
         }
         for (ObjectMap.Entry<IntNodePart, ArrayMap<String, Matrix4>> e : nodePartBones.entries()) {
-            if (e.key.invBoneBindTransforms == null)
-                e.key.invBoneBindTransforms = new ArrayMap<>(Node.class, Matrix4.class);
+            if (e.key.invBoneBindTransforms == null) {
+                e.key.invBoneBindTransforms = new ArrayMap<>(IntNode[]::new, Matrix4[]::new);
+            }
             e.key.invBoneBindTransforms.clear();
             for (ObjectMap.Entry<String, Matrix4> b : e.value.entries())
                 e.key.invBoneBindTransforms.put(getNode(b.key), new Matrix4(b.value).inv());
@@ -161,7 +162,6 @@ public class IntModel implements Disposable {
             node.rotation.set(modelNode.rotation);
         if (modelNode.scale != null)
             node.scale.set(modelNode.scale);
-        // FIXME create temporary maps for faster lookup?
         if (modelNode.parts != null) {
             for (ModelNodePart modelNodePart : modelNode.parts) {
                 IntMeshPart meshPart = null;
@@ -188,14 +188,12 @@ public class IntModel implements Disposable {
                 if (meshPart == null || meshMaterial == null)
                     throw new GdxRuntimeException("Invalid node: " + node.id);
 
-                if (meshPart != null && meshMaterial != null) {
-                    IntNodePart nodePart = new IntNodePart();
-                    nodePart.meshPart = meshPart;
-                    nodePart.material = meshMaterial;
-                    node.parts.add(nodePart);
-                    if (modelNodePart.bones != null)
-                        nodePartBones.put(nodePart, modelNodePart.bones);
-                }
+                IntNodePart nodePart = new IntNodePart();
+                nodePart.meshPart = meshPart;
+                nodePart.material = meshMaterial;
+                node.parts.add(nodePart);
+                if (modelNodePart.bones != null)
+                    nodePartBones.put(nodePart, modelNodePart.bones);
             }
         }
 

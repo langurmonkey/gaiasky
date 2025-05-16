@@ -61,10 +61,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     /** These names are not allowed **/
     private static final String[] forbiddenNameValues = {"-", "...", "nop", "nan", "?", "_", "x", "n/a"};
-    /** Store already visited colName:attribute pairs. **/
-    private final Map<String, Integer> stringAttributesMap;
-    /** Store the last index for a given attribute. **/
-    private final Map<String, Integer> lastIndexMap;
     private StarTableFactory factory;
     private long objectId = 1;
     /** Dataset options, may be null. **/
@@ -74,8 +70,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     public STILDataProvider() {
         super();
-        stringAttributesMap = new HashMap<>();
-        lastIndexMap = new HashMap<>();
         // Logging level to WARN.
         try {
             java.util.logging.Logger.getLogger("uk.ac.starlink")
@@ -208,8 +202,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 // not working, try next
             }
         }
-        Pair<UCD, String>[] result;
-        result = new Pair[strings.size];
+        @SuppressWarnings("unchecked")
+        Pair<UCD, String>[] result = (Pair<UCD, String>[]) new Pair<?>[strings.size];
         int i = 0;
         for (Pair<UCD, String> value : strings) {
             result[i++] = value;

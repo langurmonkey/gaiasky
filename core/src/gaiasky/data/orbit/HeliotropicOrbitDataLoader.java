@@ -112,7 +112,7 @@ public class HeliotropicOrbitDataLoader {
                     Vector3D pos = new Vector3D(parsed(tokens[2]), parsed(tokens[3]), -parsed(tokens[1]));
 
                     // Transform to heliotropic using the Sun's ecliptic longitude
-                    Vector3D posHel = correctSunLongitude(pos, time, 0);
+                    Vector3D posHel = correctSunLongitude(pos, time);
 
                     // To ecliptic again
                     pos.mul(Coordinates.eqToEcl());
@@ -159,24 +159,11 @@ public class HeliotropicOrbitDataLoader {
      * @return Vector3 with the position in the heliotropic reference frame
      */
     protected Vector3D correctSunLongitude(final Vector3D pos, Instant t) {
-        return correctSunLongitude(pos, t, 0);
-    }
-
-    /**
-     * Transforms the given vector to a heliotropic system using the given time.
-     *
-     * @param pos    Position vector
-     * @param t      Time
-     * @param origin The origin angle
-     *
-     * @return Vector3 with the position in the heliotropic reference frame
-     */
-    protected Vector3D correctSunLongitude(final Vector3D pos, Instant t, float origin) {
         Vector3D upDirection = new Vector3D(0, 1, 0);
         // We get the Up direction of the ecliptic in equatorial coordinates
         upDirection.mul(Coordinates.eclToEq());
         return pos.cpy()
-                .rotate(upDirection, AstroUtils.getSunLongitude(t) - origin);
+                .rotate(upDirection, AstroUtils.getSunLongitude(t) - (float) 0);
     }
 
     private float getYearFraction(int year, int month, int day, int hour, int min, int sec) {

@@ -51,16 +51,9 @@ public class BinaryVersion3 implements BinaryIO {
         int floatOffset = 0;
         // Double
         for (int i = 0; i < 3; i++) {
-            if (i < dataD.length) {
-                // Goes to double array
-                dataD[i] = in.readDouble();
-                dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
-            } else {
-                // Goes to float array
-                int idx = i - dataD.length;
-                dataF[idx] = (float) in.readDouble();
-                floatOffset = idx + 1;
-            }
+            // Goes to double array
+            dataD[i] = in.readDouble();
+            dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
         }
         // Float
         for (int i = 0; i < 11; i++) {

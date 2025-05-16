@@ -1,5 +1,4 @@
-# GAIA SKY TEST PROTOCOL
-
+# Gaia Sky test protocol
 
 This document lists a sequence of actions to be performed in order to test the readiness of Gaia Sky for release. These are typically pain-points that have either failed in the past or are too obscure to be caught during the regular usage of the program during the testing phase.
 
