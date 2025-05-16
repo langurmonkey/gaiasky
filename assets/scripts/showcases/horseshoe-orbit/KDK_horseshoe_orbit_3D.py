@@ -63,7 +63,7 @@ class KDKRunnable(object):
             
             vC=vC+a*dt/2.
             ###
-            gs.setObjectPosition(self.object, xC/1.e9)
+            gs.setObjectPosition(self.object, float(xC)/1.e9)
             self.xC=xC
             self.vC=vC
             self.ti=ti
@@ -271,7 +271,7 @@ class RelativeLineUpdaterRunnableSyn():
             for i in range(pc.getNumPoints()):
                 s=self.positions[i]
                 x=s[0]*dAB +s[1]*vAB+s[2]*r3
-                pc.set(i, x[0] + Ap[0], x[1] + Ap[1], x[2] + Ap[2])
+                pc.set(i, float(x[0] + Ap[0]), float(x[1] + Ap[1]), float(x[2] + Ap[2]))
             self.line.markForUpdate()
         self.ti=ti
 
@@ -381,7 +381,7 @@ class RelativeLineUpdaterRunnableSynProjectOnOrbit():
                 for i in range(pc.getNumPoints()):
                     s=self.positions[i]
                     x=s[0]*dAB +s[1]*vAB+s[2]*r3
-                    pc.set(i, x[0] + AProj[0], x[1] + AProj[1], x[2] + AProj[2])
+                    pc.set(i, float(x[0] + AProj[0]), float(x[1] + AProj[1]), float(x[2] + AProj[2]))
                 self.line.markForUpdate()
         self.ti=ti
 
@@ -409,7 +409,7 @@ class LineUpdaterRunnable():
         if ((dt!=0) and (currt - self.lastt >= 0.1/5.)): 
                 xC = np.array(gs.getObjectPosition("Test Object"))
                 pc = self.line.getPointCloud()
-                pc.addPoint(xC[0],xC[1],xC[2])
+                pc.addPoint(float(xC[0]),float(xC[1]),float(xC[2]))
                 self.line.markForUpdate()
                 self.lastt=currt
             

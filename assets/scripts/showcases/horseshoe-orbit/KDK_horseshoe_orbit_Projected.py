@@ -64,7 +64,7 @@ class KDKRunnable(object):
             
             vC=vC+a*dt/2.
             ###
-            gs.setObjectPosition(self.object, xC/1.e9)
+            gs.setObjectPosition(self.object, float(xC)/1.e9)
             self.xC=xC
             self.vC=vC
             self.ti=ti
@@ -410,7 +410,7 @@ class LineUpdaterRunnable():
         if ((dt!=0) and (currt - self.lastt >= 0.1/5.)): 
                 xC = np.array(gs.getObjectPosition("Test Object"))
                 pc = self.line.getPointCloud()
-                pc.addPoint(xC[0],xC[1],xC[2])
+                pc.addPoint(float(xC[0]),float(xC[1]),float(xC[2]))
                 self.line.markForUpdate()
                 self.lastt=currt
             
