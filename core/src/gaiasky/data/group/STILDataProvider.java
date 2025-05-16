@@ -203,7 +203,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             }
         }
         @SuppressWarnings("unchecked")
-        Pair<UCD, String>[] result = (Pair<UCD, String>[]) new Pair<?>[strings.size];
+        Pair<UCD, String>[] result = (Pair<UCD, String>[]) new Pair[strings.size];
         int i = 0;
         for (Pair<UCD, String> value : strings) {
             result[i++] = value;

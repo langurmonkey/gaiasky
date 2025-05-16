@@ -35,6 +35,7 @@ public class OrientationServerLoader extends AsynchronousAssetLoader<Orientation
                 logger.error("Orientation server loader class name is null or blank");
                 throw new RuntimeException("Orientation server loader class name is null or blank");
             }
+            @SuppressWarnings("unchecked")
             Class<? extends OrientationServer> c = (Class<? extends OrientationServer>) Class.forName(className);
             server = c.getDeclaredConstructor(String.class).newInstance(fileName);
         } catch (Exception e) {

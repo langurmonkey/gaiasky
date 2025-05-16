@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings({ "rawtypes" })
-public class AssetBean {
+public class AssetBean<T> {
 
     /**
      * Asset descriptors set.
@@ -28,31 +28,31 @@ public class AssetBean {
     private static final AtomicReference<AssetManager> assetManager = new AtomicReference<>();
 
     private final String assetName;
-    private final Class assetClass;
-    private AssetLoaderParameters assetParams = null;
+    private final Class<T> assetClass;
+    private AssetLoaderParameters<T> assetParams = null;
 
-    private AssetBean(String assetName, Class assetClass) {
+    private AssetBean(String assetName, Class<T> assetClass) {
         super();
         this.assetName = assetName;
         this.assetClass = assetClass;
     }
 
-    private AssetBean(String assetName, Class assetClass, AssetLoaderParameters params) {
+    private AssetBean(String assetName, Class<T> assetClass, AssetLoaderParameters<T> params) {
         this(assetName, assetClass);
         this.assetParams = params;
     }
 
-    public static void addAsset(String assetName, Class assetClass) {
+    public static <T> void addAsset(String assetName, Class<T> assetClass) {
         if (assetManager == null) {
-            assetDescriptors.add(new AssetBean(assetName, assetClass));
+            assetDescriptors.add(new AssetBean<T>(assetName, assetClass));
         } else {
             assetManager.get().load(assetName, assetClass);
         }
     }
 
-    public static void addAsset(String assetName, Class assetClass, AssetLoaderParameters params) {
+    public static  <T> void addAsset(String assetName, Class<T> assetClass, AssetLoaderParameters<T> params) {
         if (assetManager == null) {
-            assetDescriptors.add(new AssetBean(assetName, assetClass, params));
+            assetDescriptors.add(new AssetBean<T>(assetName, assetClass, params));
         } else {
             assetManager.get().load(assetName, assetClass, params);
         }
