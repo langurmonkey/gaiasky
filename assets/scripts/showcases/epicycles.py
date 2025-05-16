@@ -49,9 +49,7 @@ class LineUpdaterRunnable(object):
             pc = self.line.getPointCloud()
             #gs.print("Polyline: %d, positions: %d" % (pc.getNumPoints(), len(self.positions)))
             for i in range(pc.getNumPoints()):
-                pc.setX(i, self.positions[i][0] + earthp[0])
-                pc.setY(i, self.positions[i][1] + earthp[1])
-                pc.setZ(i, self.positions[i][2] + earthp[2])
+                pc.set(i, self.positions[i][0] + earthp[0], self.positions[i][1] + earthp[1], self.positions[i][2] + earthp[2])
             self.line.markForUpdate()
 
         self.frames += 1

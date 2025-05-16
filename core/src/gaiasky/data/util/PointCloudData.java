@@ -8,8 +8,8 @@
 package gaiasky.data.util;
 
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.time.Instant;
@@ -95,6 +95,65 @@ public class PointCloudData implements Cloneable {
 
     public PointCloudData(int capacity) {
         samples = new ArrayList<>(capacity);
+    }
+
+    /**
+     * Sets the given index with the given coordinates.
+     *
+     * @param index The index.
+     * @param x     The x coordinate.
+     * @param y     The y coordinate.
+     * @param z     The z coordinate.
+     */
+    public void set(int index, double x, double y, double z) {
+        if (index < samples.size() && index >= 0) {
+            samples.set(index, new PointSample(x, y, z));
+        }
+    }
+
+    /**
+     * Sets the x component of the point at the given index.
+     * <p>
+     * This method is given for backwards compatibility with old scripts.
+     *
+     * @param index The index.
+     * @param x     The x component.
+     */
+    public void setX(int index, double x) {
+        if (index < samples.size() && index >= 0) {
+            var p = samples.get(index);
+            samples.set(index, new PointSample(x, p.y, p.z, p.seconds, p.nanos));
+        }
+    }
+
+    /**
+     * Sets the y component of the point at the given index.
+     * <p>
+     * This method is given for backwards compatibility with old scripts.
+     *
+     * @param index The index.
+     * @param y     The y component.
+     */
+    public void setY(int index, double y) {
+        if (index < samples.size() && index >= 0) {
+            var p = samples.get(index);
+            samples.set(index, new PointSample(p.x, y, p.z, p.seconds, p.nanos));
+        }
+    }
+
+    /**
+     * Sets the z component of the point at the given index.
+     * <p>
+     * This method is given for backwards compatibility with old scripts.
+     *
+     * @param index The index.
+     * @param z     The z component.
+     */
+    public void setZ(int index, double z) {
+        if (index < samples.size() && index >= 0) {
+            var p = samples.get(index);
+            samples.set(index, new PointSample(p.x, p.y, z, p.seconds, p.nanos));
+        }
     }
 
     /**

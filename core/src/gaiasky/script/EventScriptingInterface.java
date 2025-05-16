@@ -3918,7 +3918,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
             var base = Mapper.base.get(entity);
             base.setName(name);
-            base.setComponentType(ComponentType.Others);
+            base.setComponentType(ComponentType.Orbits);
 
             var body = Mapper.body.get(entity);
             body.setColor(color);

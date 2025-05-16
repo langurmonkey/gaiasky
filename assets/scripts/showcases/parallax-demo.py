@@ -69,13 +69,11 @@ class LineUpdaterRunnable(object):
         earthp = gs.getObjectPosition("Earth")
         starp = gs.getObjectPosition(self.starname)
         pl = self.polyline.getPointCloud()
-        pl.setX(0, earthp[0])
-        pl.setY(0, earthp[1])
-        pl.setZ(0, earthp[2])
+
+        pl.set(0, earthp[0], earthp[1], earthp[2])
         lpos=[(starp[0]*sc-earthp[0]*(sc-1.0)),(starp[1]*sc-earthp[1]*(sc-1.0)),(starp[2]*sc-earthp[2]*(sc-1.0))]
-        pl.setX(1, lpos[0])
-        pl.setY(1, lpos[1])
-        pl.setZ(1, lpos[2])
+        pl.set(1, lpos[0], lpos[1], lpos[2])
+
         self.polyline.markForUpdate()
 
         # New line from sun to star?

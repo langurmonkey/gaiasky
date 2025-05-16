@@ -282,9 +282,7 @@ class RelativeLineUpdaterRunnableSyn():
             for i in range(pc.getNumPoints()):
                 s=self.positions[i]
                 x=s[0]*dAB +s[1]*vAB+s[2]*r3
-                pc.setX(i, x[0]  + Ap[0])
-                pc.setY(i, x[1]  + Ap[1])
-                pc.setZ(i, x[2]  + Ap[2])
+                pc.set(i, x[0] + Ap[0], x[1] + Ap[1], x[2] + Ap[2])
             self.line.markForUpdate()
         self.ti=ti
 
@@ -394,9 +392,7 @@ class RelativeLineUpdaterRunnableSynProjectOnOrbit():
                 for i in range(pc.getNumPoints()):
                     s=self.positions[i]
                     x=s[0]*dAB +s[1]*vAB+s[2]*r3
-                    pc.setX(i, x[0]  + AProj[0])
-                    pc.setY(i, x[1]  + AProj[1])
-                    pc.setZ(i, x[2]  + AProj[2])
+                    pc.set(i, x[0] + AProj[0], x[1] + AProj[1], x[2] + AProj[2])
                 self.line.markForUpdate()
         self.ti=ti
 

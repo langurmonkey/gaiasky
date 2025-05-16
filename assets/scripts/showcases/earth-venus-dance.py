@@ -21,12 +21,8 @@ class LineUpdaterRunnable(object):
         venusp = gs.getObjectPosition("Venus")
         plc = self.plcurrent.getPointCloud()
 
-        plc.setX(0, earthp[0])
-        plc.setY(0, earthp[1])
-        plc.setZ(0, earthp[2])
-        plc.setX(1, venusp[0])
-        plc.setY(1, venusp[1])
-        plc.setZ(1, venusp[2])
+        plc.set(0, earthp[0], earthp[1], earthp[2])
+        plc.set(1, venusp[0], venusp[1], venusp[2])
 
         self.plcurrent.markForUpdate()
         

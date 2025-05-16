@@ -26,12 +26,8 @@ class LineUpdaterRunnable(object):
         moonp = gs.getObjectPosition("Moon")
         pl = self.polyline.getPointCloud()
 
-        pl.setX(0, earthp[0])
-        pl.setY(0, earthp[1])
-        pl.setZ(0, earthp[2])
-        pl.setX(1, moonp[0])
-        pl.setY(1, moonp[1])
-        pl.setZ(1, moonp[2])
+        pl.set(0, earthp[0], earthp[1], earthp[2])
+        pl.set(1, moonp[0], moonp[1], moonp[2])
 
         # Persist line every 0.2 seconds
         now = time.time()
