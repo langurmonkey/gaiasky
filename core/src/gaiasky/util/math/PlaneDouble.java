@@ -8,12 +8,18 @@
 
 package gaiasky.util.math;
 
+import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * A plane defined via a unit length normal and the distance from the origin, as you learned in your math class.
+ */
 public class PlaneDouble implements Serializable {
+    @Serial
     private static final long serialVersionUID = -1240652082930747866L;
     public final Vector3D normal = new Vector3D();
     public double d = 0;
+
     /**
      * Constructs a new plane with all values set to 0
      */
@@ -115,9 +121,9 @@ public class PlaneDouble implements Serializable {
      * Returns on which side the given point lies relative to the plane and its normal. PlaneSide.Front refers to the side the
      * plane normal points to.
      *
-     * @param x
-     * @param y
-     * @param z
+     * @param x x-coordinate of the point.
+     * @param y y-coordinate of the point.
+     * @param z z-coordinate of the point.
      *
      * @return The side the point lies relative to the plane
      */
