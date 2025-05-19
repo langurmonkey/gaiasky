@@ -1036,7 +1036,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     public String toString() {
-        return Objects.requireNonNullElseGet(modelFile, () -> "{" + type + ", params: " + params.toString() + "}");
+        return Objects.requireNonNullElseGet(modelFile, () -> "{" + type + ", params: " + (params != null ? params.toString() : "null") + "}");
     }
 
     /**

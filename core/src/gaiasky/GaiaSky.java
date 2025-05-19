@@ -822,9 +822,13 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 EventManager.publish(Event.DEBUG_THREADS, this, executorService.getPool()
                         .getActiveCount(), executorService.getPool()
                                              .getPoolSize());
+
                 // Dynamic resolution.
-                EventManager.publish(Event.DEBUG_DYN_RES, this, dynamicResolutionLevel,
-                                     settings.graphics.dynamicResolutionScale[dynamicResolutionLevel]);
+                if (settings.graphics.dynamicResolution) {
+                    EventManager.publish(Event.DEBUG_DYN_RES, this, dynamicResolutionLevel,
+                                         settings.graphics.dynamicResolutionScale[dynamicResolutionLevel]);
+                }
+
                 // Octree objects.
                 if (OctreeLoader.instance != null) {
                     // Observed objects.

@@ -58,8 +58,7 @@ public class OwnLabel extends Label implements Disableable {
     public void receiveScrollEvents() {
         // FOCUS_MODE listener
         addListener((e) -> {
-            if (e instanceof InputEvent) {
-                InputEvent ie = (InputEvent) e;
+            if (e instanceof InputEvent ie) {
                 e.setBubbles(false);
                 if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
                     return this.getStage().setScrollFocus(this);

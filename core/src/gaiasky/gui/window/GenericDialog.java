@@ -64,6 +64,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected float lastPosX = -1, lastPosY = -1;
     protected HorizontalGroup buttonGroup;
     protected boolean enterExit = true, escExit = true;
+    protected boolean keysListener = true;
     protected Runnable acceptListener, cancelListener, closeListener;
     // Specific mouse/keyboard listener, if any.
     protected AbstractMouseKbdListener mouseKbdListener;
@@ -273,39 +274,41 @@ public abstract class GenericDialog extends CollapsibleWindow {
         pack();
 
         // Add keys for ESC, ENTER and TAB
-        me.addListener(event -> {
-            if (event instanceof InputEvent ie) {
-                if (ie.getType() == Type.keyUp) {
-                    int key = ie.getKeyCode();
-                    switch (key) {
-                        case Keys.ESCAPE -> {
-                            if (escExit) {
-                                closeCancel();
+        if (keysListener) {
+            me.addListener(event -> {
+                if (event instanceof InputEvent ie) {
+                    if (ie.getType() == Type.keyUp) {
+                        int key = ie.getKeyCode();
+                        switch (key) {
+                            case Keys.ESCAPE -> {
+                                if (escExit) {
+                                    closeCancel();
+                                }
+                                // Do not propagate to parents
+                                event.stop();
+                                return true;
                             }
-                            // Do not propagate to parents
-                            event.stop();
-                            return true;
-                        }
-                        case Keys.ENTER -> {
-                            if (enterExit) {
-                                closeAccept();
+                            case Keys.ENTER -> {
+                                if (enterExit) {
+                                    closeAccept();
+                                }
+                                // Do not propagate to parents
+                                event.stop();
+                                return true;
                             }
-                            // Do not propagate to parents
-                            event.stop();
-                            return true;
+                            case Keys.TAB -> {
+                                // Next focus, do nothing
+                                return true;
+                            }
+                            default -> {
+                            }
+                            // Nothing
                         }
-                        case Keys.TAB -> {
-                            // Next focus, do nothing
-                            return true;
-                        }
-                        default -> {
-                        }
-                        // Nothing
                     }
                 }
-            }
-            return false;
-        });
+                return false;
+            });
+        }
 
         // CAPTURE SCROLL FOCUS
         stage.addListener(event -> {

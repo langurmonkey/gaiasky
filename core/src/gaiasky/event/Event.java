@@ -88,7 +88,7 @@ public enum Event {
     AMBIENT_LIGHT_CMD,
 
     /**
-     * Anti aliasing changed, contains the new anti-aliasing value.
+     * Antialiasing changed, contains the new antialiasing value.
      **/
     ANTIALIASING_CMD,
     /** Changes the quality setting of FXAA. Includes an integer in [0|1|2]. **/
@@ -96,6 +96,9 @@ public enum Event {
 
     /** Notifies of screen resolution changes in windowed mode. Contains the new width and height as integers. **/
     WINDOW_RESOLUTION_INFO,
+
+    /** Shows the object debug window. **/
+    SHOW_OBJECT_DEBUG_ACTION,
 
     /** Shows window to give a name to the new position bookmark. **/
     SHOW_ADD_POSITION_BOOKMARK_ACTION,

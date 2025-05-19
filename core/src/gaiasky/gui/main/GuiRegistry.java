@@ -92,6 +92,7 @@ public class GuiRegistry implements IObserver {
     private DateDialog dateDialog;
     private BookmarkNameDialog locationBookmarkDialog;
     private BookmarkInfoDialog bookmarkInfoDialog;
+    private ObjectDebugWindow objectDebugWindow;
     /**
      * Keyframes window.
      **/
@@ -129,13 +130,27 @@ public class GuiRegistry implements IObserver {
         this.catalogManager = catalogManager;
         this.view = new FocusView();
         // Windows which are visible from any GUI.
-        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION,
-                Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION,
-                Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO,
-                Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION,
-                Event.SHOW_RESTART_ACTION,
-                Event.CLOSE_ALL_GUI_WINDOWS_CMD, Event.SHOW_DATE_TIME_EDIT_ACTION,
-                Event.SHOW_ADD_POSITION_BOOKMARK_ACTION, Event.SHOW_BOOKMARK_INFO_ACTION);
+        EventManager.instance.subscribe(this,
+                                        Event.SHOW_SEARCH_ACTION,
+                                        Event.SHOW_QUIT_ACTION,
+                                        Event.SHOW_ABOUT_ACTION,
+                                        Event.SHOW_LOAD_CATALOG_ACTION,
+                                        Event.SHOW_PREFERENCES_ACTION,
+                                        Event.SHOW_KEYFRAMES_WINDOW_ACTION,
+                                        Event.SHOW_SLAVE_CONFIG_ACTION,
+                                        Event.SHOW_TEXTURE_WINDOW_ACTION,
+                                        Event.UI_THEME_RELOAD_INFO,
+                                        Event.MODE_POPUP_CMD,
+                                        Event.DISPLAY_GUI_CMD,
+                                        Event.CAMERA_MODE_CMD,
+                                        Event.UI_RELOAD_CMD,
+                                        Event.SHOW_PER_OBJECT_VISIBILITY_ACTION,
+                                        Event.SHOW_RESTART_ACTION,
+                                        Event.CLOSE_ALL_GUI_WINDOWS_CMD,
+                                        Event.SHOW_DATE_TIME_EDIT_ACTION,
+                                        Event.SHOW_ADD_POSITION_BOOKMARK_ACTION,
+                                        Event.SHOW_BOOKMARK_INFO_ACTION,
+                                        Event.SHOW_OBJECT_DEBUG_ACTION);
     }
 
     public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
@@ -366,9 +381,12 @@ public class GuiRegistry implements IObserver {
                 }
                 case SHOW_QUIT_ACTION -> {
                     if (!removeModeChangePopup() && !removeGamepadGui()) {
-                        if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
+                        if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(),
+                                                  GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
                             // Release mouse if captured.
-                            GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+                            GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(),
+                                                  GLFW.GLFW_CURSOR,
+                                                  GLFW.GLFW_CURSOR_NORMAL);
                         } else {
                             Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
                             if (Settings.settings.program.exitConfirmation) {
@@ -450,7 +468,9 @@ public class GuiRegistry implements IObserver {
                     fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                     fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                     fc.setAcceptText(I18n.msg("gui.loadcatalog"));
-                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv")
+                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName()
+                            .toString()
+                            .endsWith(".csv")
                             || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
                     fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
                     fc.setResultListener((success, result) -> {
@@ -468,13 +488,20 @@ public class GuiRegistry implements IObserver {
                                             }
                                         });
                                     } else {
-                                        final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, stage);
+                                        final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName,
+                                                                                            fileName,
+                                                                                            skin,
+                                                                                            stage);
                                         Runnable doLoad = () -> {
                                             GaiaSky.instance.getExecutorService().execute(() -> {
                                                 DatasetOptions datasetOptions = dld.generateDatasetOptions();
                                                 // Load dataset.
-                                                GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI,
-                                                        datasetOptions, true);
+                                                GaiaSky.instance.scripting()
+                                                        .loadDataset(datasetOptions.catalogName,
+                                                                     result.toAbsolutePath().toString(),
+                                                                     CatalogInfoSource.UI,
+                                                                     datasetOptions,
+                                                                     true);
                                                 // Select first.
                                                 CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
                                                 if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
@@ -488,7 +515,9 @@ public class GuiRegistry implements IObserver {
                                                     } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
                                                             view.getGraph().children.get(0))) {
                                                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
+                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD,
+                                                                             this,
+                                                                             EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
                                                     }
                                                     // Open UI datasets.
                                                     GaiaSky.instance.scripting().expandUIPane("Datasets");
@@ -549,6 +578,12 @@ public class GuiRegistry implements IObserver {
                     }
                     dateDialog.updateTime(GaiaSky.instance.time.getTime(), Settings.settings.program.timeZone.getTimeZone());
                     dateDialog.show(stage);
+                }
+                case SHOW_OBJECT_DEBUG_ACTION -> {
+                    if (objectDebugWindow == null) {
+                        objectDebugWindow = new ObjectDebugWindow(stage, skin, scene);
+                    }
+                    objectDebugWindow.show(stage);
                 }
                 case SHOW_ADD_POSITION_BOOKMARK_ACTION -> {
                     if (locationBookmarkDialog == null) {
@@ -657,7 +692,8 @@ public class GuiRegistry implements IObserver {
 
                         } else {
                             // Remove
-                            if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent() && modeChangeInfoPopup.getName().equals("mct-" + name)) {
+                            if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent() && modeChangeInfoPopup.getName()
+                                    .equals("mct-" + name)) {
                                 modeChangeInfoPopup.remove();
                                 modeChangeInfoPopup = null;
                             }
@@ -699,7 +735,8 @@ public class GuiRegistry implements IObserver {
                                 Path workingDir = Path.of(System.getProperty("user.dir"));
                                 Path[] scripts;
                                 if (SysUtils.isWindows()) {
-                                    scripts = new Path[]{workingDir.resolve("gaiasky.exe"), workingDir.resolve("gaiasky.bat"), workingDir.resolve("gradlew.bat")};
+                                    scripts = new Path[]{workingDir.resolve("gaiasky.exe"), workingDir.resolve("gaiasky.bat"), workingDir.resolve(
+                                            "gradlew.bat")};
                                 } else {
                                     scripts = new Path[]{workingDir.resolve("gaiasky"), workingDir.resolve("gradlew")};
                                 }

@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
 import com.badlogic.gdx.utils.Null;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.validator.*;
@@ -45,6 +46,7 @@ public class OwnTextField extends TextField {
     public OwnTextField(@Null String text, Skin skin) {
         super(text, new TextFieldStyle(skin.get(TextFieldStyle.class)));
         this.skin = skin;
+        this.regularColor = getColor().cpy();
         initClearButton();
     }
 
@@ -58,6 +60,7 @@ public class OwnTextField extends TextField {
     public OwnTextField(String text, Skin skin, String styleName) {
         super(text, new TextFieldStyle(skin.get(styleName, TextFieldStyle.class)));
         this.skin = skin;
+        this.regularColor = getColor().cpy();
         initClearButton();
     }
 
@@ -101,13 +104,13 @@ public class OwnTextField extends TextField {
     }
 
     public void setValidator(IValidator validator) {
-        if(validator == null) {
+        if (validator == null) {
             // Remove.
-            if(validatorListener != null) {
+            if (validatorListener != null) {
                 removeListener(validatorListener);
                 validatorListener = null;
             }
-            if(validatorTooltipListener != null) {
+            if (validatorTooltipListener != null) {
                 removeListener(validatorTooltipListener);
                 validatorTooltipListener = null;
             }
@@ -156,20 +159,29 @@ public class OwnTextField extends TextField {
         }
     }
 
+    public void setToRegularColor() {
+        this.setColor(regularColor);
+        this.getStyle().fontColor = regularColor;
+    }
+
+    public void setToErrorColor() {
+        this.setColor(errorColor);
+        this.getStyle().fontColor = errorColor;
+    }
+
+
     private void initValidator() {
         if (validator != null) {
-            errorColor = new Color(0xff3333ff);
+            errorColor = ColorUtils.gRedC;
             regularColor = getColor().cpy();
             addListener(validatorListener = (event) -> {
                 if (event instanceof ChangeEvent) {
                     String str = getText();
                     if (validator.validate(str)) {
-                        this.setColor(regularColor);
-                        this.getStyle().fontColor = regularColor;
+                        setToRegularColor();
                         lastCorrectText = str;
                     } else {
-                        this.setColor(errorColor);
-                        this.getStyle().fontColor = errorColor;
+                        setToErrorColor();
                     }
                     return true;
                 } else if (event instanceof FocusEvent) {
@@ -178,8 +190,7 @@ public class OwnTextField extends TextField {
                         String str = getText();
                         if (!validator.validate(str)) {
                             this.setText(lastCorrectText);
-                            this.setColor(regularColor);
-                            this.getStyle().fontColor = regularColor;
+                            setToRegularColor();
                         }
                     }
                     return true;
@@ -197,13 +208,17 @@ public class OwnTextField extends TextField {
     private void addValidatorTooltip(IValidator validator) {
         if (validator != null) {
             if (validator instanceof FloatValidator fv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMinString(), fv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMinString(), fv.getMaxString()),
+                                                                          skin));
             } else if (validator instanceof DoubleValidator dv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", dv.getMinString(), dv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", dv.getMinString(), dv.getMaxString()),
+                                                                          skin));
             } else if (validator instanceof IntValidator iv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMinString(), iv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMinString(), iv.getMaxString()),
+                                                                          skin));
             } else if (validator instanceof LongValidator lv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", lv.getMinString(), lv.getMaxString()), skin));
+                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", lv.getMinString(), lv.getMaxString()),
+                                                                          skin));
             }
             if (validator instanceof CallbackValidator cv) {
                 addValidatorTooltip(cv.getParent());

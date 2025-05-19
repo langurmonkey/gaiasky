@@ -34,8 +34,8 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
@@ -93,14 +93,10 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         bw = 41f;
 
         focusInfo = new Table();
-        focusInfo.pad(pad5);
         Table cameraInfo = new Table();
-        cameraInfo.pad(pad5);
         Table pointerInfo = new Table();
-        pointerInfo.pad(pad5);
         moreInfo = new Table();
         rulerInfo = new Table();
-        rulerInfo.pad(pad5);
 
         // FOCUS_MODE
         focusName = new OwnLabel("", skin, "hud-header");
@@ -397,8 +393,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusInfo.add(moreInfo)
                 .left()
                 .colspan(2)
-                .padBottom(pad5)
-                .padTop(pad10);
+                .padBottom(pad10);
 
         // POINTER INFO
         if (!vr) {
@@ -429,13 +424,15 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     .row();
             pointerInfo.add(viewImgBtn)
                     .left()
-                    .padRight(pad3);
+                    .padRight(pad3)
+                    .padBottom(pad10);
             pointerInfo.add(RADECViewLabel)
                     .left();
             pointerInfo.add(viewRADEC)
                     .expandX()
                     .left()
-                    .padLeft(pad5);
+                    .padLeft(pad5)
+                    .padBottom(pad10);
         }
 
         // CAMERA INFO
