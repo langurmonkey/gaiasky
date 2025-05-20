@@ -159,9 +159,9 @@ scene:
     # 2 - god rays.
     # 3 - horizontal and vertical spikes.
     # 4 - simple radial profile.
-    textureIndex: 4
+    textureIndex: 5
     # Same as textureIndex, but used for close-by stars with glow effect.
-    textureIndexLens: 1
+    textureIndexLens: 3
     # Star opacity mapping, as in [min, max].
     opacity: [ 0.0, 1.0 ]
     # Star groups.
