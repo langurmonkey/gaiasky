@@ -38,7 +38,9 @@ import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.Separator;
 import net.jafama.FastMath;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
@@ -52,6 +54,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
     static {
         updatePads();
     }
+
+    /**
+     * Stores the last active tab for each subclass.
+     */
+    private static final Map<Class<? extends GenericDialog>, Integer> lastActiveTab = new HashMap<>(20);
 
     final protected Stage stage;
     final protected Skin skin;
@@ -71,7 +78,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     // The gamepad listener for this window, if any.
     protected AbstractGamepadListener gamepadListener;
     /** If this dialog has tabs, this list holds them. **/
-    protected Array<Button> tabButtons;
+    protected Array<TextButton> tabButtons;
     /** Currently selected tab **/
     protected int selectedTab = 0;
     /** Actual actor for each tab. **/
@@ -193,6 +200,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
                         }
                         if (tabButtons != null) {
                             selectedTab = tabsGroup.getCheckedIndex();
+                            lastActiveTab.put(me.getClass(), selectedTab);
                         }
                     }
                 }
@@ -203,6 +211,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 tabButtons.get(i).addListener(tabListener);
                 tabsGroup.add(tabButtons.get(i));
             }
+
+            // Select tab.
+            int checkedIndex = lastActiveTab.getOrDefault(me.getClass(), 0);
+            tabsGroup.setChecked(((TextButton) tabButtons.get(checkedIndex)).getText().toString());
         }
     }
 
@@ -697,7 +709,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         return bottom;
     }
 
-    public Array<Button> getTabButtons() {
+    public Array<TextButton> getTabButtons() {
         return tabButtons;
     }
 
