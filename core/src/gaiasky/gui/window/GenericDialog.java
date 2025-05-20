@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
@@ -72,6 +73,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected HorizontalGroup buttonGroup;
     protected boolean enterExit = true, escExit = true;
     protected boolean keysListener = true;
+    private boolean initializing = true;
     protected Runnable acceptListener, cancelListener, closeListener;
     // Specific mouse/keyboard listener, if any.
     protected AbstractMouseKbdListener mouseKbdListener;
@@ -200,21 +202,25 @@ public abstract class GenericDialog extends CollapsibleWindow {
                         }
                         if (tabButtons != null) {
                             selectedTab = tabsGroup.getCheckedIndex();
-                            lastActiveTab.put(me.getClass(), selectedTab);
+                            if (!initializing) {
+                                lastActiveTab.put(me.getClass(), selectedTab);
+                            }
                         }
                     }
                 }
             };
 
             // Add listeners to tabs, and tabs and groups.
+            initializing = true;
             for (int i = 0; i < tabButtons.size; i++) {
                 tabButtons.get(i).addListener(tabListener);
                 tabsGroup.add(tabButtons.get(i));
             }
+            initializing = false;
 
             // Select tab.
-            int checkedIndex = lastActiveTab.getOrDefault(me.getClass(), 0);
-            tabsGroup.setChecked(((TextButton) tabButtons.get(checkedIndex)).getText().toString());
+            var lastSelected = lastActiveTab.getOrDefault(me.getClass(), 0);
+            tabsGroup.setChecked(tabButtons.get(lastSelected).getText().toString());
         }
     }
 

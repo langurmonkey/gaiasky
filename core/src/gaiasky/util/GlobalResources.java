@@ -622,9 +622,6 @@ public class GlobalResources {
                 }
             }
         }
-
-        // Not found.
-        logger.warn("Texture not found: " + path);
         return null;
     }
 
