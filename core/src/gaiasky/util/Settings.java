@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -867,7 +868,9 @@ public class Settings extends SettingsObject {
                 // - the current resolved path does not exist, and
                 // - the dataset location is not null or empty, and
                 // - the injected dataset location is not already in the path.
-                if (!Files.exists(resolvedPath) && dsLocation != null && !dsLocation.isEmpty() && !pathFromData.getName(0).toString().equals(dsLocation)) {
+                if (!Files.exists(resolvedPath) && dsLocation != null && !dsLocation.isEmpty() && !pathFromData.getName(0)
+                        .toString()
+                        .equals(dsLocation)) {
                     // Use dsLocation
                     return Path.of(location).resolve(dsLocation).resolve(pathFromDataStr);
                 } else {
@@ -1130,7 +1133,7 @@ public class Settings extends SettingsObject {
         @Override
         protected void setupListeners() {
             EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD,
-                    Event.BACKBUFFER_SCALE_CMD, Event.PROCEDURAL_GENERATION_RESOLUTION_CMD);
+                                            Event.BACKBUFFER_SCALE_CMD, Event.PROCEDURAL_GENERATION_RESOLUTION_CMD);
 
             fullScreen.setupListeners();
         }
@@ -1443,8 +1446,15 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
-                EventManager.instance.subscribe(this, Event.CAMERA_CINEMATIC_CMD, Event.FOCUS_LOCK_CMD, Event.ORIENTATION_LOCK_CMD, Event.FOV_CHANGED_CMD,
-                        Event.CAMERA_SPEED_CMD, Event.ROTATION_SPEED_CMD, Event.TURNING_SPEED_CMD, Event.SPEED_LIMIT_CMD);
+                EventManager.instance.subscribe(this,
+                                                Event.CAMERA_CINEMATIC_CMD,
+                                                Event.FOCUS_LOCK_CMD,
+                                                Event.ORIENTATION_LOCK_CMD,
+                                                Event.FOV_CHANGED_CMD,
+                                                Event.CAMERA_SPEED_CMD,
+                                                Event.ROTATION_SPEED_CMD,
+                                                Event.TURNING_SPEED_CMD,
+                                                Event.SPEED_LIMIT_CMD);
 
                 focusLock.setupListeners();
             }
@@ -1581,13 +1591,17 @@ public class Settings extends SettingsObject {
             public String getStarTexture(int textureIndex) {
                 String starTexIdx = String.format("%02d", textureIndex);
                 String texture = settings.data.dataFile(
-                        GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE, ".jpg", ".png"));
+                        GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                                                                  ".jpg",
+                                                                  ".png"));
                 if (texture == null) {
                     // Fall back to whatever is available.
                     for (int i = 1; i < 9; i++) {
                         starTexIdx = String.format("%02d", i);
                         texture = settings.data.dataFile(
-                                GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE, ".jpg", ".png"));
+                                GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                                                                          ".jpg",
+                                                                          ".png"));
                         if (texture != null)
                             return texture;
                     }
@@ -1595,6 +1609,27 @@ public class Settings extends SettingsObject {
                     return texture;
                 }
                 return null;
+            }
+
+            /**
+             * Gets the available star texture indices by looking at the available files in the file system.
+             *
+             * @return An {@link IntArray} with the available indices.
+             */
+            @JsonIgnore
+            public IntArray getStarTextureIndices() {
+                IntArray result = new IntArray(9);
+                // Fall back to whatever is available.
+                for (int i = 1; i < 9; i++) {
+                    var starTexIdx = String.format("%02d", i);
+                    var t = GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                                                                      ".jpg",
+                                                                      ".png");
+                    if (t != null) {
+                        result.add(i);
+                    }
+                }
+                return result;
             }
 
             @JsonIgnore
@@ -1660,9 +1695,18 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
-                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD,
-                        Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD,
-                        Event.STAR_BASE_LEVEL_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
+                EventManager.instance.subscribe(this,
+                                                Event.STAR_BRIGHTNESS_CMD,
+                                                Event.STAR_BRIGHTNESS_POW_CMD,
+                                                Event.STAR_GLOW_FACTOR_CMD,
+                                                Event.STAR_POINT_SIZE_CMD,
+                                                Event.STAR_POINT_SIZE_INCREASE_CMD,
+                                                Event.STAR_POINT_SIZE_DECREASE_CMD,
+                                                Event.STAR_POINT_SIZE_RESET_CMD,
+                                                Event.STAR_BASE_LEVEL_CMD,
+                                                Event.STAR_GROUP_BILLBOARD_CMD,
+                                                Event.STAR_GROUP_NEAREST_CMD,
+                                                Event.BILLBOARD_TEXTURE_IDX_CMD);
 
                 group.setupListeners();
                 threshold.setupListeners();
@@ -1833,8 +1877,10 @@ public class Settings extends SettingsObject {
                                final Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
-                        case PM_NUM_FACTOR_CMD -> number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
-                        case PM_LEN_FACTOR_CMD -> length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
+                        case PM_NUM_FACTOR_CMD ->
+                                number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
+                        case PM_LEN_FACTOR_CMD ->
+                                length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
                         case PM_COLOR_MODE_CMD -> colorMode = MathUtilsDouble.clamp((int) data[0], 0, 5);
                         case PM_ARROWHEADS_CMD -> arrowHeads = (boolean) data[0];
                     }
@@ -1852,7 +1898,11 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
-                EventManager.instance.subscribe(this, Event.PM_LEN_FACTOR_CMD, Event.PM_NUM_FACTOR_CMD, Event.PM_COLOR_MODE_CMD, Event.PM_ARROWHEADS_CMD);
+                EventManager.instance.subscribe(this,
+                                                Event.PM_LEN_FACTOR_CMD,
+                                                Event.PM_NUM_FACTOR_CMD,
+                                                Event.PM_COLOR_MODE_CMD,
+                                                Event.PM_ARROWHEADS_CMD);
             }
 
             @Override
@@ -1948,8 +1998,9 @@ public class Settings extends SettingsObject {
                 if (isEnabled() && source != this) {
                     switch (event) {
                         case AMBIENT_LIGHT_CMD -> ambient = (float) data[0];
-                        case ELEVATION_MULTIPLIER_CMD ->
-                                elevation.multiplier = MathUtilsDouble.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
+                        case ELEVATION_MULTIPLIER_CMD -> elevation.multiplier = MathUtilsDouble.clamp((float) data[0],
+                                                                                                      Constants.MIN_ELEVATION_MULT,
+                                                                                                      Constants.MAX_ELEVATION_MULT);
                         case ELEVATION_TYPE_CMD -> elevation.type = (ElevationType) data[0];
                         case TESSELLATION_QUALITY_CMD -> elevation.quality = (float) data[0];
                         case ORBIT_SOLID_ANGLE_TH_CMD -> orbitSolidAngleThreshold = (double) data[0];
@@ -1980,8 +2031,13 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
-                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD,
-                        Event.ORBIT_SOLID_ANGLE_TH_CMD, Event.SVT_CACHE_SIZE_CMD);
+                EventManager.instance.subscribe(this,
+                                                Event.AMBIENT_LIGHT_CMD,
+                                                Event.ELEVATION_MULTIPLIER_CMD,
+                                                Event.ELEVATION_TYPE_CMD,
+                                                Event.TESSELLATION_QUALITY_CMD,
+                                                Event.ORBIT_SOLID_ANGLE_TH_CMD,
+                                                Event.SVT_CACHE_SIZE_CMD);
 
                 line.setupListeners();
                 shadow.setupListeners();
@@ -2471,12 +2527,24 @@ public class Settings extends SettingsObject {
 
         @Override
         protected void setupListeners() {
-            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD,
-                    Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
-                    Event.INDEXOFREFRACTION_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD,
-                    Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
-                    Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD,
-                    Event.UI_SCALE_FACTOR_CMD, Event.UV_GRID_FRAME_COORDINATES_CMD, Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD);
+            EventManager.instance.subscribe(this,
+                                            Event.STEREOSCOPIC_CMD,
+                                            Event.STEREO_PROFILE_CMD,
+                                            Event.CUBEMAP_CMD,
+                                            Event.CUBEMAP_PROJECTION_CMD,
+                                            Event.PLANETARIUM_PROJECTION_CMD,
+                                            Event.INDEXOFREFRACTION_CMD,
+                                            Event.MINIMAP_DISPLAY_CMD,
+                                            Event.MINIMAP_TOGGLE_CMD,
+                                            Event.PLANETARIUM_APERTURE_CMD,
+                                            Event.PLANETARIUM_ANGLE_CMD,
+                                            Event.CUBEMAP_PROJECTION_CMD,
+                                            Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD,
+                                            Event.CUBEMAP_RESOLUTION_CMD,
+                                            Event.POINTER_GUIDES_CMD,
+                                            Event.UI_SCALE_FACTOR_CMD,
+                                            Event.UV_GRID_FRAME_COORDINATES_CMD,
+                                            Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD);
 
             minimap.setupListeners();
             fileChooser.setupListeners();
@@ -3063,7 +3131,7 @@ public class Settings extends SettingsObject {
              */
             @JsonProperty("theme")
             public void setTheme(String theme) {
-                if(!theme.equals("default")) {
+                if (!theme.equals("default")) {
                     theme = "default";
                 }
                 this.theme = theme;
@@ -3119,7 +3187,9 @@ public class Settings extends SettingsObject {
 
             @JsonIgnore
             public String getLastCheckedString() {
-                DateTimeFormatter df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
+                DateTimeFormatter df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM)
+                        .withLocale(I18n.locale)
+                        .withZone(ZoneOffset.UTC);
                 return df.format(lastCheck);
             }
 
@@ -3767,7 +3837,8 @@ public class Settings extends SettingsObject {
                         }
                         toneMapping.type = newTM;
                     }
-                    case EXPOSURE_CMD -> toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+                    case EXPOSURE_CMD ->
+                            toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
                     case UPSCALE_FILTER_CMD -> upscaleFilter = (UpscaleFilter) data[0];
                     default -> {
                     }
@@ -3816,10 +3887,10 @@ public class Settings extends SettingsObject {
         @Override
         protected void setupListeners() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD,
-                    Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
-                    Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
-                    Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD,
-                    Event.ANTIALIASING_CMD, Event.FXAA_QUALITY_CMD);
+                                            Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
+                                            Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
+                                            Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD,
+                                            Event.ANTIALIASING_CMD, Event.FXAA_QUALITY_CMD);
 
             antialiasing.setupListeners();
             bloom.setupListeners();
@@ -4412,9 +4483,9 @@ public class Settings extends SettingsObject {
         @Override
         protected void setupListeners() {
             EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD,
-                    Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD,
-                    Event.RELATIVISTIC_ABERRATION_CMD, Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP,
-                    Event.DISPLAY_VR_GUI_CMD);
+                                            Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD,
+                                            Event.RELATIVISTIC_ABERRATION_CMD, Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP,
+                                            Event.DISPLAY_VR_GUI_CMD);
         }
 
         @Override

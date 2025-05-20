@@ -65,6 +65,7 @@ import java.util.stream.IntStream;
 public class PreferencesWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(PreferencesWindow.class);
 
+
     private final Array<OwnLabel> labels;
 
     private final DecimalFormat nf3;
@@ -103,7 +104,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, antiAlias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
-            screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect;
+            screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect, textureIndex;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin, recGridStyle;
@@ -144,7 +145,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                              final Skin skin,
                              final GlobalResources globalResources,
                              final boolean welcomeScreen) {
-        super(I18n.msg("gui.settings") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build), skin, stage);
+        super(I18n.msg("gui.settings") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build),
+              skin,
+              stage);
 
         this.tabContents = new Array<>();
         this.labels = new Array<>();
@@ -482,7 +485,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // LIMIT FPS
         IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
         double limitFps = settings.graphics.fpsLimit <= 0 ? 60 : settings.graphics.fpsLimit;
-        this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsDouble.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitFpsValidator);
+        this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsDouble.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)),
+                                            skin,
+                                            limitFpsValidator);
         this.maxFpsInput.setDisabled(settings.graphics.fpsLimit <= 0);
 
         OwnLabel maxFpsLabel = new OwnLabel(I18n.msg("gui.limitfps"), skin);
@@ -542,8 +547,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             float h = (float) (Gdx.graphics.getHeight() * Settings.settings.graphics.backBufferScale);
             var resInfo = TextUtils.breakCharacters(
                     I18n.msg("gui.extview.resolution.info",
-                            Integer.toString(MathUtils.round(w)),
-                            Integer.toString(MathUtils.round(h))),
+                             Integer.toString(MathUtils.round(w)),
+                             Integer.toString(MathUtils.round(h))),
                     45);
             var infoLabel = new OwnLabel(resInfo, skin);
 
@@ -675,7 +680,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // CHROMATIC ABERRATION
         OwnLabel chromaticAberrationLabel = new OwnLabel(I18n.msg("gui.chromaticaberration"), skin, "default");
         chromaticAberration = new OwnSliderPlus("", Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT,
-                Constants.SLIDER_STEP_TINY * 0.1f, skin);
+                                                Constants.SLIDER_STEP_TINY * 0.1f, skin);
         chromaticAberration.setName("chromatic aberration amount");
         chromaticAberration.setWidth(sliderWidth);
         chromaticAberration.setValue(settings.postprocess.chromaticAberration.amount);
@@ -690,7 +695,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // FILM GRAIN
         OwnLabel filmGrainLabel = new OwnLabel(I18n.msg("gui.filmgrain"), skin, "default");
         filmGrain = new OwnSliderPlus("", Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY,
-                Constants.SLIDER_STEP_TINY * 0.1f, skin);
+                                      Constants.SLIDER_STEP_TINY * 0.1f, skin);
         filmGrain.setName("film grain intensity");
         filmGrain.setWidth(sliderWidth);
         filmGrain.setValue(settings.postprocess.filmGrain.intensity);
@@ -820,7 +825,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel smResolutionLabel = new OwnLabel(I18n.msg("gui.graphics.shadows.resolution"), skin);
         smResolutionLabel.setDisabled(!settings.scene.renderer.shadow.active);
         IntValidator smResValidator = new IntValidator(128, GaiaSky.instance.maxTextureSize);
-        smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(settings.scene.renderer.shadow.resolution, 128, GaiaSky.instance.maxTextureSize)), skin, smResValidator);
+        smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(settings.scene.renderer.shadow.resolution,
+                                                                         128,
+                                                                         GaiaSky.instance.maxTextureSize)), skin, smResValidator);
         smResolution.setWidth(inputWidth);
         smResolution.setDisabled(!settings.scene.renderer.shadow.active);
 
@@ -874,13 +881,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Slider brightness = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         brightness.setName("brightness");
         brightness.setWidth(sliderWidth);
-        brightness.setValue(MathUtilsDouble.lint(settings.postprocess.levels.brightness, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, Constants.MIN_SLIDER,
-                Constants.MAX_SLIDER));
+        brightness.setValue(MathUtilsDouble.lint(settings.postprocess.levels.brightness,
+                                                 Constants.MIN_BRIGHTNESS,
+                                                 Constants.MAX_BRIGHTNESS,
+                                                 Constants.MIN_SLIDER,
+                                                 Constants.MAX_SLIDER));
         brightness.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.BRIGHTNESS_CMD, brightness,
-                        MathUtilsDouble.lint(brightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_BRIGHTNESS,
-                                Constants.MAX_BRIGHTNESS), true);
+                                     MathUtilsDouble.lint(brightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_BRIGHTNESS,
+                                                          Constants.MAX_BRIGHTNESS), true);
                 return true;
             }
             return false;
@@ -895,12 +905,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contrast.setName("contrast");
         contrast.setWidth(sliderWidth);
         contrast.setValue(
-                MathUtilsDouble.lint(settings.postprocess.levels.contrast, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+                MathUtilsDouble.lint(settings.postprocess.levels.contrast,
+                                     Constants.MIN_CONTRAST,
+                                     Constants.MAX_CONTRAST,
+                                     Constants.MIN_SLIDER,
+                                     Constants.MAX_SLIDER));
         contrast.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CONTRAST_CMD, contrast,
-                        MathUtilsDouble.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST,
-                                Constants.MAX_CONTRAST), true);
+                                     MathUtilsDouble.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST,
+                                                          Constants.MAX_CONTRAST), true);
                 return true;
             }
             return false;
@@ -914,11 +928,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Slider hue = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         hue.setName("hue");
         hue.setWidth(sliderWidth);
-        hue.setValue(MathUtilsDouble.lint(settings.postprocess.levels.hue, Constants.MIN_HUE, Constants.MAX_HUE, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        hue.setValue(MathUtilsDouble.lint(settings.postprocess.levels.hue,
+                                          Constants.MIN_HUE,
+                                          Constants.MAX_HUE,
+                                          Constants.MIN_SLIDER,
+                                          Constants.MAX_SLIDER));
         hue.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.HUE_CMD, hue,
-                        MathUtilsDouble.lint(hue.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_HUE, Constants.MAX_HUE), true);
+                                     MathUtilsDouble.lint(hue.getValue(),
+                                                          Constants.MIN_SLIDER,
+                                                          Constants.MAX_SLIDER,
+                                                          Constants.MIN_HUE,
+                                                          Constants.MAX_HUE), true);
                 return true;
             }
             return false;
@@ -932,13 +954,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Slider saturation = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         saturation.setName("saturation");
         saturation.setWidth(sliderWidth);
-        saturation.setValue(MathUtilsDouble.lint(settings.postprocess.levels.saturation, Constants.MIN_SATURATION, Constants.MAX_SATURATION, Constants.MIN_SLIDER,
-                Constants.MAX_SLIDER));
+        saturation.setValue(MathUtilsDouble.lint(settings.postprocess.levels.saturation,
+                                                 Constants.MIN_SATURATION,
+                                                 Constants.MAX_SATURATION,
+                                                 Constants.MIN_SLIDER,
+                                                 Constants.MAX_SLIDER));
         saturation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SATURATION_CMD, saturation,
-                        MathUtilsDouble.lint(saturation.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SATURATION,
-                                Constants.MAX_SATURATION), true);
+                                     MathUtilsDouble.lint(saturation.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SATURATION,
+                                                          Constants.MAX_SATURATION), true);
                 return true;
             }
             return false;
@@ -1079,7 +1104,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // Back-buffer scale
             OwnLabel backBufferScaleLabel = new OwnLabel(I18n.msg("gui.backbuffer.scale"), skin);
             backBufferScaleLabel.setDisabled(settings.graphics.dynamicResolution);
-            backBufferScale = new OwnSliderPlus("", Constants.BACKBUFFER_SCALE_MIN, Constants.BACKBUFFER_SCALE_MAX, Constants.BACKBUFFER_SCALE_STEP, skin);
+            backBufferScale = new OwnSliderPlus("",
+                                                Constants.BACKBUFFER_SCALE_MIN,
+                                                Constants.BACKBUFFER_SCALE_MAX,
+                                                Constants.BACKBUFFER_SCALE_STEP,
+                                                skin);
             backBufferScale.setWidth(sliderWidth);
             backBufferScale.setMappedValue(settings.graphics.backBufferScale);
             backBufferScale.setDisabled(settings.graphics.dynamicResolution);
@@ -1248,6 +1277,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel titleStars = new OwnLabel(I18n.msg("gui.ui.scene.stars"), skin, "header");
         Table starsTable = new Table();
 
+        // Texture index
+        OwnLabel textureIndexLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.texture"), skin);
+        var indexList = settings.scene.star.getStarTextureIndices();
+        var indices = new Array<ComboBoxBean>(indexList.size);
+        ComboBoxBean selected = null;
+        for (int y = 0; y < indexList.size; y++) {
+            var idx = indexList.get(y);
+            var cbb = new ComboBoxBean(Integer.toString(idx), idx);
+            indices.add(cbb);
+            if (idx == settings.scene.star.textureIndex) {
+                selected = cbb;
+            }
+        }
+        textureIndex = new OwnSelectBox<>(skin);
+        textureIndex.setItems(indices);
+        if (selected != null)
+            textureIndex.setSelected(selected);
+
         // Render stars as spheres
         OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.starspheres"), skin);
         starSpheres = new OwnCheckBox("", skin);
@@ -1267,10 +1314,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        labels.add(starSpheresLabel, lightGlowLabel);
+        labels.add(textureIndexLabel, starSpheresLabel, lightGlowLabel);
 
         starsTable.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(lightGlow).left().padRight(pad18).padBottom(pad10).row();
+        starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
         starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
 
@@ -1302,7 +1351,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         saveTextures = new OwnCheckBox("", skin, pad10);
         saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
         OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
-        saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()), skin));
+        saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()),
+                                                           skin));
         HorizontalGroup saveTexturesGroup = new HorizontalGroup();
         saveTexturesGroup.space(pad10);
         saveTexturesGroup.addActor(saveTextures);
@@ -1522,7 +1572,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // GUIDES WIDTH
         OwnLabel pointerGuidesWidthLabel = new OwnLabel(I18n.msg("gui.ui.pointer.guides.width"), skin, "default");
-        pointerGuidesWidth = new OwnSliderPlus("", Constants.MIN_POINTER_GUIDES_WIDTH, Constants.MAX_POINTER_GUIDES_WIDTH, Constants.SLIDER_STEP_TINY, skin);
+        pointerGuidesWidth = new OwnSliderPlus("",
+                                               Constants.MIN_POINTER_GUIDES_WIDTH,
+                                               Constants.MAX_POINTER_GUIDES_WIDTH,
+                                               Constants.SLIDER_STEP_TINY,
+                                               skin);
         pointerGuidesWidth.setName("pointerguideswidth");
         pointerGuidesWidth.setWidth(sliderWidth);
         pointerGuidesWidth.setValue(settings.program.pointer.guides.width);
@@ -1643,8 +1697,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Draw distance
         OwnLabel ddLabel = new OwnLabel(I18n.msg("gui.lod.thresholds"), skin);
-        lodTransitions = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 0.1f, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG,
-                skin);
+        lodTransitions = new OwnSliderPlus("",
+                                           Constants.MIN_SLIDER,
+                                           Constants.MAX_SLIDER,
+                                           0.1f,
+                                           Constants.MIN_LOD_TRANS_ANGLE_DEG,
+                                           Constants.MAX_LOD_TRANS_ANGLE_DEG,
+                                           skin);
         lodTransitions.setDisplayValueMapped(true);
         lodTransitions.setWidth(sliderWidth);
         lodTransitions.setMappedValue(settings.scene.octree.threshold[0] * MathUtilsDouble.radDeg);
@@ -1669,7 +1728,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Max num of velocity vectors per star set.
         OwnLabel velVectorsLabel = new OwnLabel(I18n.msg("gui.velvec.num"), skin);
-        velocityVectors = new OwnSliderPlus("", Constants.MIN_VELOCITY_VECTORS_STAR_GROUP, Constants.MAX_VELOCITY_VECTORS_STAR_GROUP, Constants.SLIDER_STEP, skin);
+        velocityVectors = new OwnSliderPlus("",
+                                            Constants.MIN_VELOCITY_VECTORS_STAR_GROUP,
+                                            Constants.MAX_VELOCITY_VECTORS_STAR_GROUP,
+                                            Constants.SLIDER_STEP,
+                                            skin);
         velocityVectors.setWidth(sliderWidth);
         velocityVectors.setValue(settings.scene.star.group.numVelocityVector);
 
@@ -1742,7 +1805,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controls.add(new OwnLabel(I18n.msg("gui.keymappings.action"), skin, "header")).padBottom(pad18).left();
         controls.add(new OwnLabel(I18n.msg("gui.keymappings.keys"), skin, "header")).padBottom(pad18).left().row();
 
-        controls.add(new OwnLabel(I18n.msg("action.forward"), skin )).left().padRight(pad34).padBottom(pad10);
+        controls.add(new OwnLabel(I18n.msg("action.forward"), skin)).left().padRight(pad34).padBottom(pad10);
         controls.add(new OwnLabel(GSKeys.toString(Keys.UP).toUpperCase(), skin, "mono-pink")).padBottom(pad10).left().row();
         controls.add(new OwnLabel(I18n.msg("action.backward"), skin)).left().padRight(pad34).padBottom(pad10);
         controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink")).padBottom(pad10).left().row();
@@ -1822,7 +1885,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.screenshots.directory.choose"), skin, stage, Paths.get(settings.screenshot.location),
-                        FileChooser.FileChooserTarget.DIRECTORIES);
+                                                 FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -1847,12 +1910,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnLabel xScreenshotsLabel = new OwnLabel("x", skin);
         IValidator screenshotsSizeValidator = new IntValidator(ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE);
         ssWidthField = new OwnTextField(
-                Integer.toString(MathUtils.clamp(settings.screenshot.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)),
+                Integer.toString(MathUtils.clamp(settings.screenshot.resolution[0],
+                                                 ScreenshotSettings.MIN_SCREENSHOT_SIZE,
+                                                 ScreenshotSettings.MAX_SCREENSHOT_SIZE)),
                 skin, screenshotsSizeValidator);
         ssWidthField.setWidth(inputSmallWidth);
         ssWidthField.setDisabled(settings.screenshot.isSimpleMode());
         ssHeightField = new OwnTextField(
-                Integer.toString(MathUtils.clamp(settings.screenshot.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)),
+                Integer.toString(MathUtils.clamp(settings.screenshot.resolution[1],
+                                                 ScreenshotSettings.MIN_SCREENSHOT_SIZE,
+                                                 ScreenshotSettings.MAX_SCREENSHOT_SIZE)),
                 skin, screenshotsSizeValidator);
         ssHeightField.setWidth(inputSmallWidth);
         ssHeightField.setDisabled(settings.screenshot.isSimpleMode());
@@ -1962,7 +2029,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameOutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.frameoutput.directory.choose"), skin, stage, Paths.get(settings.frame.location),
-                        FileChooser.FileChooserTarget.DIRECTORIES);
+                                                 FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -1997,12 +2064,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnLabel xFrameLabel = new OwnLabel("x", skin);
         IValidator frameoutputSizeValidator = new IntValidator(ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE);
         foWidthField = new OwnTextField(
-                Integer.toString(MathUtils.clamp(settings.frame.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin,
+                Integer.toString(MathUtils.clamp(settings.frame.resolution[0],
+                                                 ScreenshotSettings.MIN_SCREENSHOT_SIZE,
+                                                 ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin,
                 frameoutputSizeValidator);
         foWidthField.setWidth(inputSmallWidth);
         foWidthField.setDisabled(settings.frame.isSimpleMode());
         foHeightField = new OwnTextField(
-                Integer.toString(MathUtils.clamp(settings.frame.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin,
+                Integer.toString(MathUtils.clamp(settings.frame.resolution[1],
+                                                 ScreenshotSettings.MIN_SCREENSHOT_SIZE,
+                                                 ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin,
                 frameoutputSizeValidator);
         foHeightField.setWidth(inputSmallWidth);
         foHeightField.setDisabled(settings.frame.isSimpleMode());
@@ -2274,16 +2345,22 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Warp file
         OwnLabel warpFileLabel = new OwnLabel(I18n.msg("gui.planetarium.sphericalmirror.warpfile"), skin);
         var currentMeshWarp = settings.program.modeCubemap.planetarium.sphericalMirrorWarp;
-        var meshWarpText = currentMeshWarp != null ? currentMeshWarp.getFileName().toString() : I18n.msg("gui.planetarium.sphericalmirror.warpfile.select");
+        var meshWarpText = currentMeshWarp != null ? currentMeshWarp.getFileName().toString() : I18n.msg(
+                "gui.planetarium.sphericalmirror.warpfile.select");
         var meshWarpPath = currentMeshWarp != null ? currentMeshWarp.getParent() : SysUtils.getUserHome();
         meshWarpFileLocation = new OwnTextButton(TextUtils.capString(meshWarpText, 45), skin);
         meshWarpFileLocation.pad(pad10, pad34, pad10, pad34);
         meshWarpFileLocation.addListener(
-                new OwnTextTooltip(currentMeshWarp != null ? currentMeshWarp.toString() : I18n.msg("gui.planetarium.sphericalmirror.warpfile.select"), skin));
+                new OwnTextTooltip(currentMeshWarp != null ? currentMeshWarp.toString() : I18n.msg("gui.planetarium.sphericalmirror.warpfile.select"),
+                                   skin));
         meshWarpFilePath = settings.program.modeCubemap.planetarium.sphericalMirrorWarp;
         meshWarpFileLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.msg("gui.planetarium.sphericalmirror.warpfile"), skin, stage, meshWarpPath, FileChooser.FileChooserTarget.FILES);
+                FileChooser fc = new FileChooser(I18n.msg("gui.planetarium.sphericalmirror.warpfile"),
+                                                 skin,
+                                                 stage,
+                                                 meshWarpPath,
+                                                 FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> Files.exists(pathname) && Files.isRegularFile(pathname));
@@ -2296,7 +2373,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                             meshWarpFilePath = result;
                             meshWarpFileLocation.addListener(new OwnTextTooltip(result.toString(), skin));
                         } else {
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.planetarium.sphericalmirror.warpfile.invalid", result.toString()));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                                 this,
+                                                 I18n.msg("gui.planetarium.sphericalmirror.warpfile.invalid", result.toString()));
                         }
                     }
                     return true;
@@ -2369,18 +2448,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 } else {
                     // Try again
                     FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(settings.data.location) + "/gaiasky-data.json");
-                    DownloadHelper.downloadFile(settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null,
-                            (digest) -> {
-                                DataDescriptor dd = DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor);
-                                DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
-                                ddw.setModal(true);
-                                ddw.show(stage);
-                            },
-                            () -> {
-                                // Fail?
-                                logger.error("No internet connection or server is down!");
-                                GuiUtils.addNoConnectionWindow(skin, stage);
-                            }, null);
+                    DownloadHelper.downloadFile(settings.program.url.dataDescriptor,
+                                                dataDescriptor,
+                                                Settings.settings.program.offlineMode,
+                                                null,
+                                                null,
+                                                (digest) -> {
+                                                    DataDescriptor dd = DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor);
+                                                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
+                                                    ddw.setModal(true);
+                                                    ddw.show(stage);
+                                                },
+                                                () -> {
+                                                    // Fail?
+                                                    logger.error("No internet connection or server is down!");
+                                                    GuiUtils.addNoConnectionWindow(skin, stage);
+                                                },
+                                                null);
                 }
                 return true;
             }
@@ -2888,8 +2972,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Star spheres
         settings.scene.star.renderStarSpheres = starSpheres.isChecked();
 
+        // Star texture index
+        if (settings.scene.star.textureIndex != textureIndex.getSelected().value) {
+            EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, textureIndex.getSelected().value);
+        }
+
+
         // Fade time
-        settings.scene.fadeMs = MathUtils.clamp(fadeTimeField.getLongValue(settings.scene.fadeMs), Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
+        settings.scene.fadeMs = MathUtils.clamp(fadeTimeField.getLongValue(settings.scene.fadeMs),
+                                                Constants.MIN_FADE_TIME_MS,
+                                                Constants.MAX_FADE_TIME_MS);
 
         // Dynamic resolution
         settings.graphics.dynamicResolution = !settings.runtime.openXr && dynamicResolution.isChecked();
@@ -2937,7 +3029,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 settings.program.ui.newUI != newUI.isChecked();
 
         settings.program.locale = languageBean.locale.toLanguageTag();
-        I18n.forceInit(new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
+        I18n.forceInit(new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"),
+                       new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
         settings.program.ui.theme = newTheme.value;
         boolean previousPointerCoords = settings.program.pointer.coordinates;
         settings.program.pointer.coordinates = pointerCoords.isChecked();
@@ -2951,7 +3044,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.CROSSHAIR_HOME_CMD, this, crosshairHome.isChecked());
 
         // Pointer guides
-        EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointerGuides.isChecked(), pointerGuidesColor.getPickedColor(), pointerGuidesWidth.getMappedValue());
+        EventManager.publish(Event.POINTER_GUIDES_CMD,
+                             this,
+                             pointerGuides.isChecked(),
+                             pointerGuidesColor.getPickedColor(),
+                             pointerGuidesWidth.getMappedValue());
 
         // Recursive grid
         settings.program.recursiveGrid.origin = OriginType.values()[recGridOrigin.getSelectedIndex()];
@@ -2981,7 +3078,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.scene.octree.fade = lodFadeCb.isChecked();
         settings.scene.octree.threshold[0] =
                 MathUtilsDouble.lint(lodTransitions.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG,
-                        Constants.MAX_LOD_TRANS_ANGLE_DEG) * (float) MathUtilsDouble.degRad;
+                                     Constants.MAX_LOD_TRANS_ANGLE_DEG) * (float) MathUtilsDouble.degRad;
         // Here we use a 0.4 rad between the thresholds
         settings.scene.octree.threshold[1] = settings.scene.octree.fade ? settings.scene.octree.threshold[0] + 0.4f : settings.scene.octree.threshold[0];
         // Number of velocity vectors per star group.
