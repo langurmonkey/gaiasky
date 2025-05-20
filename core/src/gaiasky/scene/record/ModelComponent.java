@@ -553,7 +553,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
                 Material mat = instance.materials.get(i);
                 if (mat.has(FloatAttribute.BodySize)) {
                     // Update.
-                    ((FloatAttribute) mat.get(FloatAttribute.BodySize)).value = (float) sizeInternal;
+                    ((FloatAttribute) Objects.requireNonNull(mat.get(FloatAttribute.BodySize))).value = (float) sizeInternal;
                 } else {
                     // Add attribute.
                     mat.set(new FloatAttribute(FloatAttribute.BodySize, (float) sizeInternal));
@@ -569,7 +569,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             Material mat = instance.materials.get(i);
             if (mat.has(FloatAttribute.KmToU)) {
                 // Update.
-                ((FloatAttribute) mat.get(FloatAttribute.KmToU)).value = (float) kmToUnits;
+                ((FloatAttribute) Objects.requireNonNull(mat.get(FloatAttribute.KmToU))).value = (float) kmToUnits;
             } else {
                 // Add attribute.
                 mat.set(new FloatAttribute(FloatAttribute.KmToU, (float) kmToUnits));
@@ -1090,7 +1090,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             Material mat = instance.materials.get(i);
             if (mat.has(Vector3Attribute.CameraPos)) {
                 // Update.
-                ((Vector3Attribute) mat.get(Vector3Attribute.CameraPos)).value.set(cameraPos);
+                ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.CameraPos))).value.set(cameraPos);
 
             } else {
                 // Add attribute.
@@ -1110,7 +1110,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             Material mat = instance.materials.get(i);
             if (mat.has(FloatAttribute.Time)) {
                 // Update.
-                ((FloatAttribute) mat.get(FloatAttribute.Time)).value = (float) t;
+                ((FloatAttribute) Objects.requireNonNull(mat.get(FloatAttribute.Time))).value = (float) t;
 
             } else {
                 // Add attribute.
@@ -1125,7 +1125,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             Material mat = instance.materials.get(i);
             if (mat.has(FloatAttribute.SimuTime)) {
                 // Update.
-                ((FloatAttribute) mat.get(FloatAttribute.SimuTime)).value = (float) t;
+                ((FloatAttribute) Objects.requireNonNull(mat.get(FloatAttribute.SimuTime))).value = (float) t;
 
             } else {
                 // Add attribute.

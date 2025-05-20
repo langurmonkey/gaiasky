@@ -187,7 +187,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
                 }
             } else {
                 // Fire change event.
-                ChangeEvent event = Pools.obtain(ChangeEvent.class);
+                ChangeEvent event = Pools.obtain(ChangeEvent::new);
                 event.setTarget(target);
                 target.fire(event);
                 Pools.free(event);

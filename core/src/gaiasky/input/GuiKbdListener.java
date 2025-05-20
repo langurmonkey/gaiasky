@@ -90,16 +90,15 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
         Actor target = stage.getKeyboardFocus();
 
         if (target != null) {
-            if (target instanceof CheckBox) {
+            if (target instanceof CheckBox cb) {
                 // Check or uncheck.
-                CheckBox cb = (CheckBox) target;
                 if (!cb.isDisabled()) {
                     cb.setChecked(!cb.isChecked());
                     return true;
                 }
             } else if (target instanceof Button) {
                 // Fire change event on buttons.
-                ChangeEvent event = Pools.obtain(ChangeEvent.class);
+                ChangeEvent event = Pools.obtain(ChangeEvent::new);
                 event.setTarget(target);
                 target.fire(event);
                 Pools.free(event);
@@ -132,8 +131,7 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
         if (focus instanceof Slider) {
             GuiUtils.sliderMove(!left, 0.05f, (Slider) focus);
             return true;
-        } else if (focus instanceof SelectBox) {
-            var selectBox = (SelectBox<?>) focus;
+        } else if (focus instanceof SelectBox<?> selectBox) {
             GuiUtils.selectBoxMoveSelection(left, false, selectBox);
             return true;
         }
@@ -145,8 +143,7 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
         if (focus instanceof Slider) {
             GuiUtils.sliderMove(false, 1.0f, (Slider) focus);
             return true;
-        } else if (focus instanceof SelectBox) {
-            var selectBox = (SelectBox<?>) focus;
+        } else if (focus instanceof SelectBox<?> selectBox) {
             GuiUtils.selectBoxMoveSelection(true, true, selectBox);
             return true;
         }
@@ -158,8 +155,7 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
         if (focus instanceof Slider) {
             GuiUtils.sliderMove(true, 1.0f, (Slider) focus);
             return true;
-        } else if (focus instanceof SelectBox) {
-            var selectBox = (SelectBox<?>) focus;
+        } else if (focus instanceof SelectBox<?> selectBox) {
             GuiUtils.selectBoxMoveSelection(false, true, selectBox);
             return true;
         }
