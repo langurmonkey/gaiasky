@@ -38,7 +38,6 @@ tasks.register('versionFile') {
 
     doLast {
         File versionFile = file('build/classes/java/main/version')
-        delete versionFile
         versionFile.parentFile.mkdirs() // Ensure directory exists
 
         versionFile.withWriter('UTF-8') { writer ->
