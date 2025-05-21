@@ -147,7 +147,7 @@ scene:
     # Modulate the brightness of stars.
     power: 1.0
     # Base screen size of stars.
-    pointSize: 5.1
+    pointSize: 3.0
     # Value to add to each star's saturation value in HSV.
     # A value of 0 does not modify the saturation of stars.
     saturate: 0.16
