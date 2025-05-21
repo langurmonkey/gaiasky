@@ -102,6 +102,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         fps = new OwnLabel("", skin, "hud-big");
         fps.setAlignment(Align.right);
         fps.setColor(skin.getColor("green"));
+        fps.setWidth(170f);
         fps.addListener(new OwnTextTooltip(I18n.msg("gui.debug.fps.info"), skin));
         add(fps).right().minWidth(minWidth);
         row();

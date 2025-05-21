@@ -15,15 +15,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FilterView;
@@ -43,7 +43,7 @@ import java.util.*;
  * objects as base units. It exposes the internal {@link com.badlogic.ashley.core.Component} objects and
  * their attributes.
  */
-public class ObjectDebugWindow extends GenericDialog {
+public class ObjectDebugWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(ObjectDebugWindow.class);
 
     private final Scene scene;
@@ -83,6 +83,8 @@ public class ObjectDebugWindow extends GenericDialog {
 
         buildSuper();
         info(I18n.msg("gui.debug.info"));
+
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
     }
 
     @Override
@@ -202,10 +204,7 @@ public class ObjectDebugWindow extends GenericDialog {
         contentCell = content.add();
         contentCell.top().left().padTop(pad10).expandX().expandY();
 
-        var focus = (FocusView) GaiaSky.instance.getCameraManager().getFocus();
-        if (focus != null) {
-            updateContent(focus.getEntity());
-        }
+        pack();
     }
 
     private void updateContent(Entity e) {
@@ -238,6 +237,18 @@ public class ObjectDebugWindow extends GenericDialog {
 
         contentCell.setActor(c);
 
+        pack();
+    }
+
+    @Override
+    public GenericDialog show(Stage stage) {
+        var gd = super.show(stage);
+
+        var focus = (FocusView) GaiaSky.instance.getCameraManager().getFocus();
+        if (focus != null) {
+            updateContent(focus.getEntity());
+        }
+        return gd;
     }
 
     private Actor getComponentActor(Component component) {
@@ -248,6 +259,7 @@ public class ObjectDebugWindow extends GenericDialog {
         var fields = component.getClass().getDeclaredFields();
         for (var field : fields) {
             var modifiers = field.getModifiers();
+            var type = field.getType();
 
             var hg = new HorizontalGroup();
             hg.space(pad10);
@@ -255,8 +267,8 @@ public class ObjectDebugWindow extends GenericDialog {
             var name = TextUtils.capString(field.getName(), 20);
             var nameLabel = new OwnLabel(name, skin);
             // Type
-            var type = TextUtils.capString(field.getType().getSimpleName(), 13);
-            var typeLabel = new OwnLabel(type, skin, "default-blue");
+            var typeStr = TextUtils.capString(type.getSimpleName(), 13);
+            var typeLabel = new OwnLabel(typeStr, skin, "default-blue");
 
             hg.addActor(nameLabel);
             hg.addActor(typeLabel);
@@ -268,15 +280,19 @@ public class ObjectDebugWindow extends GenericDialog {
                 var fin = Modifier.isFinal(modifiers);
                 var priv = Modifier.isPrivate(modifiers);
                 var nil = value == null;
-                var prim = isPrimitiveType(field.getType());
+                var primStr = isPrimitiveOrStringType(type);
+                var bool = isBoolean(type);
 
-                var valueCapped = !nil ? TextUtils.capString(value.toString(), 40) : "null";
+                var valueStr = toString(value, type);
+                var valueCapped = TextUtils.capString(valueStr, 40);
                 Actor fieldActor;
-                if (fin || priv || nil || !prim) {
+                if (fin || priv || nil || !primStr) {
+                    // Just show value, not editable.
                     fieldActor = new OwnLabel(valueCapped, skin);
                     fieldActor.setColor(ColorUtils.oDarkGrayC);
+                    fieldActor.addListener(new OwnTextTooltip(valueStr, skin));
                 } else {
-                    if (isBoolean(field.getType())) {
+                    if (bool) {
                         fieldActor = new OwnCheckBox("", skin);
                         ((OwnCheckBox) fieldActor).setChecked((Boolean) value);
                         fieldActor.addListener((event) -> {
@@ -295,7 +311,8 @@ public class ObjectDebugWindow extends GenericDialog {
                         var tf = new OwnTextField(valueCapped, skin);
                         tf.setWidth(450f);
                         tf.setErrorColor(ColorUtils.gRedC);
-                        var button = new OwnTextIconButton("", skin, "install");
+                        final Image applyImage = new Image(skin.getDrawable("iconic-check"));
+                        var button = new OwnTextIconButton("", applyImage, skin);
                         button.addListener(new OwnTextTooltip(I18n.msg("gui.debug.object.setval"), skin));
                         button.addListener((event) -> {
                             if (event instanceof ChangeListener.ChangeEvent) {
@@ -305,9 +322,9 @@ public class ObjectDebugWindow extends GenericDialog {
                                     field.set(component, val);
                                     tf.setToRegularColor();
                                 } catch (IllegalAccessException e) {
-                                    logger.warn(I18n.msg("gui.debug.error.set", tf.getText(), name));
+                                    logger.debug(I18n.msg("gui.debug.error.set", tf.getText(), name));
                                 } catch (Exception e) {
-                                    logger.warn(I18n.msg("gui.debug.error.parse", tf.getText(), name));
+                                    logger.debug(I18n.msg("gui.debug.error.parse", tf.getText(), name));
                                     tf.setToErrorColor();
                                 }
                             }
@@ -320,7 +337,7 @@ public class ObjectDebugWindow extends GenericDialog {
                 }
                 c.add(fieldActor).left().padBottom(pad10).expandX().row();
             } catch (IllegalAccessException e) {
-                logger.warn(I18n.msg("gui.debug.error.access", name), e);
+                logger.debug(I18n.msg("gui.debug.error.access", name), e);
             }
         }
 
@@ -351,12 +368,16 @@ public class ObjectDebugWindow extends GenericDialog {
         WRAPPER_TYPE_MAP.add(Void.class);
     }
 
-    private static boolean isPrimitiveType(Class source) {
-        return source.isPrimitive() || WRAPPER_TYPE_MAP.contains(source);
+    private static boolean isPrimitiveOrStringType(Class source) {
+        return source.isPrimitive() || WRAPPER_TYPE_MAP.contains(source) || isString(source);
     }
 
     private static boolean isBoolean(Class source) {
         return source.equals(boolean.class) || source.equals(Boolean.class);
+    }
+
+    private static boolean isString(Class source) {
+        return source.equals(String.class);
     }
 
     public static Object parse(Class clazz, String value) throws NumberFormatException, NullPointerException {
@@ -368,6 +389,46 @@ public class ObjectDebugWindow extends GenericDialog {
         if (Float.class == clazz || Float.TYPE == clazz) return Float.parseFloat(value);
         if (Double.class == clazz || Double.TYPE == clazz) return Double.parseDouble(value);
         return value;
+    }
+
+    private static String toString(Object value, Class type) {
+        if (value == null) {
+            return "EMPTY";
+        } else if (Entity.class.isAssignableFrom(type)) {
+            var entity = (Entity) value;
+            var base = Mapper.base.get(entity);
+            return base != null ? base.getName() : Entity.class.getSimpleName();
+        } else if (type.isArray()) {
+            int length = java.lang.reflect.Array.getLength(value);
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = 0; i < length; i++) {
+                Object element = java.lang.reflect.Array.get(value, i);
+                sb.append(toString(element, element.getClass()));
+                if (i < length - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        } else if (type.isAssignableFrom(Array.class)) {
+            var arr = (Array) value;
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = 0; i < arr.size; i++) {
+                Object element = arr.get(i);
+                sb.append(toString(element, element.getClass()));
+                if (i < arr.size - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        } else if (type.isAnnotationPresent(FunctionalInterface.class)) {
+            return "Functional interface";
+        } else {
+            return value.toString();
+        }
     }
 
     /**
@@ -493,5 +554,18 @@ public class ObjectDebugWindow extends GenericDialog {
 
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        // Only respond if the window is in the stage.
+        if (me.hasParent())
+            if (event == Event.FOCUS_CHANGED) {
+                var focus = (FocusView) data[0];
+                if (focus != null && focus.getEntity() != null)
+                    GaiaSky.postRunnable(() -> {
+                        updateContent(focus.getEntity());
+                    });
+            }
     }
 }

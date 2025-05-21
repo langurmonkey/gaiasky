@@ -10,7 +10,6 @@ package gaiasky.render;
 import gaiasky.util.Bits;
 import gaiasky.util.i18n.I18n;
 
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
