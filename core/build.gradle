@@ -20,24 +20,37 @@ project.ext.tmpDir = new File("/tmp/gaiasky-gradle/")
 project.ext.tmpDir.mkdirs()
 project.ext.jreArchive = "jre-archive.tar.gz"
 
+interface Injected {
+    @Inject FileSystemOperations getFs() 
+}
+
+def coreProject = project(':core')
+
 tasks.register('versionFile') {
+    // Capture values at configuration time
+    def buildtime = coreProject.buildtime
+    def rev = coreProject.rev
+    def tag = coreProject.tag
+    def builder = coreProject.builder
+    def system = coreProject.system
+
+    outputs.file layout.buildDirectory.file("classes/java/main/version")
+
     doLast {
         File versionFile = file('build/classes/java/main/version')
         delete versionFile
-        def writer = new FileWriter(versionFile)
+        versionFile.parentFile.mkdirs() // Ensure directory exists
 
-        try {
-            writer.write('buildtime=' + project(':core').buildtime + '\n')
-            writer.write('build=' + project(':core').rev + '\n')
-            writer.write('version=' + project(':core').tag + '\n')
-            writer.write('builder=' + project(':core').builder + '\n')
-            writer.write('system=' + project(':core').system + '\n')
-            writer.flush()
-        } finally {
-            writer.close()
+        versionFile.withWriter('UTF-8') { writer ->
+            writer.writeLine("buildtime=$buildtime")
+            writer.writeLine("build=$rev")
+            writer.writeLine("version=$tag")
+            writer.writeLine("builder=$builder")
+            writer.writeLine("system=$system")
         }
     }
 }
+
 
 sourceSets {
     main {
