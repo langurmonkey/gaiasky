@@ -152,7 +152,7 @@ scene:
     saturate: 0.16
     # Control the glow amount when close to stars.
     # Should be set rather low, i.e., in [0.01, 0.5].
-    glowFactor: 0.08
+    glowFactor: 0.075
     # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png.
     # 1 - horizontal spike.
     # 2 - god rays.
