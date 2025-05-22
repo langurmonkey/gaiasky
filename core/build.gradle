@@ -6,7 +6,7 @@ apply plugin: "de.undercouch.download"
 import com.install4j.gradle.Install4jTask
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-JavaVersion minJavaVersion = JavaVersion.VERSION_20
+JavaVersion minJavaVersion = JavaVersion.VERSION_21
 java {
     sourceCompatibility = minJavaVersion
 }
@@ -384,7 +384,7 @@ tasks.register('createTar') {
 
 tasks.register('downloadJRE', Download) {
     description = 'Downloads the JRE, needed to include in the package files.'
-    src "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jre_x64_linux_hotspot_21.0.2_13.tar.gz"
+    src "https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.1%2B9/OpenJDK24U-jdk_x64_linux_hotspot_24.0.1_9.tar.gz"
     dest new File("$tmpDir", "$jreArchive")
     onlyIfModified true
     overwrite true
