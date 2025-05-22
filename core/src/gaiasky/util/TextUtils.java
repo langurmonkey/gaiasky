@@ -23,20 +23,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TextUtils {
 
-     // Regex pattern to match ANSI escape sequences
+    // Regex pattern to match ANSI escape sequences
     private static final String ANSI_REGEX = "\\u001B\\[[;\\d]*m";
 
     /**
      * Removes ANSI color codes from the input string.
      *
      * @param input The string possibly containing ANSI color codes.
+     *
      * @return A clean string without ANSI codes.
      */
     public static String stripAnsiCodes(String input) {
         if (input == null) return null;
         return input.replaceAll(ANSI_REGEX, "");
     }
-    
+
 
     /**
      * Escape a give String to make it safe to be printed or stored.
@@ -958,6 +959,48 @@ public class TextUtils {
         } catch (Exception e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Sanitizes the given input string so that it can be used as a file name.
+     *
+     * @param input The input string.
+     *
+     * @return A file system sanitized version of the string.
+     */
+    public static String sanitizeFilename(String input) {
+        // 1. Replace illegal characters with underscores
+        String sanitized = input.replaceAll("[\\\\/:*?\"<>|]", "_");
+
+        // 2. Remove control characters
+        sanitized = sanitized.replaceAll("[\\p{Cntrl}]", "");
+
+        // 3. Trim spaces and dots (important for Windows)
+        sanitized = sanitized.trim();
+        while (sanitized.endsWith(".") || sanitized.endsWith(" ")) {
+            sanitized = sanitized.substring(0, sanitized.length() - 1);
+        }
+
+        // 4. Windows reserved names check
+        String[] reserved = {
+                "CON", "PRN", "AUX", "NUL",
+                "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+                "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+        };
+
+        for (String res : reserved) {
+            if (sanitized.equalsIgnoreCase(res)) {
+                sanitized = "_" + sanitized;
+                break;
+            }
+        }
+
+        // 5. Empty fallback
+        if (sanitized.isEmpty()) {
+            sanitized = "unnamed";
+        }
+
+        return sanitized;
     }
 
 

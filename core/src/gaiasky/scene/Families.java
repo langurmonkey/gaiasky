@@ -25,6 +25,7 @@ public class Families {
             particleSets,
             particles,
             orbits,
+            orbitsTLE,
             locations,
             billboardSets,
             billboardGalaxies,
@@ -59,6 +60,7 @@ public class Families {
         particleSets = Family.one(ParticleSet.class, StarSet.class).exclude(TagNoProcess.class, TagOctreeObject.class).get();
         particles = Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).exclude(TagNoProcess.class).get();
         orbits = Family.all(Trajectory.class, Verts.class).exclude(TagNoProcess.class, TagSetElement.class).get();
+        orbitsTLE = Family.all(TLESource.class).exclude(TagNoProcess.class, TagSetElement.class).get();
         locations = Family.all(LocationMark.class).exclude(TagNoProcess.class).get();
         billboardSets = Family.all(BillboardSet.class).exclude(TagNoProcess.class).get();
         billboardGalaxies = Family.all(TagBillboardGalaxy.class).exclude(TagNoProcess.class).get();

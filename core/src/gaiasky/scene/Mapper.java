@@ -62,6 +62,7 @@ public class Mapper {
     public static final ComponentMapper<SingleMatrix> matrix = ComponentMapper.getFor(SingleMatrix.class);
     public static final ComponentMapper<SingleTexture> texture = ComponentMapper.getFor(SingleTexture.class);
     public static final ComponentMapper<Trajectory> trajectory = ComponentMapper.getFor(Trajectory.class);
+    public static final ComponentMapper<TLESource> tle = ComponentMapper.getFor(TLESource.class);
     public static final ComponentMapper<Verts> verts = ComponentMapper.getFor(Verts.class);
     public static final ComponentMapper<OrbitElementsSet> orbitElementsSet = ComponentMapper.getFor(OrbitElementsSet.class);
     public static final ComponentMapper<ParentOrientation> parentOrientation = ComponentMapper.getFor(ParentOrientation.class);

@@ -15,13 +15,21 @@ import gaiasky.data.api.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Trajectory;
+import gaiasky.scene.component.Verts;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.util.Logger;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
 import org.lwjgl.opengl.GL20;
 
+/**
+ * Initializes trajectory entities.
+ */
 public class TrajectoryInitializer extends AbstractInitSystem {
+    private static final Logger.Log logger = Logger.getLogger(TrajectoryInitializer.class);
 
     /**
      * The trajectory utils instance.
@@ -42,6 +50,32 @@ public class TrajectoryInitializer extends AbstractInitSystem {
         var verts = Mapper.verts.get(entity);
         var line = Mapper.line.get(entity);
 
+        // Load trajectory.
+        loadTrajectory(entity, base, trajectory, verts);
+
+        // All trajectories have the same primitive and render group.
+        verts.glPrimitive = GL20.GL_LINE_STRIP;
+        verts.renderGroup = RenderGroup.LINE_GPU;
+
+        line.renderConsumer = LineEntityRenderSystem::renderTrajectory;
+
+        // Initialize default colors if needed.
+        if (body.color == null) {
+            body.color = new float[]{0.8f, 0.8f, 0.8f, 1f};
+        }
+        if (trajectory.bodyColor == null) {
+            trajectory.bodyColor = new float[]{0.8f, 0.8f, 0.8f, 0.6f};
+        }
+    }
+
+    /**
+     * Loads the provider class and samples this trajectory.
+     * @param entity The entity.
+     * @param base The base component.
+     * @param trajectory The trajectory.
+     * @param verts The verts object.
+     */
+    public static void loadTrajectory(Entity entity, Base base, Trajectory trajectory, Verts verts) {
         if (trajectory.bodyRepresentation.isOrbit()) {
             if (trajectory.provider != null) {
                 try {
@@ -51,12 +85,12 @@ public class TrajectoryInitializer extends AbstractInitSystem {
                         trajectory.providerInstance = ClassReflection.newInstance(trajectory.providerClass);
                         trajectory.providerInstance.initialize(entity, trajectory);
                         trajectory.providerInstance.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0],
-                                trajectory.providerClass,
-                                trajectory.oc,
-                                trajectory.multiplier,
-                                trajectory.numSamples,
-                                trajectory.sampling),
-                                trajectory.newMethod);
+                                                                                                             trajectory.providerClass,
+                                                                                                             trajectory.oc,
+                                                                                                             trajectory.multiplier,
+                                                                                                             trajectory.numSamples,
+                                                                                                             trajectory.sampling),
+                                                         trajectory.newMethod);
                         verts.pointCloudData = trajectory.providerInstance.getData();
 
                         // Transform data using affine transformations.
@@ -84,19 +118,6 @@ public class TrajectoryInitializer extends AbstractInitSystem {
                 }
             }
         }
-        // All trajectories have the same primitive and render group.
-        verts.glPrimitive = GL20.GL_LINE_STRIP;
-        verts.renderGroup = RenderGroup.LINE_GPU;
-
-        line.renderConsumer = LineEntityRenderSystem::renderTrajectory;
-
-        // Initialize default colors if needed.
-        if (body.color == null) {
-            body.color = new float[]{0.8f, 0.8f, 0.8f, 1f};
-        }
-        if (trajectory.bodyColor == null) {
-            trajectory.bodyColor = new float[]{0.8f, 0.8f, 0.8f, 0.6f};
-        }
     }
 
     @Override
@@ -111,14 +132,19 @@ public class TrajectoryInitializer extends AbstractInitSystem {
         utils.initOrbitMetadata(body, trajectory, verts);
         verts.primitiveSize = 1.1f;
 
+        initializeBodyConnection(entity, trajectory);
+
+        utils.initializeTransformMatrix(trajectory, graph, transform);
+
+        trajectory.isInOrbitalElementsGroup = graph.parent != null && Mapper.orbitElementsSet.has(graph.parent);
+    }
+
+    public static void initializeBodyConnection(Entity entity, Trajectory trajectory){
+
         if (trajectory.body != null) {
             var bodyBase = Mapper.base.get(trajectory.body);
             trajectory.params = new OrbitDataLoaderParameters(bodyBase.names[0], null, trajectory.oc.period, 600, trajectory.sampling);
             trajectory.params.entity = entity;
         }
-
-        utils.initializeTransformMatrix(trajectory, graph, transform);
-
-        trajectory.isInOrbitalElementsGroup = graph.parent != null && Mapper.orbitElementsSet.has(graph.parent);
     }
 }

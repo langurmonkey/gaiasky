@@ -235,6 +235,7 @@ public class Scene {
             addInitializer(new ParticleInitializer(setUp, families.particles, priority++));
             addInitializer(new ModelInitializer(setUp, families.models, priority++));
             addInitializer(new TrajectoryInitializer(setUp, families.orbits, priority++));
+            addInitializer(new TLEInitializer(this, setUp, families.orbitsTLE, priority++));
             addInitializer(new VertsInitializer(setUp, families.verts, priority++));
             addInitializer(new LocInitializer(setUp, families.locations, priority++));
             addInitializer(new BillboardSetInitializer(setUp, families.billboardSets, priority++));

@@ -168,7 +168,7 @@ public class PointCloudData implements Cloneable {
     }
 
     public boolean hasTime() {
-        return samples != null && !samples.isEmpty() && samples.get(0).seconds > Long.MIN_VALUE;
+        return samples != null && !samples.isEmpty() && samples.getFirst().seconds > Long.MIN_VALUE;
     }
 
     /**
@@ -252,7 +252,7 @@ public class PointCloudData implements Cloneable {
 
     public Instant getStart() {
         if (start == null) {
-            start = samples.get(0)
+            start = samples.getFirst()
                     .toInstant();
         }
         return start;
@@ -264,7 +264,7 @@ public class PointCloudData implements Cloneable {
 
     public Instant getEnd() {
         if (end == null) {
-            end = samples.get(samples.size() - 1)
+            end = samples.getLast()
                     .toInstant();
         }
         return end;
@@ -413,8 +413,8 @@ public class PointCloudData implements Cloneable {
     }
 
     private int binarySearch(ArrayList<PointSample> samples, long time) {
-        if (time >= samples.get(0)
-                .toEpochMilli() && time <= samples.get(samples.size() - 1)
+        if (time >= samples.getFirst()
+                .toEpochMilli() && time <= samples.getLast()
                 .toEpochMilli()) {
             return binarySearch(samples, time, 0, samples.size() - 1);
         } else {

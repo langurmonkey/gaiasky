@@ -19,6 +19,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.update.VersionChecker;
 import org.apache.commons.io.FileUtils;
@@ -39,6 +40,8 @@ public class DataDescriptorUtils {
     private static DataDescriptorUtils instance;
     private final JsonReader reader;
     private FileHandle fh;
+
+    private static final Set<String> specialDirectories = Set.of(SysUtils.TMP_DIR_NAME, SysUtils.CACHE_DIR_NAME);
 
     private DataDescriptorUtils() {
         super();
@@ -71,7 +74,10 @@ public class DataDescriptorUtils {
                 if (p.toFile().isFile() && p.getFileName().toString().endsWith(".json")) {
                     return true;
                 } else
-                    return p.toFile().isDirectory() && !p.equals(dataLocation) && !p.resolve("dataset.json").toFile().exists() && !p.getFileName().toString().equals("tmp");
+                    return p.toFile().isDirectory()
+                            && !p.equals(dataLocation)
+                            && !p.resolve("dataset.json").toFile().exists()
+                            && !specialDirectories.contains(p.getFileName().toString());
             }).count();
             return num > 0;
         } catch (IOException e) {
@@ -88,7 +94,10 @@ public class DataDescriptorUtils {
                 if (p.toFile().isFile() && p.getFileName().toString().endsWith(".json")) {
                     return true;
                 } else
-                    return p.toFile().isDirectory() && !p.equals(dataLocation) && !p.resolve("dataset.json").toFile().exists() && !p.getFileName().toString().equals("tmp");
+                    return p.toFile().isDirectory()
+                            && !p.equals(dataLocation)
+                            && !p.resolve("dataset.json").toFile().exists()
+                            && !specialDirectories.contains(p.getFileName().toString());
             }).toList();
             if (!toDelete.isEmpty()) {
                 for (var delete : toDelete) {

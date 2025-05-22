@@ -24,7 +24,13 @@ import net.jafama.FastMath;
 
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);
+
+    /**
+     * The entity that employs this trajectory/orbit. This is **not** the orbit object, but the
+     * actual planet/moon/spacecraft object.
+     **/
     public Entity body;
+
     public Vector3D curr;
     public double alpha;
     public Matrix4D localTransformD = new Matrix4D();
@@ -32,6 +38,7 @@ public class Trajectory implements Component {
     public Double multiplier = 1.0d;
     public Class<? extends IOrbitDataProvider> providerClass;
     public IOrbitDataProvider providerInstance;
+    /** Orbit component object. **/
     public OrbitComponent oc;
 
     /**
@@ -45,9 +52,9 @@ public class Trajectory implements Component {
      * Asteroids have this set to true.
      */
     public boolean newMethod = false;
-    // Current orbit completion -- current delta from t0.
+    /** Current orbit completion -- current delta from t0. **/
     public double coord;
-    // The orientation model.
+    /** The orientation model. **/
     public OrbitOrientationModel model = OrbitOrientationModel.DEFAULT;
     public boolean isInOrbitalElementsGroup = false;
     /**
@@ -216,6 +223,7 @@ public class Trajectory implements Component {
      * Mutes the orbit line in orbital elements trajectories.
      *
      * @param onlyBody Whether to display only the body for this trajectory.
+     *
      * @deprecated Use {{@link #setBodyRepresentation(String)}} instead.
      */
     @Deprecated

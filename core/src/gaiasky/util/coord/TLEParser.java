@@ -25,29 +25,30 @@ public class TLEParser {
      */
     public static class OrbitalElements {
         public String name;
-        public double epochJD;
+        public double period;           // days
+        public double epochJD;          // JD
+        public double semiMajorAxis;    // km
         public double inclination;      // degrees
         public double ascendingNode;    // degrees
         public double eccentricity;     // unitless
-        public double argOfPericenter;       // degrees
+        public double argOfPericenter;  // degrees
         public double meanAnomaly;      // degrees
-        public double meanMotion;       // revolutions per day
         public int revolutionNumber;    // orbit count at epoch
 
         @Override
         public String toString() {
-            return String.format(
-                    "Name: %s\nEpoch: %s\nInclination: %.4f°\nAscending node: %.4f°\nEccentricity: %.7f\nArgument of Pericenter: %.4f°\nMean Anomaly: %.4f°\nMean Motion: %.8f rev/day\nRev #: %d",
-                    name,
-                    epochJD,
-                    inclination,
-                    ascendingNode,
-                    eccentricity,
-                    argOfPericenter,
-                    meanAnomaly,
-                    meanMotion,
-                    revolutionNumber
-            );
+            return "OrbitalElements{" +
+                    "argOfPericenter=" + argOfPericenter +
+                    ", name='" + name + '\'' +
+                    ", period=" + period +
+                    ", epochJD=" + epochJD +
+                    ", semiMajorAxis=" + semiMajorAxis +
+                    ", inclination=" + inclination +
+                    ", ascendingNode=" + ascendingNode +
+                    ", eccentricity=" + eccentricity +
+                    ", meanAnomaly=" + meanAnomaly +
+                    ", revolutionNumber=" + revolutionNumber +
+                    '}';
         }
     }
 
@@ -115,13 +116,36 @@ public class TLEParser {
                 elem.eccentricity = Double.parseDouble("0." + line2.substring(26, 33).trim());
                 elem.argOfPericenter = Double.parseDouble(line2.substring(34, 42).trim());
                 elem.meanAnomaly = Double.parseDouble(line2.substring(43, 51).trim());
-                elem.meanMotion = Double.parseDouble(line2.substring(52, 63).trim());
+                var meanMotion = Double.parseDouble(line2.substring(52, 63).trim());
+                elem.period = 1.0 / meanMotion;
+                elem.semiMajorAxis = getSemiMajorAxisKm(meanMotion);
                 elem.revolutionNumber = Integer.parseInt(line2.substring(63, 68).trim());
 
                 return elem;
             }
         }
         return null;
+    }
+
+    /**
+     * Computes the semi-major axis (in km) from TLE line 2 using Kepler's Third Law.
+     *
+     * @param meanMotion The mean motion in rev/day.
+     *
+     * @return Semi-major axis in kilometers.
+     *
+     * @throws IllegalArgumentException if the TLE line is invalid.
+     */
+    private double getSemiMajorAxisKm(double meanMotion) {
+        // Constants
+        final double mu = 398600.4418; // km^3/s^2 (Earth)
+        final double secondsPerDay = 86400.0;
+        double meanMotionRadPerSec = 2.0 * Math.PI * meanMotion / secondsPerDay;
+
+        // Kepler's Third Law
+        double semiMajorAxis = Math.cbrt(mu / (meanMotionRadPerSec * meanMotionRadPerSec));
+
+        return semiMajorAxis;
     }
 
     /**

@@ -61,12 +61,12 @@ public class SysUtils {
     private static final String BOOKMARKS_DIR_NAME = "bookmarks";
     private static final String MPCDI_DIR_NAME = "mpcdi";
     private static final String DATA_DIR_NAME = "data";
-    private static final String TMP_DIR_NAME = "tmp";
-    private static final String CACHE_DIR_NAME = "cache";
     private static final String CRASHREPORTS_DIR_NAME = "crashreports";
     private static final String SHADER_OUT_DIR_NAME = "shaders";
     private static final String SHADER_CACHE_DIR_NAME = "shadercache";
     private static final String LOG_DIR_NAME = "log";
+    public static final String TMP_DIR_NAME = "tmp";
+    public static final String CACHE_DIR_NAME = "cache";
 
 
     static {

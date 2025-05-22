@@ -334,6 +334,10 @@
       "nameTLE": {
         "description": "Name of the object, exactly as it appears in the TLE file referenced by ``url``.",
         "unit": "String"
+      },
+      "tleUpdateInterval": {
+        "description": "Update interval, in days. This is the number of days (integer plus fraction) that need to elapse until a new update of the TLE data is attempted. Set negative to update every time.",
+        "unit": "Double"
       }
     },
     "ModelScaffolding": {

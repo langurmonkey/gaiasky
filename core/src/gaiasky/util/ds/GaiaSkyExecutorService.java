@@ -8,49 +8,43 @@
 package gaiasky.util.ds;
 
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
-import net.jafama.FastMath;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Executor service of Gaia Sky, backed by a {@link ThreadPoolExecutor}. It includes a blocking queue of tasks to be run.
+ * Executor service of Gaia Sky, backed by an {@link ExecutorService} constructed with virtual threads.
  */
 public class GaiaSkyExecutorService {
     private static final Logger.Log logger = Logger.getLogger(GaiaSkyExecutorService.class);
     /**
      * Thread pool executor.
      */
-    private ThreadPoolExecutor pool;
-    private BlockingQueue<Runnable> workQueue;
+    private ExecutorService pool;
     public GaiaSkyExecutorService() {
         super();
         initialize();
     }
 
     public void initialize() {
-        workQueue = new LinkedBlockingQueue<>();
-        int nThreads = !Settings.settings.performance.multithreading ? 1 : FastMath.max(1, Settings.settings.performance.getNumberOfThreads());
         // Create fixed thread pool executor, with a static number of threads.
-        pool = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.SECONDS, workQueue);
-        pool.setThreadFactory(new DaemonThreadFactory());
+        pool = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("gaiasky-virtual-", 0).factory());
     }
 
     public boolean execute(Runnable r) {
-        if (pool != null && !pool.isShutdown() && !inQueue(r)) {
+        if (pool != null && !pool.isShutdown()) {
             pool.execute(r);
             return true;
         }
         return false;
     }
 
-    public ThreadPoolExecutor getPool() {
+    public ExecutorService getPool() {
         return pool;
     }
 
-    public boolean inQueue(Runnable task) {
-        return workQueue != null && workQueue.contains(task);
-    }
 
     public void shutDownThreadPool() {
         // Shut down pool
@@ -65,21 +59,6 @@ public class GaiaSkyExecutorService {
                 logger.error(e);
             }
         }
-        if (workQueue != null)
-            workQueue.clear();
-    }
-
-    private static class DaemonThreadFactory implements ThreadFactory {
-        private int sequence = 0;
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "gaiasky-worker-" + sequence);
-            sequence++;
-            t.setDaemon(true);
-            return t;
-        }
-
     }
 
 }

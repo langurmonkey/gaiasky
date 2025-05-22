@@ -98,6 +98,8 @@ public class TLEParserTest {
             System.out.println(elements);
             var instant = AstroUtils.julianDateToInstant(elements.epochJD);
             Assert.assertEquals("2025-05-23T04:13:49.199230671Z", instant.toString());
+            Assert.assertEquals(0.0645305142577, elements.period, 1e-10);
+            Assert.assertEquals(6795.873069940159, elements.semiMajorAxis, 1e-8);
             Assert.assertEquals(51.6387, elements.inclination, 1e-5);
             Assert.assertEquals(75.9349, elements.ascendingNode, 1e-5);
             Assert.assertEquals(0.0002437, elements.eccentricity, 1e-7);

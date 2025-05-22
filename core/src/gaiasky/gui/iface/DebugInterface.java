@@ -37,8 +37,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private OwnLabel debugRAMTotal;
     private OwnLabel debugVRAMUsed;
     private OwnLabel debugVRAMTotal;
-    private OwnLabel threadsRunning;
-    private OwnLabel threadsSize;
     private OwnLabel debugObjectsDisplay;
     private OwnLabel debugObjectsLoaded;
     private OwnLabel debugOcObserved;
@@ -81,7 +79,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                                         Event.DEBUG_TIME,
                                         Event.DEBUG_RAM,
                                         Event.DEBUG_VRAM,
-                                        Event.DEBUG_THREADS,
                                         Event.DEBUG_OBJECTS,
                                         Event.DEBUG_QUEUE,
                                         Event.DEBUG_DYN_RES,
@@ -261,23 +258,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra.add(vmemoryLabel).left().padBottom(groupSeparation);
         extra.row();
 
-        /* THREADS */
-        threadsRunning = new OwnLabel("", skin, "hud");
-        threadsSize = new OwnLabel("", skin, "hud");
-
-        Table debugThreadsTable = new Table(skin);
-        debugThreadsTable.add(new OwnLabel(I18n.msg("gui.debug.threads.running"), skin, "hud")).right().padRight(pad10);
-        debugThreadsTable.add(threadsRunning).right().row();
-        debugThreadsTable.add(new OwnLabel(I18n.msg("gui.debug.threads.poolsize"), skin, "hud")).right().padRight(pad10);
-        debugThreadsTable.add(threadsSize).right();
-
-        Label threadsLabel = new OwnLabel(I18n.msg("gui.debug.threads"), skin, "hud-big");
-        threadsLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.threads.info"), skin));
-        threadsLabel.setColor(skin.getColor("theme"));
-        extra.add(debugThreadsTable).right().padRight(pad10).padBottom(groupSeparation);
-        extra.add(threadsLabel).left().padBottom(groupSeparation);
-        extra.row();
-
         /* OBJECTS */
         debugObjectsDisplay = new OwnLabel("", skin, "hud");
         debugObjectsLoaded = new OwnLabel("", skin, "hud");
@@ -395,14 +375,6 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                             debugVRAMUsed.setColor(getColor(used, total));
                             debugVRAMTotal.setText(memFormatter.format(total) + unit);
                         }
-                    }
-                }
-                case DEBUG_THREADS -> {
-                    if (debug && data.length > 0) {
-                        Integer active = (Integer) data[0];
-                        Integer poolSize = (Integer) data[1];
-                        threadsRunning.setText(active);
-                        threadsSize.setText(poolSize);
                     }
                 }
                 case DEBUG_OBJECTS -> {

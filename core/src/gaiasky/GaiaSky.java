@@ -818,10 +818,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                                      MemInfo.getMaxMemory());
                 // V-RAM.
                 EventManager.publish(Event.DEBUG_VRAM, this, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
-                // Threads.
-                EventManager.publish(Event.DEBUG_THREADS, this, executorService.getPool()
-                        .getActiveCount(), executorService.getPool()
-                                             .getPoolSize());
 
                 // Dynamic resolution.
                 if (settings.graphics.dynamicResolution) {

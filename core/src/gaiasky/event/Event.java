@@ -360,8 +360,6 @@ public enum Event {
     DEBUG_TIME,
     /** Contains the used graphics memory and total graphics memory in bytes. **/
     DEBUG_VRAM,
-    /** Contains the number of running background threads, and the total number of threads in the pool. **/
-    DEBUG_THREADS,
     /** Contains the current dynamic resolution level and the corresponding back buffer scale **/
     DEBUG_DYN_RES,
     /**
