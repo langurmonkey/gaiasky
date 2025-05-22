@@ -19,6 +19,14 @@ public class TLESource implements Component {
     /** Name of the satellite/spacecraft in the TLE data file. **/
     public String nameTLE;
     /** Update interval, in days. Set negative to update every time, disregarding the last update time. **/
-    public double tleUpdateInterval = 10.0;
+    public double updateIntervalTLE = 10.0;
+
+    public void setUpdateInterval(Double interval) {
+       this.updateIntervalTLE = interval;
+    }
+
+    public void setTleUpdateInterval(Double interval){
+        this.updateIntervalTLE = interval;
+    }
 
 }

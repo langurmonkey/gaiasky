@@ -67,7 +67,7 @@ public class TLEInitializer extends AbstractInitSystem {
                         var data = jsonReader.parse(new FileHandle(filePath.toFile()));
                         var lastUpdateStr = data.getString("lastUpdate");
                         Instant lastUpdate = Instant.parse(lastUpdateStr);
-                        mustUpdate = ((now.getEpochSecond() - lastUpdate.getEpochSecond()) / 86400.0) > tle.tleUpdateInterval;
+                        mustUpdate = ((now.getEpochSecond() - lastUpdate.getEpochSecond()) / 86400.0) > tle.updateIntervalTLE;
                     } catch (Exception e) {
                         // Error reading file, update.
                         mustUpdate = true;
