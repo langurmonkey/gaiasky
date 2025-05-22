@@ -116,7 +116,6 @@ public class DatasetManagerWindow extends GenericDialog {
         this(stage, skin, serverDd, true, I18n.msg("gui.close"));
     }
 
-    @SuppressWarnings("unchecked")
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
         super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates", serverDd.numUpdates) : ""), skin, stage);
         this.nf = new DecimalFormat("##0.0");
@@ -319,7 +318,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             // Change data location.
                             Settings.settings.data.location = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
                             // Create temp dir.
-                            SysUtils.mkdir(SysUtils.getTempDir(Settings.settings.data.location));
+                            SysUtils.mkdir(SysUtils.getDataTempDir(Settings.settings.data.location));
                             me.pack();
                             GaiaSky.postRunnable(() -> {
                                 // Reset datasets.
@@ -964,7 +963,7 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void downloadDataset(DatasetDesc dataset, Runnable successRunnable) {
-        var tempDir = SysUtils.getTempDir(Settings.settings.data.location);
+        var tempDir = SysUtils.getDataTempDir(Settings.settings.data.location);
 
         try {
             var fileStore = Files.getFileStore(tempDir);
@@ -1250,7 +1249,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private void cleanupTempFiles(final boolean dataDownloads,
                                   final boolean dataDescriptor) {
         if (dataDownloads) {
-            final Path tempDir = SysUtils.getTempDir(Settings.settings.data.location);
+            final Path tempDir = SysUtils.getDataTempDir(Settings.settings.data.location);
             // Clean up partial downloads.
             try (final Stream<Path> stream = Files.find(tempDir, 2, (path, basicFileAttributes) -> {
                 final File file = path.toFile();
@@ -1264,7 +1263,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         if (dataDescriptor) {
             // Clean up data descriptor.
-            Path gsDownload = SysUtils.getTempDir(Settings.settings.data.location).resolve("gaiasky-data.json");
+            Path gsDownload = SysUtils.getDataTempDir(Settings.settings.data.location).resolve("gaiasky-data.json");
             deleteFile(gsDownload);
         }
     }

@@ -188,6 +188,12 @@
                 "gaiasky.scenegraph.Orbit"
             ]
         },
+        "OrbitTLE": {
+            "parent": "Orbit",
+            "components": [
+                "TLESource"
+            ]
+        },
         "HeliotropicOrbit": {
             "parent": "Orbit",
             "components": [

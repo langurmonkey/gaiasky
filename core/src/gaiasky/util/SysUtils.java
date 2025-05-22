@@ -62,6 +62,7 @@ public class SysUtils {
     private static final String MPCDI_DIR_NAME = "mpcdi";
     private static final String DATA_DIR_NAME = "data";
     private static final String TMP_DIR_NAME = "tmp";
+    private static final String CACHE_DIR_NAME = "cache";
     private static final String CRASHREPORTS_DIR_NAME = "crashreports";
     private static final String SHADER_OUT_DIR_NAME = "shaders";
     private static final String SHADER_CACHE_DIR_NAME = "shadercache";
@@ -365,13 +366,29 @@ public class SysUtils {
     /**
      * Gets the path to the actual temporary directory in the data folder. It needs the location of
      * the user-configured data folder as input.
+     * <p>
+     * The temp directory is used to store partial dataset downloads and data descriptors.
      *
      * @param dataLocation The user-defined data location.
      *
      * @return A path that points to the temporary directory.
      */
-    public static Path getTempDir(String dataLocation) {
+    public static Path getDataTempDir(String dataLocation) {
         return Path.of(dataLocation).resolve(TMP_DIR_NAME);
+    }
+
+    /**
+     * Gets the path to the actual cache directory in the data folder. It needs the location of
+     * the user-configured data folder as input.
+     * <p>
+     * The cache directory is used to store TLE and other time-changing data.
+     *
+     * @param dataLocation The user-defined data location.
+     *
+     * @return A path that points to the cache directory.
+     */
+    public static Path getDataCacheDir(String dataLocation) {
+        return Path.of(dataLocation).resolve(CACHE_DIR_NAME);
     }
 
     /**
@@ -595,8 +612,8 @@ public class SysUtils {
             }
             // Post popup.
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, pixmaps,
-                    I18n.msg("gui.procedural.info.savetextures",
-                            SysUtils.getProceduralPixmapDir().toString()));
+                                 I18n.msg("gui.procedural.info.savetextures",
+                                          SysUtils.getProceduralPixmapDir().toString()));
 
         });
 
@@ -712,9 +729,9 @@ public class SysUtils {
 
     private static String getJarName() {
         return new File(SysUtils.class.getProtectionDomain()
-                .getCodeSource()
-                .getLocation()
-                .getPath())
+                                .getCodeSource()
+                                .getLocation()
+                                .getPath())
                 .getName();
     }
 
@@ -737,7 +754,8 @@ public class SysUtils {
 
     private static Path getCurrentJARDirectory() {
         try {
-            return Path.of(new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent()).toAbsolutePath();
+            return Path.of(new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent())
+                    .toAbsolutePath();
         } catch (URISyntaxException exception) {
             logger.error(exception);
         }

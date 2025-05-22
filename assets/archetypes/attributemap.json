@@ -325,6 +325,17 @@
         "unit": "Double"
       }
     },
+    "TLESource" : {
+      "description": "Defines attributes used to update a trajectory by fetching data in TLE format from a URL.",
+      "urlTLE": {
+        "description": "URL of the TLE file to fetch. This URL must return a file with the data for a number of objects. Each object has exactly three lines of text in the file. The first line contains the object name. The other two lines contain the data in TLE (Two-Line Element set) format. A good TLE provider is `celestrak <https://celestrak.org/NORAD/elements/>`__.",
+        "unit": "String"
+      },
+      "nameTLE": {
+        "description": "Name of the object, exactly as it appears in the TLE file referenced by ``url``.",
+        "unit": "String"
+      }
+    },
     "ModelScaffolding": {
       "description": "Defines attributes related objects with 3D models.",
       "referencePlane": {

@@ -38,6 +38,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Contains the parameters for particle sets. These are groups of point particles with optional additional
+ * attributes.
+ */
 public class ParticleSet implements Component, IDisposable {
 
     private static long idSeq = 0;

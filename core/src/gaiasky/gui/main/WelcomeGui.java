@@ -165,7 +165,7 @@ public class WelcomeGui extends AbstractGui {
             buildWaitingUI();
 
             // Fetch descriptor file.
-            dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
+            dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
             DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor,
                                         dataDescriptor,
                                         Settings.settings.program.offlineMode,

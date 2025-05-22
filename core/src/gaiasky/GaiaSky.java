@@ -1112,7 +1112,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
         // Clear temp.
         try {
-            Path tmp = SysUtils.getTempDir(settings.data.location);
+            Path tmp = SysUtils.getDataTempDir(settings.data.location);
             if (java.nio.file.Files.exists(tmp) && java.nio.file.Files.isDirectory(tmp)) GlobalResources.deleteRecursively(tmp);
         } catch (Exception e) {
             logger.error(e, "Error deleting tmp directory");

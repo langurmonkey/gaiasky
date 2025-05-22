@@ -2447,7 +2447,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     ddw.show(stage);
                 } else {
                     // Try again
-                    FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(settings.data.location) + "/gaiasky-data.json");
+                    FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(settings.data.location) + "/gaiasky-data.json");
                     DownloadHelper.downloadFile(settings.program.url.dataDescriptor,
                                                 dataDescriptor,
                                                 Settings.settings.program.offlineMode,

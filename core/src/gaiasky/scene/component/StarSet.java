@@ -16,6 +16,9 @@ import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 
+/**
+ * Contains the parameters for star sets. These are groups of stars that are rendered together.
+ */
 public class StarSet extends ParticleSet {
     /**
      * Epoch for the times in the light curves in julian days.
