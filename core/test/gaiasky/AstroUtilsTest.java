@@ -14,15 +14,6 @@ import java.time.Instant;
  * Tests the astronomical algorithms in the class {@link AstroUtils}.
  */
 public class AstroUtilsTest {
-    @Before
-    public void setUp() {
-
-    }
-
-    @After
-    public void tearDown() {
-
-    }
 
     @Test
     public void testJulianDates() {
