@@ -547,7 +547,7 @@ public class BitmapFontCache {
      */
     public GlyphLayout addText(CharSequence str, float x, float y, int start, int end, float targetWidth, int halign,
             boolean wrap, String truncate) {
-        GlyphLayout layout = Pools.obtain(GlyphLayout.class);
+        GlyphLayout layout = Pools.obtain(GlyphLayout::new);
         pooledLayouts.add(layout);
         layout.setText(font, str, start, end, color, targetWidth, halign, wrap, truncate);
         addText(layout, x, y);

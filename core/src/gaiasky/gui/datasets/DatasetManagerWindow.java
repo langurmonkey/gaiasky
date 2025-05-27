@@ -37,10 +37,7 @@ import gaiasky.input.WindowKbdListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.datadesc.DataDescriptor;
-import gaiasky.util.datadesc.DataDescriptorUtils;
-import gaiasky.util.datadesc.DatasetDesc;
-import gaiasky.util.datadesc.DatasetType;
+import gaiasky.util.datadesc.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
 import gaiasky.util.scene2d.*;
@@ -567,7 +564,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             logger.info(I18n.msg("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(Settings.SOURCE_VERSION)));
                         }
                     } else {
-                        select.setChecked(isPathIn(Settings.settings.data.dataFile(dataset.checkStr), currentSetting));
+                        select.setChecked(DatasetDownloadUtils.isPathIn(Settings.settings.data.dataFile(dataset.checkStr), currentSetting));
                         select.addListener(new OwnTextTooltip(dataset.checkPath.toString(), skin));
                     }
                     select.setSize(installOrSelectSize, installOrSelectSize);
@@ -653,7 +650,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                 datasetContext.addItem(update);
                                             }
                                             if (!dataset.baseData && !dataset.type.equals("texture-pack") && dataset.minGsVersion <= Settings.SOURCE_VERSION) {
-                                                boolean enabled = isPathIn(dataset.catalogFile.path(), currentSetting);
+                                                boolean enabled = DatasetDownloadUtils.isPathIn(dataset.catalogFile.path(), currentSetting);
                                                 if (enabled) {
                                                     // Disable.
                                                     var disable = new MenuItem(I18n.msg("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
@@ -793,7 +790,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 } else {
                     // Notify status.
                     List<String> currentSetting = Settings.settings.data.dataFiles;
-                    boolean enabled = isPathIn(dataset.catalogFile.path(), currentSetting);
+                    boolean enabled = DatasetDownloadUtils.isPathIn(dataset.catalogFile.path(), currentSetting);
                     status = new OwnLabel(I18n.msg(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
                 }
             }
@@ -939,19 +936,6 @@ public class DatasetManagerWindow extends GenericDialog {
         }
     }
 
-    private boolean isPathIn(String path, List<String> setting) {
-        for (String candidate : setting) {
-            var candidatePath = Settings.settings.data.dataPath(candidate);
-            try {
-                if (Path.of(path).toRealPath().equals(candidatePath.toRealPath())) {
-                    return true;
-                }
-            } catch (IOException e) {
-                logger.error(e);
-            }
-        }
-        return false;
-    }
 
     public void refresh() {
         content.clear();
@@ -1047,14 +1031,14 @@ public class DatasetManagerWindow extends GenericDialog {
             if (errors == 0) {
                 try {
                     // Extract.
-                    decompress(tempDownload.path(), new File(dataLocation), dataset);
+                    DatasetDownloadUtils.decompress(tempDownload.path(), new File(dataLocation), dataset);
                 } catch (Exception e) {
                     logger.error(e, "Error decompressing: " + name);
                     errorMsg = "(decompressing error)";
                     errors++;
                 } finally {
                     // Remove archive.
-                    cleanupTempFile(tempDownload.path());
+                    DatasetDownloadUtils.cleanupTempFile(tempDownload.path());
                 }
             }
 
@@ -1134,149 +1118,6 @@ public class DatasetManagerWindow extends GenericDialog {
 
     }
 
-    private void decompress(String in, File out, DatasetDesc dataset) throws Exception {
-        FileInfoInputStream fIs = new FileInfoInputStream(in);
-        GZIPInputStream gzIs = new GZIPInputStream(fIs);
-        TarInputStream tarIs = new TarInputStream(gzIs);
-        double sizeKb = fileSize(in) / 1000d;
-        String sizeKbStr = nf.format(sizeKb);
-        TarEntry entry;
-        long last = 0;
-        boolean error = false;
-        Exception errorException = null;
-        Array<File> processedFiles = new Array<>();
-        while (null != (entry = tarIs.getNextEntry())) {
-            if (entry.isDirectory()) {
-                continue;
-            }
-            File curFile = new File(out, entry.getName());
-            File parent = curFile.getParentFile();
-            if (!parent.exists()) {
-                if (!parent.mkdirs()) {
-                    logger.info("Parent directory not created, already exists: " + parent.toPath());
-                }
-            }
-
-            try (FileOutputStream fos = new FileOutputStream(curFile); BufferedOutputStream dest = new BufferedOutputStream(fos)) {
-                processedFiles.add(curFile);
-
-                int count;
-                byte[] data = new byte[2048];
-
-                while ((count = tarIs.read(data)) != -1) {
-                    dest.write(data, 0, count);
-                }
-
-            } catch (IOException e) {
-                errorException = e;
-                error = true;
-                break;
-            }
-
-            // Every 250 ms we update the view.
-            long current = System.currentTimeMillis();
-            long elapsed = current - last;
-            if (elapsed > 250) {
-                GaiaSky.postRunnable(() -> {
-                    float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
-                    String progressString = I18n.msg("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
-                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, val, progressString, null);
-                });
-                last = current;
-            }
-
-        }
-
-        if (error) {
-            String msg = I18n.msg("gui.download.extracting.error", errorException);
-            logger.error(errorException, msg);
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, msg, -1f);
-            // Delete uncompressed files.
-            for (File f : processedFiles) {
-                deleteFile(f.toPath());
-            }
-
-        }
-    }
-
-    /**
-     * Returns the file size.
-     *
-     * @param inputFilePath A file.
-     * @return The size in bytes.
-     */
-    private long fileSize(String inputFilePath) {
-        return new File(inputFilePath).length();
-    }
-
-    /**
-     * Returns the GZ uncompressed size.
-     *
-     * @param inputFilePath A gzipped file.
-     * @return The uncompressed size in bytes.
-     * @throws IOException If the file failed to read.
-     */
-    private long fileSizeGZUncompressed(String inputFilePath) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile(inputFilePath, "r");
-        raf.seek(raf.length() - 4);
-        byte[] bytes = new byte[4];
-        raf.read(bytes);
-        long fileSize = ByteBuffer.wrap(bytes).order(ByteOrder.nativeOrder()).getLong();
-        if (fileSize < 0)
-            fileSize += (1L << 32);
-        raf.close();
-        return fileSize;
-    }
-
-    /**
-     * We should never need to call this, as the main {@link GaiaSky#dispose()} method
-     * already cleans up the temp directory.
-     * This way, we allow download resumes within the same session.
-     */
-    private void cleanupTempFiles() {
-        cleanupTempFiles(true, false);
-    }
-
-    /**
-     * Remove a single file in the temp directory.
-     * @param file The file to remove.
-     */
-    private void cleanupTempFile(String file) {
-        deleteFile(Path.of(file));
-    }
-
-    @SuppressWarnings("all")
-    private void cleanupTempFiles(final boolean dataDownloads,
-                                  final boolean dataDescriptor) {
-        if (dataDownloads) {
-            final Path tempDir = SysUtils.getDataTempDir(Settings.settings.data.location);
-            // Clean up partial downloads.
-            try (final Stream<Path> stream = Files.find(tempDir, 2, (path, basicFileAttributes) -> {
-                final File file = path.toFile();
-                return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
-            })) {
-                stream.forEach(this::deleteFile);
-            } catch (IOException e) {
-                logger.error(e);
-            }
-        }
-
-        if (dataDescriptor) {
-            // Clean up data descriptor.
-            Path gsDownload = SysUtils.getDataTempDir(Settings.settings.data.location).resolve("gaiasky-data.json");
-            deleteFile(gsDownload);
-        }
-    }
-
-    private void deleteFile(Path p) {
-        if (java.nio.file.Files.exists(p)) {
-            try {
-                java.nio.file.Files.delete(p);
-            } catch (IOException e) {
-                logger.error(e, "Failed cleaning up file: " + p);
-            }
-        }
-    }
 
     private void setStatusError(DatasetDesc ds) {
         setStatusError(ds, null);
@@ -1509,7 +1350,7 @@ public class DatasetManagerWindow extends GenericDialog {
         if (dataset.datasetType.typeStr.equalsIgnoreCase("catalog-lod")) {
             var lodDatasets = dataset.datasetType.datasets;
             for (var lodDataset : lodDatasets) {
-                if (lodDataset != dataset && isEnabled(lodDataset)) {
+                if (lodDataset != dataset && DatasetDownloadUtils.isEnabled(lodDataset)) {
                     return Optional.of(I18n.msg("gui.download.incompatibility.lod"));
                 }
             }
@@ -1518,7 +1359,7 @@ public class DatasetManagerWindow extends GenericDialog {
         if (dataset.datasetType.typeStr.equalsIgnoreCase("catalog-cluster")) {
             var clusterDatasets = dataset.datasetType.datasets;
             for (var clusterDataset : clusterDatasets) {
-                if (clusterDataset != dataset && isEnabled(clusterDataset)) {
+                if (clusterDataset != dataset && DatasetDownloadUtils.isEnabled(clusterDataset)) {
                     return Optional.of(I18n.msg("gui.download.incompatibility.cluster"));
                 }
             }
@@ -1527,16 +1368,12 @@ public class DatasetManagerWindow extends GenericDialog {
         if (dataset.datasetType.typeStr.equalsIgnoreCase("catalog-gal") && dataset.key.contains("sdss")) {
             var galDatasets = dataset.datasetType.datasets;
             for (var sdssDataset : galDatasets) {
-                if (sdssDataset.key.contains("sdss") && sdssDataset != dataset && isEnabled(sdssDataset)) {
+                if (sdssDataset.key.contains("sdss") && sdssDataset != dataset && DatasetDownloadUtils.isEnabled(sdssDataset)) {
                     return Optional.of(I18n.msg("gui.download.incompatibility.sdss"));
                 }
             }
         }
         return Optional.empty();
-    }
-
-    private boolean isEnabled(final DatasetDesc dataset) {
-        return isPathIn(Settings.settings.data.dataFile(dataset.checkStr), Settings.settings.data.dataFiles);
     }
 
     /**

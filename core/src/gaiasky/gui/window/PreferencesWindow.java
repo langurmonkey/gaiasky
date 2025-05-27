@@ -1290,10 +1290,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 selected = cbb;
             }
         }
-        textureIndex = new OwnSelectBox<>(skin);
-        textureIndex.setItems(indices);
-        if (selected != null)
-            textureIndex.setSelected(selected);
+        // Do not show texture index if we did not find any texture (i.e. the base data package is not downloaded yet).
+        if (!indexList.isEmpty()) {
+            textureIndex = new OwnSelectBox<>(skin);
+            textureIndex.setItems(indices);
+            if (selected != null)
+                textureIndex.setSelected(selected);
+        }
 
         // Render stars as spheres
         OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.starspheres"), skin);
@@ -1318,8 +1321,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         starsTable.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(lightGlow).left().padRight(pad18).padBottom(pad10).row();
-        starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
+        if (textureIndex != null) {
+            starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
+            starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
+        }
         starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
 
@@ -2973,7 +2978,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.scene.star.renderStarSpheres = starSpheres.isChecked();
 
         // Star texture index
-        if (settings.scene.star.textureIndex != textureIndex.getSelected().value) {
+        if (textureIndex != null && settings.scene.star.textureIndex != textureIndex.getSelected().value) {
             EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, textureIndex.getSelected().value);
         }
 

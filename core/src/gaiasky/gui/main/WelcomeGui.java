@@ -36,10 +36,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.gui.iface.PopupNotificationsInterface;
-import gaiasky.gui.window.AboutWindow;
-import gaiasky.gui.window.DataLocationCheckWindow;
-import gaiasky.gui.window.GenericDialog;
-import gaiasky.gui.window.PreferencesWindow;
+import gaiasky.gui.window.*;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.input.GuiKbdListener;
 import gaiasky.util.*;
@@ -83,6 +80,10 @@ public class WelcomeGui extends AbstractGui {
     private PopupNotificationsInterface popupInterface;
     private WelcomeGuiKbdListener kbdListener;
     private Table datasetsContainer;
+    private boolean preventRecommended = false;
+
+    /** The recommended datasets. **/
+    private static final Set<String> recommendedDatasets = Set.of("default-data", "catalog-hipparcos", "catalog-nbg", "catalog-nebulae", "catalog-sdss-12");
 
     /**
      * Creates an initial GUI.
@@ -221,24 +222,26 @@ public class WelcomeGui extends AbstractGui {
     private void buildWaitingUI() {
         // Render message.
         if (!Settings.settings.program.offlineMode) {
-            this.updateUnitsPerPixel(2.2f);
+            this.updateUnitsPerPixel(1.6f);
+            // Central table
+            Table centerContainer = new Table(skin);
+            centerContainer.setFillParent(true);
+            centerContainer.bottom().right();
+            if (bgTex == null) {
+                bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
+            }
+            Drawable bg = new SpriteDrawable(new Sprite(bgTex));
+            centerContainer.setBackground(bg);
+
             var table = new Table(skin);
-            table.setFillParent(true);
-            table.bottom()
-                    .right()
-                    .padBottom(40f)
-                    .padRight(40f);
             var gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
-            table.add(gaiaSky)
-                    .bottom()
-                    .right()
-                    .padBottom(30f)
-                    .row();
+            table.add(gaiaSky).row();
             var msg = new OwnLabel(I18n.msg("gui.welcome.datasets.updates"), skin);
-            table.add(msg)
-                    .bottom()
-                    .right();
-            stage.addActor(table);
+            table.add(msg);
+
+            centerContainer.add(table).bottom().right().padBottom(30f).padRight(30f);
+
+            stage.addActor(centerContainer);
         }
     }
 
@@ -249,7 +252,8 @@ public class WelcomeGui extends AbstractGui {
         serverDatasets = !downloadError ? DataDescriptorUtils.instance()
                 .buildServerDatasets(dataDescriptor) : null;
         reloadLocalDatasets();
-        // Center table
+
+        // Central table
         Table centerContainer = new Table(skin);
         centerContainer.setFillParent(true);
         centerContainer.center();
@@ -322,146 +326,8 @@ public class WelcomeGui extends AbstractGui {
 
         String textStyle = "main-title-s";
 
-        // Start Gaia Sky button
-        OwnTextIconButton startButton = new OwnTextIconButton(I18n.msg("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
-        startButton.setSpace(pad18);
-        startButton.setPad(pad16);
-        startButton.setContentAlign(Align.center);
-        startButton.align(Align.center);
-        startButton.setHeight(buttonHeight);
-        startButton.pack();
-        startButton.setWidth(Math.max(startButton.getWidth(), buttonWidth));
-        startButton.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                // Check base data is enabled
-                startLoading();
-            }
-            return true;
-        });
-        buttonList.add(startButton);
 
-        Table startGroup = new Table(skin);
-        OwnLabel startLabel = new OwnLabel(I18n.msg("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
-        startGroup.add(startLabel)
-                .top()
-                .left()
-                .padBottom(pad16)
-                .row();
-        if (!baseDataPresent) {
-            // No basic data, can't start!
-            startButton.setDisabled(true);
-
-            OwnLabel noBaseData = new OwnLabel(I18n.msg("gui.welcome.start.nobasedata"), skin, textStyle);
-            noBaseData.setColor(ColorUtils.gRedC);
-            startGroup.add(noBaseData)
-                    .bottom()
-                    .left();
-        } else if (numCatalogsAvailable > 0 && numTotalCatalogsEnabled == 0) {
-            OwnLabel noCatsSelected = new OwnLabel(I18n.msg("gui.welcome.start.nocatalogs"), skin, textStyle);
-            noCatsSelected.setColor(ColorUtils.gRedC);
-            startGroup.add(noCatsSelected)
-                    .bottom()
-                    .left();
-        } else if (numGaiaDRCatalogsEnabled > 1 || numStarCatalogsEnabled == 0) {
-            OwnLabel tooManyDR = new OwnLabel(I18n.msg("gui.welcome.start.check"), skin, textStyle);
-            tooManyDR.setColor(ColorUtils.gRedC);
-            startGroup.add(tooManyDR)
-                    .bottom()
-                    .left();
-        } else {
-            OwnLabel ready = new OwnLabel(I18n.msg("gui.welcome.start.ready"), skin, textStyle);
-            ready.setColor(ColorUtils.gGreenC);
-            startGroup.add(ready)
-                    .bottom()
-                    .left();
-        }
-
-        // Dataset manager button
-        OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.msg("gui.welcome.dsmanager"), skin, "cloud-download");
-        datasetManagerButton.setSpace(pad18);
-        datasetManagerButton.setPad(pad16);
-        datasetManagerButton.setContentAlign(Align.center);
-        datasetManagerButton.align(Align.center);
-        datasetManagerButton.setHeight(buttonHeight * 0.8f);
-        datasetManagerButton.pack();
-        datasetManagerButton.setWidth(Math.max(datasetManagerButton.getWidth(), buttonWidth * 0.8f));
-        datasetManagerButton.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                addDatasetManagerWindow(serverDatasets);
-            }
-            return true;
-        });
-        buttonList.add(datasetManagerButton);
-
-        Table datasetManagerInfo = new Table(skin);
-        OwnLabel downloadLabel = new OwnLabel(I18n.msg("gui.welcome.dsmanager.desc"), skin, textStyle);
-        datasetManagerInfo.add(downloadLabel)
-                .top()
-                .left()
-                .padBottom(pad16);
-        if (serverDatasets != null && serverDatasets.updatesAvailable) {
-            datasetManagerInfo.row();
-            OwnLabel updates = new OwnLabel(I18n.msg("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin, textStyle);
-            updates.setColor(ColorUtils.gYellowC);
-            datasetManagerInfo.add(updates)
-                    .bottom()
-                    .left();
-        } else if (!baseDataPresent) {
-            datasetManagerInfo.row();
-            OwnLabel getBasedata = new OwnLabel(I18n.msg("gui.welcome.dsmanager.info"), skin, textStyle);
-            getBasedata.setColor(ColorUtils.gGreenC);
-            datasetManagerInfo.add(getBasedata)
-                    .bottom()
-                    .left();
-        } else {
-            // Number selected
-            OwnLabel numCatalogsEnabled = new OwnLabel(I18n.msg("gui.welcome.enabled", numTotalCatalogsEnabled, numCatalogsAvailable), skin,
-                                                       textStyle);
-            numCatalogsEnabled.setColor(ColorUtils.gBlueC);
-            datasetManagerInfo.row()
-                    .padBottom(pad16);
-            datasetManagerInfo.add(numCatalogsEnabled)
-                    .left()
-                    .padBottom(pad18);
-        }
-
-        // Selection problems/issues
-        Table selectionInfo = new Table(skin);
-        if (numCatalogsAvailable == 0) {
-            // No catalog files, disable and add notice
-            OwnLabel noCatalogs = new OwnLabel(I18n.msg("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
-            noCatalogs.setColor(ColorUtils.aOrangeC);
-            selectionInfo.add(noCatalogs);
-        } else if (numGaiaDRCatalogsEnabled > 1) {
-            OwnLabel tooManyDR = new OwnLabel(I18n.msg("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
-            tooManyDR.setColor(ColorUtils.gRedC);
-            selectionInfo.add(tooManyDR);
-        } else if (numStarCatalogsEnabled > 1) {
-            OwnLabel warn2Star = new OwnLabel(I18n.msg("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
-            warn2Star.setColor(ColorUtils.aOrangeC);
-            selectionInfo.add(warn2Star);
-        } else if (numStarCatalogsEnabled == 0) {
-            OwnLabel noStarCatalogs = new OwnLabel(I18n.msg("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
-            noStarCatalogs.setColor(ColorUtils.aOrangeC);
-            selectionInfo.add(noStarCatalogs);
-        }
-
-        // Exit button
-        OwnTextIconButton exitButton = new OwnTextIconButton(I18n.msg("gui.exit"), skin, "quit");
-        exitButton.setSpace(pad16);
-        exitButton.align(Align.center);
-        exitButton.setSize(buttonWidth * 0.5f, buttonHeight * 0.6f);
-        exitButton.addListener(new OwnTextTooltip(I18n.msg("context.quit"), skin, 10));
-        exitButton.addListener(new ClickListener() {
-            public void clicked(InputEvent event,
-                                float x,
-                                float y) {
-                GaiaSky.postRunnable(Gdx.app::exit);
-            }
-        });
-        buttonList.add(exitButton);
-
-        // Title
+        // Add title to center.
         center.add(titleGroup)
                 .center()
                 .padLeft(pad32 * 2f)
@@ -469,42 +335,251 @@ public class WelcomeGui extends AbstractGui {
                 .colspan(2)
                 .row();
 
-        // Start button
-        center.add(startButton)
-                .right()
-                .top()
-                .padBottom(pad18 * 10f)
-                .padRight(pad28 * 2f);
-        center.add(startGroup)
-                .top()
-                .left()
-                .padBottom(pad18 * 10f)
-                .row();
 
-        // Dataset manager
-        center.add(datasetManagerButton)
-                .right()
-                .top()
-                .padBottom(pad32)
-                .padRight(pad28 * 2f);
-        center.add(datasetManagerInfo)
-                .left()
-                .top()
-                .padBottom(pad32)
-                .row();
+        final int numLocalDatasets = localDatasets.get().datasets.size();
+        final boolean regularStart = numLocalDatasets > 0 || preventRecommended;
 
-        center.add(selectionInfo)
-                .colspan(2)
-                .center()
-                .top()
-                .padBottom(pad32 * 4f)
-                .row();
+        if (regularStart) {
+            // Regular Welcome screen options: Start Gaia Sky, Dataset Manager, Exit
+            // Start Gaia Sky button
+            OwnTextIconButton startButton = new OwnTextIconButton(I18n.msg("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
+            startButton.setSpace(pad18);
+            startButton.setPad(pad16);
+            startButton.setContentAlign(Align.center);
+            startButton.align(Align.center);
+            startButton.setHeight(buttonHeight);
+            startButton.pack();
+            startButton.setWidth(Math.max(startButton.getWidth(), buttonWidth));
+            startButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    // Check base data is enabled
+                    startLoading();
+                }
+                return true;
+            });
+            buttonList.add(startButton);
 
-        // Quit
-        center.add(exitButton)
-                .center()
-                .top()
-                .colspan(2);
+            Table startGroup = new Table(skin);
+            OwnLabel startLabel = new OwnLabel(I18n.msg("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
+            startGroup.add(startLabel)
+                    .top()
+                    .left()
+                    .padBottom(pad16)
+                    .row();
+            if (!baseDataPresent) {
+                // No basic data, can't start!
+                startButton.setDisabled(true);
+
+                OwnLabel noBaseData = new OwnLabel(I18n.msg("gui.welcome.start.nobasedata"), skin, textStyle);
+                noBaseData.setColor(ColorUtils.gRedC);
+                startGroup.add(noBaseData)
+                        .bottom()
+                        .left();
+            } else if (numCatalogsAvailable > 0 && numTotalCatalogsEnabled == 0) {
+                OwnLabel noCatsSelected = new OwnLabel(I18n.msg("gui.welcome.start.nocatalogs"), skin, textStyle);
+                noCatsSelected.setColor(ColorUtils.gRedC);
+                startGroup.add(noCatsSelected)
+                        .bottom()
+                        .left();
+            } else if (numGaiaDRCatalogsEnabled > 1 || numStarCatalogsEnabled == 0) {
+                OwnLabel tooManyDR = new OwnLabel(I18n.msg("gui.welcome.start.check"), skin, textStyle);
+                tooManyDR.setColor(ColorUtils.gRedC);
+                startGroup.add(tooManyDR)
+                        .bottom()
+                        .left();
+            } else {
+                OwnLabel ready = new OwnLabel(I18n.msg("gui.welcome.start.ready"), skin, textStyle);
+                ready.setColor(ColorUtils.gGreenC);
+                startGroup.add(ready)
+                        .bottom()
+                        .left();
+            }
+
+            // Dataset manager button
+            OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.msg("gui.welcome.dsmanager"), skin, "cloud-download");
+            datasetManagerButton.setSpace(pad18);
+            datasetManagerButton.setPad(pad16);
+            datasetManagerButton.setContentAlign(Align.center);
+            datasetManagerButton.align(Align.center);
+            datasetManagerButton.setHeight(buttonHeight);
+            datasetManagerButton.pack();
+            datasetManagerButton.setWidth(Math.max(datasetManagerButton.getWidth(), buttonWidth));
+            datasetManagerButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    addDatasetManagerWindow(serverDatasets);
+                }
+                return true;
+            });
+            buttonList.add(datasetManagerButton);
+
+            Table datasetManagerInfo = new Table(skin);
+            OwnLabel downloadLabel = new OwnLabel(I18n.msg("gui.welcome.dsmanager.desc"), skin, textStyle);
+            datasetManagerInfo.add(downloadLabel)
+                    .top()
+                    .left()
+                    .padBottom(pad16);
+            if (serverDatasets != null && serverDatasets.updatesAvailable) {
+                datasetManagerInfo.row();
+                OwnLabel updates = new OwnLabel(I18n.msg("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin, textStyle);
+                updates.setColor(ColorUtils.gYellowC);
+                datasetManagerInfo.add(updates)
+                        .bottom()
+                        .left();
+            } else if (!baseDataPresent) {
+                datasetManagerInfo.row();
+                OwnLabel getBasedata = new OwnLabel(I18n.msg("gui.welcome.dsmanager.info"), skin, textStyle);
+                getBasedata.setColor(ColorUtils.gGreenC);
+                datasetManagerInfo.add(getBasedata)
+                        .bottom()
+                        .left();
+            } else {
+                // Number selected
+                OwnLabel numCatalogsEnabled = new OwnLabel(I18n.msg("gui.welcome.enabled", numTotalCatalogsEnabled, numCatalogsAvailable), skin,
+                                                           textStyle);
+                numCatalogsEnabled.setColor(ColorUtils.gBlueC);
+                datasetManagerInfo.row()
+                        .padBottom(pad16);
+                datasetManagerInfo.add(numCatalogsEnabled)
+                        .left()
+                        .padBottom(pad18);
+            }
+
+            // Selection problems/issues
+            Table selectionInfo = new Table(skin);
+            if (numCatalogsAvailable == 0) {
+                // No catalog files, disable and add notice
+                OwnLabel noCatalogs = new OwnLabel(I18n.msg("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
+                noCatalogs.setColor(ColorUtils.aOrangeC);
+                selectionInfo.add(noCatalogs);
+            } else if (numGaiaDRCatalogsEnabled > 1) {
+                OwnLabel tooManyDR = new OwnLabel(I18n.msg("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
+                tooManyDR.setColor(ColorUtils.gRedC);
+                selectionInfo.add(tooManyDR);
+            } else if (numStarCatalogsEnabled > 1) {
+                OwnLabel warn2Star = new OwnLabel(I18n.msg("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
+                warn2Star.setColor(ColorUtils.aOrangeC);
+                selectionInfo.add(warn2Star);
+            } else if (numStarCatalogsEnabled == 0) {
+                OwnLabel noStarCatalogs = new OwnLabel(I18n.msg("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
+                noStarCatalogs.setColor(ColorUtils.aOrangeC);
+                selectionInfo.add(noStarCatalogs);
+            }
+
+            // Start button
+            center.add(startButton)
+                    .right()
+                    .top()
+                    .padBottom(pad18 * 10f)
+                    .padRight(pad28 * 2f);
+            center.add(startGroup)
+                    .top()
+                    .left()
+                    .padBottom(pad18 * 10f)
+                    .row();
+
+            // Dataset manager
+            center.add(datasetManagerButton)
+                    .right()
+                    .top()
+                    .padBottom(pad32)
+                    .padRight(pad28 * 2f);
+            center.add(datasetManagerInfo)
+                    .left()
+                    .top()
+                    .padBottom(pad32)
+                    .row();
+
+            center.add(selectionInfo)
+                    .colspan(2)
+                    .center()
+                    .top()
+                    .padBottom(pad32 * 4f)
+                    .row();
+
+            if(numLocalDatasets == 0 && preventRecommended) {
+                // Add back button
+                OwnTextIconButton backButton = new OwnTextIconButton(I18n.msg("gui.back"), skin, "back");
+                backButton.addListener(new OwnTextTooltip(I18n.msg("gui.back.prev"), skin, 10));
+                backButton.setHeight(buttonHeight * 0.6f);
+                backButton.setWidth(buttonWidth * 0.5f);
+                backButton.addListener(new ClickListener() {
+                    public void clicked(InputEvent event,
+                                        float x,
+                                        float y) {
+                        preventRecommended = false;
+                        reloadView();
+                    }
+                });
+                backButton.pack();
+
+                center.add(backButton)
+                        .colspan(2)
+                        .left()
+                        .bottom()
+                        .padBottom(pad32);
+            }
+
+        } else {
+            // Recommended datasets
+            OwnTextIconButton recommendedDatasetsButton = new OwnTextIconButton(I18n.msg("gui.welcome.recommended"), skin, "start");
+            recommendedDatasetsButton.setSpace(pad18);
+            recommendedDatasetsButton.setPad(pad16);
+            recommendedDatasetsButton.setContentAlign(Align.center);
+            recommendedDatasetsButton.align(Align.center);
+            recommendedDatasetsButton.setHeight(buttonHeight);
+            recommendedDatasetsButton.pack();
+            recommendedDatasetsButton.setWidth(Math.max(recommendedDatasetsButton.getWidth(), buttonWidth));
+            recommendedDatasetsButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    // Download recommended datasets view.
+                    var recommended = serverDatasets.datasets.stream().filter(ds -> recommendedDatasets.contains(ds.key))
+                            .sorted(Comparator.comparing(datasetDesc -> datasetDesc.name))
+                            .toList();
+
+                    System.out.println("Recommended: ");
+                    recommended.forEach(ds -> System.out.println(ds.name));
+
+                    var bdw = new BatchDownloadWindow("Recommended datasets", skin, stage, recommended, this::startLoading, () -> Gdx.app.exit());
+                    bdw.show(stage);
+                    bdw.downloadDatasets();
+                }
+                return true;
+            });
+            buttonList.add(recommendedDatasetsButton);
+
+            // Full control
+            OwnTextIconButton customizeButton = new OwnTextIconButton(I18n.msg("gui.welcome.custom"), skin, "cloud-download");
+            customizeButton.setSpace(pad18);
+            customizeButton.setPad(pad16);
+            customizeButton.setContentAlign(Align.center);
+            customizeButton.align(Align.center);
+            customizeButton.setHeight(buttonHeight);
+            customizeButton.pack();
+            customizeButton.setWidth(Math.max(recommendedDatasetsButton.getWidth(), buttonWidth));
+            customizeButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    preventRecommended = true;
+                    reloadView();
+                }
+                return true;
+            });
+            buttonList.add(customizeButton);
+
+            // Recommended datasets button
+            center.add(recommendedDatasetsButton)
+                    .center()
+                    .top()
+                    .padBottom(pad18 * 3f)
+                    .row();
+
+            // Customize datasets button
+            center.add(customizeButton)
+                    .center()
+                    .top()
+                    .padBottom(pad32 * 5f)
+                    .row();
+        }
+
 
         // Add to center container
         centerContainer.add(center)
@@ -531,7 +606,7 @@ public class WelcomeGui extends AbstractGui {
             enabledDatasets.forEach(ds -> {
                 var typeIcon = new OwnImage(skin.getDrawable(DatasetManagerWindow.getIcon(ds.type)));
                 typeIcon.setSize(30f, 30f);
-                var g = hg(typeIcon,new OwnLabel(TextUtils.capString(ds.name, 32), skin));
+                var g = hg(typeIcon, new OwnLabel(TextUtils.capString(ds.name, 32), skin));
                 datasets.add(g)
                         .left()
                         .padBottom(pad16)
@@ -571,6 +646,8 @@ public class WelcomeGui extends AbstractGui {
         screenMode.add(screenModeButton);
 
         // Bottom icons
+
+        // About button
         OwnTextIconButton about = new OwnTextIconButton("", skin, "help");
         about.addListener(new OwnTextTooltip(I18n.msg("gui.help.about"), skin, 10));
         about.addListener((event) -> {
@@ -587,6 +664,7 @@ public class WelcomeGui extends AbstractGui {
         });
         about.pack();
 
+        // Preferences button
         OwnTextIconButton preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.addListener(new OwnTextTooltip(I18n.msg("gui.preferences"), skin, 10));
         preferences.addListener((event) -> {
@@ -603,15 +681,30 @@ public class WelcomeGui extends AbstractGui {
         });
         preferences.pack();
 
+        // Exit button
+        OwnTextIconButton exit = new OwnTextIconButton("", skin, "quit");
+        exit.addListener(new OwnTextTooltip(I18n.msg("context.quit"), skin, 10));
+        exit.addListener(new ClickListener() {
+            public void clicked(InputEvent event,
+                                float x,
+                                float y) {
+                GaiaSky.postRunnable(Gdx.app::exit);
+            }
+        });
+        exit.pack();
+
+
         // Add to button list.
         buttonList.add(preferences);
         buttonList.add(about);
         buttonList.add(screenModeButton);
+        buttonList.add(exit);
 
         HorizontalGroup bottomRight = new HorizontalGroup();
         bottomRight.space(pad18);
         bottomRight.addActor(preferences);
         bottomRight.addActor(about);
+        bottomRight.addActor(exit);
         bottomRight.setFillParent(true);
         bottomRight.bottom()
                 .right()
@@ -692,7 +785,7 @@ public class WelcomeGui extends AbstractGui {
             }
             if (base != null) {
                 if (!Settings.settings.data.dataFiles.contains(base.checkStr)) {
-                    Settings.settings.data.dataFiles.add(0, base.checkStr);
+                    Settings.settings.data.dataFiles.addFirst(base.checkStr);
                 }
             }
         }
@@ -995,7 +1088,7 @@ public class WelcomeGui extends AbstractGui {
     public void fireChange() {
         if (buttonList != null) {
             Button b = buttonList.get(currentSelected);
-            ChangeEvent event = Pools.obtain(ChangeEvent.class);
+            ChangeEvent event = Pools.obtain(ChangeEvent::new);
             event.setTarget(b);
             b.fire(event);
             Pools.free(event);

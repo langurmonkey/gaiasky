@@ -16,6 +16,9 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 
+/**
+ * Checks the current data location for old or unwanted directories and offers to clean them up.
+ */
 public class DataLocationCheckWindow extends GenericDialog {
     public DataLocationCheckWindow(String title, Skin skin, Stage stage) {
         super(title, skin, stage);

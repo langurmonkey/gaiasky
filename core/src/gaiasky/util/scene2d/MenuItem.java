@@ -196,7 +196,7 @@ public class MenuItem extends Button {
     }
 
     void fireChangeEvent() {
-        ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
+        ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent::new);
         fire(changeEvent);
         Pools.free(changeEvent);
     }

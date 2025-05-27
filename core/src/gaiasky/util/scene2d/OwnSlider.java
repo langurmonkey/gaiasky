@@ -149,7 +149,7 @@ public class OwnSlider extends Slider {
         }
         // Force label listener to update even when programmatic change events are off.
         if (!programmaticChangeEvents && labelListener != null) {
-            ChangeEvent changeEvent = Pools.obtain(ChangeEvent.class);
+            ChangeEvent changeEvent = Pools.obtain(ChangeEvent::new);
             labelListener.handle(changeEvent);
             Pools.free(changeEvent);
         }
