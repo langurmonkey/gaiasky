@@ -364,7 +364,7 @@ program:
       active: false
       # Color of pointer guides in RGBA.
       color: [ 1.0, 1.0, 1.0, 0.3 ]
-      # Width of pointer guide lines.
+      # Width of pointer guides.
       width: 1.5
   # Recursive grid configuration.
   recursiveGrid:
