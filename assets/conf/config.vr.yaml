@@ -357,7 +357,7 @@ program:
   # Pointer configuration.
   pointer:
     # Display the coordinates of the pointer projected on the sides of the window.
-    coordinates: true
+    coordinates: false
     # Pointer guides configuration.
     guides:
       # Display pointer guides.
