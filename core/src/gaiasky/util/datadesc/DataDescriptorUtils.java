@@ -132,16 +132,16 @@ public class DataDescriptorUtils {
         if (this.fh != null) {
             logger.info("Building data descriptor model from file: " + this.fh.file().toPath());
 
+
             InputStream inputStream;
             try {
                 FileInputStream fis = new FileInputStream(this.fh.file());
-
                 try {
-                    fis = new FileInputStream(this.fh.file());
                     inputStream = new GZIPInputStream(fis);
                 } catch (IOException e) {
                     logger.info("Not a gzipped file, trying uncompressed.");
-                    inputStream = fis;
+                    // Re-open the file to get a fresh, unconsumed stream
+                    inputStream = new FileInputStream(this.fh.file());
                 }
             } catch (FileNotFoundException e) {
                 logger.error("Error reading file: " + this.fh.file().toPath());
