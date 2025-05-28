@@ -12,6 +12,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -80,6 +81,7 @@ public class BatchDownloadWindow extends GenericDialog {
     protected void build() {
         content.clear();
         var info = new OwnLabel(infoString, skin);
+        info.setAlignment(Align.center);
         content.add(info).colspan(2).padBottom(pad34).row();
 
         final var status = new OwnLabel("idle", skin);

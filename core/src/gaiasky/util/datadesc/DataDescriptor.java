@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 public class DataDescriptor {
 
@@ -21,18 +22,26 @@ public class DataDescriptor {
     /** Raw datasets list, where each dataset has a type **/
     public List<DatasetDesc> datasets;
 
+    /** Recommended datasets as an array of keys. **/
+    public String[] recommended;
+
     public boolean updatesAvailable = false;
     public int numUpdates = 0;
 
-    public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets) {
+    public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets, String[] recommended) {
         this.types = types;
         this.datasets = datasets;
+        this.recommended = recommended;
 
         for (DatasetDesc ds : datasets) {
             updatesAvailable = updatesAvailable || ds.outdated;
             if (ds.outdated)
                 numUpdates++;
         }
+
+    }
+    public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets) {
+        this(types, datasets, null);
     }
 
     /**

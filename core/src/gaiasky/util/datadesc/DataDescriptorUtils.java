@@ -156,26 +156,38 @@ public class DataDescriptorUtils {
                 // We don't want repeated elements but want to keep insertion order
                 Set<String> types = new LinkedHashSet<>();
 
-                JsonValue dst = dataDesc.child().child();
-                while (dst != null) {
-                    boolean hasMinGsVersion = dst.has("mingsversion");
-                    int minGsVersion = VersionChecker.correctVersionNumber(dst.getInt("mingsversion", 0));
-                    int thisVersion = dst.getInt("version", 0);
+                // Parse "recommended".
+                var rec = dataDesc.get("recommended");
+                String[] recommended = null;
+                if(rec != null) {
+                    try {
+                        recommended = rec.asStringArray();
+                    } catch(IllegalStateException ignored) {
+                        // Nothing.
+                    }
+                }
+
+                // Parse "files".
+                var item = dataDesc.get("files").child();
+                while (item != null) {
+                    boolean hasMinGsVersion = item.has("mingsversion");
+                    int minGsVersion = VersionChecker.correctVersionNumber(item.getInt("mingsversion", 0));
+                    int thisVersion = item.getInt("version", 0);
 
                     // Only datasets with minGsVersion are supported.
                     // Only datasets with new format in 3.3.1 supported.
                     if (hasMinGsVersion && Settings.SOURCE_VERSION >= minGsVersion && minGsVersion >= 3030100) {
                         // Dataset type
-                        String type = dst.getString("type");
+                        String type = item.getString("type");
 
                         // Check if better option already exists
-                        String dsKey = dst.has("key") ? dst.getString("key") : dst.getString("name");
+                        String dsKey = item.has("key") ? item.getString("key") : item.getString("name");
                         if (bestDs.containsKey(dsKey)) {
                             JsonValue other = bestDs.get(dsKey);
                             int otherVersion = other.getInt("version", 0);
                             if (otherVersion >= thisVersion) {
                                 // Ignore this version
-                                dst = dst.next();
+                                item = item.next();
                                 continue;
                             } else {
                                 // Remove other version, use this
@@ -186,20 +198,20 @@ public class DataDescriptorUtils {
 
                         // Add to map
                         if (typeMap.containsKey(type)) {
-                            typeMap.get(type).add(dst);
+                            typeMap.get(type).add(item);
                         } else {
                             List<JsonValue> aux = new ArrayList<>();
-                            aux.add(dst);
+                            aux.add(item);
                             typeMap.put(type, aux);
                         }
 
                         // Add to set
                         types.add(type);
                         // Add to bestDs
-                        bestDs.put(dsKey, dst);
+                        bestDs.put(dsKey, item);
                     }
                     // Next
-                    dst = dst.next();
+                    item = item.next();
                 }
 
 
@@ -219,7 +231,7 @@ public class DataDescriptorUtils {
                     typesList.add(currentType);
                 }
 
-                DataDescriptor desc = new DataDescriptor(typesList, datasetsList);
+                DataDescriptor desc = new DataDescriptor(typesList, datasetsList, recommended);
                 DataDescriptor.serverDataDescriptor = desc;
                 return desc;
             } catch (Exception e) {

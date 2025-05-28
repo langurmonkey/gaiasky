@@ -530,7 +530,13 @@ public class WelcomeGui extends AbstractGui {
             recommendedDatasetsButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     // Download recommended datasets view.
-                    var recommended = serverDatasets.datasets.stream().filter(ds -> Settings.settings.program.recommendedDatasets.contains(ds.key))
+                    Set<String> recommendedDatasets;
+                    if (serverDatasets.recommended != null && serverDatasets.recommended.length > 0) {
+                        recommendedDatasets = Set.of(serverDatasets.recommended);
+                    } else {
+                        recommendedDatasets = Settings.settings.program.recommendedDatasets;
+                    }
+                    var recommended = serverDatasets.datasets.stream().filter(ds -> recommendedDatasets.contains(ds.key))
                             .sorted(Comparator.comparing(datasetDesc -> datasetDesc.name))
                             .toList();
                     var bdwTitle = I18n.msg("gui.batch.recommended.title");
