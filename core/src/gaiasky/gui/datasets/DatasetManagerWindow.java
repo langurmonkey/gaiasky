@@ -989,7 +989,7 @@ public class DatasetManagerWindow extends GenericDialog {
         ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
             double readMb = (double) read / 1e6d;
             double totalMb = (double) total / 1e6d;
-            final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksumming", nf.format(progress));
+            final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksum.check", nf.format(progress));
             double mbPerSecond = speed / 1000d;
             final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI.
@@ -1002,7 +1002,7 @@ public class DatasetManagerWindow extends GenericDialog {
             String errorMsg = null;
             // Unpack.
             int errors = 0;
-            logger.info("Extracting: " + tempDownload.path());
+            logger.info(I18n.msg("gui.download.extracting", tempDownload.path()));
             String dataLocation = Settings.settings.data.location + File.separatorChar;
             // Checksum.
             if (digest != null && dataset.sha256 != null) {
@@ -1010,22 +1010,22 @@ public class DatasetManagerWindow extends GenericDialog {
                 try {
                     boolean ok = serverDigest.equals(digest);
                     if (ok) {
-                        logger.info("SHA256 ok: " + name);
+                        logger.info(I18n.msg("gui.download.checksum.ok", name));
                     } else {
-                        logger.error("SHA256 check failed: " + name);
-                        errorMsg = "(SHA256 check failed)";
+                        logger.error(I18n.msg("gui.download.checksum.fail", name));
+                        errorMsg = I18n.msg("gui.download.checksum.fail.msg");
                         errors++;
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, -1f);
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.error", name), -1f);
                     }
                 } catch (Exception e) {
-                    logger.info("Error checking SHA256: " + name);
-                    errorMsg = "(SHA256 check failed)";
+                    logger.info(I18n.msg("gui.download.checksum.error", name));
+                    errorMsg = I18n.msg("gui.download.checksum.fail.msg");
                     errors++;
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, -1f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.error", name), -1f);
                 }
             } else {
-                logger.info("No digest found for dataset: " + name);
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "No digest found for dataset: " + name, -1f);
+                logger.info(I18n.msg("gui.download.checksum.notfound", name));
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.notfound", name), -1f);
             }
 
             if (errors == 0) {
@@ -1033,8 +1033,8 @@ public class DatasetManagerWindow extends GenericDialog {
                     // Extract.
                     DatasetDownloadUtils.decompress(tempDownload.path(), new File(dataLocation), dataset);
                 } catch (Exception e) {
-                    logger.error(e, "Error decompressing: " + name);
-                    errorMsg = "(decompressing error)";
+                    logger.error(e, I18n.msg("gui.download.decompress.error", name));
+                    errorMsg = I18n.msg("gui.download.decompress.error.msg");
                     errors++;
                 } finally {
                     // Remove archive.

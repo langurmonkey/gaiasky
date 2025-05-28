@@ -82,8 +82,6 @@ public class WelcomeGui extends AbstractGui {
     private Table datasetsContainer;
     private boolean preventRecommended = false;
 
-    /** The recommended datasets. **/
-    private static final Set<String> recommendedDatasets = Set.of("default-data", "catalog-hipparcos", "catalog-nbg", "catalog-nebulae", "catalog-sdss-12");
 
     /**
      * Creates an initial GUI.
@@ -496,7 +494,7 @@ public class WelcomeGui extends AbstractGui {
                     .padBottom(pad32 * 4f)
                     .row();
 
-            if(numLocalDatasets == 0 && preventRecommended) {
+            if (numLocalDatasets == 0 && preventRecommended) {
                 // Add back button
                 OwnTextIconButton backButton = new OwnTextIconButton(I18n.msg("gui.back"), skin, "back");
                 backButton.addListener(new OwnTextTooltip(I18n.msg("gui.back.prev"), skin, 10));
@@ -532,14 +530,23 @@ public class WelcomeGui extends AbstractGui {
             recommendedDatasetsButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     // Download recommended datasets view.
-                    var recommended = serverDatasets.datasets.stream().filter(ds -> recommendedDatasets.contains(ds.key))
+                    var recommended = serverDatasets.datasets.stream().filter(ds -> Settings.settings.program.recommendedDatasets.contains(ds.key))
                             .sorted(Comparator.comparing(datasetDesc -> datasetDesc.name))
                             .toList();
-
-                    System.out.println("Recommended: ");
-                    recommended.forEach(ds -> System.out.println(ds.name));
-
-                    var bdw = new BatchDownloadWindow("Recommended datasets", skin, stage, recommended, this::startLoading, () -> Gdx.app.exit());
+                    var bdwTitle = I18n.msg("gui.batch.recommended.title");
+                    var bdwInfo = I18n.msg("gui.batch.recommended.info");
+                    var bdw = new BatchDownloadWindow(bdwTitle, bdwInfo, skin, stage, recommended);
+                    bdw.setSuccessRunnable(() -> {
+                        bdw.closeCancel();
+                        bdw.dispose();
+                        startLoading();
+                    });
+                    bdw.setErrorRunnable(() -> {
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.batch.error.global"));
+                        bdw.closeCancel();
+                        bdw.dispose();
+                        reloadView();
+                    });
                     bdw.show(stage);
                     bdw.downloadDatasets();
                 }

@@ -37,21 +37,24 @@ import java.util.function.Consumer;
 public class BatchDownloadWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(BatchDownloadWindow.class);
 
+    private final String infoString;
     private final List<DatasetDesc> datasets;
-    private final Runnable success;
-    private final Runnable error;
     private final DecimalFormat nf;
     private final Set<DatasetWatcher> watchers;
-    private OwnLabel status, speed;
+    /** Runs when all downloads are successful. **/
+    private Runnable success;
+    /** Runs when at least one of the downloads fail. **/
+    private Runnable error;
 
     private final Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
 
-    public BatchDownloadWindow(String title, Skin skin, Stage stage, List<DatasetDesc> datasets, Runnable success, Runnable error) {
+    public BatchDownloadWindow(String title, String info, Skin skin, Stage stage, List<DatasetDesc> datasets, Runnable success, Runnable error) {
         super(title, skin, stage);
         this.nf = new DecimalFormat("##0.0");
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
         this.watchers = new HashSet<>();
 
+        this.infoString = info;
         this.datasets = datasets;
         this.success = success;
         this.error = error;
@@ -61,14 +64,25 @@ public class BatchDownloadWindow extends GenericDialog {
         buildSuper();
     }
 
+    public BatchDownloadWindow(String title, String info, Skin skin, Stage stage, List<DatasetDesc> datasets) {
+        this(title, info, skin, stage, datasets, null, null);
+    }
+
+    public void setErrorRunnable(Runnable r) {
+        this.error = r;
+    }
+
+    public void setSuccessRunnable(Runnable r) {
+        this.success = r;
+    }
+
     @Override
     protected void build() {
         content.clear();
-        var info = new OwnLabel("Downloading recommended datasets. Gaia Sky will start\nautomatically when done. Please wait...", skin);
+        var info = new OwnLabel(infoString, skin);
         content.add(info).colspan(2).padBottom(pad34).row();
 
-        status = new OwnLabel("idle", skin);
-
+        final var status = new OwnLabel("idle", skin);
 
         for (var d : datasets) {
             var name = new OwnLabel(d.name, skin, "header-s");
@@ -121,7 +135,7 @@ public class BatchDownloadWindow extends GenericDialog {
                 return;
             }
         } catch (IOException e) {
-            logger.warn("Error getting file store for temp dir: " + tempDir);
+            logger.warn(I18n.msg("gui.batch.error.filestore", tempDir));
         }
 
         String name = dataset.name;
@@ -148,7 +162,7 @@ public class BatchDownloadWindow extends GenericDialog {
         ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
             double readMb = (double) read / 1e6d;
             double totalMb = (double) total / 1e6d;
-            final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksumming", nf.format(progress));
+            final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksum.check", nf.format(progress));
             double mbPerSecond = speed / 1000d;
             final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI.
@@ -161,30 +175,30 @@ public class BatchDownloadWindow extends GenericDialog {
             String errorMsg = null;
             // Unpack.
             int errors = 0;
-            logger.info("Extracting: " + tempDownload.path());
+            logger.info(I18n.msg("gui.download.extracting", tempDownload.path()));
             String dataLocation = Settings.settings.data.location + File.separatorChar;
             // Checksum.
             if (digest != null && dataset.sha256 != null) {
                 String serverDigest = dataset.sha256;
                 try {
-                    boolean ok = serverDigest.equals(digest);
+                    final var ok = serverDigest.equals(digest);
                     if (ok) {
-                        logger.info("SHA256 ok: " + name);
+                        logger.info(I18n.msg("gui.download.checksum.ok", name));
                     } else {
-                        logger.error("SHA256 check failed: " + name);
-                        errorMsg = "(SHA256 check failed)";
+                        logger.error(I18n.msg("gui.download.checksum.fail", name));
+                        errorMsg = I18n.msg("gui.download.checksum.fail.msg");
                         errors++;
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, -1f);
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.error", name), -1f);
                     }
                 } catch (Exception e) {
-                    logger.info("Error checking SHA256: " + name);
-                    errorMsg = "(SHA256 check failed)";
+                    logger.info(I18n.msg("gui.download.checksum.error", name));
+                    errorMsg = I18n.msg("gui.download.checksum.fail.msg");
                     errors++;
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, -1f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.error", name), -1f);
                 }
             } else {
-                logger.info("No digest found for dataset: " + name);
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "No digest found for dataset: " + name, -1f);
+                logger.info(I18n.msg("gui.download.checksum.notfound", name));
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.notfound", name), -1f);
             }
 
             if (errors == 0) {
@@ -192,8 +206,8 @@ public class BatchDownloadWindow extends GenericDialog {
                     // Extract.
                     DatasetDownloadUtils.decompress(tempDownload.path(), new File(dataLocation), dataset);
                 } catch (Exception e) {
-                    logger.error(e, "Error decompressing: " + name);
-                    errorMsg = "(decompressing error)";
+                    logger.error(e, I18n.msg("gui.download.decompress.error", name));
+                    errorMsg = I18n.msg("gui.download.decompress.error.msg");
                     errors++;
                 } finally {
                     // Set to 100% completion.
@@ -224,6 +238,10 @@ public class BatchDownloadWindow extends GenericDialog {
                     setStatusError(dataset, errorMessage);
                     currentDownloads.remove(dataset.key);
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), -1f);
+                    // Main error runnable.
+                    if (error != null) {
+                        error.run();
+                    }
                 }
             });
 

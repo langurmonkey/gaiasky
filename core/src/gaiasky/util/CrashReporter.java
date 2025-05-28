@@ -234,7 +234,7 @@ public class CrashReporter {
             strArray.add(cp.getPhysicalProcessorCount() + " physical CPU core(s)");
             int nLp = cp.getLogicalProcessorCount();
             strArray.add(nLp + " logical CPU(s)");
-        } catch (Error e) {
+        } catch (Exception ignored) {
             strArray.add("Could not get CPU information!");
         }
 

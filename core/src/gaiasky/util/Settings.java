@@ -2330,6 +2330,7 @@ public class Settings extends SettingsObject {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ProgramSettings extends SettingsObject implements IObserver {
+        /** Is the program running in safe mode? **/
         public boolean safeMode;
         /**
          * Flag to mark whether safe mode is activated via command line argument.
@@ -2356,6 +2357,10 @@ public class Settings extends SettingsObject {
         public UpdateSettings update;
         public UrlSettings url;
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
+
+        /** The recommended datasets, as a list of keys. **/
+        @JsonIgnore
+        public final Set<String> recommendedDatasets = Set.of("default-data", "catalog-hipparcos", "catalog-nbg", "catalog-nebulae", "catalog-sdss-12");
 
         @JsonIgnore
         public String getDefaultLocale() {
