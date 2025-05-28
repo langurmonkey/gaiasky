@@ -499,7 +499,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(VSOP87Binary.class, new VSOP87Loader(dataResolver));
 
         // Init global resources -- Can't be postponed!
-        this.globalResources = new GlobalResources(assetManager);
+        this.globalResources = new GlobalResources();
 
         // Initialise master manager.
         MasterManager.initialize();
@@ -978,6 +978,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 gui.dispose();
             guis.clear();
         }
+
+        globalResources.initialize(assetManager);
 
         mainGui = new FullGui(globalResources.getSkin(), graphics, unitsPerPixel, globalResources);
         mainGui.initialize(assetManager, globalResources.getSpriteBatch());

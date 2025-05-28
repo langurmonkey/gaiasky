@@ -77,7 +77,8 @@ public class GlobalResources {
         nfSci = new DecimalFormat("0.###E0");
     }
 
-    public GlobalResources(AssetManager manager) {
+    public GlobalResources() {
+        textures = new HashMap<>();
         // Shape shader
         this.shapeShader = new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl"));
         if (!shapeShader.isCompiled()) {
@@ -100,9 +101,10 @@ public class GlobalResources {
         this.extSpriteBatch = new ExtSpriteBatch(1000, getExtSpriteShader());
 
         updateSkin();
+    }
 
+    public void initialize(AssetManager manager) {
         /* TEXTURES */
-        textures = new HashMap<>();
         TextureLoader.TextureParameter params = new TextureLoader.TextureParameter();
         params.minFilter = TextureFilter.Linear;
         params.magFilter = TextureFilter.Linear;
@@ -689,7 +691,7 @@ public class GlobalResources {
             combinations.add(defines.toString());
         }
 
-        return combinations.toArray(String.class);
+        return combinations.toArray(String[]::new);
     }
 
     public static String nObjectsToString(long objects) {
