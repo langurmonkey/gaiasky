@@ -274,7 +274,7 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the frames directory.
+     * Gets a file pointer to the frames' directory.
      *
      * @return A pointer to the Gaia Sky frames directory.
      */
@@ -292,7 +292,7 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the mappings directory.
+     * Gets a file pointer to the mappings' directory.
      *
      * @return A pointer to the Gaia Sky mappings directory.
      */
@@ -319,9 +319,9 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the mpcdi directory.
+     * Gets a file pointer to the MPCDI directory.
      *
-     * @return A pointer to the Gaia Sky mpcdi directory.
+     * @return A pointer to the Gaia Sky MPCDI directory.
      */
     public static Path getDefaultMpcdiDir() {
         return getDataDir().resolve(MPCDI_DIR_NAME);
@@ -339,7 +339,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the crash reports directory, where crash reports are stored.
      *
-     * @return A pointer to the crash reports directory.
+     * @return A pointer to the crash reports' directory.
      */
     public static Path getCrashReportsDir() {
         return getDataDir().resolve(CRASHREPORTS_DIR_NAME);
@@ -392,7 +392,7 @@ public class SysUtils {
     }
 
     /**
-     * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
+     * Returns the default data directory. That is <code>~/.gaiasky/</code> in Windows and macOS, and <code>~/.local/share/gaiasky</code>
      * in Linux.
      *
      * @return Default data directory.
@@ -406,9 +406,8 @@ public class SysUtils {
     }
 
     /**
-     * Returns the default cache directory, for non-essential data. This is ~/.gaiasky/ in Windows and macOS, and
-     * ~/.cache/gaiasky
-     * in Linux.
+     * Returns the default cache directory, for non-essential data. This is <code>~/.gaiasky/</code> in Windows and macOS, and
+     * <code>~/.cache/gaiasky</code> in Linux.
      *
      * @return The default cache directory.
      */
@@ -421,8 +420,8 @@ public class SysUtils {
     }
 
     /**
-     * Returns the default shader cache directory. This is ~/.gaiasky/shadercache/ in Windows and macOS, and
-     * ~/.cache/gaiasky/shadercache/ in Linux.
+     * Returns the default shader cache directory. This is <code>~/.gaiasky/shadercache/</code> in Windows and macOS, and
+     * <code>~/.cache/gaiasky/shadercache/</code> in Linux.
      *
      * @return The default shader cache directory.
      */
@@ -517,7 +516,7 @@ public class SysUtils {
      * release notes version. This file is typically in the
      * configuration directory.
      *
-     * @return Path to the release notes revision file
+     * @return Path to the release notes revision file.
      */
     public static Path getReleaseNotesRevisionFile() {
         return getConfigDir().resolve(".releasenotes.rev");
