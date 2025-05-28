@@ -334,7 +334,7 @@ public class WelcomeGui extends AbstractGui {
                 .row();
 
 
-        final int numLocalDatasets = localDatasets.get().datasets.size();
+        final int numLocalDatasets = localDatasets.get().datasets.size() + (baseDataPresent ? 1 : 0);
         final boolean regularStart = numLocalDatasets > 0 || preventRecommended;
 
         if (regularStart) {
