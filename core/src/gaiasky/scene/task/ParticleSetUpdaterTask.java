@@ -74,7 +74,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     }
 
     /** Contains the stage that needs to be run next for this updater. **/
-    private UpdateStage stage;
+    private final ThreadLocal<UpdateStage> stage;
 
     /** Nested class holding the brightness lookup table. **/
     private static class StarBrightness {
@@ -97,7 +97,8 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
         this.buffer = new TopNBuffer(this.particleSet.indices.length);
-        this.stage = SORT1;
+        this.stage = new ThreadLocal<>();
+        this.stage.set(SORT1);
         this.executor = GaiaSky.instance.getExecutorService();
 
         if (particleSet.isStars) {
@@ -125,7 +126,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         var pointData = particleSet.pointData;
         if (pointData != null && !pointData.isEmpty() && pointData.getFirst()
                 .names() != null) {
-            switch (stage) {
+            switch (stage.get()) {
                 case METADATA -> {
                     if (base.opacity > 0
                             && ((particleSet.lastSortCameraPos.dst2D(camera.getPos()) > CAM_DX_TH_SQ)
@@ -144,16 +145,16 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     public void run() {
         var time = GaiaSky.instance.time;
         var camera = GaiaSky.instance.getICamera();
-        switch (stage) {
+        switch (stage.get()) {
             case METADATA -> {
                 // Compute metadata -- brightness proxy for every star.
-                stage = BUSY;
+                stage.set(BUSY);
                 updateMetadataConsumer.accept(time, camera);
-                stage = SORT1;
+                stage.set(SORT1);
             }
             case SORT1 -> {
                 // Get K-brightest star indices -- first half.
-                stage = BUSY;
+                stage.set(BUSY);
 
                 var totalCount = particleSet.pointData.size();
                 var metadata = particleSet.metadata;
@@ -167,11 +168,11 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                     buffer.add(i, metadata[i]);
                 }
 
-                stage = SORT2;
+                stage.set(SORT2);
             }
             case SORT2 -> {
                 // Get K-brightest star indices -- second half.
-                stage = BUSY;
+                stage.set(BUSY);
 
                 var totalCount = particleSet.pointData.size();
                 var metadata = particleSet.metadata;
@@ -192,7 +193,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 GaiaSky.postRunnable(() -> {
                     particleSet.lastSortCameraPos.set(camera.getPos());
                     particleSet.lastSortTime = GaiaSky.instance.getT();
-                    stage = METADATA;
+                    stage.set(METADATA);
                 });
             }
         }
