@@ -254,9 +254,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private OpenXRListener openXRListener;
 
-    private double DIST_A;
-    private double DIST_B;
-    private double DIST_C;
+    private double DIST_SMOOTH_UP;
     private double MAX_ALLOWED_DISTANCE;
 
     private SpriteBatch spriteBatch;
@@ -342,9 +340,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         freeTargetPos = new Vector3Q();
         freeTargetOn = false;
 
-        DIST_A = 0.1 * Constants.PC_TO_U;
-        DIST_B = 5.0 * Constants.KPC_TO_U;
-        DIST_C = 5000.0 * Constants.MPC_TO_U;
+        DIST_SMOOTH_UP = 5000.0 * Constants.MPC_TO_U;
         MAX_ALLOWED_DISTANCE = 50_000.0 * Constants.MPC_TO_U;
 
         // Mouse and keyboard listeners.
@@ -1298,7 +1294,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return distance;
     }
 
-    private double previousStarClosestDistance = -1;
     /**
      * For stars, we implement a smoothing radius.
      *
@@ -1314,14 +1309,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         double dist0Scale = 1.0E4;
         double dist1Scale = 1.5E7;
-        var closestDist = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
-        if(previousStarClosestDistance < 0) {
-            previousStarClosestDistance = closestDist;
-        }
-        previousStarClosestDistance = MathUtilsDouble.lowPass(closestDist, previousStarClosestDistance, 10.0);
-        return previousStarClosestDistance;
+        return computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
     }
 
+    private double previousDistance = -1;
     /**
      * The speed scaling function.
      *
@@ -1334,10 +1325,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         var closestBodyDistance = getClosestBodyDistance();
         var closestStarDistance = getClosestStarDistance();
 
-        final var dist = FastMath.min(focusDistance, FastMath.min(closestBodyDistance, closestStarDistance));
-        final var distanceMap = MathUtilsDouble.flint(dist, 0, DIST_C, 0, 2e16);
+        var dist = FastMath.min(focusDistance, FastMath.min(closestBodyDistance, closestStarDistance));
+        previousDistance = MathUtilsDouble.lowPass(dist, previousDistance, 10.0);
+        final var distanceMap = MathUtilsDouble.flint(previousDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 
-        return dist >= 0 ? (Math.max(distanceMap, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
+        return previousDistance >= 0 ? (Math.max(distanceMap, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
     }
 
     /**
@@ -1546,9 +1538,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             case NEW_DISTANCE_SCALE_FACTOR -> {
                 synchronized (updateLock) {
-                    DIST_A = 0.1 * Constants.PC_TO_U;
-                    DIST_B = 5.0 * Constants.KPC_TO_U;
-                    DIST_C = 5000.0 * Constants.MPC_TO_U;
+                    DIST_SMOOTH_UP = 5000.0 * Constants.MPC_TO_U;
                     MAX_ALLOWED_DISTANCE = 50_000.0 * Constants.MPC_TO_U;
                 }
             }

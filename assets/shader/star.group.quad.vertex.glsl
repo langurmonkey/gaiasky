@@ -58,7 +58,7 @@ out vec2 v_uv;
 
 void main() {
     // Lengths
-    float l0 = LEN0;
+    float l0 = LEN0 * u_vrScale;
     float l1 = l0 * 1e3;
 
     vec3 particlePos = a_starPos.xyz;
