@@ -45,7 +45,7 @@ import static gaiasky.scene.task.ParticleSetUpdaterTask.UpdateStage.*;
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
     // Minimum amount of time [s] between two update calls
-    protected static final double UPDATE_INTERVAL_S = 2.0;
+    protected static final double UPDATE_INTERVAL_S = 0.6;
     protected static final double UPDATE_INTERVAL_S_2 = UPDATE_INTERVAL_S * 2.0;
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;

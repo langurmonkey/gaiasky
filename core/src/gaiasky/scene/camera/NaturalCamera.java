@@ -1298,6 +1298,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return distance;
     }
 
+    private double previousStarClosestDistance = -1;
     /**
      * For stars, we implement a smoothing radius.
      *
@@ -1311,7 +1312,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 proximity.effective[0].getClosestDistToCamera() + MIN_DIST
                 : 1.0e40;
 
-        return computeDistanceScale(distance, radius * 1.0E4, radius * 1.5E7);
+        double dist0Scale = 1.0E4;
+        double dist1Scale = 1.5E7;
+        var closestDist = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
+        if(previousStarClosestDistance < 0) {
+            previousStarClosestDistance = closestDist;
+        }
+        previousStarClosestDistance = MathUtilsDouble.lowPass(closestDist, previousStarClosestDistance, 10.0);
+        return previousStarClosestDistance;
     }
 
     /**
