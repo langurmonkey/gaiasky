@@ -1294,22 +1294,25 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return distance;
     }
 
+    private double previousStarDistance = -1;
     /**
      * For stars, we implement a smoothing radius.
      *
      * @return The minimum distance to a star, with a smoothing radius.
      */
     private double getClosestStarDistance() {
-        var radius = proximity.effective[0] != null ?
-                proximity.effective[0].getRadius()
-                : 1.0e40;
-        var distance = proximity.effective[0] != null ?
-                proximity.effective[0].getClosestDistToCamera() + MIN_DIST
-                : 1.0e40;
+        var star = proximity.effective[0];
+        if (star == null) return 1.0e40;
+
+        var radius = star.getRadius();
+        var distance = star.getClosestDistToCamera() + MIN_DIST;
 
         double dist0Scale = 1.0E4;
-        double dist1Scale = 1.5E7;
-        return computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
+        double dist1Scale = 1.0E8;
+        double rawDistance = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
+
+        previousStarDistance = MathUtilsDouble.lowPass(rawDistance, previousStarDistance, 5.0); // smooth over ~5 frames
+        return previousStarDistance;
     }
 
     private double previousDistance = -1;
@@ -1326,7 +1329,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         var closestStarDistance = getClosestStarDistance();
 
         var dist = FastMath.min(focusDistance, FastMath.min(closestBodyDistance, closestStarDistance));
-        previousDistance = MathUtilsDouble.lowPass(dist, previousDistance, 10.0);
+        double smoothing = (dist < previousDistance) ? 10.0 : 5.0;
+        previousDistance = MathUtilsDouble.lowPass(dist, previousDistance, smoothing);
         final var distanceMap = MathUtilsDouble.flint(previousDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 
         return previousDistance >= 0 ? (Math.max(distanceMap, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
