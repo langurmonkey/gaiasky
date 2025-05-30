@@ -48,8 +48,8 @@ import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
@@ -315,7 +315,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                            ShaderProgram shapeShader) {
         if (vr) {
             camera = new PerspectiveCamera(Settings.settings.scene.camera.fov, Settings.settings.graphics.backBufferResolution[0],
-                    Settings.settings.graphics.backBufferResolution[1]);
+                                           Settings.settings.graphics.backBufferResolution[1]);
         } else {
             camera = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
@@ -368,12 +368,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         // FOCUS_MODE is changed from GUI.
         EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD,
-                Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD,
-                Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN,
-                Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD,
-                Event.FREE_MODE_COORD_CMD, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD,
-                Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO,
-                Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
+                                        Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD,
+                                        Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN,
+                                        Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD,
+                                        Event.FREE_MODE_COORD_CMD, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD,
+                                        Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO,
+                                        Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
     }
 
     @Override
@@ -518,7 +518,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                         if (!vr) {
                             if (!diverted && !surfaceModeFlag.get()) {
-                                directionToTarget(dt, aux4b, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3f : 1e2f));
+                                directionToTarget(dt,
+                                                  aux4b,
+                                                  Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3f : 1e2f));
                             } else {
                                 updateRotationFree(dt, Settings.settings.scene.camera.turn);
                             }
@@ -561,8 +563,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         appMagEarth = computeFocusApparentMagnitudeEarth();
                     }
 
-                    EventManager.publish(Event.FOCUS_INFO_UPDATED, this, focus.getDistToCamera() - focus.getRadius(), focus.getSolidAngle(), focus.getAlpha(),
-                            focus.getDelta(), focus.getAbsolutePosition(aux2b).lenDouble() - focus.getRadius(), appMagCamera, appMagEarth);
+                    EventManager.publish(Event.FOCUS_INFO_UPDATED,
+                                         this,
+                                         focus.getDistToCamera() - focus.getRadius(),
+                                         focus.getSolidAngle(),
+                                         focus.getAlpha(),
+                                         focus.getDelta(),
+                                         focus.getAbsolutePosition(aux2b).lenDouble() - focus.getRadius(),
+                                         appMagCamera,
+                                         appMagEarth);
                 } else {
                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                 }
@@ -590,7 +599,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     if (!vr) {
                         // If target is present, update direction
                         if (freeTargetOn) {
-                            directionToTarget(dt, freeTargetPos, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3d : 1e2d));
+                            directionToTarget(dt,
+                                              freeTargetPos,
+                                              Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3d : 1e2d));
                             if (facingFocus) {
                                 freeTargetOn = false;
                             }
@@ -1014,7 +1025,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             double elevation =
                     closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / FastMath.max(4.0,
-                            20.0 - Settings.settings.scene.renderer.elevation.multiplier);
+                                                                                                         20.0 - Settings.settings.scene.renderer.elevation.multiplier);
             double newDist = aux5b.scl(-1).add(pos).lenDouble();
             if (newDist < elevation) {
                 aux5b.nor().scl(elevation - newDist);
@@ -1251,12 +1262,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Computes the final distance to use for the speed scaling, given the closest object's radius and distance. This method takes into account
      * the focus object if the camera is in focus mode, and creates a smoothing function between the distance of the closest object and that of the focus.
      *
-     * @param radius   The radius of the closest object.
-     * @param distance The distance to the closest object.
+     * @param distance           The distance to the closest object.
+     * @param smoothingDistance0 First interpolation distance for smoothing.
+     * @param smoothingDistance1 Second interpolation distance for smoothing.
      *
      * @return The distance scale to compute the camera speed scaling factor.
      */
-    private double computeDistanceScale(double radius, double distance, double smoothingDistance0, double smoothingDistance1) {
+    private double computeDistanceScale(double distance, double smoothingDistance0, double smoothingDistance1) {
         if (getMode().isFocus()) {
             var focusDistance = focus.getDistToCamera() + MIN_DIST;
             // Compute interpolation value between focus and closest star.
@@ -1299,7 +1311,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 proximity.effective[0].getClosestDistToCamera() + MIN_DIST
                 : 1.0e40;
 
-        return computeDistanceScale(radius, distance, radius * 1.0E4, radius * 1.0E8);
+        return computeDistanceScale(distance, radius * 1.0E4, radius * 1.5E7);
     }
 
     /**
@@ -1314,19 +1326,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         var closestBodyDistance = getClosestBodyDistance();
         var closestStarDistance = getClosestStarDistance();
 
-        final double dist = FastMath.min(focusDistance, FastMath.min(closestBodyDistance, closestStarDistance));
-
-        final double distanceMap;
-        if (dist < DIST_A) {
-            // d < 0.1 pc
-            distanceMap = MathUtilsDouble.flint(dist, 0, DIST_A, 0, 1e6);
-        } else if (dist < DIST_B) {
-            // 0.1 pc < d < 5 Kpc
-            distanceMap = MathUtilsDouble.flint(dist, DIST_A, DIST_B, 1e6, 1e10);
-        } else {
-            // d > 5 Kpc
-            distanceMap = MathUtilsDouble.flint(dist, DIST_B, DIST_C, 1e10, 2e16);
-        }
+        final var dist = FastMath.min(focusDistance, FastMath.min(closestBodyDistance, closestStarDistance));
+        final var distanceMap = MathUtilsDouble.flint(dist, 0, DIST_C, 0, 2e16);
 
         return dist >= 0 ? (Math.max(distanceMap, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
     }
@@ -1904,7 +1905,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         Vector3D pos = aux5;
         p.put(pos);
         DecalUtils.drawSprite(sprite, batch, (float) pos.x, (float) pos.y, (float) pos.z, 0.0008d,
-                1f, this, true, 0.04f, 0.04f);
+                              1f, this, true, 0.04f, 0.04f);
     }
 
     private void drawCrossHair(SpriteBatch batch,
@@ -1927,12 +1928,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             } else {
                 if (!focusMode) {
                     drawCrossHair(chFocus.getClosestAbsolutePos(aux1b).add(posInv), chFocus.getClosestDistToCamera(),
-                            chFocus.getRadius(), crosshairSprite.getTexture(), crosshairScale,
-                            arrowTex, rw, rh, r, g, b, a);
+                                  chFocus.getRadius(), crosshairSprite.getTexture(), crosshairScale,
+                                  arrowTex, rw, rh, r, g, b, a);
                 } else {
                     drawCrossHair(chFocus.getAbsolutePosition(aux1b).add(posInv), chFocus.getDistToCamera(),
-                            chFocus.getRadius(), crosshairSprite.getTexture(), crosshairScale, arrowTex,
-                            rw, rh, r, g, b, a);
+                                  chFocus.getRadius(), crosshairSprite.getTexture(), crosshairScale, arrowTex,
+                                  rw, rh, r, g, b, a);
                 }
             }
         }
@@ -2000,8 +2001,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     spriteBatch.draw(arrowTex, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
                 } else {
                     aux2f2.set(auxf1.x - (rw / 2f), auxf1.y - (rh / 2f));
-                    spriteBatch.draw(arrowTex, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90f + aux2f2.angleDeg(), 0, 0, (int) chw, (int) chh, false,
-                            false);
+                    spriteBatch.draw(arrowTex,
+                                     auxf1.x - chw2,
+                                     auxf1.y - chh2,
+                                     chw2,
+                                     chh2,
+                                     chw,
+                                     chh,
+                                     1f,
+                                     1f,
+                                     -90f + aux2f2.angleDeg(),
+                                     0,
+                                     0,
+                                     (int) chw,
+                                     (int) chh,
+                                     false,
+                                     false);
                 }
             }
         }
