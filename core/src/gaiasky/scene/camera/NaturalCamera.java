@@ -1294,7 +1294,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return distance;
     }
 
-    private double previousStarDistance = -1;
+    private double smoothedStarDistance = -1;
     /**
      * For stars, we implement a smoothing radius.
      *
@@ -1311,11 +1311,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double dist1Scale = 1.0E8;
         double rawDistance = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
 
-        previousStarDistance = MathUtilsDouble.lowPass(rawDistance, previousStarDistance, 5.0); // smooth over ~5 frames
-        return previousStarDistance;
+        smoothedStarDistance = MathUtilsDouble.lowPass(rawDistance, smoothedStarDistance, 5.0); // smooth over ~5 frames
+        return smoothedStarDistance;
     }
 
-    private double previousDistance = -1;
+    private double smoothedDistance = -1;
     /**
      * The speed scaling function.
      *
@@ -1328,12 +1328,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         var closestBodyDistance = getClosestBodyDistance();
         var closestStarDistance = getClosestStarDistance();
 
-        var dist = FastMath.min(focusDistance, FastMath.min(closestBodyDistance, closestStarDistance));
-        double smoothing = (dist < previousDistance) ? 10.0 : 5.0;
-        previousDistance = MathUtilsDouble.lowPass(dist, previousDistance, smoothing);
-        final var distanceMap = MathUtilsDouble.flint(previousDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
+        double dist = FastMath.min(closestStarDistance, FastMath.min(closestBodyDistance, focusDistance));
+        double smoothing = (dist < smoothedDistance) ? 10.0 : 5.0;
+        smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, smoothing);
+        final var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 
-        return previousDistance >= 0 ? (Math.max(distanceMap, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
+        return smoothedDistance >= 0 ? (Math.max(distanceMap, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
     }
 
     /**

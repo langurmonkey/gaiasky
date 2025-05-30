@@ -53,16 +53,21 @@ public final class MathUtilsDouble {
     static public double cos(double radians) {
         return Sin.table[(int) ((radians + PI / 2) * radToIndex) & SIN_MASK];
     }
-    /** Returns the sine in degrees from a lookup table. For optimal precision, use degrees between -360 and 360 (both
-     * inclusive). */
-    static public double sinDeg (double degrees) {
-        return Sin.table[(int)(degrees * degToIndex) & SIN_MASK];
+
+    /**
+     * Returns the sine in degrees from a lookup table. For optimal precision, use degrees between -360 and 360 (both
+     * inclusive).
+     */
+    static public double sinDeg(double degrees) {
+        return Sin.table[(int) (degrees * degToIndex) & SIN_MASK];
     }
 
-    /** Returns the cosine in degrees from a lookup table. For optimal precision, use degrees between -360 and 360 (both
-     * inclusive). */
-    static public double cosDeg (double degrees) {
-        return Sin.table[(int)((degrees + 90) * degToIndex) & SIN_MASK];
+    /**
+     * Returns the cosine in degrees from a lookup table. For optimal precision, use degrees between -360 and 360 (both
+     * inclusive).
+     */
+    static public double cosDeg(double degrees) {
+        return Sin.table[(int) ((degrees + 90) * degToIndex) & SIN_MASK];
     }
 
     /**
@@ -219,6 +224,7 @@ public final class MathUtilsDouble {
      * Fast sqrt method. Default passes it through one round of Newton's method
      *
      * @param value The value
+     *
      * @return The square root value
      */
     static public double sqrt(double value) {
@@ -239,6 +245,33 @@ public final class MathUtilsDouble {
         return x * (1.0 - a) + y * a;
     }
 
+    /**
+     * Returns a soft minimum between two values, biased toward the lower one.
+     * The {@code weight} controls how strongly the result is pulled toward the minimum.
+     *
+     * @param a      First value.
+     * @param b      Second value.
+     * @param weight The interpolation factor. 0 returns {@code a}, 1 returns {@code min(a, b)}.
+     *
+     * @return A softly biased minimum of {@code a} and {@code b}.
+     */
+    public static double softMin(double a, double b, double weight) {
+        return lerp(a, FastMath.min(a, b), weight);
+    }
+
+    /**
+     * Linearly interpolates between two values.
+     *
+     * @param a The start value.
+     * @param b The end value.
+     * @param t The interpolation factor, typically in the range [0, 1].
+     *          A value of 0 returns {@code a}, a value of 1 returns {@code b}, and values in between interpolate linearly.
+     *
+     * @return The interpolated value between {@code a} and {@code b}.
+     */
+    public static double lerp(double a, double b, double t) {
+        return a + t * (b - a);
+    }
 
     /**
      * Fast linear interpolation. If you can guarantee that x0 &le; x1, then use this.
@@ -248,6 +281,7 @@ public final class MathUtilsDouble {
      * @param x1 Superior limit to the independent value.
      * @param y0 Inferior limit to the dependent value.
      * @param y1 Superior limit to the dependent value.
+     *
      * @return The interpolated value.
      */
     public static double flint(double x,
@@ -273,6 +307,7 @@ public final class MathUtilsDouble {
      * @param x1 Superior limit to the independent value.
      * @param y0 Inferior limit to the dependent value.
      * @param y1 Superior limit to the dependent value.
+     *
      * @return The interpolated value.
      */
     public static double lint(double x,
@@ -305,6 +340,7 @@ public final class MathUtilsDouble {
      * @param x1 Superior limit to the independent value.
      * @param y0 Inferior limit to the dependent value.
      * @param y1 Superior limit to the dependent value.
+     *
      * @return The interpolated value
      */
     public static float lint(float x,
@@ -337,6 +373,7 @@ public final class MathUtilsDouble {
      * @param x1 Superior limit to the independent value.
      * @param y0 Inferior limit to the dependent value.
      * @param y1 Superior limit to the dependent value.
+     *
      * @return The interpolated value
      */
     public static float lint(long x,
@@ -370,6 +407,7 @@ public final class MathUtilsDouble {
      * @param x1 The first segment delimiter.
      * @param x2 The second segment delimiter.
      * @param x0 The point.
+     *
      * @return The Euclidean distance between the segment (x1, x2)
      */
     public static double distancePointSegment(double x1,
@@ -434,6 +472,7 @@ public final class MathUtilsDouble {
      *
      * @param value  The value to round
      * @param places The number of decimal places
+     *
      * @return The rounded value
      */
     public static double roundAvoid(double value,
@@ -471,7 +510,9 @@ public final class MathUtilsDouble {
      *
      * @param a      angle to normalize
      * @param center center of the desired 2&pi; interval for the result
+     *
      * @return a-2k&pi; with integer k and center-&pi; &lt;= a-2k&pi; &lt;= center+&pi;
+     *
      * @since 1.2
      */
     public static double normalizeAngle(double a,
@@ -514,6 +555,7 @@ public final class MathUtilsDouble {
      * @param newValue      The new value.
      * @param smoothedValue The previous smoothed value.
      * @param smoothing     The smoothing factor.
+     *
      * @return The new value with a low-pass filter applied.
      */
     public static double lowPass(double newValue, double smoothedValue, double smoothing) {
@@ -531,6 +573,7 @@ public final class MathUtilsDouble {
      * @param newValue      The new value.
      * @param smoothedValue The previous smoothed value.
      * @param smoothing     The smoothing factor.
+     *
      * @return The new value with a low-pass filter applied.
      */
     public static float lowPass(float newValue, float smoothedValue, float smoothing) {
@@ -557,6 +600,7 @@ public final class MathUtilsDouble {
      *
      * @param x    The value to sample, in [0, 1].
      * @param span The span of the function. The value gets re-mapped using this span.
+     *
      * @return The logistic sigmoid function.
      */
     public static double logisticSigmoid(double x, double span) {
