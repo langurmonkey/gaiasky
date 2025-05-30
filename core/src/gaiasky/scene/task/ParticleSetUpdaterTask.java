@@ -43,10 +43,6 @@ import static gaiasky.scene.task.ParticleSetUpdaterTask.UpdateStage.*;
  * </ul>
  */
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
-
-    // Minimum amount of time [s] between two update calls
-    protected static final double UPDATE_INTERVAL_S = 0.1;
-    protected static final double UPDATE_INTERVAL_S_2 = UPDATE_INTERVAL_S * 2.0;
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
     protected static final double CAM_DX_TH_SQ = CAM_DX_TH * CAM_DX_TH;
@@ -127,15 +123,13 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
      */
     public void update(ICamera camera) {
         var pointData = particleSet.pointData;
-        if (pointData != null && !pointData.isEmpty() && pointData.get(0)
+        if (pointData != null && !pointData.isEmpty() && pointData.getFirst()
                 .names() != null) {
-            double t = GaiaSky.instance.getT() - particleSet.lastSortTime;
             switch (stage) {
                 case METADATA -> {
                     if (base.opacity > 0
-                            && (t > UPDATE_INTERVAL_S_2
-                            || (particleSet.lastSortCameraPos.dst2D(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
-                            || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_S))) {
+                            && ((particleSet.lastSortCameraPos.dst2D(camera.getPos()) > CAM_DX_TH_SQ)
+                            || (GaiaSky.instance.time.getWarpFactor() > 1.0e12))) {
                         executor.execute(this);
                     }
                 }
