@@ -1339,6 +1339,8 @@ public class Settings extends SettingsObject {
             public float fov;
             public boolean cinematic;
             public boolean targetMode;
+            /** Also use distance to closest star to compute camera velocity scale factor. **/
+            public boolean starDistanceScaling = true;
             public FocusSettings focusLock;
 
             @JsonProperty("speedLimitIndex")

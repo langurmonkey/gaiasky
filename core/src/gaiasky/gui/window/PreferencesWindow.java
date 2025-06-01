@@ -62,6 +62,9 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
+/**
+ * The preferences window exposes the system settings to the user.
+ */
 public class PreferencesWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(PreferencesWindow.class);
 
@@ -99,7 +102,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox ssr;
     private OwnCheckBox eclipses;
     private OwnCheckBox eclipseOutlines;
-    private OwnCheckBox starSpheres;
+    private OwnCheckBox starSpheres, starDistanceScaling;
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
@@ -1317,8 +1320,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        labels.add(textureIndexLabel, starSpheresLabel, lightGlowLabel);
+        // Star distance to compute camera speed scaling
+        OwnLabel starDistanceScalingLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.distance.scaling"), skin);
+        starDistanceScaling = new OwnCheckBox("", skin);
+        starDistanceScaling.setChecked(settings.scene.camera.starDistanceScaling);
 
+        // Add labels
+        labels.add(textureIndexLabel, starSpheresLabel, starDistanceScalingLabel, lightGlowLabel);
+
+        // Add to table
         starsTable.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(lightGlow).left().padRight(pad18).padBottom(pad10).row();
         if (textureIndex != null) {
@@ -1327,6 +1337,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
+        starsTable.add(starDistanceScalingLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(starDistanceScaling).left().padRight(pad18).padBottom(pad10).row();
 
         // Add to content
         addContentGroup(contentSceneTable, titleStars, starsTable);
@@ -2976,6 +2988,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Star spheres
         settings.scene.star.renderStarSpheres = starSpheres.isChecked();
+
+        // Star distance scaling
+        settings.scene.camera.starDistanceScaling = starDistanceScaling.isChecked();
 
         // Star texture index
         if (textureIndex != null && settings.scene.star.textureIndex != textureIndex.getSelected().value) {

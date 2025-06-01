@@ -1374,9 +1374,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The minimum distance to a star, with a smoothing radius.
      */
     private double getClosestStarDistance() {
-        if (vr) {
-            // In VR, traversing the star field with speed scaling depending on the closest star is actually not good.
-            // Speed jumps after metadata updates are too noticeable. Hence, we discard star distances in VR.
+        if (!Settings.settings.scene.camera.starDistanceScaling) {
+            // Do not use star distance to compute velocity scaling.
+            // Some times, traversing the star field with speed scaling depending on the closest star is actually not good.
+            // Speed jumps after metadata updates are too noticeable.
             return Double.MAX_VALUE;
         } else {
             var star = proximity.effective[0];
@@ -1389,7 +1390,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             double dist1Scale = 1.0E8;
             double rawDistance = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
 
-            smoothedStarDistance = MathUtilsDouble.lowPass(rawDistance, smoothedStarDistance, 5.0); // smooth over ~5 frames
+            smoothedStarDistance = MathUtilsDouble.lowPass(rawDistance, smoothedStarDistance, 3.0); // smooth over ~3 frames
             return smoothedStarDistance;
         }
     }
@@ -1409,8 +1410,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         var closestStarDistance = getClosestStarDistance();
 
         double dist = FastMath.min(closestStarDistance, FastMath.min(closestBodyDistance, focusDistance));
-        double smoothing = (dist < smoothedDistance) ? 10.0 : 5.0;
-        smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, smoothing);
+        smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, 3.0);
         final var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 
         return smoothedDistance >= 0 ? (Math.max(distanceMap,

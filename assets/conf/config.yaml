@@ -123,6 +123,8 @@ scene:
     fov: 45.0
     # Cinematic camera
     cinematic: false
+    # Use distance to closest star to compute camera velocity scaling
+    starDistanceScaling: true
     # Target on in free mode. This scales the velocity of the camera according
     # to the distance to the closest object.
     targetMode: true

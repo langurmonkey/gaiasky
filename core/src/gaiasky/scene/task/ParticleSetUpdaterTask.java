@@ -43,6 +43,10 @@ import static gaiasky.scene.task.ParticleSetUpdaterTask.UpdateStage.*;
  * </ul>
  */
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
+
+    // Minimum amount of time [s] between two update calls
+    protected static final double UPDATE_INTERVAL_S = 0.05;
+    protected static final double UPDATE_INTERVAL_S_2 = UPDATE_INTERVAL_S * 2.0;
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
     protected static final double CAM_DX_TH_SQ = CAM_DX_TH * CAM_DX_TH;
@@ -74,7 +78,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     }
 
     /** Contains the stage that needs to be run next for this updater. **/
-    private final ThreadLocal<UpdateStage> stage;
+    private volatile UpdateStage stage;
 
     /** Nested class holding the brightness lookup table. **/
     private static class StarBrightness {
@@ -97,8 +101,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
         this.buffer = new TopNBuffer(this.particleSet.indices.length);
-        this.stage = new ThreadLocal<>();
-        this.stage.set(SORT1);
+        this.stage = SORT1;
         this.executor = GaiaSky.instance.getExecutorService();
 
         if (particleSet.isStars) {
@@ -126,11 +129,13 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         var pointData = particleSet.pointData;
         if (pointData != null && !pointData.isEmpty() && pointData.getFirst()
                 .names() != null) {
-            switch (stage.get()) {
+            double t = GaiaSky.instance.getT() - particleSet.lastSortTime;
+            switch (stage) {
                 case METADATA -> {
                     if (base.opacity > 0
-                            && ((particleSet.lastSortCameraPos.dst2D(camera.getPos()) > CAM_DX_TH_SQ)
-                            || (GaiaSky.instance.time.getWarpFactor() > 1.0e12))) {
+                            && (t > UPDATE_INTERVAL_S_2
+                            || (particleSet.lastSortCameraPos.dst2D(camera.getPos()) > CAM_DX_TH_SQ && t > UPDATE_INTERVAL_S)
+                            || (GaiaSky.instance.time.getWarpFactor() > 1.0e12 && t > UPDATE_INTERVAL_S))) {
                         executor.execute(this);
                     }
                 }
@@ -145,16 +150,16 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     public void run() {
         var time = GaiaSky.instance.time;
         var camera = GaiaSky.instance.getICamera();
-        switch (stage.get()) {
+        switch (stage) {
             case METADATA -> {
                 // Compute metadata -- brightness proxy for every star.
-                stage.set(BUSY);
+                stage = BUSY;
                 updateMetadataConsumer.accept(time, camera);
-                stage.set(SORT1);
+                stage = SORT1;
             }
             case SORT1 -> {
                 // Get K-brightest star indices -- first half.
-                stage.set(BUSY);
+                stage = BUSY;
 
                 var totalCount = particleSet.pointData.size();
                 var metadata = particleSet.metadata;
@@ -168,11 +173,11 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                     buffer.add(i, metadata[i]);
                 }
 
-                stage.set(SORT2);
+                stage = SORT2;
             }
             case SORT2 -> {
                 // Get K-brightest star indices -- second half.
-                stage.set(BUSY);
+                stage = BUSY;
 
                 var totalCount = particleSet.pointData.size();
                 var metadata = particleSet.metadata;
@@ -193,7 +198,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 GaiaSky.postRunnable(() -> {
                     particleSet.lastSortCameraPos.set(camera.getPos());
                     particleSet.lastSortTime = GaiaSky.instance.getT();
-                    stage.set(METADATA);
+                    stage = METADATA;
                 });
             }
         }
