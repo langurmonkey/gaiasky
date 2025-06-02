@@ -40,9 +40,8 @@
   <releases>
 
     <release version="3.6.8" date="2025-03-19" urgency="high">
-      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.6.8.1e74ed71e/releasenotes.html</url>
+      <url>https://gaiasky.space/news/2025/gaiasky_3.6.8</url>
       <description>
-        See the full release notes <a href="http://gaiasky.space/news/2025/gaiasky_3.6.8/">here</a>.
         <p>Features</p>
         <ul>
           <li>Major UI overhaul: consolidated fonts, updated themes, removed deprecated components.</li>
