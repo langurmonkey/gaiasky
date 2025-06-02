@@ -1374,9 +1374,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The minimum distance to a star, with a smoothing radius.
      */
     private double getClosestStarDistance() {
-        if (!Settings.settings.scene.camera.starDistanceScaling) {
+        if (GaiaSky.instance.cameraManager.getMode().isFocus() || !Settings.settings.scene.camera.starDistanceScaling) {
             // Do not use star distance to compute velocity scaling.
-            // Some times, traversing the star field with speed scaling depending on the closest star is actually not good.
+            // Occasionally, traversing the star field with speed scaling depending on the closest star is actually not good.
             // Speed jumps after metadata updates are too noticeable.
             return Double.MAX_VALUE;
         } else {
@@ -1386,8 +1386,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             var radius = star.getRadius();
             var distance = star.getClosestDistToCamera() + MIN_DIST;
 
-            double dist0Scale = 1.0E4;
-            double dist1Scale = 1.0E8;
+            double dist0Scale = 1.0E3;
+            double dist1Scale = 1.0E7;
             double rawDistance = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
 
             smoothedStarDistance = MathUtilsDouble.lowPass(rawDistance, smoothedStarDistance, 3.0); // smooth over ~3 frames
