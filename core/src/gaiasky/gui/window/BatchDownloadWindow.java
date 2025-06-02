@@ -95,9 +95,15 @@ public class BatchDownloadWindow extends GenericDialog {
             progress.setValue(0f);
             progress.setVisible(true);
 
-            content.add(progress).left().padRight(pad20).padBottom(pad10).row();
+            var cell = content.add(progress);
+            cell.left().padRight(pad20).padBottom(pad10).row();
 
-            var watcher = new DatasetWatcher(d, progress, null, status, null);
+            Runnable success = () -> {
+                cell.clearActor();
+                cell.setActor(new OwnLabel(I18n.msg("gui.done"), skin, "default-blue"));
+            };
+
+            var watcher = new DatasetWatcher(d, progress, null, status, null, success);
             watchers.add(watcher);
         }
 

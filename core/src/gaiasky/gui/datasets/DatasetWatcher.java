@@ -33,17 +33,22 @@ public class DatasetWatcher implements IObserver {
     private final OwnTextIconButton button;
     private final OwnLabel status;
     private final Table table;
+    private final Runnable success;
 
-    public DatasetWatcher(DatasetDesc dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table) {
+    public DatasetWatcher(DatasetDesc dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table, Runnable success) {
         super();
         this.dataset = dataset;
         this.progress = progress;
         this.button = button;
         this.status = status;
         this.table = table;
+        this.success = success;
 
         EventManager.instance.subscribe(this, Event.DATASET_DOWNLOAD_START_INFO, Event.DATASET_DOWNLOAD_FINISH_INFO, Event.DATASET_DOWNLOAD_PROGRESS_INFO);
 
+    }
+    public DatasetWatcher(DatasetDesc dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table) {
+        this(dataset, progress, button, status, table, null);
     }
 
     public void dispose() {
@@ -104,6 +109,9 @@ public class DatasetWatcher implements IObserver {
                             } else {
                                 this.status.setText(I18n.msg(messageKey));
                             }
+                        }
+                        if (success != null) {
+                            success.run();
                         }
                     }
                     case DATASET_DOWNLOAD_PROGRESS_INFO -> {
