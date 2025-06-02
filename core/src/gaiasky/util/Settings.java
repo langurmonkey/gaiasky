@@ -2362,7 +2362,7 @@ public class Settings extends SettingsObject {
 
         /** The recommended datasets, as a list of keys. **/
         @JsonIgnore
-        public final Set<String> recommendedDatasets = Set.of("default-data", "catalog-hipparcos", "catalog-nbg", "catalog-nebulae", "catalog-sdss-12");
+        public final Set<String> recommendedDatasets = Set.of("default-data", "gaia-dr3-best", "catalog-nbg", "catalog-nebulae", "catalog-sdss-12");
 
         @JsonIgnore
         public String getDefaultLocale() {
