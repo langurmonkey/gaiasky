@@ -1,3 +1,101 @@
+<a name="3.6.8"></a>
+## [3.6.8](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.8) (2025-06-02)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.7...3.6.8)
+
+### Bug Fixes
+- Re-wrapping file input stream around a GZipped input stream and re-using it later causes non-gzipped JSON descriptor files to fail during parsing. 
+- Changing data directory results in crash during initial loading process due to out-of-order resource initialization. Fixes [#795](https://codeberg.org/gaiasky/gaiasky/issues/795). 
+- access project data in configuration phase in gradle build file, so that it works with gradle 10+. 
+- incorrect conversion of uptime seconds to "HH:mm:ss" string. 
+- focused own slider plus text uses theme color. 
+- made actual output area of console more opaque. 
+- revert 180 degrees phase in argument of pericenter after double-checking. 
+- unintended phase of 180 degrees in argument of pericenter, really specifying the position of the apocenter. 
+- automatically select Gregorian or Julian calendar in Julian date determination (pre/post 1582-10-15. Remove unused classes. 
+- anchor top info interface to the left to avoid position jittering due to on-update changing width. 
+- layout of preferences window. 
+- crash when trying to set data directory to folder at the root of a drive in Windows. Fixes [#825](https://codeberg.org/gaiasky/gaiasky/issues/825). 
+- improve high-eccentricity orbit sampling by using constant nu spacing instead of constant time. 
+- update algorithm to convert keplerian elements to cartesian coordinates to handle edge cases better. 
+- update size of very first UI text. 
+- image button alignment issues. 
+- individual visibility dialog shows button for 'Invisible' object type. 
+- inconsistent size and behavior of error window (shows up when Gaia Sky crashes). 
+- persisting empty folder bookmarks turns them into (useless) leaf bookmarks. 
+- persist bookmark operations immediately instead of waiting for app to exit. Avoids losing work if app crashes. 
+- make sure that bookmark names and folder names are properly validated by banning some special characters which are not allowed. 
+- position of context menus in bookmarks pane is off. 
+
+### Build System
+- upgrade to libGDX 1.13.5. 
+- upgrade to JRE 24 in default Install4j builds. Use Generational ZGC by default in all launchers, as it shows much shorter pauses and latency. 
+- enable logging when running tests with gradle. 
+- update source compatibility from 17 to 20. 
+- add test infrastructure, and activate JUnit dependencies. Add test for conversion between keplerian and cartesian system. 
+- move `gdx-tools` to compile-only dependency. 
+- upgrade to gradle 8.13. 
+- update AUR package URL to gaiasky.space. 
+
+### Code Refactoring
+- remove duplicate star/particle index array, make original array of primitives instead of boxed integers, use priority queue to sort only top K particles in sets. 
+- rename all shaders to end with `.glsl` extension. 
+
+### Documentation
+- greatly improve descriptions for many attributes in the attributes map JSON file. 
+
+### Features
+- New setting: 'use distance to closest star to compute camera velocity scaling'. It is off by default in VR, on in desktop. 
+- Remove artificial time delay between consecutive particle group update operations. 
+- Write last session log to `/log/` even when Gaia Sky finishes gracefully. This is useful for a number of ways. 
+- Simplify onboarding by offering `recommended datasets` and an easier path to a running Gaia Sky. 
+- disable pointer coordinates in the default configuration file. 
+- TLE initializer checks for cached TLE data for those objects that need it. If found it uses the cached data. If the cached data is not found or is out of date, it pulls the TLE data from the given URL, parses it, and applies the resulting orbital elements. Fixes [#831](https://codeberg.org/gaiasky/gaiasky/issues/831). 
+- add TLE parser to parse orbital data in Two-Line Elements format. Part of [#831](https://codeberg.org/gaiasky/gaiasky/issues/831). 
+- Add star texture selector to preferences dialog. 
+- Remember last visited tab in generic dialogs (preferences, about, etc.). 
+- add 'object debug' feature, where every field of every component for an object can be inspected (and some even changed). This is accessed via the 'alpha' symbol in the system/debug information panel. 
+- update welcome window background image. 
+- complete French translation. 
+- update label font to Inter. 
+- update part of the French translation file. 
+- complete German translation, remove unused keys in I18n files. 
+- substitute `Apfloat` with `Quadruple`, a compact 128-bit floating point library that performs better and is sufficient for our needs. 
+- split particle set update into three frames. 
+- add `setCameraDirectionEquatorial()` and `setCameraDirectionGalactic()` API calls to transition the camera direction to specific coordinates given in the equatorial and galactic spherical systems. 
+- add enabled dataset list directly in welcome window. 
+- add Julian date tab to date/time dialog so that the time can also be set in Julian days. Fix issues with time zones, making it possible now to use the system default time zone. 
+- further optimize `PointCloudData` and `PointSample` to directly include the long seconds and int nanos in the recrod instead of the `Instant` instance. 
+- add shading style to star and particle sets, with possible values `default` and `twinkle`. 
+- improve visual quality of UI theme by increasing the padding and upping the image quality setting. 
+- big update to improve and refactor the user interface. Update and consolidate fonts, update skin system to be able to auto-generate themes from colors, remove old UI themes, remove Title component types, which were broken. 
+- add bookmark information dialog, which displays the information on a bookmark (type, object, attributes, etc.). It can be accessed via right-click context menu in the bookmarks tree. 
+- add thiele-innes conversion script, and add method to gaia NSS processor. 
+- add new configuration flag to expand panes in main UI by simply moving the mouse over the (left) buttons. 
+- add functionality to copy contents of console to the clipboard (full console output and per-message). 
+- add ability to save current settings with a location bookmark. The dialog to create a location bookmark now contains 4 checkboxes (additionally to the name text box) to choose whether the bookmark is to persist camera position, camera orientation, time, and settings. This relates to [#794](https://codeberg.org/gaiasky/gaiasky/issues/794). 
+- add variation of `goToObjectSmooth()` with solid angle and sync flag. 
+- add action descriptions to `keyboard.mappings` file so that documentation can be generated automagically. 
+- refine default distance scaling function to use mix between closest body/star and focus distances. 
+- make distance scaling depend on closest object by default. 
+
+### Performance Improvements
+- use own customized maps (`FastObjectIntMap`, `FastStringObjectMap`) as indices to improve lookup performance and eliminate unnecessary boxing. 
+- optimize lots of allocation hotspots to drastically reduce the number of short-lived object allocations. 
+- substitute standard library hash maps with more performant versions in Libgdx to avoid unnecessary allocation of `Node` and boxed `Integer` objects in the millions. 
+- use own `Bits` instead of `BitSet` to enable direct access to underlying long values. 
+- avoid recomputation of star size factors every frame. 
+- drastic improvement in label rendering performance, which includes a refactoring and re-implementation of the background particle/star updater tasks. 
+- use half-precision floating point numbers (16-bit) for several in-memory non-critical particle and star attributes (muAlpha, muDelta, radial velocity, apparent magnitude, absolute magnitude, effective temperature) to reduce memory footprint with minor penalty. 
+- flatten all particle data holders into different Java records for the different types to improve memory footprint and layout. 
+- move old `ParticleRecord` and `VariableRecord` classes to a new `Particle` record class, which is immutable by default and better suited for tabular data. Remove unused attributes like the octant reference. 
+- move implementation of `PointCloudData` to records. This implementation makes itmore compact memory-wise and uses only one array list instead of four. 
+- distribute star/particle set operation into two frames instead of 1. We move the metadata update operation to the first frame, and the sorting to the second frame. 
+
+### Merge Requests
+- Merge branch 'quadruple'
+- Merge branch 'particle-update-refactor'
+
+
 <a name="3.6.7"></a>
 ## [3.6.7](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.7) (2025-03-18)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.6...3.6.7)

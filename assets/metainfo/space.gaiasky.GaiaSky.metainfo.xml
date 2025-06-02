@@ -40,67 +40,35 @@
   <releases>
 
     <release version="3.6.8" date="2025-03-19" urgency="high">
-      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.6.8.8737441c3/releasenotes.html</url>
+      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.6.8.1e74ed71e/releasenotes.html</url>
       <description>
+        See the full release notes <a href="http://gaiasky.space/news/2025/gaiasky_3.6.8/">here</a>.
         <p>Features</p>
         <ul>
           <li>Major UI overhaul: consolidated fonts, updated themes, removed deprecated components.</li>
           <li>Improved visual quality: increased padding and higher image resolution in UI.</li>
           <li>Switched to Inter as the default label font.</li>
           <li>Panels in the main UI now expand when the mouse hovers over the buttons.</li>
-          <li>Welcome window enhancements:
-            <ul>
-              <li>Displays the list of enabled datasets.</li>
-              <li>New “Recommended Datasets” option for one-click download and launch.</li>
-              <li>Updated background image.</li>
-            </ul>
-          </li>
-          <li>Time and calendar:
-            <ul>
-              <li>Julian date tab added to date/time dialog.</li>
-              <li>Time zone support improved; system-default time zone now used.</li>
-            </ul>
-          </li>
+          <li>Displays the list of enabled datasets.</li>
+          <li>New “Recommended Datasets” option for one-click download and launch.</li>
+          <li>Updated background image.</li>
+          <li>Julian date tab added to date/time dialog.</li>
+          <li>Time zone support improved; system-default time zone now used.</li>
           <li>Dialogs remember the last opened tab (e.g. Preferences, About).</li>
           <li>New star texture selector added to Preferences.</li>
           <li>New object debug tool available via the debug panel—inspect and edit component fields.</li>
           <li>Pointer coordinates display disabled by default (can be re-enabled in Preferences).</li>
-          <li>Console output:
-            <ul>
-              <li>Messages and full log can now be copied to the clipboard.</li>
-            </ul>
-          </li>
-          <li>Bookmark improvements:
-            <ul>
-              <li>Bookmarks can now include camera position, orientation, time, and settings.</li>
-              <li>Bookmark information dialog added (accessible via right-click).</li>
-              <li>Empty folder bookmarks are removed automatically.</li>
-              <li>Bookmark operations persist immediately.</li>
-              <li>Invalid characters are now restricted in bookmark and folder names.</li>
-            </ul>
-          </li>
-          <li>Added Thiele-Innes conversion script, and support in the Gaia NSS processor.</li>
+          <li>Bookmark improvements.</li>
+        </ul>
         <p>Bug fixes</p>
           <ul>
             <li>Fixed incorrect formatting of uptime duration.</li>
             <li>Julian vs Gregorian calendar automatically selected based on date.</li>
             <li>Fixed layout issues in Preferences and other dialogs.</li>
-            <li>UI components:
-              <ul>
-                <li>Image button alignment corrected.</li>
-                <li>Anchoring of the top info interface improved to prevent jitter.</li>
-                <li>First UI text size adjusted.</li>
-              </ul>
-            </li>
+            <li>UI fixes.</li>
             <li>Fixed crash when setting data directory to a root drive in Windows.</li>
-            <li>Fixed crash due to early resolution of <code>attitudeindicator.png</code> path when changing data directory.
-            </li>
-            <li>Improved orbit rendering:
-              <ul>
-                <li>Constant true anomaly spacing used for high-eccentricity orbits.</li>
-                <li>Better handling of edge cases in Keplerian-to-Cartesian conversion.</li>
-              </ul>
-            </li>
+            <li>Fixed crash due to early resolution of <code>attitudeindicator.png</code>.</li>
+            <li>Improved orbit rendering.</li>
             <li>Reused GZipped file streams no longer break on non-gzipped JSON files.</li>
             <li>Context menu in bookmarks pane now positioned correctly.</li>
             <li>Error window layout made consistent.</li>
@@ -108,8 +76,7 @@
           </ul>
         <p>Performance improvements</p>
           <ul>
-            <li>Replaced <code>Apfloat</code> with <code>Quadruple</code>: faster
-              128-bit floating point math with adequate precision.</li>
+            <li>Replaced <code>Apfloat</code> with <code>Quadruple</code></li>
             <li>Reduced short-lived object allocations in many systems.</li>
             <li>Major speed-up in label rendering via task refactoring.</li>
             <li>Star size factors now cached instead of recalculated per frame.</li>
