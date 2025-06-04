@@ -749,6 +749,10 @@
           "fixedAngularSizeRad"
         ]
       },
+      "generateIndex": {
+        "description": "Generate the index for this particle set so that the particles can be looked up by name. Typically, this is off for particle sets. Set this to true if your particles have meaningful names.",
+        "unit": "Boolean"
+      },
       "renderSetLabel": {
         "description": "Enable or disable the global label of this particle set. If true, the name of this particle set is rendered at the given label position.",
         "unit": "Boolean"

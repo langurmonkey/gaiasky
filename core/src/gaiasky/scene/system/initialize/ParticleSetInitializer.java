@@ -240,10 +240,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                     provider.setProviderParams(params);
                 }
                 provider.setTransformMatrix(transform.matrix);
+                // By default, do not generate index in particle sets.
                 set.setData(provider.loadData(set.datafile, set.factor));
                 set.isExtended = !set.data()
                         .isEmpty() && set.data()
-                        .get(0)
+                        .getFirst()
                         .getType() == ParticleType.PARTICLE_EXT;
 
                 if (provider instanceof STILDataProvider stil) {
@@ -300,7 +301,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
                 // Set data, generate index
                 List<IParticleRecord> l = provider.loadData(set.datafile, set.factor);
-                set.setData(l);
+                set.setData(l, true);
 
             } catch (Exception e) {
                 Logger.getLogger(this.getClass())
