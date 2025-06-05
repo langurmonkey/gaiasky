@@ -645,8 +645,8 @@ public class Coordinates {
     public static Vector3D properMotionsToCartesian(double muAlphaStar, double muDelta, double radVel, double ra, double dec,
                                                     double distPc,
                                                     Vector3D out) {
-        double ma = muAlphaStar * Nature.MILLIARCSEC_TO_ARCSEC;
-        double md = muDelta * Nature.MILLIARCSEC_TO_ARCSEC;
+        double ma = muAlphaStar * Nature.MAS_TO_ARCSEC;
+        double md = muDelta * Nature.MAS_TO_ARCSEC;
 
         // Multiply arcsec/yr with distance in parsecs gives a linear velocity. The factor 4.74 converts result to km/s
         double vta = ma * distPc * Nature.ARCSEC_PER_YEAR_TO_KMS;
@@ -722,8 +722,8 @@ public class Coordinates {
         double vta = vxKms * ax + vyKms * ay + vzKms * az;
         double vtd = vxKms * dx + vyKms * dy + vzKms * dz;
 
-        double muAlphaStar = (vta / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
-        double muDelta = (vtd / arcsecPerYearToKm) * Nature.ARCSEC_TO_MILLIARCSEC;
+        double muAlphaStar = (vta / arcsecPerYearToKm) * Nature.ARCSEC_TO_MAS;
+        double muDelta = (vtd / arcsecPerYearToKm) * Nature.ARCSEC_TO_MAS;
 
         return out.set(muAlphaStar, muDelta, vr);
     }

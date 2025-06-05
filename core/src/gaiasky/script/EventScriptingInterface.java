@@ -52,6 +52,7 @@ import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.component.AttitudeComponent;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.SetUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.view.FocusView;
@@ -4663,7 +4664,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                             if (datasetOptions != null)
                                 datasetOptions.initializeCatalogInfo = false;
                             starGroup.set(
-                                    EntityUtils.getStarSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions, false));
+                                    SetUtils.createStarSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions, false));
 
                             // Catalog info.
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
@@ -4693,7 +4694,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                         postRunnable(() -> {
                             datasetOptions.initializeCatalogInfo = false;
                             particleGroup.set(
-                                    EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions,
+                                    SetUtils.createParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions,
                                                                false));
 
                             // Catalog info
@@ -4723,7 +4724,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                         postRunnable(() -> {
                             datasetOptions.initializeCatalogInfo = false;
                             particleGroup.set(
-                                    EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions,
+                                    SetUtils.createParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions,
                                                                false));
 
                             // Catalog info

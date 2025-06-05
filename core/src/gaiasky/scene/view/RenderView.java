@@ -14,6 +14,10 @@ import gaiasky.scene.component.ParticleExtra;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 
+/**
+ * View of an entity for rendering purposes.
+ * Adds particle extra, particle set, and star set cached components to whatever is in base view.
+ */
 public class RenderView extends BaseView implements IRenderable {
 
     /** Particle component, maybe. **/

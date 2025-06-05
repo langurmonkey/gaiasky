@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Octant;
 import gaiasky.scene.component.StarSet;
-import gaiasky.scene.entity.StarSetUtils;
+import gaiasky.scene.entity.SetUtils;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
@@ -49,7 +49,7 @@ public class OctreeObjectView extends PositionView implements IOctreeObject {
 
     @Override
     public void dispose() {
-        (new StarSetUtils(null)).dispose(entity, set);
+        SetUtils.dispose(entity, set);
     }
 
     public void setOctant(OctreeNode octreeNode) {

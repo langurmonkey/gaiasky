@@ -23,7 +23,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.tag.TagOctreeObject;
-import gaiasky.scene.entity.StarSetUtils;
+import gaiasky.scene.entity.SetUtils;
 import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scene.system.initialize.SceneGraphBuilderSystem;
@@ -119,10 +119,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * from outside.
      */
     private int dataVersionHint;
-    /**
-     * Utils class.
-     **/
-    private StarSetUtils utils;
 
     /**
      * The scene graph builder.
@@ -184,7 +180,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         particles = filePaths[0];
         metadata = filePaths[1];
 
-        utils = new StarSetUtils(scene);
         sceneGraphBuilder = new SceneGraphBuilderSystem(scene.index(), null, 0);
         setInitializer = new ParticleSetInitializer(true, null, 0);
         baseInitializer = new BaseInitializer(scene, true, null, 0);
@@ -545,7 +540,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         var octree = Mapper.octree.get(octreeWrapper);
 
         List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
-        Entity sg = utils.getDefaultStarSet("stargroup-%%SGID%%", data, baseInitializer, setInitializer, fullInit);
+        Entity sg = SetUtils.createStarSet(scene, "stargroup-%%SGID%%", data, baseInitializer, setInitializer, fullInit);
         sg.add(new TagOctreeObject());
 
         var set = Mapper.starSet.get(sg);
