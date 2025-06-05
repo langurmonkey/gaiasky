@@ -49,6 +49,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Initializer class for particle and star sets ({@link ParticleSet}, {@link StarSet}.
+ */
 public class ParticleSetInitializer extends AbstractInitSystem {
     private static final Log logger = Logger.getLogger(ParticleSetInitializer.class);
 
@@ -100,7 +103,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         if (starSet != null) {
             // Stars.
             // Is it a catalog of variable stars?
-            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.get(0)
+            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.getFirst()
                     .isVariable();
             // We need the sorting data ALWAYS, not only when numLabels > 0.
             // We use them to draw the close-up stars.

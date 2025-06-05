@@ -14,8 +14,6 @@ import gaiasky.scene.component.ParticleExtra;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 
-import java.util.Locale;
-
 public class RenderView extends BaseView implements IRenderable {
 
     /** Particle component, maybe. **/

@@ -87,9 +87,9 @@ public class VertexBufferObject implements IntVertexData {
     /**
      * Low level method to reset the buffer and attributes to the specified values. Use with care!
      *
-     * @param data
-     * @param ownsBuffer
-     * @param value
+     * @param data Buffer with the data.
+     * @param ownsBuffer Whether the buffer is owned by this object.
+     * @param value The vertex attributes.
      */
     protected void setBuffer(Buffer data, boolean ownsBuffer, VertexAttributes value) {
         if (isBound)

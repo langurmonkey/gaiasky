@@ -69,7 +69,7 @@ public class StarSetUtils {
         label.setLabelPosition(new double[] { 0.0, -5.0e7, -4e8 });
 
         var set = Mapper.starSet.get(entity);
-        set.setData(data);
+        set.setData(data, true);
 
         // Initialize.
         baseInitializer.initializeEntity(entity);
