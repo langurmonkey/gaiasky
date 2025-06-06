@@ -6,6 +6,7 @@ apply plugin: "de.undercouch.download"
 import com.install4j.gradle.Install4jTask
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
+// Remember to also modify GaiaSkyDesktop#MIN_JAVA_VERSION
 JavaVersion minJavaVersion = JavaVersion.VERSION_21
 java {
     sourceCompatibility = minJavaVersion

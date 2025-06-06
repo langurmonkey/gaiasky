@@ -18,6 +18,9 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
+/**
+ * Table displaying the version, build, and some more system information in a single line.
+ */
 public class VersionLineTable extends Table {
 
     public VersionLineTable(Skin skin) {

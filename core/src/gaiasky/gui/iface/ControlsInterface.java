@@ -62,9 +62,6 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         final float pad10 = 10f;
         final float pad20 = 20f;
 
-        // Component and action buttons.
-        final OwnTextIconButton buttonTime, buttonCamera, buttonTypes, buttonVisuals, buttonDatasets, buttonLocation, buttonBookmarks;
-
         componentButtons = new Array<>(7);
 
         // Table to the left, which holds the (components and action) buttons.
@@ -82,39 +79,39 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         // TIME.
         TimeComponent timeComponent = new TimeComponent(skin, stage);
         timeComponent.initialize(getContentWidth());
-        buttonTime = createComponentButton(skin, pad10, "menu-time", I18n.msg("gui.time"), timeComponent, "action.expandcollapse.pane/gui.time");
+        createComponentButton(skin, I18n.msg("gui.time"), timeComponent, "action.expandcollapse.pane/gui.time");
 
         // CAMERA.
         CameraComponent cameraComponent = new CameraComponent(skin, stage);
         cameraComponent.initialize(getContentWidth());
-        buttonCamera = createComponentButton(skin, pad10, pad10 * 6f, "menu-camera", I18n.msg("gui.camera"), cameraComponent, "action.expandcollapse.pane/gui.camera");
+        createComponentButton(skin, pad10, pad10 * 6f, "menu-camera", I18n.msg("gui.camera"), cameraComponent, "action.expandcollapse.pane/gui.camera");
 
         // TYPE VISIBILITY.
         VisibilityComponent visibilityComponent = new VisibilityComponent(skin, stage);
         visibilityComponent.setVisibilityEntitites(visibilityEntities, visible);
         visibilityComponent.initialize(getContentWidth());
-        buttonTypes = createComponentButton(skin, pad10, pad10 * 12f, "menu-types", I18n.msg("gui.visibility"), visibilityComponent, "action.expandcollapse.pane/gui.visibility");
+        createComponentButton(skin, pad10, pad10 * 12f, "menu-types", I18n.msg("gui.visibility"), visibilityComponent, "action.expandcollapse.pane/gui.visibility");
 
         // VISUALS.
         VisualSettingsComponent visualSettingsComponent = new VisualSettingsComponent(skin, stage);
         visualSettingsComponent.initialize(getContentWidth());
-        buttonVisuals = createComponentButton(skin, pad10, pad10 * 17.5f, "menu-visuals", I18n.msg("gui.lighting"), visualSettingsComponent, "action.expandcollapse.pane/gui.lighting");
+        createComponentButton(skin, pad10, pad10 * 17.5f, "menu-visuals", I18n.msg("gui.lighting"), visualSettingsComponent, "action.expandcollapse.pane/gui.lighting");
 
         // DATASETS.
         DatasetsComponent datasetsComponent = new DatasetsComponent(skin, stage, catalogManager);
         datasetsComponent.initialize(getContentWidth());
-        buttonDatasets = createComponentButton(skin, pad10, pad10 * 23f, "menu-datasets", I18n.msg("gui.dataset.title"), datasetsComponent, "action.expandcollapse.pane/gui.dataset.title");
+        createComponentButton(skin, pad10, pad10 * 23f, "menu-datasets", I18n.msg("gui.dataset.title"), datasetsComponent, "action.expandcollapse.pane/gui.dataset.title");
 
         // LOCATION LOG.
         LocationLogComponent locationLogComponent = new LocationLogComponent(skin, stage);
         locationLogComponent.initialize(getContentWidth());
-        buttonLocation = createComponentButton(skin, pad10, pad10 * 29f, "menu-location-log", I18n.msg("gui.locationlog"), locationLogComponent, null);
+        createComponentButton(skin, pad10, pad10 * 29f, "menu-location-log", I18n.msg("gui.locationlog"), locationLogComponent, null);
 
         // BOOKMARKS.
         BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, stage);
         bookmarksComponent.setScene(scene);
         bookmarksComponent.initialize(getContentWidth());
-        buttonBookmarks = createComponentButton(skin, pad10, pad10 * 35f, "menu-bookmarks", I18n.msg("gui.bookmarks"), bookmarksComponent, "action.expandcollapse.pane/gui.bookmarks");
+        createComponentButton(skin, pad10, pad10 * 35f, "menu-bookmarks", I18n.msg("gui.bookmarks"), bookmarksComponent, "action.expandcollapse.pane/gui.bookmarks");
 
         // Spacing
         tableButtons.add().left().growY().row();
@@ -219,12 +216,8 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                 Event.EXPAND_COLLAPSE_PANE_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD);
     }
 
-    private OwnTextIconButton createComponentButton(Skin skin, float pad, String buttonStyle, String title, GuiComponent component) {
-        return createComponentButton(skin, pad, 0f, buttonStyle, title, component, null);
-    }
-
-    private OwnTextIconButton createComponentButton(Skin skin, float pad, String buttonStyle, String title, GuiComponent component, String action) {
-        return createComponentButton(skin, pad, 0f, buttonStyle, title, component, action);
+    private void createComponentButton(Skin skin, String title, GuiComponent component, String action) {
+        createComponentButton(skin, (float) 10.0, 0f, "menu-time", title, component, action);
     }
 
     /**
@@ -428,9 +421,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                     buttonMinimap.setCheckedNoFire(show);
                 }
             }
-            case MINIMAP_TOGGLE_CMD -> {
-                buttonMinimap.setCheckedNoFire(!buttonMinimap.isChecked());
-            }
+            case MINIMAP_TOGGLE_CMD -> buttonMinimap.setCheckedNoFire(!buttonMinimap.isChecked());
             default -> {
             }
         }

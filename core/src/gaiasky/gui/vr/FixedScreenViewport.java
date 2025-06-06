@@ -17,6 +17,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
 
+/**
+ * Viewport that uses an orthographic camera and a fixed width and height. Mainly for use in VR, as it can't be scaled.
+ */
 public class FixedScreenViewport extends Viewport {
     private final int width;
     private final int height;

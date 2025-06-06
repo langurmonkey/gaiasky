@@ -401,7 +401,7 @@ public class JsonLoader extends AbstractSceneLoader {
 
     private boolean set(JsonValue attribute, Object instance, Object value, Class<?> valueClass, Class<?> instanceClass) {
         String methodName = "set" + TextUtils.propertyToMethodName(attribute.name);
-        Method m = searchMethod(methodName, valueClass, instanceClass, false);
+        Method m = searchMethod(methodName, valueClass, instanceClass);
         if (m != null) {
             try {
                 m.invoke(instance, value);
@@ -417,7 +417,7 @@ public class JsonLoader extends AbstractSceneLoader {
 
     private boolean update(JsonValue attribute, Object instance, Object value, Class<?> valueClass, Class<?> instanceClass) {
         String methodName = "update" + TextUtils.propertyToMethodName(attribute.name);
-        Method m = searchMethod(methodName, valueClass, instanceClass, false);
+        Method m = searchMethod(methodName, valueClass, instanceClass);
         if (m != null) {
             try {
                 m.invoke(instance, value);
@@ -434,14 +434,13 @@ public class JsonLoader extends AbstractSceneLoader {
      * Searches for the given method with the given class. If none is found, it looks for fitting methods
      * with the class' interfaces and superclasses recursively.
      *
-     * @param methodName     The method name.
-     * @param parameterType  The parameter class type.
-     * @param source         The class of the source object.
-     * @param printException Whether to print an exception if no method is found.
+     * @param methodName    The method name.
+     * @param parameterType The parameter class type.
+     * @param source        The class of the source object.
      *
      * @return The method, if found. Null otherwise.
      */
-    private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source, boolean printException) {
+    private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source) {
         Method m = null;
         try {
             m = ClassReflection.getMethod(source, methodName, parameterType);
@@ -451,10 +450,7 @@ public class JsonLoader extends AbstractSceneLoader {
                     // Special case
                     m = ClassReflection.getMethod(source, methodName, IBodyCoordinates.class);
                 }
-            } catch (ReflectionException e1) {
-                if (printException) {
-                    logger.error(e1);
-                }
+            } catch (ReflectionException ignored) {
             }
         }
         return m;

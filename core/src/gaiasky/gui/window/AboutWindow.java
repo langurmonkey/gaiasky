@@ -37,6 +37,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
 
+/**
+ * The help and about window. Displays information on the program and how to get help.
+ */
 @SuppressWarnings("ALL")
 public class AboutWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(AboutWindow.class);

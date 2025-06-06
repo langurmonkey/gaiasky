@@ -34,6 +34,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
 
+/**
+ * Displays system information in the welcome and loading screens.
+ */
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     private final ZoneId timeZone;

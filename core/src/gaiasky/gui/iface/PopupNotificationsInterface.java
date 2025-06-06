@@ -24,6 +24,10 @@ import gaiasky.util.scene2d.OwnButton;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 
+/**
+ * The notifications interface shows messages as pop-up notifications at the top-right of the screen. Clicking on
+ * notifications closes them.
+ */
 public class PopupNotificationsInterface extends TableGuiInterface implements IObserver {
     protected final Table me;
     protected final VerticalGroup stack;
@@ -132,21 +136,9 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
             float seconds = defaultSeconds;
             if (data.length > 1) {
                 try {
-                    // It is usually a float.
-                    seconds = (Float) data[1];
-                } catch (ClassCastException e) {
-                    try {
-                        // Try double.
-                        seconds = ((Double) data[1]).floatValue();
-                    } catch (ClassCastException e1) {
-                        try {
-                            // Try integer.
-                            seconds = ((Integer) data[1]).floatValue();
-                        } catch (ClassCastException e2) {
-                            // Try long.
-                            seconds = ((Long) data[1]).floatValue();
-                        }
-                    }
+                    seconds = ((Number) data[1]).floatValue();
+                } catch (ClassCastException ignored) {
+                    // Item [1] should always be a number!
                 }
             }
             addNotification(message, seconds);

@@ -17,6 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.gui.iface.DebugInterface;
 
+/**
+ * System metrics and other stuff, typically displayed at the top-right of the screen.
+ * Uses {@link DebugInterface}.
+ */
 public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container<Actor> di;

@@ -17,6 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.gui.iface.TimeGuiInterface;
 
+/**
+ * Displays the simulation time during clean mode (no-gui mode).
+ */
 public class TimeGui extends AbstractGui {
     private TimeGuiInterface time;
     private Container<Actor> t;

@@ -49,7 +49,7 @@ public class FileDataLoaderEclipticJulianTime {
                     transform.scl(Constants.KM_TO_U);
                     if (!t.equals(last)) {
 
-                        Vector3D pos = new Vector3D(parsed(tokens[1]), parsed(tokens[2]), parsed(tokens[3]));
+                        Vector3D pos = new Vector3D(parseDouble(tokens[1]), parseDouble(tokens[2]), parseDouble(tokens[3]));
                         pos.mul(transform);
                         orbitData.addPoint(pos, t.toInstant());
                         last.setTime(t.getTime());
@@ -63,15 +63,15 @@ public class FileDataLoaderEclipticJulianTime {
         return orbitData;
     }
 
-    protected float parsef(String str) {
+    protected float parseFloat(String str) {
         return Float.parseFloat(str);
     }
 
-    protected double parsed(String str) {
+    protected double parseDouble(String str) {
         return Double.parseDouble(str);
     }
 
-    protected int parsei(String str) {
+    protected int parseInt(String str) {
         return Integer.parseInt(str);
     }
 

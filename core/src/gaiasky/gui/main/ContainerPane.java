@@ -13,8 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.Separator;
 
+/**
+ * A generic container pane backed by a {@link Table}.
+ */
 public class ContainerPane extends Table {
-
 
     public ContainerPane(Skin skin, String title, final Actor actor) {
         super(skin);

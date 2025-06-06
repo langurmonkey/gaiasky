@@ -126,7 +126,7 @@ public class LogWindow extends GenericDialog {
             FileWriter fw = new FileWriter(log.toFile());
             BufferedWriter bw = new BufferedWriter(fw);
             for (MessageBean mb : NotificationsInterface.historical) {
-                fw.write(format.format(mb.date) + " - " + mb.msg + '\n');
+                fw.write(format.format(mb.date()) + " - " + mb.msg() + '\n');
             }
             bw.flush();
             bw.close();
@@ -147,8 +147,8 @@ public class LogWindow extends GenericDialog {
     }
 
     private void addMessage(MessageBean mb) {
-        Label date = new OwnLabel(format.format(mb.date), skin);
-        Label msg = new OwnLabel(mb.msg, skin);
+        Label date = new OwnLabel(format.format(mb.date()), skin);
+        Label msg = new OwnLabel(mb.msg(), skin);
         logs.add(date).left().padRight(pad);
         logs.add(msg).left().row();
         numMessages++;

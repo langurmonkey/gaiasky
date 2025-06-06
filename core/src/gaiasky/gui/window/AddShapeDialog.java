@@ -24,6 +24,9 @@ import gaiasky.util.scene2d.OwnSelectBox;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.FloatValidator;
 
+/**
+ * Window with the controls necessary to add a new shape around an object.
+ */
 public class AddShapeDialog extends GenericDialog {
 
     private final IFocus object;

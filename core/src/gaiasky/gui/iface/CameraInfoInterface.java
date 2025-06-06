@@ -40,6 +40,9 @@ import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
 
+/**
+ * Builds the pane that contains information on the current camera state.
+ */
 public class CameraInfoInterface extends TableGuiInterface implements IObserver {
     static private final int MAX_RULER_NAME_LEN = 9;
     private final FocusView view;
@@ -513,9 +516,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 .left();
         if (maximized) {
             contentCell = add(content);
-        } else {
-            contentCell = add();
-        }
+        } else contentCell = add();
         row();
         add(toggleSize).right()
                 .pad(pad5)
@@ -599,9 +600,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                         focusActionsGroup.addActor(refreshOrbit);
                         refreshOrbit.addListener(lastRefreshListener = (evt) -> {
                             if (evt instanceof ChangeEvent) {
-                                GaiaSky.postRunnable(() -> {
-                                    EventManager.publish(Event.ORBIT_REFRESH_CMD, refreshOrbit, orbitEntity);
-                                });
+                                GaiaSky.postRunnable(() -> EventManager.publish(Event.ORBIT_REFRESH_CMD, refreshOrbit, orbitEntity));
                                 return true;
                             }
                             return false;
@@ -638,7 +637,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                                                                                     .trim()));
                 labelVisibility.addListener(new OwnTextTooltip(I18n.msg("action.forcelabel", currentFocus.getName()), skin));
 
-                // Id, names
+                // ID, names
                 focusId.setText(idString);
                 focusId.clearListeners();
                 focusId.addListener(new OwnTextTooltip(id, skin));
@@ -923,7 +922,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         }
     }
 
-    @SuppressWarnings({"rawtypes"})
     private void displayInfo(Cell cell, Actor info) {
         cell.setActor(info);
         pack();

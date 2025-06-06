@@ -183,7 +183,7 @@ public class DatasetFiltersWindow extends GenericDialog {
                 if (Mapper.particleSet.has(ci.entity) || Mapper.starSet.has(ci.entity)) {
                     var set = Mapper.particleSet.has(ci.entity) ? Mapper.particleSet.get(ci.entity) : Mapper.starSet.get(ci.entity);
                     if (!set.data().isEmpty()) {
-                        IParticleRecord first = set.data().get(0);
+                        IParticleRecord first = set.data().getFirst();
                         if (first.hasExtra()) {
                             ObjectMap.Keys<UCD> ucds = first.extraKeys();
                             for (UCD ucd : ucds)

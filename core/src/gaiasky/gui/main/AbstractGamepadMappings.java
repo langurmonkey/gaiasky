@@ -15,6 +15,9 @@ import gaiasky.util.math.MathUtilsDouble;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Base abstract implementation for gamepad mappings.
+ */
 public abstract class AbstractGamepadMappings implements IGamepadMappings {
     protected static final Logger.Log logger = Logger.getLogger(AbstractGamepadMappings.class);
 

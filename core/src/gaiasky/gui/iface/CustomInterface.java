@@ -161,7 +161,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
                     int size = (int) s;
                     int cSize = findClosestSize(size);
                     String style = "msg-" + cSize;
-                    TextArea customText = null;
+                    TextArea customText;
                     boolean add = false;
                     if (customElements.containsKey(id)) {
                         if (customElements.get(id) instanceof TextArea) {
@@ -221,13 +221,12 @@ public class CustomInterface implements IObserver, IGuiInterface {
     }
 
     private int findClosestSize(int size) {
-        for (int i = 0; i < sizes.size(); i++) {
-            int current = sizes.get(i);
+        for (int current : sizes) {
             if (size == current || size < current) {
                 return current;
             }
         }
-        return sizes.get(sizes.size() - 1);
+        return sizes.getLast();
     }
 
     @Override

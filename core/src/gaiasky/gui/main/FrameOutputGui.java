@@ -26,7 +26,10 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public class RenderGui extends AbstractGui {
+/**
+ * User interface active during rendering to still frames, both in the frame output mode, and screenshots (advanced mode).
+ */
+public class FrameOutputGui extends AbstractGui {
     protected Label time;
     protected Table mainTable;
 
@@ -34,7 +37,7 @@ public class RenderGui extends AbstractGui {
 
     protected DateTimeFormatter df;
 
-    public RenderGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public FrameOutputGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }

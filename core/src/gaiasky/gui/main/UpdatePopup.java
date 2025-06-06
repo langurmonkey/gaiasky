@@ -16,6 +16,9 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 
+/**
+ * New version notification pop-up. Shows up whenever a new version of Gaia Sky is available.
+ */
 public class UpdatePopup extends GenericDialog {
     private final String tagVersion;
 

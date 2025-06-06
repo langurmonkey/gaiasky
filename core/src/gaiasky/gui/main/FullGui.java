@@ -13,7 +13,6 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -56,6 +55,9 @@ import java.time.Instant;
 
 import static gaiasky.event.Event.*;
 
+/**
+ * Aggregates and manages all the panels and separate user interfaces in Gaia Sky.
+ */
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
     private final GlobalResources globalResources;
@@ -328,23 +330,18 @@ public class FullGui extends AbstractGui {
             }
 
             /* CAPTURE SCROLL FOCUS */
-            stage.addListener(new EventListener() {
+            stage.addListener(event -> {
+                if (event instanceof InputEvent ie) {
 
-                @Override
-                public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
-                    if (event instanceof InputEvent ie) {
-
-                        if (ie.getType() == Type.mouseMoved) {
-                            Actor scrollPanelAncestor = GuiUtils.getScrollPaneAncestor(ie.getTarget());
-                            stage.setScrollFocus(scrollPanelAncestor);
-                        } else if (ie.getType() == Type.touchDown) {
-                            if (ie.getTarget() instanceof TextField)
-                                stage.setKeyboardFocus(ie.getTarget());
-                        }
+                    if (ie.getType() == Type.mouseMoved) {
+                        Actor scrollPanelAncestor = GuiUtils.getScrollPaneAncestor(ie.getTarget());
+                        stage.setScrollFocus(scrollPanelAncestor);
+                    } else if (ie.getType() == Type.touchDown) {
+                        if (ie.getTarget() instanceof TextField)
+                            stage.setKeyboardFocus(ie.getTarget());
                     }
-                    return false;
                 }
-
+                return false;
             });
 
             /* KEYBOARD FOCUS */
@@ -698,34 +695,4 @@ public class FullGui extends AbstractGui {
         return cool;
     }
 
-    public static void addCubemapProceduralWindow(Skin skin, Stage stage, String objectName) {
-        GenericDialog proceduralCubemap = new GenericDialog(I18n.msg("notif.error", I18n.msg("gui.procedural.title", objectName)), skin, stage) {
-
-            @Override
-            protected void build() {
-                OwnLabel info1 = new OwnLabel(I18n.msg("gui.procedural.cubemap.1"), skin);
-                OwnLabel info2 = new OwnLabel(I18n.msg("gui.procedural.cubemap.2"), skin);
-                content.add(info1).left().padTop(10).padBottom(5).row();
-                content.add(info2).left().padBottom(10);
-            }
-
-            @Override
-            protected boolean accept() {
-                return true;
-            }
-
-            @Override
-            protected void cancel() {
-            }
-
-            @Override
-            public void dispose() {
-            }
-
-        };
-        proceduralCubemap.setAcceptText(I18n.msg("gui.ok"));
-        proceduralCubemap.setCancelText(null);
-        proceduralCubemap.buildSuper();
-        proceduralCubemap.show(stage);
-    }
 }

@@ -27,6 +27,9 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
+/**
+ * Gets notifications and other kinds of messages from the event manager and logs them to the console.
+ */
 public class ConsoleLogger implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
@@ -71,7 +74,7 @@ public class ConsoleLogger implements IObserver {
         Instant date = Instant.now();
         log(df.format(date), msg, LoggerLevel.INFO);
         if (useHistorical) {
-            NotificationsInterface.historical.add(new MessageBean(date, msg));
+            NotificationsInterface.historical.add(new MessageBean(msg, date));
         }
     }
 
@@ -91,7 +94,7 @@ public class ConsoleLogger implements IObserver {
         Instant date = Instant.now();
         log(tag(date, level), msg, level);
         if (useHistorical) {
-            NotificationsInterface.historical.add(new MessageBean(date, msg));
+            NotificationsInterface.historical.add(new MessageBean(msg, date));
         }
     }
 

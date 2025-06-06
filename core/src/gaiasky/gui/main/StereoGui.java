@@ -31,6 +31,9 @@ import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 
 import java.text.DecimalFormat;
 
+/**
+ * User interface in stereographic mode.
+ */
 public class StereoGui extends AbstractGui {
     private final Skin skin;
 

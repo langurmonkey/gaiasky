@@ -22,6 +22,9 @@ import gaiasky.gui.api.IGuiInterface;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 
+/**
+ * Base implementation for top-level GUIs. Contains the essentials used by (almost) all.
+ */
 public abstract class AbstractGui implements IObserver, IGui {
 
     /**

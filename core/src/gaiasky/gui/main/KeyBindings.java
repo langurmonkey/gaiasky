@@ -35,6 +35,9 @@ import java.util.*;
 
 import static gaiasky.util.Settings.StereoProfile.values;
 
+/**
+ * Defines keyboard bindings to actions.
+ */
 public class KeyBindings {
     // Special keys
     public static final int CTRL_L = Keys.CONTROL_LEFT;
@@ -65,14 +68,6 @@ public class KeyBindings {
 
     public Map<TreeSet<Integer>, ProgramAction> getMappings() {
         return mappings;
-    }
-
-    public Map<ProgramAction, Array<TreeSet<Integer>>> getMappingsInv() {
-        return mappingsInv;
-    }
-
-    public Map<TreeSet<Integer>, ProgramAction> getSortedMappings() {
-        return GlobalResources.sortByValue(mappings);
     }
 
     public Map<ProgramAction, Array<TreeSet<Integer>>> getSortedMappingsInv() {
@@ -341,14 +336,10 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.keyframes", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.keyframes")));
 
         // Divide time warp
-        addAction(new ProgramAction("action.dividetime", () -> {
-            EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this);
-        }, 500L));
+        addAction(new ProgramAction("action.dividetime", () -> EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this), 500L));
 
         // Double time warp
-        addAction(new ProgramAction("action.doubletime", () -> {
-            EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this);
-        }, 500L));
+        addAction(new ProgramAction("action.doubletime", () -> EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this), 500L));
 
         // Reset time warp to 1
         addAction(new ProgramAction("action.time.warp.reset", () -> EventManager.publish(Event.TIME_WARP_CMD, this, 1d)));

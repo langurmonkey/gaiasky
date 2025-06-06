@@ -13,6 +13,9 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 
+/**
+ * Listens to controller connection and disconnection events and passes them on to the event manager.
+ */
 public class ControllerConnectionListener extends ControllerAdapter {
     private static final Logger.Log logger = Logger.getLogger(ControllerConnectionListener.class);
 

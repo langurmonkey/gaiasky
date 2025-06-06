@@ -7,12 +7,6 @@
 
 package gaiasky.gui.util;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Net.HttpMethods;
-import com.badlogic.gdx.Net.HttpRequest;
-import com.badlogic.gdx.Net.HttpResponse;
-import com.badlogic.gdx.Net.HttpResponseListener;
-import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -33,8 +27,9 @@ import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * Updates information coming from external sources regarding particular objects.
+ */
 public class ExternalInformationUpdater {
     private static final Log logger = Logger.getLogger(ExternalInformationUpdater.class);
 
@@ -43,7 +38,7 @@ public class ExternalInformationUpdater {
     private LabelStyle linkStyle;
     private Cell<Link> dataCell, gaiaCell, simbadCell;
     private Link simbadLink;
-    private OwnTextButton infoButton, gaiaButton;
+    private OwnTextButton infoButton, archiveButton;
     // The table to modify
     private Table table;
     private float pad;
@@ -68,16 +63,16 @@ public class ExternalInformationUpdater {
                 gaiaCell = table.add().left();
                 simbadCell = table.add().left();
 
-                // Gaia archive.
+                // Archive.
                 if (focus.isStar()) {
                     EventManager.publish(Event.UPDATE_ARCHIVE_VIEW_CMD, this, focus);
-                    if (gaiaButton != null)
-                        gaiaButton.remove();
-                    gaiaButton = new OwnTextButton(I18n.msg("gui.focusinfo.archive"), skin);
-                    gaiaButton.pad(pad / 3f, pad, pad / 3f, pad);
-                    gaiaButton.addListener(new GaiaArchiveButtonListener(focus));
-                    gaiaButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.gaiaarchive"), skin));
-                    gaiaCell.setActor(gaiaButton).padRight(pad);
+                    if (archiveButton != null)
+                        archiveButton.remove();
+                    archiveButton = new OwnTextButton(I18n.msg("gui.focusinfo.archive"), skin);
+                    archiveButton.pad(pad / 3f, pad, pad / 3f, pad);
+                    archiveButton.addListener(new GaiaArchiveButtonListener(focus));
+                    archiveButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.gaiaarchive"), skin));
+                    gaiaCell.setActor(archiveButton).padRight(pad);
                 } else {
                     gaiaCell.padRight(0);
                 }
@@ -139,47 +134,6 @@ public class ExternalInformationUpdater {
             listener.ko(null);
         }
     }
-
-
-    private void createRequest(final String base, final String name, final String[] suffixes, final AtomicInteger index, LinkListener listener) {
-        if (index.get() < suffixes.length) {
-            final String url = base + name + suffixes[index.get()];
-            HttpRequest request = new HttpRequest(HttpMethods.GET);
-            request.setUrl(url);
-            request.setTimeOut(TIMEOUT_MS);
-
-            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
-                @Override
-                public void handleHttpResponse(HttpResponse httpResponse) {
-                    if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
-                        listener.ok(url);
-                    } else {
-                        // Next
-                        index.incrementAndGet();
-                        createRequest(base, name, suffixes, index, listener);
-                    }
-                }
-
-                @Override
-                public void failed(Throwable t) {
-                    // Next
-                    index.incrementAndGet();
-                    createRequest(base, name, suffixes, index, listener);
-                }
-
-                @Override
-                public void cancelled() {
-                    // Next
-                    index.incrementAndGet();
-                    createRequest(base, name, suffixes, index, listener);
-                }
-            });
-        } else {
-            // Ran out of suffixes!
-            listener.ok(null);
-        }
-    }
-
 
     private record GaiaArchiveButtonListener(FocusView focus) implements EventListener {
 

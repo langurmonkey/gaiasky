@@ -66,14 +66,9 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private String message;
     private boolean initialized = false;
 
-    private final String black = "\033[30m";
-    private final String red = "\033[31m";
     private final String green = "\033[32m";
     private final String yellow = "\033[33m";
     private final String blue = "\033[34m";
-    private final String magenta = "\033[35m";
-    private final String cyan = "\033[36m";
-    private final String white = "\033[37m";
     private final String reset = "\033[0m";
 
 
@@ -320,7 +315,6 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                 var code = Integer.parseInt(subString.substring(2, mIdx));
                 subString = subString.substring(mIdx + 1);
                 currCol = switch (code) {
-                    case 0, 37, 39 -> Color.WHITE;
                     case 30 -> Color.BLACK;
                     case 31 -> ColorUtils.gRedC;
                     case 32 -> ColorUtils.gGreenC;
@@ -364,7 +358,6 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             var text = new OwnLabel(str, getSkin(), "mono");
             text.setColor(col);
             hg.addActor(text);
-            return hg;
         } else {
             // We have breaks.
             var part = str;
@@ -387,8 +380,8 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                 text.setColor(col);
                 hg.addActor(text);
             }
-            return hg;
         }
+        return hg;
     }
 
     private String processMethod(Method m) {
@@ -410,17 +403,6 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                     .append(reset);
         }
         return sb.toString();
-    }
-
-    /**
-     * Tokenizes the list of parameters by splitting at white spaces.
-     *
-     * @param params The parameters in a single string.
-     *
-     * @return Array of parameters.
-     */
-    private String[] tokenizeParametersSimple(String params) {
-        return params.split("\\s+");
     }
 
     /**

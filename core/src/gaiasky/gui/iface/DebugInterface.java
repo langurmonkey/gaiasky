@@ -29,6 +29,10 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.text.DecimalFormat;
 
+/**
+ * Displays system metrics (runtime, frame rate, RAM usage, etc.) that are passed down through the
+ * event manager in a nice little collapsible panel.
+ */
 public class DebugInterface extends TableGuiInterface implements IObserver {
     private OwnLabel debugRuntime;
     private OwnLabel debugRAMUsed;
@@ -396,7 +400,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 case DEBUG_DYN_RES -> {
                     if (debug && data.length > 0) {
-                        debugDynRes.setText("L" + data[0] + ": " + fpsFormatter.format((Double) data[1]));
+                        debugDynRes.setText("L" + data[0] + ": " + fpsFormatter.format(data[1]));
                         if (!showDynRes) {
                             showDynRes = true;
                             build();

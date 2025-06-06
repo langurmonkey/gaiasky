@@ -14,6 +14,9 @@ import gaiasky.util.i18n.I18n;
 
 import java.lang.reflect.Field;
 
+/**
+ * Defines the keys used in Gaia Sky.
+ */
 public class GSKeys {
     public static final int ANY_KEY = Keys.ANY_KEY;
     public static final int NUM_0 = Keys.NUM_0;

@@ -14,20 +14,19 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
-public class MessageBean {
+/**
+ * Holds pairs of message and date for logs.
+ * @param msg The message, as a string.
+ * @param date The date, as an instant.
+ */
+public record MessageBean(String msg, Instant date) {
     private static final String TAG_SEPARATOR = " - ";
-    private static final DateTimeFormatter df = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
-    public String msg;
-    public Instant date;
-
-    public MessageBean(Instant date, String msg) {
-        this.msg = msg;
-        this.date = date;
-    }
+    private static final DateTimeFormatter df = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
+            .withLocale(I18n.locale)
+            .withZone(ZoneOffset.UTC);
 
     public MessageBean(String msg) {
-        this.msg = msg;
-        this.date = Instant.now();
+        this(msg, Instant.now());
     }
 
     /** Has the message finished given the timeout? **/

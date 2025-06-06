@@ -22,6 +22,9 @@ import gaiasky.util.Settings;
 import java.util.Objects;
 import java.util.TreeSet;
 
+/**
+ * Controls inputs from the keyboard.
+ */
 public class KeyboardInputController extends InputAdapter implements IObserver {
 
     private final Input input;

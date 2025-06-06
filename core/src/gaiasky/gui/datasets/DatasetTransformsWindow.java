@@ -10,13 +10,10 @@ package gaiasky.gui.datasets;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.gui.beans.StringIndexComobBoxBean;
 import gaiasky.gui.beans.TransformComboBoxBean;
 import gaiasky.gui.window.GenericDialog;
@@ -29,7 +26,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.scene2d.*;
@@ -236,7 +232,7 @@ public class DatasetTransformsWindow extends GenericDialog {
                 type.setItems(transformTypes);
                 type.setSelectedIndex(getIndex(transform));
                 type.addListener((event) -> {
-                    if (event instanceof ChangeEvent ce) {
+                    if (event instanceof ChangeEvent) {
                         var bean = type.getSelected();
                         if (!transform.getClass().equals(bean.clazz())) {
                             GaiaSky.postRunnable(() -> {
@@ -261,178 +257,199 @@ public class DatasetTransformsWindow extends GenericDialog {
 
                 // Content
                 Table transformTable = new Table(skin);
-                Cell<?> content = table.add(transformTable).colspan(3).width(700f).padTop(pad20);
+                table.add(transformTable).colspan(3).width(700f).padTop(pad20);
 
                 DoubleValidator tValidator = new DoubleValidator(-10_000_000_000.0, 10_000_000_000.0);
                 DoubleValidator aValidator = new DoubleValidator(-100.0, 100.0);
                 DoubleValidator angleValidator = new DoubleValidator(-360.0, 360.0);
                 DoubleValidator sValidator = new DoubleValidator(-1_000_000.0, 1_000_000.0);
 
-                if (transform instanceof TranslateTransform tr) {
-                    // Labels
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.translate.x"), skin)).center().padRight(pad10).padBottom(pad10);
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.translate.y"), skin)).center().padRight(pad10).padBottom(pad10);
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.translate.z"), skin)).center().padBottom(pad10).row();
-                    // Inputs
-                    double[] translationIn = tr.getVector() != null ? tr.getVector() : new double[]{0, 0, 0};
-                    OwnTextField x = new OwnTextField(Double.toString(translationIn[0] * Constants.U_TO_PC), skin, tValidator);
-                    x.setWidth(220f);
-                    OwnTextField y = new OwnTextField(Double.toString(translationIn[1] * Constants.U_TO_PC), skin, tValidator);
-                    y.setWidth(220f);
-                    OwnTextField z = new OwnTextField(Double.toString(translationIn[2] * Constants.U_TO_PC), skin, tValidator);
-                    z.setWidth(220f);
-                    transformTable.add(x).center().padRight(pad10);
-                    transformTable.add(y).center().padRight(pad10);
-                    transformTable.add(z).center();
+                switch (transform) {
+                    case TranslateTransform tr -> {
+                        // Labels
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.translate.x"), skin))
+                                .center()
+                                .padRight(pad10)
+                                .padBottom(pad10);
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.translate.y"), skin))
+                                .center()
+                                .padRight(pad10)
+                                .padBottom(pad10);
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.translate.z"), skin)).center().padBottom(pad10).row();
+                        // Inputs
+                        double[] translationIn = tr.getVector() != null ? tr.getVector() : new double[]{0, 0, 0};
+                        OwnTextField x = new OwnTextField(Double.toString(translationIn[0] * Constants.U_TO_PC), skin, tValidator);
+                        x.setWidth(220f);
+                        OwnTextField y = new OwnTextField(Double.toString(translationIn[1] * Constants.U_TO_PC), skin, tValidator);
+                        y.setWidth(220f);
+                        OwnTextField z = new OwnTextField(Double.toString(translationIn[2] * Constants.U_TO_PC), skin, tValidator);
+                        z.setWidth(220f);
+                        transformTable.add(x).center().padRight(pad10);
+                        transformTable.add(y).center().padRight(pad10);
+                        transformTable.add(z).center();
 
-                    // Listener.
-                    EventListener el = (event) -> {
-                        if (event instanceof ChangeEvent ce) {
-                            double[] translation = new double[3];
-                            if (x.isValid()) {
-                                translation[0] = x.getDoubleValue(0f) * Constants.PC_TO_U;
-                                transformsEdited = true;
+                        // Listener.
+                        EventListener el = (event) -> {
+                            if (event instanceof ChangeEvent) {
+                                double[] translation = new double[3];
+                                if (x.isValid()) {
+                                    translation[0] = x.getDoubleValue(0f) * Constants.PC_TO_U;
+                                    transformsEdited = true;
+                                }
+                                if (y.isValid()) {
+                                    translation[1] = y.getDoubleValue(0f) * Constants.PC_TO_U;
+                                    transformsEdited = true;
+                                }
+                                if (z.isValid()) {
+                                    translation[2] = z.getDoubleValue(0f) * Constants.PC_TO_U;
+                                    transformsEdited = true;
+                                }
+                                if (transformsEdited) {
+                                    tr.setVector(translation);
+                                }
+                                return true;
                             }
-                            if (y.isValid()) {
-                                translation[1] = y.getDoubleValue(0f) * Constants.PC_TO_U;
-                                transformsEdited = true;
-                            }
-                            if (z.isValid()) {
-                                translation[2] = z.getDoubleValue(0f) * Constants.PC_TO_U;
-                                transformsEdited = true;
-                            }
-                            if (transformsEdited) {
-                                tr.setVector(translation);
-                            }
-                            return true;
-                        }
-                        return false;
-                    };
-                    x.addListener(el);
-                    y.addListener(el);
-                    z.addListener(el);
+                            return false;
+                        };
+                        x.addListener(el);
+                        y.addListener(el);
+                        z.addListener(el);
 
-                } else if (transform instanceof RotateTransform tr) {
-                    // Labels
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.axis.x"), skin)).center().padRight(pad10).padBottom(pad10);
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.axis.y"), skin)).center().padRight(pad10).padBottom(pad10);
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.axis.z"), skin)).center().padRight(pad20).padBottom(pad10);
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.angle"), skin)).center().padBottom(pad10).row();
-                    // Inputs
-                    double[] axisIn = tr.getAxis() != null ? tr.getAxis() : new double[]{1, 0, 0};
-                    OwnTextField x = new OwnTextField(Double.toString(axisIn[0]), skin, aValidator);
-                    OwnTextField y = new OwnTextField(Double.toString(axisIn[1]), skin, aValidator);
-                    OwnTextField z = new OwnTextField(Double.toString(axisIn[2]), skin, aValidator);
-                    OwnTextField angle = new OwnTextField(Double.toString(tr.getAngle()), skin, angleValidator);
-
-                    transformTable.add(x).center().padRight(pad10);
-                    transformTable.add(y).center().padRight(pad10);
-                    transformTable.add(z).center().padRight(pad20);
-                    transformTable.add(angle).center();
-
-                    // Listener.
-                    EventListener el = (event) -> {
-                        if (event instanceof ChangeEvent ce) {
-                            double[] axis = new double[3];
-                            double angleDeg = 0;
-                            if (x.isValid()) {
-                                axis[0] = x.getDoubleValue(0f);
-                                transformsEdited = true;
-                            }
-                            if (y.isValid()) {
-                                axis[1] = y.getDoubleValue(0f);
-                                transformsEdited = true;
-                            }
-                            if (z.isValid()) {
-                                axis[2] = z.getDoubleValue(0f);
-                                transformsEdited = true;
-                            }
-                            if (angle.isValid()) {
-                                angleDeg = angle.getDoubleValue(0f);
-                                transformsEdited = true;
-                            }
-                            if (transformsEdited) {
-                                tr.setAxis(axis);
-                                tr.setAngle(angleDeg);
-                            }
-                            return true;
-                        }
-                        return false;
-                    };
-                    x.addListener(el);
-                    y.addListener(el);
-                    z.addListener(el);
-                    angle.addListener(el);
-
-                } else if (transform instanceof ScaleTransform tr) {
-                    // Labels
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.scale.x"), skin)).center().padRight(pad10).padBottom(pad10);
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.scale.y"), skin)).center().padRight(pad10).padBottom(pad10);
-                    transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.scale.z"), skin)).center().padBottom(pad10).row();
-                    // Inputs
-                    double[] scaleIn = tr.getScale() != null ? tr.getScale() : new double[]{1, 1, 1};
-                    OwnTextField x = new OwnTextField(Double.toString(scaleIn[0]), skin, sValidator);
-                    OwnTextField y = new OwnTextField(Double.toString(scaleIn[1]), skin, sValidator);
-                    OwnTextField z = new OwnTextField(Double.toString(scaleIn[2]), skin, sValidator);
-                    transformTable.add(x).center().padRight(pad10);
-                    transformTable.add(y).center().padRight(pad10);
-                    transformTable.add(z).center();
-
-                    // Listener.
-                    EventListener el = (event) -> {
-                        if (event instanceof ChangeEvent ce) {
-                            double[] scale = new double[3];
-                            if (x.isValid()) {
-                                scale[0] = x.getDoubleValue(0f);
-                                transformsEdited = true;
-                            }
-                            if (y.isValid()) {
-                                scale[1] = y.getDoubleValue(0f);
-                                transformsEdited = true;
-                            }
-                            if (z.isValid()) {
-                                scale[2] = z.getDoubleValue(0f);
-                                transformsEdited = true;
-                            }
-                            if (transformsEdited) {
-                                tr.setScale(scale);
-                            }
-                            return true;
-                        }
-                        return false;
-                    };
-                    x.addListener(el);
-                    y.addListener(el);
-                    z.addListener(el);
-
-                } else if (transform instanceof MatrixTransform tr) {
-                    OwnSelectBox<StringIndexComobBoxBean> refSysTransforms = new OwnSelectBox<>(skin);
-                    refSysTransforms.setWidth(selectWidth);
-                    refSysTransforms.setItems(refSysTypes);
-                    if (!tr.isEmpty()) {
-                        var matrix = tr.getMatDouble();
-                        int refSysIndex = findRefSysTransformIndex(matrix);
-                        if (refSysIndex >= 0) {
-                            refSysTransforms.setSelectedIndex(refSysIndex);
-                        }
-                    } else {
-                        refSysTransforms.setSelectedIndex(0);
-                        tr.setMatrix(Coordinates.getTransformD(refSysTypes[0].value));
                     }
-                    transformTable.add(refSysTransforms).center().padRight(pad10);
+                    case RotateTransform tr -> {
+                        // Labels
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.axis.x"), skin))
+                                .center()
+                                .padRight(pad10)
+                                .padBottom(pad10);
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.axis.y"), skin))
+                                .center()
+                                .padRight(pad10)
+                                .padBottom(pad10);
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.axis.z"), skin))
+                                .center()
+                                .padRight(pad20)
+                                .padBottom(pad10);
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.rotate.angle"), skin)).center().padBottom(pad10).row();
+                        // Inputs
+                        double[] axisIn = tr.getAxis() != null ? tr.getAxis() : new double[]{1, 0, 0};
+                        OwnTextField x = new OwnTextField(Double.toString(axisIn[0]), skin, aValidator);
+                        OwnTextField y = new OwnTextField(Double.toString(axisIn[1]), skin, aValidator);
+                        OwnTextField z = new OwnTextField(Double.toString(axisIn[2]), skin, aValidator);
+                        OwnTextField angle = new OwnTextField(Double.toString(tr.getAngle()), skin, angleValidator);
 
-                    // Listener
-                    refSysTransforms.addListener((event) -> {
-                        if (event instanceof ChangeEvent ce) {
-                            var bean = refSysTransforms.getSelected();
-                            var newMatrix = Coordinates.getTransformD(bean.value);
-                            tr.setMatrix(newMatrix);
-                            transformsEdited = true;
-                            return true;
+                        transformTable.add(x).center().padRight(pad10);
+                        transformTable.add(y).center().padRight(pad10);
+                        transformTable.add(z).center().padRight(pad20);
+                        transformTable.add(angle).center();
+
+                        // Listener.
+                        EventListener el = (event) -> {
+                            if (event instanceof ChangeEvent) {
+                                double[] axis = new double[3];
+                                double angleDeg = 0;
+                                if (x.isValid()) {
+                                    axis[0] = x.getDoubleValue(0f);
+                                    transformsEdited = true;
+                                }
+                                if (y.isValid()) {
+                                    axis[1] = y.getDoubleValue(0f);
+                                    transformsEdited = true;
+                                }
+                                if (z.isValid()) {
+                                    axis[2] = z.getDoubleValue(0f);
+                                    transformsEdited = true;
+                                }
+                                if (angle.isValid()) {
+                                    angleDeg = angle.getDoubleValue(0f);
+                                    transformsEdited = true;
+                                }
+                                if (transformsEdited) {
+                                    tr.setAxis(axis);
+                                    tr.setAngle(angleDeg);
+                                }
+                                return true;
+                            }
+                            return false;
+                        };
+                        x.addListener(el);
+                        y.addListener(el);
+                        z.addListener(el);
+                        angle.addListener(el);
+
+                    }
+                    case ScaleTransform tr -> {
+                        // Labels
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.scale.x"), skin)).center().padRight(pad10).padBottom(pad10);
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.scale.y"), skin)).center().padRight(pad10).padBottom(pad10);
+                        transformTable.add(new OwnLabel(I18n.msg("gui.dataset.transform.scale.z"), skin)).center().padBottom(pad10).row();
+                        // Inputs
+                        double[] scaleIn = tr.getScale() != null ? tr.getScale() : new double[]{1, 1, 1};
+                        OwnTextField x = new OwnTextField(Double.toString(scaleIn[0]), skin, sValidator);
+                        OwnTextField y = new OwnTextField(Double.toString(scaleIn[1]), skin, sValidator);
+                        OwnTextField z = new OwnTextField(Double.toString(scaleIn[2]), skin, sValidator);
+                        transformTable.add(x).center().padRight(pad10);
+                        transformTable.add(y).center().padRight(pad10);
+                        transformTable.add(z).center();
+
+                        // Listener.
+                        EventListener el = (event) -> {
+                            if (event instanceof ChangeEvent) {
+                                double[] scale = new double[3];
+                                if (x.isValid()) {
+                                    scale[0] = x.getDoubleValue(0f);
+                                    transformsEdited = true;
+                                }
+                                if (y.isValid()) {
+                                    scale[1] = y.getDoubleValue(0f);
+                                    transformsEdited = true;
+                                }
+                                if (z.isValid()) {
+                                    scale[2] = z.getDoubleValue(0f);
+                                    transformsEdited = true;
+                                }
+                                if (transformsEdited) {
+                                    tr.setScale(scale);
+                                }
+                                return true;
+                            }
+                            return false;
+                        };
+                        x.addListener(el);
+                        y.addListener(el);
+                        z.addListener(el);
+
+                    }
+                    case MatrixTransform tr -> {
+                        OwnSelectBox<StringIndexComobBoxBean> refSysTransforms = new OwnSelectBox<>(skin);
+                        refSysTransforms.setWidth(selectWidth);
+                        refSysTransforms.setItems(refSysTypes);
+                        if (!tr.isEmpty()) {
+                            var matrix = tr.getMatDouble();
+                            int refSysIndex = findRefSysTransformIndex(matrix);
+                            if (refSysIndex >= 0) {
+                                refSysTransforms.setSelectedIndex(refSysIndex);
+                            }
+                        } else {
+                            refSysTransforms.setSelectedIndex(0);
+                            tr.setMatrix(Coordinates.getTransformD(refSysTypes[0].value));
                         }
-                        return false;
-                    });
+                        transformTable.add(refSysTransforms).center().padRight(pad10);
 
+                        // Listener
+                        refSysTransforms.addListener((event) -> {
+                            if (event instanceof ChangeEvent) {
+                                var bean = refSysTransforms.getSelected();
+                                var newMatrix = Coordinates.getTransformD(bean.value);
+                                tr.setMatrix(newMatrix);
+                                transformsEdited = true;
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
+                    default -> {
+                    }
                 }
 
 
@@ -511,16 +528,6 @@ public class DatasetTransformsWindow extends GenericDialog {
         }
     }
 
-    private AttributeComboBoxBean getAttributeBean(IAttribute attr,
-                                                   Array<AttributeComboBoxBean> attrs) {
-        for (AttributeComboBoxBean attribute : attrs) {
-            if (attr.toString().contains(attribute.name)) {
-                return attribute;
-            }
-        }
-        return null;
-    }
-
     @Override
     protected boolean accept() {
         // Filter
@@ -529,7 +536,6 @@ public class DatasetTransformsWindow extends GenericDialog {
                 // Update.
                 setAffine(ci.entity, affine.transformations);
             } else {
-                // ERROR!
                 throw new RuntimeException("No affine component found.");
             }
         }

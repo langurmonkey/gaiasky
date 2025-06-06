@@ -21,6 +21,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 
+/**
+ * Contains mappings from actions to input targets for gamepads. The information is typically
+ * loaded from <code>gamepad_name.controller</code> files.
+ */
 public class GamepadMappings extends AbstractGamepadMappings {
     private String controllerName;
 
@@ -57,39 +61,39 @@ public class GamepadMappings extends AbstractGamepadMappings {
 
             AXIS_VALUE_POW = parseDouble(mappings, "4.0", "axis.value.pow");
 
-            AXIS_LSTICK_H = parseInt(mappings, "-1", "axis.roll", "axis.lstick.h");
+            AXIS_LSTICK_H = parseInt(mappings, "axis.roll", "axis.lstick.h");
             AXIS_LSTICK_H_SENS = parseDouble(mappings, "1.0", "axis.roll.sensitivity", "axis.lstick.h.sensitivity");
-            AXIS_RSTICK_H = parseInt(mappings, "-1", "axis.pitch", "axis.rstick.h");
+            AXIS_RSTICK_H = parseInt(mappings, "axis.pitch", "axis.rstick.h");
             AXIS_RSTICK_H_SENS = parseDouble(mappings, "1.0", "axis.pitch.sensitivity", "axis.rstick.h.sensitivity");
-            AXIS_RSTICK_V = parseInt(mappings, "-1", "axis.yaw", "axis.rstick.v");
+            AXIS_RSTICK_V = parseInt(mappings, "axis.yaw", "axis.rstick.v");
             AXIS_RSTICK_V_SENS = parseDouble(mappings, "1.0", "axis.yaw.sensitivity", "axis.rstick.v.sensitivity");
-            AXIS_LSTICK_V = parseInt(mappings, "-1", "axis.move", "axis.lstick.v");
+            AXIS_LSTICK_V = parseInt(mappings, "axis.move", "axis.lstick.v");
             AXIS_LSTICK_V_SENS = parseDouble(mappings, "1.0", "axis.move.sensitivity", "axis.lstick.v.sensitivity");
-            AXIS_RB = parseInt(mappings, "-1", "axis.rb");
-            AXIS_LB = parseInt(mappings, "-1", "axis.lb");
-            AXIS_RT = parseInt(mappings, "-1", "axis.velocityup", "axis.rt");
+            AXIS_RB = parseInt(mappings, "axis.rb");
+            AXIS_LB = parseInt(mappings, "axis.lb");
+            AXIS_RT = parseInt(mappings, "axis.velocityup", "axis.rt");
             AXIS_RT_SENS = parseDouble(mappings, "-1", "axis.velocityup.sensitivity", "axis.rt.sensitivity");
-            AXIS_LT = parseInt(mappings, "-1", "axis.velocitydown", "axis.lt");
+            AXIS_LT = parseInt(mappings, "axis.velocitydown", "axis.lt");
             AXIS_LT_SENS = parseDouble(mappings, "1.0", "axis.velocitydown.sensitivity", "axis.lt.sensitivity");
-            AXIS_DPAD_H = parseInt(mappings, "-1", "axis.dpad.h");
-            AXIS_DPAD_V = parseInt(mappings, "-1", "axis.dpad.v");
+            AXIS_DPAD_H = parseInt(mappings, "axis.dpad.h");
+            AXIS_DPAD_V = parseInt(mappings, "axis.dpad.v");
 
-            BUTTON_DPAD_UP = parseInt(mappings, "-1", "button.up", "button.dpad.u");
-            BUTTON_DPAD_DOWN = parseInt(mappings, "-1", "button.down", "button.dpad.d");
-            BUTTON_DPAD_LEFT = parseInt(mappings, "-1", "button.dpad.l");
-            BUTTON_DPAD_RIGHT = parseInt(mappings, "-1", "button.dpad.r");
-            BUTTON_A = parseInt(mappings, "-1", "button.velocityup", "button.a");
-            BUTTON_B = parseInt(mappings, "-1", "button.velocitydown", "button.b");
-            BUTTON_X = parseInt(mappings, "-1", "button.velocitytenth", "button.x");
-            BUTTON_Y = parseInt(mappings, "-1", "button.velocityhalf", "button.y");
-            BUTTON_RSTICK = parseInt(mappings, "-1", "button.rstick", "button.mode.toggle");
-            BUTTON_LSTICK = parseInt(mappings, "-1", "button.lstick");
-            BUTTON_RT = parseInt(mappings, "-1", "button.rt");
-            BUTTON_RB = parseInt(mappings, "-1", "button.rb");
-            BUTTON_LT = parseInt(mappings, "-1", "button.lt");
-            BUTTON_LB = parseInt(mappings, "-1", "button.lb");
-            BUTTON_START = parseInt(mappings, "-1", "button.start");
-            BUTTON_SELECT = parseInt(mappings, "-1", "button.select");
+            BUTTON_DPAD_UP = parseInt(mappings, "button.up", "button.dpad.u");
+            BUTTON_DPAD_DOWN = parseInt(mappings, "button.down", "button.dpad.d");
+            BUTTON_DPAD_LEFT = parseInt(mappings, "button.dpad.l");
+            BUTTON_DPAD_RIGHT = parseInt(mappings, "button.dpad.r");
+            BUTTON_A = parseInt(mappings, "button.velocityup", "button.a");
+            BUTTON_B = parseInt(mappings, "button.velocitydown", "button.b");
+            BUTTON_X = parseInt(mappings, "button.velocitytenth", "button.x");
+            BUTTON_Y = parseInt(mappings, "button.velocityhalf", "button.y");
+            BUTTON_RSTICK = parseInt(mappings, "button.rstick", "button.mode.toggle");
+            BUTTON_LSTICK = parseInt(mappings, "button.lstick");
+            BUTTON_RT = parseInt(mappings, "button.rt");
+            BUTTON_RB = parseInt(mappings, "button.rb");
+            BUTTON_LT = parseInt(mappings, "button.lt");
+            BUTTON_LB = parseInt(mappings, "button.lb");
+            BUTTON_START = parseInt(mappings, "button.start");
+            BUTTON_SELECT = parseInt(mappings, "button.select");
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e, "Error reading inputListener mappings");
@@ -160,16 +164,16 @@ public class GamepadMappings extends AbstractGamepadMappings {
         }
     }
 
-    private int parseInt(Properties mappings, String defaultValue, String... properties) {
+    private int parseInt(Properties mappings, String... properties) {
         try {
             for (String property : properties) {
                 if (mappings.containsKey(property)) {
-                    return Integer.parseInt(mappings.getProperty(property, defaultValue));
+                    return Integer.parseInt(mappings.getProperty(property, "-1"));
                 }
             }
             throw new RuntimeException("Properties not found: " + GlobalResources.toString(properties, "", ","));
         } catch (Exception e) {
-            return Integer.parseInt(defaultValue);
+            return Integer.parseInt("-1");
         }
     }
 

@@ -61,6 +61,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+/**
+ * Manages the interface that shows up immediately after starting Gaia Sky. Coordinates access to the dataset manager window, and
+ * provides access to start the application.
+ */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
     private static final AtomicReference<DataDescriptor> localDatasets = new AtomicReference<>();

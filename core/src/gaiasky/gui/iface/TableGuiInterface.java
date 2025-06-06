@@ -11,6 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.gui.api.IGuiInterface;
 
+/**
+ * Abstract interface item backed by a {@link Table}.
+ */
 public abstract class TableGuiInterface extends Table implements IGuiInterface {
     protected TableGuiInterface(Skin skin) {
         super(skin);

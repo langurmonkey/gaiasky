@@ -423,13 +423,13 @@ public class DatasetManagerWindow extends GenericDialog {
         for (DatasetType type : dataDescriptor.types) {
             List<DatasetDesc> datasets = type.datasets;
             List<DatasetDesc> filtered = datasets.stream().filter(d -> d.filter(filter) && (mode != DatasetMode.AVAILABLE || !d.exists)).collect(Collectors.toList());
-            added += addDatasetTypeGroup(leftTable, mode, dataDescriptor, currentSetting, type, filtered, width, filter);
+            added += addDatasetTypeGroup(leftTable, mode, currentSetting, type, filtered, width, filter);
         }
         leftTable.pack();
         return added;
     }
 
-    private int addDatasetTypeGroup(Table leftTable, DatasetMode mode, DataDescriptor dataDescriptor, List<String> currentSetting, DatasetType type, List<DatasetDesc> filtered, float width, String filter) {
+    private int addDatasetTypeGroup(Table leftTable, DatasetMode mode, List<String> currentSetting, DatasetType type, List<DatasetDesc> filtered, float width, String filter) {
         int added = 0;
         if (!filtered.isEmpty()) {
             final Array<CheckBox> groupCheckBoxes = new Array<>();
@@ -973,9 +973,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 double mbPerSecond = speed / 1000d;
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
                 // Since we are downloading on a background thread, post a runnable to touch UI.
-                GaiaSky.postRunnable(() -> {
-                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
-                });
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString));
             } catch (Exception e) {
                 logger.warn(I18n.msg("gui.download.error.progress"));
             }
@@ -987,9 +985,7 @@ public class DatasetManagerWindow extends GenericDialog {
             double mbPerSecond = speed / 1000d;
             final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI.
-            GaiaSky.postRunnable(() -> {
-                EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
-            });
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString));
         };
 
         Consumer<String> finish = (digest) -> {
@@ -1529,10 +1525,9 @@ public class DatasetManagerWindow extends GenericDialog {
             stage.setKeyboardFocus(target);
             // Move scroll, select parent container button (dataset widget), and use its position.
             if (selection.getFirst() != null) {
-                target = target.getParent();
-                while (!(target instanceof Button)) {
+                do {
                     target = target.getParent();
-                }
+                } while (!(target instanceof Button));
             }
             var coordinates = target.localToAscendantCoordinates(leftScroll.getActor(), new Vector2(target.getX(), target.getY()));
             leftScroll.scrollTo(coordinates.x, coordinates.y, target.getWidth(), FastMath.min(200f, target.getHeight() * 10f));

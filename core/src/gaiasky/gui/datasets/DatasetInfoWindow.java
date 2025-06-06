@@ -21,11 +21,7 @@ import gaiasky.util.scene2d.*;
  * A window that displays information on a particular dataset.
  */
 public class DatasetInfoWindow extends GenericDialog {
-    private static final Logger.Log logger = Logger.getLogger(DatasetInfoWindow.class);
-
     private final CatalogInfo ci;
-    private OwnTextField highlightSizeFactor, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
-    private OwnCheckBox allVisible, fadeIn, fadeOut;
 
     public DatasetInfoWindow(CatalogInfo ci,
                              Skin skin,
@@ -61,6 +57,13 @@ public class DatasetInfoWindow extends GenericDialog {
         content.add(new OwnLabel(I18n.msg("gui.dataset.loaded"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18);
         content.add(new OwnLabel(ci.loadDateUTC.atZone(Settings.settings.program.timeZone.getTimeZone()).toString(), skin)).top().left().padRight(pad18).padBottom(pad18).row();
         // Description
+        final OwnScrollPane scroll = getOwnScrollPane();
+        content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18 * 2f);
+        content.add(scroll).top().left().padRight(pad18).padBottom(pad18 * 2f).row();
+
+    }
+
+    private OwnScrollPane getOwnScrollPane() {
         String descriptionString = ci.description != null ? ci.description : ci.name;
         OwnTextArea descriptionTextArea = new OwnTextArea(descriptionString, skin, "no-disabled");
         descriptionTextArea.setWidth(600f);
@@ -72,9 +75,7 @@ public class DatasetInfoWindow extends GenericDialog {
         OwnScrollPane scroll = new OwnScrollPane(descriptionTextArea, skin, "default-nobg");
         scroll.setWidth(640f);
         scroll.setHeight(300f);
-        content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18 * 2f);
-        content.add(scroll).top().left().padRight(pad18).padBottom(pad18 * 2f).row();
-
+        return scroll;
     }
 
     @Override

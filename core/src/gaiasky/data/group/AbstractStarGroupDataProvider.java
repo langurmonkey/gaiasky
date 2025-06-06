@@ -33,7 +33,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
-    public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
     protected static Log logger;
     /**
      * Parallelism value

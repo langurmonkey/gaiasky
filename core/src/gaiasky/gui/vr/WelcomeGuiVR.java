@@ -28,6 +28,9 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
+/**
+ * A welcome GUI for VR mode. It informs the user to manage the datasets in the main screen.
+ */
 public class WelcomeGuiVR extends AbstractGui {
 
     private Table center, bottom;

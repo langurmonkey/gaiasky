@@ -56,6 +56,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Provides a way to navigate and edit the most important settings in Gaia Sky using a gamepad or a VR controller.
+ */
 public class GamepadGui extends AbstractGui {
     private static final Logger.Log logger = Logger.getLogger(GamepadGui.class.getSimpleName());
 

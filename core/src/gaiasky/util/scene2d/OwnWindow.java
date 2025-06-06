@@ -177,10 +177,6 @@ public class OwnWindow extends Table {
                 return isModal;
             }
 
-            public boolean scrolled(InputEvent event, float x, float y, int amount) {
-                return isModal;
-            }
-
             public boolean keyDown(InputEvent event, int keycode) {
                 return isModal;
             }
@@ -303,10 +299,6 @@ public class OwnWindow extends Table {
         return hit;
     }
 
-    public boolean isMovable() {
-        return isMovable;
-    }
-
     public void setMovable(boolean isMovable) {
         this.isMovable = isMovable;
     }
@@ -319,24 +311,12 @@ public class OwnWindow extends Table {
         this.isModal = isModal;
     }
 
-    public void setKeepWithinStage(boolean keepWithinStage) {
-        this.keepWithinStage = keepWithinStage;
-    }
-
     public boolean isResizable() {
         return isResizable;
     }
 
     public void setResizable(boolean isResizable) {
         this.isResizable = isResizable;
-    }
-
-    public void setResizeBorder(int resizeBorder) {
-        this.resizeBorder = resizeBorder;
-    }
-
-    public boolean isDragging() {
-        return dragging;
     }
 
     public float getPrefWidth() {

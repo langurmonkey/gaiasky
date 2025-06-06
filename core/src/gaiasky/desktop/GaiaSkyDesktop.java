@@ -51,8 +51,9 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
     /**
      * Minimum Java version required to run Gaia Sky.
+     * Remember to keep this in sync with attribute <code>minJavaVersion</code> in <code>core/build.gradle</code>.
      **/
-    private static final String REQUIRED_JAVA_VERSION = "15";
+    private static final int MIN_JAVA_VERSION = 21;
     /**
      * Default major OpenGL version.
      **/
@@ -97,10 +98,6 @@ public class GaiaSkyDesktop implements IObserver {
      * Whether the REST server is enabled or not.
      **/
     private static boolean REST_ENABLED;
-    /**
-     * Running with an unsupported Java version.
-     **/
-    private static boolean JAVA_VERSION_PROBLEM_FLAG = false;
     /**
      * CLI arguments.
      **/
@@ -380,23 +377,12 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static void javaVersionCheck() {
         double jv = SysUtils.getJavaVersion();
-        boolean linux = SysUtils.isLinux();
-        boolean gnome = SysUtils.checkGnome();
-        if (jv >= 10 && linux && gnome) {
-            out.println("======================================= WARNING ========================================");
-            out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n"
-                                + "This version may crash. If it does, comment out the property\n"
-                                + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
-            out.println("========================================================================================");
-            out.println();
-        }
 
-        if (jv < 9) {
+        if (jv < MIN_JAVA_VERSION) {
             out.println("========================== ERROR ==============================");
             out.println("You are using Java " + jv + ", which is unsupported by Gaia Sky");
-            out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
+            out.println("             Please, use at least Java " + MIN_JAVA_VERSION);
             out.println("===============================================================");
-            JAVA_VERSION_PROBLEM_FLAG = true;
         }
     }
 

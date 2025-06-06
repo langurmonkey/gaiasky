@@ -14,7 +14,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.api.IGui;
-import gaiasky.gui.main.RenderGui;
+import gaiasky.gui.main.FrameOutputGui;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.camera.ICamera;
@@ -45,7 +45,7 @@ public class ScreenshotsManager implements IObserver {
         this.screenshotRenderer = new BasicFileImageRenderer();
 
         // Frame output GUI
-        this.renderGui = new RenderGui(globalResources.getSkin(), Gdx.graphics, Settings.settings.program.ui.scale);
+        this.renderGui = new FrameOutputGui(globalResources.getSkin(), Gdx.graphics, Settings.settings.program.ui.scale);
         this.renderGui.initialize(null, globalResources.getSpriteBatch());
         this.renderGui.doneLoading(null);
 

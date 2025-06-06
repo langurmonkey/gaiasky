@@ -37,6 +37,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The pane at the bottom that displays log messages and other notifications.
+ */
 public class NotificationsInterface extends TableGuiInterface implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
@@ -54,7 +57,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     boolean permanent = false;
     boolean multiple;
     boolean writeDates = true;
-    // Whether to show the notification sources.
+    /** Whether to show the notification sources. **/
     boolean showSources = false;
 
     /**
@@ -138,10 +141,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 Event.OCTREE_PARTICLE_FADE_CMD, Event.SCREEN_NOTIFICATION_CMD, Event.MODE_POPUP_CMD, Event.CAMERA_CINEMATIC_CMD);
     }
 
-    public static int getNumberMessages() {
-        return historical.size();
-    }
-
     public static List<MessageBean> getHistorical() {
         return historical;
     }
@@ -181,7 +180,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
 
     private String formatMessage(MessageBean msgBean, LoggerLevel level) {
         String lvl = level.equals(LoggerLevel.DEBUG) ? " DEBUG" : "";
-        return (writeDates ? df.format(msgBean.date) + lvl + TAG_SEPARATOR : (lvl.isBlank() ? "" : lvl + TAG_SEPARATOR)) + msgBean.msg;
+        return (writeDates ? df.format(msgBean.date()) + lvl + TAG_SEPARATOR : (lvl.isBlank() ? "" : lvl + TAG_SEPARATOR)) + msgBean.msg();
     }
 
     public void update() {

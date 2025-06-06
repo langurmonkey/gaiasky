@@ -19,6 +19,10 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
+/**
+ * Displays icons informing of certain internal states of the application at the bottom of the screen.
+ * Some of the possible states are no-input mode, frame output, or background loading.
+ */
 public class RunStateInterface extends TableGuiInterface implements IObserver {
 
     private final Cell<?> keyboardImgCell;
@@ -26,14 +30,10 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
     private final Cell<?> pauseBgCell;
     private final Cell<?> frameoutputImgCell;
     private final Image keyboardImg;
-    private final Image frameoutputImg;
+    private final Image frameOutputImg;
     private final OwnTextIconButton cancelCamera;
     private final OwnTextIconButton bgLoading;
     private boolean loadingPaused = false;
-
-    public RunStateInterface(Skin skin) {
-        this(skin, false);
-    }
 
     public RunStateInterface(Skin skin, boolean horizontal) {
         super(skin);
@@ -42,8 +42,8 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
 
         keyboardImg = new Image(skin.getDrawable("no-input"));
         keyboardImg.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.noinput"), skin));
-        frameoutputImg = new Image(skin.getDrawable("frameoutput"));
-        frameoutputImg.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.frameoutputon"), skin));
+        frameOutputImg = new Image(skin.getDrawable("frameoutput"));
+        frameOutputImg.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.frameoutputon"), skin));
 
         bgLoading = new OwnTextIconButton("", skin, "dataload-bg", "toggle");
         OwnTextTooltip pauseBgTT = new OwnTextTooltip(I18n.msg("gui.tooltip.pausebg"), skin);
@@ -116,7 +116,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
                 boolean visible = (Boolean) data[0];
                 if (visible) {
                     if (frameoutputImgCell.getActor() == null)
-                        frameoutputImgCell.setActor(frameoutputImg);
+                        frameoutputImgCell.setActor(frameOutputImg);
                 } else {
                     frameoutputImgCell.setActor(null);
                 }

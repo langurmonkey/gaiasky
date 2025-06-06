@@ -22,6 +22,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
 
+/**
+ * An interface that displays the current simulation time. Listens to {@link Event#TIME_CHANGE_INFO} events
+ * to update the time.
+ */
 public class TimeGuiInterface extends TableGuiInterface implements IObserver {
 
     private final ZoneId timeZone;

@@ -50,6 +50,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+/**
+ * Keeps track of and manages the active user interfaces ({@link IGui} instances).
+ */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
     /**
@@ -492,40 +495,38 @@ public class GuiRegistry implements IObserver {
                                                                                             fileName,
                                                                                             skin,
                                                                                             stage);
-                                        Runnable doLoad = () -> {
-                                            GaiaSky.instance.getExecutorService().execute(() -> {
-                                                DatasetOptions datasetOptions = dld.generateDatasetOptions();
-                                                // Load dataset.
-                                                GaiaSky.instance.scripting()
-                                                        .loadDataset(datasetOptions.catalogName,
-                                                                     result.toAbsolutePath().toString(),
-                                                                     CatalogInfoSource.UI,
-                                                                     datasetOptions,
-                                                                     true);
-                                                // Select first.
-                                                CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
-                                                if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
-                                                    view.setEntity(ci.entity);
-                                                    if (view.isSet()) {
-                                                        var set = view.getSet();
-                                                        if (set.data() != null && !set.data().isEmpty() && EntityUtils.isVisibilityOn(ci.entity)) {
-                                                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getFirstParticleName());
-                                                        }
-                                                    } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
-                                                            view.getGraph().children.get(0))) {
+                                        Runnable doLoad = () -> GaiaSky.instance.getExecutorService().execute(() -> {
+                                            DatasetOptions datasetOptions = dld.generateDatasetOptions();
+                                            // Load dataset.
+                                            GaiaSky.instance.scripting()
+                                                    .loadDataset(datasetOptions.catalogName,
+                                                                 result.toAbsolutePath().toString(),
+                                                                 CatalogInfoSource.UI,
+                                                                 datasetOptions,
+                                                                 true);
+                                            // Select first.
+                                            CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
+                                            if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
+                                                view.setEntity(ci.entity);
+                                                if (view.isSet()) {
+                                                    var set = view.getSet();
+                                                    if (set.data() != null && !set.data().isEmpty() && EntityUtils.isVisibilityOn(ci.entity)) {
                                                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD,
-                                                                             this,
-                                                                             EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
+                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getFirstParticleName());
                                                     }
-                                                    // Open UI datasets.
-                                                    GaiaSky.instance.scripting().expandUIPane("Datasets");
-                                                } else {
-                                                    logger.info("No data loaded (did the load crash?)");
+                                                } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
+                                                        view.getGraph().children.get(0))) {
+                                                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                                                    EventManager.publish(Event.FOCUS_CHANGE_CMD,
+                                                                         this,
+                                                                         EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
                                                 }
-                                            });
-                                        };
+                                                // Open UI datasets.
+                                                GaiaSky.instance.scripting().expandUIPane("Datasets");
+                                            } else {
+                                                logger.info("No data loaded (did the load crash?)");
+                                            }
+                                        });
                                         dld.setAcceptListener(doLoad);
                                         dld.show(stage);
                                     }
@@ -702,12 +703,9 @@ public class GuiRegistry implements IObserver {
                 }
                 case DISPLAY_GUI_CMD -> {
                     boolean displayGui = (Boolean) data[0];
-                    if (!displayGui) {
-                        // Remove processor.
-                        inputMultiplexer.removeProcessor(current.getGuiStage());
-                    } else {
+                    inputMultiplexer.removeProcessor(current.getGuiStage());
+                    if (displayGui) {
                         // Add processor if needed.
-                        inputMultiplexer.removeProcessor(current.getGuiStage());
                         inputMultiplexer.addProcessor(0, current.getGuiStage());
                     }
                 }

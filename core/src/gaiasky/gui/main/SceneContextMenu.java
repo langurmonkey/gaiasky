@@ -40,6 +40,9 @@ import gaiasky.util.scene2d.OwnImage;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Manages the main context menu that pops up on right mouse click.
+ */
 public class SceneContextMenu extends ContextMenu {
 
     // The skin

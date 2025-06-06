@@ -74,7 +74,7 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                 numSamples = FastMath.max(200, FastMath.min(2000, numSamples));
                 data = getNextData(numSamples);
                 String bodyDesc = parameter.name;
-                double last = 0, accum = 0;
+                double last = 0, cumulative = 0;
 
                 // Milliseconds of this orbit in one revolution.
                 long orbitalMs = (long) (period * 86400000.0);
@@ -110,10 +110,10 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                         last = FastMath.toDegrees(eclX);
                     }
 
-                    accum += FastMath.toDegrees(eclX) - last;
+                    cumulative += FastMath.toDegrees(eclX) - last;
                     last = FastMath.toDegrees(eclX);
 
-                    if (accum > 359 || t + stepMs > period * Nature.D_TO_MS) {
+                    if (cumulative > 359 || t + stepMs > period * Nature.D_TO_MS) {
                         break;
                     }
                     aux1.mul(Coordinates.eclToEq());
@@ -123,7 +123,7 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
                     t += stepMs;
                 }
                 // Close the circle.
-                var f = data.samples.get(0);
+                var f = data.samples.getFirst();
                 data.addPoint(f.x(), f.y(), f.z(), d);
 
                 if (writeData) {

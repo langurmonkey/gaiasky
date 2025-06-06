@@ -42,6 +42,9 @@ import gaiasky.util.scene2d.Separator;
 
 import java.util.Objects;
 
+/**
+ * Interface that displays when Gaia Sky is loading assets and catalogs.
+ */
 public class LoadingGui extends AbstractGui {
     private static final long tipTime = 3500;
     public NotificationsInterface notificationsInterface;

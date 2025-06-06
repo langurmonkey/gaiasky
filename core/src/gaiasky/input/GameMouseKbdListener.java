@@ -21,6 +21,9 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.math.MathUtilsDouble;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Listener for game mode, where the controls are done with the keyboard (WASD) and mouse.
+ */
 public class GameMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
     private final NaturalCamera camera;
     private float prevX = 0, prevY = 0;
@@ -114,7 +117,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
             mpi.addMapping("Move down", "C");
             mpi.addMapping("Look around", "Mouse");
             mpi.addMapping("Toggle mouse capture", "SHIFT", "CTRL", "L");
-            mpi.addMapping("Go back to focus mode", "1");
+            mpi.addMapping("Go back to regular mode", "1");
 
             EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "gamemode", 10f);
         });

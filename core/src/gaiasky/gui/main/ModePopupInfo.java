@@ -10,6 +10,11 @@ package gaiasky.gui.main;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Pair;
 
+/**
+ * Holds information about the mode change pop-ups that appear when changing to some camera modes.
+ * Typically, those are used to inform the user of the new keyboard mappings that are in effect in the new mode, and
+ * how to go back to the default camera mode.
+ */
 public class ModePopupInfo {
 
     public String title;

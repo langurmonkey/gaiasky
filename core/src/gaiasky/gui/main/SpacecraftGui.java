@@ -56,6 +56,9 @@ import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 
+/**
+ * User interface during spacecraft mode.
+ */
 public class SpacecraftGui extends AbstractGui {
 
     // Number format
