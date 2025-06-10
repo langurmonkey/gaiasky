@@ -281,7 +281,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             Texture lensStarBurst = manager.get(lensStarburstName);
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
-            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.strength, lensFlareSettings.type.ordinal(), true);
+            LensFlare lensFlare = new LensFlare((int) (width * lensFlareSettings.fboScale),
+                                                (int) (height * lensFlareSettings.fboScale),
+                                                lensFlareSettings.strength,
+                                                lensFlareSettings.type.ordinal(),
+                                                true);
             lensFlare.setColor(new float[]{1f, 1f, 1f});
             lensFlare.setLensDirtTexture(lensDirt);
             lensFlare.setLensStarburstTexture(lensStarBurst);

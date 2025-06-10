@@ -610,7 +610,7 @@ postprocess:
     texLensColor: $data/default-data/tex/base/lenscolor.png
     texLensDirt: $data/default-data/tex/base/lensdirt%#QUAL#%.jpg
     texLensStarburst: $data/default-data/tex/base/lensstarburst.jpg
-    fboScale: 0.2
+    fboScale: 0.4
   # Light glow effect
   lightGlow:
     active: false

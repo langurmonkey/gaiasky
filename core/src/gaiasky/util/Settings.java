@@ -4177,7 +4177,7 @@ public class Settings extends SettingsObject {
             public String texLensColor = Constants.DATA_LOCATION_TOKEN + "tex/base/lenscolor.png";
             public String texLensDirt = Constants.DATA_LOCATION_TOKEN + "tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg";
             public String texLensStarburst = Constants.DATA_LOCATION_TOKEN + "tex/base/lensstarburst.jpg";
-            public float fboScale = 0.2f;
+            public float fboScale = 0.4f;
 
             public void setType(String type) {
                 this.type = LensFlareType.valueOf(type.toUpperCase());
