@@ -12,11 +12,8 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.util.ShaderLoader;
 
 public final class LensFlareFilter extends Filter<LensFlareFilter> {
-    // Flare type: 0: simple, 1: complex
-    private int type;
     private final Vector2 viewport;
     private float[] lightPositions;
-    private float[] lightIntensities;
     private int nLights = 0;
     private final Vector3 color;
     private float intensity;
@@ -28,21 +25,19 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
      * @param height      The viewport height.
      * @param intensity   The intensity of the effect.
      * @param type        The type, 0 for simple, 1 for complex.
-     * @param useLensDirt Whether to use the lens dirt effect.
      */
     public LensFlareFilter(int width, int height, float intensity, int type, boolean useLensDirt) {
-        super(ShaderLoader.fromFile("screenspace", "lensflare", getDefines(type, useLensDirt)));
-        this.type = type;
+        super("screenspace", "lensflare", getDefines(type, useLensDirt));
         this.viewport = new Vector2(width, height);
         this.intensity = intensity;
-        this.color = new Vector3(1.5f, 1.2f, 1.2f);
+        this.color = new Vector3(1.0f, 1.0f, 1.0f);
 
         rebind();
     }
 
     private static String getDefines(int type, boolean useLensDirt) {
         StringBuilder sb = new StringBuilder();
-        if(type == 0) {
+        if (type == 0) {
             sb.append("#define simpleLensFlare\n");
         } else {
             sb.append("#define complexLensFlare\n");
@@ -53,10 +48,6 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         return sb.toString();
     }
 
-    public void setType(int type) {
-        this.type = type;
-    }
-
     public void setViewportSize(float width, float height) {
         this.viewport.set(width, height);
         setParam(Param.Viewport, this.viewport);
@@ -65,10 +56,9 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
     public void setLightPositions(int nLights, float[] positions, float[] intensities) {
         this.nLights = nLights;
         this.lightPositions = positions;
-        this.lightIntensities = intensities;
         setParam(Param.NLights, this.nLights);
         setParamv(Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
-        setParamv(Param.LightIntensities, this.lightIntensities, 0, this.nLights);
+        setParamv(Param.LightIntensities, intensities, 0, this.nLights);
     }
 
     public void setIntensity(float intensity) {
@@ -88,9 +78,9 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         setParams(Param.Viewport, viewport);
         setParams(Param.Intensity, intensity);
         setParams(Param.Color, color);
-        setParams(GlowFilter.Param.NLights, nLights);
+        setParams(Param.NLights, nLights);
         if (lightPositions != null)
-            setParamsv(GlowFilter.Param.LightPositions, lightPositions, 0, nLights * 2);
+            setParamsv(Param.LightPositions, lightPositions, 0, nLights * 2);
         endParams();
     }
 

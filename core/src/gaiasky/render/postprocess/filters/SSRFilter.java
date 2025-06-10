@@ -25,7 +25,7 @@ public class SSRFilter extends Filter3<SSRFilter> {
     private Texture texture1, texture2, texture3;
 
     public SSRFilter() {
-        super(ShaderLoader.fromFile("raymarching/screenspace", "ssr"));
+        super("raymarching/screenspace", "ssr");
         this.zFarK = new Vector2();
         this.frustumCorners = new Matrix4();
         this.projection = new Matrix4();

@@ -20,10 +20,10 @@ import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
 public class LensFlare extends PostProcessorEffect {
-    private PingPongBuffer pingPongBuffer;
+    private final PingPongBuffer pingPongBuffer;
     private final LensFlareFilter flare;
     private LensDirtFilter dirt;
-    private CombineFilter combineFilter;
+    private final CombineFilter combineFilter;
     private final boolean useLensDirt;
 
     /**
@@ -33,19 +33,27 @@ public class LensFlare extends PostProcessorEffect {
      * @param height      The viewport height.
      * @param intensity   The intensity of the effect.
      * @param type        The type, 0 for simple, 1 for complex.
-     * @param useLensDirt Use lens dirt effect. Warning: very slow!
      */
     public LensFlare(int width, int height, float intensity, int type, boolean useLensDirt) {
-        flare = new LensFlareFilter(width, height, intensity, type, useLensDirt);
-
-        disposables.add(flare);
-        if (useLensDirt) {
-            pingPongBuffer = PostProcessor.newPingPongBuffer(width, height, PostProcessor.getFramebufferFormat(), false);
-            dirt = new LensDirtFilter(true);
-            combineFilter = new CombineFilter();
-            disposables.addAll(pingPongBuffer, dirt, combineFilter);
-        }
         this.useLensDirt = useLensDirt;
+        this.flare = new LensFlareFilter(width, height, intensity, type, useLensDirt);
+        // AMD APUs have trouble converting from regular buffers to float buffers,
+        // leading to artifacts in the lens flare when not using a float buffer!
+        this.pingPongBuffer = PostProcessor.newPingPongBuffer(width,
+                                                              height,
+                                                              PostProcessor.getFramebufferFormat(),
+                                                              false,
+                                                              false,
+                                                              false,
+                                                              false);
+        this.combineFilter = new CombineFilter();
+
+        disposables.addAll(flare, pingPongBuffer, combineFilter);
+
+        if (useLensDirt) {
+            this.dirt = new LensDirtFilter();
+            disposables.add(dirt);
+        }
     }
 
     public void setViewport(int width, int height) {
@@ -83,43 +91,50 @@ public class LensFlare extends PostProcessorEffect {
     }
 
     @Override
-    public void rebind() {
-        flare.rebind();
+    public void updateShaders() {
+        super.updateShaders();
+        flare.updateProgram();
         if (useLensDirt) {
-            combineFilter.rebind();
-            pingPongBuffer.rebind();
+            dirt.updateProgram();
         }
     }
 
     @Override
+    public void rebind() {
+        flare.rebind();
+        combineFilter.rebind();
+        pingPongBuffer.rebind();
+    }
+
+    @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
-        if (useLensDirt) {
-            boolean blendingWasEnabled = PostProcessor.isStateEnabled(GL20.GL_BLEND);
-            Gdx.gl.glDisable(GL20.GL_BLEND);
+        boolean blendingWasEnabled = PostProcessor.isStateEnabled(GL20.GL_BLEND);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
-            Texture sourceTexture = src.getColorBufferTexture();
+        Texture sourceTexture = src.getColorBufferTexture();
 
-            pingPongBuffer.begin();
-            {
+        pingPongBuffer.begin();
+        {
+            if (useLensDirt) {
                 // Apply flare.
                 flare.setInput(sourceTexture).setOutput(pingPongBuffer.getSourceBuffer()).render();
                 // Apply dirt.
                 dirt.setInput(pingPongBuffer.getSourceBuffer()).setOutput(pingPongBuffer.getResultBuffer()).render();
-
-            }
-            pingPongBuffer.end();
-
-            if (blendingWasEnabled) {
-                Gdx.gl.glEnable(GL20.GL_BLEND);
+            } else {
+                // Apply flare only.
+                flare.setInput(sourceTexture).setOutput(pingPongBuffer.getResultBuffer()).render();
             }
 
-            restoreViewport(dest);
-
-            // Mix original with flare.
-            combineFilter.setOutput(dest).setInput(sourceTexture, pingPongBuffer.getResultTexture()).render();
-        } else {
-            restoreViewport(dest);
-            flare.setInput(src).setOutput(dest).render();
         }
+        pingPongBuffer.end();
+
+        if (blendingWasEnabled) {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+        }
+
+        restoreViewport(dest);
+
+        // Mix original with flare.
+        combineFilter.setInput(sourceTexture, pingPongBuffer.getResultTexture()).setOutput(dest).render();
     }
 }

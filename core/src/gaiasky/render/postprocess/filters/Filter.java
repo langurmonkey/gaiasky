@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.postprocess.util.FullscreenQuad;
+import gaiasky.render.util.ShaderLoader;
 
 public abstract class Filter<T> implements Disposable {
 
@@ -26,6 +27,19 @@ public abstract class Filter<T> implements Disposable {
     protected FrameBuffer outputBuffer = null;
     protected ShaderProgram program;
     private boolean programBegan = false;
+    protected String vertexShaderName, fragmentShaderName, defines;
+
+    protected Filter(String vertex, String fragment, String defines) {
+        this.vertexShaderName = vertex;
+        this.fragmentShaderName = fragment;
+        this.defines = defines;
+        this.program = ShaderLoader.fromFile(vertex, fragment, defines);
+    }
+
+    protected Filter(String vertex, String fragment) {
+        this(vertex, fragment, "");
+    }
+
     protected Filter(ShaderProgram program) {
         this.program = program;
     }
@@ -46,6 +60,19 @@ public abstract class Filter<T> implements Disposable {
     public T setOutput(FrameBuffer output) {
         this.outputBuffer = output;
         return (T) this;
+    }
+
+    /**
+     * Disposes the current shader, reloads it from disk and re-compiles it. Run synchronously.
+     */
+    public void updateProgram() {
+        if (vertexShaderName != null && fragmentShaderName != null) {
+            try {
+                var program = ShaderLoader.fromFile(vertexShaderName, fragmentShaderName, defines);
+                updateProgram(program);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     /**

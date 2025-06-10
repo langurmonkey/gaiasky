@@ -21,13 +21,12 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 zfark;
     private final Vector3 pos;
     private final float[] additional;
-    private final String fragmentShaderName;
     private Matrix4 frustumCorners;
     private final Matrix4 invView;
     private final Matrix4 combined;
     private float timeSecs;
     // VR scaling.
-    private float distanceScale;
+    private final float distanceScale;
     private float size;
     /**
      * Default depth buffer texture. In our case, it contains the logarithmic
@@ -58,8 +57,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
      * @param viewportSize   The viewport size in pixels.
      */
     public RaymarchingFilter(String fragmentShader, Vector2 viewportSize) {
-        super(ShaderLoader.fromFile("raymarching/screenspace", fragmentShader));
-        this.fragmentShaderName = fragmentShader;
+        super("raymarching/screenspace", fragmentShader);
         this.viewport = viewportSize;
         this.zfark = new Vector2();
         this.pos = new Vector3();

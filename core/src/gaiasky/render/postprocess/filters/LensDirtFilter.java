@@ -8,7 +8,6 @@
 package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
-import gaiasky.render.util.ShaderLoader;
 
 public final class LensDirtFilter extends Filter<LensDirtFilter> {
     private Texture lensDirtTexture;
@@ -16,11 +15,7 @@ public final class LensDirtFilter extends Filter<LensDirtFilter> {
     private float starburstOffset;
 
     public LensDirtFilter() {
-        this(false);
-    }
-
-    public LensDirtFilter(boolean addToBase) {
-        super(ShaderLoader.fromFile("screenspace", "lensdirt", addToBase? "#define addToBase" : ""));
+        super("screenspace", "lensdirt");
         rebind();
     }
 

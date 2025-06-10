@@ -1,6 +1,8 @@
 #version 330 core
-// Simple lens flare implementation by Toni Sagrista. This implementation needs the position of the light.
+// Simple lens flare implementation by Toni Sagrista.
+// This implementation needs the positions and intensities of the lights.
 
+// Input texture. Typically, this is the base scene.
 uniform sampler2D u_texture0;
 
 #define MAX_LIGHTS 10
@@ -27,7 +29,7 @@ layout (location = 0) out vec4 fragColor;
 #define STRENGTH 1.0
 #endif // useLensDirt
 
-vec3 flare_simple(vec2 uv, vec2 pos, float intensity) {
+vec3 flare_simple(vec2 uv, vec2 pos) {
     vec2 main = uv - pos;
     vec2 uvd = uv * (length(uv));
 
@@ -36,9 +38,9 @@ vec3 flare_simple(vec2 uv, vec2 pos, float intensity) {
 
     float f1 = max(0.01-pow(length(uv+1.2*pos), 1.9), 0.0)*7.0;
 
-    float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos), 2.0)), 0.0)*00.1;
-    float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos), 2.0)), 0.0)*00.08;
-    float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*pos), 2.0)), 0.0)*00.06;
+    float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos), 2.0)), 0.0)*0.1;
+    float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos), 2.0)), 0.0)*0.08;
+    float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*pos), 2.0)), 0.0)*0.06;
 
     vec2 uvx = mix(uv, uvd, -0.5);
 
@@ -46,7 +48,7 @@ vec3 flare_simple(vec2 uv, vec2 pos, float intensity) {
     float f42 = max(0.01-pow(length(uvx+0.47*pos), 2.4), 0.0)*5.0;
     float f43 = max(0.01-pow(length(uvx+0.54*pos), 2.4), 0.0)*3.0;
 
-    uvx = mix(uv, uvd, -.4);
+    uvx = mix(uv, uvd, -0.4);
 
     float f5 = max(0.01-pow(length(uvx+0.2*pos), 5.5), 0.0)*2.0;
     float f52 = max(0.01-pow(length(uvx+0.4*pos), 5.5), 0.0)*2.0;
@@ -58,23 +60,22 @@ vec3 flare_simple(vec2 uv, vec2 pos, float intensity) {
     float f62 = max(0.01-pow(length(uvx-0.325*pos), 1.6), 0.0)*3.0;
     float f63 = max(0.01-pow(length(uvx-0.35*pos), 1.6), 0.0)*5.0;
 
-    vec3 c = vec3(.0);
+    vec3 c = vec3(0.0);
 
     c.r += f2+f4+f5+f6;
     c.g += f22+f42+f52+f62;
     c.b += f23+f43+f53+f63;
     c = c * 1.5 - vec3(length(uvd) * 0.05);
-
-    return c * intensity;
+    return c;
 }
 
 vec3 cc(vec3 color, float factor, float factor2) {
-    float w = color.x + color.y + color.z;
+    float w = max(color.x + color.y + color.z, 1.0e-6);
     return mix(color, vec3(w) * factor, w * factor2);
 }
 
 vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
-    vec3 color = u_color * flare_simple(uv, light_pos, intensity) * STRENGTH;
+    vec3 color = u_color * flare_simple(uv, light_pos) * intensity * STRENGTH;
     color = cc(color, 0.5, 0.1);
     return vec4(color, 1.0);
 }
@@ -122,7 +123,7 @@ vec3 circle(vec2 p, float size, float decay, vec3 color, vec3 color2, float dist
     float l2 = length(p + mouse*(dist*4.0))+size/3.0;
 
     // Circles big (c), rings (c1).
-    float c = max(00.01-pow(length(p + mouse*dist), size*1.4), 0.0) * 35.0;
+    float c = max(0.01-pow(length(p + mouse*dist), size*1.4), 0.0) * 35.0;
     float c1 = max(0.001-pow(l-0.3, 1.0/40.0)+sin(l*30.0), 0.0) * 9.0;
     float s = max(0.01-pow(regShape(p*5.0 + mouse*dist*5.0 + 0.9, 6), 1.0), 0.0) * 9.0;
 
@@ -178,42 +179,32 @@ void main(void) {
         vec2 uv = v_texCoords - 0.5;
         float ar = u_viewport.x / u_viewport.y;
         uv.x *= ar;
-        #ifdef useLensDirt
         vec4 color = vec4(0.0);
-        #else
-        vec4 color = texture(u_texture0, v_texCoords);
-        #endif // useLensDirt
 
         for (int light = 0; light < u_nLights; light++) {
             vec2 light_pos = u_lightPositions[light] - 0.5;
             float light_intensity = u_lightIntensities[light];
 
             // Compute intensity of light.
-            float t = 0;
+            float t = 0.0;
             float a = 0.01;
             float dt = 3.0 * 3.14159 / N_SAMPLES;
             float lum = 0.0;
             for (int idx = 0; idx < N_SAMPLES; idx++){
-                vec2 curr_coord = clamp(light_pos + vec2(0.5) + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
-                lum += (clamp(luma(texture(u_texture0, curr_coord).rgb), 0.0, 1.0));
+                vec2 curr_coord = light_pos + vec2(0.5) + vec2(fx(t, a) / ar, fy(t, a));
+                lum += luma(texture(u_texture0, curr_coord).rgb);
                 t += dt;
             }
             lum /= N_SAMPLES;
 
-            float weight = clamp(1.6 - 2.0 * length(light_pos), 0.0, 1.0);
-            float intensity = u_intensity * lum * weight * light_intensity;
+            float intensity = u_intensity * lum * light_intensity;
 
             if (intensity > 0.0) {
                 color += lens_flare(uv, intensity, light_pos);
             }
         }
-
-        fragColor = color;
+        fragColor = clamp(color, 0.0, 1.0);
     } else {
-        #ifdef useLensDirt
         fragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        #else
-        fragColor = texture(u_texture0, v_texCoords);
-        #endif // useLensDirt
     }
 }

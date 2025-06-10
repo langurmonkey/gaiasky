@@ -32,6 +32,9 @@ public final class ShaderLoader {
 
     public static ShaderProgram fromFile(String vertexFileName, String fragmentFileName, String defines) throws RuntimeException {
         String log = "\"" + vertexFileName + " / " + fragmentFileName + "\"";
+        if (defines == null) {
+            defines = "";
+        }
         if (!defines.isEmpty()) {
             log += " w/ (" + defines.replace("\n", ", ") + ")";
         }

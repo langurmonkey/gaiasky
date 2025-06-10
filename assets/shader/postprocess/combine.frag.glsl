@@ -34,20 +34,23 @@ const vec3 GRAYSCALE = vec3(0.3, 0.59, 0.11);
 // higher = increase saturation
 
 vec3 adjustSaturation(vec3 color, float saturation) {
-	vec3 grey = vec3(dot(color, GRAYSCALE));
-	return mix(grey, color, saturation);
+	if (saturation == 1.0) {
+		return color;
+	} else {
+		vec3 grey = vec3(dot(color, GRAYSCALE));
+		return mix(grey, color, saturation);
+	}
 }
 
-void main()
-{
-	// lookup inputs
+void main() {
+	// Lookup inputs, apply intensity
 	vec3 src1 = texture(u_texture0, v_texCoords).rgb * u_src1Intensity;
 	vec3 src2 = texture(u_texture1, v_texCoords).rgb * u_src2Intensity;
 
-	// adjust color saturation and intensity
+	// Adjust color saturation
 	src1.rgb = adjustSaturation(src1.rgb, u_src1Saturation);
 	src2.rgb = adjustSaturation(src2.rgb, u_src2Saturation);
 
 	// combine
-	fragColor = vec4(src1 + src2 , 1.0);
+	fragColor = vec4(clamp(src1 + src2, 0.0, 1.0) , 1.0);
 }

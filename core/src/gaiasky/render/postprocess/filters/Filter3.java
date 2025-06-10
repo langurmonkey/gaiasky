@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.postprocess.util.FullscreenQuad3;
+import gaiasky.render.util.ShaderLoader;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
@@ -31,6 +32,19 @@ public abstract class Filter3<T> implements Disposable {
     protected FrameBuffer outputBuffer = null;
     protected ShaderProgram program;
     private boolean programBegan = false;
+    protected String vertexShaderName, fragmentShaderName, defines;
+
+    protected Filter3(String vertex, String fragment, String defines) {
+        this.vertexShaderName = vertex;
+        this.fragmentShaderName = fragment;
+        this.defines = defines;
+        this.program = ShaderLoader.fromFile(vertex, fragment, defines);
+    }
+
+    protected Filter3(String vertex, String fragment) {
+        this(vertex, fragment, "");
+    }
+
     protected Filter3(ShaderProgram program) {
         this.program = program;
     }
@@ -57,7 +71,13 @@ public abstract class Filter3<T> implements Disposable {
      * Disposes the current shader, reloads it from disk and re-compiles it. Run synchronously.
      */
     public void updateProgram() {
-        // Empty, re-implement in subclass if needed.
+        if (vertexShaderName != null && fragmentShaderName != null) {
+            try {
+                var program = ShaderLoader.fromFile(vertexShaderName, fragmentShaderName, defines);
+                updateProgram(program);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     /**
@@ -129,10 +149,10 @@ public abstract class Filter3<T> implements Disposable {
         program.bind();
 
         switch (param.arrayElementSize()) {
-        case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
-        case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
-        case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
-        case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
+            case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
+            case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
+            case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
+            case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
         }
 
         return (T) this;
@@ -211,10 +231,10 @@ public abstract class Filter3<T> implements Disposable {
         }
 
         switch (param.arrayElementSize()) {
-        case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
-        case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
-        case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
-        case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
+            case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
+            case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
+            case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
+            case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
         }
 
         return (T) this;

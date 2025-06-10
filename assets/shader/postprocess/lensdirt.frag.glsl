@@ -29,12 +29,8 @@ void main() {
     float starburst = texture(u_texture2, vec2(mod(abs(radial - u_starburstOffset), 1.0), 0.0)).r
                * texture(u_texture2, vec2(mod(abs(-radial + u_starburstOffset), 1.0), 0.0)).r;
 
-    starburst = clamp(starburst + (1.0 - smoothstep(0.0, 0.4, d)), 0.0, 1.0);
+    starburst = clamp(starburst + (1.0 - smoothstep(0.0, 0.3, d)), 0.0, 1.0);
 
-    #ifdef addToBase
-        fragColor = base + base * (dirt + starburst);
-    #else
-        fragColor = base * (dirt + starburst);
-    #endif
-
+    fragColor = base * (dirt * 3.0 + starburst);
+    fragColor = clamp(fragColor, 0.0, 1.0);
 }
