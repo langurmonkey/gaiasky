@@ -10,6 +10,7 @@ package gaiasky.render.postprocess.effects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
@@ -34,16 +35,23 @@ public final class CrtMonitor extends PostProcessorEffect {
     public CrtMonitor(int fboWidth, int fboHeight, boolean barrelDistortion, boolean performBlur, CrtScreenFilter.RgbMode mode, int effectsSupport) {
 
         if (performBlur) {
-            pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
-            blurFilter = new BlurFilter(fboWidth, fboHeight);
-            blurFilter.setPasses(1);
-            blurFilter.setAmount(1f);
+            // Use RGB888 to force internal format GL_RGB16F, omitting the alpha channel.
+            this.pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth,
+                                                                  fboHeight,
+                                                                  Pixmap.Format.RGB888,
+                                                                  false,
+                                                                  false,
+                                                                  false,
+                                                                  false);
+            this.blurFilter = new BlurFilter(fboWidth, fboHeight);
+            this.blurFilter.setPasses(1);
+            this.blurFilter.setAmount(1f);
             // blur.setType( BlurType.Gaussian3x3b ); // high defocus
-            blurFilter.setType(BlurFilter.BlurType.Gaussian3x3); // modern machines defocus
-            disposables.addAll(pingPongBuffer, blurFilter);
+            this.blurFilter.setType(BlurFilter.BlurType.Gaussian3x3); // modern machines defocus
+            this.disposables.addAll(pingPongBuffer, blurFilter);
         } else {
-            buffer = new FrameBuffer(PostProcessor.getFramebufferFormat(), fboWidth, fboHeight, false);
-            disposables.addAll(buffer);
+            this.buffer = new FrameBuffer(PostProcessor.getFramebufferFormat(), fboWidth, fboHeight, false);
+            this.disposables.addAll(buffer);
         }
 
         combineFilter = new CombineFilter();

@@ -100,7 +100,13 @@ public final class PingPongBuffer implements Disposable {
 
     private static void addColorRenderTarget(FrameBufferBuilder builder, Format pixmapFormat, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
-            addFloatRenderTarget(builder, Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGBA16F);
+            if (pixmapFormat == Format.RGBA8888 || pixmapFormat == Format.RGBA4444) {
+                // Use alpha.
+                addFloatRenderTarget(builder, Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGBA16F);
+            } else {
+                // Skip alpha.
+                addFloatRenderTarget(builder, Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8 : GL30.GL_RGB16F);
+            }
         } else {
             addColorRenderTarget(builder, pixmapFormat);
         }

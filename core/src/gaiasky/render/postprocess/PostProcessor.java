@@ -117,7 +117,12 @@ public final class PostProcessor implements Disposable {
      * <p>
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
-    public static PingPongBuffer newPingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
+    public static PingPongBuffer newPingPongBuffer(int width, int height,
+                                                   Format pixmapFormat,
+                                                   boolean hasDepth,
+                                                   boolean hasNormal,
+                                                   boolean hasReflectionMask,
+                                                   boolean preventFloatBuffer) {
         PingPongBuffer buffer = new PingPongBuffer(width, height, pixmapFormat, hasDepth, hasNormal, hasReflectionMask, preventFloatBuffer);
         buffers.add(buffer);
         return buffer;

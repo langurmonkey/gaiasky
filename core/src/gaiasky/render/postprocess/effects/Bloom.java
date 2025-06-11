@@ -9,6 +9,7 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessor;
@@ -28,7 +29,14 @@ public final class Bloom extends PostProcessorEffect {
     private int sFactor, dFactor;
 
     public Bloom(int fboWidth, int fboHeight) {
-        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false, false, false, false);
+        // Use RGB888 to force internal format GL_RGB16F, omitting the alpha channel.
+        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth,
+                                                         fboHeight,
+                                                         Pixmap.Format.RGB888,
+                                                         false,
+                                                         false,
+                                                         false,
+                                                         false);
 
         blurFilter = new BlurFilter(fboWidth, fboHeight);
         thresholdFilter = new ThresholdFilter();

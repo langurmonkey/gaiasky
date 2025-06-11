@@ -9,6 +9,7 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessor;
@@ -31,12 +32,19 @@ public final class LightScattering extends PostProcessorEffect {
     private int sFactor, dFactor;
 
     public LightScattering(int fboWidth, int fboHeight) {
-        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
+        // Use RGB888 to force internal format GL_RGB16F, omitting the alpha channel.
+        this.pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth,
+                                                              fboHeight,
+                                                              Pixmap.Format.RGB888,
+                                                              false,
+                                                              false,
+                                                              false,
+                                                              false);
 
-        scatteringFilter = new LightScatteringFilter(fboWidth, fboHeight);
-        blurFilter = new BlurFilter(fboWidth, fboHeight);
-        biasFilter = new BiasFilter();
-        combineFilter = new CombineFilter();
+        this.scatteringFilter = new LightScatteringFilter(fboWidth, fboHeight);
+        this.blurFilter = new BlurFilter(fboWidth, fboHeight);
+        this.biasFilter = new BiasFilter();
+        this.combineFilter = new CombineFilter();
 
         disposables.addAll(pingPongBuffer, scatteringFilter, blurFilter, biasFilter, combineFilter);
 

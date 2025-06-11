@@ -9,6 +9,7 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessor;
@@ -29,13 +30,20 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     private int sFactor, dFactor;
 
     public PseudoLensFlare(int fboWidth, int fboHeight) {
-        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
+        // Use RGB888 to force internal format GL_RGB16F, omitting the alpha channel.
+        this.pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth,
+                                                              fboHeight,
+                                                              Pixmap.Format.RGB888,
+                                                              false,
+                                                              false,
+                                                              false,
+                                                              false);
 
-        flare = new PseudoLensFlareFilter(fboWidth, fboHeight);
-        dirt = new LensDirtFilter();
-        blurFilter = new BlurFilter(fboWidth, fboHeight);
-        biasFilter = new BiasFilter();
-        combineFilter = new CombineFilter();
+        this.flare = new PseudoLensFlareFilter(fboWidth, fboHeight);
+        this.dirt = new LensDirtFilter();
+        this.blurFilter = new BlurFilter(fboWidth, fboHeight);
+        this.biasFilter = new BiasFilter();
+        this.combineFilter = new CombineFilter();
 
         disposables.addAll(pingPongBuffer, flare, dirt, blurFilter, biasFilter, combineFilter);
 

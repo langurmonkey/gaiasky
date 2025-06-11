@@ -9,6 +9,7 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessor;
@@ -39,9 +40,10 @@ public class LensFlare extends PostProcessorEffect {
         this.flare = new LensFlareFilter(width, height, intensity, type, useLensDirt);
         // AMD APUs have trouble converting from regular buffers to float buffers,
         // leading to artifacts in the lens flare when not using a float buffer!
+        // Use RGB888 to force internal format GL_RGB16F, omitting the alpha channel.
         this.pingPongBuffer = PostProcessor.newPingPongBuffer(width,
                                                               height,
-                                                              PostProcessor.getFramebufferFormat(),
+                                                              Pixmap.Format.RGB888,
                                                               false,
                                                               false,
                                                               false,
