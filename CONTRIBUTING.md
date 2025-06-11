@@ -96,7 +96,19 @@ cp gsbundle.properties assets/i18n/gsbundle_vi_VN.properties
 cp objects.properties assets/i18n/objects_vi_VN.properties
 ```
 
-Now you are ready to start translating! Once you are done, create a merge request and we'll merge your file into the main repository after making sure everything is alright.
+These files contain a list of `key=value` pairs. Blank lines, and comment lines (starting with the character `#`) are ignored. You just need to translate the `value` from English to your language. Do not modify the `key`! For instance, the following text in the English file:
+
+```gsbundle.properties
+gui.yes=Yes
+```
+
+Would be translated to Vietnamese like this:
+
+```gsbundle_vi_VN.properties
+gui.yes=Đúng
+```
+
+Now you are ready to start translating! Once you are done, [create a pull request](https://codeberg.org/gaiasky/gaiasky/compare/master...master) and we'll merge your file into the main repository after making sure everything is alright. If you are not familiar with git repositories and pull requests, just send us the translation files [via email](https://gaiasky.space/contact).
 
 #### Tip strings
 
