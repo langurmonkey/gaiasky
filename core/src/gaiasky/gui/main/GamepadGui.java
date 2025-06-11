@@ -87,7 +87,7 @@ public class GamepadGui extends AbstractGui {
 
     private TopInfoInterface topLine;
     private CameraInfoInterface focusInterface;
-    private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome;
+    private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome, debugInfo;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop;
     private OwnTextButton timeUp;
@@ -162,8 +162,20 @@ public class GamepadGui extends AbstractGui {
     }
 
     private void registerEvents() {
-        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
-        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.SHOW_CONTROLLER_GUI_ACTION,
+                                        Event.TIME_STATE_CMD,
+                                        Event.SCENE_LOADED,
+                                        Event.CAMERA_MODE_CMD,
+                                        Event.FOCUS_CHANGE_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.STAR_POINT_SIZE_CMD,
+                                        Event.STAR_BRIGHTNESS_CMD,
+                                        Event.STAR_BRIGHTNESS_POW_CMD,
+                                        Event.STAR_GLOW_FACTOR_CMD,
+                                        Event.STAR_BASE_LEVEL_CMD,
+                                        Event.LABEL_SIZE_CMD,
+                                        Event.LINE_WIDTH_CMD);
         EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD, Event.TOGGLE_VISIBILITY_CMD);
         EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.INVERT_X_CMD, Event.INVERT_Y_CMD);
         EventManager.instance.subscribe(this, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
@@ -470,7 +482,14 @@ public class GamepadGui extends AbstractGui {
 
         // Speed
         final Label speedLabel = new Label(I18n.msg("gui.camera.speed"), skin, "header-raw");
-        camSpeedSlider = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin, "header-raw");
+        camSpeedSlider = new OwnSliderPlus("",
+                                           Constants.MIN_SLIDER,
+                                           Constants.MAX_SLIDER,
+                                           Constants.SLIDER_STEP,
+                                           Constants.MIN_CAM_SPEED,
+                                           Constants.MAX_CAM_SPEED,
+                                           skin,
+                                           "header-raw");
         cameraModel[0][3] = camSpeedSlider;
         camSpeedSlider.setName("camera speed");
         camSpeedSlider.setWidth(ww);
@@ -487,7 +506,14 @@ public class GamepadGui extends AbstractGui {
 
         // Rot
         final Label rotationLabel = new Label(I18n.msg("gui.rotation.speed"), skin, "header-raw");
-        camRotSlider = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin, "header-raw");
+        camRotSlider = new OwnSliderPlus("",
+                                         Constants.MIN_SLIDER,
+                                         Constants.MAX_SLIDER,
+                                         Constants.SLIDER_STEP,
+                                         Constants.MIN_ROT_SPEED,
+                                         Constants.MAX_ROT_SPEED,
+                                         skin,
+                                         "header-raw");
         cameraModel[0][4] = camRotSlider;
         camRotSlider.setName("rotate speed");
         camRotSlider.setWidth(ww);
@@ -504,7 +530,14 @@ public class GamepadGui extends AbstractGui {
 
         // Turn
         final Label turnLabel = new Label(I18n.msg("gui.turn.speed"), skin, "header-raw");
-        camTurnSlider = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin, "header-raw");
+        camTurnSlider = new OwnSliderPlus("",
+                                          Constants.MIN_SLIDER,
+                                          Constants.MAX_SLIDER,
+                                          Constants.SLIDER_STEP,
+                                          Constants.MIN_TURN_SPEED,
+                                          Constants.MAX_TURN_SPEED,
+                                          skin,
+                                          "header-raw");
         cameraModel[0][5] = camTurnSlider;
         camTurnSlider.setName("turn speed");
         camTurnSlider.setWidth(ww);
@@ -775,7 +808,7 @@ public class GamepadGui extends AbstractGui {
                     }
                     return false;
                 });
-                addButtonTooltip(button, ct);
+                addButtonTooltip(button, ct, name);
 
                 // In VR, protect 'Others' component type by disabling it. Otherwise, VR controllers, which are of type 'Others',
                 // may disappear.
@@ -906,7 +939,14 @@ public class GamepadGui extends AbstractGui {
         Table graphicsT = new Table(skin);
 
         // Star brightness
-        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin, "header-raw");
+        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"),
+                                           Constants.MIN_SLIDER,
+                                           Constants.MAX_SLIDER,
+                                           Constants.SLIDER_STEP_TINY,
+                                           Constants.MIN_STAR_BRIGHTNESS,
+                                           Constants.MAX_STAR_BRIGHTNESS,
+                                           skin,
+                                           "header-raw");
         starBrightness.setWidth(ww);
         starBrightness.setHeight(sh);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
@@ -919,7 +959,13 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Magnitude multiplier
-        magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"),
+                                                Constants.MIN_STAR_BRIGHTNESS_POW,
+                                                Constants.MAX_STAR_BRIGHTNESS_POW,
+                                                Constants.SLIDER_STEP_TINY,
+                                                false,
+                                                skin,
+                                                "header-raw");
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
@@ -933,7 +979,13 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Star glow factor
-        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR, Constants.SLIDER_STEP_TINY * 0.1f, false, skin, "header-raw");
+        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"),
+                                           Constants.MIN_STAR_GLOW_FACTOR,
+                                           Constants.MAX_STAR_GLOW_FACTOR,
+                                           Constants.SLIDER_STEP_TINY * 0.1f,
+                                           false,
+                                           skin,
+                                           "header-raw");
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
         starGlowFactor.setWidth(ww);
         starGlowFactor.setHeight(sh);
@@ -947,7 +999,13 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Point size
-        pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"),
+                                      Constants.MIN_STAR_POINT_SIZE,
+                                      Constants.MAX_STAR_POINT_SIZE,
+                                      Constants.SLIDER_STEP_TINY,
+                                      false,
+                                      skin,
+                                      "header-raw");
         pointSize.setWidth(ww);
         pointSize.setHeight(sh);
         pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
@@ -961,7 +1019,13 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Base star level
-        starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"),
+                                          Constants.MIN_STAR_MIN_OPACITY,
+                                          Constants.MAX_STAR_MIN_OPACITY,
+                                          Constants.SLIDER_STEP_TINY,
+                                          false,
+                                          skin,
+                                          "header-raw");
         starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
         starBaseLevel.setWidth(ww);
         starBaseLevel.setHeight(sh);
@@ -975,7 +1039,13 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Bloom
-        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"),
+                                        Constants.MIN_BLOOM,
+                                        Constants.MAX_BLOOM,
+                                        Constants.SLIDER_STEP_TINY,
+                                        false,
+                                        skin,
+                                        "header-raw");
         bloomSlider.setWidth(ww);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity);
@@ -988,7 +1058,13 @@ public class GamepadGui extends AbstractGui {
         });
 
         // Unsharp mask
-        unsharpMaskSlider = new OwnSliderPlus(I18n.msg("gui.unsharpmask"), Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        unsharpMaskSlider = new OwnSliderPlus(I18n.msg("gui.unsharpmask"),
+                                              Constants.MIN_UNSHARP_MASK_FACTOR,
+                                              Constants.MAX_UNSHARP_MASK_FACTOR,
+                                              Constants.SLIDER_STEP_TINY,
+                                              false,
+                                              skin,
+                                              "header-raw");
         unsharpMaskSlider.setWidth(ww);
         unsharpMaskSlider.setHeight(sh);
         unsharpMaskSlider.setValue(Settings.settings.postprocess.unsharpMask.factor);
@@ -1002,7 +1078,13 @@ public class GamepadGui extends AbstractGui {
 
         if (!vr) {
             // Lens flare
-            lensFlare = new OwnSliderPlus(I18n.msg("gui.lensflare"), Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+            lensFlare = new OwnSliderPlus(I18n.msg("gui.lensflare"),
+                                          Constants.MIN_LENS_FLARE_STRENGTH,
+                                          Constants.MAX_LENS_FLARE_STRENGTH,
+                                          Constants.SLIDER_STEP_TINY,
+                                          false,
+                                          skin,
+                                          "header-raw");
             lensFlare.setWidth(ww);
             lensFlare.setHeight(sh);
             lensFlare.setValue(Settings.settings.postprocess.lensFlare.strength);
@@ -1026,7 +1108,13 @@ public class GamepadGui extends AbstractGui {
             });
 
             // Motion blur
-            motionBlur = new OwnSliderPlus(I18n.msg("gui.motionblur"), Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+            motionBlur = new OwnSliderPlus(I18n.msg("gui.motionblur"),
+                                           Constants.MOTIONBLUR_MIN,
+                                           Constants.MOTIONBLUR_MAX,
+                                           Constants.SLIDER_STEP_TINY,
+                                           false,
+                                           skin,
+                                           "header-raw");
             motionBlur.setWidth(ww);
             motionBlur.setHeight(sh);
             motionBlur.setMappedValue(Settings.settings.postprocess.motionBlur.strength);
@@ -1105,13 +1193,29 @@ public class GamepadGui extends AbstractGui {
         updatePads(graphicsT);
 
         // SYSTEM
-        Actor[][] systemModel = new Actor[1][1];
+        Actor[][] systemModel = new Actor[1][2];
         model.add(systemModel);
 
         Table sysT = new Table(skin);
 
+        // Debug info panel
+        final Label debugLabel = new Label(I18n.msg("gui.system.debuginfo"), skin, "header-raw");
+        debugInfo = new OwnCheckBox("", skin, 0f);
+        systemModel[0][0] = debugInfo;
+        debugInfo.setChecked(Settings.settings.program.debugInfo);
+        debugInfo.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_DEBUG_CMD, debugInfo, debugInfo.isChecked());
+                return true;
+            }
+            return false;
+        });
+        sysT.add(debugLabel).right().padBottom(pad40).padRight(pad20);
+        sysT.add(debugInfo).left().padBottom(pad40).row();
+
+        // Quit button
         OwnTextButton quit = new OwnTextIconButton(I18n.msg("gui.quit.title"), Align.center, skin, "quit");
-        systemModel[0][0] = quit;
+        systemModel[0][1] = quit;
         quit.setWidth(ww);
         quit.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -1120,7 +1224,7 @@ public class GamepadGui extends AbstractGui {
             }
             return false;
         });
-        sysT.add(quit);
+        sysT.add(quit).colspan(2);
 
         tabContents.add(container(sysT, tw1, th));
         updatePads(sysT);
@@ -1292,7 +1396,13 @@ public class GamepadGui extends AbstractGui {
         fillBookmarksColumn(columns, columnIndex, bookmarks, model, w, h, true);
     }
 
-    private void fillBookmarksColumn(Cell<Container>[] columns, int columnIndex, List<BookmarkNode> bookmarks, Actor[][] model, float w, float h, boolean select) {
+    private void fillBookmarksColumn(Cell<Container>[] columns,
+                                     int columnIndex,
+                                     List<BookmarkNode> bookmarks,
+                                     Actor[][] model,
+                                     float w,
+                                     float h,
+                                     boolean select) {
         assert columns != null : "Column list can't be null";
         assert columnIndex < columns.length && columnIndex >= 0 : "Column index out of bounds";
 
@@ -1348,7 +1458,8 @@ public class GamepadGui extends AbstractGui {
                 // Move scroll position.
                 var scroll = GuiUtils.getScrollPaneAncestor(selectedBookmark);
                 if (scroll != null) {
-                    var coordinates = selectedBookmark.localToAscendantCoordinates(scroll.getActor(), new Vector2(selectedBookmark.getX(), selectedBookmark.getY()));
+                    var coordinates = selectedBookmark.localToAscendantCoordinates(scroll.getActor(),
+                                                                                   new Vector2(selectedBookmark.getX(), selectedBookmark.getY()));
                     scroll.scrollTo(coordinates.x, coordinates.y, selectedBookmark.getWidth(), selectedBookmark.getHeight() + 250f);
                 }
 
@@ -1846,9 +1957,9 @@ public class GamepadGui extends AbstractGui {
         }
     }
 
-    private void addButtonTooltip(Button button, ComponentType ct) {
+    private void addButtonTooltip(Button button, ComponentType ct, String name) {
         String[] hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key, true);
-        String text = TextUtils.capitalise(ct.getName());
+        String text = TextUtils.capitalise(name);
         if (ct.equals(ComponentType.Constellations)) {
             text += " - " + I18n.msg("gui.tooltip.ct.constellations.hip");
         }
@@ -1864,12 +1975,15 @@ public class GamepadGui extends AbstractGui {
         // Hide and remove
         if (content.isVisible() && content.hasParent()) {
             searchField.setText("");
-            content.addAction(Actions.sequence(Actions.alpha(1f), Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()), Actions.visible(false), Actions.run(() -> {
-                content.remove();
-                content.clear();
-                stage.setKeyboardFocus(null);
-                removeGamepadListener();
-            })));
+            content.addAction(Actions.sequence(Actions.alpha(1f),
+                                               Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                                               Actions.visible(false),
+                                               Actions.run(() -> {
+                                                   content.remove();
+                                                   content.clear();
+                                                   stage.setKeyboardFocus(null);
+                                                   removeGamepadListener();
+                                               })));
 
             return true;
         }
@@ -1882,10 +1996,13 @@ public class GamepadGui extends AbstractGui {
             rebuildGui();
             programmaticUpdate();
             stage.addActor(content);
-            content.addAction(Actions.sequence(Actions.alpha(0f), Actions.visible(true), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()), Actions.run(() -> {
-                updateFocused();
-                addGamepadListener();
-            })));
+            content.addAction(Actions.sequence(Actions.alpha(0f),
+                                               Actions.visible(true),
+                                               Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                                               Actions.run(() -> {
+                                                   updateFocused();
+                                                   addGamepadListener();
+                                               })));
 
             // Close all open windows.
             EventManager.publish(Event.CLOSE_ALL_GUI_WINDOWS_CMD, this);
@@ -2045,6 +2162,16 @@ public class GamepadGui extends AbstractGui {
         @Override
         public void rightStickHorizontal(float value) {
             super.rightStickHorizontal(gui.getFocusedActor(), value);
+        }
+
+        @Override
+        public void rightTrigger(float value) {
+            super.rightTrigger(gui.getFocusedActor(), value);
+        }
+
+        @Override
+        public void leftTrigger(float value) {
+            super.leftTrigger(gui.getFocusedActor(), value);
         }
     }
 

@@ -115,6 +115,18 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
                     rightStickHorizontal(value);
                     lastAxisEvtTime = now;
                 }
+            } else if (axisCode == mappings.getAxisRT()) {
+                // Right trigger.
+                if (value != 0) {
+                    rightTrigger(value);
+                    lastAxisEvtTime = now;
+                }
+            } else if (axisCode == mappings.getAxisLT()) {
+                // Left trigger.
+                if (value != 0) {
+                    leftTrigger(value);
+                    lastAxisEvtTime = now;
+                }
             }
         }
         lastControllerUsed = controller;
@@ -260,10 +272,9 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
     }
 
     protected void rightStickVertical(Actor focus, float value) {
-        if (focus instanceof SelectBox) {
+        if (focus instanceof SelectBox sb) {
             // Up/down in select box.
-            var selectBox = (SelectBox<?>) stage.getKeyboardFocus();
-            GuiUtils.selectBoxMoveSelection(value < 0, false, selectBox);
+            GuiUtils.selectBoxMoveSelection(value < 0, false, sb);
         } else {
             // Move scroll.
             var scroll = GuiUtils.getScrollPaneIn(getContentContainers().get(0));
@@ -277,6 +288,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
      * By default, the horizontal right stick does:
      * <ul>
      *     <li>Move sliders right and left.</li>
+     *     <li>Move selection in select boxes.</li>
      * </ul>
      *
      * @param value The axis value.
@@ -288,10 +300,48 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
     protected void rightStickHorizontal(Actor focus, float value) {
         if (focus instanceof Slider) {
             GuiUtils.sliderMove(value > 0, 0.05f, (Slider) focus);
-        } else if (focus instanceof SelectBox) {
-            var selectBox = (SelectBox<?>) stage.getKeyboardFocus();
-            GuiUtils.selectBoxMoveSelection(value < 0, false, selectBox);
+        } else if (focus instanceof SelectBox sb) {
+            GuiUtils.selectBoxMoveSelection(value < 0, false, sb);
         }
     }
 
+    /**
+     * The right trigger does:
+     * <ul>
+     *     <li>Move sliders right.</li>
+     *     <li>Move selection in select boxes down.</li>
+     * </ul>
+     * @param value The axis value.
+     */
+    protected void rightTrigger(float value) {
+        rightTrigger(stage.getKeyboardFocus(), value);
+    }
+
+    protected void rightTrigger(Actor focus, float value) {
+        if (focus instanceof Slider) {
+            GuiUtils.sliderMove(true, 0.05f, (Slider) focus);
+        } else if (focus instanceof SelectBox sb) {
+            GuiUtils.selectBoxMoveSelection(false, false, sb);
+        }
+    }
+
+    /**
+     * The left trigger does:
+     * <ul>
+     *     <li>Move sliders left.</li>
+     *     <li>Move selection in select boxes up.</li>
+     * </ul>
+     * @param value The axis value.
+     */
+    protected void leftTrigger(float value) {
+        leftTrigger(stage.getKeyboardFocus(), value);
+    }
+
+    protected void leftTrigger(Actor focus, float value) {
+        if (focus instanceof Slider) {
+            GuiUtils.sliderMove(false, 0.05f, (Slider) focus);
+        } else if (focus instanceof SelectBox sb) {
+            GuiUtils.selectBoxMoveSelection(true, false, sb);
+        }
+    }
 }
