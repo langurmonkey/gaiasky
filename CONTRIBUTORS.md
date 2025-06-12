@@ -8,4 +8,5 @@
 | Guillaume Plum        | https://github.com/ElricleNecro  | French translation                    |
 | Alexandre Prokoudine  | alexandre.prokoudine@gmail.com   | Russian translation                   |
 | Georgi Georgiev       | g.georgiev.shumen@gmail.com      | Bulgarian translation, cleanup        |
-| Svetlin Tassev        | stassev.AT.alum. .mit. .edu      | Some showcase scripts and projection shaders.
+| Svetlin Tassev        | stassev.AT.alum. .mit. .edu      | Some showcase scripts and projection shaders.|
+| Erdem Uygun           | uygun.erdem@gmail.com            | Turkish translation                   |
