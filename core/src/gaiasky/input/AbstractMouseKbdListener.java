@@ -46,7 +46,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     public boolean keyDown(int keyCode) {
         if (isActive()) {
             // Input-enabled setting only for non-GUI listeners.
-            if (this instanceof GuiKbdListener || Settings.settings.runtime.inputEnabled) {
+            if (GuiKbdListener.class.isAssignableFrom(this.getClass()) || Settings.settings.runtime.inputEnabled) {
                 if (iCamera != null) {
                     iCamera.setGamepadInput(false);
                 }
@@ -248,4 +248,8 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
         this.active.set(false);
     }
 
+
+    protected float getFpsScale() {
+        return (1.0f / Gdx.graphics.getDeltaTime()) / 60.0f;
+    }
 }

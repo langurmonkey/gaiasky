@@ -166,7 +166,14 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     public MainMouseKbdListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
-        EventManager.instance.subscribe(this, Event.TOUCH_DOWN, Event.TOUCH_UP, Event.TOUCH_DRAGGED, Event.SCROLLED, Event.KEY_DOWN, Event.KEY_UP, Event.SCENE_LOADED);
+        EventManager.instance.subscribe(this,
+                                        Event.TOUCH_DOWN,
+                                        Event.TOUCH_UP,
+                                        Event.TOUCH_DRAGGED,
+                                        Event.SCROLLED,
+                                        Event.KEY_DOWN,
+                                        Event.KEY_UP,
+                                        Event.SCENE_LOADED);
     }
 
     private KeyframesView getKeyframesPathObject() {
@@ -262,7 +269,9 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 }
                 if (button == Buttons.RIGHT) {
                     // Select keyframes.
-                    if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected())) {
+                    if (!(anyPressed(Keys.ALT_LEFT,
+                                     Keys.SHIFT_LEFT,
+                                     Keys.CONTROL_LEFT) && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected())) {
                         FocusView hit;
                         keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
                         if (keyframeBeingDragged) {
@@ -317,7 +326,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 } else if (button == this.button && button == rightMouseButton) {
                     if (keyframeBeingDragged) {
                         keyframeBeingDragged = false;
-                    } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(
+                    } else if (gesture.dst(screenX,
+                                           screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(
                             Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                         Objects.requireNonNull(getKeyframesPathObject()).unselect();
@@ -357,6 +367,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                                   double deltaY,
                                   int button) {
         if (isActive()) {
+
             boolean accel = Settings.settings.scene.camera.cinematic;
             if (accel) {
                 dragDx = deltaX;
@@ -369,7 +380,6 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     dragDx = 0;
                     dragDy = 0;
                 }
-
                 dragDx = lowPass(dragDx, deltaX * noAccelFactor, noAccelSmoothing);
                 dragDy = lowPass(dragDy, deltaY * noAccelFactor, noAccelSmoothing);
                 // Update last drag
@@ -385,7 +395,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     camera.addRotateMovement(dragDx, dragDy, false, accel);
                 }
             } else if (button == rightMouseButton) {
-                if (keyframeBeingDragged || (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT,
+                if (keyframeBeingDragged || (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT,
+                                                                                                                                     Keys.CONTROL_LEFT,
                                                                                                                                      Keys.ALT_LEFT))) {
                     // Drag keyframe
                     dragKeyframe(screenX, screenY, dragDx, dragDy);
@@ -425,8 +436,10 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 boolean result = super.touchDragged(screenX, screenY, pointer);
                 if (result || this.button < 0)
                     return result;
-                final double deltaX = (screenX - startX) / Gdx.graphics.getWidth();
-                final double deltaY = (startY - screenY) / Gdx.graphics.getHeight();
+
+                var fpsScale = getFpsScale();
+                final double deltaX = fpsScale * (screenX - startX) / Gdx.graphics.getWidth();
+                final double deltaY = fpsScale * (startY - screenY) / Gdx.graphics.getHeight();
                 startX = screenX;
                 startY = screenY;
                 return processDrag(screenX, screenY, deltaX, deltaY, button);
@@ -440,6 +453,9 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     public boolean scrolled(float amountX,
                             float amountY) {
         if (isActive()) {
+            var fpsScale = getFpsScale();
+            amountX *= fpsScale;
+            amountY *= fpsScale;
             super.scrolled(amountX, amountY);
             if (Settings.settings.runtime.inputEnabled) {
                 return zoom(amountY * scrollFactor);
@@ -561,15 +577,15 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                        Object source,
                        final Object... data) {
         switch (event) {
-        case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-        case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-        case TOUCH_DRAGGED -> this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
-        case SCROLLED -> this.scrolled(0f, (float) data[0]);
-        case KEY_DOWN -> this.keyDown((int) data[0]);
-        case KEY_UP -> this.keyUp((int) data[0]);
-        case SCENE_LOADED -> this.scene = (Scene) data[0];
-        default -> {
-        }
+            case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+            case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+            case TOUCH_DRAGGED -> this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
+            case SCROLLED -> this.scrolled(0f, (float) data[0]);
+            case KEY_DOWN -> this.keyDown((int) data[0]);
+            case KEY_UP -> this.keyUp((int) data[0]);
+            case SCENE_LOADED -> this.scene = (Scene) data[0];
+            default -> {
+            }
         }
     }
 
