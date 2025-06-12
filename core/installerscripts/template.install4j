@@ -41,7 +41,7 @@
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" dpiAware="false">
         <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC -Dpython.console.encoding=UTF-8 -Dassets.location=./">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC --sun-misc-unsafe-memory-access=allow -Dpython.console.encoding=UTF-8 -Dassets.location=./">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -54,7 +54,7 @@
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
         <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC --sun-misc-unsafe-memory-access=allow -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -67,7 +67,7 @@
       <executable name="${compiler:sys.shortName}vr" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gsvr_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
         <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC --sun-misc-unsafe-memory-access=allow -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
