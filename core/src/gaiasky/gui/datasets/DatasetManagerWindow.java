@@ -873,7 +873,7 @@ public class DatasetManagerWindow extends GenericDialog {
             infoTable.add(desc).top().left().padBottom(pad34).row();
             infoTable.add(releaseNotesTitle).top().left().padBottom(pad18).row();
             infoTable.add(releaseNotes).top().left().padBottom(pad34).row();
-            infoTable.add(filesTitle).top().left().padBottom(pad34).row();
+            infoTable.add(filesTitle).top().left().padBottom(pad18).row();
             infoTable.add(files).top().left().padBottom(pad34).row();
             infoTable.add(dataLocationNote).top().left();
 
