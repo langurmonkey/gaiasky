@@ -407,6 +407,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         final var s = Settings.settings;
         cfg.setTitle(Settings.APPLICATION_NAME);
+        cfg.disableAudio(true);
         if (!cliArgs.vr) {
             // We also default to full screen in small displays (around 720p, or a bit larger).
             // To that effect, we check the length of the diagonal:
