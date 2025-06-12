@@ -850,6 +850,7 @@ public class DatasetManagerWindow extends GenericDialog {
             releaseNotes.setWidth(1000f);
 
             // Files.
+            var filesTitle = new OwnLabel(I18n.msg("gui.download.files"), skin, "grey-large");
             String filesString;
             if (dataset.files == null || dataset.files.length == 0) {
                 filesString = "-";
@@ -862,16 +863,17 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
                 filesString = filesString.replace(dataLocation, Constants.DATA_LOCATION_TOKEN);
             }
-            var files = new OwnLabel(I18n.msg("gui.download.files", filesString), skin, "grey-large");
+            var files = new OwnLabel(filesString, skin, "mono");
 
             // Data location.
             var dataLocationNoteString = Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location;
-            var dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin);
+            var dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin, "mono-pink");
             dataLocationNote.addListener(new OwnTextTooltip(dataLocationNoteString, skin, 10));
 
             infoTable.add(desc).top().left().padBottom(pad34).row();
             infoTable.add(releaseNotesTitle).top().left().padBottom(pad18).row();
             infoTable.add(releaseNotes).top().left().padBottom(pad34).row();
+            infoTable.add(filesTitle).top().left().padBottom(pad34).row();
             infoTable.add(files).top().left().padBottom(pad34).row();
             infoTable.add(dataLocationNote).top().left();
 
