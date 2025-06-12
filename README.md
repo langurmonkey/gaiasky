@@ -54,7 +54,7 @@ This is the Gaia Sky source repository. We recommend using the [pre-built packag
 
 In order to compile and run Gaia Sky using the `master` branch sources, you need the following installed in your system:
 
-- `JDK`, latest LTS version recommended
+- `JDK`, latest LTS version recommended, but definitely 21 or newer
 - `git`
 
 First, clone the [Gaia Sky repository](https://codeberg.org/gaiasky/gaiasky):
