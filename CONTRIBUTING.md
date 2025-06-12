@@ -138,7 +138,7 @@ The loading screen of Gaia Sky displays funny sentences which are automatically 
 
 #### Translation status
 
-Right now we have translation files for Bulgarian, English (UK and US), German, French, Catalan, Spanish and Slovenian. The level of completion varies from language to language. You can compute it by running:
+Right now we have translation files for Bulgarian, English, German, French, Catalan, Spanish, Turkish, Slovenian, and Russian. The level of completion varies from language to language. You can compute it by running:
 
 ```bash
 gradlew core:translationStatus
